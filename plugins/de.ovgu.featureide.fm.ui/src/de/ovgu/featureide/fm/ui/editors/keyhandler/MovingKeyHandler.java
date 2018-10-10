@@ -29,8 +29,6 @@ import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
@@ -69,16 +67,16 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 			final int dex = parent != null ? parent.getObject().getStructure().getChildIndex(feature.getObject().getStructure()) : 0;
 			if (!feature.getGraphicalModel().getLayout().verticalLayout()) {
 				if ((event.keyCode == SWT.ARROW_DOWN) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
-					navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(0)), event);
+					navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
 					return true;
 				}
 				if (parent != null) {
 					if ((event.keyCode == SWT.ARROW_RIGHT) && (parent != null)) {
-						navigateTo(findNextFeature(feature, dex, 1, direction.right), event);
+						navigateTo(findNextFeature(feature, dex, direction.right), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_LEFT) && (parent != null)) {
-						navigateTo(findNextFeature(feature, dex, 1, direction.left), event);
+						navigateTo(findNextFeature(feature, dex, direction.left), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_UP) && (parent != null)) {
@@ -100,11 +98,11 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_DOWN)) {
-						navigateTo(findNextFeature(feature, dex, 1, direction.right), event);
+						navigateTo(findNextFeature(feature, dex, direction.right), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_UP)) {
-						navigateTo(findNextFeature(feature, dex, 1, direction.left), event);
+						navigateTo(findNextFeature(feature, dex, direction.left), event);
 						return true;
 					}
 				} else {
@@ -114,7 +112,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 			// true if a constraint is selected
 		} else if (part instanceof ConstraintEditPart) {
 			final ConstraintEditPart constraint = (ConstraintEditPart) part;
-			final List<IGraphicalConstraint> graphList = constraint.getModel().getGraphicalModel().getConstraints();
+			final List<IGraphicalConstraint> graphList = constraint.getModel().getGraphicalModel().getVisibleConstraints();
 			final int dex = graphList.indexOf(constraint.getModel());
 			if (event.keyCode == SWT.ARROW_UP) {
 				if (dex > 0) {
@@ -137,74 +135,64 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		return true;
 	}
 
-	/**
-	 * navigates to next feature, which is on the same layer
-	 *
-	 * @param parent
-	 * @param dex
-	 * @param layer
-	 */
-	private FeatureEditPart findNextFeature(IGraphicalFeature feature, int dex, int layer, direction direct) {
+	private FeatureEditPart findNextFeature(IGraphicalFeature feature, int dex, direction direct) {
 		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
-		final List<IFeatureStructure> siblings = parent.getObject().getStructure().getChildren();
+		final List<IGraphicalFeature> graphSiblings = parent.getGraphicalChildren(false);
 		final Map<?, ?> editPartRegistry = getViewer().getEditPartRegistry();
-		final boolean oneMore = checkForOneMore(siblings, dex, direct);
+		final boolean oneMore = checkForOneMore(graphSiblings, dex, direct);
 		final int newDirection = (direct == direction.right) ? 1 : (direct == direction.left) ? -1 : 0;
 		// checks if there is an adjacent feature which has the same parent
-		if (oneMore && (layer == 1)) {
-			final IFeature nextSibling = siblings.get(dex + newDirection).getFeature();
-			final IGraphicalFeature nextGraphicalSibling = parent.getGraphicalModel().getGraphicalFeature(nextSibling);
-			final FeatureEditPart editPart = (FeatureEditPart) editPartRegistry.get(nextGraphicalSibling);
+		if (oneMore) {
+			final IGraphicalFeature nextSibling = graphSiblings.get(dex + newDirection);
+			final FeatureEditPart editPart = (FeatureEditPart) editPartRegistry.get(nextSibling);
 			return editPart;
 			// looks if there is an adjacent feature on the current layer
-		} else if (oneMore && (layer != 1)) {
-			// moves through the sibling-list of the current feature in the given direction
-			for (int i = dex + newDirection; (i < siblings.size()) && (i >= 0); i = i + newDirection) {
-				IFeatureStructure nextSibling = siblings.get(i);
-				// moves through the layer until it reached the original layer
-				for (int l = 1; l < layer; l++) {
-					final List<IFeatureStructure> descendants = nextSibling.getChildren();
-					if ((descendants != null) && !descendants.isEmpty()) {
-						final int neighbor = (direct == direction.right) ? 0 : descendants.size() - 1;
-						nextSibling = descendants.get(neighbor);
-						if (l == (layer - 1)) {
-							final IGraphicalFeature ret = feature.getGraphicalModel().getGraphicalFeature(nextSibling.getFeature());
-							return (FeatureEditPart) editPartRegistry.get(ret);
-
-						}
-					} else {
-						break;
-					}
-				}
-			}
-			if (parent.getObject().getStructure().isRoot()) {
-				return null;
-			}
-			final IGraphicalFeature grandParent = parent.getSourceConnection().getTarget();
-			final int newDex = grandParent.getObject().getStructure().getChildIndex(parent.getObject().getStructure());
-			return findNextFeature(parent, newDex, layer + 1, direct);
-			// case if current parent has no features in the given direction
 		} else {
-			if (parent.getObject().getStructure().isRoot()) {
-				return null;
-			} else {
-				final IGraphicalFeature grandParent = parent.getSourceConnection().getTarget();
-				final int newDex = grandParent.getObject().getStructure().getChildIndex(parent.getObject().getStructure());
-				return findNextFeature(parent, newDex, layer + 1, direct);
-			}
+			final IGraphicalFeature goalFeature = searchUp(feature, 0, direct);
+			return (FeatureEditPart) editPartRegistry.get(goalFeature);
 		}
 
 	}
 
+	private IGraphicalFeature searchUp(IGraphicalFeature feature, int layer, direction direct) {
+		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
+		final List<IGraphicalFeature> siblings = parent.getGraphicalChildren(false);
+		final int dex = siblings.indexOf(feature);
+		final int listDirection = direct == direction.left ? -1 : 1;
+		for (int i = dex + listDirection; (i < siblings.size()) && (i >= 0); i += listDirection) {
+			final IGraphicalFeature ret = searchDown(siblings.get(i), layer, direct);
+			if (ret != null) {
+				return ret;
+			}
+		}
+		if (parent.getObject().getStructure().isRoot()) {
+			return null;
+		}
+		return searchUp(parent, layer + 1, direct);
+	}
+
+	private IGraphicalFeature searchDown(IGraphicalFeature feature, int layer, direction direct) {
+		if (layer == 0) {
+			return feature;
+		}
+		final List<IGraphicalFeature> children = feature.getGraphicalChildren(false);
+		if ((children != null) && !children.isEmpty()) {
+			final int listDirection = direct == direction.left ? -1 : 1;
+			final int listStart = direct == direction.left ? children.size() - 1 : 0;
+			for (int i = listStart; (i < children.size()) && (i >= 0); i += listDirection) {
+				final IGraphicalFeature ret = searchDown(children.get(i), layer - 1, direct);
+				if (ret != null) {
+					return ret;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * looks if in the given direction is at least one more feature
-	 *
-	 * @param siblings
-	 * @param dex
-	 * @param direct
-	 * @return
 	 */
-	private boolean checkForOneMore(List<IFeatureStructure> siblings, int dex, direction direct) {
+	private boolean checkForOneMore(List<IGraphicalFeature> siblings, int dex, direction direct) {
 		if (direct == direction.right) {
 			return (dex < (siblings.size() - 1));
 		} else if (direct == direction.left) {
