@@ -39,6 +39,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Enis Belli
  * @author Christopher Sontag
  * @author Maximilian Kühl
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 public class CollapsedDecoration extends ConnectionDecoration implements GUIDefaults {
 
@@ -50,12 +52,15 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 	public boolean isLegendEntry = false;
 
+	private Dimension dimension = new Dimension(0, 0);
+
 	public CollapsedDecoration(IGraphicalFeature parent) {
 		super();
 		graphicalFeature = parent;
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
+		graphicalFeature.setCollapsedDecoration(this);
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setOpaque(true);
@@ -128,7 +133,9 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
 			setBounds(bounds);
+
 		}
+		dimension = bounds.getSize();
 	}
 
 	@Override
@@ -161,6 +168,11 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 		graphics.fillRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+	}
+
+	public Dimension getDimension() {
+
+		return dimension;
 	}
 
 }

@@ -26,6 +26,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
 /**
  * Graphical representation of a feature.
@@ -46,6 +47,10 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	void setCollapsed(boolean collapse);
 
 	void addTargetConnection(FeatureConnection connection);
+
+	void setCollapsedDecoration(CollapsedDecoration decoration);
+
+	CollapsedDecoration getCollapsedDecoration();
 
 	@CheckForNull
 	FeatureConnection getSourceConnection();
