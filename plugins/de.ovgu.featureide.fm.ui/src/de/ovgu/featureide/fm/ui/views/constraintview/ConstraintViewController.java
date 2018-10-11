@@ -394,8 +394,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			}
 		}
 
-		FeatureModelUtil.getActiveFMEditor().removePageChangedListener(pageChangeListener);
-
 		getSite().getPage().removePartListener(partListener);
 	}
 
