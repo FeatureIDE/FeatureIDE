@@ -159,9 +159,10 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
-			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell(SWT.MIN | SWT.MAX));
+			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
 			if (!dialog.isRemember()) {
 				dialog.open();
+
 			} else {
 				if (dialog.getDecision()) {
 					try {
