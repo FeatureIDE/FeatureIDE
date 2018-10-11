@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
@@ -45,21 +44,15 @@ import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
  * @author Rahel Arens
  */
 public class FocusOnExplanationInViewAction extends Action {
-
-	IGraphicalFeatureModel graphicalFeatureModel;
-
-	FeatureModelAnalyzer analyzer = null;
-
-	IStructuredSelection selection;
-
-	IFeature iFeature = null;
-
-	IConstraint constraint;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+	private IStructuredSelection selection;
+	private IConstraint constraint;
 
 	public FocusOnExplanationInViewAction(IGraphicalFeatureModel graphicalFeatureModel, Object viewer) {
 		super(FOCUS_ON_EXPLANATION);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
+
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			constraint = (IConstraint) selection.getFirstElement();
@@ -72,7 +65,8 @@ public class FocusOnExplanationInViewAction extends Action {
 		FocusOnExplanationOperation focusOnExplanationOperation = null;
 		// If model is void always show voidModelExplanation
 		if (!FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
-			focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, FeatureModelUtil.getFeatureModel().getAnalyser().getVoidFeatureModelExplanation());
+			focusOnExplanationOperation =
+				new FocusOnExplanationOperation(graphicalFeatureModel, FeatureModelUtil.getFeatureModel().getAnalyser().getVoidFeatureModelExplanation());
 		}
 		if (constraint != null) {
 			// Handler if constraint has an explanation
@@ -110,6 +104,11 @@ public class FocusOnExplanationInViewAction extends Action {
 		}
 	}
 
+	/**
+	 * This method checks if the selection has some explanation.
+	 *
+	 * @return If selection has explanation true else false.
+	 */
 	public boolean hasExplanation(IStructuredSelection sel) {
 		if (!FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
 			return true;

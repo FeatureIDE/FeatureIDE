@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInVie
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewDoubleClickListener implements IDoubleClickListener {
-	ConstraintViewController controller;
+	private final ConstraintViewController controller;
 
 	public ConstraintViewDoubleClickListener(ConstraintViewController controller) {
 		this.controller = controller;
@@ -43,7 +43,6 @@ public class ConstraintViewDoubleClickListener implements IDoubleClickListener {
 
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-
 		if (event.getSource() instanceof TreeViewer) {
 			final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 			if (treeSelection.getFirstElement() instanceof IConstraint) {

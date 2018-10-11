@@ -135,7 +135,6 @@ public class ConstraintViewDialog extends Dialog {
 
 		final Button noButton = new Button(buttons, SWT.PUSH);
 		noButton.setText(StringTable.NO);
-
 		noButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {

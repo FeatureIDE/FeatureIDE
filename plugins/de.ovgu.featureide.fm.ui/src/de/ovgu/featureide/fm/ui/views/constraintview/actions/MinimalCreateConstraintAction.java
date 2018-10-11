@@ -30,12 +30,11 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 /**
- * a modified CreateConstraintAction for the ConstraintView
+ * A modified CreateConstraintAction for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
 public class MinimalCreateConstraintAction extends Action {
-
 	private IFeatureModel featuremodel;
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
@@ -49,6 +48,9 @@ public class MinimalCreateConstraintAction extends Action {
 		new ConstraintDialog(featuremodel, null);
 	}
 
+	/**
+	 * This method updates the feature model
+	 */
 	public void update(IFeatureModel featuremodel) {
 		this.featuremodel = featuremodel;
 	}

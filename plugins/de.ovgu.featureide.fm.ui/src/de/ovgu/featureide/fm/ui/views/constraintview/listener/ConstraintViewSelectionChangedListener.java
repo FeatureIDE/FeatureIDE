@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewSelectionChangedListener implements ISelectionChangedListener {
-	ConstraintViewController controller;
+	private final ConstraintViewController controller;
 
 	public ConstraintViewSelectionChangedListener(ConstraintViewController controller) {
 		this.controller = controller;

@@ -558,9 +558,9 @@ public class StringTable {
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
-	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TEXT = "Turns off the constraint view dialog.";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
 	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP =
-		"If this option is not selected FeatureIDE will asks you after opening a feature diagramm if you want to open the ConstraintView";
+		"If this option is not selected, upon opening a feature diagramm FeatureIDE will ask you if you want to open the ConstraintView. Uncheck this if you want to change the default behaviour.";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ =
 		"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ =

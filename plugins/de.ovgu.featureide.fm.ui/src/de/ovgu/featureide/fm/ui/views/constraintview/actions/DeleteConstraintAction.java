@@ -60,6 +60,7 @@ public class DeleteConstraintAction extends Action {
 	@Override
 	public void run() {
 		AbstractFeatureModelOperation abstractFeatureModelOperation = null;
+		// Decision single or multiply selection of constraints
 		if (selection.toList().size() == 1) {
 			abstractFeatureModelOperation = new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModel);
 		} else if (selection.toList().size() > 1) {
@@ -74,7 +75,9 @@ public class DeleteConstraintAction extends Action {
 	}
 
 	/**
-	 * this method is a selection verifier, returns true if this command can process the selected items.
+	 * this method verifies the selection.
+	 *
+	 * @return returns true if this action can process the selected items else false.
 	 */
 	public boolean isValidSelection(IStructuredSelection selection) {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
- * this action deletes constraints in the view
+ * This action deletes constraints in the view
  *
  * @author "Rosiak Kamil"
  */
@@ -56,7 +56,9 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	}
 
 	/**
-	 * input validation
+	 * this method verifies the selection.
+	 *
+	 * @return returns true if this action can process the selected items else false.
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {

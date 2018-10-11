@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewPartListener implements IPartListener2 {
-	ConstraintViewController controller;
+	private final ConstraintViewController controller;
 
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
 		controller = cvc;

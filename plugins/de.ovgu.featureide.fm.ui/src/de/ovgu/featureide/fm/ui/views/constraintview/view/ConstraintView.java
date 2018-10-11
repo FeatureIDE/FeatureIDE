@@ -50,9 +50,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author "Rahel Arens"
  */
 public class ConstraintView implements GUIDefaults {
+
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+
 	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;

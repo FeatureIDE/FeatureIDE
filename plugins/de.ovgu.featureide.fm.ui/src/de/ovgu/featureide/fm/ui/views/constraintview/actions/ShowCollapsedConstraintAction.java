@@ -35,12 +35,11 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedConstraintsOperation;
 
 /**
- * a modified ShowCollapsedConstraintsAction for the ConstraintView
+ * A modified ShowCollapsedConstraintsAction for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
 public class ShowCollapsedConstraintAction extends Action {
-
 	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
 	private IGraphicalFeatureModel featureModel;
 
@@ -60,6 +59,9 @@ public class ShowCollapsedConstraintAction extends Action {
 		}
 	}
 
+	/**
+	 * This method updates the feature model
+	 */
 	public void update(IGraphicalFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}

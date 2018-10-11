@@ -39,12 +39,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraint
  * @author Rahel Arens
  */
 public class FocusOnContainedFeaturesAction extends Action {
-
 	private IStructuredSelection selection;
-
-	IGraphicalFeatureModel graphicalFeatureModel;
-
-	IConstraint constraint;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	public FocusOnContainedFeaturesAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(FOCUS_ON_CONTAINED_FEATURES);
@@ -66,6 +62,11 @@ public class FocusOnContainedFeaturesAction extends Action {
 		}
 	}
 
+	/**
+	 * this method verifies the selection.
+	 *
+	 * @return returns true if this action can process the selected items else false.
+	 */
 	public boolean isValidSelection(IStructuredSelection selection) {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
 			return true;

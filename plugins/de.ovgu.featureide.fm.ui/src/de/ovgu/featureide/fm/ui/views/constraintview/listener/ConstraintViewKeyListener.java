@@ -73,7 +73,6 @@ public class ConstraintViewKeyListener implements KeyListener {
 			// pressing the escape button will remove the focus or current selection
 			viewer.getViewer().setSelection(null);
 		}
-
 	}
 
 	@Override
