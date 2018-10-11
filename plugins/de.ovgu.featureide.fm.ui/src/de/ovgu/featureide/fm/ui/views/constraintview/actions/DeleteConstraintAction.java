@@ -42,13 +42,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
  * @author "Rahel Arens"
  */
 public class DeleteConstraintAction extends Action {
-
 	private IFeatureModel featureModel;
-
 	private IStructuredSelection selection;
-
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
-
 	private TreeViewer viewer;
 
 	public DeleteConstraintAction(Object viewer, IFeatureModel featureModel) {

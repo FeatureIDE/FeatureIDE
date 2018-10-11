@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
 
 /**
  * this action deletes constraints in the view
- * 
+ *
  * @author "Rosiak Kamil"
  */
 public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
@@ -66,5 +66,4 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 		}
 		return false;
 	}
-
 }
