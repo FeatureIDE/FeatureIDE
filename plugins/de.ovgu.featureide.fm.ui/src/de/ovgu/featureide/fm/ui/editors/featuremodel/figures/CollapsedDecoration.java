@@ -133,7 +133,6 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
 			setBounds(bounds);
-
 		}
 		dimension = bounds.getSize();
 	}
@@ -171,8 +170,6 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 	}
 
 	public Dimension getDimension() {
-
 		return dimension;
 	}
-
 }

@@ -280,7 +280,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setCollapsedDecoration(CollapsedDecoration decoration) {
 		deco = decoration;
-
 	}
 
 	/*
@@ -289,7 +288,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 	 */
 	@Override
 	public CollapsedDecoration getCollapsedDecoration() {
-
 		return deco;
 	}
 

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
 /**
- * TODO description
+ * Calculates the Bounds of the IGraphicalFeatureModel
  *
  * @author Insansa Michel
  * @author Malek Badeer
@@ -55,10 +55,10 @@ public class FeatureModelBounds {
 			if (position.y < min.y) {
 				min.y = position.y;
 			}
-			if ((position.x + position.width) > max.x) {
+			if ((position.right()) > max.x) {
 				max.x = position.right();
 			}
-			if ((position.y + position.height) > max.y) {
+			if ((position.bottom()) > max.y) {
 				max.y = position.bottom();
 			}
 
@@ -73,10 +73,10 @@ public class FeatureModelBounds {
 						if (position.y < min.y) {
 							min.y = position.y;
 						}
-						if ((position.x + position.width) > max.x) {
+						if ((position.right()) > max.x) {
 							max.x = position.right();
 						}
-						if ((position.y + position.height) > max.y) {
+						if ((position.bottom()) > max.y) {
 							max.y = position.bottom();
 						}
 					}
