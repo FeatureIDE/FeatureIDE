@@ -50,20 +50,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author "Rahel Arens"
  */
 public class ConstraintView implements GUIDefaults {
-
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
+	// Style parameters for the view
 	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
 	private final int ALPHA_VALUE = 175;
-
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
-
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
+
+	// UI elements
 	private TreeViewer treeViewer;
 	private Tree tree;
 	private Text searchBox;
@@ -97,7 +97,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * This method creates a TreeItem and adds data to it.
+	 * This method creates a TreeItem and adds the constraint as data to it.
 	 */
 	public TreeItem createTreeItem(IConstraint constraint) {
 		final TreeItem item = new TreeItem(tree, SWT.None);
@@ -108,8 +108,8 @@ public class ConstraintView implements GUIDefaults {
 	/**
 	 * This method decorates the icon of the TreeItem with the evidence color of the explanation.
 	 *
-	 * @param constraint the constraint that would be shown in the view
-	 * @param color the evidence color of the explanation
+	 * @param constraint the constraint that would be shown in the view.
+	 * @param color the evidence color of the explanation.
 	 */
 	public void addDecoratedItem(IConstraint constraint, Color color) {
 		final TreeItem item = addItem(constraint);
@@ -117,12 +117,7 @@ public class ConstraintView implements GUIDefaults {
 		if (color == null) {
 			elementImg = FM_INFO;
 		} else {
-			elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
-			final GC gc = new GC(elementImg);
-			gc.setBackground(color);
-			gc.setAntialias(SWT.ON);
-			gc.setAlpha(ALPHA_VALUE);
-			gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
+			elementImg = getColoredCircleIcon(color);
 		}
 		item.setImage(elementImg);
 	}
@@ -138,18 +133,28 @@ public class ConstraintView implements GUIDefaults {
 					if (color == null) {
 						elementImg = FM_INFO;
 					} else {
-						elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
-						final GC gc = new GC(elementImg);
-						gc.setBackground(color);
-						gc.setAntialias(SWT.ON);
-						gc.setAlpha(ALPHA_VALUE);
-						gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET,
-								elementImg.getBounds().width - BORDER_OFFSET);
+						elementImg = getColoredCircleIcon(color);
 					}
 					item.setImage(elementImg);
 				}
 			}
 		}
+	}
+
+	/**
+	 * This method draws a circle icon filled with the parameters color.
+	 *
+	 * @param color that the icon will be filled with.
+	 * @return
+	 */
+	private Image getColoredCircleIcon(Color color) {
+		final Image elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
+		final GC gc = new GC(elementImg);
+		gc.setBackground(color);
+		gc.setAntialias(SWT.ON);
+		gc.setAlpha(ALPHA_VALUE);
+		gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
+		return elementImg;
 	}
 
 	/**

@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstraintAction;
 
 /**
- * this class contains a menu where settings can be set for the ConstraintView
+ * This class contains a menu where settings can be set for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
@@ -95,10 +95,10 @@ public class ConstraintViewSettingsMenu {
 	/**
 	 * disables all actions (run method is not called when activated)
 	 */
-	public void setStatOfActions(Boolean isEnabdled) {
-		createAction.setEnabled(isEnabdled);
-		refreshAction.setEnabled(isEnabdled);
-		collapseAction.setEnabled(isEnabdled);
+	public void setStatOfActions(Boolean isEnabled) {
+		createAction.setEnabled(isEnabled);
+		refreshAction.setEnabled(isEnabled);
+		collapseAction.setEnabled(isEnabled);
 	}
 
 }

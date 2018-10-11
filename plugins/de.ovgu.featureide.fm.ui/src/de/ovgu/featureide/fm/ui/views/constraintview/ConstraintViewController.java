@@ -32,6 +32,8 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -79,6 +81,34 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	private String searchText = "";
 
+	private final IEventListener eventListener = new IEventListener() {
+		/**
+		 * Reacts on observer of the current feature model
+		 */
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			if (FeatureModelUtil.getActiveFMEditor() != null) {
+				if (!isRefreshWithDelete()) {
+					checkForRefresh();
+					setRefreshWithDelete(true);
+				} else {
+					checkForRefresh();
+				}
+			}
+		}
+	};
+
+	private final IPageChangedListener pageChangeListener = new IPageChangedListener() {
+		@Override
+		public void pageChanged(PageChangedEvent event) {
+			if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
+				refreshView(FeatureModelUtil.getFeatureModel());
+			} else {
+				viewer.addNoFeatureModelItem();
+			}
+		}
+	};
+
 	/**
 	 * Standard SWT initialize called after construction.
 	 */
@@ -88,7 +118,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		viewer = new ConstraintView(parent);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		createListener();
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(FeatureModelUtil.getFeatureModel());
@@ -99,16 +128,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		new ConstraintViewContextMenu(this);
 	}
 
-	public void createListener() {
-		partListener = new ConstraintViewPartListener(this);
-		getSite().getPage().addPartListener(partListener);
-	}
-
 	/**
 	 * reacts when searchBox noticed input and modifies the Constraint table according to the input
 	 */
 	private final ModifyListener searchListener = new ModifyListener() {
-
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
@@ -340,20 +363,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	/**
 	 * add a listener to the Feature model editor to get the page change events
-	 *
-	 * TODO: remove listener when view is closed
 	 */
 	public void addPageChangeListener(FeatureModelEditor fme) {
-		fme.addPageChangedListener(new IPageChangedListener() {
-			@Override
-			public void pageChanged(PageChangedEvent event) {
-				if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
-					refreshView(FeatureModelUtil.getFeatureModel());
-				} else {
-					viewer.addNoFeatureModelItem();
-				}
-			}
-		});
+		fme.addPageChangedListener(pageChangeListener);
 	}
 
 	/**
@@ -363,19 +375,34 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		viewer.getViewer().addSelectionChangedListener(new ConstraintViewSelectionChangedListener(this));
 		viewer.getViewer().addDoubleClickListener(new ConstraintViewDoubleClickListener(this));
 		viewer.getViewer().getTree().addKeyListener(new ConstraintViewKeyListener(this));
+		partListener = new ConstraintViewPartListener(this);
+		getSite().getPage().addPartListener(partListener);
 	}
 
 	@Override
 	public void dispose() {
+		// remove eventListener from current FeatureModel
 		if (currentModel != null) {
 			currentModel.removeListener(eventListener);
 		}
-		getSite().getPage().removePartListener(partListener);
+		// remove all PageListener from open FeatureModelEditors
+		final IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+		for (final IEditorReference ref : editors) {
+			if (ref.getEditor(false) instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) ref.getEditor(false);
+				editor.removePageChangedListener(pageChangeListener);
+			}
+		}
 
+		FeatureModelUtil.getActiveFMEditor().removePageChangedListener(pageChangeListener);
+
+		getSite().getPage().removePartListener(partListener);
 	}
 
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+		viewer.getViewer().getTree().setFocus();
+	}
 
 	/**
 	 * Changes if the Constraints are shown under the feature model
@@ -388,30 +415,12 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		}
 	}
 
-	private final IEventListener eventListener = new IEventListener() {
-		/**
-		 * Reacts on observer of the current feature model
-		 */
-		@Override
-		public void propertyChange(FeatureIDEEvent event) {
-			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				if (!isRefreshWithDelete()) {
-					checkForRefresh();
-					setRefreshWithDelete(true);
-				} else {
-					checkForRefresh();
-				}
-			}
-		}
-	};
+	// ################################# Getter and Setter ###################################################
 
 	public boolean isConstraintsHidden() {
 		return constraintsHidden;
 	}
 
-	/**
-	 * returns the current model
-	 */
 	public IFeatureModel getCurrentModel() {
 		return currentModel;
 	}

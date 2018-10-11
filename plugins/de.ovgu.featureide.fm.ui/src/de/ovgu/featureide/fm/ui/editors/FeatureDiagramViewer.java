@@ -160,7 +160,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
 			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell(SWT.MIN | SWT.MAX));
-			System.out.println(dialog.isRemember());
 			if (!dialog.isRemember()) {
 				dialog.open();
 			} else {
