@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
 
 /**
  * this action deletes constraints in the view
- *
+ * 
  * @author "Rosiak Kamil"
  */
 public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
@@ -42,8 +42,11 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
+
 		if (viewer instanceof TreeViewer) {
+			final IStructuredSelection selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			constraint = (IConstraint) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			setEnabled(isValidSelection(selection));
 		}
 	}
 
@@ -57,7 +60,7 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.getFirstElement() instanceof IConstraint) {
+		if ((selection.getFirstElement() instanceof IConstraint) && (selection.size() == 1)) {
 			constraint = (IConstraint) selection.getFirstElement();
 			return true;
 		}
