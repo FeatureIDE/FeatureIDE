@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	private final int yDistanceLeftRight = 8;
 
 	public CreateFeatureBelowOperation(IGraphicalFeature feature, IFeatureModel featureModel) {
-		super(featureModel, CREATE_LAYER);
+		super(featureModel, CREATE_FEATURE_BELOW);
 		this.feature = feature.getObject();
 		graphicalFeature = feature;
 	}

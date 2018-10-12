@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
@@ -61,7 +61,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private final int leftRightDefaultDistance = 120;
 
 	public CreateFeatureAboveOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
-		super(featureModel.getFeatureModel(), CREATE_COMPOUND);
+		super(featureModel.getFeatureModel(), CREATE_FEATURE_ABOVE);
 		this.selectedFeatures = selectedFeatures;
 		child = selectedFeatures.get(0);
 		int number = 0;
@@ -163,6 +163,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private void shiftChildren(List<IGraphicalFeature> graphicalChildren, int distance, boolean topDown) {
 		for (int i = 0; i < graphicalChildren.size(); i++) {
 			shiftChildren(graphicalChildren.get(i).getGraphicalChildren(true), distance, topDown);
+			// if there are more layouts to come, there has to be more cases added here
 			if (topDown) {
 				graphicalChildren.get(i).setLocation(new Point(graphicalChildren.get(i).getLocation().x, graphicalChildren.get(i).getLocation().y + distance));
 			} else {

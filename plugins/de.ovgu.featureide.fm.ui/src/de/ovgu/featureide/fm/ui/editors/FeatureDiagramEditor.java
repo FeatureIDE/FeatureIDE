@@ -112,10 +112,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescri
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
@@ -133,6 +134,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAc
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
@@ -169,8 +171,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private Label infoLabel;
 
 	private CalculateDependencyAction calculateDependencyAction;
-	private CreateLayerAction createLayerAction;
-	private CreateCompoundAction createCompoundAction;
+	private CreateFeatureBelowAction createFeatureBelowAction;
+	private CreateFeatureAboveAction createFeatureAboveAction;
+	private CreateSiblingAction createSiblingAction;
+	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
 	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
@@ -252,10 +256,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private void createActions() {
 		final IFeatureModel featureModel = getFeatureModel();
 		actions.clear();
-
+		createFeatureBelowAction = addAction(new CreateFeatureBelowAction(viewer, graphicalFeatureModel));
+		createFeatureAboveAction = addAction(new CreateFeatureAboveAction(viewer, graphicalFeatureModel));
+		createSiblingAction = addAction(new CreateSiblingAction(viewer, graphicalFeatureModel));
 		// FM structure modify actions
-		createLayerAction = addAction(new CreateLayerAction(viewer, graphicalFeatureModel));
-		createCompoundAction = addAction(new CreateCompoundAction(viewer, graphicalFeatureModel));
+		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
@@ -602,6 +607,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				} else {
 					// new Feature is root so update all childs from root
 					viewer.refreshChildAll(newCompound);
+				}
+			}
+			viewer.internRefresh(true);
+			setDirty();
+			analyzeFeatureModel();
+			break;
+		case FEATURE_ADD_SIBLING:
+			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
+				final IFeature parent = (IFeature) event.getOldValue();
+				if (parent != null) {
+					final IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
+					graphicalParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+					viewer.refreshChildAll(parent);
 				}
 			}
 			viewer.internRefresh(true);
@@ -993,7 +1011,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final KeyHandler handler = viewer.getKeyHandler();
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
-		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
+		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createFeatureBelowAction);
 		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
 		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
 
@@ -1120,9 +1138,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createNameTypeMenuManager());
 		}
 		if (isFeatureMenu(selection)) {
-			menuManager.add(createCompoundAction);
-			menuManager.add(createLayerAction);
+			menuManager.add(createFeatureAboveAction);
+			menuManager.add(createFeatureBelowAction);
+			menuManager.add(createSiblingAction);
 			menuManager.add(createConstraintWithAction);
+			menuManager.add(selectSubtreeAction);
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
@@ -1256,11 +1276,17 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		if (CreateLayerAction.ID.equals(workbenchActionID)) {
-			return createLayerAction;
+		if (CreateFeatureBelowAction.ID.equals(workbenchActionID)) {
+			return createFeatureBelowAction;
 		}
-		if (CreateCompoundAction.ID.equals(workbenchActionID)) {
-			return createCompoundAction;
+		if (CreateFeatureAboveAction.ID.equals(workbenchActionID)) {
+			return createFeatureAboveAction;
+		}
+		if (CreateSiblingAction.ID.equals(workbenchActionID)) {
+			return createSiblingAction;
+		}
+		if (SelectSubtreeAction.ID.equals(workbenchActionID)) {
+			return selectSubtreeAction;
 		}
 		if (DeleteAction.ID.equals(workbenchActionID)) {
 			return deleteAction;
