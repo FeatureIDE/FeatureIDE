@@ -52,6 +52,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		// calls the super method if no arrow key was pressed
 		if ((event.keyCode != SWT.ARROW_DOWN) && (event.keyCode != SWT.ARROW_LEFT) && (event.keyCode != SWT.ARROW_RIGHT) && (event.keyCode != SWT.ARROW_UP)) {
 			return super.keyPressed(event);
 		}
@@ -65,33 +66,38 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 			final IGraphicalFeature feature = featurepart.getModel();
 			final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
 			final int dex = parent != null ? parent.getObject().getStructure().getChildIndex(feature.getObject().getStructure()) : 0;
+			// checks if a top-down layout is chosen
 			if (!feature.getGraphicalModel().getLayout().verticalLayout()) {
+				// checks if the down arrow key is pressed and if the selected feature has visible children
 				if ((event.keyCode == SWT.ARROW_DOWN) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
 					navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
 					return true;
 				}
+				// checks if the selected feature is the root
 				if (parent != null) {
-					if ((event.keyCode == SWT.ARROW_RIGHT) && (parent != null)) {
+					if ((event.keyCode == SWT.ARROW_RIGHT)) {
 						navigateTo(findNextFeature(feature, dex, direction.right), event);
 						return true;
 					}
-					if ((event.keyCode == SWT.ARROW_LEFT) && (parent != null)) {
+					if ((event.keyCode == SWT.ARROW_LEFT)) {
 						navigateTo(findNextFeature(feature, dex, direction.left), event);
 						return true;
 					}
-					if ((event.keyCode == SWT.ARROW_UP) && (parent != null)) {
+					if ((event.keyCode == SWT.ARROW_UP)) {
 						navigateTo((EditPart) editPartRegistry.get(parent), event);
 						return true;
 					}
 				} else {
 					return true;
 				}
-
+				// in case that the left to right layout is chosen
 			} else {
+				// checks if the right arrow key is pressed and if the selected feature has visible children
 				if ((event.keyCode == SWT.ARROW_RIGHT) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
 					navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
 					return true;
 				}
+				// checks if the selected feature is the root
 				if (parent != null) {
 					if ((event.keyCode == SWT.ARROW_LEFT)) {
 						navigateTo((EditPart) editPartRegistry.get(parent), event);
@@ -128,6 +134,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 				}
 				return true;
 			}
+			// ignore the left and right arrow key
 			if ((event.keyCode == SWT.ARROW_LEFT) || (event.keyCode == SWT.ARROW_RIGHT)) {
 				return true;
 			}
