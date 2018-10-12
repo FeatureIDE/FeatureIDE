@@ -74,7 +74,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		viewer = view;
 
 		alternativeKeyHandler = new KeyHandler();
-		gvKeyHandler = new GraphicalViewerKeyHandler(view);
+		gvKeyHandler = new MovingKeyHandler(view);// GraphicalViewerKeyHandler(view);
 		gvKeyHandler.setParent(alternativeKeyHandler);
 		setParent(gvKeyHandler);
 		lastTime = 0;
