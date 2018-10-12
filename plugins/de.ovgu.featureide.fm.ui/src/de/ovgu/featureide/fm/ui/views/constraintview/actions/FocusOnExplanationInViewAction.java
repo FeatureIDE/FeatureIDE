@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -76,20 +77,13 @@ public class FocusOnExplanationInViewAction extends Action {
 				focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, explanation);
 				// Check if any feature has this constraint as a reason in its explanation
 			} else {
+				// Iterate Features
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-					if (feature.getFeatureModel().getAnalyser().getExplanation(feature) != null) {
-						for (final Object reason : feature.getFeatureModel().getAnalyser().getExplanation(feature).getReasons()) {
-							if (reason instanceof FeatureModelReason) {
-								final FeatureModelReason fmReason = (FeatureModelReason) reason;
-								if (fmReason.getSubject().getElement() instanceof IConstraint) {
-									if (fmReason.getSubject().getElement().equals(constraint)) {
-										final FeatureModelExplanation<?> fme =
-											(FeatureModelExplanation<?>) feature.getFeatureModel().getAnalyser().getExplanation(feature);
-										focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, fme);
-									}
-								}
-							}
-						}
+					// Check if Feature has an Explanation
+					final Explanation<?> featureExplanation = feature.getFeatureModel().getAnalyser().getExplanation(feature);
+					if ((featureExplanation != null) && constraintIsInExplanation(featureExplanation)) {
+						final FeatureModelExplanation<?> fme = (FeatureModelExplanation<?>) feature.getFeatureModel().getAnalyser().getExplanation(feature);
+						focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, fme);
 					}
 				}
 			}
@@ -102,6 +96,23 @@ public class FocusOnExplanationInViewAction extends Action {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
+	}
+
+	/**
+	 * This method checks if the constraint appears in a given Explanation
+	 */
+	private boolean constraintIsInExplanation(Explanation<?> featureExplanation) {
+		// Iterate Reasons
+		for (final Object reason : featureExplanation.getReasons()) {
+			if (reason instanceof FeatureModelReason) {
+				final FeatureModelReason fmReason = (FeatureModelReason) reason;
+				// Check if this Constraint is one of the reasons
+				if (fmReason.getSubject().getElement().equals(constraint)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
