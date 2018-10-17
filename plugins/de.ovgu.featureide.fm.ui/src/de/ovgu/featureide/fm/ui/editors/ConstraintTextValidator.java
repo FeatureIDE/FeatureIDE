@@ -139,10 +139,15 @@ public final class ConstraintTextValidator {
 			nodeCreator.setCnfType(CNFType.Regular);
 			nodeCreator.setIncludeBooleanValues(false);
 			initialResult.satInstance = new SatInstance(nodeCreator.createNodes(), Functional.toList(FeatureUtils.getFeatureNamesList(clone)));
-			initialResult.solver = new BasicSolver(initialResult.satInstance);
 
-			monitor.checkCancel();
-			initialResult.valid = null != LongRunningWrapper.runMethod(new ValidAnalysis(initialResult.solver), monitor);
+			initialResult.valid = true;
+			try {
+				initialResult.solver = new BasicSolver(initialResult.satInstance);
+				monitor.checkCancel();
+				initialResult.valid = null != LongRunningWrapper.runMethod(new ValidAnalysis(initialResult.solver), monitor);
+			} catch (final ContradictionException contraExc) {
+				initialResult.valid = false;
+			}
 
 			if (initialResult.valid) {
 
