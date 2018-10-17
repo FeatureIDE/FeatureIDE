@@ -40,8 +40,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SYNCHRONIZE_FE
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,7 +48,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 
@@ -962,7 +960,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
 				if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
 					// ignore changes in unselected feature folders
-					final List<String> selectedFeatures = readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
+					final Configuration currentConfiguration = new Configuration(getFeatureModel(), true);
+					final FileHandler<Configuration> fileHandler =
+						ConfigurationManager.load(currentConfig.getLocation().toFile().toPath(), currentConfiguration);
+
+					final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
 					for (final IResource res : sourceFolder.members()) {
 						if (res instanceof IFolder) {
 							if (selectedFeatures.contains(res.getName())) {
@@ -1410,34 +1412,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	@Override
 	public void built() {
 		buildRelevantChanges = false;
-	}
-
-	// TODO move to configuration reader
-	public List<String> readFeaturesfromConfigurationFile(File file) {
-		if (!file.exists()) {
-			return new ArrayList<String>();
-		}
-		Scanner scanner = null;
-		try {
-			ArrayList<String> list;
-			scanner = new Scanner(file, "UTF-8");
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-				return list;
-			} else {
-				return new ArrayList<String>();
-			}
-		} catch (final FileNotFoundException e) {
-			LOGGER.logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-		}
-		return new ArrayList<String>();
 	}
 
 	@Override
