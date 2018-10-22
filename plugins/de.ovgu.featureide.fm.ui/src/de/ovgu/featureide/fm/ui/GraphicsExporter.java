@@ -61,7 +61,7 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.elements.TikzFormat;
+import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
@@ -137,15 +137,15 @@ public class GraphicsExporter {
 			}
 
 			// output Head
-			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
+			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzGraphicalFeatureModelFormat.TikZHeadFormat();
 			FileHandler.save(outputDir.resolve("head.tex"), null, formatHead);
 
 			// output body
-			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody(file.getName());
+			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzGraphicalFeatureModelFormat.TikZBodyFormat(file.getName());
 			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
 
 			// output main
-			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat().new TikZMain();
+			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat().new TikZMainFormat();
 			FileHandler.save(outputDir.resolve(file.getName()), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
 
 			succ = true;

@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Simon Wenk
  * @author Yang Liu
  */
-public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
+public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	private static final String lnSep = System.lineSeparator();
 
@@ -45,7 +45,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	 * Creates the styles and packages that are required for the converted Feature Model Diagram. <br> <br> <b>Note:</b> For exporting purposes the file name
 	 * must be <i> head.tex </i> and exported in the same folder as the main file.
 	 */
-	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
+	public static class TikZHeadFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
 		 * Writes the required styles and packages in a String.
@@ -94,14 +94,14 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	 * Creates the body for the LaTeX export. <br> <br> <b>Note:</b> For exporting purposes the file name must be <i> body.tex </i> and exported in the same
 	 * folder as the main file. This file runs only with the head file and the main file.
 	 */
-	public static class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
+	public static class TikZBodyFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 		private final String FileName;
 
 		/**
 		 * @param FileName The file name of the main file
 		 */
-		public TikZBody(String FileName) {
+		public TikZBodyFormat(String FileName) {
 			this.FileName = FileName;
 		}
 
@@ -156,7 +156,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	 *
 	 * @see {TikzHead}
 	 */
-	public class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
+	public class TikZMainFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
 		 * Writes the tree of the Feature Diagram in tex-format.
@@ -166,28 +166,16 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
-			StringBuilder str = new StringBuilder();
+			final StringBuilder str = new StringBuilder();
 
-			str.append("\\begin{forest}" + lnSep + "	featureDiagram" + lnSep + "	");
-			printTree(getRoot(object), object, str);
-			str = postProcessing(str);
-			str.append("	" + lnSep);
-			printLegend(str, object.isLegendHidden());
-			str.append("\\end{forest}");
+			printForest(object, str);
 
 			return str.toString();
 		}
 
 		@Override
-		public boolean supportsRead() {
-			return false;
-
-		}
-
-		@Override
 		public boolean supportsWrite() {
 			return true;
-
 		}
 
 		@Override
@@ -207,7 +195,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzGraphicalFeatureModelFormat.class.getSimpleName();
 
 	/**
 	 * Processes a String to make special symbols LaTeX compatible.
@@ -215,18 +203,8 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	 * @param str a StringBuilder which content should be LaTeX code
 	 * @return a StringBuilder which contend has compatible LaTeX code
 	 */
-	public static StringBuilder postProcessing(StringBuilder str) {
-		final int strLength = str.length();
-		StringBuilder newString = new StringBuilder();
-		newString = newString.append(str);
-		for (int i = 0, j = 0; i < strLength; ++i) {
-			if (str.charAt(i) == '_') {
-				newString.insert(i + j, '\\');
-				++j;
-			}
-		}
-		return newString;
-
+	public static void postProcessing(StringBuilder str) {
+		str.replace(0, str.length(), str.toString().replace("_", "\\_"));
 	}
 
 	private void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
@@ -311,9 +289,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	private static void printHead(StringBuilder str) {
-		str.append("\\documentclass[border=5pt]{standalone}" + lnSep + "%---required packages & variable definitions------------------------------------"
-			+ lnSep + "\\usepackage{forest}" + lnSep + "\\usepackage{xcolor}" + lnSep + "\\usetikzlibrary{angles}" + lnSep
-			+ "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep + "\\newcommand{\\circleSize}{0.25em}" + lnSep + "\\newcommand{\\angleSize}{0.8em}" + lnSep
+		str.append("%---required packages & variable definitions------------------------------------" + lnSep + "\\usepackage{forest}" + lnSep
+			+ "\\usepackage{xcolor}" + lnSep + "\\usetikzlibrary{angles}" + lnSep + "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep
+			+ "\\newcommand{\\circleSize}{0.25em}" + lnSep + "\\newcommand{\\angleSize}{0.8em}" + lnSep
 			+ "%-------------------------------------------------------------------------------" + lnSep
 			+ "%---Define the style of the tree------------------------------------------------" + lnSep + "\\forestset{" + lnSep
 			+ "	/tikz/mandatory/.style={" + lnSep + "		circle,fill=drawColor," + lnSep + "		draw=drawColor," + lnSep + "		inner sep=\\circleSize"
@@ -338,6 +316,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	private static void printBody(StringBuilder str, String FileName) {
+		str.append("\\documentclass[border=5pt]{standalone}" + lnSep);
 		str.append("\\input{head.tex}" + lnSep); // Include head
 		str.append("\\begin{document}" + lnSep + "	");
 		str.append("\\sffamily" + lnSep);
@@ -359,65 +338,76 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return myRoot;
 	}
 
-	private void printLegend(StringBuilder str, boolean legendHidden) {
-		if (!legendHidden) {
-			boolean check = false;
-			final StringBuilder myString = new StringBuilder();
-			if (legend[0]) {
-				check = true;
-				myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
-				legend[0] = false;
+	private void printForest(IGraphicalFeatureModel object, final StringBuilder str) {
+		str.append("\\begin{forest}" + lnSep + "\tfeatureDiagram" + lnSep + "\t");
+		final StringBuilder treeStringBuilder = new StringBuilder();
+		printTree(getRoot(object), object, treeStringBuilder);
+		postProcessing(treeStringBuilder);
+		str.append(treeStringBuilder);
+		str.append("\t" + lnSep);
+		if (!object.isLegendHidden()) {
+			printLegend(str);
+		}
+		str.append("\\end{forest}");
+	}
+
+	private void printLegend(StringBuilder str) {
+		boolean check = false;
+		final StringBuilder myString = new StringBuilder();
+		if (legend[0]) {
+			check = true;
+			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
+			legend[0] = false;
+		}
+		if (legend[1]) {
+			check = true;
+			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
+			legend[1] = false;
+		}
+		if (legend[2]) {
+			check = true;
+			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\" + lnSep);
+			legend[2] = false;
+		}
+		if (legend[3]) {
+			check = true;
+			myString.append("		\\node [optional,label=right:Optional] {}; \\\\" + lnSep);
+			legend[3] = false;
+		}
+		if (legend[4]) {
+			check = true;
+			// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; " + lnSep
+			// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
+			myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
+				+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+				+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
+			legend[4] = false;
+		}
+		if (legend[5]) {
+			check = true;
+			// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
+			// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
+			myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+				+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
+			legend[5] = false;
+		}
+		if (legend[6]) {
+			check = true;
+			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
+			legend[6] = false;
+		}
+		if (check) {
+			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
+				+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
+				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\" + lnSep);
+			str.append(myString);
+			str.append("	};" + lnSep);
+			check = false;
+		} else {
+			for (int i = 0; i < legend.length; ++i) {
+				legend[i] = false;
 			}
-			if (legend[1]) {
-				check = true;
-				myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
-				legend[1] = false;
-			}
-			if (legend[2]) {
-				check = true;
-				myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\" + lnSep);
-				legend[2] = false;
-			}
-			if (legend[3]) {
-				check = true;
-				myString.append("		\\node [optional,label=right:Optional] {}; \\\\" + lnSep);
-				legend[3] = false;
-			}
-			if (legend[4]) {
-				check = true;
-				// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; " + lnSep
-				// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
-				myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
-					+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
-					+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
-				legend[4] = false;
-			}
-			if (legend[5]) {
-				check = true;
-				// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
-				// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
-				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);"
-					+ lnSep + "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
-				legend[5] = false;
-			}
-			if (legend[6]) {
-				check = true;
-				myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
-				legend[6] = false;
-			}
-			if (check) {
-				str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
-					+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
-					+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\" + lnSep);
-				str.append(myString);
-				str.append("	};" + lnSep);
-				check = false;
-			} else {
-				for (int i = 0; i < legend.length; ++i) {
-					legend[i] = false;
-				}
-				check = false;
-			}
+			check = false;
 		}
 	}
 
@@ -430,36 +420,24 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	@Override
 	public String write(IGraphicalFeatureModel object) {
 		final StringBuilder str = new StringBuilder();
-		printHead(str);
-		str.append("\\begin{document}" + lnSep + "	%---The Feature Diagram-----------------------------------------------------" + lnSep + "	\\begin{forest}"
-			+ lnSep + "		featureDiagram" + lnSep);
-
-		StringBuilder myTree = new StringBuilder();
-		str.append("		");
-		printTree(getRoot(object), object, myTree);
-		myTree = postProcessing(myTree);
-		str.append(myTree);
+		str.append("\\documentclass[border=5pt]{standalone}");
 		str.append(lnSep);
-		printLegend(str, object.isLegendHidden());
-		str.append("	\\end{forest}" + lnSep + "	%---------------------------------------------------------------------------" + lnSep + "\\end{document}");
+		printHead(str);
+		str.append("\\begin{document}" + lnSep + "	%---The Feature Diagram-----------------------------------------------------" + lnSep);
+		printForest(object, str);
+		str.append(lnSep);
+		str.append("\t%---------------------------------------------------------------------------" + lnSep + "\\end{document}");
 		return str.toString();
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return false;
-
 	}
 
 	@Override
 	public boolean supportsWrite() {
 		return true;
-
 	}
 
 	@Override
 	public APersistentFormat<IGraphicalFeatureModel> getInstance() {
-		return new TikzFormat();
+		return new TikzGraphicalFeatureModelFormat();
 	}
 
 	/**

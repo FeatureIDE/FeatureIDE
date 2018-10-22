@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.ui.editors.elements.TikzFormat;
+import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
 
 /**
  * Converts the configuration (advanced configuration) in a LaTeX format. This class implements a LaTeX converter for the advanced configuration of a Feature
@@ -113,9 +113,9 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		 */
 		@Override
 		public String write(Configuration config) {
-			StringBuilder str = new StringBuilder();
+			final StringBuilder str = new StringBuilder();
 			printRoot(config, config.getRoot().getFeature(), str, 0);
-			str = TikzFormat.postProcessing(str);
+			TikzGraphicalFeatureModelFormat.postProcessing(str);
 			return str.toString();
 		}
 
@@ -202,9 +202,9 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printHead(StringBuilder str) {
-		str.append("\\documentclass[varwidth,convert,border=5pt]{standalone}" + lnSep + "\\usepackage{amsmath}" + lnSep + "\\usepackage{tikz}" + lnSep
-			+ "\\usepackage{color}" + lnSep + "\\definecolor{boxColor}{RGB}{192 192 192}" + lnSep + "\\definecolor{plusColor}{RGB}{48 191 48}" + lnSep
-			+ "\\definecolor{minusColor}{HTML}{be0105}" + lnSep + "\\newcommand\\tab[1][1em]{\\hspace*{#1}}" + lnSep + lnSep
+		str.append("\\usepackage{amsmath}" + lnSep + "\\usepackage{tikz}" + lnSep + "\\usepackage{color}" + lnSep + "\\definecolor{boxColor}{RGB}{192 192 192}"
+			+ lnSep + "\\definecolor{plusColor}{RGB}{48 191 48}" + lnSep + "\\definecolor{minusColor}{HTML}{be0105}" + lnSep
+			+ "\\newcommand\\tab[1][1em]{\\hspace*{#1}}" + lnSep + lnSep
 			+ "\\newcommand{\\myPlus}{\\ \\fcolorbox{black}{boxColor}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }" + lnSep
 			+ "\\newcommand{\\myPlusblank}{\\ \\fcolorbox{black}{white}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }" + lnSep
 			+ "\\newcommand{\\myMinus}{\\ \\fcolorbox{black}{boxColor}{\\color{minusColor}$\\boldsymbol{\\pmb{-}}$}\\ }" + lnSep
@@ -233,6 +233,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printBody(StringBuilder str, String fileName) {
+		str.append("\\documentclass[varwidth,convert,border=5pt]{standalone}" + lnSep);
 		str.append(
 				"\\input{head.tex}" + lnSep + "\\begin{document}" + lnSep + "	\\sffamily" + lnSep + "	\\input{" + fileName + "}" + lnSep + "\\end{document}");
 	}
@@ -361,14 +362,16 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	 */
 	@Override
 	public String write(Configuration config) {
-		StringBuilder str = new StringBuilder();
+		final StringBuilder str = new StringBuilder();
+		str.append("\\documentclass[varwidth,convert,border=5pt]{standalone}");
+		str.append(lnSep);
 		printHead(str);
 		str.append(lnSep);
 		str.append("\\begin{document}");
 		str.append(lnSep);
 		str.append("\\sffamily");
 		printRoot(config, config.getRoot().getFeature(), str, 0);
-		str = TikzFormat.postProcessing(str);
+		TikzGraphicalFeatureModelFormat.postProcessing(str);
 		str.append(lnSep);
 		str.append("\\end{document}");
 
