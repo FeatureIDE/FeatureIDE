@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUN
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -46,7 +46,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private final IFeature newCompound;
 	private final IFeature child;
 	LinkedList<IFeature> selectedFeatures;
-	HashMap<IFeature, Integer> children = new HashMap<>();
+	TreeMap<Integer, IFeature> children = new TreeMap<>();
 
 	boolean parentOr = false;
 	boolean parentAlternative = false;
@@ -72,7 +72,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			newCompound.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
 			for (final IFeature iFeature : selectedFeatures) {
-				children.put(iFeature, parent.getChildIndex(iFeature.getStructure()));
+				children.put(parent.getChildIndex(iFeature.getStructure()), iFeature);
 			}
 			for (final IFeature iFeature : selectedFeatures) {
 				parent.removeChild(iFeature.getStructure());
@@ -105,8 +105,8 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		if (parent != null) {
 			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
 			featureModel.deleteFeature(newCompound);
-			for (final IFeature iFeature : children.keySet()) {
-				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());
+			for (final Integer position : children.keySet()) {
+				parent.addChildAtPosition(position, children.get(position).getStructure());
 			}
 
 			if (parentOr) {
@@ -118,6 +118,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			}
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());
+			newCompound.getStructure().removeChild(child.getStructure());
 			return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, null);
 		}
 		return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, parent.getFeature(), null);

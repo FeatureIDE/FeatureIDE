@@ -205,9 +205,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				setActivePage(getDiagramEditorIndex());
 			}
 		}
-		final Object o = diagramEditor.getAdapter(adapter);
-		if (o != null) {
-			return o;
+		if (diagramEditor != null) {
+			final Object o = diagramEditor.getAdapter(adapter);
+			if (o != null) {
+				return o;
+			}
 		}
 		return super.getAdapter(adapter);
 	}
@@ -391,33 +393,38 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	protected void createPages() {
-		createActions();
-
-		pages.clear();
-		addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfmManager, true));
-		addPage(featureOrderEditor = new FeatureOrderEditor(fmManager, gfmManager));
-		createExtensionPages();
-		addPage(textEditor = new FeatureModelTextEditorPage(this));
-
-		fmManager.addListener(diagramEditor);
-		getFeatureModel().addListener(diagramEditor);
-
-		extensionPages = pages.subList(2, pages.size() - 1);
-
-		currentPageIndex = 0;
-		// if there are errors in the model file, go to source page
-		if (!checkModel(textEditor.getCurrentContent())) {
-			setActivePage(textEditor.getIndex());
+		if (fmManager == null) {
+			addPage(new FeatureModelEditorErrorPage());
+			setActivePage(0);
 		} else {
-			diagramEditor.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+			createActions();
 
-				@Override
-				public void run() {
-					pageChange(getDiagramEditorIndex());
-					diagramEditor.getViewer().internRefresh(false);
-					diagramEditor.analyzeFeatureModel();
-				}
-			});
+			pages.clear();
+			addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfmManager, true));
+			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager, gfmManager));
+			createExtensionPages();
+			addPage(textEditor = new FeatureModelTextEditorPage(this));
+
+			fmManager.addListener(diagramEditor);
+			getFeatureModel().addListener(diagramEditor);
+
+			extensionPages = pages.subList(2, pages.size() - 1);
+
+			currentPageIndex = 0;
+			// if there are errors in the model file, go to source page
+			if (!checkModel(textEditor.getCurrentContent())) {
+				setActivePage(textEditor.getIndex());
+			} else {
+				diagramEditor.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						pageChange(getDiagramEditorIndex());
+						diagramEditor.getViewer().internRefresh(false);
+						diagramEditor.analyzeFeatureModel();
+					}
+				});
+			}
 		}
 	}
 
@@ -512,12 +519,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	protected void pageChange(int newPageIndex) {
-		if (getPage(currentPageIndex).allowPageChange(newPageIndex)) {
+		final IFeatureModelEditorPage currentPage = getPage(currentPageIndex);
+		if (currentPage.allowPageChange(newPageIndex)) {
 			final IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
 			if (contributor instanceof FeatureModelEditorContributor) {
-				((FeatureModelEditorContributor) contributor).setActivePage(this, newPageIndex);
+				((FeatureModelEditorContributor) contributor).setActivePage(this, currentPage.getID());
 			}
-			getPage(currentPageIndex).pageChangeFrom(newPageIndex);
+			currentPage.pageChangeFrom(newPageIndex);
 			getPage(newPageIndex).pageChangeTo(currentPageIndex);
 			currentPageIndex = newPageIndex;
 			super.pageChange(newPageIndex);
@@ -530,28 +538,32 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	protected void setInput(IEditorInput input) {
 		// Cast is necessary, don't remove
 		markerHandler = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
-		setPartName(getModelFile().getProject().getName() + MODEL);
-		setTitleToolTip(input.getToolTipText());
-
+		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		super.setInput(input);
 
-		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		fmManager = FeatureModelManager.getInstance(path);
-		fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
-		createModelFileMarkers(fmManager.getLastProblems());
+		if (fmManager != null) {
+			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
+			createModelFileMarkers(fmManager.getLastProblems());
 
-		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
-		if ((extraPath != null) && !extraPath.toFile().exists()) {
-			FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
+			final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
+			if ((extraPath != null) && !extraPath.toFile().exists()) {
+				FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
+			}
+
+			gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
+			FMPropertyManager.registerEditor(this);
+
+			setPartName(getModelFile().getProject().getName() + MODEL);
+		} else {
+			setPartName(input.getName());
 		}
-
-		gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
+		setTitleToolTip(input.getToolTipText());
 
 		// TODO _Interfaces Removed Code
 		// FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
 		// FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
 
-		FMPropertyManager.registerEditor(this);
 		// featureModel.getColorschemeTable().readColorsFromFile(file.getProject());
 	}
 
@@ -581,7 +593,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	 * @param index The index of the page
 	 * @return The page
 	 */
-	private IFeatureModelEditorPage getPage(int index) {
+	public IFeatureModelEditorPage getPage(int index) {
 		for (final IFeatureModelEditorPage page : pages) {
 			if (page.getIndex() == index) {
 				return page;
