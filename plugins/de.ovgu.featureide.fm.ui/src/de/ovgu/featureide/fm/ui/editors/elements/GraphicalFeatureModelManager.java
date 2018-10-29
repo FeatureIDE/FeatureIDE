@@ -68,8 +68,8 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 		return getFileHandler(path, new ObjectCreator(model));
 	}
 
-	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, FileIdentifier<IGraphicalFeatureModel> identifier) {
-		super(model, identifier);
+	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, Path identifier) {
+		super(model, identifier, GraphicalFeatureModelFormatManager.getInstance());
 	}
 
 	@Override

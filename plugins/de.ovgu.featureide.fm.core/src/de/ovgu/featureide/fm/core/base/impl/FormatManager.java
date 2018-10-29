@@ -82,6 +82,7 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 		return null;
 	}
 
+	@CheckForNull
 	public T getFormatByContent(Path path) {
 		if (path != null) {
 			final String extension = SimpleFileHandler.getFileExtension(path);
@@ -106,6 +107,23 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 			}
 		}
 		return null;
+	}
+
+	public List<T> getFormatListForExtension(Path path) {
+		return getFormatListForExtension(path.getFileName().toString());
+	}
+
+	public List<T> getFormatListForExtension(String fileName) {
+		final LinkedList<T> formatList = new LinkedList<>();
+		if (fileName != null) {
+			final String extension = SimpleFileHandler.getFileExtension(fileName);
+			for (final T format : getExtensions()) {
+				if (format.supportsRead() && extension.equals(format.getSuffix())) {
+					formatList.add(format);
+				}
+			}
+		}
+		return formatList;
 	}
 
 }

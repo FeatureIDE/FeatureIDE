@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 
@@ -34,6 +35,12 @@ import de.ovgu.featureide.fm.core.io.Problem.Severity;
 public class ProblemList extends ArrayList<Problem> {
 
 	private static final long serialVersionUID = -8296890463897407370L;
+
+	public ProblemList() {}
+
+	public ProblemList(Collection<Problem> problems) {
+		super(problems);
+	}
 
 	/**
 	 * Checks whether a given list of problems contains at least one problem with the specified or a greater severity level.

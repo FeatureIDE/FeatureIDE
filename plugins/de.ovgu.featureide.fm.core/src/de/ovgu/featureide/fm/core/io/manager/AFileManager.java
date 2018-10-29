@@ -23,12 +23,15 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.CheckForNull;
 
@@ -53,49 +56,6 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
 
-	public static class FileIdentifier<T> {
-		private final Path path;
-		private final IPersistentFormat<T> format;
-
-		private FileIdentifier(Path path, IPersistentFormat<T> format) {
-			this.path = path.toAbsolutePath().normalize();
-			this.format = format;
-		}
-
-		@Override
-		public int hashCode() {
-			int result = format.getId().hashCode();
-			result = (31 * result) + path.hashCode();
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if ((obj == null) || (getClass() != obj.getClass())) {
-				return false;
-			}
-			final FileIdentifier<?> other = (FileIdentifier<?>) obj;
-			return (format.getId().equals(other.format.getId()) && path.equals(other.path));
-		}
-
-		public Path getPath() {
-			return path;
-		}
-
-		public IPersistentFormat<T> getFormat() {
-			return format;
-		}
-
-		@Override
-		public String toString() {
-			return "Path: " + path + ", Format: " + format.getId();
-		}
-
-	}
-
 	protected static abstract class ObjectCreator<T> {
 
 		private final Class<T> objectClass;
@@ -114,8 +74,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-	private static final Map<FileIdentifier<?>, IFileManager<?>> idMap = new HashMap<>();
-	private static final Map<Path, List<IFileManager<?>>> pathMap = new HashMap<>();
+	private static final Map<Path, IFileManager<?>> pathMap = new HashMap<>();
 
 	/**
 	 * Constructs a path for a given file to store additional information.
@@ -153,16 +112,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	/**
 	 * Checks whether there is already an instance.
 	 *
-	 * @param identifier The {@link FileIdentifier identifier} for the file.
-	 * @return {@code true} if there is an instance, {@code false} otherwise
-	 */
-	protected static final boolean hasInstance(FileIdentifier<?> identifier) {
-		return idMap.containsKey(identifier);
-	}
-
-	/**
-	 * Checks whether there is already an instance.
-	 *
 	 * @param path The path pointing to the file.
 	 * @return {@code true} if there is an instance, {@code false} otherwise
 	 */
@@ -170,7 +119,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return pathMap.containsKey(path);
 	}
 
-	public static List<IFileManager<?>> getInstanceList(Path path) {
+	public static IFileManager<?> getInstance(Path path) {
 		return pathMap.get(path);
 	}
 
@@ -185,15 +134,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	 */
 	@SuppressWarnings("unchecked")
 	@CheckForNull
-	protected static final <R extends IFileManager<?>> R removeInstance(FileIdentifier<?> identifier) {
-		final List<IFileManager<?>> managerList = pathMap.get(identifier.getPath());
-		if (managerList != null) {
-			managerList.remove(identifier);
-			if (managerList.isEmpty()) {
-				pathMap.remove(identifier.getPath());
-			}
-		}
-		return (R) idMap.remove(identifier);
+	protected static final <R extends IFileManager<?>> R removeInstance(Path identifier) {
+		return (R) pathMap.remove(identifier);
 	}
 
 	protected static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator) {
@@ -236,20 +178,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		final SimpleFileHandler<T> fileHandler = getFileHandler(path, objectCreator);
 		if (fileHandler.getObject() != null) {
 			try {
-				final FileIdentifier<T> fileIdentifier = new FileIdentifier<T>(path, fileHandler.getFormat());
-
 				final Constructor<? extends IFileManager<T>> constructor =
-					objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, FileIdentifier.class);
+					objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, Path.class);
 				constructor.setAccessible(true);
-				final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), fileIdentifier);
-
-				idMap.put(fileIdentifier, instance);
-				List<IFileManager<?>> managerlist = pathMap.get(path);
-				if (managerlist == null) {
-					managerlist = new LinkedList<>();
-					pathMap.put(path, managerlist);
-				}
-				managerlist.add(instance);
+				final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), path);
+				pathMap.put(path, instance);
 
 				instance.getLastProblems().addAll(fileHandler.getLastProblems());
 				return (R) objectCreator.fileManagerClass.cast(instance);
@@ -277,7 +210,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	protected static final <T, R extends IFileManager<T>> R getInstance(Path path, ObjectCreator<T> objectCreator, boolean createInstance) {
 		final IPersistentFormat<T> format = objectCreator.formatManager.getFormatByContent(path);
 		if (format != null) {
-			final IFileManager<?> instance = idMap.get(new FileIdentifier<T>(path, format));
+			final IFileManager<?> instance = pathMap.get(path);
 			if (instance == null) {
 				if (createInstance) {
 					return newInstance(path, objectCreator);
@@ -292,25 +225,30 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	private final IEventManager eventManager = new DefaultEventManager();
 	private final ProblemList lastProblems = new ProblemList();
 
-	protected final Object syncObject = new Object();
+//	protected final Object fileOperationSynchronizer = new Object();
+	protected final Lock fileOperationLock = new ReentrantLock();
 
-	protected final FileIdentifier<T> identifier;
+	private final Path path;
+	private final List<? extends IPersistentFormat<T>> formats;
 
 	protected String persistentObjectSource;
 	protected T persistentObject;
 	protected T variableObject;
 
+	private IPersistentFormat<T> format;
 	private boolean modifying = false;
 
-	protected AFileManager(T object, FileIdentifier<T> identifier) {
-		this.identifier = identifier;
+	protected AFileManager(T object, Path path, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+		this.path = path;
+		this.formats = formatManager.getFormatListForExtension(getAbsolutePath());
 
 		variableObject = object;
 
-		if (FileSystem.exists(identifier.getPath())) {
+		if (FileSystem.exists(path)) {
 			try {
-				final String content = new String(FileSystem.read(identifier.getPath()), DEFAULT_CHARSET);
-				final ProblemList problems = identifier.getFormat().getInstance().read(variableObject, content);
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				detectFormat(path, content);
+				final ProblemList problems = format.getInstance().read(variableObject, content);
 				if (problems != null) {
 					lastProblems.addAll(problems);
 				}
@@ -319,6 +257,18 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			}
 		}
 		setPersistentObject(copyObject(variableObject));
+	}
+
+	private void detectFormat(Path path, final CharSequence content) throws NoSuchExtensionException {
+		for (final IPersistentFormat<T> possibleFormat : formats) {
+			if (possibleFormat.supportsContent(content)) {
+				format = possibleFormat;
+				break;
+			}
+		}
+		if (format == null) {
+			throw new NoSuchExtensionException("No fitting format found for file " + path.toString());
+		}
 	}
 
 	@Override
@@ -330,8 +280,16 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	@Override
 	public T getObject() {
-		synchronized (syncObject) {
-			return persistentObject;
+		return persistentObject;
+	}
+
+	@Override
+	public T getSnapshot() {
+		fileOperationLock.lock();
+		try {
+			return copyObject(variableObject);
+		} finally {
+			fileOperationLock.unlock();
 		}
 	}
 
@@ -340,9 +298,17 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return variableObject;
 	}
 
+	@Override
+	public Lock getFileOperationLock() {
+		return fileOperationLock;
+	}
+
 	public void setModifying(boolean modifying) {
-		synchronized (syncObject) {
+		fileOperationLock.lock();
+		try {
 			this.modifying = modifying;
+		} finally {
+			fileOperationLock.unlock();
 		}
 	}
 
@@ -353,12 +319,17 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	@Override
 	public IPersistentFormat<T> getFormat() {
-		return identifier.format;
+		return format;
 	}
 
 	@Override
 	public ProblemList getLastProblems() {
-		return lastProblems;
+		fileOperationLock.lock();
+		try {
+			return new ProblemList(lastProblems);
+		} finally {
+			fileOperationLock.unlock();
+		}
 	}
 
 	private void handleException(Exception e) {
@@ -370,58 +341,86 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		if (persistentObject == null) {
 			persistentObjectSource = null;
 		} else {
-			persistentObjectSource = identifier.getFormat().getInstance().write(persistentObject);
+			persistentObjectSource = format.getInstance().write(persistentObject);
 		}
 	}
 
 	@Override
-	public boolean read() {
-		if (!FileSystem.exists(identifier.getPath())) {
-			return false;
+	public ProblemList read() {
+		if (!FileSystem.exists(path)) {
+			return new ProblemList(Arrays.asList(new Problem(new NoSuchFileException(path.toString()))));
 		}
 		if (persistentObject == null) {
-			return false;
+			return new ProblemList(Arrays.asList(new Problem(new IllegalStateException("Initialization Problem"))));
 		}
-		final boolean success, changed;
-		synchronized (syncObject) {
+		final boolean changed;
+		final ProblemList problems;
+		fileOperationLock.lock();
+		try {
 			if (modifying) {
-				return true;
+				return new ProblemList();
 			}
 			lastProblems.clear();
 			final T tempObject = copyObject(persistentObject);
 			try {
-				final String content = new String(FileSystem.read(identifier.getPath()), DEFAULT_CHARSET);
-				final List<Problem> problemList = identifier.getFormat().getInstance().read(tempObject, content);
+				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+				detectFormat(path, content);
+				final List<Problem> problemList = format.getInstance().read(tempObject, content);
 				if (problemList != null) {
 					lastProblems.addAll(problemList);
 				}
 				changed = hasChanged(tempObject);
 			} catch (final Exception e) {
 				handleException(e);
-				return false;
+				return new ProblemList(lastProblems);
 			}
 			if (changed) {
 				setPersistentObject(tempObject);
 			}
-			success = lastProblems.isEmpty();
+			problems = new ProblemList(lastProblems);
+		} finally {
+			fileOperationLock.unlock();
 		}
 		if (changed) {
 			ExternalChangeListener.update(this);
 		}
-		return success;
+		return problems;
 	}
 
-	// TODO Quickfix for #501. Should be implemented by overriding the current instance pointer.
 	@Override
-	public void override() {
-		synchronized (syncObject) {
+	public ProblemList readFromSource(CharSequence source) {
+		fileOperationLock.lock();
+		try {
+			lastProblems.clear();
+			try {
+				detectFormat(path, source);
+				final List<Problem> problemList = format.getInstance().read(variableObject, source);
+				if (problemList != null) {
+					lastProblems.addAll(problemList);
+				}
+			} catch (final Exception e) {
+				handleException(e);
+			}
+			return new ProblemList(lastProblems);
+		} finally {
+			fileOperationLock.unlock();
+		}
+	}
+
+	// TODO Quickfix for #501. Should be implemented by overwriting the current instance pointer.
+	@Override
+	public void overwrite() {
+		fileOperationLock.lock();
+		try {
 			if (modifying) {
 				return;
 			}
-			final String write = identifier.getFormat().getInstance().write(persistentObject);
-			identifier.getFormat().getInstance().read(variableObject, write);
+			final String write = format.getInstance().write(persistentObject);
+			format.getInstance().read(variableObject, write);
 			// variableObject = copyObject(localObject);
 			// persistentObject = copyObject(localObject);
+		} finally {
+			fileOperationLock.unlock();
 		}
 		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERRIDDEN));
 	}
@@ -438,7 +437,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */
 	protected boolean hasChanged(T newObject) {
-		return !Objects.equals(identifier.getFormat().getInstance().write(newObject), persistentObjectSource);
+		return !Objects.equals(format.getInstance().write(newObject), persistentObjectSource);
 	}
 
 	/**
@@ -452,38 +451,42 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	}
 
 	@Override
-	public boolean save() {
-		final boolean success;
-		synchronized (syncObject) {
+	public ProblemList save() {
+		final ProblemList problems;
+		fileOperationLock.lock();
+		try {
 			lastProblems.clear();
 			try {
 				if (modifying) {
-					return true;
+					return new ProblemList();
 				}
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
-				FileSystem.write(identifier.getPath(), identifier.getFormat().getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
+				FileSystem.write(path, format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
 				setPersistentObject(copyObject(tempObject));
 			} catch (final Exception e) {
 				handleException(e);
-				return false;
+				return new ProblemList(lastProblems);
 			} finally {
 				modifying = false;
 			}
-			success = lastProblems.isEmpty();
+			problems = new ProblemList(lastProblems);
+		} finally {
+			fileOperationLock.unlock();
 		}
 		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
-		return success;
+		return problems;
 	}
 
 	@Override
-	public boolean externalSave(Runnable externalSaveMethod) {
-		final boolean success;
-		synchronized (syncObject) {
+	public ProblemList externalSave(Runnable externalSaveMethod) {
+		final ProblemList problems;
+		fileOperationLock.lock();
+		try {
 			lastProblems.clear();
 			try {
 				if (modifying) {
-					return true;
+					return new ProblemList();
 				}
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
@@ -491,38 +494,43 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				setPersistentObject(copyObject(tempObject));
 			} catch (final Exception e) {
 				handleException(e);
-				return false;
+				return new ProblemList(lastProblems);
 			} finally {
 				modifying = false;
 			}
-			success = lastProblems.isEmpty();
+			problems = new ProblemList(lastProblems);
+		} finally {
+			fileOperationLock.unlock();
 		}
 		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
-		return success;
+		return problems;
 	}
 
 	@Override
 	public void dispose() {
-		removeInstance(identifier);
-		synchronized (syncObject) {
+		removeInstance(path);
+		fileOperationLock.lock();
+		try {
 			setPersistentObject(null);
 			variableObject = null;
+		} finally {
+			fileOperationLock.unlock();
 		}
 	}
 
 	@Override
 	public String getAbsolutePath() {
-		return identifier.getPath().toString();
+		return path.toString();
 	}
 
 	@Override
 	public Path getPath() {
-		return identifier.path;
+		return path;
 	}
 
 	@Override
 	public String toString() {
-		return "File manager for " + identifier;
+		return "File manager for " + path.toString();
 	}
 
 }

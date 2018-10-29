@@ -52,22 +52,18 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
-			if (newInput instanceof IFeatureModel) {
-				fModel = ((IFeatureModel) newInput);
+			if (newInput instanceof FeatureModelManager) {
+				fModel = ((FeatureModelManager) newInput).editObject();
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
 					final FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
 					if (fmm != null) {
-						fModel = fmm.getObject();
+						fModel = fmm.editObject();
 					}
 				}
 			}
 		}
 
-	}
-
-	public IFeatureModel getFeatureModel() {
-		return fModel;
 	}
 
 	@Override

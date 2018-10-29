@@ -110,23 +110,16 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	}
 
 	private void setExpandedElements() {
-		final FMTreeContentProvider contentProvider = (FMTreeContentProvider) getTreeProvider();
 		final ArrayList<Object> expandedElements = new ArrayList<>();
-		if (contentProvider.getFeatureModel() != null) {
-			for (final IFeature f : contentProvider.getFeatureModel().getFeatures()) {
-				if (f.getStructure().hasChildren() && !graphicalFeatureModel.getGraphicalFeature(f).isCollapsed()) {
-					expandedElements.add(f);
-				}
+		for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
+			if (!f.isCollapsed()) {
+				expandedElements.add(f);
 			}
 			expandedElements.add("Constraints");
 			viewer.setExpandedElements(expandedElements.toArray());
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
 		if ((graphicalFeatureModel != null) && syncCollapsedStateAction.isChecked() && (event.getElement() instanceof IFeature)) {

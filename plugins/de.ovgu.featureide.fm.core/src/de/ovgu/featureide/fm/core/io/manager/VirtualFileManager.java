@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -40,7 +41,7 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 
 	protected T variableObject;
 
-	protected final IPersistentFormat<T> format;
+	protected IPersistentFormat<T> format;
 
 	public VirtualFileManager(T object, IPersistentFormat<T> format) {
 		this.format = format;
@@ -68,21 +69,21 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 	}
 
 	@Override
-	public boolean read() {
-		return true;
+	public ProblemList read() {
+		return new ProblemList();
 	}
 
 	@Override
-	public void override() {}
+	public void overwrite() {}
 
 	@Override
-	public boolean save() {
-		return true;
+	public ProblemList save() {
+		return new ProblemList();
 	}
 
 	@Override
-	public boolean externalSave(Runnable externalSaveMethod) {
-		return true;
+	public ProblemList externalSave(Runnable externalSaveMethod) {
+		return new ProblemList();
 	}
 
 	@Override
@@ -123,6 +124,21 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 	@Override
 	public boolean hasChanged() {
 		return false;
+	}
+
+	@Override
+	public Lock getFileOperationLock() {
+		return null;
+	}
+
+	@Override
+	public ProblemList readFromSource(CharSequence source) {
+		return new ProblemList();
+	}
+
+	@Override
+	public T getSnapshot() {
+		return variableObject;
 	}
 
 }

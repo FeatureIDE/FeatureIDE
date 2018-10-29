@@ -18,29 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.manager;
+package de.ovgu.featureide.fm.ui.editors.elements;
 
-import java.nio.file.Paths;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
+/**
+ * Manages all formats for {@link de.ovgu.featureide.fm.core.configuration.Configuration configurations}.
+ *
+ * @author Sebastian Krieter
+ */
+public final class GraphicalFeatureModelFormatManager extends FormatManager<IGraphicalFeatureModelFormat> {
 
-public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
-
-	@Override
-	public boolean visit(IResourceDelta delta) {
-		if (((delta.getKind() == IResourceDelta.ADDED))
-			|| ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
-			final IResource resource = delta.getResource();
-			if (resource instanceof IFile) {
-				final IFileManager<?> instance = AFileManager.getInstance(Paths.get(resource.getLocationURI()));
-				if (instance != null) {
-					instance.read();
-				}
-			}
-		}
-		return true;
+	private GraphicalFeatureModelFormatManager() {
+		super(GraphicalFeatureModelFormat.class);
 	}
+
+	private static GraphicalFeatureModelFormatManager instance = new GraphicalFeatureModelFormatManager();
+
+	public static GraphicalFeatureModelFormatManager getInstance() {
+		return instance;
+	}
+
+	public static IGraphicalFeatureModelFormat getDefaultFormat() {
+		return new GraphicalFeatureModelFormat();
+	}
+
 }

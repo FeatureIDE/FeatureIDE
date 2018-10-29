@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -281,7 +280,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void performRenamings() {
-		getRenamingsManager().performRenamings();
+		getRenamingsManager().notifyAboutRenamings();
 	}
 
 	/**
@@ -297,7 +296,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void performRenamings(IFile file) {
-		getRenamingsManager().performRenamings(Paths.get(file.getLocationURI()));
+		getRenamingsManager().notifyAboutRenamings();
 	}
 
 	/**

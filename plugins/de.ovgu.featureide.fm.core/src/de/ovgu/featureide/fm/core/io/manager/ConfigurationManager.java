@@ -72,8 +72,8 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
 	}
 
-	protected ConfigurationManager(Configuration configuration, FileIdentifier<Configuration> identifier) {
-		super(configuration, identifier);
+	protected ConfigurationManager(Configuration configuration, Path identifier) {
+		super(configuration, identifier, ConfigFormatManager.getInstance());
 	}
 
 	@Override
@@ -83,9 +83,11 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public void setConfiguration(Configuration configuration) {
 		variableObject = configuration;
-		synchronized (syncObject) {
-			// persistentObject = copyObject(variableObject);
+		fileOperationLock.lock();
+		try {
 			setPersistentObject(copyObject(variableObject));
+		} finally {
+			fileOperationLock.unlock();
 		}
 	}
 

@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Sebastian Krieter
  */
-public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
+public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> implements IGraphicalFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 

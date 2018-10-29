@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -43,43 +44,58 @@ public interface IFileManager<T> extends IEventManager {
 	ProblemList getLastProblems();
 
 	/**
-	 * Loads the content from the local file and stores it in the local object. To update the persistent and variable object, {@link #override()} must be
+	 * Loads the content from the local file and stores it in the local object. To update the persistent and variable object, {@link #overwrite()} must be
 	 * called.
 	 *
 	 * @return {@code true} if successful read, {@code false} otherwise.
 	 *
-	 * @see #override()
+	 * @see #overwrite()
 	 */
-	boolean read();
+	ProblemList read();
+
+	ProblemList readFromSource(CharSequence source);
 
 	/**
 	 * Save last modifications to the local file. Updates (overrides) local object and persistent object.
 	 *
 	 * @return {@code true} if successful write, {@code false} otherwise.
 	 */
-	boolean save();
+	ProblemList save();
 
-	boolean externalSave(Runnable externalSaveMethod);
+	ProblemList externalSave(Runnable externalSaveMethod);
 
 	/**
-	 * Overrides the variable and persistent object with the local object.
+	 * Overwrites the variable object with the persistent object.
 	 */
-	void override();
+	void overwrite();
 
 	/**
+	 * Returns the persistent object of the manager.
+	 *
 	 * @return The persistent object.
 	 */
 	T getObject();
 
 	/**
+	 * Returns the variable object of the manager. Use {@link #getFileOperationLock()} to synchronize all modifications to the variable object.
+	 *
 	 * @return The variable object.
 	 */
 	T editObject();
+
+	T getSnapshot();
 
 	boolean hasChanged();
 
 	IPersistentFormat<T> getFormat();
 
 	void dispose();
+
+	/**
+	 * Acquire the lock for editing the variable object.
+	 *
+	 * @return The lock used by the file manager while accessing the file.
+	 */
+	Lock getFileOperationLock();
 
 }

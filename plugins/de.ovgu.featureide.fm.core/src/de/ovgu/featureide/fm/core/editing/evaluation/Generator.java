@@ -94,7 +94,6 @@ public abstract class Generator {
 			}
 			count += childrenCount;
 		}
-		fm.getRenamingsManager().performRenamings();
 		return fm;
 	}
 

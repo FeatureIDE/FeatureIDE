@@ -84,7 +84,7 @@ public class FmOutlinePageContextMenu {
 	private final Object site;
 	private FeatureModelEditor fTextEditor;
 	private final TreeViewer viewer;
-	private IFeatureModel fInput;
+	private final IFeatureModel fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
@@ -358,10 +358,6 @@ public class FmOutlinePageContextMenu {
 
 	public IFeatureModel getFeatureModel() {
 		return fInput;
-	}
-
-	public void setFeatureModel(IFeatureModel fm) {
-		fInput = fm;
 	}
 
 	/**

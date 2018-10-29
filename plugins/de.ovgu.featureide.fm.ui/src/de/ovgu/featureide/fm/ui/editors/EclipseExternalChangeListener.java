@@ -72,10 +72,10 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 							"The feature model file was modified in another editor. Do you like to load the new file and override your local changes?",
 							MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
 					if (dialog.open() == 0) {
-						fileManager.override();
+						fileManager.overwrite();
 					}
 				} else {
-					fileManager.override();
+					fileManager.overwrite();
 				}
 			}
 		});

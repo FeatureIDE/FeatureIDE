@@ -59,8 +59,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
-	}
+	public void doSave(IProgressMonitor monitor) {}
 
 	@Override
 	public void doSaveAs() {}

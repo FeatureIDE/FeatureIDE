@@ -136,7 +136,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 			if (configurationManager != null) {
 				configurationManager.removeListener(ConfigurationEditor.this);
-				configurationManager.override();
+				configurationManager.overwrite();
 			}
 			FeatureColorManager.removeListener(ConfigurationEditor.this);
 		}

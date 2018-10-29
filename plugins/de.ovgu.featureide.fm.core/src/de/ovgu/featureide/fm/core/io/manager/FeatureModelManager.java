@@ -93,8 +93,8 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return save(featureModel, outPath, format);
 	}
 
-	protected FeatureModelManager(IFeatureModel model, FileIdentifier<IFeatureModel> identifier) {
-		super(setSourcePath(model, identifier.getPath()), identifier);
+	protected FeatureModelManager(IFeatureModel model, Path identifier) {
+		super(setSourcePath(model, identifier), identifier, FMFormatManager.getInstance());
 	}
 
 	private static IFeatureModel setSourcePath(IFeatureModel model, Path path) {
@@ -103,9 +103,9 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	}
 
 	@Override
-	public void override() {
+	public void overwrite() {
 		persistentObject.setUndoContext(variableObject.getUndoContext());
-		super.override();
+		super.overwrite();
 	}
 
 	@Override
