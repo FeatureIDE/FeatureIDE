@@ -34,11 +34,11 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
  *
  * @author Domenik Eichhorn
  */
-public class MinimalCreateConstraintAction extends Action {
+public class CreateConstraintInViewAction extends Action {
 	private IFeatureModel featuremodel;
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	public MinimalCreateConstraintAction(IFeatureModel featuremodel) {
+	public CreateConstraintInViewAction(IFeatureModel featuremodel) {
 		super(StringTable.CREATE_CONSTRAINT, createImage);
 		this.featuremodel = featuremodel;
 	}

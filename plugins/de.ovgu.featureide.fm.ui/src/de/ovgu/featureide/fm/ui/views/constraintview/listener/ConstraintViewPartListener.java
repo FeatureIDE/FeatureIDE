@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 /**
  * This class is the implementation of the IPartListener2 for the ConstraintView.
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class ConstraintViewPartListener implements IPartListener2 {
 	private final ConstraintViewController controller;
@@ -54,7 +54,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 		if (part.getPart(false) instanceof FeatureModelEditor) {
 			controller.getView().removeAll();
 			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().setStatOfActions(false);
+			controller.getSettingsMenu().setStateOfActions(false);
 		}
 	}
 
@@ -64,7 +64,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 			controller.checkForRefresh();
 		} else {
 			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().setStatOfActions(false);
+			controller.getSettingsMenu().setStateOfActions(false);
 		}
 	}
 

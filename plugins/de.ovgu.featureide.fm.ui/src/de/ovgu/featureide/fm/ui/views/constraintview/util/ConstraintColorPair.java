@@ -25,9 +25,9 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * This class maps a IConstraint to an Color.
+ * This class maps an IConstraint to a Color.
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class ConstraintColorPair {
 	private IConstraint constraint;

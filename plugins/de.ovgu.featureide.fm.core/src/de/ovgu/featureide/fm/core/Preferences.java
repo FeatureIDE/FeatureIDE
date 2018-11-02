@@ -54,7 +54,7 @@ public abstract class Preferences {
 	}
 
 	/**
-	 * this method adds a value by his key to the preferences
+	 * this method adds a value by its key to the preferences
 	 */
 	public static void store(String key, String value) {
 		preferences.put(key, value);
@@ -62,7 +62,7 @@ public abstract class Preferences {
 	}
 
 	/**
-	 * get the value of an given key
+	 * get the value of a given key
 	 */
 	public static String getPref(String key, String defaultValue) {
 		return preferences.get(key, defaultValue);

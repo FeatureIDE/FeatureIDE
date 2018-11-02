@@ -28,13 +28,13 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
  * ConstraintView KeyListener
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class ConstraintViewKeyListener implements KeyListener {
 	// integer values that are returned when pressing a special button (from keyListener)
@@ -53,7 +53,7 @@ public class ConstraintViewKeyListener implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		if (e.keyCode == SWT.DEL) {
 			// pressing the del button while having a constraint selected will delete it
-			new DeleteConstraintAction(viewer.getViewer(), controller.getCurrentModel()).run();
+			new DeleteConstraintInViewAction(viewer.getViewer(), controller.getCurrentModel()).run();
 		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
 			// pressing CTRL + F will get you in the search box
 			viewer.getSearchBox().setFocus();
@@ -64,7 +64,7 @@ public class ConstraintViewKeyListener implements KeyListener {
 						null);
 			} catch (final ExecutionException e1) {}
 		} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
-			// pressing CTRL + SHIFT + Z will re do undo's
+			// pressing CTRL + SHIFT + Z will redo undos
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) controller.getCurrentModel().getUndoContext(), null,
 						null);

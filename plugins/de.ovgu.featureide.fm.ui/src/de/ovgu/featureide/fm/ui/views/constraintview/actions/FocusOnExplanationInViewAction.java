@@ -77,7 +77,6 @@ public class FocusOnExplanationInViewAction extends Action {
 				focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, explanation);
 				// Check if any feature has this constraint as a reason in its explanation
 			} else {
-				// Iterate Features
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 					// Check if Feature has an Explanation
 					final Explanation<?> featureExplanation = feature.getFeatureModel().getAnalyser().getExplanation(feature);

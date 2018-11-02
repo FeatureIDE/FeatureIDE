@@ -153,7 +153,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	}
 
 	/**
-	 * Opens a dialog and asks the user if he wants to show the constraint view.
+	 * Opens a dialog and asks the user if they want to show the constraint view.
 	 */
 	public void openConstraintDecision() {
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

@@ -39,11 +39,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedCon
  *
  * @author Domenik Eichhorn
  */
-public class ShowCollapsedConstraintAction extends Action {
+public class ShowCollapsedConstraintsInViewAction extends Action {
 	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
 	private IGraphicalFeatureModel featureModel;
 
-	public ShowCollapsedConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
+	public ShowCollapsedConstraintsInViewAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_COLLAPSED_CONSTRAINTS, ImageDescriptor.createFromImage(SHOW_HIDE_IMAGE));
 		this.featureModel = featureModel;
 	}

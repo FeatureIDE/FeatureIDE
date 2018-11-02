@@ -28,12 +28,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.MinimalCreateConstraintAction;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.CreateConstraintInViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshConstraintViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstraintsInViewAction;
 
 /**
- * This class contains a menu where settings can be set for the ConstraintView
+ * This class contains a menu with settings for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
@@ -42,15 +42,15 @@ public class ConstraintViewSettingsMenu {
 	private ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 
-	private final ShowCollapsedConstraintAction collapseAction;
-	private final RefreshViewAction refreshAction;
-	private final MinimalCreateConstraintAction createAction;
+	private final ShowCollapsedConstraintsInViewAction collapseAction;
+	private final RefreshConstraintViewAction refreshAction;
+	private final CreateConstraintInViewAction createAction;
 
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
 		// create actions:
-		collapseAction = new ShowCollapsedConstraintAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
-		refreshAction = new RefreshViewAction(controller); // Action that lets the user refresh the view manually
-		createAction = new MinimalCreateConstraintAction(controller.getCurrentModel()); // Action that lets user create a new constraint
+		collapseAction = new ShowCollapsedConstraintsInViewAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
+		refreshAction = new RefreshConstraintViewAction(controller); // Action that lets the user refresh the view manually
+		createAction = new CreateConstraintInViewAction(controller.getCurrentModel()); // Action that lets user create a new constraint
 		// create layout:
 		update(controller);
 		createToolBarLayout();
@@ -63,7 +63,7 @@ public class ConstraintViewSettingsMenu {
 		this.controller = controller;
 		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
 			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				setStatOfActions(true);
+				setStateOfActions(true);
 				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 				createAction.update(controller.getCurrentModel());
 				refreshAction.update(controller);
@@ -77,7 +77,7 @@ public class ConstraintViewSettingsMenu {
 				}
 			}
 		} else {
-			setStatOfActions(false);
+			setStateOfActions(false);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class ConstraintViewSettingsMenu {
 	/**
 	 * disables all actions (run method is not called when activated)
 	 */
-	public void setStatOfActions(Boolean isEnabled) {
+	public void setStateOfActions(Boolean isEnabled) {
 		createAction.setEnabled(isEnabled);
 		refreshAction.setEnabled(isEnabled);
 		collapseAction.setEnabled(isEnabled);

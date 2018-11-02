@@ -38,11 +38,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraint
  *
  * @author Rahel Arens
  */
-public class FocusOnContainedFeaturesAction extends Action {
+public class FocusOnContainedFeaturesInViewAction extends Action {
 	private IStructuredSelection selection;
 	private IGraphicalFeatureModel graphicalFeatureModel;
 
-	public FocusOnContainedFeaturesAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
+	public FocusOnContainedFeaturesInViewAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(FOCUS_ON_CONTAINED_FEATURES);
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();

@@ -62,10 +62,10 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewSettings
 /**
  * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
  *
- * @author "Rosiak Kamil"
- * @author "Domenik Eichhorn"
- * @author "Rahel Arens"
- * @author "Thomas Graave"
+ * @author Rosiak Kamil
+ * @author Domenik Eichhorn
+ * @author Rahel Arens
+ * @author Thomas Graave
  */
 public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.ConstraintView";
@@ -412,8 +412,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			constraintsHidden = hideConstraints;
 		}
 	}
-
-	// ################################# Getter and Setter ###################################################
 
 	public boolean isConstraintsHidden() {
 		return constraintsHidden;

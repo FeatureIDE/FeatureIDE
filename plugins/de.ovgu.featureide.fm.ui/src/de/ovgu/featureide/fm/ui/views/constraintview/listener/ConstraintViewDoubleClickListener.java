@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInVie
 /**
  * ConstraintView DoubleClickListener
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class ConstraintViewDoubleClickListener implements IDoubleClickListener {
 	private final ConstraintViewController controller;

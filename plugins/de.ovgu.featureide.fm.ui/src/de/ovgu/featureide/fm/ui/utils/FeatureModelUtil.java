@@ -29,11 +29,11 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 /**
  * This is a utility class thats provides some helper methods to get feature model context.
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class FeatureModelUtil {
 	/**
-	 * This method returns the active feature model editor if available else it returns null.
+	 * This method returns the active feature model editor if available, else it returns null.
 	 */
 	public static FeatureModelEditor getActiveFMEditor() {
 		final IEditorPart viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();

@@ -29,15 +29,15 @@ import org.eclipse.swt.widgets.Menu;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.FocusOnContainedFeaturesAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.FocusOnContainedFeaturesInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.FocusOnExplanationInViewAction;
 
 /**
  * This class represents the context menu of the ConstraintView.
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  * @author Rahel Arens
  */
 public class ConstraintViewContextMenu {
@@ -66,13 +66,13 @@ public class ConstraintViewContextMenu {
 	}
 
 	/**
-	 * Fill dynamic context menu
+	 * Fills the dynamic context menu
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
 		contextMenu.add(new CreateConstraintAction(viewer, controller.getCurrentModel()));
-		contextMenu.add(new FocusOnContainedFeaturesAction(viewer, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()));
+		contextMenu.add(new FocusOnContainedFeaturesInViewAction(viewer, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()));
 		contextMenu.add(new FocusOnExplanationInViewAction(FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel(), viewer));
 		contextMenu.add(new EditConstraintInViewAction(viewer, controller.getCurrentModel()));
-		contextMenu.add(new DeleteConstraintAction(viewer, controller.getCurrentModel()));
+		contextMenu.add(new DeleteConstraintInViewAction(viewer, controller.getCurrentModel()));
 	}
 }

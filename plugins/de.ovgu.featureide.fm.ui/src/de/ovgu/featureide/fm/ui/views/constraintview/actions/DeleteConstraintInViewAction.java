@@ -38,16 +38,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
 /**
  * This class represents the Action to delete one or multiply Constraints selected in the ConstraintView.
  *
- * @author "Rosiak Kamil"
- * @author "Rahel Arens"
+ * @author Rosiak Kamil
+ * @author Rahel Arens
  */
-public class DeleteConstraintAction extends Action {
+public class DeleteConstraintInViewAction extends Action {
 	private IFeatureModel featureModel;
 	private IStructuredSelection selection;
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 	private TreeViewer viewer;
 
-	public DeleteConstraintAction(Object viewer, IFeatureModel featureModel) {
+	public DeleteConstraintInViewAction(Object viewer, IFeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();

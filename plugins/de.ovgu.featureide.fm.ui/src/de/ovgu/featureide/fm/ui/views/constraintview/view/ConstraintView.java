@@ -44,10 +44,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 /**
  * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
  *
- * @author "Rosiak Kamil"
- * @author "Domenik Eichhorn"
- * @author "Thomas Graave"
- * @author "Rahel Arens"
+ * @author Rosiak Kamil
+ * @author Domenik Eichhorn
+ * @author Thomas Graave
+ * @author Rahel Arens
  */
 public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
@@ -188,7 +188,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * This method adds a item to represent that no feature model editor is activated or no feature model is loaded.
+	 * This method adds an item to represent that no feature model editor is activated or no feature model is loaded.
 	 */
 	public void addNoFeatureModelItem() {
 		removeAll();
@@ -250,7 +250,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * Adding the columns with topics to the tree viewer
+	 * Adds the columns with topics to the tree viewer
 	 */
 	private void addColumns(TreeViewer viewer) {
 		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
@@ -268,7 +268,6 @@ public class ConstraintView implements GUIDefaults {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 		});

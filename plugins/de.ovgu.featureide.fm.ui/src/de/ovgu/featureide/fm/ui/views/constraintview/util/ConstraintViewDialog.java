@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 /**
  * A dialog that asks a user to open the constraint view. Its saves the decision in the workspace wide preferences.
  *
- * @author "Rosiak Kamil"
+ * @author Rosiak Kamil
  */
 public class ConstraintViewDialog extends Dialog {
 	public static final String CONSTRAINT_VIEW_REMEMBER = "de.ovgu.featureide.fm.ui.views.constraintview_remember";
@@ -101,17 +101,16 @@ public class ConstraintViewDialog extends Dialog {
 	}
 
 	/**
-	 * This method creating a label with the question.
+	 * This method creates a label with the question.
 	 */
 	private void createLabel(Shell shell) {
-		// Question text
 		final CLabel label = new CLabel(shell, SWT.NONE);
 		label.setText(StringTable.CONSTRAINT_VIEW_QUESTION_DIALOG);
 		label.setImage(shell.getDisplay().getSystemImage(SWT.ICON_QUESTION));
 	}
 
 	/**
-	 * creating the checkbox for the remember function.
+	 * Creates the checkbox for the remember function.
 	 */
 	private void createCheckBox(Shell shell) {
 		final Button rememberDecButton = new Button(shell, SWT.CHECK);

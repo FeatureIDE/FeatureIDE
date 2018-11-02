@@ -28,15 +28,15 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * This action refreshed the ConstraintView
+ * This action refreshes the ConstraintView
  *
  * @author Domenik Eichhorn
  */
-public class RefreshViewAction extends Action {
+public class RefreshConstraintViewAction extends Action {
 	private static final Image REFRESH_IMG = FMUIPlugin.getImage("refresh_tab.gif");
 	private ConstraintViewController controller;
 
-	public RefreshViewAction(ConstraintViewController controller) {
+	public RefreshConstraintViewAction(ConstraintViewController controller) {
 		super("Refresh View", ImageDescriptor.createFromImage(REFRESH_IMG));
 		this.controller = controller;
 	}

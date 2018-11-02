@@ -76,7 +76,6 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		final Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 
-		// completion group
 		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
 		completionGroup.setText(CONFIGURATION_COLORING);
 		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
