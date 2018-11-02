@@ -42,8 +42,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
-	public enum direction {
-		left, right
+	private enum Direction {
+		LEFT, RIGHT
 	};
 
 	public MovingKeyHandler(GraphicalViewer viewer) {
@@ -76,11 +76,11 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 				// checks if the selected feature is the root
 				if (parent != null) {
 					if ((event.keyCode == SWT.ARROW_RIGHT)) {
-						navigateTo(findNextFeature(feature, dex, direction.right), event);
+						navigateTo(findNextFeature(feature, dex, Direction.RIGHT), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_LEFT)) {
-						navigateTo(findNextFeature(feature, dex, direction.left), event);
+						navigateTo(findNextFeature(feature, dex, Direction.LEFT), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_UP)) {
@@ -104,11 +104,11 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_DOWN)) {
-						navigateTo(findNextFeature(feature, dex, direction.right), event);
+						navigateTo(findNextFeature(feature, dex, Direction.RIGHT), event);
 						return true;
 					}
 					if ((event.keyCode == SWT.ARROW_UP)) {
-						navigateTo(findNextFeature(feature, dex, direction.left), event);
+						navigateTo(findNextFeature(feature, dex, Direction.LEFT), event);
 						return true;
 					}
 				} else {
@@ -142,12 +142,12 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		return true;
 	}
 
-	private FeatureEditPart findNextFeature(IGraphicalFeature feature, int dex, direction direct) {
+	private FeatureEditPart findNextFeature(IGraphicalFeature feature, int dex, Direction direct) {
 		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
 		final List<IGraphicalFeature> graphSiblings = parent.getGraphicalChildren(false);
 		final Map<?, ?> editPartRegistry = getViewer().getEditPartRegistry();
 		final boolean oneMore = checkForOneMore(graphSiblings, dex, direct);
-		final int newDirection = (direct == direction.right) ? 1 : (direct == direction.left) ? -1 : 0;
+		final int newDirection = (direct == Direction.RIGHT) ? 1 : (direct == Direction.LEFT) ? -1 : 0;
 		// checks if there is an adjacent feature which has the same parent
 		if (oneMore) {
 			final IGraphicalFeature nextSibling = graphSiblings.get(dex + newDirection);
@@ -161,11 +161,11 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
 	}
 
-	private IGraphicalFeature searchUp(IGraphicalFeature feature, int layer, direction direct) {
+	private IGraphicalFeature searchUp(IGraphicalFeature feature, int layer, Direction direct) {
 		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
 		final List<IGraphicalFeature> siblings = parent.getGraphicalChildren(false);
 		final int dex = siblings.indexOf(feature);
-		final int listDirection = direct == direction.left ? -1 : 1;
+		final int listDirection = direct == Direction.LEFT ? -1 : 1;
 		for (int i = dex + listDirection; (i < siblings.size()) && (i >= 0); i += listDirection) {
 			final IGraphicalFeature ret = searchDown(siblings.get(i), layer, direct);
 			if (ret != null) {
@@ -178,14 +178,14 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		return searchUp(parent, layer + 1, direct);
 	}
 
-	private IGraphicalFeature searchDown(IGraphicalFeature feature, int layer, direction direct) {
+	private IGraphicalFeature searchDown(IGraphicalFeature feature, int layer, Direction direct) {
 		if (layer == 0) {
 			return feature;
 		}
 		final List<IGraphicalFeature> children = feature.getGraphicalChildren(false);
 		if ((children != null) && !children.isEmpty()) {
-			final int listDirection = direct == direction.left ? -1 : 1;
-			final int listStart = direct == direction.left ? children.size() - 1 : 0;
+			final int listDirection = direct == Direction.LEFT ? -1 : 1;
+			final int listStart = direct == Direction.LEFT ? children.size() - 1 : 0;
 			for (int i = listStart; (i < children.size()) && (i >= 0); i += listDirection) {
 				final IGraphicalFeature ret = searchDown(children.get(i), layer - 1, direct);
 				if (ret != null) {
@@ -199,10 +199,10 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 	/**
 	 * looks if in the given direction is at least one more feature
 	 */
-	private boolean checkForOneMore(List<IGraphicalFeature> siblings, int dex, direction direct) {
-		if (direct == direction.right) {
+	private boolean checkForOneMore(List<IGraphicalFeature> siblings, int dex, Direction direct) {
+		if (direct == Direction.RIGHT) {
 			return (dex < (siblings.size() - 1));
-		} else if (direct == direction.left) {
+		} else if (direct == Direction.LEFT) {
 			return dex > 0;
 		}
 		return false;
