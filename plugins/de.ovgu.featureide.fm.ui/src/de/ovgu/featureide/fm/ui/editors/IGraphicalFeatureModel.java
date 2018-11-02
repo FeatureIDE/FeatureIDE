@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of a feature model.
  *
  * @author Sebastian Krieter
+ * @author Thomas Graave
+ * @author Rahel Arens
  */
 public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
@@ -50,6 +52,10 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void setLegend(Legend legend);
 
 	Legend getLegend();
+
+	void setConstraintsHidden(boolean hideConstraints);
+
+	boolean getConstraintsHidden();
 
 	void handleLegendLayoutChanged();
 
@@ -94,6 +100,15 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	 * @since 3.3
 	 *
 	 * @return All not collapsed constraints stored in this feature model.
+	 */
+	List<IGraphicalConstraint> getNonCollapsedConstraints();
+
+	/**
+	 * Returns getNonCollapsedConstraints only if the Constraints are not supposed to be hidden.
+	 *
+	 * @see #getNonCollapsedConstraints()
+	 *
+	 * @return All not collapsed constraints stored in this feature model that shall be shown in the feature model editor.
 	 */
 	List<IGraphicalConstraint> getVisibleConstraints();
 

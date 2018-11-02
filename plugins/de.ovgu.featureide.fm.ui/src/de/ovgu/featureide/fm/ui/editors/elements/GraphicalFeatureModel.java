@@ -46,6 +46,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of an {@link IFeatureModel} instance.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Thomas Graave
  *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
@@ -58,6 +60,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<IConstraint, IGraphicalConstraint>();
 
 	protected boolean hiddenLegend = false;
+	protected boolean hiddenConstraints = false;
 	protected Legend legend;
 
 	/**
@@ -154,6 +157,16 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	@Override
+	public void setConstraintsHidden(boolean hideConstraints) {
+		hiddenConstraints = hideConstraints;
+	}
+
+	@Override
+	public boolean getConstraintsHidden() {
+		return hiddenConstraints;
+	}
+
+	@Override
 	public void handleModelLayoutChanged() {
 		fireEvent(EventType.MODEL_LAYOUT_CHANGED);
 	}
@@ -207,6 +220,15 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getVisibleConstraints() {
+		final List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
+		if (hiddenConstraints) {
+			return constraints;
+		}
+		return getNonCollapsedConstraints();
+	}
+
+	@Override
+	public List<IGraphicalConstraint> getNonCollapsedConstraints() {
 		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
 		}

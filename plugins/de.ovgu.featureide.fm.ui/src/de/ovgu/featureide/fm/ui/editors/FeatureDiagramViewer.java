@@ -34,7 +34,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -50,6 +54,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintViewDialog;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature diagrams and cross-tree constraints.
@@ -142,6 +148,30 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
+		}
+		openConstraintDecision();
+	}
+
+	/**
+	 * Opens a dialog and asks the user if he wants to show the constraint view.
+	 */
+	public void openConstraintDecision() {
+		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
+			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
+			if (!dialog.isRemember()) {
+				dialog.open();
+
+			} else {
+				if (dialog.getDecision()) {
+					try {
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
+					} catch (final PartInitException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 
