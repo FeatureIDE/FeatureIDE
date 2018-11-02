@@ -25,7 +25,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewPartListener implements IPartListener2 {
-	ConstraintViewController controller;
+	private final ConstraintViewController controller;
 
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
 		controller = cvc;
@@ -42,7 +41,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partOpened(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID)) {
+		if (part.getId().equals(ConstraintViewController.ID) || part.getId().equals(FeatureModelEditor.ID)) {
 			controller.setConstraintsHidden(true);
 		}
 	}
@@ -52,12 +51,10 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partClosed(IWorkbenchPartReference part) {
-		if (part instanceof FeatureModelEditor) {
-			if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
-				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-				controller.addPageChangeListener(editor);
-				controller.getTreeViewer().refresh();
-			}
+		if (part.getPart(false) instanceof FeatureModelEditor) {
+			controller.getView().removeAll();
+			controller.getView().addNoFeatureModelItem();
+			controller.getSettingsMenu().setStatOfActions(false);
 		}
 	}
 
@@ -67,14 +64,13 @@ public class ConstraintViewPartListener implements IPartListener2 {
 			controller.checkForRefresh();
 		} else {
 			controller.getView().addNoFeatureModelItem();
+			controller.getSettingsMenu().setStatOfActions(false);
 		}
 	}
 
 	@Override
 	public void partActivated(IWorkbenchPartReference part) {
 		if (part.getPart(false) instanceof FeatureModelEditor) {
-			controller.checkForRefresh();
-		} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
 			controller.checkForRefresh();
 		}
 		if (part.getPart(false) instanceof IEditorPart) {

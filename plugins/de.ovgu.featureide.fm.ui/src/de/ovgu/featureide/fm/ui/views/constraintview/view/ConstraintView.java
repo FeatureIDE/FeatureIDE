@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -51,20 +53,26 @@ public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+
+	// Style parameters for the view
 	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
 	private final int ALPHA_VALUE = 175;
-
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM_EDITOR;
-
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
+
+	// UI elements
 	private TreeViewer treeViewer;
 	private Tree tree;
 	private Text searchBox;
 
 	private TreeColumn constraintColumn, descriptionColumn;
+
+	public void dispose() {
+		treeViewer.getTree().dispose();
+	}
 
 	public ConstraintView(Composite parent) {
 		init(parent);
@@ -89,7 +97,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * This method creates a TreeItem and adds data to it.
+	 * This method creates a TreeItem and adds the constraint as data to it.
 	 */
 	public TreeItem createTreeItem(IConstraint constraint) {
 		final TreeItem item = new TreeItem(tree, SWT.None);
@@ -100,8 +108,8 @@ public class ConstraintView implements GUIDefaults {
 	/**
 	 * This method decorates the icon of the TreeItem with the evidence color of the explanation.
 	 *
-	 * @param constraint the constraint that would be shown in the view
-	 * @param color the evidence color of the explanation
+	 * @param constraint the constraint that would be shown in the view.
+	 * @param color the evidence color of the explanation.
 	 */
 	public void addDecoratedItem(IConstraint constraint, Color color) {
 		final TreeItem item = addItem(constraint);
@@ -109,14 +117,62 @@ public class ConstraintView implements GUIDefaults {
 		if (color == null) {
 			elementImg = FM_INFO;
 		} else {
-			elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
-			final GC gc = new GC(elementImg);
-			gc.setBackground(color);
-			gc.setAntialias(SWT.ON);
-			gc.setAlpha(ALPHA_VALUE);
-			gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
+			elementImg = getColoredCircleIcon(color);
 		}
 		item.setImage(elementImg);
+	}
+
+	/**
+	 * Changes the existing item to a decorated item
+	 */
+	public void changeToDecoratedItem(IConstraint constraint, Color color) {
+		for (final TreeItem item : tree.getItems()) {
+			if (item.getData() instanceof IConstraint) {
+				if (item.getData().equals(constraint)) {
+					Image elementImg;
+					if (color == null) {
+						elementImg = FM_INFO;
+					} else {
+						elementImg = getColoredCircleIcon(color);
+					}
+					item.setImage(elementImg);
+				}
+			}
+		}
+	}
+
+	/**
+	 * This method draws a circle icon filled with the parameters color.
+	 *
+	 * @param color that the icon will be filled with.
+	 * @return
+	 */
+	private Image getColoredCircleIcon(Color color) {
+		final Image elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
+		final GC gc = new GC(elementImg);
+		gc.setBackground(color);
+		gc.setAntialias(SWT.ON);
+		gc.setAlpha(ALPHA_VALUE);
+		gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
+		return elementImg;
+	}
+
+	/**
+	 * Removes decoration from item
+	 */
+	public void undecorateItem(IConstraint constraint) {
+		for (final TreeItem item : tree.getItems()) {
+			if (item.getData() instanceof IConstraint) {
+				if (item.getData().equals(constraint)) {
+					if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+						item.setImage(FM_INFO);
+					} else {
+						item.setImage(IMAGE_EMPTY);
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -160,7 +216,9 @@ public class ConstraintView implements GUIDefaults {
 	 * This method removes all constraints from the view
 	 */
 	public void removeAll() {
-		treeViewer.getTree().removeAll();
+		if (treeViewer.getTree() != null) {
+			treeViewer.getTree().removeAll();
+		}
 	}
 
 	/**
@@ -185,9 +243,9 @@ public class ConstraintView implements GUIDefaults {
 		tree.setLayoutData(treeData);
 		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
 		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
-
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
+
 		addColumns(treeViewer);
 	}
 
@@ -200,7 +258,20 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn.setMoveable(true);
 		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
+		constraintColumn.addSelectionListener(new SelectionListener() {
 
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("Constraint Header");
+
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);
@@ -215,4 +286,5 @@ public class ConstraintView implements GUIDefaults {
 		return searchBox;
 
 	}
+
 }

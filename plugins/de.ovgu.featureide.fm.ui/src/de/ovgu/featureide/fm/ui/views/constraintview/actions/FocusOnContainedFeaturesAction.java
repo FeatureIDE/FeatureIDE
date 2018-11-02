@@ -20,55 +20,43 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_CONTAINED_FEATURES;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
 
 /**
- * This class represents the Action to delete one or multiply Constraints selected in the ConstraintView.
+ * This class represents the Action to focus on contained Features of a constraint selected in the ConstraintView.
  *
- * @author "Rosiak Kamil"
- * @author "Rahel Arens"
+ * @author Rahel Arens
  */
-public class DeleteConstraintAction extends Action {
-	private IFeatureModel featureModel;
+public class FocusOnContainedFeaturesAction extends Action {
 	private IStructuredSelection selection;
-	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
-	private TreeViewer viewer;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
-	public DeleteConstraintAction(Object viewer, IFeatureModel featureModel) {
-		super("Delete (Del)", deleteImage);
+	public FocusOnContainedFeaturesAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
+		super(FOCUS_ON_CONTAINED_FEATURES);
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-			this.featureModel = featureModel;
+			setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
+			this.graphicalFeatureModel = graphicalFeatureModel;
 			setEnabled(isValidSelection(selection));
-			this.viewer = (TreeViewer) viewer;
 		}
 	}
 
 	@Override
 	public void run() {
-		AbstractFeatureModelOperation abstractFeatureModelOperation = null;
-		// Decision single or multiply selection of constraints
-		if (selection.toList().size() == 1) {
-			abstractFeatureModelOperation = new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModel);
-		} else if (selection.toList().size() > 1) {
-			abstractFeatureModelOperation = new ElementDeleteOperation(viewer, featureModel);
-		}
-
+		final ExpandConstraintOperation op = new ExpandConstraintOperation(graphicalFeatureModel, (IConstraint) selection.getFirstElement());
 		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(abstractFeatureModelOperation, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -81,14 +69,6 @@ public class DeleteConstraintAction extends Action {
 	 */
 	public boolean isValidSelection(IStructuredSelection selection) {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
-			return true;
-		} else if ((selection.size() > 1)) {
-			// checking that every selected item is a constraint
-			for (final Object sel : selection.toList()) {
-				if (!(sel instanceof IConstraint)) {
-					return false;
-				}
-			}
 			return true;
 		}
 		return false;
