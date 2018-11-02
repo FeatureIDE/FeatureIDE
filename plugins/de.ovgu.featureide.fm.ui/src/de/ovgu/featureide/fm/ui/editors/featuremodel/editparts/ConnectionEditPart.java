@@ -176,6 +176,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		final IFeature feature = getModel().getTarget().getObject();
 		final IFeatureModel featureModel = feature.getFeatureModel();
+		final IGraphicalFeature newModel = getModel().getTarget();
 
 		int groupType;
 
@@ -186,13 +187,14 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		} else {
 			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
 		}
-
-		final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
+		// Blocks unintentional FeatureGroupTypeChange when Parent is collapsed (Issue #806)
+		if (!newModel.isCollapsed()) {
+			final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
+			try {
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			} catch (final ExecutionException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 		}
 	}
 
