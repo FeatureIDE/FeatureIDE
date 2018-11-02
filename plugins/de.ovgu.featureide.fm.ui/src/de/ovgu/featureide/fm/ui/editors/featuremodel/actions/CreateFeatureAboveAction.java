@@ -37,9 +37,9 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
@@ -50,11 +50,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateCompoundAction extends Action {
+public class CreateFeatureAboveAction extends Action {
 
-	public static final String ID = "de.ovgu.featureide.createcompound";
+	public static final String ID = "de.ovgu.featureide.createfeatureabove";
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	private IFeature parent = null;
 
@@ -71,9 +71,9 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
+	public CreateFeatureAboveAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
-		this.featureModel = featureModel;
+		graphicalFeatureModel = featureModel;
 		setEnabled(false);
 		setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -87,7 +87,7 @@ public class CreateCompoundAction extends Action {
 	public void run() {
 		// if (selectedFeatures.size() != 1)
 		// throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		final CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures);
+		final CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(graphicalFeatureModel, selectedFeatures);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
