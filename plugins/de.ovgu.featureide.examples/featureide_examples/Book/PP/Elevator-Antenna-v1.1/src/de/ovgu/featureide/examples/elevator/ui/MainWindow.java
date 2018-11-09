@@ -25,7 +25,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -44,6 +43,10 @@ import de.ovgu.featureide.examples.elevator.core.controller.ITickListener;
 
 import de.ovgu.featureide.examples.elevator.core.model.Elevator;
 import de.ovgu.featureide.examples.elevator.core.model.ElevatorState;
+
+//#if FloorPermission
+import java.util.Arrays;
+//#endif
 
 //#if Service
 import java.awt.Dimension;

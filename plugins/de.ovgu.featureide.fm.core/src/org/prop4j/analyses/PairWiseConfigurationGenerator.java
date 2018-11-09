@@ -559,7 +559,6 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		// satisfiable?
 		if (allYesSolution != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			solver.isSatisfiable();
 			allNoSolution = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
@@ -927,13 +926,17 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 					break;
 				}
 			}
+			solver.assignmentPush(mx1);
 			if (xModel1 == null) {
-				throw new RuntimeException();
+				xModel1 = solver.findModel();
+				if (xModel1 == null) {
+					solver.assignmentPop();
+					throw new RuntimeException();
+				}
 			}
 
 			int c = 0;
 
-			solver.assignmentPush(mx1);
 			final int rowIndex = i * numVariables;
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {

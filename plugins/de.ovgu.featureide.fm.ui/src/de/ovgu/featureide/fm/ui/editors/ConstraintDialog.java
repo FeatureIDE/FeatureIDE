@@ -684,7 +684,6 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
-		constraintText.setPossibleWords(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
 			@Override
@@ -960,7 +959,7 @@ public class ConstraintDialog implements GUIDefaults {
 			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
 
 		} catch (final ParseException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -977,12 +976,12 @@ public class ConstraintDialog implements GUIDefaults {
 			if (constraintNode == null) {
 				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
 						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
-				constraintText.underlineEverything(constraintText.getUnknownWords().isEmpty());
 			} else {
 				if (!validator.validateAsync(constraintNode, onUpdate)) {
 					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
 				}
 			}
+			constraintText.updateHighlight(nodeReader.errorType);
 		}
 	}
 }

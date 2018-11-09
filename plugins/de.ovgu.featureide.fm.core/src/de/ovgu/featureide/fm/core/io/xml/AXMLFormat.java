@@ -155,6 +155,10 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 		return true;
 	}
 
+	protected final boolean supportsContent(CharSequence content, Pattern pattern) {
+		return supportsRead() && pattern.matcher(content).find();
+	}
+
 	protected final boolean supportsContent(LazyReader reader, Pattern pattern) {
 		if (supportsRead()) {
 			final Matcher matcher = pattern.matcher("");
