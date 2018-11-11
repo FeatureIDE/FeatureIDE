@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * @author Sabrina Hugo
@@ -64,8 +65,23 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 			final IGraphicalFeature feature = featurepart.getModel();
 			final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
 			final int dex = parent != null ? parent.getObject().getStructure().getChildIndex(feature.getObject().getStructure()) : 0;
+
+			final FeatureModelLayout layout = feature.getGraphicalModel().getLayout();
+
+			// checks if root bottom layout is chosen
+			if (layout.getTopDownInverted()) {
+				handleTopDownInvertedLayout(event, editPartRegistry, feature, parent, dex);
+				return true;
+			}
+
+			// checks if root right layout is chosen
+			if (layout.getLeftRightInverted()) {
+				handleLeftRightInvertedLayout(event, editPartRegistry, feature, parent, dex);
+				return true;
+			}
+
 			// checks if a top-down layout is chosen
-			if (!feature.getGraphicalModel().getLayout().verticalLayout()) {
+			if (!feature.getGraphicalModel().getLayout().getHasVerticalLayout()) {
 				handleTopDownLayout(event, editPartRegistry, feature, parent, dex);
 				return true;
 				// in case that the left to right layout is chosen
@@ -73,6 +89,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 				handleLeftRightLayout(event, editPartRegistry, feature, parent, dex);
 				return true;
 			}
+
 			// true if a constraint is selected
 		} else if (part instanceof ConstraintEditPart) {
 			final ConstraintEditPart constraint = (ConstraintEditPart) part;
@@ -120,6 +137,26 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		}
 	}
 
+	private void handleLeftRightInvertedLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature,
+			final IGraphicalFeature parent, final int dex) {
+		// checks if the right arrow key is pressed and if the selected feature has visible children
+		if ((event.keyCode == SWT.ARROW_LEFT) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+		}
+		// checks if the selected feature is the root
+		if (parent != null) {
+			if ((event.keyCode == SWT.ARROW_RIGHT)) {
+				navigateTo((EditPart) editPartRegistry.get(parent), event);
+			}
+			if ((event.keyCode == SWT.ARROW_DOWN)) {
+				navigateTo(findNextFeature(feature, dex, Direction.RIGHT), event);
+			}
+			if ((event.keyCode == SWT.ARROW_UP)) {
+				navigateTo(findNextFeature(feature, dex, Direction.LEFT), event);
+			}
+		}
+	}
+
 	private void handleTopDownLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature, final IGraphicalFeature parent,
 			final int dex) {
 		// checks if the down arrow key is pressed and if the selected feature has visible children
@@ -138,6 +175,30 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 				return;
 			}
 			if ((event.keyCode == SWT.ARROW_UP)) {
+				navigateTo((EditPart) editPartRegistry.get(parent), event);
+				return;
+			}
+		}
+	}
+
+	private void handleTopDownInvertedLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature, final IGraphicalFeature parent,
+			final int dex) {
+		// checks if the down arrow key is pressed and if the selected feature has visible children
+		if ((event.keyCode == SWT.ARROW_UP) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+			return;
+		}
+		// checks if the selected feature is the root
+		if (parent != null) {
+			if ((event.keyCode == SWT.ARROW_RIGHT)) {
+				navigateTo(findNextFeature(feature, dex, Direction.RIGHT), event);
+				return;
+			}
+			if ((event.keyCode == SWT.ARROW_LEFT)) {
+				navigateTo(findNextFeature(feature, dex, Direction.LEFT), event);
+				return;
+			}
+			if ((event.keyCode == SWT.ARROW_DOWN)) {
 				navigateTo((EditPart) editPartRegistry.get(parent), event);
 				return;
 			}

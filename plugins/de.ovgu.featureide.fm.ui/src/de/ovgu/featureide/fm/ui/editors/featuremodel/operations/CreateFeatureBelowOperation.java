@@ -106,7 +106,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 			}
 		}
 		// decides if the anchor points are at the side or on the top of the rectangle
-		if (!newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout()) {
+		if (!newGraphicalFeature.getGraphicalModel().getLayout().getHasVerticalLayout()) {
 			newGraphicalFeature.setLocation(new Point(maxX + xDistanceTopDown, yLocation));
 		} else {
 			newGraphicalFeature.setLocation(new Point(xLocation, maxY + yDistanceLeftRight));

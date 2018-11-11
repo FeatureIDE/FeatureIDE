@@ -140,7 +140,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		// decides if the anchor points are at the side or on the top of the rectangle
 		int distance;
 		boolean topDown;
-		if (!newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout()) {
+		if (!newGraphicalFeature.getGraphicalModel().getLayout().getHasVerticalLayout()) {
 			newGraphicalFeature.setLocation(new Point(minX, yLocation));
 			topDown = true;
 			distance = topDownDefaultDistance;
@@ -176,7 +176,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation() {
 		final IFeatureStructure parent = newCompound.getStructure().getParent();
 		if (newGraphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 0) {
-			shiftChildren(newGraphicalFeature.getGraphicalChildren(true), (-distance), !newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout());
+			shiftChildren(newGraphicalFeature.getGraphicalChildren(true), (-distance), !newGraphicalFeature.getGraphicalModel().getLayout().getHasVerticalLayout());
 		}
 		if (parent != null) {
 			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());

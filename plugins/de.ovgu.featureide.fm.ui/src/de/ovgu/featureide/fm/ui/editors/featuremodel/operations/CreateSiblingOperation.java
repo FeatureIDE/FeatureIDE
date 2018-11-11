@@ -100,7 +100,7 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 			}
 		}
 
-		if (featureModel.getLayout().verticalLayout()) {
+		if (featureModel.getLayout().getHasVerticalLayout()) {
 			// left to right
 			featureModel.getGraphicalFeature(newFeature).setLocation(new Point(xLocation, maxY + yDistanceLeftRight));
 		} else {
