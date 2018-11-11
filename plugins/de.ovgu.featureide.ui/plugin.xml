@@ -1007,6 +1007,7 @@
 				categoryId="de.ovgu.featureide.ui.AnnoCompletion"
 				class="de.ovgu.featureide.ui.editors.AnnoCompletion">
 			<partition type="__java_singleline_comment"/>
+			<partition type="__java_multiline_comment"/>
 		</javaCompletionProposalComputer>
 		<proposalCategory
 				id="FeatureCompletion"

@@ -661,7 +661,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+		return super.supportsContent(content, CONTENT_REGEX);
 	}
 
 	@Override

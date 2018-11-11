@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.regex.Pattern;
+
 /**
  * Definition of valid operator names for constraint expressions.
  *
@@ -28,6 +30,22 @@ package de.ovgu.featureide.fm.core;
 public class Operator {
 
 	public static final String[] NAMES = { "Not", "And", "Or", "Implies", "Iff", "(", ")" };
+
+	public static final String REGEX;
+	static {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		for (final String keyword : NAMES) {
+			if ((keyword == "(") || (keyword == ")")) {
+				sb.append("\\" + keyword);
+			} else {
+				sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
+			}
+			sb.append("|");
+		}
+		sb.setCharAt(sb.length() - 1, ')');
+		REGEX = sb.toString();
+	}
 
 	/**
 	 * @param name

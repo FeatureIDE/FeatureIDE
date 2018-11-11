@@ -575,13 +575,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						feature.addAttribute(att.cloneRecursive(feature));
 					}
 				}
+				treeViewer.refresh();
 			}
 		} else if (event.getEventType() == EventType.STRUCTURE_CHANGED) {
 			if (event.getSource() instanceof GraphicalFeature) {
 				GraphicalFeature graphFeat = (GraphicalFeature) event.getSource();
 				ExtendedFeature feat = (ExtendedFeature) graphFeat.getObject();
 				for (IFeatureAttribute att : feat.getAttributes()) {
-					if (!((ExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
+					if (att.isRecursive() && !((ExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
 						feat.removeAttribute(att);
 					}
 				}
@@ -592,7 +593,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						}
 					}
 				}
-
+				treeViewer.refresh();
 			}
 		} else if (event.getEventType() == EventType.COLOR_CHANGED) {
 			treeViewer.refresh();
