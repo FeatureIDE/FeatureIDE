@@ -735,7 +735,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
-					graphicalFeatureModel.getLayout().setLayout(1);
 					graphicalFeatureModel.init();
 
 					viewer.setContents(graphicalFeatureModel);
