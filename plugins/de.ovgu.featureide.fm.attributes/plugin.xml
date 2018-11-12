@@ -76,7 +76,7 @@
    <extension
          point="de.ovgu.featureide.fm.core.FMComposer">
       <fmComposer
-            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModeling"
+            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModelingFMExtension"
             composer="de.ovgu.featureide.core.ExtendedFeatureModeling"
             id="de.ovgu.featureide.core.ExtendedFeatureModelingFMExtension"
             name="Extended FeatureModeling FMExtension">
