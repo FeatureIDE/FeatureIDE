@@ -403,7 +403,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 	}
 
 	/**
@@ -447,6 +447,8 @@ public class CorePlugin extends AbstractCorePlugin {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
+
 		final IFeatureModel featureModel = createFeatureModelFile(project, composer);
 		createConfigFile(project, configPath, featureModel, "default.");
 
@@ -465,11 +467,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, addNature);
+		if (addNature) {
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void setProjectProperties(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addNature) {
+			final String buildPath) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
@@ -477,9 +481,6 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
-		}
-		if (addNature) {
-			addFeatureNatureToProject(project);
 		}
 	}
 
