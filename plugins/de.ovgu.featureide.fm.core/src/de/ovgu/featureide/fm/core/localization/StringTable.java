@@ -504,7 +504,7 @@ public class StringTable {
 		"Select only one feature in order to replace it with an equivalent one.";
 	public static final String IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_ = "It can not be replaced with an equivalent one.";
 	public static final String CHANGE_GROUP_TYPE = "Change Group Type";
-	public static final String CREATE_SIBLING = "Create Sibling Feature";
+	public static final String CREATE_SIBLING = "Create Sibling Feature (CTRL + G)";
 	public static final String MOVE_FEATURE = "Move Feature";
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
@@ -1093,5 +1093,5 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
-	public static final String SELECT_SUBTREE = "Select Subtree";
+	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 }
