@@ -20,20 +20,24 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo functionality.
@@ -45,21 +49,28 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	private final IFeature newCompound;
 	private final IFeature child;
+	private final IGraphicalFeature newGraphicalFeature;
+	private int distance;
 	LinkedList<IFeature> selectedFeatures;
 	TreeMap<Integer, IFeature> children = new TreeMap<>();
 
 	boolean parentOr = false;
 	boolean parentAlternative = false;
 
-	public CreateFeatureAboveOperation(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
-		super(featureModel, CREATE_COMPOUND);
+	private final int topDownDefaultDistance = 50;
+	private final int leftRightDefaultDistance = 120;
+
+	public CreateFeatureAboveOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
+		super(featureModel.getFeatureModel(), CREATE_FEATURE_ABOVE);
 		this.selectedFeatures = selectedFeatures;
 		child = selectedFeatures.get(0);
 		int number = 0;
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
+		while (FeatureUtils.getFeatureNames(featureModel.getFeatureModel()).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
 
-		newCompound = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newCompound =
+			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
 
+		newGraphicalFeature = featureModel.getGraphicalFeature(newCompound);
 	}
 
 	@Override
@@ -96,12 +107,77 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			featureModel.addFeature(newCompound);
 			featureModel.getStructure().setRoot(newCompound.getStructure());
 		}
+
+		if (newGraphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 0) {
+			adjustPositions();
+		}
+
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newCompound);
+	}
+
+	/**
+	 * adjusts position of the new feature and its children in manual layout
+	 */
+	private void adjustPositions() {
+		final List<IGraphicalFeature> graphicalChildren = newGraphicalFeature.getGraphicalChildren(true);
+		int minX = graphicalChildren.get(0).getLocation().x;
+		int minY = graphicalChildren.get(0).getLocation().y;
+		int yLocation = graphicalChildren.get(0).getLocation().y;
+		int xLocation = graphicalChildren.get(0).getLocation().x;
+
+		// looks for the leftest x coordinate and the topmost y coordinate of a child
+		for (final IGraphicalFeature child : graphicalChildren) {
+			if (child.getLocation().x < minX) {
+				minX = child.getLocation().x;
+				yLocation = child.getLocation().y;
+			}
+			if (child.getLocation().y < minY) {
+				minY = child.getLocation().y;
+				xLocation = child.getLocation().x;
+			}
+		}
+
+		// decides if the anchor points are at the side or on the top of the rectangle
+		int distance;
+		boolean topDown;
+		if (!newGraphicalFeature.getGraphicalModel().getLayout().getHasVerticalLayout()) {
+			newGraphicalFeature.setLocation(new Point(minX, yLocation));
+			topDown = true;
+			distance = topDownDefaultDistance;
+		} else {
+			newGraphicalFeature.setLocation(new Point(xLocation, minY));
+			topDown = false;
+			distance = leftRightDefaultDistance;
+		}
+		this.distance = distance;
+		shiftChildren(graphicalChildren, distance, topDown);
+	}
+
+	/**
+	 * shifts the subtree of the new feature above
+	 *
+	 * @param graphicalChildren children of the new feature
+	 * @param distance distance to shift
+	 * @param topDown previous layout
+	 */
+	private void shiftChildren(List<IGraphicalFeature> graphicalChildren, int distance, boolean topDown) {
+		for (int i = 0; i < graphicalChildren.size(); i++) {
+			shiftChildren(graphicalChildren.get(i).getGraphicalChildren(true), distance, topDown);
+			// if there are more layouts to come, there has to be more cases added here
+			if (topDown) {
+				graphicalChildren.get(i).setLocation(new Point(graphicalChildren.get(i).getLocation().x, graphicalChildren.get(i).getLocation().y + distance));
+			} else {
+				graphicalChildren.get(i).setLocation(new Point(graphicalChildren.get(i).getLocation().x + distance, graphicalChildren.get(i).getLocation().y));
+			}
+		}
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		final IFeatureStructure parent = newCompound.getStructure().getParent();
+		if (newGraphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 0) {
+			shiftChildren(newGraphicalFeature.getGraphicalChildren(true), (-distance), !newGraphicalFeature.getGraphicalModel().getLayout().getHasVerticalLayout());
+		}
 		if (parent != null) {
 			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
 			featureModel.deleteFeature(newCompound);

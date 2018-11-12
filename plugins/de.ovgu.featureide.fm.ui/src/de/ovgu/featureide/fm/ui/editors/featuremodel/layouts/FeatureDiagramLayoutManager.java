@@ -337,11 +337,11 @@ abstract public class FeatureDiagramLayoutManager {
 		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 
 		// Check the first four positions for intersections with the features
-		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().getHasVerticalLayout());
 
 		// Add the position next to the featureModel and check for hits with the constraints
 		rects.add(new Rectangle(new Point(max.x + FMPropertyManager.getFeatureSpaceX(), min.y), legendSize));
-		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().getHasVerticalLayout());
 
 		if (rects.size() > 0) {
 			// At this point, rects does only contain positions for the legend that are acceptable. So we take the first
