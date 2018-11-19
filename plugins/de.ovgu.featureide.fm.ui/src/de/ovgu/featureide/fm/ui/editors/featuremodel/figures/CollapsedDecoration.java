@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * A decoration for a feature connection that indicates the mandatory property.
+ * A decoration for a feature connection that indicates the collapsed property.
  *
  * @author Joshua Sprey
  * @author Enis Belli
@@ -46,7 +46,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 public class CollapsedDecoration extends ConnectionDecoration implements GUIDefaults {
 
 	private final Label childrenCount = new Label();
-	// private static GridLayout gl = new GridLayout();
 	private static final FreeformLayout layout = new FreeformLayout();
 
 	private IGraphicalFeature graphicalFeature;
@@ -109,7 +108,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
 				// left to right layout
-				super.setLocation(p.translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
+				super.setLocation(p.translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, (-getBounds().height / 2) + 1));
 			}
 		}
 		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
@@ -150,9 +149,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 	}
 
 	@Override
-	public void setReferencePoint(Point p) {
-
-	}
+	public void setReferencePoint(Point p) {}
 
 	@Override
 	protected void fillShape(Graphics graphics) {}
