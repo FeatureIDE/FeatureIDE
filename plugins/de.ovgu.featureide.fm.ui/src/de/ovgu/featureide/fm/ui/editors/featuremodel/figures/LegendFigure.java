@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -36,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -43,6 +45,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AbstractGraphicalFeatureFilter;
@@ -193,20 +196,31 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		fmStructure.setShowHiddenFeatures(showHidden);
 
-		mandatory = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new MandatoryGraphicalFeatureFilter())).size() > 0;
-		optional = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OptionalGraphicalFeatureFilter())).size() > 0;
-		alternative = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AlternativeGroupFilter())).size() > 0;
-		or = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OrGroupFilter())).size() > 0;
-		_abstract = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AbstractGraphicalFeatureFilter())).size() > 0;
-		concrete = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new ConcreteGraphicalFeatureFilter())).size() > 0;
-		hidden = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new HiddenGraphicalFeatureFilter())).size() > 0;
+		// Retrieve visible features
+		final List<IGraphicalFeature> graphicalVisibleFeatures = graphicalFeatureModel.getVisibleFeatures();
+		final List<IFeature> visibleFeatures = new ArrayList<>();
+		for (final IGraphicalFeature iGraphicalFeature : graphicalVisibleFeatures) {
+			visibleFeatures.add(iGraphicalFeature.getObject());
+		}
+
+		mandatory = Functional.toList(Functional.filter(graphicalVisibleFeatures, new MandatoryGraphicalFeatureFilter())).size() > 0;
+		optional = Functional.toList(Functional.filter(graphicalVisibleFeatures, new OptionalGraphicalFeatureFilter())).size() > 0;
+		alternative = Functional.toList(Functional.filter(graphicalVisibleFeatures, new AlternativeGroupFilter())).size() > 0;
+		or = Functional.toList(Functional.filter(graphicalVisibleFeatures, new OrGroupFilter())).size() > 0;
+		_abstract = Functional.toList(Functional.filter(graphicalVisibleFeatures, new AbstractGraphicalFeatureFilter())).size() > 0;
+		concrete = Functional.toList(Functional.filter(graphicalVisibleFeatures, new ConcreteGraphicalFeatureFilter())).size() > 0;
+		hidden = Functional.toList(Functional.filter(graphicalVisibleFeatures, new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 		if (analyser.calculateDeadConstraints) {
-			dead = fmStructure.hasDeadFeatures();
+			final List<IFeature> deadFeatures = new ArrayList<>(analyser.getDeadFeatures());
+			deadFeatures.retainAll(visibleFeatures);
+			dead = deadFeatures.size() > 0;
 		}
 		if (analyser.calculateFOConstraints) {
-			falseoptional = fmStructure.hasFalseOptionalFeatures();
+			final List<IFeature> falseOptionalFeatures = new ArrayList<>(analyser.getFalseOptionalFeatures());
+			falseOptionalFeatures.retainAll(visibleFeatures);
+			falseoptional = falseOptionalFeatures.size() > 0;
 		}
 		indetHidden = fmStructure.hasIndetHidden();
 

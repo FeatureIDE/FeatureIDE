@@ -705,7 +705,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-
 			setDirty(true);
 			analyzeFeatureModel();
 			break;
@@ -870,7 +869,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(selectedFeature);
 			}
 			viewer.internRefresh(false);
-			analyzeFeatureModel();
 			setDirty(true);
 			// Center collapsed feature after operation
 			if (event.getSource() instanceof IFeature) {
@@ -884,7 +882,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.reload();
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
-			analyzeFeatureModel();
 			setDirty(true);
 
 			// Center root feature after operation
