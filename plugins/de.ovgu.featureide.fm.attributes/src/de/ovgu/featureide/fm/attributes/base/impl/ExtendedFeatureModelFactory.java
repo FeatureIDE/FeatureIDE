@@ -38,7 +38,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedFeatureModel createFeatureModel() {
+	public ExtendedFeatureModel create() {
 		return new ExtendedFeatureModel(ID);
 	}
 }

@@ -115,7 +115,9 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
@@ -345,8 +347,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (instance != null) {
 			featureModelManager = instance;
 		} else {
-			featureModelManager =
-				new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
+			featureModelManager = new VirtualFileManager<>(DefaultFeatureModelFactory.getInstance().create(), new XmlFeatureModelFormat());
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
@@ -480,8 +481,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void guidslToXML() {
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
-			FeatureModelManager.convert(Paths.get(project.getFile("model.m").getLocationURI()), Paths.get(project.getFile("model.xml").getLocationURI()),
-					new XmlFeatureModelFormat());
+			FeatureModelIO.getInstance().convert(Paths.get(project.getFile("model.m").getLocationURI()),
+					Paths.get(project.getFile("model.xml").getLocationURI()), new XmlFeatureModelFormat());
 			// TODO GUIDSL Annotations, should be handled in guidsl format #write
 			// if (!guidslReader.getAnnLine().isEmpty()) {
 			// ModelMarkerHandler<IFile> modelFile = new ModelMarkerHandler<>(project.getFile("model.m"));
@@ -576,14 +577,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				try {
 					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 					configurationUpdate = true;
+					final IFeatureModel featureModel = featureModelManager.getObject();
 					configFolder.accept(new IResourceVisitor() {
-
-						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
-
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							if ((resource instanceof IFile) && resource.isAccessible()) {
-								final FileHandler<Configuration> fileHandler = ConfigurationManager.load(Paths.get(resource.getLocationURI()), config);
+								final FileHandler<Configuration> fileHandler =
+									ConfigurationIO.getInstance().getFileHandler(Paths.get(resource.getLocationURI()));
+								fileHandler.getObject().initFeatures(featureModel);
 								if (!fileHandler.getLastProblems().containsError()) {
 									fileHandler.write();
 								}
@@ -960,9 +961,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
 				if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
 					// ignore changes in unselected feature folders
-					final Configuration currentConfiguration = new Configuration(getFeatureModel(), true);
-					final FileHandler<Configuration> fileHandler =
-						ConfigurationManager.load(currentConfig.getLocation().toFile().toPath(), currentConfiguration);
+					final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig.getLocation().toFile().toPath());
+					final Configuration currentConfiguration = fileHandler.getObject();
+					currentConfiguration.initFeatures(getFeatureModel());
 
 					final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
 					for (final IResource res : sourceFolder.members()) {
@@ -1197,16 +1198,17 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<IFile> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+		final IFeatureModel featureModel = featureModelManager.getObject();
 
 		int row = 0;
 		for (final IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
-			ConfigurationManager.load(Paths.get(file.getLocationURI()), configuration);
+			final Configuration configuration = ConfigurationManager.load(Paths.get(file.getLocationURI()));
+			configuration.initFeatures(featureModel);
 
 			int column = 0;
 			for (final String feature : concreteFeatures) {
-				final SelectableFeature selectablefeature = configuration.getSelectablefeature(feature);
+				final SelectableFeature selectablefeature = configuration.getSelectableFeature(feature);
 				if (selectablefeature != null) {
 					currentRow[column] = selectablefeature.getSelection() == Selection.SELECTED;
 				}

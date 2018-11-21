@@ -114,11 +114,11 @@ public class SimpleFileHandler<T> {
 		return fileHandler.getLastProblems();
 	}
 
-	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+	public static <T> ProblemList load(Path path, T object, FormatManager<T> formatManager) {
 		return load(new SimpleFileHandler<>(path, object, null), formatManager);
 	}
 
-	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<T> formatManager) {
 		final String content = fileHandler.getContent();
 
 		if (content != null) {

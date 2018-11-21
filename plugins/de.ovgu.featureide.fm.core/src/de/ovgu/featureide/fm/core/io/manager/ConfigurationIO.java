@@ -18,24 +18,37 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.core.io.manager;
+
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.FactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * Provides a {@link FactoryWorkspace} for given path.<br/> The purpose of this provider is to associate a certain factory workspace with a certain project /
- * folder.
+ * File handling operations for configurations.
  *
  * @author Sebastian Krieter
  */
-public interface IFactoryWorkspaceProvider {
+public class ConfigurationIO extends AbstractIO<Configuration> {
 
-	FactoryWorkspace getFactoryWorkspace(String path);
+	private static final ConfigurationIO INSTANCE = new ConfigurationIO();
 
-	FactoryWorkspace getFactoryWorkspace();
+	public static ConfigurationIO getInstance() {
+		return INSTANCE;
+	}
 
-	void addFactoryWorkspace(String path, FactoryWorkspace workspace);
+	private ConfigurationIO() {}
 
-	void save();
+	@Override
+	protected FormatManager<Configuration> getFormatManager() {
+		return ConfigFormatManager.getInstance();
+	}
 
-	boolean load();
+	@Override
+	protected FactoryManager<Configuration> getFactoryManager() {
+		return ConfigurationFactoryManager.getInstance();
+	}
 
 }

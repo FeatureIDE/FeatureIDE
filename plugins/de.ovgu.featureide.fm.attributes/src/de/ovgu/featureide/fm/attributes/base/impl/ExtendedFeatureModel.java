@@ -14,7 +14,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		super(copyFeatureModel, newRoot);
 
 		try {
-			factory = FMFactoryManager.getFactoryById(factoryID);
+			factory = FMFactoryManager.getInstance().getFactory(factoryID);
 		} catch (NoSuchExtensionException e) {
 			factory = new ExtendedFeatureModelFactory();
 		}
@@ -24,7 +24,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		super(factoryID);
 
 		try {
-			factory = FMFactoryManager.getFactoryById(factoryID);
+			factory = FMFactoryManager.getInstance().getFactory(factoryID);
 		} catch (NoSuchExtensionException e) {
 			factory = new ExtendedFeatureModelFactory();
 		}

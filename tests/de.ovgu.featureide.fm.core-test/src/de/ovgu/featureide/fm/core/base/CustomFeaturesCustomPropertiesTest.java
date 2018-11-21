@@ -79,7 +79,7 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
-		public IFeatureModel createFeatureModel() {
+		public IFeatureModel create() {
 			return new FeatureModel(ID);
 		}
 
@@ -99,7 +99,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 		FMFactoryManager.getInstance().addExtension(factory);
 
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 
 		final IFeature f1 = factory.createFeature(model, "A");
 		final IFeature f2 = factory.createFeature(model, "B");
@@ -134,7 +134,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 
@@ -170,7 +170,7 @@ public class CustomFeaturesCustomPropertiesTest {
 		modelFile.delete();
 		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 
-		final IFeatureModel model2 = factory.createFeatureModel();
+		final IFeatureModel model2 = factory.create();
 		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {

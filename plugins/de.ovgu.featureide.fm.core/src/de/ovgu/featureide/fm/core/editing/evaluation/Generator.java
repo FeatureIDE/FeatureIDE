@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -67,8 +68,8 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
+		final IFeatureModel fm = factory.create();
 		final List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));
 		int count = 1;
@@ -199,7 +200,7 @@ public abstract class Generator {
 
 	public static IFeatureModel generalization(IFeatureModel originalFM, long id, int numberOfEdits) {
 		final IFeatureModel fm = originalFM.clone(null);
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
 		final Random random = new Random(id);
 
 		for (int i = 0; i < numberOfEdits; i++) {
@@ -326,7 +327,7 @@ public abstract class Generator {
 			Logger.logError(e);
 		}
 		IFeatureModel fm = originalFM.clone(null);
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
 		final Random random = new Random(id);
 
 		for (int i = 0; i < numberOfEdits; i++) {

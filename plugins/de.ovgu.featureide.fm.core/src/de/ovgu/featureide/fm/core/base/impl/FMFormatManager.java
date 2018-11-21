@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.cnf.CNFFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
@@ -36,21 +37,23 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  *
  * @author Sebastian Krieter
  */
-public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
+public final class FMFormatManager extends FormatManager<IFeatureModel> {
 
-	private FMFormatManager() {
-		super(XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class,
-				ConquererFMWriter.class, CNFFormat.class);
+	@Override
+	protected Class<?>[] getDefaultClasses() {
+		return new Class<?>[] { XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class,
+			ConquererFMWriter.class, CNFFormat.class };
 	}
 
 	private static FMFormatManager instance = new FMFormatManager();
 
 	public static FMFormatManager getInstance() {
+		instance.setLoader(null);
 		return instance;
 	}
 
-	public static void setExtensionLoader(IExtensionLoader<IFeatureModelFormat> extensionLoader) {
-		instance.setExtensionLoaderInternal(extensionLoader);
+	public static void initialize(IExtensionLoader<IPersistentFormat<IFeatureModel>> extensionLoader) {
+		instance.setLoader(extensionLoader);
 	}
 
 	public static IFeatureModelFormat getDefaultFormat() {

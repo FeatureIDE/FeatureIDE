@@ -54,7 +54,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 			number++;
 		}
 
-		newFeature = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());

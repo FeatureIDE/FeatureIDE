@@ -69,7 +69,7 @@ public class TypeChef {
 		try {
 			print = new BufferedWriter(new FileWriter(outputFile));
 
-			final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath()).getObject();
+			final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath());
 
 			final Node nodes = AdvancedNodeCreator.createCNF(fm);
 			final StringBuilder cnf = new StringBuilder();

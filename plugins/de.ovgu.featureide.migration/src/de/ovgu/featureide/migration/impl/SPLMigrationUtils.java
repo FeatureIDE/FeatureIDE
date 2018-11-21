@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
@@ -175,8 +175,7 @@ public class SPLMigrationUtils {
 			throws CoreException, UnsupportedEncodingException {
 		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
 		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
-		FileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel, Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT),
-				defaultFormat);
+		ConfigurationManager.save(new Configuration(featureModel, false, true), Paths.get(configFile.getLocationURI()), defaultFormat);
 	}
 
 	/**

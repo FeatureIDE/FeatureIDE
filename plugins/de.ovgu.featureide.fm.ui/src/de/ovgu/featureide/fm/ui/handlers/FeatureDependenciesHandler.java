@@ -132,7 +132,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		return FeatureModelManager.load(Paths.get(inputFile.getLocationURI())).getObject();
+		return FeatureModelManager.load(Paths.get(inputFile.getLocationURI()));
 	}
 
 }

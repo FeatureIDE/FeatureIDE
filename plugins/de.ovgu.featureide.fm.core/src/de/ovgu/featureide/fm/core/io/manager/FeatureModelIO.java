@@ -18,34 +18,37 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.core.io.manager;
 
-import java.util.HashMap;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.FactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 
 /**
- * This {@link IFactoryWorkspaceProvider provider} maps paths to {@link FactoryWorkspace workspaces}.
+ * File handling operations for feature models.
  *
  * @author Sebastian Krieter
  */
-public abstract class AFactoryWorkspaceProvider implements IFactoryWorkspaceProvider {
+public class FeatureModelIO extends AbstractIO<IFeatureModel> {
 
-	protected final HashMap<String, FactoryWorkspace> projectMap = new HashMap<>();
-	protected final FactoryWorkspace defaultWorkspace = new FactoryWorkspace();
+	private static final FeatureModelIO INSTANCE = new FeatureModelIO();
+
+	public static FeatureModelIO getInstance() {
+		return INSTANCE;
+	}
+
+	private FeatureModelIO() {}
 
 	@Override
-	public FactoryWorkspace getFactoryWorkspace(String path) {
-		final FactoryWorkspace factoryWorkspace = projectMap.get(path);
-		return factoryWorkspace != null ? factoryWorkspace : defaultWorkspace;
+	protected FormatManager<IFeatureModel> getFormatManager() {
+		return FMFormatManager.getInstance();
 	}
 
 	@Override
-	public FactoryWorkspace getFactoryWorkspace() {
-		return defaultWorkspace;
-	}
-
-	@Override
-	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
-		projectMap.put(path, workspace);
+	protected FactoryManager<IFeatureModel> getFactoryManager() {
+		return FMFactoryManager.getInstance();
 	}
 
 }

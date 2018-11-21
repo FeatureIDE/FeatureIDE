@@ -30,7 +30,6 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -42,16 +41,9 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  *
  * @author Sebastian Krieter
  */
-public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
+public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 
-	@SafeVarargs
-	public FormatManager(Class<? extends T>... formats) {
-		setExtensionLoaderInternal(new CoreExtensionLoader<T>(formats));
-	}
-
-	protected FormatManager() {}
-
-	public T getFormatById(String id) throws NoSuchExtensionException {
+	public IPersistentFormat<T> getFormatById(String id) throws NoSuchExtensionException {
 		return getExtension(id);
 	}
 
@@ -70,10 +62,10 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	 *         be parsed.
 	 */
 	@CheckForNull
-	public T getFormatByContent(CharSequence content, String fileName) {
+	public IPersistentFormat<T> getFormatByContent(CharSequence content, String fileName) {
 		if (fileName != null) {
 			final String extension = SimpleFileHandler.getFileExtension(fileName);
-			for (final T format : getExtensions()) {
+			for (final IPersistentFormat<T> format : getExtensions()) {
 				if (extension.equals(format.getSuffix()) && format.supportsContent(content)) {
 					return format;
 				}
@@ -83,11 +75,11 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	}
 
 	@CheckForNull
-	public T getFormatByContent(Path path) {
+	public IPersistentFormat<T> getFormatByContent(Path path) {
 		if (path != null) {
 			final String extension = SimpleFileHandler.getFileExtension(path);
-			final List<T> formatList = new LinkedList<>();
-			for (final T format : getExtensions()) {
+			final List<IPersistentFormat<T>> formatList = new LinkedList<>();
+			for (final IPersistentFormat<T> format : getExtensions()) {
 				if (extension.equals(format.getSuffix())) {
 					formatList.add(format);
 				}
@@ -95,7 +87,7 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 			if (!formatList.isEmpty()) {
 				try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.SYNC, StandardOpenOption.READ)) {
 					final LazyReader lazyReader = new LazyReader(inputStream);
-					for (final T format : formatList) {
+					for (final IPersistentFormat<T> format : formatList) {
 						if (extension.equals(format.getSuffix()) && format.supportsContent(lazyReader)) {
 							return format;
 						}
@@ -109,15 +101,15 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 		return null;
 	}
 
-	public List<T> getFormatListForExtension(Path path) {
+	public List<IPersistentFormat<T>> getFormatListForExtension(Path path) {
 		return getFormatListForExtension(path.getFileName().toString());
 	}
 
-	public List<T> getFormatListForExtension(String fileName) {
-		final LinkedList<T> formatList = new LinkedList<>();
+	public List<IPersistentFormat<T>> getFormatListForExtension(String fileName) {
+		final LinkedList<IPersistentFormat<T>> formatList = new LinkedList<>();
 		if (fileName != null) {
 			final String extension = SimpleFileHandler.getFileExtension(fileName);
-			for (final T format : getExtensions()) {
+			for (final IPersistentFormat<T> format : getExtensions()) {
 				if (format.supportsRead() && extension.equals(format.getSuffix())) {
 					formatList.add(format);
 				}

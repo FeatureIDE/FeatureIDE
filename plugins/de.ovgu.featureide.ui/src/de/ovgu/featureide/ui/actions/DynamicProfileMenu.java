@@ -44,7 +44,6 @@ import org.eclipse.ui.internal.Workbench;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -98,7 +97,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	private boolean initFeatureModel() {
 		try {
 			final IFeatureProject curFeatureProject = getCurrentFeatureProject();
-			featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
+			featureModel = curFeatureProject == null ? null : curFeatureProject.getFeatureModel();
 			return featureModel != null;
 		} catch (final Exception e) {
 			return false;

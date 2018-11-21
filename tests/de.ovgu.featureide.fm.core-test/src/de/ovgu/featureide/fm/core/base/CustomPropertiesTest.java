@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -36,13 +36,13 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public class CustomPropertiesTest {
 
 	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
-	static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+	static final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 	@Before
 	public void setup() {
 		CustomFeaturesCustomPropertiesTest.setFileSystem();
 
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 
 		final IFeature f1 = factory.createFeature(model, "A");
 		final IFeature f2 = factory.createFeature(model, "B");
@@ -71,7 +71,7 @@ public class CustomPropertiesTest {
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.containsError());
 
@@ -100,7 +100,7 @@ public class CustomPropertiesTest {
 		modelFile.delete();
 		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 
-		final IFeatureModel model2 = factory.createFeatureModel();
+		final IFeatureModel model2 = factory.create();
 		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {

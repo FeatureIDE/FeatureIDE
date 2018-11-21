@@ -23,12 +23,12 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.nio.file.Path;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -38,42 +38,31 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class ConfigurationManager extends AFileManager<Configuration> {
 
-	private static class ObjectCreator extends AFileManager.ObjectCreator<Configuration> {
-
-		private final Configuration configuration;
-
-		public ObjectCreator(Configuration configuration) {
-			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
-			this.configuration = configuration;
-		}
-
-		@Override
-		protected Configuration createObject(Path path, IPersistentFormat<Configuration> format) throws NoSuchExtensionException {
-			return configuration;
-		}
-	}
-
-	@Nonnull
-	public static IPersistentFormat<Configuration> getDefaultFormat() {
-		return new XMLConfFormat();
-	}
-
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
-		return AFileManager.getInstance(path, new ObjectCreator(null), false);
+		return getInstance(path, true);
 	}
 
 	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
-		return AFileManager.getInstance(path, new ObjectCreator(configuration), true);
+	public static final ConfigurationManager getInstance(Path identifier, boolean createInstance) {
+		return getInstance(identifier, createInstance, ConfigurationManager.class);
 	}
 
-	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
-		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
+	public static final Configuration load(Path path) {
+		return ConfigurationIO.getInstance().load(path);
 	}
 
-	protected ConfigurationManager(Configuration configuration, Path identifier) {
-		super(configuration, identifier, ConfigFormatManager.getInstance());
+	public static final boolean save(Configuration configuration, Path path, IPersistentFormat<Configuration> format) {
+		return ConfigurationIO.getInstance().save(configuration, path, format);
+	}
+
+	protected ConfigurationManager(Path identifier) {
+		super(identifier, ConfigFormatManager.getInstance(), ConfigurationFactoryManager.getInstance());
+	}
+
+	@Override
+	public IConfigurationFormat getFormat() {
+		return (IConfigurationFormat) super.getFormat();
 	}
 
 	@Override
@@ -81,14 +70,42 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		return oldObject.clone();
 	}
 
-	public void setConfiguration(Configuration configuration) {
-		variableObject = configuration;
+	private FeatureModelManager featureModelManager;
+
+	public void linkFeatureModel(FeatureModelManager featureModelManager) {
+		this.featureModelManager = featureModelManager;
+		final IFeatureModel featureModel = featureModelManager.getObject();
 		fileOperationLock.lock();
 		try {
-			setPersistentObject(copyObject(variableObject));
+			getObject().initFeatures(featureModel);
+			editObject().initFeatures(featureModel);
 		} finally {
 			fileOperationLock.unlock();
 		}
+	}
+
+	public void update() {
+		if (featureModelManager != null) {
+			final IFeatureModel featureModel = featureModelManager.getObject();
+			fileOperationLock.lock();
+			try {
+				getObject().updateFeatures(featureModel);
+				editObject().updateFeatures(featureModel);
+				editObject().update();
+			} finally {
+				fileOperationLock.unlock();
+			}
+		}
+	}
+
+	@Override
+	protected Configuration createObject() throws Exception {
+		final Configuration configuration = super.createObject();
+		configuration.setPropagate(true);
+		if (featureModelManager != null) {
+			configuration.initFeatures(featureModelManager.getObject());
+		}
+		return configuration;
 	}
 
 }

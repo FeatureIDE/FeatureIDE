@@ -298,7 +298,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printConfiguration(Configuration config, IFeature node, StringBuilder tree) {
-		_printConfiguration(config.getSelectablefeature(node.getName()), tree);
+		_printConfiguration(config.getSelectableFeature(node.getName()), tree);
 	}
 
 	private static void _printConfiguration(SelectableFeature node, StringBuilder tree) {
@@ -316,7 +316,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printNodeName(Configuration config, IFeature node, StringBuilder tree) {
-		_printNodeName(config.getSelectablefeature(node.getName()), tree);
+		_printNodeName(config.getSelectableFeature(node.getName()), tree);
 	}
 
 	/**

@@ -75,7 +75,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 			}
 			final Configuration configuration = new Configuration(featureModel, true);
 			for (final String feature : unusedFeatures) {
-				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
+				if (configuration.getSelectableFeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);
 
 				}

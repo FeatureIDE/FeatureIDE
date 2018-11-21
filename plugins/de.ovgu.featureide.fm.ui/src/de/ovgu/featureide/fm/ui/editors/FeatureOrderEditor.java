@@ -86,8 +86,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * @param featureModelEditor
 	 */
-	public FeatureOrderEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
-		super(fmManager, gfmManager);
+	public FeatureOrderEditor(IFileManager<IFeatureModel> fmManager, IGraphicalFeatureModel gfm) {
+		super(fmManager, gfm);
 	}
 
 	@Override

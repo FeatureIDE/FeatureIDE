@@ -32,7 +32,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
@@ -67,7 +67,11 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				builder.configurationNumber = Math.min(new Configuration(featureModel, false, false).number(1000000, false), builder.configurationNumber);
+				final ConfigurationPropagator configurationPropagator = new ConfigurationPropagator(featureModel, true);
+				LongRunningWrapper.runMethod(configurationPropagator.load());
+				final long number = LongRunningWrapper.runMethod(configurationPropagator.number(1000000, false));
+
+				builder.configurationNumber = Math.min(number, builder.configurationNumber);
 				if (builder.configurationNumber < 0) {
 					UIPlugin.getDefault().logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
 					builder.configurationNumber = Math.min(Integer.MAX_VALUE, builder.configurationNumber);
@@ -164,7 +168,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 					}
 				}
 				for (final String f : selectedFeatures3) {
-					if (configuration.getSelectablefeature(f).getSelection() != Selection.SELECTED) {
+					if (configuration.getSelectableFeature(f).getSelection() != Selection.SELECTED) {
 						return;
 					}
 				}

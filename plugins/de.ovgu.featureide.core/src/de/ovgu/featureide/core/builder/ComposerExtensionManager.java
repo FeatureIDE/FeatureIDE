@@ -45,7 +45,7 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 	private static ComposerExtensionManager instance = new ComposerExtensionManager();
 
 	private ComposerExtensionManager() {
-		setExtensionLoaderInternal(new EclipseExtensionLoader<IComposerExtension>(CorePlugin.PLUGIN_ID, IComposerExtensionBase.extensionPointID,
+		setLoader(new EclipseExtensionLoader<IComposerExtension>(CorePlugin.PLUGIN_ID, IComposerExtensionBase.extensionPointID,
 				IComposerExtensionBase.extensionID, IComposerExtension.class) {
 
 			@Override

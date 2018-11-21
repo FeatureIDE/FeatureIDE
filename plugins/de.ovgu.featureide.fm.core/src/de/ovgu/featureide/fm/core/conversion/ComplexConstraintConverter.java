@@ -166,7 +166,7 @@ public class ComplexConstraintConverter {
 
 		// Work with a clone
 		fm = model.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 
 		// Basic cleaning
 		if (removeRedundncy && !prepare()) {

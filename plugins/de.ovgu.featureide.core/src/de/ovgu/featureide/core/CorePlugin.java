@@ -98,6 +98,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
@@ -594,12 +595,12 @@ public class CorePlugin extends AbstractCorePlugin {
 			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
-				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
+				factory = FMFactoryManager.getInstance().getFactory(modelPath, format);
 			} catch (final NoSuchExtensionException e) {
 				Logger.logError(e);
-				factory = FMFactoryManager.getDefaultFactory();
+				factory = DefaultFeatureModelFactory.getInstance();
 			}
-			final IFeatureModel featureModel = factory.createFeatureModel();
+			final IFeatureModel featureModel = factory.create();
 			FMComposerManager.getFMComposerExtension(project);
 			featureModel.createDefaultValues(project.getName());
 

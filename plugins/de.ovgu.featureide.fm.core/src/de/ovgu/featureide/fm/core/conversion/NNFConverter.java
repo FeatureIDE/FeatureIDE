@@ -235,7 +235,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 		this.preserve = preserve;
 
 		if (nodes.isEmpty()) {

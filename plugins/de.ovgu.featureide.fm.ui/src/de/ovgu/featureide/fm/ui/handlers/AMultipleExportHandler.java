@@ -94,7 +94,7 @@ public abstract class AMultipleExportHandler<T> extends AContainerHandler {
 		}
 	}
 
-	protected abstract FormatManager<? extends IPersistentFormat<T>> getFormatManager();
+	protected abstract FormatManager<T> getFormatManager();
 
 	protected abstract FileHandler<T> read(final Path modelFilePath);
 

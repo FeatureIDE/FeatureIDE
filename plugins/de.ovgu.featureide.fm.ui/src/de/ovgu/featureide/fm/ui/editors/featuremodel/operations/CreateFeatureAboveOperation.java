@@ -24,8 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUN
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
-import java.util.TreeMap;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -58,7 +58,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		int number = 0;
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
 
-		newCompound = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newCompound = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 
 	}
 

@@ -21,19 +21,24 @@
 package de.ovgu.featureide.fm.ui.editors.elements;
 
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Manages all formats for {@link de.ovgu.featureide.fm.core.configuration.Configuration configurations}.
  *
  * @author Sebastian Krieter
  */
-public final class GraphicalFeatureModelFormatManager extends FormatManager<IGraphicalFeatureModelFormat> {
+public final class GraphicalFeatureModelFormatManager extends FormatManager<IGraphicalFeatureModel> {
 
-	private GraphicalFeatureModelFormatManager() {
-		super(GraphicalFeatureModelFormat.class);
+	@Override
+	protected Class<?>[] getDefaultClasses() {
+		return new Class<?>[] { GraphicalFeatureModelFormat.class };
 	}
 
 	private static GraphicalFeatureModelFormatManager instance = new GraphicalFeatureModelFormatManager();
+	static {
+		instance.setLoader(null);
+	}
 
 	public static GraphicalFeatureModelFormatManager getInstance() {
 		return instance;

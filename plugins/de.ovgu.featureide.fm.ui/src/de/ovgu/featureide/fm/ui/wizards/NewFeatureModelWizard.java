@@ -37,8 +37,9 @@ import org.eclipse.ui.IWorkbench;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -58,14 +59,14 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		final IFeatureModelFormat format = formatPage.getFormat();
+		final IPersistentFormat<IFeatureModel> format = formatPage.getFormat();
 		final Path fmPath = getNewFilePath(format);
 		IFeatureModel featureModel;
 		try {
-			featureModel = FMFactoryManager.getFactory(fmPath.toString(), format).createFeatureModel();
+			featureModel = FMFactoryManager.getInstance().getFactory(fmPath, format).create();
 		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);
-			featureModel = FMFactoryManager.getEmptyFeatureModel();
+			featureModel = DefaultFeatureModelFactory.getInstance().create();
 		}
 		featureModel.createDefaultValues("");
 		FileHandler.save(fmPath, featureModel, format);
@@ -74,7 +75,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		return true;
 	}
 
-	public Path getNewFilePath(IFeatureModelFormat format) {
+	public Path getNewFilePath(IPersistentFormat<IFeatureModel> format) {
 		String fileName = locationpage.getFileName();
 		if (!fileName.matches(".+\\." + Pattern.quote(format.getSuffix()))) {
 			fileName += "." + format.getSuffix();

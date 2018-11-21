@@ -25,8 +25,7 @@ import java.nio.file.Path;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -36,13 +35,13 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 public class FeatureModelConversionHandler extends AMultipleExportHandler<IFeatureModel> {
 
 	@Override
-	protected FormatManager<? extends IPersistentFormat<IFeatureModel>> getFormatManager() {
+	protected FormatManager<IFeatureModel> getFormatManager() {
 		return FMFormatManager.getInstance();
 	}
 
 	@Override
 	protected FileHandler<IFeatureModel> read(Path modelFilePath) {
-		return FeatureModelManager.load(modelFilePath);
+		return FeatureModelIO.getInstance().getFileHandler(modelFilePath);
 	}
 
 }

@@ -53,7 +53,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -95,7 +95,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		configFolder = page.getContainerObject();
 		final IFeatureProject featureProject = page.getFeatureProject();
 		final IFeatureModel featureModel = featureProject.getFeatureModel();
-		final IConfigurationFormat format = page.getFormat();
+		final IPersistentFormat<Configuration> format = page.getFormat();
 
 		final String suffix = "." + format.getSuffix();
 		final String name = page.getFileName();
@@ -129,7 +129,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	/**
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
 	 */
-	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
+	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IPersistentFormat<Configuration> format, IProgressMonitor monitor)
 			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);

@@ -137,7 +137,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			if (!rootFeature.getName().equals(featureName)) {
 				final Configuration config = new Configuration(featureModel);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
-				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED) {
+				if (config.getSelectableFeature(featureName).getAutomatic() != Selection.SELECTED) {
 					return false;
 				}
 			}
@@ -174,7 +174,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 					config.setManual(feat.getName(), Selection.UNSELECTED);
 				}
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
-				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED) {
+				if (config.getSelectableFeature(featureName).getAutomatic() != Selection.SELECTED) {
 					return false;
 				}
 			}
@@ -253,7 +253,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		final SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		final SelectableFeature feature = currentConfig.getSelectableFeature(featureName);
 		final Selection oldManual = feature.getManual();
 		try {
 			currentConfig.setManual(feature, Selection.SELECTED);
@@ -269,7 +269,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		final SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		final SelectableFeature feature = currentConfig.getSelectableFeature(featureName);
 		final Selection oldManual = feature.getManual();
 		try {
 			currentConfig.setManual(feature, Selection.UNSELECTED);
@@ -285,7 +285,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return false;
 		}
-		return currentConfig.getSelectablefeature(featureName).getSelection() == Selection.SELECTED;
+		return currentConfig.getSelectableFeature(featureName).getSelection() == Selection.SELECTED;
 	}
 
 	@Override
@@ -293,7 +293,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return false;
 		}
-		return currentConfig.getSelectablefeature(featureName).getSelection() == Selection.UNSELECTED;
+		return currentConfig.getSelectableFeature(featureName).getSelection() == Selection.UNSELECTED;
 	}
 
 	@Override

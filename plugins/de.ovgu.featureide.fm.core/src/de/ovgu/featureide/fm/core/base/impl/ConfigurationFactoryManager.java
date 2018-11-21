@@ -20,50 +20,41 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.IExtensionLoader;
+import de.ovgu.featureide.fm.core.base.IFactory;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * Factory for {@link IFeatureModel feature models} used in multi product lines.
+ * Manages all factories for configuration objects.
  *
  * @author Sebastian Krieter
  */
-public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
-
-	public static final String ID = PluginID.PLUGIN_ID + ".ExtendedFeatureModelFactory";
-
-	public static ExtendedFeatureModelFactory getInstance() {
-		return new ExtendedFeatureModelFactory();
-	}
-
-	public ExtendedFeatureModelFactory() {}
+public class ConfigurationFactoryManager extends FactoryManager<Configuration> {
 
 	@Override
-	public String getId() {
-		return ID;
+	protected String getDefaultID() {
+		return DefaultConfigurationFactory.ID;
 	}
 
 	@Override
-	public boolean initExtension() {
-		return true;
+	protected Class<?>[] getDefaultClasses() {
+		return new Class<?>[] { DefaultConfigurationFactory.class };
+	}
+
+	private static ConfigurationFactoryManager instance = new ConfigurationFactoryManager();
+
+	public static ConfigurationFactoryManager getInstance() {
+		instance.setLoader(null, null);
+		return instance;
+	}
+
+	public static void initialize(IExtensionLoader<IFactory<Configuration>> extensionLoader, IFactoryWorkspaceLoader factorySpaceLoader) {
+		instance.setLoader(extensionLoader, factorySpaceLoader);
 	}
 
 	@Override
-	public ExtendedConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
-		return new ExtendedConstraint(featureModel, propNode);
-	}
-
-	@Override
-	public ExtendedFeature createFeature(IFeatureModel featureModel, String name) {
-		return new ExtendedFeature(featureModel, name);
-	}
-
-	@Override
-	public ExtendedFeatureModel create() {
-		return new ExtendedFeatureModel(ID);
+	public IFactory<? extends Configuration> getFactory(Configuration object) {
+		return DefaultConfigurationFactory.getInstance();
 	}
 
 }

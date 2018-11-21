@@ -54,7 +54,6 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -62,7 +61,7 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -119,14 +118,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (arguments.merger instanceof VariantMerger) {
-			final Configuration conf = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
-			try {
-				final IFile file = featureProject.getCurrentConfiguration();
-				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
-			} catch (final Exception e) {
-				CorePlugin.getDefault().logError(e);
-				return false;
-			}
+			final Configuration conf = ConfigurationManager.load(Paths.get(featureProject.getCurrentConfiguration().getLocationURI()));
+			conf.initFeatures(featureProject.getFeatureModel());
 			final Collection<String> featureNames = conf.getSelectedFeatureNames();
 
 			final int[] tempFeatureList = new int[featureNames.size()];

@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -78,7 +79,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
-		factory = FMFactoryManager.getFactory(object);
+		factory = FMFactoryManager.getInstance().getFactory(object);
 		attributeFactory = new FeatureAttributeFactory();
 
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
@@ -741,6 +742,15 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	@Override
 	public IFeatureNameValidator getFeatureNameValidator() {
 		return validator;
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			return true;
+		}
+		return false;
 	}
 
 }

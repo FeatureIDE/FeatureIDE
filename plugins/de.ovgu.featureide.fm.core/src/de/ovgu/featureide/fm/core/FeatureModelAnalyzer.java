@@ -662,8 +662,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 		 * First every relevant constraint of every hidden feature is checked if its form equals HIDDEN_FEATURE <=> A where A is an expression containing only
 		 * non hidden features If there is a constraint of that kind for a hidden feature it is added to a list.
 		 */
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
-		final Collection<IFeature> list = new LinkedList<IFeature>();
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
+		final Collection<IFeature> list = new LinkedList<>();
 		final Collection<IFeature> hiddenFeatures = getHiddenFeatures();
 		for (final IFeature feature : hiddenFeatures) {
 			for (final IConstraint constraint : feature.getStructure().getRelevantConstraints()) {

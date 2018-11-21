@@ -38,9 +38,9 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -57,7 +57,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	protected IFeatureModel featureModel;
 	private int configurationNr = 0;
 
-	protected final IPersistentFormat<Configuration> configFormat = ConfigurationManager.getDefaultFormat();
+	protected final IPersistentFormat<Configuration> configFormat = ConfigFormatManager.getDefaultFormat();
 
 	@Override
 	public String getLabel() {

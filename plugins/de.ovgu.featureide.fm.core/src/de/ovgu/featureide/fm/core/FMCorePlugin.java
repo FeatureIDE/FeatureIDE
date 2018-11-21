@@ -35,23 +35,25 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.core.base.IFactory;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.EclipseFactoryWorkspaceProvider;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -79,29 +81,21 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 		FileSystem.INSTANCE = new EclipseFileSystem();
 		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
-
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
-				IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
-				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
-				IConfigurationFormat.extensionID, IConfigurationFormat.class));
-
-//		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
-//		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
-//		FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
-
 		Logger.logger = new EclipseLogger();
-		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
 
-		if (!FMFactoryManager.factoryWorkspaceProvider.load()) {
-			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
-		}
+		FMFactoryManager.initialize(new EclipseExtensionLoader<IFactory<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
+				IFeatureModelFactory.extensionID, IFeatureModelFactory.class), new EclipseFactoryWorkspaceProvider());
+		ConfigurationFactoryManager.initialize(null, null);
+		FMFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
+				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<Configuration>>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
+				IConfigurationFormat.extensionID, IConfigurationFormat.class));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		FMFactoryManager.factoryWorkspaceProvider.save();
+		FMFactoryManager.getInstance().save();
+		ConfigurationFactoryManager.getInstance().save();
 		plugin = null;
 		super.stop(context);
 	}

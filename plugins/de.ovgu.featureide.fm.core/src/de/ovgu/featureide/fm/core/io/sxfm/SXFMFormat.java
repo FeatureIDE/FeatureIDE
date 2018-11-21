@@ -373,7 +373,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			final IFeatureModelFactory factory = FMFactoryManager.getFactory(object);
+			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(object);
 			FeatureIndent lastFeat = new FeatureIndent(null, -1, null);
 			// List of Features with arbitrary cardinalities
 			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();

@@ -42,7 +42,7 @@ public abstract class AFeatureModelFormat extends APersistentFormat<IFeatureMode
 	}
 
 	protected void setFactory(final IFeatureModel featureModel) {
-		factory = FMFactoryManager.getFactory(featureModel);
+		factory = FMFactoryManager.getInstance().getFactory(featureModel);
 	}
 
 	@Override

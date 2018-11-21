@@ -106,7 +106,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
-		factory = FMFactoryManager.getFactory(object);
+		factory = FMFactoryManager.getInstance().getFactory(object);
 
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 

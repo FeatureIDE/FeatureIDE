@@ -45,9 +45,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -65,9 +66,9 @@ public class ImportHandler extends AFileHandler {
 	protected final void singleAction(IFile outputFile) {
 		final Path modelFilePath = Paths.get(outputFile.getLocationURI());
 
-		final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
+		final List<IPersistentFormat<IFeatureModel>> formatExtensions = FMFormatManager.getInstance().getExtensions();
 		int countReadableFormats = 0;
-		for (final IFeatureModelFormat format : formatExtensions) {
+		for (final IPersistentFormat<IFeatureModel> format : formatExtensions) {
 			if (format.supportsRead()) {
 				countReadableFormats++;
 			}
@@ -77,7 +78,7 @@ public class ImportHandler extends AFileHandler {
 		names[0] = "All files *.*";
 		extensions[0] = "*.*";
 		int index = 1;
-		for (final IFeatureModelFormat format : formatExtensions) {
+		for (final IPersistentFormat<IFeatureModel> format : formatExtensions) {
 			if (format.supportsRead()) {
 				final String extension = "*." + format.getSuffix();
 				names[index] = format.getName() + " " + extension;
@@ -105,7 +106,7 @@ public class ImportHandler extends AFileHandler {
 			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 		}
 
-		final FileHandler<IFeatureModel> filHandler = FeatureModelManager.load(inputFile.toPath());
+		final FileHandler<IFeatureModel> filHandler = FeatureModelIO.getInstance().getFileHandler(inputFile.toPath());
 		final ProblemList problems = filHandler.getLastProblems();
 		if (problems.containsError()) {
 			final StringBuilder sb = new StringBuilder("Error while loading file: \n");

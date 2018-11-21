@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  *
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SelectableFeature extends TreeElement {
+public class SelectableFeature extends TreeElement implements Cloneable {
 
 	private Selection manual = Selection.UNDEFINED;
 
@@ -45,15 +46,27 @@ public class SelectableFeature extends TreeElement {
 
 	private Selection recommended = Selection.UNDEFINED;
 
-	private final IFeature feature;
+	private IFeature feature;
 
 	private int recommendationValue = -1;
 	private Map<Integer, Node> openClauses = null;
 
 	private String name;
 
+	public SelectableFeature(String name) {
+		this.name = name;
+	}
+
 	public SelectableFeature(IFeature feature) {
 		this.feature = feature;
+	}
+
+	public SelectableFeature(SelectableFeature oldSelectableFeature) {
+		feature = oldSelectableFeature.feature;
+		name = oldSelectableFeature.name;
+		manual = oldSelectableFeature.manual;
+		automatic = oldSelectableFeature.automatic;
+		recommended = oldSelectableFeature.recommended;
 	}
 
 	public Selection getSelection() {
@@ -89,6 +102,10 @@ public class SelectableFeature extends TreeElement {
 			return name;
 		}
 		return feature == null ? "" : feature.getName();
+	}
+
+	public void setFeature(IFeature feature) {
+		this.feature = feature;
 	}
 
 	public IFeature getFeature() {
@@ -145,6 +162,19 @@ public class SelectableFeature extends TreeElement {
 			return openClauses.keySet();
 		}
 		return Collections.emptySet();
+	}
+
+	@Override
+	public SelectableFeature clone() {
+		if (!this.getClass().equals(SelectableFeature.class)) {
+			try {
+				return (SelectableFeature) super.clone();
+			} catch (final CloneNotSupportedException e) {
+				Logger.logError(e);
+				throw new RuntimeException("Cloning is not supported for " + this.getClass());
+			}
+		}
+		return new SelectableFeature(this);
 	}
 
 }

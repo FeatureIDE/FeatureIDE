@@ -31,6 +31,7 @@ import java.io.StringReader;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -52,7 +53,8 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
@@ -100,9 +102,9 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
-					final String name = renamingsManager.getNewName(line.substring(2));
+					final String name = renamingsManager == null ? line.substring(2) : renamingsManager.getNewName(line.substring(2));
 
-					final SelectableFeature feature = configuration.getSelectablefeature(name);
+					final SelectableFeature feature = configuration.getSelectableFeature(name);
 					if (feature == null) {
 						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {

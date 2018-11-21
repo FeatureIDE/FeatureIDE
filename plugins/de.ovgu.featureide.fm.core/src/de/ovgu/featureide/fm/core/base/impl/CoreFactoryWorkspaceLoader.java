@@ -20,33 +20,30 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
- * This {@link IFactoryWorkspaceProvider provider} only uses native Java methods.
+ * This {@link IFactoryWorkspaceLoader loader} only uses native Java methods.
  *
  * @author Sebastian Krieter
  */
-public final class CoreFactoryWorkspaceProvider extends AFactoryWorkspaceProvider {
+// TODO implement save and load mechanism
+public final class CoreFactoryWorkspaceLoader implements IFactoryWorkspaceLoader {
 
 	@Override
-	public FactoryWorkspace getFactoryWorkspace(String path) {
-		return super.getFactoryWorkspace(Paths.get(path).toAbsolutePath().toString());
+	public Path getDistinctPath(Path path) {
+		return path.toAbsolutePath();
 	}
 
 	@Override
-	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
-		super.addFactoryWorkspace(Paths.get(path).toAbsolutePath().toString(), workspace);
-	}
+	public void save(FactoryManager<?> manager) {}
 
 	@Override
-	public void save() {
-
-	}
-
-	@Override
-	public boolean load() {
+	public boolean load(FactoryManager<?> manager) {
 		return false;
 	}
+
+	@Override
+	public void setSubNode(String subNode) {}
 
 }

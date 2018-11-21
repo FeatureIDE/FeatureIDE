@@ -18,31 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.impl;
+
+import java.nio.file.Path;
 
 /**
- * Handles extensions via native Java.
+ * Loads a {@link FactoryWorkspace} for given path.<br/> The purpose of this provider is to associate a certain factory workspace with a certain project /
+ * folder.
  *
  * @author Sebastian Krieter
  */
-public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+public interface IFactoryWorkspaceLoader {
 
-	private final Class<? extends T>[] extensionArray;
+	Path getDistinctPath(Path path);
 
-	@SafeVarargs
-	public CoreExtensionLoader(Class<? extends T>... extensions) {
-		this.extensionArray = extensions;
-	}
+	void save(FactoryManager<?> manager);
 
-	@Override
-	public void loadProviders(ExtensionManager<T> extensionManager) {
-		for (final Class<? extends T> extensionClass : extensionArray) {
-			try {
-				extensionManager.addExtension(extensionClass.newInstance());
-			} catch (final Throwable e) {
-				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
-			}
-		}
-	}
+	boolean load(FactoryManager<?> manager);
+
+	void setSubNode(String subNode);
 
 }

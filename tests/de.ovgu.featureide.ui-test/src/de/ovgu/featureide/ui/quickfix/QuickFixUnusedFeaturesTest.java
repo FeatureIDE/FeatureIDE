@@ -73,7 +73,7 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : Commons.getFeatureModelFolder().listFiles(getFileFilter(".xml"))) {
 			final Object[] models = new Object[2];
 
-			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
+			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().create();
 			SimpleFileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
 			models[0] = fm;
 			models[1] = f.getName();

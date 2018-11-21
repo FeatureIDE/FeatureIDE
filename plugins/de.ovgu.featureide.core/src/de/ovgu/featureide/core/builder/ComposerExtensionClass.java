@@ -66,7 +66,8 @@ import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
-import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -475,13 +476,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY);
-
-		final ProblemList problems = SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-		if (problems.containsError()) {
+		final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(Paths.get(config.getLocationURI()));
+		if (fileHandler.getLastProblems().containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;
 		}
+		final Configuration configuration = fileHandler.getObject();
 
 		try {
 			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + new DefaultFormat().getSuffix());

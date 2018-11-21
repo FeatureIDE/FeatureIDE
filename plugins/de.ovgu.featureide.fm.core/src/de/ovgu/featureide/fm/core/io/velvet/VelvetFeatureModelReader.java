@@ -67,12 +67,12 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -132,7 +132,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		return FeatureModelManager.load(file.toPath()).getObject();
+		return FeatureModelManager.load(file.toPath());
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -941,8 +941,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportSyntaxError(curNode);
 			}
 		}
-		final IFeatureModelFactory mappingModelFactory = FMFactoryManager.getDefaultFactory();
-		final IFeatureModel mappingModel = mappingModelFactory.createFeatureModel();
+		final IFeatureModelFactory mappingModelFactory = DefaultFeatureModelFactory.getInstance();
+		final IFeatureModel mappingModel = mappingModelFactory.create();
 		final IFeatureStructure rootFeature = mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 		rootFeature.setAnd();
 		rootFeature.setAbstract(true);

@@ -28,7 +28,7 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Abstract class to generater configurations.
+ * Abstract class to generate configurations.
  *
  * @author Jens Meinicke
  */
@@ -54,7 +54,7 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 		this.builder = builder;
 		this.featureModel = featureModel;
 		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel, Configuration.PARAM_NONE);
+		configuration = new Configuration(featureModel, false, false);
 	}
 
 	protected void cancelGenerationJobs() {

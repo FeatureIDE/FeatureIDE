@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -105,9 +105,12 @@ public class ConfigurationLoader {
 						final int extensionIndex = fileName.lastIndexOf('.');
 						final String configurationName = (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
 						if (configurationNames.add(configurationName)) {
-							final Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
-							final FileHandler<Configuration> fileHandler = ConfigurationManager.load(file, currentConfiguration);
+							final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(file);
 							if (!fileHandler.getLastProblems().containsError()) {
+								final Configuration currentConfiguration = fileHandler.getObject();
+								currentConfiguration.initFeatures(featureModel);
+								currentConfiguration.setPropagate(propagateConfigs);
+
 								configs.add(currentConfiguration);
 								if (callback != null) {
 									callback.onConfigurationLoaded(currentConfiguration, file);

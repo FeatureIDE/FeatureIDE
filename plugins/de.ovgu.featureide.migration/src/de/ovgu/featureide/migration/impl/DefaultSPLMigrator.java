@@ -294,13 +294,13 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		featureModel.reset();
 
-		featureModel.getStructure().setRoot(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
+		featureModel.getStructure().setRoot(FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
 		featureModel.getStructure().getRoot().changeToAlternative();
 		featureModel.getStructure().getRoot().setAbstract(true);
 
 		for (final IProject project : projects) {
 			featureModel.getStructure().getRoot()
-					.addChild(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
+					.addChild(FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
 		}
 
 		return featureModel;

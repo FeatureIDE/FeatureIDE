@@ -54,14 +54,14 @@ public class ConfigNode extends Parent {
 		final LongRunningMethod<Boolean> job = new TreeJob(this) {
 
 			private String calculateConfigs() {
-				final boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-				if (!ignoreAbstract && (innerModel.getAnalyser().countConcreteFeatures() == 0)) {
+				final boolean removeAbstract = !description.equals(DESC_CONFIGS);
+				if (removeAbstract && (innerModel.getAnalyser().countConcreteFeatures() == 0)) {
 					// case: there is no concrete feature so there is only one program variant,
 					// without this the calculation least much to long
 					return "1";
 				}
 
-				final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout, !ignoreAbstract);
+				final long number = new Configuration(innerModel, false, !removeAbstract).number(timeout, removeAbstract);
 
 				return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 			}

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -87,7 +88,7 @@ public class ConfigurationMatrix {
 	}
 
 	private Config createConfig(Configuration configuration) {
-		final List<SelectableFeature> features = configuration.getFeatures();
+		final Collection<SelectableFeature> features = configuration.getFeatures();
 		final byte[] configArray = new byte[features.size()];
 		int i = 0;
 		for (final SelectableFeature feature : features) {

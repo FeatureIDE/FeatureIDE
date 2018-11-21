@@ -75,7 +75,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 		}
 		// create a configuration without the feature
 		configuration = new Configuration(featureModel, true);
-		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
+		if (configuration.getSelectableFeature(featureName).getAutomatic() != Selection.UNDEFINED) {
 			return;
 		}
 		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
@@ -99,7 +99,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 			if (configuration.isValid()) {
 				break;
 			}
-			final SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+			final SelectableFeature selectableFeature = configuration.getSelectableFeature(feature.getName());
 			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
 				configuration.setManual(selectableFeature, Selection.SELECTED);
 			}
@@ -111,7 +111,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 				if (feature.getName().equals(featureName)) {
 					continue;
 				}
-				final SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+				final SelectableFeature selectableFeature = configuration.getSelectableFeature(feature.getName());
 				try {
 					if ((selectableFeature.getAutomatic() == Selection.UNDEFINED) && (selectableFeature.getManual() == Selection.SELECTED)) {
 						configuration.setManual(selectableFeature, Selection.UNDEFINED);

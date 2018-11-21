@@ -456,7 +456,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final IFeatureModel featureModel = featureProject.getFeatureModel();
-				final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+				final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 				for (final FSTClass c : fstModel.getClasses()) {
 					for (final FSTRole r : c.getRoles()) {
 						final IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());

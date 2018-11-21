@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -93,10 +94,11 @@ public class Commons {
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
 		for (final File f : modelFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.load(f.toPath()).getObject();
+				return FeatureModelManager.load(f.toPath());
 			}
 		}
-		return FMFactoryManager.getEmptyFeatureModel();
+		fail();
+		return null;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

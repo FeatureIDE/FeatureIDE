@@ -58,7 +58,8 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
@@ -89,7 +90,7 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
-					name = renamingsManager.getNewName(name);
+					name = renamingsManager == null ? name : renamingsManager.getNewName(name);
 					final IFeature feature = configuration.getFeatureModel().getFeature(name);
 					if ((feature != null) && feature.getStructure().hasHiddenParent()) {
 						hiddenFeatures.add(name);

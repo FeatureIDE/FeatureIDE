@@ -199,7 +199,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 							}
 						} else {
 							final IFeatureModel featureModel = curFeature.getFeatureModel();
-							final IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
+							final IFeature pseudoAlternative = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (final IFeature child : list) {
@@ -249,7 +249,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 	// TODO Change to own job
 	public IFeatureModel sliceModel(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames, IMonitor monitor) {
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(orgFeatureModel);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(orgFeatureModel);
 		monitor.setTaskName("Slicing Feature Model");
 		monitor.setRemainingWork(100);
 

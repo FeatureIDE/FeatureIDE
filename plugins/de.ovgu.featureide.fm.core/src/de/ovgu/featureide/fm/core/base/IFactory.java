@@ -18,31 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base;
+
+import de.ovgu.featureide.fm.core.IExtension;
 
 /**
- * Handles extensions via native Java.
+ * Factory to create an instance of T.
  *
  * @author Sebastian Krieter
  */
-public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+public interface IFactory<T> extends IExtension {
 
-	private final Class<? extends T>[] extensionArray;
-
-	@SafeVarargs
-	public CoreExtensionLoader(Class<? extends T>... extensions) {
-		this.extensionArray = extensions;
-	}
-
-	@Override
-	public void loadProviders(ExtensionManager<T> extensionManager) {
-		for (final Class<? extends T> extensionClass : extensionArray) {
-			try {
-				extensionManager.addExtension(extensionClass.newInstance());
-			} catch (final Throwable e) {
-				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
-			}
-		}
-	}
+	T create();
 
 }

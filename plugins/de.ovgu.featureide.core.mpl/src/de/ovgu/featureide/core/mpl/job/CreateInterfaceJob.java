@@ -153,7 +153,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		m.reset();
 
 		// set new abstract root
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(m);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(m);
 		final IFeature nroot = factory.createFeature(m, "nroot");
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
@@ -382,7 +382,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 							}
 						} else {
 							final IFeatureModel featureModel = curFeature.getFeatureModel();
-							final IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
+							final IFeature pseudoAlternative = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (final IFeature child : list) {

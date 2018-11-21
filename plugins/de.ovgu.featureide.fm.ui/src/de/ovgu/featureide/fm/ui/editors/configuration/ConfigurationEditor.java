@@ -60,7 +60,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -119,7 +118,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private int currentPageIndex = -1;
 
-	private boolean autoSelectFeatures = false;
+	private boolean autoSelectFeatures = true;
 	private boolean invalidFeatureModel = true;
 	private boolean containsError = false;
 
@@ -239,22 +238,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		// featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		// }
 
-		final IFeatureGraph fg = (res == null)
-			? loadFeatureGraph(
-					org.eclipse.core.runtime.Path.fromOSString(modelFile.getAbsolutePath()).removeLastSegments(1).append("model.fg").toFile().toPath())
-			: loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg").toFile().toPath());
-		final Configuration c = (fg == null) ? new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY)
-			: new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
-
 		final Path path = file.getLocation().toFile().toPath();
 		configurationManager = ConfigurationManager.getInstance(path);
-		if (configurationManager != null) {
-//			FileHandler.load(Paths.get(file.getLocationURI()), c, ConfigFormatManager.getInstance().getFormatByFileName(file.getLocation().toOSString()));
-			configurationManager.setConfiguration(c);
-		} else {
-			configurationManager = ConfigurationManager.getInstance(path, c);
-		}
 		configurationManager.read();
+		configurationManager.linkFeatureModel(featureModelManager);
 
 		final ProblemList lastProblems = configurationManager.getLastProblems();
 		createModelFileMarkers(lastProblems);
@@ -373,11 +360,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		case MODEL_DATA_OVERRIDDEN:
 		case COLOR_CHANGED:
 			if (evt.getSource() instanceof IFeatureModel) {
-				final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
-				configuration.loadPropagator();
-				LongRunningWrapper.runMethod(configuration.getPropagator().resolve());
-
-				configurationManager.setConfiguration(configuration);
+				configurationManager.update();
+				if (configurationManager.hasChanged()) {
+					firePropertyChange(IEditorPart.PROP_DIRTY);
+				}
 				setContainsError(false);
 
 				// Reinitialize the pages

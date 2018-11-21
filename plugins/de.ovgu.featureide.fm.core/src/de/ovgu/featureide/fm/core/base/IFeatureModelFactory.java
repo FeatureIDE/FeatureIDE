@@ -22,14 +22,12 @@ package de.ovgu.featureide.fm.core.base;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.IExtension;
-
 /**
  * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFactory extends IExtension {
+public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 
 	public static String extensionPointID = "FMFactory";
 
@@ -38,7 +36,5 @@ public interface IFeatureModelFactory extends IExtension {
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
-
-	IFeatureModel createFeatureModel();
 
 }

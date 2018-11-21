@@ -18,31 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.impl;
+
+import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IFactory;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * Handles extensions via native Java.
+ * Factory for the default {@link Configuration} object.
  *
  * @author Sebastian Krieter
  */
-public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+public class DefaultConfigurationFactory implements IFactory<Configuration> {
 
-	private final Class<? extends T>[] extensionArray;
+	public static final String ID = PluginID.PLUGIN_ID + ".DefaultConfigurationFactory";
 
-	@SafeVarargs
-	public CoreExtensionLoader(Class<? extends T>... extensions) {
-		this.extensionArray = extensions;
+	public static DefaultConfigurationFactory getInstance() {
+		return new DefaultConfigurationFactory();
 	}
 
 	@Override
-	public void loadProviders(ExtensionManager<T> extensionManager) {
-		for (final Class<? extends T> extensionClass : extensionArray) {
-			try {
-				extensionManager.addExtension(extensionClass.newInstance());
-			} catch (final Throwable e) {
-				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
-			}
-		}
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
+	public Configuration create() {
+		return new Configuration();
 	}
 
 }

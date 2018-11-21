@@ -239,10 +239,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param fm The feature model
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
-	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager, boolean isEditable) {
-		super(fmManager, gfmManager);
+	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, IGraphicalFeatureModel gfm, boolean isEditable) {
+		super(fmManager, gfm);
 
-		graphicalFeatureModel = gfmManager.editObject();
+		graphicalFeatureModel = gfm;
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
 		fmManager.addListener(this);
 		createActions();
@@ -1219,7 +1219,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
-		return new FeatureDiagramEditor(fmManager, gfmManager, true);
+		return new FeatureDiagramEditor(fmManager, gfm, true);
 	}
 
 	@Override
@@ -1243,7 +1243,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
 		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
-		gfmManager.dispose();
+//		gfmManager.dispose();
 		super.dispose();
 	}
 

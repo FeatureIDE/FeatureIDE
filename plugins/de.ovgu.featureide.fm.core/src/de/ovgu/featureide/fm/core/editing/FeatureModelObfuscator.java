@@ -27,7 +27,6 @@ import java.security.SecureRandom;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -76,19 +75,13 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	public FeatureModelObfuscator(IFeatureModel featureModel, String salt) {
 		this.salt = salt.getBytes(StandardCharsets.UTF_8);
 		orgFeatureModel = featureModel;
-		IFeatureModelFactory factoryById;
-		try {
-			factoryById = FMFactoryManager.getFactoryById(orgFeatureModel.getFactoryID());
-		} catch (final NoSuchExtensionException e) {
-			factoryById = FMFactoryManager.getDefaultFactory();
-		}
-		factory = factoryById;
+		factory = FMFactoryManager.getInstance().getFactory(orgFeatureModel);
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor monitor) throws Exception {
 		digest = MessageDigest.getInstance("SHA-256");
-		obfuscatedFeatureModel = factory.createFeatureModel();
+		obfuscatedFeatureModel = factory.create();
 		obfuscateStructure(orgFeatureModel.getStructure().getRoot(), null);
 		obfuscateConstraints();
 		return obfuscatedFeatureModel;

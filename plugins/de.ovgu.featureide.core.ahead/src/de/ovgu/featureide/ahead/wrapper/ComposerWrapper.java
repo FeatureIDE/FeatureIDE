@@ -52,9 +52,8 @@ import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import jampack.Jampack;
 import mixin.Mixin;
@@ -170,10 +169,10 @@ public class ComposerWrapper {
 		featureFolders.clear();
 
 		if (configFile != null) {
-			final Configuration configuration =
-				new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
-			final ProblemList load = FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-			if (!load.containsError()) {
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(Paths.get(configFile.getLocationURI()));
+			if (!fileHandler.getLastProblems().containsError()) {
+				final Configuration configuration = fileHandler.getObject();
+				configuration.initFeatures(featureProject.getFeatureModel());
 				final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
 				for (final IFeature feature : selectedFeatures) {
 					if (feature.getStructure().isConcrete()) {

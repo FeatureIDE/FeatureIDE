@@ -71,6 +71,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -378,7 +379,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
-		return FeatureModelManager.load(file.toPath()).getObject();
+		return FeatureModelManager.load(file.toPath());
 	}
 
 	private boolean checkExternalModelFile(Tree curNode) {
@@ -595,7 +596,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
-		final IFeatureModel fm = new ExtendedFeatureModelFactory().createFeatureModel();
+		final IFeatureModel fm = new ExtendedFeatureModelFactory().create();
 		fm.setSourceFile(file.toPath());
 		SimpleFileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
@@ -1246,8 +1247,8 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 		}
 		if (!IS_USED_AS_API) {
-			final IFeatureModelFactory mappingModelFactory = FMFactoryManager.getDefaultFactory();
-			final IFeatureModel mappingModel = mappingModelFactory.createFeatureModel();
+			final IFeatureModelFactory mappingModelFactory = DefaultFeatureModelFactory.getInstance();
+			final IFeatureModel mappingModel = mappingModelFactory.create();
 			final IFeatureStructure rootFeature = mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 			rootFeature.setAnd();
 			rootFeature.setAbstract(true);
@@ -1384,6 +1385,14 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public String getName() {
 		return "Velvet";
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		}
+		return false;
 	}
 
 }
