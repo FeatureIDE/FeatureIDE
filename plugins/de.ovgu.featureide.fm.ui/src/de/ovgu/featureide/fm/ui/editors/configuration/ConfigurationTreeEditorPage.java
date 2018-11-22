@@ -35,9 +35,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -159,6 +159,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getDefault().getImageDescriptor("icons/tree02.png").createImage();
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
+	private static final Image IMAGE_RESOLVE = FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif").createImage();
 	protected static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
 
 	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
@@ -191,8 +192,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private int index;
 
 	private Label infoLabel;
+	private ToolItem resolveButton;
 
-	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<>();
+	protected final LinkedHashMap<SelectableFeature, TreeItem> itemMap = new LinkedHashMap<>();
 
 	protected final JobToken infoLabelToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 	protected final JobToken updateToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
@@ -354,6 +356,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.grabExcessHorizontalSpace = false;
 		final ToolBar toolbar = new ToolBar(compositeTop, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		toolbar.setLayoutData(gridData);
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
+		resolveButton = new ToolItem(toolbar, SWT.PUSH);
+		resolveButton.setImage(IMAGE_RESOLVE);
+		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
+		resolveButton.setEnabled(false);
+		resolveButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				computeTree(true, true);
+				resolveButton.setEnabled(false);
+				setDirty();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
@@ -968,6 +988,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						refreshItem(item);
 					}
 				}
+				if (configurationEditor.getConfiguration().getRoot().getSelection() == Selection.UNDEFINED) {
+					resolveButton.setEnabled(true);
+				}
 			}
 		});
 		curGroup = 0;
@@ -1192,65 +1215,70 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	protected void computeTree(boolean redundantManual) {
+		computeTree(redundantManual, false);
+	}
+
+	protected void computeTree(boolean redundantManual, boolean resolve) {
 		final Display currentDisplay = Display.getCurrent();
 		if (currentDisplay == null) {
 			return;
 		}
 		updateInfoLabel(null);
 
-		final IRunner<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
-		if (updateJob != null) {
+		if (resolve) {
+			final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().resolve();
+			final IRunner<Void> updateJob = LongRunningWrapper.getRunner(update);
 			updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
-
 				@Override
 				public void jobFinished(IJob<Void> finishedJob) {
 					if (finishedJob.getStatus() == JobStatus.OK) {
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
-
-						LongRunningWrapper.startJob(coloringToken, computeColoring(currentDisplay));
-						// XXX Prevents configuration files from being deleted (read/write conflict)
-//						if (configurationEditor instanceof ConfigurationEditor) {
-//							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
-//							// Get current configuration
-//							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-//							// Cast is necessary, don't remove
-//							final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
-//
-//							byte[] content;
-//							try {
-//								content = new byte[document.getContents().available()];
-//								document.getContents().read(content);
-//								if (!source.equals(new String(content))) {
-//									setDirty();
-//								}
-//							} catch (final IOException e) {
-//								FMUIPlugin.getDefault().logError(e);
-//							} catch (final CoreException e) {
-//								FMUIPlugin.getDefault().logError(e);
-//							}
-//						}
+						currentDisplay.syncExec(new Runnable() {
+							@Override
+							public void run() {
+								for (final TreeItem item : itemMap.values()) {
+									refreshItem(item);
+								}
+							}
+						});
 					}
 				}
 			});
+			LongRunningWrapper.startJob(updateToken, updateJob);
+		} else {
+			final IRunner<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
+			if (updateJob != null) {
+				updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
 
-			updateFeatures.clear();
-			walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+					@Override
+					public void jobFinished(IJob<Void> finishedJob) {
+						if (finishedJob.getStatus() == JobStatus.OK) {
+							updateInfoLabel(currentDisplay);
+							autoExpand(currentDisplay);
+							LongRunningWrapper.startJob(coloringToken, computeColoring(currentDisplay));
+						}
+					}
+				});
 
-				@Override
-				public Void invoke(TreeItem item, SelectableFeature feature) {
-					// lockItem(item);
-					updateFeatures.add(feature);
-					return null;
-				}
-			}, new IFunction<Void, Void>() {
+				updateFeatures.clear();
+				walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 
-				@Override
-				public Void invoke(Void t) {
-					LongRunningWrapper.startJob(updateToken, updateJob);
-					return null;
-				}
-			});
+					@Override
+					public Void invoke(TreeItem item, SelectableFeature feature) {
+						// lockItem(item);
+						updateFeatures.add(feature);
+						return null;
+					}
+				}, new IFunction<Void, Void>() {
+
+					@Override
+					public Void invoke(Void t) {
+						LongRunningWrapper.startJob(updateToken, updateJob);
+						return null;
+					}
+				});
+			}
 		}
 	}
 
