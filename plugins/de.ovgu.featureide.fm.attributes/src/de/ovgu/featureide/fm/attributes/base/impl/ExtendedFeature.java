@@ -1,6 +1,8 @@
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -10,13 +12,13 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 public class ExtendedFeature extends Feature {
 
-	protected CopyOnWriteArrayList<IFeatureAttribute> attributes;
+	protected List<IFeatureAttribute> attributes;
 
 	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(copyFeature, featureModel, newFeatrureStructure);
 
 		// Copy all attributes from the copy feature
-		attributes = new CopyOnWriteArrayList<>();
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
 			attributes.add(attribute);
 		}
@@ -26,10 +28,10 @@ public class ExtendedFeature extends Feature {
 		super(featureModel, name);
 
 		// Create empty attributes list
-		attributes = new CopyOnWriteArrayList<>();
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 	}
 
-	public CopyOnWriteArrayList<IFeatureAttribute> getAttributes() {
+	public List<IFeatureAttribute> getAttributes() {
 		return attributes;
 	}
 
@@ -39,10 +41,6 @@ public class ExtendedFeature extends Feature {
 
 	public void removeAttribute(IFeatureAttribute attribute) {
 		attributes.remove(attribute);
-	}
-
-	public void setAttributes(CopyOnWriteArrayList<IFeatureAttribute> attributes) {
-		this.attributes = attributes;
 	}
 
 	@Override
