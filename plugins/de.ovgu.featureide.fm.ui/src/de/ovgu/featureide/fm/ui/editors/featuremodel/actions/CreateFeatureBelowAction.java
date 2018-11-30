@@ -28,8 +28,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
 
 /**
@@ -37,23 +37,24 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBel
  *
  * @author Thomas Thuem
  */
-public class CreateLayerAction extends SingleSelectionAction {
+public class CreateFeatureBelowAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.createlayer";
+	public static final String ID = "de.ovgu.featureide.createbelow";
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
+	public CreateFeatureBelowAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(CREATE_FEATURE_BELOW + " (Ins)", viewer, ID);
 		setImageDescriptor(createImage);
-		this.featureModel = featureModel;
+		graphicalFeatureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(feature, featureModel);
+		final CreateFeatureBelowOperation op =
+			new CreateFeatureBelowOperation(graphicalFeatureModel.getGraphicalFeature(feature), graphicalFeatureModel.getFeatureModel());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

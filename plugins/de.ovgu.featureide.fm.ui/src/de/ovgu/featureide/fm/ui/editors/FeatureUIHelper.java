@@ -151,7 +151,7 @@ public class FeatureUIHelper {
 			}
 		}
 		// without abego library
-		if (featureModel.getLayout().verticalLayout()) {
+		if (featureModel.getLayout().getHasVerticalLayout()) {
 			return bounds.getLeft();
 		} else {
 			return bounds.getTop();
@@ -277,18 +277,26 @@ public class FeatureUIHelper {
 			}
 		}
 //		without abego library
-		if (layout.verticalLayout()) {
+		if (layout.getHasVerticalLayout()) {
 			return bounds.getRight();
 		}
 		return bounds.getBottom();
 	}
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {
-		featureModel.getLayout().verticalLayout(isVerticalLayout);
+		featureModel.getLayout().setHasVerticalLayout(isVerticalLayout);
 	}
 
 	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
-		return featureModel.getLayout().verticalLayout();
+		return featureModel.getLayout().getHasVerticalLayout();
+	}
+
+	public static void setLeftRightInverted(boolean isLeftRightInverted, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().setLeftRightInverted(isLeftRightInverted);
+	}
+
+	public static void setTopDownInverted(boolean isTopDownInverted, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().setTopDownInverted(isTopDownInverted);
 	}
 
 }

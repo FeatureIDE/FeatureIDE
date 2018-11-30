@@ -203,11 +203,11 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		FeatureConnection sourceConnection;
+		final Map<?, ?> registry = getViewer().getEditPartRegistry();
 		switch (prop) {
 		case CHILDREN_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
 			for (final FeatureConnection connection : getModel().getTargetConnections()) {
-				final Map<?, ?> registry = getViewer().getEditPartRegistry();
 				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
@@ -223,7 +223,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getModel());
 				if (!equals(newTarget, target)) {
 					sourceConnection.setTarget(newTarget);
-					final Map<?, ?> registry = getViewer().getEditPartRegistry();
 					final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 					if (connectionEditPart != null) {
 						refresh();
@@ -232,7 +231,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 
 			for (final FeatureConnection connection : getModel().getTargetConnections()) {
-				final Map<?, ?> registry = getViewer().getEditPartRegistry();
 				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
@@ -242,7 +240,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case GROUP_TYPE_CHANGED:
 			getFigure().setProperties();
 			sourceConnection = getModel().getSourceConnection();
-			Map<?, ?> registry = getViewer().getEditPartRegistry();
 			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			if (connectionEditPart != null) {
 				connectionEditPart.refreshSourceDecoration();
@@ -261,7 +258,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			getModel().setSize(getFigure().getSize());
 
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.propertyChange(event);
 			break;
@@ -269,6 +265,17 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case ATTRIBUTE_CHANGED:
 			getFigure().setProperties();
 			getModel().setSize(getFigure().getSize());
+			if (getModel().isCollapsed()) {
+				final List<FeatureConnection> connections = getModel().getSourceConnectionAsList();
+				for (final FeatureConnection featureConnection : connections) {
+					if (featureConnection.getSource() == featureConnection.getTarget()) {
+						final ConnectionEditPart part = (ConnectionEditPart) registry.get(featureConnection);
+						if (part != null) {
+							part.refreshSourceDecoration();
+						}
+					}
+				}
+			}
 			break;
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
@@ -280,7 +287,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case MANDATORY_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
 			connectionEditPart.propertyChange(event);
@@ -290,7 +296,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case PARENT_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshVisuals();
 			connectionEditPart.propertyChange(event);
@@ -298,7 +303,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case HIDDEN_CHANGED:
 			getFigure().setProperties();
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
 			break;
