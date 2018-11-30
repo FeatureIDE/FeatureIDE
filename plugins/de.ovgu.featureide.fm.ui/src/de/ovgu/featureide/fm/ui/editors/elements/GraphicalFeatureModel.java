@@ -277,7 +277,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public List<IGraphicalFeature> getVisibleRelations() {
 		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
 		for (final IGraphicalFeature f : getFeatures()) {
-			if (!f.isCollapsed()) {
+			if (!f.isCollapsed() && !f.hasCollapsedParent()) {
 				features.add(f);
 			}
 		}
