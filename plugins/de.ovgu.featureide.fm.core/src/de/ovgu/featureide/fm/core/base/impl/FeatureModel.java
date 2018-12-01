@@ -249,6 +249,11 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
+	}
+
+	@Override
 	public final void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
 	}
@@ -279,9 +284,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public List<IConstraint> getConstraints() {
-		final List<IConstraint> constraintList = new ArrayList<>();
-		constraintList.addAll(constraints);
-		return Collections.unmodifiableList(constraintList);
+		return Collections.unmodifiableList(constraints);
 	}
 
 	@Override

@@ -985,6 +985,11 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	@Override
+	public List<IEventListener> getListeners() {
+		return feature.getListeners();
+	}
+
+	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		feature.fireEvent(event);
 	}

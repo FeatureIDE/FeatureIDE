@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +40,11 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
+	}
+
+	@Override
+	public synchronized List<IEventListener> getListeners() {
+		return Collections.unmodifiableList(listenerList);
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
+
 import javax.annotation.Nonnull;
 
 import org.prop4j.Node;
@@ -35,6 +36,7 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -52,6 +54,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 
 	protected ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+	protected final IPropertyContainer propertyContainer;
 
 	protected final Collection<IFeature> containedFeatureList = new LinkedList<>();
 	protected final Collection<IFeature> deadFeatures = new LinkedList<>();
@@ -69,6 +72,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
 		description = oldConstraint.description;
+		propertyContainer = new MapPropertyContainer(oldConstraint.propertyContainer);
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
@@ -77,11 +81,17 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		featureSelected = false;
 		isImplicit = false;
 		description = "";
+		propertyContainer = new MapPropertyContainer();
 	}
 
 	@Override
 	public ConstraintAttribute getConstraintAttribute() {
 		return attribute;
+	}
+
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return propertyContainer;
 	}
 
 	/**
@@ -197,15 +207,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		return "AConstraint [propNode=" + propNode + "]";
 	}
 
+	@Override
 	public void setDescription(@Nonnull final String description) {
 		this.description = description;
 	}
 
-	/**
-	 * Returns the description
-	 * 
-	 * @return
-	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}

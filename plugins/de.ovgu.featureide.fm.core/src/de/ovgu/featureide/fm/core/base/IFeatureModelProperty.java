@@ -25,7 +25,7 @@ package de.ovgu.featureide.fm.core.base;
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelProperty {
+public interface IFeatureModelProperty extends IPropertyContainer {
 
 	void addAnnotation(CharSequence annotation);
 

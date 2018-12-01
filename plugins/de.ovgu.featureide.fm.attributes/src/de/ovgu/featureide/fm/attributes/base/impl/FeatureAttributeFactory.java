@@ -25,17 +25,8 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
-/**
- * TODO description
- *
- * @author User
- */
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory#createFeatureAttribute(java.lang.String)
-	 */
 	@Override
 	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature) {
 		final Boolean configurable = Boolean.parseBoolean(attributeData.isConfigurable());
@@ -73,4 +64,5 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			return null;
 		}
 	}
+
 }

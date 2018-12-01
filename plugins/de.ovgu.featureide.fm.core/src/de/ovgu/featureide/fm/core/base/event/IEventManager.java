@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import java.util.List;
+
 /**
  * Broadcasts {@link FeatureIDEEvent Events} to the corresponding {@link IEventListener IFeatureModelListeners}.
  *
@@ -32,5 +34,7 @@ public interface IEventManager {
 	void fireEvent(FeatureIDEEvent event);
 
 	void removeListener(IEventListener listener);
+
+	List<IEventListener> getListeners();
 
 }

@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,29 +49,32 @@ public interface IPropertyContainer {
 		}
 	}
 
-	public static class Entry<K, T, V> {
+	public static class Entry {
 
-		@Override
-		public String toString() {
-			return "Entry [key=" + key + ", type=" + type + ", value=" + value + "]";
+		private final String key;
+		private final String type;
+
+		private String value;
+
+		public Entry(Entry oldEntry) {
+			key = oldEntry.key;
+			type = oldEntry.type;
+			value = oldEntry.value;
 		}
 
-		K key;
-		T type;
-		V value;
-
-		public Entry(K key, T type, V value) {
-			this.key = key;
-			this.type = type;
+		public Entry(String key, String type, String value) {
+			this.key = key == null ? null : key.toLowerCase();
+			this.type = type == null ? null : type.toLowerCase();
 			this.value = value;
+		}
+
+		public Entry(String key, String type) {
+			this(key, type, null);
 		}
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = (prime * result) + ((key == null) ? 0 : key.hashCode());
-			return result;
+			return Objects.hash(key, type);
 		}
 
 		@Override
@@ -77,68 +82,60 @@ public interface IPropertyContainer {
 			if (this == obj) {
 				return true;
 			}
-			if (obj == null) {
+			if ((obj == null) || (getClass() != obj.getClass())) {
 				return false;
 			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			@SuppressWarnings("unchecked")
-			final Entry<K, T, V> other = (Entry<K, T, V>) obj;
-			if (key == null) {
-				if (other.key != null) {
-					return false;
-				}
-			} else if (!key.equals(other.key)) {
-				return false;
-			}
-			return true;
+			final Entry other = (Entry) obj;
+			return Objects.equals(key, other.key) && Objects.equals(type, other.type);
 		}
 
-		public K getKey() {
+		public String getKey() {
 			return key;
 		}
 
-		public T getType() {
+		public String getType() {
 			return type;
 		}
 
-		public V getValue() {
+		public String getValue() {
 			return value;
 		}
-	}
 
-	enum Type {
-		BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, CHAR, STRING
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return "Entry [key=" + key + ", type=" + type + ", value=" + value + "]";
+		}
 	}
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently if {@link ValueProtection#NORMAL_PERSISTENT} or
-	 * {@link ValueProtection#READ_ONLY_PERSISTENT} was used when calling
-	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} or temporarily. The latest (maybe volatile) state will
-	 * be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>),
-	 * the <code>defaultValue</code> will be returned.
+	 * {@link IPropertyContainer#set(String, String, String)} earlier. The latest (maybe volatile) state will
+	 * be taken into account, depending on the call of {@link IPropertyContainer#remove(String, String)}. If no value was assigned (the <code>key is
+	 * unknown</code>), the <code>defaultValue</code> will be returned.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
-	 * @see IPropertyContainer#get(String, Class)
-	 * @see IPropertyContainer#has(String)
-	 * @see IPropertyContainer#remove(String)
+	 * @see IPropertyContainer#get(String, String)
+	 * @see IPropertyContainer#has(String, String)
+	 * @see IPropertyContainer#remove(String, String)
 	 *
 	 * @param key property name (case insensitive)
+	 * @param type type name (case insensitive)
 	 * @param defaultValue value to return if no property is set
 	 * @return value associated with <code>key</code> if set, <code>defaultValue</code> otherwise
 	 */
-	<T> T get(final String key, final T defaultValue);
-
-	Type getDataType(final String key) throws NoSuchPropertyException;
+	String get(String key, String type, String defaultValue);
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it was
-	 * not removed by calling {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>), a
+	 * {@link IPropertyContainer#set(String, String, String)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
+	 * was
+	 * not removed by calling {@link IPropertyContainer#remove(String, String)}. If no value was assigned (the <code>key is unknown</code>), a
 	 * <code>NoSuchPropertyException</code> will be thrown.
 	 *
 	 * @see IPropertyContainer#getProperty(String, Class, Object)
@@ -149,35 +146,37 @@ public interface IPropertyContainer {
 	 * @since 3.0
 	 *
 	 * @param key property name (case insensitive)
-	 * @param type type of returning value
-	 * @param defaultValue value to return if no property is set
+	 * @param type type name (case insensitive)
 	 * @return value associated with <code>key</code> if set. If <code>key</code> is not known, throws <code>NoSuchPropertyException</code>.
 	 */
-	<T> T get(final String key) throws NoSuchPropertyException;
+	String get(String key, String type) throws NoSuchPropertyException;
 
 	/**
 	 * Checks if this object contains a property associated with the given <code>key</code>. Returns <code>true</code> if at some point earlier
-	 * {@link IPropertyContainer#set(String, Class, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such that an
-	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}, and, hence, <code>key</code> will be alive.
+	 * {@link IPropertyContainer#set(String, String, String)} was called with the corresponding <code>key</code>. Properties are stored persistently such that
+	 * an
+	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String, String)}, and, hence, <code>key</code> will be
+	 * alive.
 	 * If no property is associated to <code>key</code> the method will return <code>false</code>.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
 	 * @param key property name (case insensitive)
+	 * @param type type name (case insensitive)
 	 * @return <b>true</b> if the object contains a property associated to <code>key</code>, <b>false</b> otherwise.
 	 */
-	boolean has(final String key);
+	boolean has(final String key, String type);
 
 	/**
 	 * Returns a distinct collection of each assigned key for this object in (possible empty) set. Since keys are case-insensitive it depends on the
 	 * implementation if the user-defined strings once passed as keys are changed in some way, e.g., by converting to lower case strings.
 	 *
-	 * @return all keys of properties assigned to this object
+	 * @return all properties stored in this object
 	 */
-	Set<String> keySet();
+	Set<Entry> getProperties();
 
-	Set<Entry<String, Type, Object>> entrySet();
+	Set<Entry> getProperties(String type);
 
 	/**
 	 * Removes the content of this container and stores the entries <code>entries</code> into this one. The entries are copied, such that <code>entries !=
@@ -185,11 +184,11 @@ public interface IPropertyContainer {
 	 *
 	 * @param entries Entries to import
 	 */
-	void setEntrySet(final Set<Entry<String, Type, Object>> entries);
+	void setProperties(final Collection<Entry> entries);
 
 	/**
 	 * Removes a per-object user-defined property identified by a custom <code>key</code> and value assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
+	 * {@link IPropertyContainer#set(String, String, String)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
 	 * this method does not remove the property. If this object does not contain any property associated to <code>key</code>, a
 	 * <code>NoSuchPropertyException</code> will be thrown.
 	 *
@@ -200,23 +199,24 @@ public interface IPropertyContainer {
 	 * @see IPropertyContainer#setProperty(String)
 	 *
 	 * @param key property name (case insensitive)
-	 * @throws NoSuchPropertyException
+	 * @param type type name (case insensitive)
 	 */
-	void remove(final String key) throws NoSuchPropertyException;
+	Entry remove(final String key, String type);
 
 	/**
 	 * Sets a per-object user-defined property consisting of a <code>values</code> associated with a user-defined <code>key</code>. If <code>key</code> is
 	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. <br/> <br/> Properties are stored persistently such that an
-	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}. <br/> <br/> To receive the value behind a
-	 * <code>key</code>, call {@link IPropertyContainer#get(String, Class)}.
+	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String, String)}. <br/> <br/> To receive the value
+	 * behind a
+	 * <code>key</code>, call {@link IPropertyContainer#get(String, String)}.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
 	 * @param key property name (case insensitive)
-	 * @param type type of value to be stored
+	 * @param type type name (case insensitive)
 	 * @param value value to be stored
 	 */
-	<T> void set(final String key, final Type type, final T value);
+	void set(final String key, final String type, final String value);
 
 }

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
@@ -80,6 +82,11 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	@Override
 	public final void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	@Override

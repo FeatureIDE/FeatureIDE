@@ -93,7 +93,6 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
 		propertyContainer = clonePropertyContainer(oldFeature);
-		propertyContainer.setEntrySet(oldFeature.getCustomProperties().entrySet());
 	}
 
 	/**
