@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
@@ -267,9 +268,12 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				final List<FeatureConnection> connections = getModel().getSourceConnectionAsList();
 				for (final FeatureConnection featureConnection : connections) {
 					if (featureConnection.getSource() == featureConnection.getTarget()) {
-						final ConnectionEditPart part = (ConnectionEditPart) getViewer().getEditPartRegistry().get(featureConnection);
-						if (part != null) {
-							part.refreshSourceDecoration();
+						final EditPartViewer viewer = getViewer();
+						if (viewer != null) {
+							final ConnectionEditPart part = (ConnectionEditPart) viewer.getEditPartRegistry().get(featureConnection);
+							if (part != null) {
+								part.refreshSourceDecoration();
+							}
 						}
 					}
 				}
