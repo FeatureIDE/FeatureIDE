@@ -120,9 +120,9 @@ import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
@@ -176,7 +176,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * the model representation of the model file
 	 */
-	private final IFileManager<IFeatureModel> featureModelManager;
+	private final IFeatureModelManager featureModelManager;
 
 	private FSTModel fstModel;
 
@@ -346,12 +346,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final FeatureModelManager instance = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
 		if (instance != null) {
 			featureModelManager = instance;
+			instance.read();
 		} else {
-			featureModelManager = new VirtualFileManager<>(DefaultFeatureModelFactory.getInstance().create(), new XmlFeatureModelFormat());
+			featureModelManager = new VirtualFeatureModelManager(DefaultFeatureModelFactory.getInstance().create());
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
-		featureModelManager.read();
 
 		// initialize project structure
 		try {
@@ -1516,7 +1516,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	@Override
-	public IFileManager<IFeatureModel> getFeatureModelManager() {
+	public IFeatureModelManager getFeatureModelManager() {
 		return featureModelManager;
 	}
 

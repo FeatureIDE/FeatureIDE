@@ -98,7 +98,6 @@ public class FeatureModel implements IFeatureModel {
 
 	protected final IFeatureModelStructure structure;
 
-	protected Object undoContext = null;
 	protected Path sourceFile;
 
 	public FeatureModel(String factoryID) {
@@ -341,11 +340,6 @@ public class FeatureModel implements IFeatureModel {
 		return structure;
 	}
 
-	@Override
-	public Object getUndoContext() {
-		return undoContext;
-	}
-
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
@@ -440,11 +434,6 @@ public class FeatureModel implements IFeatureModel {
 	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
 		this.featureTable.clear();
 		this.featureTable.putAll(featureTable);
-	}
-
-	@Override
-	public void setUndoContext(Object undoContext) {
-		this.undoContext = undoContext;
 	}
 
 	@Override

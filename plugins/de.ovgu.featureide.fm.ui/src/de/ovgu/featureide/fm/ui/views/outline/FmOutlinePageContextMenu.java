@@ -52,6 +52,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -84,7 +86,7 @@ public class FmOutlinePageContextMenu {
 	private final Object site;
 	private FeatureModelEditor fTextEditor;
 	private final TreeViewer viewer;
-	private final IFeatureModel fInput;
+	private final IFeatureModelManager fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
@@ -110,19 +112,20 @@ public class FmOutlinePageContextMenu {
 	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput) {
 		this(site, viewer, fInput);
 		this.fTextEditor = fTextEditor;
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModelManager fInput) {
 		this.site = site;
 		this.viewer = viewer;
 		this.fInput = fInput;
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput,
+			boolean syncCollapsedFeatures) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
@@ -131,7 +134,7 @@ public class FmOutlinePageContextMenu {
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput, boolean registerContextMenu) {
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModelManager fInput, boolean registerContextMenu) {
 		this.site = site;
 		this.viewer = viewer;
 		this.fInput = fInput;
@@ -139,7 +142,7 @@ public class FmOutlinePageContextMenu {
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures,
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput, boolean syncCollapsedFeatures,
 			boolean registerContextMenu) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
@@ -340,9 +343,6 @@ public class FmOutlinePageContextMenu {
 		}
 	}
 
-	/**
-	 * @param iToolBarManager
-	 */
 	public void addToolbar(IToolBarManager iToolBarManager) {
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
@@ -356,7 +356,7 @@ public class FmOutlinePageContextMenu {
 		return fTextEditor;
 	}
 
-	public IFeatureModel getFeatureModel() {
+	public IManager<IFeatureModel> getFeatureModelManager() {
 		return fInput;
 	}
 

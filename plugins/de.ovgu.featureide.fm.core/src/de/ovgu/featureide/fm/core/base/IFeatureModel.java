@@ -669,32 +669,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	IFeatureModel clone();
 
 	/**
-	 * Returns the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming
-	 * or feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
-	 * {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor feature model diagram editor}.
-	 *
-	 * @since 3.0
-	 *
-	 * @see #setUndoContext(Object)
-	 *
-	 * @return undo-context of this feature model
-	 */
-	Object getUndoContext();
-
-	/**
-	 * Sets the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming or
-	 * feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
-	 * {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor feature model diagram editor}.
-	 *
-	 * @since 3.0
-	 *
-	 * @see #getUndoContext()
-	 *
-	 * @param undoContext
-	 */
-	void setUndoContext(Object undoContext);
-
-	/**
 	 * Replaces the feature order item at the specified position <code>i</code> in this feature model's feature order list with the specified element
 	 * <code>newName</code>.
 	 *

@@ -23,9 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,10 +36,11 @@ import org.eclipse.ui.actions.ActionFactory;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Deletes the selected features and moves their unselected children upwards. Also deletes the selected propositional constraint.
@@ -50,15 +49,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
  * @author Christian Becker
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class DeleteAction extends Action {
+public class DeleteAction extends AFeatureModelAction {
 
 	public static final String ID = ActionFactory.DELETE.getId();
 
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	private final Object viewer;
-
-	private final IFeatureModel featureModel;
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
@@ -69,11 +66,10 @@ public class DeleteAction extends Action {
 		}
 	};
 
-	public DeleteAction(Object viewer, IFeatureModel featureModel) {
-		super("Delete (Del)", deleteImage);
+	public DeleteAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Delete (Del)", ID, featureModelManager);
 		this.viewer = viewer;
-		this.featureModel = featureModel;
-		setId(ID);
+		setImageDescriptor(deleteImage);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -84,15 +80,7 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		final ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
-
+		FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager));
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -101,6 +89,7 @@ public class DeleteAction extends Action {
 			return false;
 		}
 
+		final IFeatureModel featureModel = featureModelManager.editObject();
 		// check that a possibly new root can be determined unique
 		final IFeature root = featureModel.getStructure().getRoot().getFeature();
 		IFeature newRoot = root;

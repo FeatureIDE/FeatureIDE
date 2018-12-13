@@ -90,8 +90,9 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 			fileOperationLock.lock();
 			try {
 				getObject().updateFeatures(featureModel);
-				editObject().updateFeatures(featureModel);
-				editObject().update();
+				final Configuration configuration = editObject();
+				configuration.updateFeatures(featureModel);
+				configuration.update();
 			} finally {
 				fileOperationLock.unlock();
 			}

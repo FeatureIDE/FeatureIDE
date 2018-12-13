@@ -151,6 +151,11 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	}
 
 	@Override
+	public void deregisterUIObject() {
+		uiObject = null;
+	}
+
+	@Override
 	public boolean isCollapsed() {
 		for (final IFeature f : correspondingConstraint.getContainedFeatures()) {
 			if (!graphicalFeatureModel.getGraphicalFeature(f).hasCollapsedParent()) {

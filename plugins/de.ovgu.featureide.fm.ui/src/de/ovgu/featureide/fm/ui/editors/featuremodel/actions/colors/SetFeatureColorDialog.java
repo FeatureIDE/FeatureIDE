@@ -38,7 +38,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATU
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,13 +54,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureColorOperation;
 
 /**
@@ -76,38 +78,39 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureColorO
  */
 public class SetFeatureColorDialog extends Dialog {
 
-	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
+	private static final Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
 
 	private static final Color WHITE = new Color(null, 255, 255, 255);
+
 	private final FeatureColor initialSelectedColor;
+	private final IFeatureModelManager featureModelManager;
+	private final List<IFeature> featureList = new ArrayList<>();
+	private final boolean enableUndoRedo;
+
 	private FeatureColor newColor = FeatureColor.NO_COLOR;
-
-	private final List<IFeature> featureList;
 	private ArrayList<IFeature> featureListBuffer = new ArrayList<>();
-
 	private Table featureTable;
 	private Combo colorDropDownMenu;
 
-	private boolean enableUndoRedo = false;
-
-	/**
-	 * @param parentShell
-	 * @param featurelist
-	 */
-	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist) {
-		this(parentShell, featurelist, null);
+	protected SetFeatureColorDialog(Shell parentShell, IFeatureModelManager featureModelManager, List<String> featurelist) {
+		this(parentShell, featureModelManager, featurelist, null);
 	}
 
-	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist, FeatureColor selectedColor) {
+	protected SetFeatureColorDialog(Shell parentShell, IFeatureModelManager featureModelManager, List<String> featurelist, FeatureColor selectedColor) {
+		this(parentShell, featureModelManager, featurelist, selectedColor, false);
+	}
+
+	protected SetFeatureColorDialog(Shell parentShell, IFeatureModelManager featureModelManager, List<String> featurelist, FeatureColor selectedColor,
+			boolean enableUndoRedo) {
 		super(parentShell);
-		featureList = featurelist;
+		this.featureModelManager = featureModelManager;
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featurelist) {
+			featureList.add(featureModel.getFeature(name));
+		}
 		initialSelectedColor = selectedColor;
-		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
-	}
-
-	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist, FeatureColor selectedColor, boolean enableUndoRedo) {
-		this(parentShell, featurelist, selectedColor);
 		this.enableUndoRedo = enableUndoRedo;
+		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
 	}
 
 	/**
@@ -319,9 +322,6 @@ public class SetFeatureColorDialog extends Dialog {
 		}
 	}
 
-	/**
-	 * @param parent
-	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		super.createContents(parent);
@@ -330,14 +330,10 @@ public class SetFeatureColorDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureListBuffer.get(0).getFeatureModel(), featureListBuffer, newColor);
+		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureModelManager, Functional.mapToStringList(featureListBuffer), newColor);
 
 		if (enableUndoRedo) {
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (final ExecutionException e) {
-				op.redo();
-			}
+			FeatureModelOperationWrapper.run(op);
 		} else {
 			op.redo();
 		}

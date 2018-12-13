@@ -21,20 +21,22 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
@@ -45,7 +47,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
  * @author Chico Sundermann
  * @author Paul Westphal
  */
-public abstract class MultipleSelectionAction extends Action implements IEventListener {
+public abstract class MultipleSelectionAction extends AFeatureModelAction implements IEventListener {
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 		@Override
@@ -57,19 +59,12 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	Object viewer;
 	protected boolean connectionSelected;
-	protected IFeature[] featureArray;
+	protected List<String> featureArray;
 
-	/**
-	 * Default constructor
-	 * 
-	 * @param text of the action in context menu
-	 * @param viewer2
-	 */
-	public MultipleSelectionAction(String text, Object viewer2, String id) {
-		super(text);
+	public MultipleSelectionAction(String text, Object viewer2, String id, IFeatureModelManager featureModelManager) {
+		super(text, id, featureModelManager);
 		viewer = viewer2;
 		setEnabled(false);
-		setId(id);
 		if (viewer2 instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer2).addSelectionChangedListener(listener);
 		} else {
@@ -79,26 +74,23 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * returns the selected features as IFeatures
-	 * 
+	 *
 	 * @return selected IFeature array
 	 */
-	protected IFeature[] getSelectedFeatures() {
-		final ArrayList<IFeature> features = new ArrayList<>();
+	protected List<String> getSelectedFeatures() {
+		final ArrayList<String> features = new ArrayList<>();
 
 		IStructuredSelection selection;
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) {
-				for (final Object obj : selection.toArray()) {
-					features.add(((FmOutlineGroupStateStorage) obj).getFeature());
+			for (final Object obj : selection.toArray()) {
+				if (obj instanceof FmOutlineGroupStateStorage) {
+					features.add(((FmOutlineGroupStateStorage) obj).getFeature().getName());
+				} else {
+					features.add(((IFeature) obj).getName());
 				}
-				return features.toArray(new IFeature[features.size()]);
-			} else {
-				for (final Object obj : selection.toArray()) {
-					features.add((IFeature) obj);
-				}
-				return features.toArray(new IFeature[features.size()]);
 			}
+			return features;
 		} else {
 			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
 		}
@@ -108,31 +100,38 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 		if (connectionSelected) {
 			for (final Object obj : selection.toArray()) {
 				final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
-				features.add(tempFeature);
+				features.add(tempFeature.getName());
 			}
-			return features.toArray(new IFeature[features.size()]);
+			return features;
 		}
 		for (final Object obj : selection.toArray()) {
-			features.add(((FeatureEditPart) obj).getModel().getObject());
+			features.add(((FeatureEditPart) obj).getModel().getObject().getName());
 		}
-		return features.toArray(new IFeature[features.size()]);
+		return features;
 	}
 
 	/**
 	 * Is called whenever the selection changes
-	 * 
+	 *
 	 * @param validSelection
 	 */
 	protected void selectionElementChanged(boolean validSelection) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
 		if (featureArray != null) {
-			for (final Object obj : featureArray) {
-				((IFeature) obj).removeListener(this);
+			for (final String tempFeature : featureArray) {
+				final IFeature feature = featureModel.getFeature(tempFeature);
+				if (feature != null) {
+					feature.removeListener(this);
+				}
 			}
 		}
 		if (validSelection) {
 			featureArray = getSelectedFeatures();
-			for (final IFeature tempFeature : featureArray) {
-				tempFeature.addListener(this);
+			for (final String tempFeature : featureArray) {
+				final IFeature feature = featureModel.getFeature(tempFeature);
+				if (feature != null) {
+					feature.addListener(this);
+				}
 			}
 			updateProperties();
 		} else {
@@ -148,7 +147,7 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * Checks whether selection only contains features
-	 * 
+	 *
 	 * @param selection
 	 * @return boolean indicating whether there are only features selected
 	 */

@@ -67,11 +67,11 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Assigns color annotations to the editor.
@@ -153,8 +153,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		});
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return project.getFeatureModel();
+	public IFeatureModelManager getFeatureModelManager() {
+		return project.getFeatureModelManager();
 	}
 
 	public IFeature getFeature(int line) {

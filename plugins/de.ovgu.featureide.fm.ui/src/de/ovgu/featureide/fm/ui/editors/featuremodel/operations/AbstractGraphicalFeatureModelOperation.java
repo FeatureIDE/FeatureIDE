@@ -31,7 +31,7 @@ public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFea
 	protected IGraphicalFeatureModel graphicalFeatureModel;
 
 	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
-		super(graphicalFeatureModel.getFeatureModel(), label);
+		super(graphicalFeatureModel.getFeatureModelManager(), label);
 		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 

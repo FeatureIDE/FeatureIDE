@@ -37,6 +37,7 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
+		FEATURE_MODEL_OPERATION,
 		/**
 		 * The constraint was moved.
 		 */
@@ -144,7 +145,7 @@ public class FeatureIDEEvent {
 		/**
 		 * The model data loaded from a file has overridden the internal model instance.
 		 */
-		MODEL_DATA_OVERRIDDEN,
+		MODEL_DATA_OVERWRITTEN,
 		/**
 		 * The diagram was redrawn.
 		 */

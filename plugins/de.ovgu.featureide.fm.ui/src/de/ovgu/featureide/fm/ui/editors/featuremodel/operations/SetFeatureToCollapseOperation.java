@@ -20,7 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -34,31 +37,36 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 
-	
+	public static final String ID = ID_PREFIX + "SetFeatureToCollapseOperation";
+
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	
-	private IFeature[] featureArray;
-	private boolean allCollapsed;
-	private String operationLabel;
-	
+
+	private final boolean allCollapsed;
+	private final String operationLabel;
+
 	/**
 	 * @param label Description of this operation to be used in the menu
 	 * @param feature feature on which this operation will be executed
 	 *
 	 */
-	public SetFeatureToCollapseOperation(IFeature[] featureArray, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
-		super(graphicalFeatureModel.getFeatureModel(), operationLabel);
+	public SetFeatureToCollapseOperation(List<String> featureNames, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
+		super(graphicalFeatureModel.getFeatureModelManager(), operationLabel, featureNames);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.featureArray = featureArray;
 		this.allCollapsed = allCollapsed;
 		this.operationLabel = operationLabel;
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
-			if(allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
-				final CollapseFeatureOperation op = new CollapseFeatureOperation(tempFeature, graphicalFeatureModel, operationLabel);
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
+				final CollapseFeatureOperation op = new CollapseFeatureOperation(name, graphicalFeatureModel, operationLabel);
 				operations.add(op);
 			}
 		}

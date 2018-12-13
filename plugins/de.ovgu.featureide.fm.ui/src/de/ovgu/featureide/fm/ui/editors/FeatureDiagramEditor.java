@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -73,6 +74,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
@@ -93,7 +95,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
@@ -239,7 +241,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param fm The feature model
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
-	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, IGraphicalFeatureModel gfm, boolean isEditable) {
+	public FeatureDiagramEditor(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm, boolean isEditable) {
 		super(fmManager, gfm);
 
 		graphicalFeatureModel = gfm;
@@ -251,7 +253,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	private void createActions() {
-		final IFeatureModel featureModel = getFeatureModel();
+		final IFeatureModelManager featureModel = getFeatureModel();
 		actions.clear();
 
 		// FM structure modify actions
@@ -302,10 +304,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// Calculation actions
 		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModel));
 		calculationActions = new ArrayList<>(4);
-		calculationActions.add(addAction(new AutomatedCalculationsAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new RunManualCalculationsAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new ConstrainsCalculationsAction(viewer, getFeatureModel())));
+		calculationActions.add(addAction(new AutomatedCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new RunManualCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new ConstrainsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 
 		// Zoom actions
 		zoomIn = addAction(new ZoomInAction(viewer.getZoomManager()));
@@ -320,7 +322,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Other actions
 		exportFeatureModelAction = addAction(new ExportFeatureModelAction(this));
-		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, getFeatureModel()));
+		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, graphicalFeatureModel.getFeatureModelManager()));
 
 		viewer.addSelectionChangedListener(new SelectionAction(graphicalFeatureModel));
 	}
@@ -449,7 +451,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(null);
 			return;
 		}
-		final FeatureModelAnalyzer analyser = getFeatureModel().getAnalyser();
+		final FeatureModelAnalyzer analyser = getFeatureModel().editObject().getAnalyser();
 		setActiveExplanation(analyser.valid() ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
 	}
 
@@ -462,7 +464,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);
-		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
+		getFeatureModel().editObject().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
 	}
 
 	/**
@@ -475,18 +477,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public void analyzeFeatureModel() {
-		if ((getFeatureModel() == null) || (getFeatureModel().getStructure().getRoot() == null) || (viewer.getContents() == null)) {
+		final IFeatureModel featureModel = getFeatureModel().editObject();
+		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null) || (viewer.getContents() == null)) {
 			return;
 		}
-		final boolean runAnalysis = getFeatureModel().getAnalyser().runCalculationAutomatically && getFeatureModel().getAnalyser().calculateFeatures;
+		final boolean runAnalysis = featureModel.getAnalyser().runCalculationAutomatically && featureModel.getAnalyser().calculateFeatures;
 		final IRunner<Boolean> analyzeJob = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
 			@Override
 			public Boolean execute(IMonitor monitor) throws Exception {
 				// TODO could be combined with analysis results
-				for (final IFeature f : getFeatureModel().getFeatures()) {
+				for (final IFeature f : featureModel.getFeatures()) {
 					f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 				}
-				for (final IConstraint c : getFeatureModel().getConstraints()) {
+				for (final IConstraint c : featureModel.getConstraints()) {
 					c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 				}
 				refreshGraphics(null);
@@ -495,7 +498,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					return true;
 				}
 
-				analyzer = getFeatureModel().getAnalyser();
+				analyzer = featureModel.getAnalyser();
 				final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
 				refreshGraphics(changedAttributes);
 				return true;
@@ -517,7 +520,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				boolean needsRelayout = false;
 				if (changedAttributes == null) {
-					for (final IFeature f : getFeatureModel().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+					for (final IFeature f : getFeatureModel().editObject().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
@@ -539,7 +542,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 								}
 								if (feature.getStructure().isRoot() && (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD)) {
 									// When root is dead refresh all subfeatures
-									for (final IFeature subFeature : getFeatureModel()
+									for (final IFeature subFeature : getFeatureModel().editObject()
 											.getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 										subFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 										graphicalFeatureModel.getGraphicalFeature(subFeature).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
@@ -553,7 +556,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 				}
 				if (needsRelayout) {
-					getFeatureModel().fireEvent(new FeatureIDEEvent(null, EventType.LOCATION_CHANGED));
+					getFeatureModel().editObject().fireEvent(new FeatureIDEEvent(null, EventType.LOCATION_CHANGED));
 				}
 				setActiveExplanation();
 				viewer.getContents().refresh();
@@ -656,7 +659,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_NAME_CHANGED:
 			final String newValue = (String) event.getNewValue();
-			final IFeature feature = graphicalFeatureModel.getFeatureModel().getFeature(newValue);
+			final IFeature feature = graphicalFeatureModel.getFeatureModelManager().editObject().getFeature(newValue);
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.update(event);
 			final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
@@ -719,29 +722,38 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
-			viewer.reload();
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					viewer.deregisterEditParts();
+					graphicalFeatureModel.init();
+					viewer.setContents(graphicalFeatureModel);
+				}
+			});
 			analyzeFeatureModel();
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-			viewer.internRefresh(true);
-			setDirty();
-			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
-				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
-				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-			}
 			break;
-		case MODEL_DATA_OVERRIDDEN:
+		case MODEL_DATA_LOADED:
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					viewer.deregisterEditParts();
+					graphicalFeatureModel.init();
+					viewer.setContents(graphicalFeatureModel);
+				}
+			});
+			analyzeFeatureModel();
+			break;
+		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
 
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
-					graphicalFeatureModel.getLayout().setLayout(1);
 					graphicalFeatureModel.init();
-
 					viewer.setContents(graphicalFeatureModel);
 				}
 			});
-//			setDirty();
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().dispose((IUndoContext) fmManager.getUndoContext(), true, true, true);
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:
@@ -767,8 +779,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			} else {
 				// No old parent so the new feature was the root
 				// Now update roots parent
-				final IGraphicalFeature root =
-					graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				final IGraphicalFeature root = graphicalFeatureModel
+						.getGraphicalFeature(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				viewer.refreshChildAll(root.getObject());
 			}
@@ -787,7 +799,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			viewer.reload();
 			refreshGraphics(null);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			analyzeFeatureModel();
 			break;
 		case REFRESH_ACTIONS:
@@ -833,13 +845,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case COLLAPSED_ALL_CHANGED:
 			viewer.reload();
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
 			analyzeFeatureModel();
 			setDirty();
 
 			// Center root feature after operation
-			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
@@ -1115,7 +1127,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private void fillContextMenu(IMenuManager menuManager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
-		if (getFeatureModel() instanceof ExtendedFeatureModel) {
+		if (getFeatureModel().editObject() instanceof ExtendedFeatureModel) {
 			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createNameTypeMenuManager());
 		}
@@ -1242,7 +1254,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		LongRunningWrapper.cancelAllJobs(analysisToken);
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
-		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
+		graphicalFeatureModel.getFeatureModelManager().editObject().removeListener(editorKeyHandler);
 //		gfmManager.dispose();
 		super.dispose();
 	}

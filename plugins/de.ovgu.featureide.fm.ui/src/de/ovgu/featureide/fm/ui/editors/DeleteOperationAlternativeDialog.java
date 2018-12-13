@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.Table;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
@@ -80,6 +81,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 	Shell shell;
 
+	private final IFeatureModelManager featureModelManager;
 	private final IFeatureModel featureModel;
 
 	Table alternativefeatureTable;
@@ -95,9 +97,10 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param featureMap
 	 * @param deleteOperation
 	 */
-	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
+	public DeleteOperationAlternativeDialog(IFeatureModelManager featureModelManager, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
 		this.featureMap = featureMap;
-		this.featureModel = featureModel;
+		this.featureModelManager = featureModelManager;
+		featureModel = featureModelManager.editObject();
 		this.parent = parent;
 
 		final List<IFeature> toBeDeleted = new LinkedList<IFeature>();
@@ -369,18 +372,19 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 	void execute() {
 		IFeature toBeDeleted;
-		IFeature alternative;
+		String alternative;
 		final List<IFeature> delFeatures = new LinkedList<IFeature>();
 
 		if (featureTable.getSelectionCount() > 0) {
-			alternative = (IFeature) (featureTable.getSelection()[0]).getData();
+			final IFeature alternativeFeature = (IFeature) (featureTable.getSelection()[0]).getData();
+			alternative = alternativeFeature != null ? alternativeFeature.getName() : null;
 		} else {
 			return;
 		}
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
-			parent.addOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
+			parent.addOperation(new DeleteFeatureOperation(featureModelManager, toBeDeleted.getName(), alternative));
 			delFeatures.add(toBeDeleted);
 		}
 

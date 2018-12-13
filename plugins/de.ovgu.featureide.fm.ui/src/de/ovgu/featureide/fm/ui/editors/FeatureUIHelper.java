@@ -56,7 +56,7 @@ public class FeatureUIHelper {
 	}
 
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
-		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
+		return getGraphicalFeature(model.getFeatureModelManager().editObject().getStructure().getRoot(), model);
 	}
 
 	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {
@@ -217,11 +217,11 @@ public class FeatureUIHelper {
 	}
 
 	/**
-	 * should not be used here
+	 * @deprecated will be moved...
 	 */
 	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
-		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
+		final List<ConnectionEditPart> editPartList = new LinkedList<>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
 		for (final FeatureConnection connection : feature.getTargetConnections()) {
 			final Object connectionEditPart = registry.get(connection);

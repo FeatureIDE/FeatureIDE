@@ -21,9 +21,7 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
-import java.util.concurrent.locks.Lock;
 
-import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -32,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  *
  * @author Sebastian Krieter
  */
-public interface IFileManager<T> extends IEventManager {
+public interface IFileManager<T> extends IManager<T> {
 
 	String getAbsolutePath();
 
@@ -62,40 +60,6 @@ public interface IFileManager<T> extends IEventManager {
 	 */
 	ProblemList save();
 
-	ProblemList externalSave(Runnable externalSaveMethod);
-
-	/**
-	 * Overwrites the variable object with the persistent object.
-	 */
-	void overwrite();
-
-	/**
-	 * Returns the persistent object of the manager.
-	 *
-	 * @return The persistent object.
-	 */
-	T getObject();
-
-	/**
-	 * Returns the variable object of the manager. Use {@link #getFileOperationLock()} to synchronize all modifications to the variable object.
-	 *
-	 * @return The variable object.
-	 */
-	T editObject();
-
-	T getSnapshot();
-
-	boolean hasChanged();
-
 	IPersistentFormat<T> getFormat();
-
-	void dispose();
-
-	/**
-	 * Acquire the lock for editing the variable object.
-	 *
-	 * @return The lock used by the file manager while accessing the file.
-	 */
-	Lock getFileOperationLock();
 
 }

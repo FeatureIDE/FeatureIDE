@@ -28,9 +28,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Basic class with some default methods for feature model editor pages.
@@ -40,7 +39,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFileManager;
  */
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
-	protected final IFileManager<IFeatureModel> fmManager;
+	protected final IFeatureModelManager fmManager;
 	protected final IGraphicalFeatureModel gfm;
 
 	private int index;
@@ -48,14 +47,14 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	protected IEditorInput input;
 	protected IEditorSite site;
 
-	public FeatureModelEditorPage(IFileManager<IFeatureModel> fmManager, IGraphicalFeatureModel gfm) {
+	public FeatureModelEditorPage(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm) {
 		super();
 		this.fmManager = fmManager;
 		this.gfm = gfm;
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return fmManager.editObject();
+	public IFeatureModelManager getFeatureModel() {
+		return fmManager;
 	}
 
 	@Override

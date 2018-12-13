@@ -107,10 +107,10 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 										viewer.setInput(iFile);
 										viewer.getContentProvider().inputChanged(viewer, null, fmManager);
 										if (fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
-											if ((contextMenu == null)
-												|| (contextMenu.getFeatureModel() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel())) {
+											if ((contextMenu == null) || (contextMenu
+													.getFeatureModelManager() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModelManager())) {
 												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
-														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel(), false);
+														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModelManager(), false);
 											}
 										}
 									}
@@ -146,7 +146,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 		}
 
 		viewer.expandToLevel(2);
-		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fmManager.editObject());
+		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fmManager);
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 

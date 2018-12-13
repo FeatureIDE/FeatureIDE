@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  *
  * @author Sebastian Krieter
  */
-public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
+public abstract class AFileManager<T> implements IFileManager<T> {
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
@@ -78,17 +78,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			final Path subpath = mainPath.subpath(0, mainPath.getNameCount() - 1);
 			final Path root = mainPath.getRoot();
 			if ((subpath != null) && (root != null)) {
-				final Path extraFolder = root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString));
-
-				if (!FileSystem.exists(extraFolder)) {
-					try {
-						FileSystem.mkDir(extraFolder);
-					} catch (final IOException e) {
-						Logger.logError(e);
-					}
-				}
-
-				return extraFolder.resolve(mainFileNameString + "." + format.getSuffix());
+				return root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString)).resolve(mainFileNameString + "." + format.getSuffix());
 			}
 		}
 		throw new IllegalArgumentException("Path " + path + " can not be transformed.");
@@ -134,7 +124,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			if (fileManagerClass.isInstance(instance)) {
 				return (R) fileManagerClass.cast(instance);
 			} else {
-				if (createInstance) {
+				if (createInstance && (path != null) && Files.exists(path)) {
 					try {
 						final Constructor<R> constructor = fileManagerClass.getDeclaredConstructor(Path.class);
 						constructor.setAccessible(true);
@@ -162,13 +152,10 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	private final IEventManager eventManager = new DefaultEventManager();
 	private final ProblemList lastProblems = new ProblemList();
 
-//	protected final Object fileOperationSynchronizer = new Object();
 	protected final Lock fileOperationLock = new ReentrantLock();
 
 	private final Path path;
 	private final List<? extends IPersistentFormat<T>> formats;
-//	private final Class<? extends IFileManager<T>> fileManagerClass;
-	private final FormatManager<T> formatManager;
 	private final FactoryManager<T> factoryManager;
 
 	protected String persistentObjectSource;
@@ -182,13 +169,15 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		this.path = path;
 		formats = formatManager.getFormatListForExtension(getAbsolutePath());
 		this.factoryManager = factoryManager;
-		this.formatManager = formatManager;
 
+		T newPersistentObject = null;
 		if (FileSystem.exists(path)) {
 			try {
 				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 				detectFormat(content);
 				final ProblemList problems = format.getInstance().read(variableObject, content);
+				newPersistentObject = createObject();
+				format.getInstance().read(newPersistentObject, content);
 				if (problems != null) {
 					lastProblems.addAll(problems);
 				}
@@ -198,13 +187,14 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		} else {
 			// TODO use cases?
 			try {
-				variableObject = factoryManager.getFactory(path, formats.get(0)).create();
-			} catch (final NoSuchExtensionException e) {
-				// TODO Auto-generated catch block
+				format = formats.get(0);
+				setVariableObject(createObject());
+				newPersistentObject = createObject();
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
-		setPersistentObject(copyObject(variableObject));
+		setPersistentObject(newPersistentObject);
 	}
 
 	private void detectFormat(final CharSequence content) throws Exception {
@@ -212,7 +202,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			if (possibleFormat.supportsContent(content)) {
 				if (format != possibleFormat) {
 					format = possibleFormat;
-					variableObject = createObject();
+					setVariableObject(createObject());
 				}
 				break;
 			}
@@ -222,6 +212,10 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		}
 	}
 
+	protected void setVariableObject(T variableObject) {
+		this.variableObject = variableObject;
+	}
+
 	protected T createObject() throws Exception {
 		return factoryManager.getFactory(path, format).create();
 	}
@@ -229,6 +223,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@Override
 	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	protected abstract T copyObject(T oldObject);
@@ -318,9 +317,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			lastProblems.clear();
 			final T tempObject;
 			try {
-				tempObject = createObject();
 				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 				detectFormat(content);
+				tempObject = createObject();
 				final List<Problem> problemList = format.getInstance().read(tempObject, content);
 				if (problemList != null) {
 					lastProblems.addAll(problemList);
@@ -373,12 +372,10 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			}
 			final String write = format.getInstance().write(persistentObject);
 			format.getInstance().read(variableObject, write);
-			// variableObject = copyObject(localObject);
-			// persistentObject = copyObject(localObject);
 		} finally {
 			fileOperationLock.unlock();
 		}
-		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERRIDDEN));
+		fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_OVERWRITTEN));
 	}
 
 	@Override
@@ -417,8 +414,10 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 					return new ProblemList();
 				}
 				modifying = true;
-				final T tempObject = copyObject(variableObject);
-				FileSystem.write(path, format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
+				final String source = format.getInstance().write(variableObject);
+				FileSystem.write(path, source.getBytes(DEFAULT_CHARSET));
+				final T tempObject = createObject();
+				format.read(tempObject, source);
 				setPersistentObject(tempObject);
 			} catch (final Exception e) {
 				handleException(e);
@@ -445,9 +444,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 					return new ProblemList();
 				}
 				modifying = true;
-				final T tempObject = copyObject(variableObject);
 				externalSaveMethod.run();
-				setPersistentObject(tempObject);
+				final List<Problem> problemList = read();
+				if (problemList != null) {
+					lastProblems.addAll(problemList);
+				}
 			} catch (final Exception e) {
 				handleException(e);
 				return new ProblemList(lastProblems);

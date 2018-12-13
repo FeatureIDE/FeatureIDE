@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -47,7 +48,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
 		final IFeatureStructure rootStructure = root.getObject().getStructure();
 		for (final IFeatureStructure feature : Features.getCompoundFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
@@ -57,8 +58,8 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
 }

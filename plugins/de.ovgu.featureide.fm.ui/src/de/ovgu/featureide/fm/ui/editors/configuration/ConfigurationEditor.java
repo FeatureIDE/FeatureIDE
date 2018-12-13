@@ -63,6 +63,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
@@ -257,9 +258,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	public void loadPropagator() {
-		if (!configurationManager.editObject().getPropagator().isLoaded()) {
+		final IConfigurationPropagator propagator = configurationManager.editObject().getPropagator();
+		if (!propagator.isLoaded()) {
 			final Display currentDisplay = Display.getCurrent();
-			final IRunner<Void> configJob = LongRunningWrapper.getRunner(configurationManager.editObject().getPropagator().load(), "Load Propagator");
+			final IRunner<Void> configJob = LongRunningWrapper.getRunner(propagator.load(), "Load Propagator");
 			configJob.addJobFinishedListener(new JobFinishListener<Void>() {
 
 				@Override
@@ -357,7 +359,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void propertyChange(final FeatureIDEEvent evt) {
 		switch (evt.getEventType()) {
 		case MODEL_DATA_SAVED:
-		case MODEL_DATA_OVERRIDDEN:
+		case MODEL_DATA_OVERWRITTEN:
 		case COLOR_CHANGED:
 			if (evt.getSource() instanceof IFeatureModel) {
 				configurationManager.update();
@@ -495,10 +497,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 						@Override
 						public void run() {
+							final Configuration configuration = configurationManager.editObject();
 							for (final IConfigurationEditorPage internalPage : allPages) {
 								if (internalPage != currentPage) {
-									internalPage
-											.propertyChange(new FeatureIDEEvent(configurationManager.editObject(), FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
+									internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
 								}
 							}
 							currentPage.doSave(monitor);
@@ -507,9 +509,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			} else {
 				configurationManager.save();
+				final Configuration configuration = configurationManager.editObject();
 				for (final IConfigurationEditorPage internalPage : allPages) {
 					if (internalPage != currentPage) {
-						internalPage.propertyChange(new FeatureIDEEvent(configurationManager.editObject(), FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
+						internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
 					}
 				}
 				currentPage.doSave(monitor);

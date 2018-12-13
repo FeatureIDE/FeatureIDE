@@ -227,6 +227,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
+	public void deregisterUIObject() {
+		uiObject = null;
+	}
+
+	@Override
 	public boolean isCollapsed() {
 		if (!getObject().getStructure().hasChildren()) {
 			return false;

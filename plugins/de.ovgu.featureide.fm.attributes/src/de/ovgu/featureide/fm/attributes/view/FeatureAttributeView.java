@@ -87,6 +87,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -502,8 +503,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (currentEditor instanceof FeatureModelEditor) {
 			if (page instanceof FeatureDiagramEditor) {
 				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
-				if (editor.getFeatureModel() instanceof ExtendedFeatureModel) {
-					setFeatureModel((ExtendedFeatureModel) editor.getFeatureModel());
+				final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
+				final IFeatureModel curFeatureModel = featureModelManager.editObject();
+				if (curFeatureModel instanceof ExtendedFeatureModel) {
+					setFeatureModel((ExtendedFeatureModel) curFeatureModel);
 					if (!treeViewer.getControl().isDisposed()) {
 						treeViewer.setInput(featureModel);
 					}

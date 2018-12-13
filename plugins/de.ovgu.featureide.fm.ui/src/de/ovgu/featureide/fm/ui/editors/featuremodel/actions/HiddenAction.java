@@ -20,12 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
 
 /**
@@ -39,11 +37,8 @@ public class HiddenAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.hidden";
 
-	private final IFeatureModel featureModel;
-
-	public HiddenAction(Object viewer, IFeatureModel featureModel) {
-		super("Hidden", viewer, ID);
-		this.featureModel = featureModel;
+	public HiddenAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Hidden", viewer, ID, featureModelManager);
 	}
 
 	@Override
@@ -51,24 +46,20 @@ public class HiddenAction extends MultipleSelectionAction {
 		changeHiddenStatus(isEveryFeatureHidden());
 		setChecked(isEveryFeatureHidden());
 	}
-	
+
 	private boolean isEveryFeatureHidden() {
-		for (IFeature tempFeature : featureArray) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			if (!(tempFeature.getStructure().isHidden())) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private void changeHiddenStatus(boolean allHidden) {
-		final SetFeatureToHiddenOperation op = 
-				new SetFeatureToHiddenOperation(featureModel, allHidden, getSelectedFeatures());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new SetFeatureToHiddenOperation(featureModelManager, allHidden, getSelectedFeatures()));
 	}
 
 	@Override

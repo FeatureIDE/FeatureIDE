@@ -49,9 +49,7 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public void handleUpdate(TreeViewer viewer, IFile iFile) {
-
-	}
+	public void handleUpdate(TreeViewer viewer, IFile iFile) {}
 
 	@Override
 	public String getProviderName() {

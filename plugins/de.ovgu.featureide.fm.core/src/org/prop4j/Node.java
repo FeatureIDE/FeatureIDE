@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
  *
@@ -431,11 +429,11 @@ public abstract class Node {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
-	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature) {
+	public List<Node> replaceFeature(String feature, String replaceWithFeature) {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+	protected List<Node> replaceFeature(String feature, String replaceWithFeature, List<Node> list) {
 		for (final Node child : children) {
 			child.replaceFeature(feature, replaceWithFeature, list);
 		}

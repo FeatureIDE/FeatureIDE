@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -53,7 +54,9 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		positionsFeatures.clear();
+		positionsConstraints.clear();
 		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
 			positionsFeatures.put(feature, feature.getLocation());
 		}
@@ -65,7 +68,7 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
 			if (positionsFeatures.containsKey(feature)) {
 				feature.setLocation(positionsFeatures.get(feature));

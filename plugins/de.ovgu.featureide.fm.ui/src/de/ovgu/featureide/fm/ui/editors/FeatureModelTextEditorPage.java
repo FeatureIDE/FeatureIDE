@@ -22,20 +22,20 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
+import java.util.concurrent.locks.Lock;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOperation;
 
 /**
@@ -78,15 +78,20 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(getFeatureModel());
+		final String text;
+		final FeatureModelManager manager = featureModelEditor.getFeatureModelManager();
+		final Lock fileOperationLock = manager.getFileOperationLock();
+		fileOperationLock.lock();
+		try {
+			featureModelEditor.gfm.writeValues();
+			text = featureModelEditor.fmManager.getFormat().getInstance().write(manager.editObject());
+		} finally {
+			fileOperationLock.unlock();
+		}
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
 		}
-	}
-
-	private IFeatureModel getFeatureModel() {
-		return featureModelEditor.getFeatureModel();
 	}
 
 	/**
@@ -143,20 +148,15 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		}
 	}
 
+	@Override
+	protected void createUndoRedoActions() {}
+
 	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final IFeatureModel fm = getFeatureModel();
-
 			// TODO _interfaces replace text with DocumentEvent (delta)
-			final SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
-
-			op.addContext((IUndoContext) fm.getUndoContext());
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			if (FeatureModelOperationWrapper.run(new SourceChangedOperation(featureModelEditor.fmManager, newText, oldText))) {
 				oldText = newText;
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
 			}
 		}
 	}

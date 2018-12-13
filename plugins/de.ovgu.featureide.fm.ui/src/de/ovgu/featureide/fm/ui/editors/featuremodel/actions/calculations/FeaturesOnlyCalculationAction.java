@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEATURES;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * Action to specify feature model analysis.<br> Only features will be analyzed and not constraints.
@@ -33,35 +34,42 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class FeaturesOnlyCalculationAction extends Action {
+public class FeaturesOnlyCalculationAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.featuresonlycalculations";
 
-	private final IFeatureModel featureModel;
-
-	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(CALCULATE_FEATURES);
-		this.featureModel = featureModel;
-		setToolTipText("Test");
-		setChecked(featureModel.getAnalyser().calculateFeatures);
-		setId(ID);
+	public FeaturesOnlyCalculationAction(IFeatureModelManager featureModelManager) {
+		super(CALCULATE_FEATURES, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateFeatures) {
-			featureModel.getAnalyser().calculateFeatures = false;
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
-			featureModel.getAnalyser().calculateDeadConstraints = false;
-			featureModel.getAnalyser().calculateFOConstraints = false;
-		} else {
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+		final IFeatureModel featureModel;
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			featureModel = featureModelManager.editObject();
+			if (featureModel.getAnalyser().calculateFeatures) {
+				featureModel.getAnalyser().calculateFeatures = false;
+				featureModel.getAnalyser().calculateConstraints = false;
+				featureModel.getAnalyser().calculateRedundantConstraints = false;
+				featureModel.getAnalyser().calculateTautologyConstraints = false;
+				featureModel.getAnalyser().calculateDeadConstraints = false;
+				featureModel.getAnalyser().calculateFOConstraints = false;
+			} else {
+				featureModel.getAnalyser().calculateFeatures = true;
+				featureModel.getAnalyser().calculateDeadConstraints = true;
+				featureModel.getAnalyser().calculateFOConstraints = true;
+			}
+		} finally {
+			lock.unlock();
 		}
 		featureModel.handleModelDataChanged();
+	}
+
+	@Override
+	public void update() {
+		setChecked(featureModelManager.editObject().getAnalyser().calculateFeatures);
 	}
 
 }

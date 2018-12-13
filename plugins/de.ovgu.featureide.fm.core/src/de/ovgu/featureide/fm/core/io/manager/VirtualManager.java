@@ -20,37 +20,33 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Holds a virtual object.
+ * Operates on a predefined object. Does not interact with the file system.
  *
  * @author Sebastian Krieter
  */
-public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
+public class VirtualManager<T> implements IManager<T> {
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
-	protected T variableObject;
+	protected final T variableObject;
 
-	protected IPersistentFormat<T> format;
+	protected final Lock lock = new ReentrantLock();
 
-	public VirtualFileManager(T object, IPersistentFormat<T> format) {
-		this.format = format;
+	public VirtualManager(T object) {
 		variableObject = object;
-	}
-
-	@Override
-	public IPersistentFormat<T> getFormat() {
-		return format;
 	}
 
 	@Override
@@ -64,31 +60,13 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 	}
 
 	@Override
-	public ProblemList getLastProblems() {
-		return new ProblemList();
-	}
-
-	@Override
-	public ProblemList read() {
-		return new ProblemList();
-	}
-
-	@Override
-	public void overwrite() {}
-
-	@Override
-	public ProblemList save() {
-		return new ProblemList();
-	}
-
-	@Override
-	public ProblemList externalSave(Runnable externalSaveMethod) {
-		return new ProblemList();
-	}
-
-	@Override
 	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	@Override
@@ -99,21 +77,6 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 	@Override
 	public void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
-	}
-
-	@Override
-	public void dispose() {
-		variableObject = null;
-	}
-
-	@Override
-	public String getAbsolutePath() {
-		return "";
-	}
-
-	@Override
-	public Path getPath() {
-		return null;
 	}
 
 	@Override
@@ -128,17 +91,33 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 
 	@Override
 	public Lock getFileOperationLock() {
-		return null;
-	}
-
-	@Override
-	public ProblemList readFromSource(CharSequence source) {
-		return new ProblemList();
+		return lock;
 	}
 
 	@Override
 	public T getSnapshot() {
 		return variableObject;
 	}
+
+	@Override
+	public ProblemList externalSave(Runnable externalSaveMethod) {
+		lock.lock();
+		try {
+			try {
+				externalSaveMethod.run();
+			} catch (final Exception e) {
+				return new ProblemList(Arrays.asList(new Problem(e)));
+			}
+		} finally {
+			lock.unlock();
+		}
+		return new ProblemList();
+	}
+
+	@Override
+	public void dispose() {}
+
+	@Override
+	public void overwrite() {}
 
 }

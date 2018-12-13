@@ -109,7 +109,8 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	/**
 	 * Sets the properties <i>icon, border and tooltips</i> of the {@link ConstraintFigure}.
 	 */
-	public void setConstraintProperties() {
+	@Override
+	public void updateProperties() {
 		init();
 
 		final IConstraint constraint = graphicalConstraint.getObject();

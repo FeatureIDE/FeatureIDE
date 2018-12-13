@@ -68,18 +68,28 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
-		public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
+		public Constraint createConstraint(IFeatureModel featureModel, Node propNode) {
 			return new Constraint(featureModel, propNode);
 		}
 
 		@Override
-		public IFeature createFeature(IFeatureModel featureModel, String name) {
+		public MyFeatureImplementation createFeature(IFeatureModel featureModel, String name) {
 			return new MyFeatureImplementation(featureModel, name);
 		}
 
 		@Override
-		public IFeatureModel create() {
+		public FeatureModel create() {
 			return new FeatureModel(ID);
+		}
+
+		@Override
+		public MyFeatureImplementation copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
+			return (MyFeatureImplementation) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		}
+
+		@Override
+		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
+			return (Constraint) oldConstraint.clone(featureModel);
 		}
 
 	}

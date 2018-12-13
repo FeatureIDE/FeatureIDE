@@ -29,10 +29,10 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
@@ -53,9 +53,9 @@ public class TikzFormatTest {
 
 	@Test
 	public void testLatexExporter() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel tikzExample = Commons.loadTestFeatureModelFromFile(TEST_XML_FILE_NAME);
+		final FeatureModelManager tikzExample = Commons.loadTestFeatureModelFromFile(TEST_XML_FILE_NAME);
 		final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzGraphicalFeatureModelFormat.TikZHeadFormat();
-		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat().new TikZMainFormat();
+		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat.TikZMainFormat();
 		final IPersistentFormat<IGraphicalFeatureModel> formatbody = new TikzGraphicalFeatureModelFormat.TikZBodyFormat(TEST_TEX_MAIN_FILE_NAME);
 		String head = new String();
 		String main = new String();

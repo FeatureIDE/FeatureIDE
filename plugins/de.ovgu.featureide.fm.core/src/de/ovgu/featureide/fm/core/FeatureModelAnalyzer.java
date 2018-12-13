@@ -832,7 +832,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		case MANDATORY_CHANGED:
 		case MODEL_DATA_CHANGED:
 		case MODEL_DATA_LOADED:
-		case MODEL_DATA_OVERRIDDEN:
+		case MODEL_DATA_OVERWRITTEN:
 		case PARENT_CHANGED:
 		case STRUCTURE_CHANGED:
 			cnf = null;

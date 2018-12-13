@@ -28,11 +28,11 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.LatexFormat;
@@ -54,8 +54,8 @@ public class LatexFormatTest {
 
 	@Test
 	public void testLatexExporter() {
-		final IFeatureModel modelExample = Commons.loadTestFeatureModelFromFile(TEST_XML_MODEL_FILE_NAME);
-		final Configuration configExample = new Configuration(modelExample, false);
+		final FeatureModelManager modelExample = Commons.loadTestFeatureModelFromFile(TEST_XML_MODEL_FILE_NAME);
+		final Configuration configExample = new Configuration(modelExample.getObject(), false);
 		final IPersistentFormat<Configuration> formatHead = new LatexFormat.LaTeXHead();
 		final IPersistentFormat<Configuration> formatMain = new LatexFormat.LaTeXMain();
 		final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(TEST_TEX_MAIN_FILE_NAME);

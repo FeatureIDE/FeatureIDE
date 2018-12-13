@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to create a new constraint. Enables undo/redo functionality.
@@ -40,36 +41,30 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 
-	private final IConstraint constraint;
-	private final IFeatureModel featureModel;
+	private final Node node;
+	private final String description;
 
-	/**
-	 * @param node the node representing the constraint to be added
-	 * @param featureModel model that will be used to add the constraint
-	 */
-	public CreateConstraintOperation(Node node, IFeatureModel featureModel, String description) {
-		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FMFactoryManager.getInstance().getFactory(featureModel).createConstraint(featureModel, node);
-		constraint.setDescription(description);
-		this.featureModel = featureModel;
+	private int constraintCount = -1;
+
+	public CreateConstraintOperation(Node node, IFeatureModelManager featureModelManager, String description) {
+		super(featureModelManager, CREATE_CONSTRAINT);
+		this.node = node;
+		this.description = description;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		featureModel.addConstraint(constraint);
-
-//		ExpandConstraintOperation operation = new ExpandConstraintOperation(featureModel, constraint);
-//		try {
-//			operation.execute(null,  null);
-//		} catch (ExecutionException e) {
-//			FMUIPlugin.getDefault().logError(e);
-//		}
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		constraintCount = featureModel.getConstraintCount();
+		final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).createConstraint(featureModel, node);
+		constraint.setDescription(description);
+		featureModel.addConstraint(constraint, constraintCount);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModel.removeConstraint(constraint);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(constraintCount);
+		featureModel.removeConstraint(constraintCount);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
 	}
 

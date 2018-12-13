@@ -291,7 +291,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			if (this.featureProject != null) {
 				featureModel = this.featureProject.getFeatureModel();
-				setFeatureColourAction.setFeatureModel(featureModel);
 			}
 		}
 	}

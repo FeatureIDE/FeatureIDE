@@ -50,10 +50,11 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		final IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
+		final IGraphicalFeature root =
+			FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModelManager().editObject().getStructure().getRoot(), featureModel);
 		layout(root);
 
-		Rectangle rootBounds = getBounds(root);
+		final Rectangle rootBounds = getBounds(root);
 		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 	}
 

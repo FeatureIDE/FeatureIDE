@@ -120,7 +120,8 @@ public class Configuration implements Cloneable {
 				this.featureModel = featureModel;
 				propagator = null;
 				root = initFeatures(null, featureRoot);
-				readdFeatures();
+				selectableFeatures.clear();
+				readdFeatures(root);
 			}
 			return true;
 		}
@@ -148,11 +149,6 @@ public class Configuration implements Cloneable {
 		return sFeature;
 	}
 
-	private void readdFeatures() {
-		selectableFeatures.clear();
-		readdFeatures(root);
-	}
-
 	private void readdFeatures(SelectableFeature root) {
 		selectableFeatures.put(root.getName(), root);
 		for (final TreeElement child : root.getChildren()) {
@@ -163,7 +159,9 @@ public class Configuration implements Cloneable {
 	private ConfigurationPropagator propagator() {
 		if ((propagator == null) || !propagator.isLoaded()) {
 			propagator = new ConfigurationPropagator(this);
-			LongRunningWrapper.runMethod(propagator.load());
+			if (featureModel != null) {
+				LongRunningWrapper.runMethod(propagator.load());
+			}
 		}
 		return propagator;
 	}

@@ -37,4 +37,8 @@ public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
+	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
+
+	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
+
 }

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -35,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  *
  * @author Sebastian Krieter
  */
-public class FeatureModelManager extends AFileManager<IFeatureModel> {
+public class FeatureModelManager extends AFileManager<IFeatureModel> implements IFeatureModelManager {
 
 	@CheckForNull
 	public static FeatureModelManager getInstance(Path path) {
@@ -47,6 +48,11 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return getInstance(identifier, createInstance, FeatureModelManager.class);
 	}
 
+	public static IFeatureModelManager getInstance(IFeatureModel featureModel) {
+		final IFeatureModelManager featureModelManager = getInstance(featureModel.getSourceFile());
+		return (featureModelManager == null) ? new VirtualFeatureModelManager(featureModel) : featureModelManager;
+	}
+
 	public static final IFeatureModel load(Path path) {
 		return FeatureModelIO.getInstance().load(path);
 	}
@@ -55,6 +61,8 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return FeatureModelIO.getInstance().save(featureModel, path, format);
 	}
 
+	protected Object undoContext = null;
+
 	protected FeatureModelManager(Path identifier) {
 		super(identifier, FMFormatManager.getInstance(), FMFactoryManager.getInstance());
 		variableObject.setSourceFile(identifier);
@@ -62,7 +70,6 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	@Override
 	public void overwrite() {
-		persistentObject.setUndoContext(variableObject.getUndoContext());
 		super.overwrite();
 	}
 
@@ -73,9 +80,34 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		final IFeatureModel clone = oldObject.clone();
-		clone.setUndoContext(oldObject.getUndoContext());
-		return clone;
+		return oldObject.clone();
+	}
+
+	@Override
+	protected void setVariableObject(IFeatureModel variableObject) {
+		if (this.variableObject != null) {
+			for (final IEventListener listener : this.variableObject.getListeners()) {
+				variableObject.addListener(listener);
+			}
+		}
+		super.setVariableObject(variableObject);
+	}
+
+	@Override
+	protected IFeatureModel createObject() throws Exception {
+		final IFeatureModel featureModel = super.createObject();
+		featureModel.setSourceFile(getPath());
+		return featureModel;
+	}
+
+	@Override
+	public Object getUndoContext() {
+		return undoContext;
+	}
+
+	@Override
+	public void setUndoContext(Object undoContext) {
+		this.undoContext = undoContext;
 	}
 
 }

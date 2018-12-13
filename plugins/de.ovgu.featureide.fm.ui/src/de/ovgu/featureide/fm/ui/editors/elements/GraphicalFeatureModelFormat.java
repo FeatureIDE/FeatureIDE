@@ -113,7 +113,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						final String xLegend = legend.getAttribute("X");
 						final String yLegend = legend.getAttribute("Y");
 
-						object.getLayout().setLegendPos(Integer.parseInt(xLegend), Integer.parseInt(yLegend));
+						object.getLegend().setPos(new Point(Integer.parseInt(xLegend), Integer.parseInt(yLegend)));
 					} else {
 						object.getLayout().setLegendAutoLayout(true);
 					}
@@ -259,7 +259,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		if (!object.getLayout().hasLegendAutoLayout()) {
 			legend.setAttribute(LEGEND_AUTO_LAYOUT, FALSE);
-			final Point legendPos = object.getLayout().getLegendPos();
+			final Point legendPos = object.getLegend().getPos();
 			legend.setAttribute("X", Integer.toString(legendPos.x));
 			legend.setAttribute("Y", Integer.toString(legendPos.y));
 		}

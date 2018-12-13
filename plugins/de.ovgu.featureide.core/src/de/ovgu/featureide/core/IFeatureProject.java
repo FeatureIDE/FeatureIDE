@@ -38,7 +38,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
 
@@ -141,7 +141,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	// TODO _Refactor: remove
 	IFeatureModel getFeatureModel();
 
-	IFileManager<IFeatureModel> getFeatureModelManager();
+	IFeatureModelManager getFeatureModelManager();
 
 	IFile getModelFile();
 

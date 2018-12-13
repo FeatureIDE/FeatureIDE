@@ -22,13 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import java.util.List;
 
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -36,6 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperation;
 
 /**
@@ -94,19 +92,9 @@ public class LegendDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		final LegendFigure legendFigure = legendEditPart.getFigure();
-
 		if (legendFigure.getLocation().equals(newLocation)) {
 			return;
 		}
-
-		final LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
-		// TODO _interfaces Removed Code
-		op.addContext((IUndoContext) model.getFeatureModel().getUndoContext());
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final Exception e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new LegendMoveOperation(model, newLocation, legendFigure));
 	}
 }

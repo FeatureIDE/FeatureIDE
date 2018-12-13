@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
@@ -59,7 +60,7 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
 		final Collection<? extends IGraphicalFeature> expandedFeatures =
 			FeatureUIHelper.getGraphicalFeatures(FeatureUtils.getParents(explanation.getAffectedFeatures()), graphicalFeatureModel);
-		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModel.getNumberOfFeatures());
+		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModelManager.editObject().getNumberOfFeatures());
 		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
 			final boolean collapse = !expandedFeatures.contains(feature);
 			if (feature.isCollapsed() == collapse) { // already in the target state, therefore no change necessary
@@ -71,14 +72,14 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		super.operation();
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		super.operation(featureModel);
 		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		super.inverseOperation();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		super.inverseOperation(featureModel);
 		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 }

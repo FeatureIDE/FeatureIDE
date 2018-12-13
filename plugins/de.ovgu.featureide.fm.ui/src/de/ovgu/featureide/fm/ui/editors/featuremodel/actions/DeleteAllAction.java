@@ -23,15 +23,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 /**
@@ -46,61 +47,52 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDelet
 public class DeleteAllAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.deleteall";
-	private final IFeatureModel featureModel;
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
-	/**
-	 *
-	 * @param viewer
-	 * @param featureModel
-	 */
-	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
-		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID);
-		this.featureModel = featureModel;
+	public DeleteAllAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID, featureModelManager);
 		setImageDescriptor(deleteImage);
 	}
 
 	@Override
 	public void run() {
-		final FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, getParentsFromSelectedFeatures());
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new FeatureTreeDeleteOperation(featureModelManager, getParentsFromSelectedFeatures()));
 	}
 
 	@Override
 	protected void updateProperties() {
 		setEnabled(!selectedFeaturesContainRoot());
 	}
-	
+
 	private boolean selectedFeaturesContainRoot() {
-		for (final IFeature tempFeature : featureArray) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			if (tempFeature.getStructure().isRoot()) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private IFeature[] getParentsFromSelectedFeatures() {
-		ArrayList<IFeature> parents = new ArrayList<>();
-		for (IFeature feature : featureArray) {
-			if (!hasParentsInTheSubTree(feature)) {
-				parents.add(feature);
+
+	private List<String> getParentsFromSelectedFeatures() {
+		final ArrayList<String> parents = new ArrayList<>();
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			if (!hasParentsInTheSubTree(featureModel.getFeature(name))) {
+				parents.add(name);
 			}
 		}
-		return parents.toArray(new IFeature[parents.size()]);
+		return parents;
 	}
-	
+
 	private boolean hasParentsInTheSubTree(IFeature feature) {
-		for (IFeature temp : featureArray) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature temp = featureModel.getFeature(name);
 			if (feature.getStructure().isAncestorOf(temp.getStructure())) {
 				return true;
-			} 
+			}
 		}
 		return false;
 	}

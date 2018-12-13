@@ -26,9 +26,9 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
@@ -39,15 +39,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
-	IFeatureModel getFeatureModel();
+	IFeatureModelManager getFeatureModelManager();
 
 	FeatureModelLayout getLayout();
 
 	boolean isLegendHidden();
 
 	void setLegendHidden(boolean hidden);
-
-	void setLegend(Legend legend);
 
 	Legend getLegend();
 
@@ -114,5 +112,12 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	 * @return
 	 */
 	int getConstraintIndex(Constraint constraint);
+
+	void writeValues();
+
+	/**
+	 *
+	 */
+	void readValues();
 
 }

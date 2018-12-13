@@ -39,8 +39,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -85,7 +83,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
@@ -98,11 +95,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog.HeaderPanel.HeaderDescriptionImage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * A simple editor for propositional constraints written below the feature diagram.
@@ -410,6 +410,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * An object which contains several validation functionalities used in this dialog to check if a given constraint text is valid.
 	 */
 	private final ConstraintTextValidator validator = new ConstraintTextValidator();
+	private final IFeatureModelManager featureModelManager;
 	private final IFeatureModel featureModel;
 	private final List<String> featureNamesList;
 
@@ -472,8 +473,9 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 	};
 
-	public ConstraintDialog(final IFeatureModel featureModel, final IConstraint constraint) {
-		this.featureModel = featureModel;
+	public ConstraintDialog(final IFeatureModelManager featureModelManager, final IConstraint constraint) {
+		this.featureModelManager = featureModelManager;
+		featureModel = featureModelManager.editObject();
 		this.constraint = constraint;
 
 		final String constraintDescriptionText;
@@ -513,8 +515,8 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.open();
 
 		update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
-		validator.init(this.featureModel, constraint, onUpdate);
-		featureNamesList = FeatureUtils.getFeatureNamesList(this.featureModel);
+		validator.init(featureModel, constraint, onUpdate);
+		featureNamesList = FeatureUtils.getFeatureNamesList(featureModel);
 
 		if (constraint != null) {
 			validate();
@@ -539,7 +541,7 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * closes the shell and adds new constraint to the feature model if possible
 	 *
-	 * @param featureModel
+	 * @param featureModelManager
 	 * @param constraint
 	 */
 	private void closeShell() {
@@ -548,23 +550,19 @@ public class ConstraintDialog implements GUIDefaults {
 		final Node propNode = nodeReader.stringToNode(input, featureNamesList);
 		final String constraintDescription = constraintDescriptionText.getText().trim();
 
-		AbstractOperation op = null;
+		AbstractFeatureModelOperation op = null;
 		if ((constraint != null)) {
 			for (final IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new EditConstraintOperation(featureModel, c, propNode, constraintDescription);
+					op = new EditConstraintOperation(featureModelManager, c, propNode, constraintDescription);
 					break;
 				}
 			}
 		}
 		if (op == null) {
-			op = new CreateConstraintOperation(propNode, featureModel, constraintDescription);
+			op = new CreateConstraintOperation(propNode, featureModelManager, constraintDescription);
 		}
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(op);
 
 		shell.dispose();
 	}

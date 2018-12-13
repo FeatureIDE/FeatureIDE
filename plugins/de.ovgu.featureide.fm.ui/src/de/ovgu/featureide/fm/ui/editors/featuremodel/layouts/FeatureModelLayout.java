@@ -37,7 +37,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean showHiddenFeatures;
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
-	private Point legendPos;
+	private final Point legendPos;
 
 	private int selectedLayoutAlgorithm;
 	private boolean showShortNames;
@@ -110,16 +110,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	@Override
 	public void verticalLayout(boolean b) {
 		hasVerticalLayout = b;
-	}
-
-	@Override
-	public Point getLegendPos() {
-		return legendPos;
-	}
-
-	@Override
-	public void setLegendPos(int x, int y) {
-		legendPos = new Point(x, y);
 	}
 
 	@Override

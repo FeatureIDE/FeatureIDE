@@ -22,17 +22,13 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_LEGEND;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Operation to move the Legend. Provides undo/redo functionality.
@@ -42,41 +38,34 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private static final String LABEL = MOVE_LEGEND;
-	private final Point newLocation;
-	private final Point oldLocation;
-	private boolean wasAutoLayout;
 	private final LegendFigure legendFigure;
+	private final Point newLocation;
+
+	private Point oldLocation;
+	private boolean wasAutoLayout;
 
 	public LegendMoveOperation(IGraphicalFeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
-		super(featureModel, LABEL);
+		super(featureModel, MOVE_LEGEND);
 		this.newLocation = newLocation;
-		oldLocation = legendFigure.getLocation();
 		this.legendFigure = legendFigure;
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		wasAutoLayout = graphicalFeatureModel.getLayout().hasLegendAutoLayout();
-		return redo(monitor, info);
-	}
-
-	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		oldLocation = legendFigure.getLocation();
 		legendFigure.setLocation(newLocation);
-		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
-		layout.setLegendPos(newLocation.x, newLocation.y);
-		layout.setLegendAutoLayout(false);
+		graphicalFeatureModel.getLegend().setPos(newLocation);
+		wasAutoLayout = graphicalFeatureModel.getLayout().hasLegendAutoLayout();
+		graphicalFeatureModel.getLayout().setLegendAutoLayout(false);
 		graphicalFeatureModel.handleLegendLayoutChanged();
 		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		legendFigure.setLocation(oldLocation);
-		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
-		layout.setLegendPos(oldLocation.x, oldLocation.y);
-		layout.setLegendAutoLayout(wasAutoLayout);
+		graphicalFeatureModel.getLegend().setPos(oldLocation);
+		graphicalFeatureModel.getLayout().setLegendAutoLayout(wasAutoLayout);
 		graphicalFeatureModel.handleLegendLayoutChanged();
 		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}

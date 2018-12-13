@@ -20,16 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintToLocationOperation;
 
@@ -84,33 +81,17 @@ public class ConstraintDragAndDropCommand extends Command {
 			return;
 		}
 
-		AbstractFeatureModelOperation op = null;
-		if (hasAutoLayout) {
-			op = new MoveConstraintOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
-			op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
-		} else {
-			op = new MoveConstraintToLocationOperation(featureModel, newLocation, constraint.getObject());
-		}
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-
+		final AbstractFeatureModelOperation op = hasAutoLayout ? new MoveConstraintOperation(featureModel.getFeatureModelManager(), index, oldIndex)
+			: new MoveConstraintToLocationOperation(featureModel, newLocation, constraint.getObject());
+		FeatureModelOperationWrapper.run(op);
 	}
 
-	/**
-	 *
-	 */
 	private int calculateNewIndex() {
 		for (final IGraphicalConstraint c : featureModel.getConstraints()) {
 			if ((c.getLocation().y + 17) > newLocation.y) {
 				isLastPos = false;
-
 				return featureModel.getConstraints().indexOf(c);
-
 			}
-
 		}
 		isLastPos = true;
 		return featureModel.getConstraints().size() - 1;
@@ -139,9 +120,6 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	}
 
-	/**
-	 *
-	 */
 	public Point getLeftPoint() {
 		final int index = calculateNewIndex();
 

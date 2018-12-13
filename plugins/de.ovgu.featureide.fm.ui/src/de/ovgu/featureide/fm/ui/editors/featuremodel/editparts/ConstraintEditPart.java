@@ -27,9 +27,11 @@ import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -81,7 +83,8 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	public void performRequest(Request request) {
 		final IGraphicalConstraint constraintModel = getModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
+			final IFeatureModel featureModel = constraintModel.getObject().getFeatureModel();
+			new ConstraintDialog(FeatureModelManager.getInstance(featureModel), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
 				for (final IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
@@ -101,6 +104,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	@Override
 	public void deactivate() {
+		getModel().deregisterUIObject();
 		super.deactivate();
 	}
 
@@ -115,7 +119,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		case CONSTRAINT_MODIFY:
 		case ATTRIBUTE_CHANGED:
 		case CONSTRAINT_SELECTED:
-			getFigure().setConstraintProperties();
+			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
@@ -139,6 +143,6 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	 */
 	protected void setActiveReason(FeatureModelReason activeReason) {
 		getFigure().setActiveReason(activeReason);
-		getFigure().setConstraintProperties();
+		getFigure().updateProperties();
 	}
 }

@@ -171,7 +171,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
+		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().editObject();
 
 		// Set the properties that should be drawn
 		refreshProperties(featureModel);
@@ -686,8 +686,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public void recreateLegend() {
 		removeAll();
-		setLocation(graphicalFeatureModel.getLayout().getLegendPos());
-		refreshProperties(graphicalFeatureModel.getFeatureModel());
+		setLocation(graphicalFeatureModel.getLegend().getPos());
+		refreshProperties(graphicalFeatureModel.getFeatureModelManager().editObject());
 		setLegendSize();
 		createRows();
 	}

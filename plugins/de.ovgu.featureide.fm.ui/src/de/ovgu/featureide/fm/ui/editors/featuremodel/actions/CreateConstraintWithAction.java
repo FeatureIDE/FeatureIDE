@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -45,9 +45,8 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 
 	protected String selectedFeature;
 
-	public CreateConstraintWithAction(Object viewer, IFeatureModel featuremodel) {
-		super(viewer, featuremodel);
-		setId(ID);
+	public CreateConstraintWithAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(viewer, featureModelManager, ID);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		}
@@ -71,25 +70,17 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 		}
 	};
 
-	/**
-	 * @param featureName
-	 */
 	protected void updateConstraintActionText(String featureName) {
 		selectedFeature = featureName;
 		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH + " \"" + featureName + "\""));
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction#run()
-	 */
 	@Override
 	public void run() {
-		final ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
+		final ConstraintDialog dialog = new ConstraintDialog(featureModelManager, null);
 		dialog.setInputText(selectedFeature);
 	}
-	
+
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		return selection.size() == 1;

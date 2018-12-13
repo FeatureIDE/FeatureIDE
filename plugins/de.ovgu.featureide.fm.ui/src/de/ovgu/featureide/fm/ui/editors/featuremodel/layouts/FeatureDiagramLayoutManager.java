@@ -345,8 +345,9 @@ abstract public class FeatureDiagramLayoutManager {
 
 		if (rects.size() > 0) {
 			// At this point, rects does only contain positions for the legend that are acceptable. So we take the first
-			featureModel.getLayout().setLegendPos(rects.get(0).getLocation().x, rects.get(0).getLocation().y);
-			return featureModel.getLayout().getLegendPos();
+			final Point location = rects.get(0).getLocation();
+			featureModel.getLegend().setPos(location);
+			return location;
 		}
 
 		// It was not possible to find any empty space, probably there is an intersection with a constraint.
@@ -354,8 +355,9 @@ abstract public class FeatureDiagramLayoutManager {
 		final Rectangle boundsOfEverything = getFeatureModelBounds(featureModel.getVisibleConstraints());
 		boundsOfEverything.union(featureModelBounds);
 
-		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
-		return featureModel.getLayout().getLegendPos();
+		final Point pos = new Point(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		featureModel.getLegend().setPos(pos);
+		return pos;
 	}
 
 	/**

@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
@@ -44,6 +45,10 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 
 	private OutlineTreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
+
+	protected TreeViewer viewer;
+	protected IFile file;
+	protected FeatureModelManager featureModelManager;
 
 	public OutlineProvider() {}
 

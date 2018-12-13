@@ -24,9 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_DESCRIP
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
@@ -39,8 +39,8 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.changefeaturedescription";
 
-	public ChangeFeatureDescriptionAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
-		super(CHANGE_DESCRIPTION, viewer, ID);
+	public ChangeFeatureDescriptionAction(Object viewer, IFeatureModelManager featureModelManager, Object graphicalViewer) {
+		super(CHANGE_DESCRIPTION, viewer, ID, featureModelManager);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 	}
 
@@ -56,6 +56,7 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 		dialog.open();
 		final String descriptemp = dialog.getValue();
 
+		// TODO implement as operation
 		if (!description.equals(descriptemp.trim())) {
 			feature.getProperty().setDescription(descriptemp);
 			feature.getFeatureModel().fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));

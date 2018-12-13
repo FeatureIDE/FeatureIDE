@@ -175,6 +175,11 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
+	}
+
+	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
 	}

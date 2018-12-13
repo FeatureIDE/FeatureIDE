@@ -41,11 +41,7 @@ import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.part.EditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditorErrorPage;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
-import de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
@@ -64,42 +60,17 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
 	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
 		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-		// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
-		// ActionFactory.PASTE.getId(),
-		ActionFactory.SELECT_ALL.getId(),
-		// ActionFactory.FIND.getId(),
-		ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
-			// IDEActionFactory.BOOKMARK.getId()
-	};
+		ActionFactory.SELECT_ALL.getId(), ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT, };
 
-	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-		ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
-		ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
+	private static final String[] TEXTEDITOR_ACTION_IDS =
+		{ ActionFactory.DELETE.getId(), ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(),
+			ActionFactory.FIND.getId(), ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		final FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
-		final IFeatureModelEditorPage page = editor.getPage(editor.getActivePage());
-		if (page != null) {
-			setActivePage(editor, page.getID());
-		}
-	}
-
-	public void setActivePage(FeatureModelEditor editor, String pageID) {
 		final IActionBars actionBars = getActionBars();
-		if (actionBars != null) {
-			switch (pageID) {
-			case FeatureDiagramEditor.ID:
-				hookGlobalDiagramActions(editor, actionBars);
-				break;
-			case FeatureModelTextEditorPage.ID:
-				hookGlobalTextActions(editor, actionBars);
-				break;
-			case FeatureModelEditorErrorPage.ID:
-				return;
-			}
-			actionBars.updateActionBars();
-		}
+		hookGlobalDiagramActions(editor, actionBars);
 	}
 
 	private void hookGlobalDiagramActions(FeatureModelEditor editor, IActionBars actionBars) {

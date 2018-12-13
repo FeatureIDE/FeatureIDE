@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
@@ -47,18 +48,18 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
  */
 public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
-	private IFeatureModel fModel;
+	private IManager<IFeatureModel> featureModelManager;
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
 			if (newInput instanceof FeatureModelManager) {
-				fModel = ((FeatureModelManager) newInput).editObject();
+				featureModelManager = ((FeatureModelManager) newInput);
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
 					final FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
 					if (fmm != null) {
-						fModel = fmm.editObject();
+						featureModelManager = fmm;
 					}
 				}
 			}
@@ -69,6 +70,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
+		final IFeatureModel fModel = featureModelManager.editObject();
 		if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
 			elements = new Object[2];
 			elements[0] = fModel.getStructure().getRoot().getFeature();
@@ -87,6 +89,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 		// we have a String as parent of constraints
 		if ((parentElement instanceof String) && CONSTRAINTS.equals(parentElement)) {
+			final IFeatureModel fModel = featureModelManager.editObject();
 			final Object[] elements = new Object[fModel.getConstraintCount()];
 			final List<IConstraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
@@ -148,7 +151,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return true;
 		} else if (element instanceof String) {
 			if (CONSTRAINTS.equals(element)) {
-				return fModel.getConstraintCount() > 0;
+				return featureModelManager.editObject().getConstraintCount() > 0;
 			}
 		}
 

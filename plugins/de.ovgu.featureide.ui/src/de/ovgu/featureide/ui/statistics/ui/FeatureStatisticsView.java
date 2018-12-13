@@ -166,7 +166,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		public void propertyChange(FeatureIDEEvent evt) {
 			switch (evt.getEventType()) {
 			case MODEL_DATA_CHANGED:
-			case MODEL_DATA_OVERRIDDEN:
+			case MODEL_DATA_OVERWRITTEN:
 			case MODEL_DATA_SAVED:
 			case MODEL_DATA_LOADED:
 			case CONSTRAINT_ADD:
@@ -269,7 +269,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 			if (currentEditor instanceof FeatureModelEditor) {
 				((FeatureModelEditor) currentEditor).removeEventListener(modelListener);
-				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
+				((FeatureModelEditor) currentEditor).getFeatureModelManager().removeListener(modelListener);
 			}
 		}
 		boolean force = true;
@@ -289,7 +289,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		currentEditor = newEditor;
 		if (newEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).addEventListener(modelListener);
-			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
+			((FeatureModelEditor) currentEditor).getFeatureModelManager().addListener(modelListener);
 		}
 		refresh(force);
 	}

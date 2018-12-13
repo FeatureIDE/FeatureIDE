@@ -20,12 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -45,10 +39,10 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
@@ -57,6 +51,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -84,15 +79,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private Figure toolTipFigure = null;
 	private static GridLayout gl = new GridLayout();
 
-	private static String ABSTRACT = " Abstract";
-	private static String HIDDEN = " hidden";
-	private static String HIDDEN_PARENT = INHERITED_HIDDEN;
-	private static String DEAD = IS_DEAD;
-	private static String FEATURE = " feature ";
-	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
-	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
-	private static String VOID = FEATURE_MODEL_IS_VOID;
-
 	private final Set<FeatureModelReason> activeReasons = new LinkedHashSet<>();
 
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
@@ -116,7 +102,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		}
 		setName(displayName);
 
-		setProperties();
+		updateProperties();
 
 		feature.setSize(getSize());
 
@@ -136,13 +122,13 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		}
 	}
 
-	public void setProperties() {
+	@Override
+	public void updateProperties() {
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		final IFeature feature = this.feature.getObject();
-		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 
 		// First draw custom color
 		final FeatureColor color = FeatureColorManager.getColor(feature);
@@ -233,32 +219,32 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 	private void appendCustomProperties(Figure toolTipContent) {
 		final StringBuilder sb = new StringBuilder();
-		final IPropertyContainer props = feature.getObject().getCustomProperties();
-		final List<String> keys = new ArrayList<>(props.keySet());
+		final IPropertyContainer propsertyContainer = feature.getObject().getCustomProperties();
+		final Set<Entry> properties2 = propsertyContainer.getProperties(XmlFeatureModelFormat.TYPE_CUSTOM);
+		final List<String> keys = new ArrayList<>(properties2.size());
+		for (final Entry entry : properties2) {
+			keys.add(entry.getKey());
+		}
 		Collections.sort(keys);
 		if (!keys.isEmpty()) {
-			final int size = props.keySet().size();
 			int maxKeyLength = 0;
-			for (int i = 0; i < size; i++) {
-				maxKeyLength = Math.max(maxKeyLength, keys.get(i).length());
+			for (final String key : keys) {
+				maxKeyLength = Math.max(maxKeyLength, key.length());
 			}
-
-			for (int i = 0; i < size; i++) {
-				final String key = keys.get(i);
+			for (final String key : keys) {
 				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
 				sb.append("\t=\t");
-				sb.append(props.get(key));
-				if ((i + 1) < size) {
-					sb.append("\n");
-				}
+				sb.append(propsertyContainer.get(key, XmlFeatureModelFormat.TYPE_CUSTOM));
+				sb.append("\n");
 			}
+			sb.delete(sb.length() - 1, sb.length());
 
 			final Label propertiesInfo = new Label("\nCustom Properties");
 			propertiesInfo.setFont(DEFAULT_FONT_BOLD);
+			toolTipContent.add(propertiesInfo);
+
 			final Label properties = new Label(sb.toString());
 			properties.setFont(DEFAULT_FONT);
-
-			toolTipContent.add(propertiesInfo);
 			toolTipContent.add(properties);
 		}
 	}

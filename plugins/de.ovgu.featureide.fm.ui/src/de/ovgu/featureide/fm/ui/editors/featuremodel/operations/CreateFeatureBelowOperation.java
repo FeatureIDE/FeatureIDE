@@ -23,12 +23,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to create a layer feature. Enables undo/redo functionality.
@@ -38,33 +38,28 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
-	private IFeature feature;
-	private IFeature newFeature;
+	private final String parentName;
+	private String newFeatureName;
 
-	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, CREATE_LAYER);
-		this.feature = feature;
+	public CreateFeatureBelowOperation(String parentName, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, CREATE_LAYER);
+		this.parentName = parentName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		int number = 1;
-
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
-			number++;
-		}
-
-		newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		newFeatureName = getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, newFeatureName);
 		featureModel.addFeature(newFeature);
-		feature = featureModel.getFeature(feature.getName());
-		feature.getStructure().addChild(newFeature.getStructure());
+		final IFeature parent = featureModel.getFeature(parentName);
+		parent.getStructure().addChild(newFeature.getStructure());
 
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, newFeature);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		newFeature = featureModel.getFeature(newFeature.getName());
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeature newFeature = featureModel.getFeature(newFeatureName);
 		featureModel.deleteFeature(newFeature);
 		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
 	}

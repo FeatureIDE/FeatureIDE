@@ -49,17 +49,12 @@ import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
  */
 public class ColorSchemeHandler extends AbstractHandler {
 
-	/*
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
-
 	private IEditorPart editorPart;
 	private IDocumentProvider provider;
 	private ITextEditor editor;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
 		editorPart = HandlerUtil.getActiveEditor(event);
 		// Cast is necessary, don't remove
 		editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
@@ -84,7 +79,7 @@ public class ColorSchemeHandler extends AbstractHandler {
 				return true;
 			}
 			final IStructuredSelection structuredSelection = new StructuredSelection(feature);
-			final SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModel());
+			final SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModelManager());
 			sfca.run();
 			return true;
 		}

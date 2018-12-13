@@ -22,43 +22,52 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONSTRAINT_ERRORS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class ConstrainsCalculationsAction extends Action {
+public class ConstrainsCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.constraintscalculations";
 
-	private final IFeatureModel featureModel;
-
-	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(CALCULATE_CONSTRAINT_ERRORS);
-		this.featureModel = featureModel;
-		setChecked(featureModel.getAnalyser().calculateConstraints);
-		setId(ID);
+	public ConstrainsCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(CALCULATE_CONSTRAINT_ERRORS, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateConstraints) {
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
-		} else {
-			featureModel.getAnalyser().calculateConstraints = true;
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateRedundantConstraints = true;
-			featureModel.getAnalyser().calculateTautologyConstraints = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+		final IFeatureModel featureModel;
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			featureModel = featureModelManager.editObject();
+			if (featureModel.getAnalyser().calculateConstraints) {
+				featureModel.getAnalyser().calculateConstraints = false;
+				featureModel.getAnalyser().calculateRedundantConstraints = false;
+				featureModel.getAnalyser().calculateTautologyConstraints = false;
+			} else {
+				featureModel.getAnalyser().calculateConstraints = true;
+				featureModel.getAnalyser().calculateFeatures = true;
+				featureModel.getAnalyser().calculateRedundantConstraints = true;
+				featureModel.getAnalyser().calculateTautologyConstraints = true;
+				featureModel.getAnalyser().calculateDeadConstraints = true;
+				featureModel.getAnalyser().calculateFOConstraints = true;
+			}
+		} finally {
+			lock.unlock();
 		}
 		featureModel.handleModelDataChanged();
+	}
+
+	@Override
+	public void update() {
+		setChecked(featureModelManager.editObject().getAnalyser().calculateConstraints);
 	}
 
 }

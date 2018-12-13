@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.eclipse.draw2d.geometry.Point;
-
 public interface IFeatureModelLayout {
 
 	public void setLegendAutoLayout(boolean b);
@@ -39,10 +37,6 @@ public interface IFeatureModelLayout {
 	public boolean verticalLayout();
 
 	public void verticalLayout(boolean b);
-
-	public Point getLegendPos();
-
-	public void setLegendPos(int x, int y);
 
 	public void setLayout(int newLayoutAlgorithm);
 

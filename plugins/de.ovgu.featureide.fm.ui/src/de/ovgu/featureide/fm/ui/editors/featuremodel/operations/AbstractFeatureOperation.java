@@ -26,6 +26,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Required to execute compound operations
@@ -35,22 +37,27 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class AbstractFeatureOperation extends AbstractFeatureModelOperation {
 
-	private final IFeature feature;
+	public static final String ID = ID_PREFIX + "AbstractFeatureOperation";
 
-	public AbstractFeatureOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, ABSTRACT_OPERATION);
-		this.feature = feature;
+	private final String featureName;
+
+	public AbstractFeatureOperation(String featureName, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, ABSTRACT_OPERATION);
+		this.featureName = featureName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
-		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IFeature feature = featureModel.getFeature(featureName);
+		final boolean oldValue = feature.getStructure().isAbstract();
+		final boolean newValue = !oldValue;
+		feature.getStructure().setAbstract(newValue);
+		return new FeatureModelOperationEvent(ID, EventType.ATTRIBUTE_CHANGED, feature, oldValue, newValue);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
 }

@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -53,7 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEventListener {
 
 	private static final long timeoutThreshold = 750;
-	private final IGraphicalFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final ScrollingGraphicalViewer viewer;
@@ -67,10 +68,10 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
 	 */
-	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel featureModel) {
+	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel graphicalFeatureModel) {
 		super();
 
-		this.featureModel = featureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		viewer = view;
 
 		alternativeKeyHandler = new KeyHandler();
@@ -80,7 +81,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		lastTime = 0;
 
 		resetFeatureList();
-		featureModel.getFeatureModel().addListener(this);
+		graphicalFeatureModel.getFeatureModelManager().editObject().addListener(this);
 	}
 
 	@Override
@@ -94,7 +95,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	@Override
 	public boolean keyPressed(KeyEvent e) {
 		if (Character.isISOControl(e.character)) {
-			if (featureModel.getLayout().hasFeaturesAutoLayout()) {
+			if (graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
 				return gvKeyHandler.keyPressed(e);
 			} else {
 				return super.keyPressed(e);
@@ -117,11 +118,12 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
+			final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().editObject();
 			// select the new feature
-			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
+			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
 				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
-				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
+				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(graphicalFeatureModel.getGraphicalFeature(curFeature));
 				if (part != null) {
 					viewer.setSelection(new StructuredSelection(part));
 					viewer.reveal(part);
@@ -149,7 +151,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 	private void resetFeatureList() {
 		featureList.clear();
-		featureList.addAll(Functional.toList(Functional.map(featureModel.getFeatureModel().getFeatures(), new Functional.IFunction<IFeature, String>() {
+		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().editObject();
+		featureList.addAll(Functional.toList(Functional.map(featureModel.getFeatures(), new Functional.IFunction<IFeature, String>() {
 
 			@Override
 			public String invoke(IFeature t) {

@@ -179,7 +179,7 @@ public class MoveAction extends Action {
 			}
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
-			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());
+			featureModel.getLegend().setPos(newPos);
 			featureModel.getLayout().setLegendAutoLayout(false);
 			featureModel.handleLegendLayoutChanged();
 			isLegendMoving = true;
@@ -189,7 +189,7 @@ public class MoveAction extends Action {
 	private void stop() {
 		doMove(true);
 		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout()) {
-			featureModel.getFeatureModel().handleModelDataChanged();
+			featureModel.getFeatureModelManager().editObject().handleModelDataChanged();
 		}
 
 		init();

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -35,6 +36,7 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -97,7 +99,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		gridLayout.marginWidth = 0;
 		parent.setLayout(gridLayout);
 
-		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(subtreeModel);
+		final VirtualFeatureModelManager featureModelManager = new VirtualFeatureModelManager(subtreeModel);
+		featureModelManager.setUndoContext(new UndoContext());
+		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModelManager);
 		graphicalFeatureModel.init();
 		final FeatureDiagramViewer viewer = new FeatureDiagramViewer(graphicalFeatureModel);
 

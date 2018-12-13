@@ -127,10 +127,6 @@ public class Feature extends AFeature {
 		return new Feature(this, newFeatureModel, newStructure);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.impl.AFeature#createTooltip(java.lang.Object[])
-	 */
 	@Override
 	public String createTooltip(Object... objects) {
 		final StringBuilder toolTip = new StringBuilder();

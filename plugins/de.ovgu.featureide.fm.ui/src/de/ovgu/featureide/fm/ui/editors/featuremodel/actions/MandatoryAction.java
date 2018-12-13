@@ -20,12 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
@@ -40,11 +38,8 @@ public class MandatoryAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
-	private final IFeatureModel featureModel;
-
-	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
-		super("Mandatory", viewer, ID);
-		this.featureModel = featureModel;
+	public MandatoryAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Mandatory", viewer, ID, featureModelManager);
 	}
 
 	@Override
@@ -54,7 +49,9 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private boolean selectionContainsOptionalFeature() {
-		for (final IFeature tempFeature : featureArray) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			if (!tempFeature.getStructure().isRoot() && tempFeature.getStructure().getParent().isAnd()) {
 				return true;
 			}
@@ -63,7 +60,9 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private boolean isEveryFeatureMandatory() {
-		for (final IFeature tempFeature : featureArray) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			if (!(tempFeature.getStructure().isMandatory())) {
 				return false;
 			}
@@ -72,13 +71,7 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private void changeMandatoryStatus(boolean allMandatory) {
-		final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(featureModel, allMandatory, getSelectedFeatures());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new SetFeatureToMandatoryOperation(featureModelManager, allMandatory, getSelectedFeatures()));
 	}
 
 	@Override

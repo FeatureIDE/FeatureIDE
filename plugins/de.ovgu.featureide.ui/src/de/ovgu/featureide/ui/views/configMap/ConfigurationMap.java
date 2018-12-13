@@ -346,7 +346,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			tree.setInput(new Object());
 			updateGUI(true);
 		} else {
-			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModelManager());
 		}
 	}
 

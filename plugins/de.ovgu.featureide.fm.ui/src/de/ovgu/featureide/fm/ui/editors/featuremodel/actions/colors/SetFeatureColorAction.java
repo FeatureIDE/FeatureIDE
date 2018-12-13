@@ -31,14 +31,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -50,10 +48,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
 
@@ -68,13 +69,12 @@ import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
  * @author Mohammed Mahhouk
  * @author Antje Moench
  */
-public class SetFeatureColorAction extends Action {
+public class SetFeatureColorAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.setfeaturecolor";
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 	protected List<IFeature> featureList = new ArrayList<>();
-	private IFeatureModel featureModel;
 
 	private boolean undoRedoEnabled = false;
 
@@ -94,40 +94,26 @@ public class SetFeatureColorAction extends Action {
 		this(viewer, null);
 	}
 
-	public SetFeatureColorAction(Viewer viewer) {
-		this(viewer, null);
-	}
-
-	public SetFeatureColorAction(Viewer viewer, IFeatureModel featureModel) {
-		super(COLORATION);
+	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModelManager featureModelManager) {
+		super(COLORATION, ID, featureModelManager);
 		viewer.addSelectionChangedListener(selectionListener);
-		init(featureModel);
-	}
-
-	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModel featureModel) {
-		super(COLORATION);
-		viewer.addSelectionChangedListener(selectionListener);
-		init(featureModel);
-	}
-
-	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModel featureModel) {
-		super(COLORATION);
-		updateFeatureList(selection);
-		init(featureModel);
-	}
-
-	private void init(IFeatureModel featureModel) {
 		setImageDescriptor(colorImage);
 		setEnableUndoRedo(true);
-		setId(ID);
-		this.featureModel = featureModel;
+	}
+
+	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModelManager featureModelManager) {
+		super(COLORATION, ID, featureModelManager);
+		updateFeatureList(selection);
+		setImageDescriptor(colorImage);
+		setEnableUndoRedo(true);
 	}
 
 	public void setEnableUndoRedo(boolean set) {
 		undoRedoEnabled = set;
 	}
 
-	protected boolean isSelectionValid(IStructuredSelection selection) {
+	private boolean isSelectionValid(IStructuredSelection selection) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
 		for (final Object object : selection.toList()) {
 			if (object instanceof IFeature) {
 				continue;
@@ -156,8 +142,8 @@ public class SetFeatureColorAction extends Action {
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
+			final IFeatureModel featureModel = featureModelManager.editObject();
 			featureList.clear();
-
 			final Object[] editPartArray = selection.toArray();
 
 			for (int i = 0; i < selection.size(); i++) {
@@ -179,10 +165,7 @@ public class SetFeatureColorAction extends Action {
 		setEnabled(!featureList.isEmpty());
 	}
 
-	public void setFeatureModel(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-	}
-
+	// TODO implement as operation
 	@Override
 	public void run() {
 		FeatureColor selectedColor = null;
@@ -190,6 +173,7 @@ public class SetFeatureColorAction extends Action {
 		final List<IFeature> features = new ArrayList<>(featureList);
 
 		if (!features.isEmpty()) {
+			final IFeatureModel featureModel = featureModelManager.editObject();
 			if (featureModel != null) {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
@@ -225,7 +209,8 @@ public class SetFeatureColorAction extends Action {
 				selectedColor = FeatureColorManager.getColor(selectedFeature);
 			}
 
-			final SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, features, selectedColor, undoRedoEnabled);
+			final SetFeatureColorDialog dialog =
+				new SetFeatureColorDialog(shell, featureModelManager, Functional.mapToStringList(features), selectedColor, undoRedoEnabled);
 
 			// inform ui to update
 			if (dialog.open() == Window.OK) {

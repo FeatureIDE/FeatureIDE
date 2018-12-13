@@ -22,8 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT_OPERATION;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to set Features abstract. Enables undo/redo functionality.
@@ -35,22 +38,28 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 
-	private final boolean allAbstract;
-	private final IFeature[] featureArray;
+	public static final String ID = ID_PREFIX + "SetFeatureToAbstractOperation";
 
-	public SetFeatureToAbstractOperation(IFeatureModel featureModel, boolean allAbstract, IFeature[] featureArray) {
-		super(featureModel, ABSTRACT_OPERATION);
+	private final boolean allAbstract;
+
+	public SetFeatureToAbstractOperation(IFeatureModelManager featureModelManager, boolean allAbstract, List<String> featureNames) {
+		super(featureModelManager, ABSTRACT_OPERATION, featureNames);
 		this.allAbstract = allAbstract;
-		this.featureArray = featureArray;
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
-			if(allAbstract || !tempFeature.getStructure().isAbstract()) {
-				final AbstractFeatureOperation op = new AbstractFeatureOperation(tempFeature, featureModel);
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (allAbstract || !tempFeature.getStructure().isAbstract()) {
+				final AbstractFeatureOperation op = new AbstractFeatureOperation(name, featureModelManager);
 				operations.add(op);
 			}
-		}		
+		}
 	}
 }

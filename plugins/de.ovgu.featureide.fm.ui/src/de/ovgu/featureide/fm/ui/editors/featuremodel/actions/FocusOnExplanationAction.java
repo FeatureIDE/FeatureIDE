@@ -22,9 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_EXPLANATION;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -32,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanationOperation;
 
 /**
@@ -66,7 +65,7 @@ public class FocusOnExplanationAction extends Action {
 	 * Adds a listener that updates the active explanation.
 	 */
 	private void addActiveExplanationListener() {
-		fm.getFeatureModel().addListener(new IEventListener() {
+		fm.getFeatureModelManager().editObject().addListener(new IEventListener() {
 
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
@@ -108,11 +107,6 @@ public class FocusOnExplanationAction extends Action {
 
 	@Override
 	public void run() {
-		final FocusOnExplanationOperation op = new FocusOnExplanationOperation(getGraphicalFeatureModel(), getExplanation());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(getGraphicalFeatureModel(), getExplanation()));
 	}
 }

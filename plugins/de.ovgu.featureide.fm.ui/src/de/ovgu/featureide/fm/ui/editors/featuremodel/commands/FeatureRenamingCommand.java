@@ -22,16 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.gef.commands.Command;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOperation;
 
 /**
@@ -42,15 +41,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOpe
  */
 public class FeatureRenamingCommand extends Command {
 
-	private final IFeatureModel featureModel;
+	private final IFeatureModelManager featureModelManager;
 
 	private final String oldName;
 
 	private final String newName;
 
-	public FeatureRenamingCommand(IFeatureModel featureModel, String oldName, String newName) {
+	public FeatureRenamingCommand(IFeatureModelManager featureModelManager, String oldName, String newName) {
 		super(RENAMING_FEATURE + oldName);
-		this.featureModel = featureModel;
+		this.featureModelManager = featureModelManager;
 		this.oldName = oldName;
 		this.newName = newName;
 	}
@@ -60,6 +59,7 @@ public class FeatureRenamingCommand extends Command {
 		if (newName == null) {
 			return false;
 		}
+		final IFeatureModel featureModel = featureModelManager.editObject();
 		if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(newName)) {
 			return false;
 		}
@@ -79,14 +79,7 @@ public class FeatureRenamingCommand extends Command {
 
 	@Override
 	public void execute() {
-		final RenameFeatureOperation op = new RenameFeatureOperation(featureModel, oldName, newName);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new RenameFeatureOperation(featureModelManager, oldName, newName));
 	}
 
 }

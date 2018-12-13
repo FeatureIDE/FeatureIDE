@@ -22,13 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CALCULATIONS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * Action to specify feature model analysis.<br> A manual call of the feature model analysis.
@@ -36,25 +37,37 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class RunManualCalculationsAction extends Action {
+public class RunManualCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.runmanualcalculations";
 
-	private final IFeatureModel featureModel;
-
-	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(RUN_MANUAL_CALCULATIONS);
+	public RunManualCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(RUN_MANUAL_CALCULATIONS, ID, featureModelManager);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"));
-		this.featureModel = featureModel;
-		setId(ID);
 	}
 
 	@Override
 	public void run() {
-		final boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
-		featureModel.getAnalyser().runCalculationAutomatically = true;
+		final IFeatureModel featureModel;
+		final boolean oldValue;
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			featureModel = featureModelManager.editObject();
+			oldValue = featureModel.getAnalyser().runCalculationAutomatically;
+			featureModel.getAnalyser().runCalculationAutomatically = true;
+		} finally {
+			lock.unlock();
+		}
+
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
+
+		lock.lock();
+		try {
+			featureModel.getAnalyser().runCalculationAutomatically = oldValue;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 }

@@ -93,7 +93,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					if (featureModelEditor == null) {
 						contentProvider.defaultContent();
 					} else {
-						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModelManager().getSnapshot(),
+								monitor);
 					}
 					return Status.OK_STATUS;
 				}
@@ -246,7 +247,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		getSite().getPage().removePartListener(editorListener);
 		if (featureModelEditor != null) {
 			featureModelEditor.removeEventListener(modelListener);
-			featureModelEditor.getFeatureModel().removeListener(modelListener);
+			featureModelEditor.getFeatureModelManager().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 		super.dispose();
@@ -267,14 +268,14 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 		if (featureModelEditor != null) {
 			featureModelEditor.removeEventListener(modelListener);
-			featureModelEditor.getFeatureModel().removeListener(modelListener);
+			featureModelEditor.getFeatureModelManager().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 
 		if (activeEditor instanceof FeatureModelEditor) {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
 			featureModelEditor.addEventListener(modelListener);
-			featureModelEditor.getFeatureModel().addListener(modelListener);
+			featureModelEditor.getFeatureModelManager().addListener(modelListener);
 		}
 		refresh();
 	}
@@ -317,7 +318,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
 						} else {
-							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModelManager().getSnapshot(),
+									monitor);
 						}
 						return Status.OK_STATUS;
 					}

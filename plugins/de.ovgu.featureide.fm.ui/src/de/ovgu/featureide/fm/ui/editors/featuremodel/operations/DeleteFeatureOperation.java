@@ -28,9 +28,13 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -41,65 +45,56 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
-	private IFeature feature;
-	private IFeature oldParent;
-	private int oldIndex;
-	private LinkedList<IFeature> oldChildren;
-	private boolean deleted = false;
-	private boolean or = false;
-	private boolean alternative = false;
-	private final IFeature replacement;
+	public static final String ID = ID_PREFIX + "DeleteFeatureOperation";
 
-	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature) {
-		super(featureModel, DELETE);
-		this.feature = feature;
-		replacement = null;
+	private final LinkedList<String> oldChildrenName = new LinkedList<>();
+	private final String featureName;
+	private final String replacementName;
+
+	private IFeature oldFeature;
+	private String oldParentName;
+	private int oldIndex;
+	private boolean deleted;
+	private boolean or;
+	private boolean alternative;
+
+	public DeleteFeatureOperation(IFeatureModelManager featureModelManger, String featureName) {
+		this(featureModelManger, featureName, null);
 	}
 
-	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature, IFeature replacement) {
-		super(featureModel, DELETE);
-		this.feature = feature;
-		this.replacement = replacement;
+	public DeleteFeatureOperation(IFeatureModelManager featureModelManger, String featureName, String replacementName) {
+		super(featureModelManger, DELETE);
+		this.featureName = featureName;
+		this.replacementName = replacementName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		feature = featureModel.getFeature(feature.getName());
-		oldParent = FeatureUtils.getParent(feature);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		oldFeature = featureModel.getFeature(featureName);
+		final IFeature oldParent = FeatureUtils.getParent(oldFeature);
 		if (oldParent != null) {
-			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
+			oldParentName = oldParent.getName();
+			oldIndex = oldParent.getStructure().getChildIndex(oldFeature.getStructure());
 			or = oldParent.getStructure().isOr();
 			alternative = oldParent.getStructure().isAlternative();
 		}
-		oldChildren = new LinkedList<IFeature>();
-		oldChildren.addAll(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
 
-		if (oldParent != null) {
-			oldParent = featureModel.getFeature(oldParent.getName());
-		}
-		final LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
+		final Iterable<IFeature> oldChildren = FeatureUtils.getChildren(oldFeature);
 
-		for (final IFeature f : oldChildren) {
-			if (!f.getName().equals(feature.getName())) {
-				final IFeature oldChild = featureModel.getFeature(f.getName());
-				oldChildrenCopy.add(oldChild);
-			}
-		}
+		oldChildrenName.clear();
+		oldChildrenName.addAll(Functional.mapToStringList(oldChildren));
 
-		oldChildren = oldChildrenCopy;
-		if (feature.getStructure().isRoot()) {
+		if (oldFeature.getStructure().isRoot()) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
 		} else {
-			deleted = featureModel.deleteFeature(feature);
+			deleted = featureModel.deleteFeature(oldFeature);
 		}
 
 		// Replace feature name in constraints
-		if (replacement != null) {
+		if (replacementName != null) {
 			for (final IConstraint c : featureModel.getConstraints()) {
-				if (c.getContainedFeatures().contains(feature)) {
-					c.getNode().replaceFeature(feature, replacement);
-				}
+				c.getNode().replaceFeature(featureName, replacementName);
 			}
 		}
 
@@ -109,33 +104,29 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				oldParent.getStructure().changeToAnd();
 			}
 		}
-		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE, oldParent, null);
+		return new FeatureModelOperationEvent(ID, EventType.FEATURE_DELETE, featureModel, oldFeature, oldParent);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		try {
 			if (!deleted) {
 				return null;
 			}
 
-			if (oldParent != null) {
-				oldParent = featureModel.getFeature(oldParent.getName());
-			}
-			final LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
+			final IFeature oldParent = (oldParentName != null) ? featureModel.getFeature(oldParentName) : null;
 
-			for (final IFeature f : oldChildren) {
-				if (!f.getName().equals(feature.getName())) {
-					final IFeature child = featureModel.getFeature(f.getName());
-					if ((child != null) && (child.getStructure().getParent() != null)) {
-						child.getStructure().getParent().removeChild(child.getStructure());
-					}
-					oldChildrenCopy.add(child);
+			final LinkedList<IFeature> oldChildren = new LinkedList<>();
+			for (final String name : oldChildrenName) {
+				final IFeature child = featureModel.getFeature(name);
+				oldChildren.add(child);
+				final IFeatureStructure structure = child.getStructure();
+				if (structure.getParent() != null) {
+					structure.getParent().removeChild(structure);
 				}
 			}
 
-			oldChildren = oldChildrenCopy;
-
+			final IFeature feature = FMFactoryManager.getInstance().getFactory(featureModel).copyFeature(featureModel, oldFeature);
 			feature.getStructure().setChildren(Functional.toList(FeatureUtils.convertToFeatureStructureList(oldChildren)));
 			if (oldParent != null) {
 				oldParent.getStructure().addChildAtPosition(oldIndex, feature.getStructure());
@@ -145,11 +136,9 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			featureModel.addFeature(feature);
 
 			// Replace feature name in Constraints
-			if (replacement != null) {
+			if (replacementName != null) {
 				for (final IConstraint c : featureModel.getConstraints()) {
-					if (c.getContainedFeatures().contains(replacement)) {
-						c.getNode().replaceFeature(replacement, feature);
-					}
+					c.getNode().replaceFeature(replacementName, featureName);
 				}
 			}
 
@@ -159,15 +148,11 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			} else if ((oldParent != null) && alternative) {
 				oldParent.getStructure().changeToAlternative();
 			}
-
+			return new FeatureModelOperationEvent(ID, EventType.FEATURE_ADD, featureModel, oldFeature, feature);
 		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);
+			return null;
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, feature);
 	}
 
-	@Override
-	public boolean canUndo() {
-		return (oldParent == null) || (featureModel.getFeature(oldParent.getName()) != null);
-	}
 }

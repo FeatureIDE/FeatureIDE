@@ -240,7 +240,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (evt.getSource() instanceof IFeatureModel) {
 				switch (evt.getEventType()) {
 				case MODEL_DATA_SAVED:
-				case MODEL_DATA_OVERRIDDEN:
+				case MODEL_DATA_OVERWRITTEN:
 					refreshPage();
 					break;
 				default:
@@ -251,7 +251,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				case MODEL_DATA_SAVED:
 					dirty = false;
 					break;
-				case MODEL_DATA_OVERRIDDEN:
+				case MODEL_DATA_OVERWRITTEN:
 					refreshPage();
 					setDirty();
 					break;
