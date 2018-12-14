@@ -26,7 +26,7 @@ abstract class ATraverser implements ITraverser {
 	protected final ModalImplicationGraph mig;
 
 	protected Visitor<?> visitor = null;
-	protected int[] model = null;
+	protected int[] currentConfiguration = null;
 
 	public ATraverser(ModalImplicationGraph mig) {
 		this.mig = mig;
@@ -44,8 +44,8 @@ abstract class ATraverser implements ITraverser {
 	}
 
 	@Override
-	public void setModel(int[] model) {
-		this.model = model;
+	public void setModel(int[] currentConfiguration) {
+		this.currentConfiguration = currentConfiguration;
 	}
 
 }

@@ -59,8 +59,8 @@ public class RecursiveTraverser extends ATraverser {
 		// Strong Edges
 		for (final int strongEdge : vertex.getStrongEdges()) {
 			final int modelIndex = Math.abs(strongEdge) - 1;
-			if (model[modelIndex] == 0) {
-				model[modelIndex] = strongEdge;
+			if (currentConfiguration[modelIndex] == 0) {
+				currentConfiguration[modelIndex] = strongEdge;
 				visitor.visitStrong(strongEdge);
 			}
 		}
@@ -78,7 +78,7 @@ public class RecursiveTraverser extends ATraverser {
 				if (literal == -curLiteral) {
 					continue;
 				}
-				final int value = model[Math.abs(literal) - 1];
+				final int value = currentConfiguration[Math.abs(literal) - 1];
 
 				if (value == 0) {
 					// add literal to list
@@ -99,8 +99,8 @@ public class RecursiveTraverser extends ATraverser {
 			if (v.size() == 1) {
 				final int literal = v.get(0);
 				final int modelIndex = Math.abs(literal) - 1;
-				if (model[modelIndex] == 0) {
-					model[modelIndex] = literal;
+				if (currentConfiguration[modelIndex] == 0) {
+					currentConfiguration[modelIndex] = literal;
 					visitor.visitStrong(literal);
 					traverseStrongRec(literal);
 				}
@@ -113,8 +113,8 @@ public class RecursiveTraverser extends ATraverser {
 
 		if (strongPath) {
 			final int modelIndex = Math.abs(curLiteral) - 1;
-			if (model[modelIndex] == 0) {
-				model[modelIndex] = curLiteral;
+			if (currentConfiguration[modelIndex] == 0) {
+				currentConfiguration[modelIndex] = curLiteral;
 				visitor.visitStrong(curLiteral);
 			}
 		}
@@ -127,7 +127,7 @@ public class RecursiveTraverser extends ATraverser {
 
 			// Strong Edges
 			for (final int strongEdge : vertex.getStrongEdges()) {
-				if (model[Math.abs(strongEdge) - 1] == 0) {
+				if (currentConfiguration[Math.abs(strongEdge) - 1] == 0) {
 					traverse(strongPath, strongEdge);
 				}
 			}
@@ -146,7 +146,7 @@ public class RecursiveTraverser extends ATraverser {
 					if (literal == -curLiteral) {
 						continue;
 					}
-					final int value = model[Math.abs(literal) - 1];
+					final int value = currentConfiguration[Math.abs(literal) - 1];
 
 					if (value == 0) {
 						// add literal to list
@@ -163,13 +163,13 @@ public class RecursiveTraverser extends ATraverser {
 
 				if (v.size() == 1) {
 					final int literal = v.get(0);
-					if (model[Math.abs(literal) - 1] == 0) {
+					if (currentConfiguration[Math.abs(literal) - 1] == 0) {
 						traverse(strongPath, literal);
 					}
 				} else {
 					for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 						final int literal = iterator.next();
-						if (model[Math.abs(literal) - 1] == 0) {
+						if (currentConfiguration[Math.abs(literal) - 1] == 0) {
 							traverse(false, literal);
 						}
 					}

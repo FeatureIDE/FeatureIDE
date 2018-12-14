@@ -20,10 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job.monitor;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * Thread to run an arbitrary function at a regular time interval.
  *
@@ -31,20 +27,18 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MonitorThread extends Thread {
 
-	private final Lock lock = new ReentrantLock();
-	private final Condition condition = lock.newCondition();
 	private final Runnable function;
 
 	private boolean monitorRun = true;
 	private long updateTime;
 
 	public MonitorThread(Runnable function) {
-		this(function, 1_000_000_000);
+		this(function, 1_000);
 	}
 
 	/**
 	 * @param function is called at every update
-	 * @param updateTime in ns
+	 * @param updateTime in ms
 	 */
 	public MonitorThread(Runnable function, long updateTime) {
 		super();
@@ -55,28 +49,21 @@ public class MonitorThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			lock.lock();
 			while (monitorRun) {
-				condition.awaitNanos(updateTime);
+				Thread.sleep(updateTime);
 				function.run();
 			}
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			lock.unlock();
 		}
+		function.run();
 	}
 
 	public void finish() {
 		try {
 			// to ensure to stop the monitor thread
 			monitorRun = false;
-			try {
-				lock.lock();
-				condition.signal();
-			} finally {
-				lock.unlock();
-			}
+			interrupt();
 			join();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();

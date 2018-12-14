@@ -43,7 +43,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
@@ -64,6 +66,7 @@ public class CNFSlicer extends AbstractManipulator {
 	protected final Set<DeprecatedClause> cleanClauseSet = new HashSet<>();
 
 	protected final LiteralSet dirtyVariables;
+//	private int numberOfCleanFeatures = 0;
 	private int numberOfDirtyFeatures = 0;
 
 	protected int[] helper;
@@ -91,8 +94,28 @@ public class CNFSlicer extends AbstractManipulator {
 		cnfCopy = new CNF(orgCNF, false);
 	}
 
+	int cr = 0, cnr = 0, dr = 0, dnr = 0;
+
+	ModalImplicationGraph dirtyGraph;
+
+	MonitorThread monitorThread = new MonitorThread(new Runnable() {
+		@Override
+		public void run() {
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append(heuristic.size()).append(": ");
+			sb.append((newCleanClauseList.size() + newDirtyClauseList.size())).append(" || ");
+			sb.append(cr).append(" | ");
+			sb.append(cnr).append(" || ");
+			sb.append(dr).append(" | ");
+			sb.append(dnr);
+
+			System.out.println(sb.toString());
+		}
+	});
+
 	@Override
-	protected CNF manipulate(IMonitor workMonitor) throws TimeoutException {
+	protected CNF manipulate(IMonitor monitor) throws TimeoutException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
 
@@ -122,8 +145,26 @@ public class CNFSlicer extends AbstractManipulator {
 			return new CNF(mapping, orgCNF.getClauses());
 		}
 
+//		final CNF cleanCNF = new CNF(mapping, cleanClauseList);
+//		numberOfCleanFeatures = cleanCNF.getVariables().size();
+//		cleanGraph = ModalImplicationGraph.build(cleanCNF, false);
+//		dirtyGraph = ModalImplicationGraph.build(orgCNF, false);
+//
+//		final Traverser traverser = dirtyGraph.traverse();
+//		final List<VertexPath> paths = new ArrayList<>(dirtyGraph.getAdjList().size());
+//		for (final Vertex vertex : dirtyGraph.getAdjList()) {
+//			final VertexPath vertexPath = new VertexPath(dirtyGraph, vertex.getId(), dirtyGraph.getAdjList().size());
+//			paths.add(vertexPath);
+//			traverser.setVisitor(vertexPath);
+//			traverser.setModel(new int[numberOfDirtyFeatures]);
+//			traverser.traverse(vertex.getVar());
+//		}
+
+		monitor.setRemainingWork(heuristic.size());
+		monitor.checkCancel();
+		monitorThread.start();
+
 		while (heuristic.hasNext()) {
-			workMonitor.checkCancel();
 			final DeprecatedFeature nextFeature = heuristic.next();
 			if (nextFeature == null) {
 				break;
@@ -144,6 +185,8 @@ public class CNFSlicer extends AbstractManipulator {
 			// Merge new dirty list into the old list
 			updateLists();
 
+			monitor.step();
+
 			// If ALL dirty clauses exclusively consists of dirty features, they can just be removed without applying resolution
 			if (globalMixedClauseCount == 0) {
 				break;
@@ -153,6 +196,7 @@ public class CNFSlicer extends AbstractManipulator {
 		addCleanClauses();
 
 		release();
+		monitorThread.finish();
 
 		return new CNF(mapping, cleanClauseList);
 	}
@@ -312,8 +356,10 @@ public class CNFSlicer extends AbstractManipulator {
 			for (int i = newDirtyListDelIndex - 1; i >= 0; --i) {
 				final DeprecatedClause curClause = newDirtyClauseList.get(i);
 				if (isRedundant(solver, curClause)) {
+					dr++;
 					Collections.swap(newDirtyClauseList, i, --newDirtyListDelIndex);
 				} else {
+					dnr++;
 					solver.addClause(curClause);
 				}
 			}
@@ -325,9 +371,23 @@ public class CNFSlicer extends AbstractManipulator {
 
 		for (int i = newCleanClauseList.size() - 1; i >= 0; --i) {
 			final DeprecatedClause clause = newCleanClauseList.get(i);
+
+//			if (clause.getLiterals().length == 2) {
+//				if (paths.get(dirtyGraph.getVertex(clause.getLiterals()[0]).getId()).hasStrongPath(clause.getLiterals()[1])) {
+//					deleteClause(clause);
+//				}
+////				dirtyGraph.addClause(clause);
+//			} else {
+//				for (final int literals : clause.getLiterals()) {
+//
+//				}
+//			}
+
 			if (isRedundant(newSolver, clause)) {
+				cr++;
 				deleteClause(clause);
 			} else {
+				cnr++;
 				newSolver.addClause(clause);
 				cleanClauseList.add(new LiteralSet(clause));
 			}
@@ -338,7 +398,7 @@ public class CNFSlicer extends AbstractManipulator {
 	protected void firstRedundancyCheck(DeprecatedFeature nextFeature) {
 		if (first && (nextFeature.getClauseCount() > 0)) {
 			first = false;
-			Collections.sort(dirtyClauseList, lengthComparator);
+			Collections.sort(dirtyClauseList.subList(0, dirtyListPosIndex), lengthComparator);
 
 			addCleanClauses();
 
@@ -349,8 +409,10 @@ public class CNFSlicer extends AbstractManipulator {
 			for (int i = dirtyListPosIndex - 1; i >= 0; --i) {
 				final DeprecatedClause mainClause = dirtyClauseList.get(i);
 				if (isRedundant(solver, mainClause)) {
+					dr++;
 					Collections.swap(dirtyClauseList, i, --dirtyListPosIndex);
 				} else {
+					dnr++;
 					solver.addClause(mainClause);
 				}
 			}
@@ -358,6 +420,10 @@ public class CNFSlicer extends AbstractManipulator {
 
 			dirtyListPosIndex = dirtyClauseList.size();
 			dirtyListNegIndex = dirtyClauseList.size();
+			cr = 0;
+			cnr = 0;
+			dr = 0;
+			dnr = 0;
 		}
 	}
 

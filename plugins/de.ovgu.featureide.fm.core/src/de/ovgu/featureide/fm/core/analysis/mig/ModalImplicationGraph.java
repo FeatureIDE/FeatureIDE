@@ -22,11 +22,13 @@ package de.ovgu.featureide.fm.core.analysis.mig;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -72,6 +74,80 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public List<LiteralSet> getComplexClauses() {
 		return Collections.unmodifiableList(complexClauses);
+	}
+
+	public void addClause(LiteralSet clause) {
+		final int[] literals = clause.getLiterals();
+		switch (clause.size()) {
+		case 0:
+			throw new RuntimeContradictionException();
+		case 1: {
+			final int literal = literals[0];
+			final Vertex vertex = getVertex(literal);
+			vertex.setCore(literal > 0);
+			vertex.setDead(literal < 0);
+			break;
+		}
+		case 2: {
+			final Vertex vertex0 = getVertex(-literals[0]);
+			final Vertex vertex1 = getVertex(-literals[1]);
+			addStrongEdge(vertex0, -vertex1.getVar());
+			addStrongEdge(vertex1, -vertex0.getVar());
+			break;
+		}
+		default: {
+			final int newClauseIndex = complexClauses.size();
+			complexClauses.add(clause);
+			for (final int literal : literals) {
+				addWeakEdge(getVertex(-literal), newClauseIndex);
+			}
+			break;
+		}
+		}
+	}
+
+	public void removeClause(LiteralSet clause) {
+		final int[] literals = clause.getLiterals();
+		switch (clause.size()) {
+		case 0:
+			throw new RuntimeContradictionException();
+		case 1: {
+			final int literal = literals[0];
+			final Vertex vertex = getVertex(literal);
+			vertex.setCore(literal > 0);
+			vertex.setDead(literal < 0);
+			break;
+		}
+		case 2: {
+			final Vertex vertex0 = getVertex(-literals[0]);
+			final Vertex vertex1 = getVertex(-literals[1]);
+			addStrongEdge(vertex0, -vertex1.getVar());
+			addStrongEdge(vertex1, -vertex0.getVar());
+			break;
+		}
+		default: {
+			final int newClauseIndex = complexClauses.size();
+			complexClauses.add(clause);
+			for (final int literal : literals) {
+				addWeakEdge(getVertex(-literal), newClauseIndex);
+			}
+			break;
+		}
+		}
+	}
+
+	private void addWeakEdge(final Vertex vertex, final int index) {
+		final int[] oldComplexClauses = vertex.getComplexClauses();
+		final int[] newComplexClauses = Arrays.copyOf(oldComplexClauses, oldComplexClauses.length + 1);
+		newComplexClauses[oldComplexClauses.length] = index;
+		vertex.setComplexClauses(newComplexClauses);
+	}
+
+	private void addStrongEdge(final Vertex vertex, final int edge) {
+		final int[] oldStrongEdges = vertex.getStrongEdges();
+		final int[] newStrongEdges = Arrays.copyOf(oldStrongEdges, oldStrongEdges.length + 1);
+		newStrongEdges[oldStrongEdges.length] = edge;
+		vertex.setStrongEdges(newStrongEdges);
 	}
 
 }

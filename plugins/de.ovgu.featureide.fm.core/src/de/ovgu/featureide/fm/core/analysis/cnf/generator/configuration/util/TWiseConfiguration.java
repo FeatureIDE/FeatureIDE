@@ -63,23 +63,24 @@ public class TWiseConfiguration {
 		private int[] unkownValues = null;
 
 		@Override
-		public void visitStrong(int curLiteral) {
+		public VisitResult visitStrong(int curLiteral) {
 			addLiteral(curLiteral);
 			if (unkownValues != null) {
 				util.getSolver().assignmentPush(curLiteral);
 				unkownValues[Math.abs(curLiteral) - 1] = 0;
 			}
+			return VisitResult.Continue;
 		}
 
 		@Override
-		public final boolean visitWeak(final int curLiteral) {
+		public final VisitResult visitWeak(final int curLiteral) {
 			if (unkownValues == null) {
 				final ISatSolver solver = util.getSolver();
 				setUpSolver(solver);
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 				switch (solver.hasSolution()) {
 				case FALSE:
-					throw new RuntimeException();
+					return VisitResult.Cancel;
 				case TIMEOUT:
 					throw new RuntimeException();
 				case TRUE:
@@ -109,7 +110,7 @@ public class TWiseConfiguration {
 					throw new RuntimeException();
 				}
 			}
-			return sat(unkownValues, curLiteral);
+			return sat(unkownValues, curLiteral) ? VisitResult.Select : VisitResult.Continue;
 		}
 
 		private final boolean sat(final int[] unkownValues, final int curLiteral) {
@@ -161,9 +162,9 @@ public class TWiseConfiguration {
 			traverser.setModel(solution.getLiterals());
 			visitor = new DefaultVisitor() {
 				@Override
-				public void visitStrong(int curLiteral) {
-					super.visitStrong(curLiteral);
+				public VisitResult visitStrong(int curLiteral) {
 					addLiteral(curLiteral);
+					return super.visitStrong(curLiteral);
 				}
 			};
 		} else {

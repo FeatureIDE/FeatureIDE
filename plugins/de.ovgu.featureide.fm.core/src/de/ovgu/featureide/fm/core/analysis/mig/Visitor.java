@@ -22,12 +22,16 @@ package de.ovgu.featureide.fm.core.analysis.mig;
 
 public interface Visitor<T> {
 
+	public enum VisitResult {
+		Cancel, Continue, Skip, Select
+	}
+
 	/**
 	 * Called when the traverser first reaches the literal via a strong path and the corresponding variable is still undefined.
 	 *
 	 * @param literal the literal reached
 	 */
-	void visitStrong(int literal);
+	VisitResult visitStrong(int literal);
 
 	/**
 	 * Called when the traverser first reaches the literal via a weak path and the corresponding variable is still undefined.
@@ -35,7 +39,7 @@ public interface Visitor<T> {
 	 * @param literal the literal reached
 	 * @return {@code true} if the corresponding variable is set to the literal, {@code false} otherwise.
 	 */
-	boolean visitWeak(int literal);
+	VisitResult visitWeak(int literal);
 
 	T getResult();
 

@@ -26,14 +26,15 @@ public class CollectingVisitor implements Visitor<VecInt[]> {
 	final VecInt[] literalList = new VecInt[] { new VecInt(), new VecInt() };
 
 	@Override
-	public void visitStrong(int curLiteral) {
+	public VisitResult visitStrong(int curLiteral) {
 		literalList[0].push(curLiteral);
+		return VisitResult.Continue;
 	}
 
 	@Override
-	public boolean visitWeak(int curLiteral) {
+	public VisitResult visitWeak(int curLiteral) {
 		literalList[1].push(curLiteral);
-		return false;
+		return VisitResult.Continue;
 	}
 
 	@Override

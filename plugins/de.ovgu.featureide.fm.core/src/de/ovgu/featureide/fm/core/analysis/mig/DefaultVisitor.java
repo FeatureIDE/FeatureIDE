@@ -23,11 +23,13 @@ package de.ovgu.featureide.fm.core.analysis.mig;
 public class DefaultVisitor implements Visitor<Void> {
 
 	@Override
-	public void visitStrong(int curLiteral) {}
+	public VisitResult visitStrong(int curLiteral) {
+		return VisitResult.Continue;
+	}
 
 	@Override
-	public boolean visitWeak(int curLiteral) {
-		return false;
+	public VisitResult visitWeak(int curLiteral) {
+		return VisitResult.Continue;
 	}
 
 	@Override

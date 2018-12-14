@@ -31,8 +31,13 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IteratorInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.mig.Visitor.VisitResult;
 
 public class Traverser extends ATraverser {
+
+	private static class CancelException extends Exception {
+		private static final long serialVersionUID = 4872529212110156314L;
+	}
 
 	public Traverser(ModalImplicationGraph mig) {
 		super(mig);
@@ -40,28 +45,43 @@ public class Traverser extends ATraverser {
 
 	@Override
 	public void traverse(int... curLiterals) {
-		final HashMap<Integer, VecInt> complexClauseMap = new HashMap<>();
+		try {
+			traverseAll(curLiterals);
+		} catch (final CancelException e) {}
+	}
+
+	private void traverseAll(int... curLiterals) throws CancelException {
+		final HashMap<Integer, VecInt> openClauseMap = new HashMap<>();
 		Arrays.fill(dfsMark, false);
 
-		traverseStrong(complexClauseMap, curLiterals);
+		traverseStrong(openClauseMap, curLiterals);
 		mainLoop: while (true) {
-			for (final Iterator<Entry<Integer, VecInt>> entryIterator = complexClauseMap.entrySet().iterator(); entryIterator.hasNext();) {
-				final Entry<Integer, VecInt> entry = entryIterator.next();
-				final VecInt v = entry.getValue();
-				if (v != null) {
-					for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
-						final int literal = iterator.next();
-						if (model[Math.abs(literal) - 1] == 0) {
+			for (final Iterator<Entry<Integer, VecInt>> openClauseIterator = openClauseMap.entrySet().iterator(); openClauseIterator.hasNext();) {
+				final VecInt openClause = openClauseIterator.next().getValue();
+				if (openClause != null) {
+					for (final IteratorInt literalIterator = openClause.iterator(); literalIterator.hasNext();) {
+						final int literal = literalIterator.next();
+						if (currentConfiguration[getIndex(literal)] == 0) {
 							final Vertex vertex = mig.getVertex(literal);
 							if (!dfsMark[vertex.getId()]) {
 								dfsMark[vertex.getId()] = true;
 								boolean changed = false;
-								if (visitor.visitWeak(literal)) {
-									changed |= attemptStrongSelect(literal, complexClauseMap);
-								} else {
-									changed |= addComplexClauses(complexClauseMap, vertex) > 0;
+								final VisitResult visitWeakResult = visitor.visitWeak(literal);
+								switch (visitWeakResult) {
+								case Cancel:
+									return;
+								case Continue:
+									changed |= addComplexClauses(openClauseMap, vertex) > 0;
+									break;
+								case Select:
+									changed |= attemptStrongSelect(literal, openClauseMap);
+									break;
+								case Skip:
+									break;
+								default:
+									throw new AssertionError(visitWeakResult);
 								}
-								changed |= processComplexClauses(complexClauseMap);
+								changed |= processComplexClauses(openClauseMap);
 								if (changed) {
 									continue mainLoop;
 								}
@@ -76,10 +96,12 @@ public class Traverser extends ATraverser {
 
 	@Override
 	public void traverseStrong(int... curLiterals) {
-		traverseStrong(new HashMap<Integer, VecInt>(), curLiterals);
+		try {
+			traverseStrong(new HashMap<Integer, VecInt>(), curLiterals);
+		} catch (final CancelException e) {}
 	}
 
-	private void traverseStrong(final HashMap<Integer, VecInt> complexClauseMap, int... curLiterals) {
+	private void traverseStrong(final HashMap<Integer, VecInt> complexClauseMap, int... curLiterals) throws CancelException {
 		boolean changed = false;
 		for (final int curLiteral : curLiterals) {
 			changed |= attemptStrongSelect(curLiteral, complexClauseMap);
@@ -89,7 +111,7 @@ public class Traverser extends ATraverser {
 		}
 	}
 
-	private boolean processComplexClauses(final HashMap<Integer, VecInt> complexClauseMap) {
+	private boolean processComplexClauses(final HashMap<Integer, VecInt> complexClauseMap) throws CancelException {
 		boolean changedInLoop, changed = false;
 		do {
 			changedInLoop = false;
@@ -99,7 +121,7 @@ public class Traverser extends ATraverser {
 				if (v != null) {
 					for (int j = v.size() - 1; j >= 0; j--) {
 						final int literal = v.get(j);
-						final int value = model[Math.abs(literal) - 1];
+						final int value = currentConfiguration[getIndex(literal)];
 						if (value != 0) {
 							if (value == literal) {
 								entry.setValue(null);
@@ -125,31 +147,56 @@ public class Traverser extends ATraverser {
 		return changed;
 	}
 
-	private boolean attemptStrongSelect(final int curLiteral, final HashMap<Integer, VecInt> complexClauseMap) {
-		final int modelIndex = Math.abs(curLiteral) - 1;
-		if (model[modelIndex] == 0) {
-			model[modelIndex] = curLiteral;
-			visitor.visitStrong(curLiteral);
-			final Vertex curVertex = mig.getVertex(curLiteral);
-			if (complexClauseMap != null) {
-				addComplexClauses(complexClauseMap, curVertex);
+	private boolean attemptStrongSelect(final int curLiteral, final HashMap<Integer, VecInt> complexClauseMap) throws CancelException {
+		final int modelIndex = getIndex(curLiteral);
+		final int currentVariableSelection = currentConfiguration[modelIndex];
+		if (currentVariableSelection == 0) {
+			currentConfiguration[modelIndex] = curLiteral;
+			VisitResult visitStrongResult = visitor.visitStrong(curLiteral);
+			switch (visitStrongResult) {
+			case Cancel:
+				throw new CancelException();
+			case Skip:
+				return true;
+			case Select:
+			case Continue:
+				break;
+			default:
+				throw new AssertionError(visitStrongResult);
 			}
-			for (final int strongEdge : curVertex.getStrongEdges()) {
-				final int modelIndex2 = Math.abs(strongEdge) - 1;
-				if (model[modelIndex2] == 0) {
-					model[modelIndex2] = strongEdge;
-					visitor.visitStrong(strongEdge);
-					if (complexClauseMap != null) {
-						addComplexClauses(complexClauseMap, mig.getVertex(strongEdge));
+
+			final Vertex curVertex = mig.getVertex(curLiteral);
+			addComplexClauses(complexClauseMap, curVertex);
+
+			for (final int strongVertex : curVertex.getStrongEdges()) {
+				final int strongVertexIndex = getIndex(strongVertex);
+				if (currentConfiguration[strongVertexIndex] == 0) {
+					currentConfiguration[strongVertexIndex] = strongVertex;
+					visitStrongResult = visitor.visitStrong(strongVertex);
+					switch (visitStrongResult) {
+					case Cancel:
+						throw new CancelException();
+					case Skip:
+						break;
+					case Select:
+					case Continue:
+						addComplexClauses(complexClauseMap, mig.getVertex(strongVertex));
+						break;
+					default:
+						throw new AssertionError(visitStrongResult);
 					}
 				}
 			}
-			if (complexClauseMap != null) {
-				return false;
-			}
 			return true;
+		} else if (currentVariableSelection != curLiteral) {
+			// TODO
+
 		}
 		return false;
+	}
+
+	private int getIndex(final int literal) {
+		return Math.abs(literal) - 1;
 	}
 
 	private int addComplexClauses(final HashMap<Integer, VecInt> complexClauseMap, final Vertex vertex) {
@@ -159,11 +206,109 @@ public class Traverser extends ATraverser {
 			final Integer index = complexClauses[i];
 			if (!complexClauseMap.containsKey(index)) {
 				final LiteralSet clause = mig.getComplexClauses().get(index);
-				complexClauseMap.putIfAbsent(index, new VecInt(Arrays.copyOf(clause.getLiterals(), clause.size())));
+				complexClauseMap.put(index, new VecInt(Arrays.copyOf(clause.getLiterals(), clause.size())));
 				added++;
 			}
 		}
 		return added;
 	}
+
+//	@Override
+//	public void traverseAll(int... curLiterals) {
+//		final HashMap<Integer, VecInt> openClauseMap = new HashMap<>();
+//		Arrays.fill(dfsMark, false);
+//
+//		traverseStrong(openClauseMap, curLiterals);
+//		mainLoop: while (true) {
+//			for (final Iterator<Entry<Integer, VecInt>> openClauseIterator = openClauseMap.entrySet().iterator(); openClauseIterator.hasNext();) {
+//				final VecInt openClause = openClauseIterator.next().getValue();
+//				if (openClause != null) {
+//					for (final IteratorInt literalIterator = openClause.iterator(); literalIterator.hasNext();) {
+//						final int literal = literalIterator.next();
+//						if (currentConfiguration[getIndex(literal)] == 0) {
+//							final Vertex vertex = mig.getVertex(literal);
+//							if (!dfsMark[vertex.getId()]) {
+//								dfsMark[vertex.getId()] = true;
+//								boolean changed = false;
+//								if (visitor.visitWeak(literal)) {
+//									changed |= attemptStrongSelect(literal, openClauseMap);
+//								} else {
+//									changed |= addComplexClauses(openClauseMap, vertex) > 0;
+//								}
+//								changed |= processComplexClauses(openClauseMap);
+//								if (changed) {
+//									continue mainLoop;
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//			break;
+//		}
+//	}
+//
+//	private boolean processComplexClauses(final HashMap<Integer, VecInt> complexClauseMap) {
+//		boolean changedInLoop, changed = false;
+//		do {
+//			changedInLoop = false;
+//			final List<VecInt> unitClauses = new LinkedList<>();
+//			for (final Entry<Integer, VecInt> entry : complexClauseMap.entrySet()) {
+//				final VecInt v = entry.getValue();
+//				if (v != null) {
+//					for (int j = v.size() - 1; j >= 0; j--) {
+//						final int literal = v.get(j);
+//						final int value = currentConfiguration[getIndex(literal)];
+//						if (value != 0) {
+//							if (value == literal) {
+//								entry.setValue(null);
+//							} else {
+//								v.delete(j);
+//							}
+//							changed = true;
+//						}
+//					}
+//
+//					if (v.size() == 1) {
+//						entry.setValue(null);
+//						unitClauses.add(v);
+//					}
+//				}
+//			}
+//
+//			for (final VecInt v : unitClauses) {
+//				changedInLoop |= attemptStrongSelect2(v.get(0), complexClauseMap);
+//			}
+//			changed |= changedInLoop;
+//		} while (changedInLoop);
+//		return changed;
+//	}
+//
+//	private boolean attemptStrongSelect(final int curLiteral, final HashMap<Integer, VecInt> complexClauseMap) {
+//		final int modelIndex = getIndex(curLiteral);
+//		if (currentConfiguration[modelIndex] == 0) {
+//			currentConfiguration[modelIndex] = curLiteral;
+//			visitor.visitStrong(curLiteral);
+//			final Vertex curVertex = mig.getVertex(curLiteral);
+//			if (complexClauseMap != null) {
+//				addComplexClauses(complexClauseMap, curVertex);
+//			}
+//			for (final int strongVertex : curVertex.getStrongEdges()) {
+//				final int strongVertexIndex = getIndex(strongVertex);
+//				if (currentConfiguration[strongVertexIndex] == 0) {
+//					currentConfiguration[strongVertexIndex] = strongVertex;
+//					visitor.visitStrong(strongVertex);
+//					if (complexClauseMap != null) {
+//						addComplexClauses(complexClauseMap, mig.getVertex(strongVertex));
+//					}
+//				}
+//			}
+//			if (complexClauseMap != null) {
+//				return false;
+//			}
+//			return true;
+//		}
+//		return false;
+//	}
 
 }
