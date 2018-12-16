@@ -7,6 +7,16 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.3 (November 2018)
+* Hotfix containing only stability improvements over v3.5.2
+* Numerous issues with the FeatureHouse composer (#794)
+* Improvements for execution of JUnit tests (#814, #819)
+* Illegal feature names in extended feature models after Eclipse restart (#833)
+* Removal of attributes when features are moved in the diagram (#829)
+* Improved layouting of feature models (#825)
+* Accidential change of siblings order (#803)
+* All kinds of void feature models supported when editing constraints (#823)
+
 Release 3.5.2 (September 2018)
 * Hotfix containing only stability improvements over v3.5.1
 * Improved loading and saving of feature models (#759, #761, #771, #773, #776, #799)

@@ -61,4 +61,6 @@ public interface IGraphicalFeature extends IGraphicalElement {
 
 	List<IGraphicalFeature> getGraphicalChildren(boolean showHidden);
 
+	List<IGraphicalFeature> getAllGraphicalChildren();
+
 }

@@ -871,7 +871,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+		return super.supportsContent(content, CONTENT_REGEX);
 	}
 
 	@Override

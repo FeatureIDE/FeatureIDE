@@ -1,7 +1,7 @@
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -18,7 +18,7 @@ public class ExtendedFeature extends Feature {
 		super(copyFeature, featureModel, newFeatrureStructure);
 
 		// Copy all attributes from the copy feature
-		attributes = new ArrayList<>();
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
 			attributes.add(attribute);
 		}
@@ -28,11 +28,11 @@ public class ExtendedFeature extends Feature {
 		super(featureModel, name);
 
 		// Create empty attributes list
-		attributes = new ArrayList<>();
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 	}
 
 	public List<IFeatureAttribute> getAttributes() {
-		return Collections.unmodifiableList(attributes);
+		return attributes;
 	}
 
 	public void addAttribute(IFeatureAttribute attribute) {
@@ -41,10 +41,6 @@ public class ExtendedFeature extends Feature {
 
 	public void removeAttribute(IFeatureAttribute attribute) {
 		attributes.remove(attribute);
-	}
-
-	public void setAttributes(List<IFeatureAttribute> attributes) {
-		this.attributes = attributes;
 	}
 
 	@Override

@@ -506,8 +506,7 @@ public class StringTable {
 		"Select only one feature in order to replace it with an equivalent one.";
 	public static final String IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_ = "It can not be replaced with an equivalent one.";
 	public static final String CHANGE_GROUP_TYPE = "Change Group Type";
-	public static final String CREATE_COMPOUND = "Create Compound";
-	public static final String CREATE_LAYER = "Create Layer";
+	public static final String CREATE_SIBLING = "Create Sibling Feature (CTRL + G)";
 	public static final String MOVE_FEATURE = "Move Feature";
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
@@ -548,6 +547,7 @@ public class StringTable {
 		"Eclipse plugin for exporting diagram in SVG format is not existing.";
 	public static final String SVG_EXPORT_FAILED = "SVG export failed";
 	public static final String NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___ = "Nothing has been saved for diagram export...";
+	public static final String NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___ = "Nothing has been saved for configuration export...";
 	public static final String FILE = "File ";
 	public static final String XML = "XML";
 	public static final String EXPORT_TO_CNF = "Export to CNF";
@@ -1104,5 +1104,5 @@ public class StringTable {
 	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
 	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
 	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
-
+	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 }

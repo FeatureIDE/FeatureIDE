@@ -27,6 +27,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.abego.treelayout.Configuration;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -144,8 +145,15 @@ abstract public class FeatureDiagramLayoutManager {
 		for (final IGraphicalConstraint constraint : constraints) {
 			final Dimension size = constraint.getSize();
 			int x;
-			if (depthFirst) {
-				x = 2 * FMPropertyManager.getFeatureSpaceX();
+			if (depthFirst || (constraint.getGraphicalModel().getLayout().getAbegoRootposition() == Configuration.Location.Left)) {
+				if (depthFirst) {
+					x = 2 * FMPropertyManager.getFeatureSpaceX();
+				} else {
+					x = rootBounds.x;
+				}
+			} else if (constraint.getGraphicalModel().getLayout().getAbegoRootposition() == Configuration.Location.Right) {
+				final int rootRight = rootBounds.x + rootBounds.width;
+				x = rootRight - size.width;
 			} else {
 				final int rootCenter = rootBounds.x + (rootBounds.width / 2);
 				x = rootCenter - (size.width / 2);
@@ -329,11 +337,11 @@ abstract public class FeatureDiagramLayoutManager {
 		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 
 		// Check the first four positions for intersections with the features
-		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().getHasVerticalLayout());
 
 		// Add the position next to the featureModel and check for hits with the constraints
 		rects.add(new Rectangle(new Point(max.x + FMPropertyManager.getFeatureSpaceX(), min.y), legendSize));
-		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().getHasVerticalLayout());
 
 		if (rects.size() > 0) {
 			// At this point, rects does only contain positions for the legend that are acceptable. So we take the first
