@@ -63,7 +63,7 @@ public class FeatureModelBounds {
 			}
 
 			if (element instanceof IGraphicalFeature) {
-				if (((IGraphicalFeature) element).isCollapsed() == true) {
+				if (((IGraphicalFeature) element).isCollapsed()) {
 					if (((IGraphicalFeature) element).getCollapsedDecoration() != null) {
 						final CollapsedDecoration collapsedDecoration = ((IGraphicalFeature) element).getCollapsedDecoration();
 						position = getBounds(collapsedDecoration);
