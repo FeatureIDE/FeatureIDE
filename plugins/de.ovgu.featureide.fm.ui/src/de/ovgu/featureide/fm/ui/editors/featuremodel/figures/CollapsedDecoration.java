@@ -187,4 +187,8 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 	public Dimension getDimension() {
 		return dimension;
 	}
+
+	public void refresh() {
+		setDecoratorText("" + GetAllChildren(graphicalFeature.getObject().getStructure()));
+	}
 }

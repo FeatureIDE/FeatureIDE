@@ -244,8 +244,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 
 		if (graphicalSource == graphicalTarget) {
-			if (graphicalSource.isCollapsed()) {
+			if (graphicalSource.isCollapsed() && (graphicalSource.getCollapsedDecoration() == null)) {
 				sourceDecoration = new CollapsedDecoration(graphicalTarget);
+			} else if (graphicalSource.isCollapsed()) {
+				sourceDecoration = graphicalSource.getCollapsedDecoration();
+				graphicalSource.getCollapsedDecoration().refresh();
 			}
 		} else {
 			if (target.getStructure().isAnd()
