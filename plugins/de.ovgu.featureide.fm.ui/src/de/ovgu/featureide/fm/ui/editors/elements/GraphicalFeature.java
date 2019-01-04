@@ -69,6 +69,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	public GraphicalFeature(GraphicalFeature graphicalFeature) {
+		collapsed = graphicalFeature.collapsed;
 		constraintSelected = graphicalFeature.constraintSelected;
 		location = graphicalFeature.location;
 		dimension = graphicalFeature.dimension;
@@ -267,6 +268,16 @@ public class GraphicalFeature implements IGraphicalFeature {
 			}
 		}
 		return Collections.unmodifiableList(features);
+	}
+
+	@Override
+	public List<IGraphicalFeature> getAllGraphicalChildren() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
+			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			features.add(gf);
+		}
+		return features;
 	}
 
 }

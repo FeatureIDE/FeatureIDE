@@ -1,0 +1,309 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.ovgu.featureide</groupId>
+  <artifactId>de.ovgu.featureide.lib.fm</artifactId>
+  <version>3.5.4-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>FeatureIDE library for feature model core</name>
+  <description>Sample library for feature model core</description>
+  <url>https://github.com/FeatureIDE/FeatureIDE</url>
+
+  <licenses>
+      <license>
+        <name>The Apache License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+  </licenses>
+
+  <developers>
+      <developer>
+          <name>Holger Fenske</name>
+          <email>h.fenske@tu-braunschweig.de</email>
+          <organization>FeatrueIDE</organization>
+          <organizationUrl>https://github.com/FeatureIDE/FeatureIDE</organizationUrl>
+      </developer>
+    </developers>
+
+
+    <scm>
+    <connection>scm:git:git://github.com/hfenske33/FeatureIDE.git</connection>
+    <developerConnection>scm:git:ssh://github.com:hfenske33/FeatureIDE.git</developerConnection>
+    <url>http://github.com/hfenske33/FeatureIDE</url>
+  </scm>
+
+
+
+  <properties>
+      <maven.compiler.source>1.7</maven.compiler.source>
+      <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
+    
+
+    <dependencies>
+      <dependency>
+         <groupId>guidsl</groupId>
+         <artifactId>guidsl</artifactId>
+         <scope>system</scope>
+         <version>1.7.0</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/guidsl.jar</systemPath>
+      </dependency>
+
+      <dependency>
+         <groupId>jakarta</groupId>
+         <artifactId>jakarta</artifactId>
+         <scope>system</scope>
+         <version>1.6.5</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/jakarta.jar</systemPath>
+      </dependency>
+
+      <dependency>
+         <groupId>antlr</groupId>
+         <artifactId>antlr</artifactId>
+         <scope>system</scope>
+         <version>1.6.0_21</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/antlr-3.4.jar</systemPath>
+      </dependency>
+
+      <dependency>
+         <groupId>sat4core</groupId>
+         <artifactId>sat4core</artifactId>
+         <scope>system</scope>
+         <version>1.7.1</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/org.sat4j.core.jar</systemPath>
+      </dependency>
+
+      <dependency>
+         <groupId>sat4</groupId>
+         <artifactId>sat4</artifactId>
+         <scope>system</scope>
+         <version>1.0</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/org.sat4j.pb.jar</systemPath>
+      </dependency>
+
+      <dependency>
+         <groupId>annotations</groupId>
+         <artifactId>annotations</artifactId>
+         <scope>system</scope>
+         <version>1.0</version>
+         <systemPath>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/annotations.jar</systemPath>
+      </dependency>
+
+   </dependencies>
+
+    <build>
+
+       <sourceDirectory>../src</sourceDirectory>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+          </execution>
+          </executions>
+        </plugin>
+		
+		<plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.7</version>
+          <extensions>true</extensions>
+          <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              </configuration>
+        </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+               <goals>
+                  <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.9.1</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+              <configuration>
+              	<!--<sourcepath>../src</sourcepath>-->
+          		<excludes>
+	    			<exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/AbstractCorePlugin.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/AWaitingJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/Constraint.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/DeprecatedFeatureModel.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/EclipseExtensionLoader.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/EclipseLogger.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/Feature.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/FeatureModel.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/FMComposerExtension.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/FMComposerManager.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/FMCorePlugin.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/FMPoint.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/IFMComposerExtension.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/ModelMarkerHandler.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/Preferences.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/SingleJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/StoppableJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/base/FeatureUtilsLegacy.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/base/impl/EclipseFactoryWorkspaceProvider.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/color/ColorPalette.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/color/FeatureColorManager.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/editing/evaluation/Evaluation.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/AbstractFeatureModelReader.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/AbstractFeatureModelWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/AbstractObjectWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/EclipseFileSystem.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/FeatureModelReaderIFileWrapper.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/FeatureModelWriterIFileWrapper.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/fama/FAMAWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/manager/EclipseFileManagerVisitor.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/manager/FileListener.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/xml/AbstractXMLFeatureModelWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelReader.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelWriter.java</exclude>
+		            <exclude>../src/de/ovgu/featureide/fm/core/job/AbstractJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/AJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/AStoppableJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/AWorkerThreadJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/AWorkMonitor.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/ConsoleProgressMonitor.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/IProjectJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/IStoppableJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/LongRunningEclipse.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/LongRunningJob.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/SyncWorkMonitor.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/WorkMonitor.java</exclude>
+		            <exclude>/home/neapel/Desktop/FeatureIDEorig/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/de/ovgu/featureide/fm/core/job/monitor/ProgressMonitor.java</exclude>
+				</excludes>
+
+          </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+          <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.7</version>
+          <extensions>true</extensions>
+          <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              </configuration>
+        </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.7.0</version>
+            <configuration>
+                <verbose>true</verbose>
+                <fork>true</fork>
+                <executable>/home/neapel/Public/JDKs/jdk1.7.0_80/bin/javac</executable>
+                <compilerVersion>1.7</compilerVersion>
+                <source>1.7</source>
+                <target>1.7</target>
+
+                <excludes>
+                  <exclude>de/ovgu/featureide/fm/core/AbstractCorePlugin.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/AWaitingJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/Constraint.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/DeprecatedFeatureModel.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/EclipseExtensionLoader.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/EclipseLogger.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/Feature.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/FeatureModel.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/FMComposerExtension.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/FMComposerManager.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/FMCorePlugin.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/FMPoint.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/IFMComposerExtension.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/ModelMarkerHandler.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/Preferences.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/SingleJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/StoppableJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/base/FeatureUtilsLegacy.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/base/impl/EclipseFactoryWorkspaceProvider.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/color/ColorPalette.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/color/FeatureColorManager.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/editing/evaluation/Evaluation.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/AbstractFeatureModelReader.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/AbstractFeatureModelWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/AbstractObjectWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/EclipseFileSystem.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/FeatureModelReaderIFileWrapper.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/FeatureModelWriterIFileWrapper.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/fama/FAMAWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/manager/EclipseFileManagerVisitor.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/manager/FileListener.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/xml/AbstractXMLFeatureModelWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelReader.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelWriter.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/AbstractJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/AJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/AStoppableJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/AWorkerThreadJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/AWorkMonitor.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/ConsoleProgressMonitor.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/IProjectJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/IStoppableJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/LongRunningEclipse.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/LongRunningJob.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/SyncWorkMonitor.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/WorkMonitor.java</exclude>
+            <exclude>de/ovgu/featureide/fm/core/job/monitor/ProgressMonitor.java</exclude>
+            </excludes>
+        
+            </configuration>
+          </plugin>
+      </plugins>
+    </build>
+
+    <distributionManagement>
+      <snapshotRepository>
+        <id>ossrh</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      
+      <repository>
+        <id>ossrh</id>
+        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+  </distributionManagement>
+
+</project>

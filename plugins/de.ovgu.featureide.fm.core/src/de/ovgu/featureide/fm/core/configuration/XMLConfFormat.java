@@ -177,7 +177,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+		return super.supportsContent(content, CONTENT_REGEX);
 	}
 
 	@Override

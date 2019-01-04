@@ -36,9 +36,9 @@ public interface IFeatureModelLayout {
 
 	public void showCollapsedConstraints(boolean b);
 
-	public boolean verticalLayout();
+	public boolean getHasVerticalLayout();
 
-	public void verticalLayout(boolean b);
+	public void setHasVerticalLayout(boolean b);
 
 	public Point getLegendPos();
 

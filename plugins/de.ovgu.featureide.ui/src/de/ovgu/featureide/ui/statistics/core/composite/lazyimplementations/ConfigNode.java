@@ -78,12 +78,9 @@ public class ConfigNode extends Parent {
 			}
 		};
 		final IRunner<Boolean> runner = LongRunningWrapper.getRunner(job, CALCULATING + description);
+		runner.setPriority(priority);
 		if (runner instanceof LongRunningJob<?>) {
-			((LongRunningJob<?>) runner).setPriority(priority);
-			final JobDoneListener listener = JobDoneListener.getInstance();
-			if (listener != null) {
-				((LongRunningJob<?>) runner).addJobChangeListener(listener);
-			}
+			((LongRunningJob<?>) runner).addJobChangeListener(JobDoneListener.getInstance());
 		}
 		runner.schedule();
 	}

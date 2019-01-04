@@ -56,9 +56,10 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		return getConfigurations();
 	}
 
-	private boolean handleNewConfig(int[] curModel) {
+	@Override
+	protected boolean handleNewConfig(int[] curModel) {
 		if (curModel == null) {
-			System.out.println("Found everything!");
+			// Found everything
 			return true;
 		}
 		final int partCount = count(curModel);
@@ -76,8 +77,7 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		try {
 			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));
 		} catch (final ContradictionException e) {
-			e.printStackTrace();
-			System.out.println("Unsatisfiable1!");
+			// Unsatisfiable -> Found everything
 			return true;
 		}
 

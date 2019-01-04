@@ -23,11 +23,10 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME;
 
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -56,19 +55,20 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
@@ -88,6 +88,7 @@ public class FmOutlinePageContextMenu {
 	private FeatureModelEditor fTextEditor;
 	private final TreeViewer viewer;
 	private IFeatureModel fInput;
+	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	private SetFeatureColorAction setFeatureColorAction;
 	private HiddenAction hAction;
@@ -95,9 +96,9 @@ public class FmOutlinePageContextMenu {
 	private AbstractAction aAction;
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
-	private RenameAction reAction;
-	private CreateCompoundAction cAction;
-	private CreateLayerAction clAction;
+	private CreateFeatureAboveAction cAction;
+	private CreateFeatureBelowAction clAction;
+	private CreateSiblingAction csAction;
 	private CreateConstraintAction ccAction;
 	private EditConstraintAction ecAction;
 	private OrAction oAction;
@@ -114,15 +115,17 @@ public class FmOutlinePageContextMenu {
 	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IGraphicalFeatureModel fInput) {
 		this(site, viewer, fInput);
 		this.fTextEditor = fTextEditor;
+		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IGraphicalFeatureModel fInput) {
 		this.site = site;
 		this.viewer = viewer;
-		this.fInput = fInput;
+		this.fInput = fInput.getFeatureModel();
+		graphicalFeatureModel = fInput;
 		initContextMenu();
 	}
 
@@ -132,13 +135,15 @@ public class FmOutlinePageContextMenu {
 		this.viewer = viewer;
 		this.fInput = fInput;
 		this.syncCollapsedFeatures = syncCollapsedFeatures;
+		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput, boolean registerContextMenu) {
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IGraphicalFeatureModel fInput, boolean registerContextMenu) {
 		this.site = site;
 		this.viewer = viewer;
-		this.fInput = fInput;
+		this.fInput = fInput.getFeatureModel();
+		graphicalFeatureModel = fInput;
 		this.registerContextMenu = registerContextMenu;
 		initContextMenu();
 	}
@@ -147,10 +152,12 @@ public class FmOutlinePageContextMenu {
 			boolean registerContextMenu) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
+		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		this.viewer = viewer;
 		this.fInput = fInput;
 		this.syncCollapsedFeatures = syncCollapsedFeatures;
 		this.registerContextMenu = registerContextMenu;
+		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
@@ -191,13 +198,11 @@ public class FmOutlinePageContextMenu {
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
-		cAction = new CreateCompoundAction(viewer, fInput);
-		clAction = new CreateLayerAction(viewer, fInput);
-
-		if (fTextEditor != null) {
-			reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
+		if (graphicalFeatureModel != null) {
+			cAction = new CreateFeatureAboveAction(viewer, graphicalFeatureModel);
+			clAction = new CreateFeatureBelowAction(viewer, graphicalFeatureModel);
+			csAction = new CreateSiblingAction(viewer, graphicalFeatureModel);
 		}
-
 		oAction = new OrAction(viewer, fInput);
 		// TODO _interfaces Removed Code
 		// roAction = new ReverseOrderAction(viewer, fInput);
@@ -311,14 +316,11 @@ public class FmOutlinePageContextMenu {
 
 			manager.add(cAction);
 
+			csAction.setText(CREATE_SIBLING);
+			manager.add(csAction);
+
 			clAction.setText(CREATE_FEATURE_BELOW);
 			manager.add(clAction);
-
-			if (reAction != null) {
-				reAction.setChecked(false);
-				reAction.setText(RENAME);
-				manager.add(reAction);
-			}
 
 			dAction.setText(DELETE);
 			manager.add(dAction);

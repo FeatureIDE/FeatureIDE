@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>de.ovgu.featureide</groupId>
-    <artifactId>de.ovgu.featureide</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <artifactId>de.ovgu.featureide.root</artifactId>
+    <version>3.5.4-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>de.ovgu.featureide.fm.gui-test</artifactId>
@@ -17,29 +17,54 @@
         <plugin>
             <groupId>org.eclipse.rcptt</groupId>
             <artifactId>rcptt-maven-plugin</artifactId>
-            <version>2.0.1</version>
+            <version>2.2.0</version>
             <extensions>true</extensions>
             <configuration> 
                 <runner>
+                	<!--<version>2.3.0-20180405.233927-307</version>-->
                     <!-- Manage the memory used by Runner -->
                     <vmArgs>
                         <vmArg>-Xmx1024m</vmArg>
-                        <vmArg>-XX:MaxPermSize=256m</vmArg>
                     </vmArgs>
                 </runner>
+
                 <aut>
                   <explicit>https://ftp.fau.de/eclipse/technology/epp/downloads/release/neon/3/eclipse-rcp-neon-3-linux-gtk-x86_64.tar.gz</explicit>
               		<injections>
                   		<injection>
-                    		<site>file://${project.parent.basedir}/runtime/target/repository</site>
+                    		<site>file://${project.parent.basedir}/deploy/NightlyUpdate/target/repository</site>
                   		</injection>
               		</injections>
-
                 </aut>
+                	
+                <tests>
+                	<test>CreateFeatureModelInFeatureIDEProject.test</test>
+                	<test>CreateFeatureModelInJavaProject.test</test>
+                	<!--<test>CreateFeaturesInFeatureDiagram.test</test>-->
+                	<!--<test>DeleteIncludingSubfeaturesInFeatureDiagram.test</test>-->
+                	<!--<test>EditAdvancedConfiguration.test</test>-->
+                	<test>EditConfiguration.test</test>
+                	<!--<test>EditFeatureModelInOutline.test</test>-->
+                	<test>ExplainingAnomaliesInFeatureDiagram.test</test>
+                	<!--<test>HandsOn1.test</test>-->
+                	<!--<test>HandsOn2.test</test>-->
+                	<!--<test>HandsOn3.test</test>-->
+                	<!--<test>HandsOn4.test</test>-->
+                	<!--<test>HandsOn5.test</test>-->
+                	<test>SelectingFeaturesInFeatureDiagram.test</test>
+                	<!--<test>SetAbstractInFeatureDiagram.test</test>
+                	<test>SetCollapsedInFeatureDiagram.test</test>
+                	<test>SetHiddenInFeatureDiagram.test</test>
+                	<test>SetMandatoryInFeatureDiagram.test</test>-->
+                </tests>
+                	
                 <testOptions>
-                    <execTimeout>3000</execTimeout>
-                    <testExecTimeout>3000</testExecTimeout>
-                </testOptions>      
+                   <!--<execTimeout>150</execTimeout>-->
+                   <!--3min is max for each job-->
+                    <testExecTimeout>180</testExecTimeout>
+                    <eclExecutionDelay>500</eclExecutionDelay>
+                </testOptions> 
+                
             </configuration>
         </plugin>
     </plugins>

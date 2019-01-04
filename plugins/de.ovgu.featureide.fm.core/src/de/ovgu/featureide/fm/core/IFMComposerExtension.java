@@ -22,13 +22,15 @@ package de.ovgu.featureide.fm.core;
 
 import org.eclipse.core.resources.IProject;
 
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
+
 /**
  * Defines feature model specific extensions.
  *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public interface IFMComposerExtension {
+public interface IFMComposerExtension extends IFeatureNameValidator {
 
 	static final String ERROR_MESSAGE_NO_COMPOSER = "The characters  \", (, ) are not allowed and the feature name has to be non-empty.";
 	static final String ERROR_MESSAGE_COMPOSER = "This feature name is not possible. The following regular expression describes all valid feature names: "
@@ -56,12 +58,6 @@ public interface IFMComposerExtension {
 	 * @return <code>true</code> if composer supports a feature order
 	 */
 	boolean hasFeatureOrder();
-
-	/**
-	 * @param true if name is a valid feature name
-	 * @return
-	 */
-	boolean isValidFeatureName(String name);
 
 	/**
 	 * @return An error message displayed for invalid feature names.

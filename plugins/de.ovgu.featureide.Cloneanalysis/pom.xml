@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>de.ovgu.featureide</groupId>
-		<artifactId>de.ovgu.featureide</artifactId>
+		<artifactId>de.ovgu.featureide.root</artifactId>
 		<version>3.4.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>

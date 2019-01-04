@@ -39,12 +39,15 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * this is a hack to quickly associate features with dimension and size (which is not available in the model). luckily these informations do not need to be
  * stored persistently.
  *
  * @author Christian Kaestner
+ * @author Martha Nyerembe
+ * @author Lukas Vogt
  */
 public class FeatureUIHelper {
 
@@ -131,7 +134,24 @@ public class FeatureUIHelper {
 	private static ZoomManager zoomManager = null;
 
 	private static Point getSourceLocation(Rectangle bounds, IGraphicalFeatureModel featureModel) {
-		if (featureModel.getLayout().verticalLayout()) {
+		// gets source location of feature models for abego Tree Layout
+		final FeatureModelLayout layout = featureModel.getLayout();
+		if (layout.isUsesAbegoTreeLayout()) {
+			switch (layout.getAbegoRootposition()) {
+			case Top:
+				return bounds.getTop();
+			case Left:
+				return bounds.getLeft();
+			case Right:
+				return bounds.getRight();
+			case Bottom:
+				return bounds.getBottom();
+			default:
+				return new Point(0, 0);
+			}
+		}
+		// without abego library
+		if (featureModel.getLayout().getHasVerticalLayout()) {
 			return bounds.getLeft();
 		} else {
 			return bounds.getTop();
@@ -188,7 +208,7 @@ public class FeatureUIHelper {
 		featureModel.getLayout().showCollapsedConstraints(show);
 	}
 
-	public static Rectangle getBounds(IGraphicalElement  element) {
+	public static Rectangle getBounds(IGraphicalElement element) {
 		if ((element.getLocation() == null) || (element.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			element.getObject().getFeatureModel().handleModelDataChanged();
@@ -240,18 +260,43 @@ public class FeatureUIHelper {
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
 		final Rectangle bounds = getBounds(feature);
-		if (feature.getGraphicalModel().getLayout().verticalLayout()) {
+//		for abego Tree Layout
+		final FeatureModelLayout layout = feature.getGraphicalModel().getLayout();
+		if (layout.isUsesAbegoTreeLayout()) {
+			switch (layout.getAbegoRootposition()) {
+			case Top:
+				return bounds.getBottom();
+			case Left:
+				return bounds.getRight();
+			case Right:
+				return bounds.getLeft();
+			case Bottom:
+				return bounds.getTop();
+			default:
+				return new Point(0, 0);
+			}
+		}
+//		without abego library
+		if (layout.getHasVerticalLayout()) {
 			return bounds.getRight();
 		}
 		return bounds.getBottom();
 	}
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {
-		featureModel.getLayout().verticalLayout(isVerticalLayout);
+		featureModel.getLayout().setHasVerticalLayout(isVerticalLayout);
 	}
 
 	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
-		return featureModel.getLayout().verticalLayout();
+		return featureModel.getLayout().getHasVerticalLayout();
+	}
+
+	public static void setLeftRightInverted(boolean isLeftRightInverted, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().setLeftRightInverted(isLeftRightInverted);
+	}
+
+	public static void setTopDownInverted(boolean isTopDownInverted, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().setTopDownInverted(isTopDownInverted);
 	}
 
 }

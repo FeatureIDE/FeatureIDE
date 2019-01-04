@@ -407,7 +407,7 @@ public class StringTable {
 	public static final String CONSTRAINT_IS_UNSATISFIABLE = "constraint is unsatisfiable";
 	public static final String PLEASE_INSERT_A_CONSTRAINT_ = "Please insert a constraint.";
 	public static final String CHECKING_CONSTRAINT___ = "Checking constraint...";
-	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Your input contains syntax errors.";
+	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Input contains syntax errors.";
 	public static final String CONSTRAINT_CONTAINS_ONE_UNKNOWN_FEATURE_NAME_ = "Constraint contains unknown feature name.";
 	public static final String TYPE_FILTER_TEXT = "type filter text";
 	public static final String CONSTRAINT_DIALOG = "Constraint Dialog";
@@ -504,8 +504,7 @@ public class StringTable {
 		"Select only one feature in order to replace it with an equivalent one.";
 	public static final String IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_ = "It can not be replaced with an equivalent one.";
 	public static final String CHANGE_GROUP_TYPE = "Change Group Type";
-	public static final String CREATE_COMPOUND = "Create Compound";
-	public static final String CREATE_LAYER = "Create Layer";
+	public static final String CREATE_SIBLING = "Create Sibling Feature (CTRL + G)";
 	public static final String MOVE_FEATURE = "Move Feature";
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
@@ -546,6 +545,7 @@ public class StringTable {
 		"Eclipse plugin for exporting diagram in SVG format is not existing.";
 	public static final String SVG_EXPORT_FAILED = "SVG export failed";
 	public static final String NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___ = "Nothing has been saved for diagram export...";
+	public static final String NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___ = "Nothing has been saved for configuration export...";
 	public static final String FILE = "File ";
 	public static final String XML = "XML";
 	public static final String EXPORT_TO_CNF = "Export to CNF";
@@ -1093,4 +1093,5 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 }

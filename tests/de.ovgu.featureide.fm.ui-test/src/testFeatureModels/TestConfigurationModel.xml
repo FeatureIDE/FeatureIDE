@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+    <struct>
+        <and abstract="true" mandatory="true" name="my_Root">
+            <alt name="Optional">
+                <feature name="Alternative1"/>
+                <feature name="Alternative2"/>
+            </alt>
+            <or mandatory="true" name="Mandatory">
+                <feature name="Or1"/>
+                <feature name="Or2"/>
+            </or>
+            <feature name="notSelected"/>
+        </and>
+    </struct>
+    <constraints/>
+    <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+    <comments/>
+    <featureOrder userDefined="false"/>
+</featureModel>

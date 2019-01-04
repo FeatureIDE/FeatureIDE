@@ -34,9 +34,7 @@ public class TreeElement {
 	TreeElement parent = null;
 
 	public void addChild(TreeElement child) {
-		synchronized (children) {
-			children.add(child);
-		}
+		children.add(child);
 		child.setParent(this);
 	}
 
@@ -50,16 +48,12 @@ public class TreeElement {
 
 	public void setChild(TreeElement child) {
 		removeChildren();
-		synchronized (children) {
-			children.add(child);
-		}
+		children.add(child);
 		child.setParent(this);
 	}
 
 	public void removeChild(TreeElement child) {
-		synchronized (children) {
-			children.remove(child);
-		}
+		children.remove(child);
 		child.setParent(null);
 	}
 

@@ -207,8 +207,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				fileHandler.getLastProblems().add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
 			} else {
 				try {
-					final T featureModel = objectCreator.createObject(path, format);
-					fileHandler.setObject(featureModel);
+					final T object = objectCreator.createObject(path, format);
+					fileHandler.setObject(object);
 					fileHandler.setFormat(format);
 					fileHandler.parse(content);
 				} catch (final NoSuchExtensionException e) {
@@ -377,6 +377,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@Override
 	public boolean read() {
 		if (!FileSystem.exists(identifier.getPath())) {
+			return false;
+		}
+		if (persistentObject == null) {
 			return false;
 		}
 		final boolean success, changed;

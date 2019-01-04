@@ -86,8 +86,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * @param featureModelEditor
 	 */
-	public FeatureOrderEditor(IFileManager<IFeatureModel> fmManager) {
-		super(fmManager);
+	public FeatureOrderEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
+		super(fmManager, gfmManager);
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			final boolean changed = updateFeatureList();
 			updateFeatureOrderList();
 			if (changed) {
-				setDirty(true);
+				setDirty();
 			}
 		}
 	}
@@ -159,13 +159,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			label.setText(USER_DEFINED_FEATURE_ORDER);
 			activate = new Button(comp, SWT.CHECK);
 			activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			
+
 				@Override
 				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 					final boolean selection = activate.getSelection();
 					enableUI(selection);
 					updateFeatureOrderList();
-					setDirty(true);
+					setDirty();
 				}
 			});
 			featureOrderTable = new FeatureOrderTable(comp, this);
@@ -208,7 +208,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus - 1);
 							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
-							setDirty(true);
+							setDirty();
 						}
 					}
 				}
@@ -237,7 +237,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus + 1);
 							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
-							setDirty(true);
+							setDirty();
 						}
 					}
 				}
@@ -286,7 +286,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				defaultFeatureList();
 				updateFeatureOrderList();
-				setDirty(true);
+				setDirty();
 			}
 		});
 	}

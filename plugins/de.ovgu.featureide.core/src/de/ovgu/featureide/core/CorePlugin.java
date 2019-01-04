@@ -103,8 +103,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -403,7 +403,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 	}
 
 	/**
@@ -447,7 +447,9 @@ public class CorePlugin extends AbstractCorePlugin {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		final IFeatureModel featureModel = createFeatureModelFile(project);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
+
+		final IFeatureModel featureModel = createFeatureModelFile(project, composer);
 		createConfigFile(project, configPath, featureModel, "default.");
 
 		if ((composer != null) && addCompiler) {
@@ -465,11 +467,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, addNature);
+		if (addNature) {
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void setProjectProperties(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addNature) {
+			final String buildPath) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
@@ -477,9 +481,6 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
-		}
-		if (addNature) {
-			addFeatureNatureToProject(project);
 		}
 	}
 
@@ -587,11 +588,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, configPath);
 	}
 
-	private static IFeatureModel createFeatureModelFile(IProject project) {
+	private static IFeatureModel createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
 		if (!modelPath.toFile().exists()) {
-			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
 				factory = FMFactoryManager.getFactory(modelPath.toString(), format);

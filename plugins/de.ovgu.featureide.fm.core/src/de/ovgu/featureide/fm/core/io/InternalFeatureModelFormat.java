@@ -30,13 +30,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  *
  * @author Sebastian Krieter
  */
-public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class InternalFeatureModelFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + InternalFeatureModelFormat.class.getSimpleName();
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private final StringBuilder sb = new StringBuilder();
 
 	@Override
 	public boolean supportsWrite() {
@@ -45,6 +44,7 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 
 	@Override
 	public String write(IFeatureModel object) {
+		final StringBuilder sb = new StringBuilder();
 		final IFeatureStructure root = object.getStructure().getRoot();
 		if (root == null) {
 			return "";
@@ -55,7 +55,7 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 		sb.append("{");
 		sb.append(NEWLINE);
 
-		writeFeatureGroup(root);
+		writeFeatureGroup(root, sb);
 
 		for (final IConstraint constraint : object.getConstraints()) {
 			sb.append(constraint.getNode().toString(SYMBOLS));
@@ -67,16 +67,16 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 		return sb.toString();
 	}
 
-	private void writeFeatureGroup(IFeatureStructure root) {
+	private void writeFeatureGroup(IFeatureStructure root, StringBuilder sb) {
 		if (root.isAnd()) {
 			for (final IFeatureStructure feature : root.getChildren()) {
-				writeFeature(feature);
+				writeFeature(feature, sb);
 			}
 		} else if (root.isOr()) {
 			sb.append("o{");
 			sb.append(NEWLINE);
 			for (final IFeatureStructure feature : root.getChildren()) {
-				writeFeature(feature);
+				writeFeature(feature, sb);
 			}
 			sb.append("}");
 			sb.append(NEWLINE);
@@ -84,14 +84,14 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 			sb.append("x{");
 			sb.append(NEWLINE);
 			for (final IFeatureStructure f : root.getChildren()) {
-				writeFeature(f);
+				writeFeature(f, sb);
 			}
 			sb.append("}");
 			sb.append(NEWLINE);
 		}
 	}
 
-	private void writeFeature(IFeatureStructure feature) {
+	private void writeFeature(IFeatureStructure feature, StringBuilder sb) {
 		if (feature.isAbstract()) {
 			sb.append("a ");
 		}
@@ -112,7 +112,7 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 				sb.append(NEWLINE);
 			}
 
-			writeFeatureGroup(feature);
+			writeFeatureGroup(feature, sb);
 
 			sb.append("}");
 		}
@@ -131,7 +131,7 @@ public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel>
 
 	@Override
 	public InternalFeatureModelFormat getInstance() {
-		return new InternalFeatureModelFormat();
+		return this;
 	}
 
 	@Override
