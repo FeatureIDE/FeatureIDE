@@ -40,8 +40,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * An UI text field with search functionality.
  *
  * @author Sebastian Krieter
- * @author "Insansa Michel"
- * @author "Malek Badeer"
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 public class SearchField<T> {
 
