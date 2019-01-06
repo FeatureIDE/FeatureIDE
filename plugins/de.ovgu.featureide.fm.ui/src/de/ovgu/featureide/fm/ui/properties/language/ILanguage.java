@@ -142,4 +142,6 @@ public interface ILanguage {
 	public String getLikelyCause();
 
 	public String getUnlikelyCause();
+
+	public String getFeature();
 }

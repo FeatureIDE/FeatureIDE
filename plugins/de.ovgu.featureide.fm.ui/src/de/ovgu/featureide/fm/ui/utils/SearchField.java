@@ -31,10 +31,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+
 /**
  * An UI text field with search functionality.
  *
  * @author Sebastian Krieter
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 public class SearchField<T> {
 
@@ -53,21 +60,45 @@ public class SearchField<T> {
 	}
 
 	private final class SearchModifyListener implements ModifyListener {
-
 		@Override
 		public void modifyText(ModifyEvent e) {
 			curIndex = 0;
-			search();
 		}
 	}
 
 	private final SearchModifyListener searchModifyListener = new SearchModifyListener();
+
 	private final SearchNextListener searchNextListener = new SearchNextListener();
 
 	private final Text searchField;
 	private final ISearchable<T> searchable;
 
 	private int curIndex;
+
+	private IGraphicalFeatureModel graphicalFeatureModel = null;
+
+	private FeatureDiagramEditor featureDiagramEditor = null;
+
+	public SearchField(Composite parent, final ISearchable<T> searchable, FeatureDiagramEditor featureDiagramEditor) {
+		this.featureDiagramEditor = featureDiagramEditor;
+		graphicalFeatureModel = this.featureDiagramEditor.getGraphicalFeatureModel();
+		if ((searchable == null) || (parent == null)) {
+			throw new NullPointerException();
+		}
+		this.searchable = searchable;
+		this.searchField = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
+
+		final GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.widthHint = 300;
+		gridData.minimumWidth = 150;
+
+		searchField.setLayoutData(gridData);
+		searchField.addModifyListener(searchModifyListener);
+		searchField.addKeyListener(searchNextListener);
+	}
 
 	public SearchField(Composite parent, final ISearchable<T> searchable) {
 		if ((searchable == null) || (parent == null)) {
@@ -98,11 +129,11 @@ public class SearchField<T> {
 		int i = 0;
 		T temp = null;
 		int tempIndex = -1;
-
 		for (; it.hasNext(); i++) {
 			final T next = it.next();
 			if (searchable.matches(next, searchString)) {
 				if (i >= curIndex) {
+					expand(next);
 					curIndex = i;
 					searchable.found(next);
 					return;
@@ -114,10 +145,34 @@ public class SearchField<T> {
 		}
 		if (temp != null) {
 			curIndex = tempIndex;
+			expand(temp);
 			searchable.found(temp);
 		} else {
 			curIndex = 0;
 		}
+	}
+
+	private void expand(T next) {
+		if (((IGraphicalFeature) next).getSourceConnection().getTarget() != null) {
+			final IGraphicalFeature parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
+			if (parent.getSourceConnection().getTarget() != null) {
+				expand((T) parent);
+			}
+			if (parent.isCollapsed()) {
+				parent.setCollapsed(false);
+				if (featureDiagramEditor != null) {
+					refresh();
+				}
+			}
+		}
+	}
+
+	private void refresh() {
+		featureDiagramEditor.getViewer().getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
+		featureDiagramEditor.getViewer().reload();
+		featureDiagramEditor.refreshGraphics(null);
+		featureDiagramEditor.getViewer().refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+		featureDiagramEditor.analyzeFeatureModel();
 	}
 
 }

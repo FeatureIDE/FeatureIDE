@@ -22,9 +22,9 @@ package de.ovgu.featureide.fm.ui.properties.language;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_TAUTOLOGY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODELIS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENGLISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSE_OPTIONAL_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODELIS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_INTERFACE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INDETERMINATE_HIDDEN;
@@ -47,9 +47,10 @@ public class English implements ILanguage {
 
 	private static final String LEGEND = "Legend:";
 	private static final String MANDATORY = "Mandatory";
-	private static final String ABSTRACT = "Abstract";
+	private static final String ABSTRACT = "Abstract feature";
 	private static final String INTERFACED = FROM_INTERFACE;
-	private static final String CONCRETE = "Concrete";
+	private static final String CONCRETE = "Concrete feature";
+	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = "Hidden";
 	private static final String COLLAPSED = "Collapsed";
 	private static final String DEAD = "Dead feature";
@@ -135,6 +136,12 @@ public class English implements ILanguage {
 	@Override
 	public String getConcrete() {
 		return CONCRETE;
+	}
+
+	@Override
+	public String getFeature() {
+		return FEATURE;
+
 	}
 
 	@Override

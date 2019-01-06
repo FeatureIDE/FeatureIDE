@@ -295,6 +295,17 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return Collections.unmodifiableList(features);
 	}
 
+	@Override
+	public List<IGraphicalFeature> getVisibleRelations() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IGraphicalFeature f : getFeatures()) {
+			if (!f.isCollapsed() && !f.hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return Collections.unmodifiableList(features);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getConstraintIndex(de.ovgu.featureide.fm.core.base.impl.Constraint)

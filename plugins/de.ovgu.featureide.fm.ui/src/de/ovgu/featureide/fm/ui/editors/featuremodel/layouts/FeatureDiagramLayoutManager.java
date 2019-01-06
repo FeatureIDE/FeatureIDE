@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureModelBounds;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -54,6 +55,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Edgard Schmidt
  * @author Stefanie Schober
  * @author Jann-Ole Henningson
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 abstract public class FeatureDiagramLayoutManager {
 
@@ -62,6 +65,8 @@ abstract public class FeatureDiagramLayoutManager {
 	protected boolean showHidden, showCollapsedConstraints;
 	protected ScrollingGraphicalViewer editor;
 	private boolean firstManualLayout = false;
+
+	private final FeatureModelBounds featureModelBound = new FeatureModelBounds();
 
 	public final void layout(IGraphicalFeatureModel featureModel, ScrollingGraphicalViewer editor) {
 		this.editor = editor;
@@ -162,33 +167,6 @@ abstract public class FeatureDiagramLayoutManager {
 
 			y += size.height;
 		}
-	}
-
-	public Rectangle getFeatureModelBounds(List<? extends IGraphicalElement> elements) {
-		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
-
-		/*
-		 * update lowest, highest, most left, most right coordinates for elements
-		 */
-
-		for (final IGraphicalElement element : elements) {
-			final Rectangle position = FeatureUIHelper.getBounds(element);
-			if (position.x < min.x) {
-				min.x = position.x;
-			}
-			if (position.y < min.y) {
-				min.y = position.y;
-			}
-			if ((position.x + position.width) > max.x) {
-				max.x = position.right();
-			}
-			if ((position.y + position.height) > max.y) {
-				max.y = position.bottom();
-			}
-		}
-
-		return new Rectangle(min, max);
 	}
 
 	/**
@@ -308,7 +286,7 @@ abstract public class FeatureDiagramLayoutManager {
 			return null;
 		}
 
-		final Rectangle featureModelBounds = getFeatureModelBounds(featureModel.getVisibleFeatures());
+		final Rectangle featureModelBounds = featureModelBound.getFeatureModelBounds(featureModel.getVisibleFeatures());
 		final Point min = featureModelBounds.getTopLeft();
 		final Point max = featureModelBounds.getBottomRight();
 
@@ -351,7 +329,7 @@ abstract public class FeatureDiagramLayoutManager {
 
 		// It was not possible to find any empty space, probably there is an intersection with a constraint.
 		// So we position the legend next to the feature model and mind the constraints
-		final Rectangle boundsOfEverything = getFeatureModelBounds(featureModel.getVisibleConstraints());
+		final Rectangle boundsOfEverything = featureModelBound.getFeatureModelBounds(featureModel.getVisibleConstraints());
 		boundsOfEverything.union(featureModelBounds);
 
 		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
