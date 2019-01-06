@@ -217,12 +217,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 		if (analyser.calculateDeadConstraints) {
-			final List<IFeature> deadFeatures = new ArrayList<>(analyser.getDeadFeatures());
+			final List<IFeature> deadFeatures = new ArrayList<>(analyser.getCachedDeadFeatures());
 			deadFeatures.retainAll(visibleFeatures);
 			dead = deadFeatures.size() > 0;
 		}
 		if (analyser.calculateFOConstraints) {
-			final List<IFeature> falseOptionalFeatures = new ArrayList<>(analyser.getFalseOptionalFeatures());
+			final List<IFeature> falseOptionalFeatures = new ArrayList<>(analyser.getCachedFalseOptionalFeatures());
 			falseOptionalFeatures.retainAll(visibleFeatures);
 			falseoptional = falseOptionalFeatures.size() > 0;
 		}
