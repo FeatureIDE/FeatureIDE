@@ -128,9 +128,19 @@ public interface ILanguage {
 	public String getAlternative();
 
 	/**
+	 * @return The word for: Alternative Group
+	 */
+	public String getAlternativeGroup();
+
+	/**
 	 * @return The word for: "or"
 	 */
 	public String getOr();
+
+	/**
+	 * @return The word for: Or Group
+	 */
+	public String getOrGroup();
 
 	/**
 	 * @return The word for: OPTIONAL
@@ -144,4 +154,5 @@ public interface ILanguage {
 	public String getUnlikelyCause();
 
 	public String getFeature();
+
 }

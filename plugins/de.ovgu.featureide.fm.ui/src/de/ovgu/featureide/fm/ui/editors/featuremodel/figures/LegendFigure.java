@@ -473,14 +473,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, ALTERNATIVE);
-		final Label labelOr = createLabel(row, language.getAlternative(), FMPropertyManager.getFeatureForgroundColor(), ALTERNATIVE_TOOLTIP);
+		final Label labelOr = createLabel(row, language.getAlternativeGroup(), FMPropertyManager.getFeatureForgroundColor(), ALTERNATIVE_TOOLTIP);
 
 		add(labelOr);
 	}
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, OR);
-		final Label labelOr = createLabel(row, language.getOr(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
+		final Label labelOr = createLabel(row, language.getOrGroup(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
 		add(labelOr);
 	}
 
