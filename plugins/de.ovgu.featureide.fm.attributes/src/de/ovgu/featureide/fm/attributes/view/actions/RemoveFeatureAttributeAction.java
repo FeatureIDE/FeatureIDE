@@ -27,14 +27,16 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * TODO description
- *
- * @author Joshua
+ * Action for the {@link FeatureAttributeView}. Is used to to remove the currently selected feature attribute.
+ * 
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class RemoveFeatureAttributeAction extends Action {
 

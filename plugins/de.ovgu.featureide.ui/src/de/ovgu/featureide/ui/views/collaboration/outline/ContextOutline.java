@@ -384,8 +384,8 @@ public class ContextOutline extends OutlineProvider {
 	/**
 	 * Jumps to a line in the given editor
 	 *
-	 * @param editorPart
-	 * @param lineNumber
+	 * @param editorPart given editor
+	 * @param lineNumber number of line
 	 */
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || (lineNumber <= 0)) {
@@ -407,7 +407,7 @@ public class ContextOutline extends OutlineProvider {
 	/**
 	 * Highlights the whole if-Block for a FSTDirective
 	 *
-	 * @param editorPart
+	 * @param editorPart given editor
 	 * @param startLine the first line of a directive
 	 * @param endLine the last line of a directive
 	 * @param startOffset characters before the statement starts

@@ -121,9 +121,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	/**
-	 * Returns a representation of the directive with its parents and children.
-	 *
-	 * @return
+	 * @return a representation of the directive with its parents and children
 	 */
 	public String toDependencyString() {
 		return (parent != null) ? parent.toDependencyString() : toString(0);
@@ -157,9 +155,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	/**
-	 * Returns a command and in an else case also a negation
-	 *
-	 * @return
+	 * @return a command and in an else case also a negation
 	 */
 	public String toCommandString() {
 		if (command.equals(FSTDirectiveCommand.ELSE) || command.equals(FSTDirectiveCommand.ELSE_NOT)) {

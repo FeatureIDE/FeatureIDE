@@ -9,6 +9,12 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
+/**
+ * Label provider for the type attribute.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeTypeColumnLabelProvider extends FeatureAttributeColumnLabelProvider {
 
 	public FeatureAttributeTypeColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {

@@ -7,6 +7,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 
+/**
+ * 
+ * Implementation of the {@link IFeatureModelFactory}. Creates extended feature models and extended features instead of the default ones.
+ * 
+ * @see IFeatureModelFactory
+ * 
+ * @author Joshua Sprey
+ * @author Chico SUndermann
+ */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
 	public static final String ID = "de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory";

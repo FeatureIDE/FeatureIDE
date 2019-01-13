@@ -48,7 +48,7 @@ public class DefaultNewFeatureProjectWizardExtension {
 	 * The page to be opened next has to be determined dynamically. This method should provide the respective next page depending on the given page.
 	 *
 	 * @param page the current page for which the next page shall be determined.
-	 * @return the next page to dynamically append to {@link NewFeatureProjectWizard} in respect to parameter.
+	 * @return the next page to dynamically append to {@link DefaultNewFeatureProjectWizardExtension} in respect to parameter.
 	 */
 	public IWizardPage getNextPage(IWizardPage page) {
 		return null;
@@ -69,10 +69,13 @@ public class DefaultNewFeatureProjectWizardExtension {
 	 * Executed after FeatureIDE project is created and before editor is opened.
 	 *
 	 * @param project feature project to be created
+	 * @param compID id of composer
 	 * @param sourcePath path in which source code is stored
 	 * @param configPath path in which config files are stored
 	 * @param buildPath path in which class files created during build process are stored
-	 * @throws CoreException
+	 * @param shouldCreateSourceFolder create source folder if wanted
+	 * @param shouldCreateBuildFolder create build folder if wanted
+	 * @throws CoreException exception
 	 */
 	public void enhanceProject(IProject project, String compID, String sourcePath, String configPath, String buildPath, boolean shouldCreateSourceFolder,
 			boolean shouldCreateBuildFolder) throws CoreException {

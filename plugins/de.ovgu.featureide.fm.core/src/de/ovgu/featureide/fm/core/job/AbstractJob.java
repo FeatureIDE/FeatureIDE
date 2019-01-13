@@ -148,8 +148,8 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	protected void finalWork() {}
 
 	/**
-	 * In this method all the work of the job is done.</br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.</br>
-	 * </br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
+	 * In this method all the work of the job is done.<br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.<br>
+	 * <br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
 	 *
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)

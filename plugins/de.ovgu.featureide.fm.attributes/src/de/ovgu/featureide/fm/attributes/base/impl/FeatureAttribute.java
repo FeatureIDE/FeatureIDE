@@ -24,38 +24,55 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * TODO description
+ * Abstract class subclassed by every type of feature attribute. Provides many function used by all types of attributes.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
 public abstract class FeatureAttribute implements IFeatureAttribute {
 
+	/** Identifier for double attributes */
 	public static final String DOUBLE = "double";
+	/** Identifier for string attributes */
 	public static final String STRING = "string";
+	/** Identifier for long attributes */
 	public static final String LONG = "long";
+	/** Identifier for boolean attributes */
 	public static final String BOOLEAN = "boolean";
 
+	/** Name of the attribute */
 	private String name;
+	/** Assigned feature of the attribute */
 	private IFeature feature;
+	/** Unit of the attribute */
 	private String unit;
+	/** Flag to identify the attribute to be recursive */
 	private boolean recursive;
+	/** Flag to identify the attribute to be configurable */
 	private boolean configureable;
+	/**
+	 * Type of the attribute. </p> Can be: {@link FeatureAttribute#DOUBLE} </p>{@link FeatureAttribute#STRING} </p> {@link FeatureAttribute#LONG} </p>
+	 * {@link FeatureAttribute#BOOLEAN} </p> Other can lead to {@link UnknownFeatureAttributeTypeException}
+	 * 
+	 */
 	protected String attributeType;
 
 	private Map<ExtendedFeature, Object> savedRecursiveValues = new HashMap<>();
 
 	/**
+	 * Creates a new feature attribute with the given values.
+	 * 
+	 * @param feature Assigned feature
 	 * @param name Name of the FeatureAttribute
 	 * @param unit Unit of the FeatureAttribute
-	 * @param value Value of the FeatureAttribute
-	 * @param type Type of the FeatureAttribute
 	 * @param recursive True, if the current Attribute should be inherited
 	 * @param configureable True, if the current FeatureAttribute needs be seting the configuration.
+	 * 
 	 */
 	protected FeatureAttribute(IFeature feature, String name, String unit, boolean recursive, boolean configureable) {
 		super();
@@ -115,6 +132,10 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		return recursive;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getType()
+	 */
 	@Override
 	public String getType() {
 		return attributeType;
@@ -198,13 +219,13 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setConfigureable(boolean)
 	 */
 	@Override
-	public void setConfigureable(boolean configurable) {
+	public void setConfigurable(boolean configurable) {
 		if (recursive) {
 			Iterable<IFeature> test = getFeature().getFeatureModel().getFeatures();
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
 				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
-						att.setConfigureable(configurable);
+						att.setConfigurable(configurable);
 					}
 				}
 			}
@@ -212,7 +233,9 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.configureable = configurable;
 	}
 
-	// recursive Method to recursive attributes to all descendants
+	/**
+	 * Recursive Method to recursive attributes to all descendants.
+	 */
 	public void recurseAttribute(IFeature feature) {
 		IFeatureAttribute attribute = this;
 		IFeatureAttribute newAttribute = null;
@@ -232,7 +255,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	/**
 	 * Removes the recursive attribute of the descendants
 	 * 
-	 * @param Feature Holding feature
+	 * @param feature Holding feature
 	 */
 	public void deleteRecursiveAttributes(IFeature feature) {
 		IFeatureAttribute attribute = this;
@@ -249,6 +272,9 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		}
 	}
 
+	/**
+	 * @return true, if attribute is head of recursive attributes.
+	 */
 	public boolean isHeadOfRecursiveAttribute() {
 		return getFeature().getStructure().isRoot() || (!((ExtendedFeature) getFeature().getStructure().getParent().getFeature()).isContainingAttribute(this));
 	}

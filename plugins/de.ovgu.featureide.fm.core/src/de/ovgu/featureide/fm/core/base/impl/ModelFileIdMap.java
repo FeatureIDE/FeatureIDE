@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +30,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * This is a helper class to realize unique numeric identifiers for feature models in respect to the models physical file. Each feature model is required to be
  * assigned to an unique identifier. This unique identifier is coupled to the model file, such that the file path determines the feature models identifier.
  *
- * @see IFeatureModel#setSourceFile(File)
- * @see FeatureModel#setSourceFile(File)
+ * @see IFeatureModel#setSourceFile(Path)
+ * @see FeatureModel#setSourceFile(Path)
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
@@ -44,14 +43,14 @@ public class ModelFileIdMap {
 	/**
 	 * Returns the feature models unique numeric identifier which is determined by the feature models physical file. A call to this method returns the id
 	 * associated with <b>modelFile</b> if the model identifier was already associated to this file name. Otherwise, the <b>featureModel</b>'s identifier is
-	 * returned and associated to <b>modelFile</b> for further usage. <br> <br> <b>Note</b>: There is no check if <b>featureModel.getId()</b> is unequal to
-	 * the identifier associated with <b>modelFile</b>, i.e., if there is already an identifier associated with <b>modelFile</b> which is unequal to
+	 * returned and associated to <b>modelFile</b> for further usage. <br> <br> <b>Note</b>: There is no check if <b>featureModel.getId()</b> is unequal to the
+	 * identifier associated with <b>modelFile</b>, i.e., if there is already an identifier associated with <b>modelFile</b> which is unequal to
 	 * <b>featureModel</b>'s model identifier, <b>modelFile</b>' identifier is returned.
 	 *
 	 * @param featureModel The feature model (might be <b>null</b>, if <b>modelFile</b> is associated to an identifier already)
 	 * @param modelFile The key value for association of feature model unique numeric identifiers. Is intended to point to the feature models underlying model
 	 *        (have to be <b>non-null</b>) physical file
-	 * @return The identifier associated with <b>modelFile</b> if there is already such an association. </b>featureModel</b>'s identifier otherwise.
+	 * @return The identifier associated with <b>modelFile</b> if there is already such an association. <b>featureModel</b>'s identifier otherwise.
 	 */
 	public static synchronized long getModelId(IFeatureModel featureModel, Path modelFile) {
 		final String fileLocation = modelFile.toAbsolutePath().toString();

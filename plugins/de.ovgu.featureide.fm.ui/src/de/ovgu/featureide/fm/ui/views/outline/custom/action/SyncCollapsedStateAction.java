@@ -34,11 +34,6 @@ public class SyncCollapsedStateAction extends Action {
 
 	private final TreeViewer viewer;
 
-	/**
-	 * Constructor for SyncCollapsedStateAction
-	 *
-	 * @param viewer
-	 */
 	public SyncCollapsedStateAction(TreeViewer viewer) {
 		super("", AS_CHECK_BOX);
 		setChecked(FMUIPlugin.getDefault().getPreferenceStore().getBoolean("outlineSyncCollapsedState"));

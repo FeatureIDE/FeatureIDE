@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 
 /**
- * Interface for methods that take a long time to finish.</br> Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
+ * Interface for methods that take a long time to finish.<br> Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
  *
  * @author Sebastian Krieter
  */

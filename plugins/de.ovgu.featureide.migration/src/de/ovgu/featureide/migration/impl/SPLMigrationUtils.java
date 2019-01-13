@@ -67,9 +67,9 @@ public class SPLMigrationUtils {
 	/**
 	 * Copies all folders and files from {@code source} to {@code destination}.
 	 *
-	 * @param source
-	 * @param destination
-	 * @throws CoreException
+	 * @param source source folder to copy from
+	 * @param destination destinaton folder to copy to
+	 * @throws CoreException exception
 	 */
 	public static void recursiveCopyFiles(IContainer source, IContainer destination) throws CoreException {
 		final IResource[] members = source.members();
@@ -131,7 +131,7 @@ public class SPLMigrationUtils {
 	 * @param project the project, the folder is going to be created in.
 	 * @param path a path relative to the project root.
 	 *
-	 * @see {@link #createFolderInProject(IProject, IPath)}
+	 * @see #createFolderInProject(IProject, IPath)
 	 */
 	public static void createFolderInProject(IProject project, String path) {
 		final IPath newPath = new Path(path);
@@ -142,7 +142,7 @@ public class SPLMigrationUtils {
 	/**
 	 * Tries to create a new Project in the Workspace and returns it.
 	 *
-	 * @param projectName
+	 * @param projectName name of project
 	 * @return the new {@link IProject} if successful, null if not.
 	 */
 	public static IProject createProject(String projectName) {
@@ -165,11 +165,12 @@ public class SPLMigrationUtils {
 	/**
 	 * Creates a {@code projectName}.config file containing {@code projectName} in the projects config folder.
 	 *
-	 * @param project
-	 * @param configPath
-	 * @param projectName
-	 * @throws CoreException
-	 * @throws UnsupportedEncodingException
+	 * @param featureModel feature model
+	 * @param project project
+	 * @param configPath path for config
+	 * @param projectName name of project
+	 * @throws CoreException exception
+	 * @throws UnsupportedEncodingException exception
 	 */
 	public static void createConfigFile(IFeatureModel featureModel, IProject project, String configPath, String projectName)
 			throws CoreException, UnsupportedEncodingException {
@@ -182,8 +183,8 @@ public class SPLMigrationUtils {
 	/**
 	 * Writes the {@code featureModel} to the default location ( {@code /model.xml}) in {@code featureProject}
 	 *
-	 * @param featureProject
-	 * @param featureModel
+	 * @param featureProject FeatureIDE project
+	 * @param featureModel feature model to write
 	 */
 	public static void writeFeatureModelToDefaultFile(IProject featureProject, IFeatureModel featureModel) {
 		final IFeatureModelFormat format = new XmlFeatureModelFormat();

@@ -23,9 +23,12 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 
 /**
- * TODO description
+ * Implementation of the {@link IFeatureAttributeParsedData}.
+ * 
+ * @see IFeatureAttributeParsedData
  *
- * @author User
+ * @author Joshua Sprey
+ * @author Chico SUndermann
  */
 public class FeatureAttributeParsedData implements IFeatureAttributeParsedData {
 

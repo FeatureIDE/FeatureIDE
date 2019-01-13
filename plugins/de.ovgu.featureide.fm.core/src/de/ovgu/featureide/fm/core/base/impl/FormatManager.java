@@ -64,10 +64,11 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	 *
 	 * @param content the file's content
 	 * @param fileName the file name
+	 *
 	 * @return A {@link IPersistentFormat format} that uses the given extension or {@code null} if there is none.<br> In case there are multiple formats that
 	 *         fit the given extension, only the first one of the list is returned. In order to avoid this, please use the methods
-	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByPath(CharSequence)}, which also take into account the content that should
-	 *         be parsed.
+	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByContent(Path)}, which also take into account the content that should be
+	 *         parsed.
 	 */
 	@CheckForNull
 	public T getFormatByContent(CharSequence content, String fileName) {

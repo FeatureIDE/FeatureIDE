@@ -36,9 +36,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 
-	/**
-	 * @param manager
-	 */
 	public DepthFirstLayout() {
 		super();
 	}
@@ -51,7 +48,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
-		Rectangle rootBounds = getBounds(root);
+		final Rectangle rootBounds = getBounds(root);
 		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 	}
 

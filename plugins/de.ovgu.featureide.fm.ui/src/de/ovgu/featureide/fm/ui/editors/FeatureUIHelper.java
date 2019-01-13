@@ -173,7 +173,7 @@ public class FeatureUIHelper {
 	}
 
 	/**
-	 * @param zoomManager
+	 * @param zoomManager respective zoom manager
 	 */
 	public static void setZoomManager(ZoomManager zoomManager) {
 		FeatureUIHelper.zoomManager = zoomManager;
@@ -218,6 +218,10 @@ public class FeatureUIHelper {
 
 	/**
 	 * should not be used here
+	 * 
+	 * @param feature feature
+	 * @param viewer viewer
+	 * @return connection edit parts
 	 */
 	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {

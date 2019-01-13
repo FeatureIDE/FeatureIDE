@@ -59,8 +59,5 @@ public interface IFMComposerExtension extends IFeatureNameValidator {
 	 */
 	boolean hasFeatureOrder();
 
-	/**
-	 * @return An error message displayed for invalid feature names.
-	 */
 	String getErrorMessage();
 }

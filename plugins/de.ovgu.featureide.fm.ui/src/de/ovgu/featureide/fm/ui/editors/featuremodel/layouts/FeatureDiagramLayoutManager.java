@@ -172,9 +172,9 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * Checks whether the passed rectangle is crossed by a line in between source and target
 	 *
-	 * @param source
-	 * @param target
-	 * @param rect
+	 * @param source source
+	 * @param target tartget
+	 * @param rect rectangle to check
 	 * @return is there an intersection?
 	 */
 	public boolean rectangleConnectionIntersection(Point source, Point target, Rectangle rect) {
@@ -218,9 +218,9 @@ abstract public class FeatureDiagramLayoutManager {
 	 *
 	 * Should it happen that the passed elements are features, their connections will be checked for an intersection as well.
 	 *
-	 * @param elements
-	 * @param rects
-	 * @param verticalLayout
+	 * @param elements graphical elements to check
+	 * @param rects rectangles to check
+	 * @param verticalLayout true if any vertical layout is selected
 	 */
 	public void checkIntersections(List<? extends IGraphicalElement> elements, List<Rectangle> rects, boolean verticalLayout) {
 		final ListIterator<Rectangle> iter = rects.listIterator();
@@ -248,10 +248,10 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * Checks for a certain feature if its connections are intersecting the given rectangle
 	 *
-	 * @param targets
-	 * @param rect
-	 * @param verticalLayout
-	 * @return
+	 * @param targets target conenction list
+	 * @param rect rectangle
+	 * @param verticalLayout is vertical layout?
+	 * @return true if intersects
 	 */
 	public boolean checkConnectionIntersections(List<FeatureConnection> targets, Rectangle rect, boolean verticalLayout) {
 		for (int i = 0; i < targets.size(); i++) {
@@ -278,7 +278,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * Manages the placement of the legend
 	 *
-	 * @param featureModel
+	 * @param featureModel feature model
 	 * @return new location of the legend
 	 */
 	public Point layoutLegend(IGraphicalFeatureModel featureModel) {

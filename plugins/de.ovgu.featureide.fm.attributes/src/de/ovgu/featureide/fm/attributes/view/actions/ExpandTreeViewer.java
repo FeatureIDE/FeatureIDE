@@ -4,6 +4,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+
+/**
+ * Action for the {@link FeatureAttributeView}. Is used to expand all tree entries.
+ * 
+ * @author Joshua Sprey
+ * @author Chico Sundermann
+ */
 public class ExpandTreeViewer extends Action {
 
 	private TreeViewer view;

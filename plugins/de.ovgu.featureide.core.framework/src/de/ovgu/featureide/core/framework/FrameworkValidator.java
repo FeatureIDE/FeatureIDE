@@ -39,7 +39,7 @@ public class FrameworkValidator {
 	/**
 	 * Checks given file
 	 *
-	 * @param file
+	 * @param file given file
 	 * @return <code>true</code> if file is correct
 	 */
 	public static boolean validate(IFile file) {

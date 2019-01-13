@@ -51,8 +51,8 @@ public class DeleteAllAction extends MultipleSelectionAction {
 
 	/**
 	 *
-	 * @param viewer
-	 * @param featureModel
+	 * @param viewer View that calls this action
+	 * @param featureModel respective feature model
 	 */
 	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
 		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID);
@@ -76,7 +76,7 @@ public class DeleteAllAction extends MultipleSelectionAction {
 	protected void updateProperties() {
 		setEnabled(!selectedFeaturesContainRoot());
 	}
-	
+
 	private boolean selectedFeaturesContainRoot() {
 		for (final IFeature tempFeature : featureArray) {
 			if (tempFeature.getStructure().isRoot()) {
@@ -85,22 +85,22 @@ public class DeleteAllAction extends MultipleSelectionAction {
 		}
 		return false;
 	}
-	
+
 	private IFeature[] getParentsFromSelectedFeatures() {
-		ArrayList<IFeature> parents = new ArrayList<>();
-		for (IFeature feature : featureArray) {
+		final ArrayList<IFeature> parents = new ArrayList<>();
+		for (final IFeature feature : featureArray) {
 			if (!hasParentsInTheSubTree(feature)) {
 				parents.add(feature);
 			}
 		}
 		return parents.toArray(new IFeature[parents.size()]);
 	}
-	
+
 	private boolean hasParentsInTheSubTree(IFeature feature) {
-		for (IFeature temp : featureArray) {
+		for (final IFeature temp : featureArray) {
 			if (feature.getStructure().isAncestorOf(temp.getStructure())) {
 				return true;
-			} 
+			}
 		}
 		return false;
 	}

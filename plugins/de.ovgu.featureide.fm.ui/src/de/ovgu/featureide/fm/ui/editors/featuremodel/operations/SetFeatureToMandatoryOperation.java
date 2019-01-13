@@ -38,8 +38,6 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 	private final boolean allMandatory;
 	private final IFeature[] featureArray;
 
-	/**
-	 */
 	public SetFeatureToMandatoryOperation(IFeatureModel featureModel, boolean allMandatory, IFeature[] featureArray) {
 		super(featureModel, MANDATORY_OPERATION);
 		this.allMandatory = allMandatory;
@@ -48,18 +46,18 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 
 	@Override
 	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
+		for (final IFeature tempFeature : featureArray) {
 			// Never change mandatory status of root
 			if (tempFeature.getStructure().isRoot()) {
 				continue;
 			}
 			// If not all of the selected features are mandatory, change all that are not mandatory to mandatory
-			if(!allMandatory && !tempFeature.getStructure().isMandatory()) {
+			if (!allMandatory && !tempFeature.getStructure().isMandatory()) {
 				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(tempFeature, featureModel);
 				operations.add(op);
 			}
 			// If all selected features are mandatory, set all that can be optional to optional
-			if(allMandatory && tempFeature.getStructure().getParent().isAnd()) {
+			if (allMandatory && tempFeature.getStructure().getParent().isAnd()) {
 				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(tempFeature, featureModel);
 				operations.add(op);
 			}

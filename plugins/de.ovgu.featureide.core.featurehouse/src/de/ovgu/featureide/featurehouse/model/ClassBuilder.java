@@ -35,7 +35,11 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 /**
  * Class builders are creating entries for the FSTModel of their special language.<br> Parent Class for all Class builders.
  *
- * @see {@link JavaClassBuilder}, {@link CClassBuilder}, {@link CSClassBuilder}, {@link HaskellClassBuilder}
+ * @see JavaClassBuilder
+ * @see CClassBuilder
+ * @see CSClassBuilder
+ * @see HaskellClassBuilder
+ *
  * @author Jens Meinicke
  */
 public class ClassBuilder {
@@ -80,6 +84,8 @@ public class ClassBuilder {
 	/**
 	 * Locks for the correct {@link ClassBuilder} of the given file.
 	 *
+	 * @param file file
+	 * @param builder builder
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {

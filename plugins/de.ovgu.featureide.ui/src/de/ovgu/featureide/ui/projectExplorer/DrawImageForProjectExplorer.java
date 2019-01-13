@@ -107,7 +107,8 @@ public class DrawImageForProjectExplorer {
 	}
 
 	/**
-	 * @param explorerObject
+	 * @param parentColors color of parent
+	 * @param explorerObject explorerObject
 	 * @param colors List of colors from de.ovgu.featureide.fm.core.annotation.ColorPalette
 	 * @param superImage The default image (may be null)
 	 * @return the image with the icon of the file, folder or package (explorerObject) and the color of the feature

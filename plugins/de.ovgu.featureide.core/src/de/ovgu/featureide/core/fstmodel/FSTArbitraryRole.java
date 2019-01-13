@@ -36,9 +36,8 @@ public class FSTArbitraryRole extends FSTRole {
 	private final List<IFile> files = new LinkedList<IFile>();
 
 	/**
-	 * @param file
-	 * @param feature
-	 * @param fstClass
+	 * @param feature feature
+	 * @param fstClass fstClass
 	 */
 	public FSTArbitraryRole(FSTFeature feature, FSTClass fstClass) {
 		super(null, feature, fstClass);
