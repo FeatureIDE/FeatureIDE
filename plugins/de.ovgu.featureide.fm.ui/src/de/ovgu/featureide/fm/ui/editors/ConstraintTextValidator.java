@@ -97,7 +97,7 @@ public final class ConstraintTextValidator {
 	 * Runs tests not blocking the current GUI thread. The result will be returned each test's result and a separate notification before the first tests starts
 	 * and (in case of all test has passed) when the entire series has ended.
 	 *
-	 * @param constraintText Test to text
+	 * @param constraintNode Test to text
 	 * @param onUpdate Update mechanism
 	 */
 	public boolean validateAsync(final Node constraintNode, final IConsumer<ValidationMessage> onUpdate) {
