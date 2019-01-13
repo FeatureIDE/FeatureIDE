@@ -58,8 +58,8 @@ public interface IFMComposerExtension {
 	boolean hasFeatureOrder();
 
 	/**
-	 * @param true if name is a valid feature name
-	 * @return
+	 * @param name string to check
+	 * @return true if name is a valid feature name
 	 */
 	boolean isValidFeatureName(String name);
 

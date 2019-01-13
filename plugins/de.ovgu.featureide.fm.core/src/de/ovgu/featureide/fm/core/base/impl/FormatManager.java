@@ -50,7 +50,7 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	protected FormatManager() {}
 
 	/**
-	 * Extracts the file extension from a file name.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * Extracts the file extension from a file name.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
 	 * but ".file.txt" would return "txt".
 	 *
 	 * @param fileName the name of a file
@@ -74,9 +74,9 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	 * Returns the format that fits the given parameter.
 	 *
 	 * @param fileName the file name (it is also possible to just specify the file extension (e.g., "xml"))
-	 * @return A {@link IPersistentFormat format} that uses the given extension or {@code null} if there is none.<br/> In case there are multiple formats that
+	 * @return A {@link IPersistentFormat format} that uses the given extension or {@code null} if there is none.<br> In case there are multiple formats that
 	 *         fit the given extension, only the first one of the list is returned. In order to avoid this, please use the methods
-	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByPath(CharSequence)}, which also take into account the content that should
+	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByFileName(String)}, which also take into account the content that should
 	 *         be parsed.
 	 */
 	@CheckForNull

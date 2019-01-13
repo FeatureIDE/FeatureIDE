@@ -74,9 +74,8 @@ public abstract class Node {
 	 * <p> Returns true iff this node evaluates to true under the given truth value assignment. The result of the evaluation is the same as if each positive
 	 * literal in the expression were replaced by the corresponding boolean value in the given map. </p>
 	 *
-	 * <p> For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied:
-	 * <pre><i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i></pre> Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the
-	 * node. </p>
+	 * For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied: <pre><i>c<sub>1</sub></i>
+	 * &and; &hellip; &and; <i>c<sub>n</sub></i></pre> Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the node.
 	 *
 	 * @param assignment truth value assignment from variable to true or false
 	 * @return the result of evaluation of this node
@@ -380,9 +379,9 @@ public abstract class Node {
 	/**
 	 * Returns a string representation of this node. The symbols for logical connectors, e.g. And, are given as a parameter.
 	 *
-	 * @see org.prop4j.NodeWriter.shortSymbols (default)
-	 * @see org.prop4j.NodeWriter.logicalSymbols
-	 * @see org.prop4j.NodeWriter.textualSymbols
+	 * @see org.prop4j.NodeWriter#shortSymbols (default)
+	 * @see org.prop4j.NodeWriter#logicalSymbols
+	 * @see org.prop4j.NodeWriter#textualSymbols
 	 *
 	 * @param symbols the symbols for logical connectors
 	 *

@@ -63,8 +63,8 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * <li><b>de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory</b>: An instance of {@link ExtendedFeatureModelFactory}</li> </ul>
 	 *
 	 * @param id the (unique) identifier for an instance of {@link IFeatureModelFactory} to be returned
-	 * @return Returns Instance of feature model factory associated with <b>id</b>, or throws <b<>RuntimeException</b> in case <b>id</b> is not known
-	 * @throws NoSuchFactoryException If no factory with the given ID is registered.
+	 * @return Returns Instance of feature model factory associated with <b>id</b>, or throws <b>RuntimeException</b> in case <b>id</b> is not known
+	 * @throws NoSuchExtensionException If no factory with the given ID is registered.
 	 */
 	public static IFeatureModelFactory getFactoryById(String id) throws NoSuchExtensionException {
 		return instance.getExtension(id);
@@ -99,7 +99,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/> <br/> <b>Important
+	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br> <br> <b>Important
 	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
 	 * factory is used for the underlying feature model file.
 	 *
@@ -115,9 +115,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given path (if none is specified an instance of the default factory is returned).<br/> <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the
-	 * correct factory is used for the underlying feature model file.
+	 * Returns the currently set default factory for the given path (if none is specified an instance of the default factory is returned).<br> <br> <b>Important
+	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
+	 * factory is used for the underlying feature model file.
 	 *
 	 * @param path
 	 *
@@ -144,9 +144,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br/> <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat<IFeatureModel>)} or {@link #getFactory(IFeatureModel)} instead to
-	 * ensure that the correct factory is used for the underlying feature model file.
+	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br> <br>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the
+	 * correct factory is used for the underlying feature model file.
 	 *
 	 * @param format
 	 *

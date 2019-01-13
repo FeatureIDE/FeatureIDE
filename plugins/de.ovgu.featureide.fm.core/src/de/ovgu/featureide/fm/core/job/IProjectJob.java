@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IProject;
 /**
  * Interface for a project job.
  *
- * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/> A {@link IProject project} must be specified via a normal parameter.
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br> A {@link IProject project} must be specified via a normal parameter.
  *
  * @author Sebastian Krieter
  */
