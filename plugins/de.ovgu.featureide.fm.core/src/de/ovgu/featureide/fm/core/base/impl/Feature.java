@@ -38,11 +38,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Implementation of {@link AFeature} used as default implementation inside FeatureIDE. <br/> <br/> This class implements the functionality required by
- * {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}. <br/> <br/> This class is intended to be the default implementation for
+ * Implementation of {@link AFeature} used as default implementation inside FeatureIDE. <br> <br> This class implements the functionality required by
+ * {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}. <br> <br> This class is intended to be the default implementation for
  * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link ExtendedFeature} and inside
- * {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}. <br/> <br/> An instance of a <code>Feature</code> is intended to be instantiated by a
- * {@link IFeatureModelFactory}. <br/> <br/> <b>Example</b><br/> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
+ * {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}. <br> <br> An instance of a <code>Feature</code> is intended to be instantiated by a
+ * {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
  * FeatureIDE's default <code>IFeature</code> ( <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the
  * corresponding default factory {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory
  * class {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> <pre> IFeatureModel model =
@@ -82,7 +82,7 @@ public class Feature extends AFeature {
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
 	 * <code>featureModel</code>, and a feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see
-	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br/> <br/> <b>Note</b>: The parameter
+	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br> <br> <b>Note</b>: The parameter
 	 * <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as an subclass of
 	 * {@link AFeatureModelElement) can be <b>null</b>.
 	 *

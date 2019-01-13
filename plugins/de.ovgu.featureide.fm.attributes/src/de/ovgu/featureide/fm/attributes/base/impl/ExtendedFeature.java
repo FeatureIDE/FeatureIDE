@@ -1,5 +1,6 @@
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ExtendedFeature extends Feature {
 
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
+
 	}
 
 	public void removeAttribute(IFeatureAttribute attribute) {
@@ -61,8 +63,12 @@ public class ExtendedFeature extends Feature {
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
 		tooltip.append("\n\n");
+
 		StringBuilder attributesString = new StringBuilder();
 		StringBuilder inhreritedString = new StringBuilder();
+		List<IFeatureAttribute> featureAttributes = new ArrayList<>();
+		List<IFeatureAttribute> inheritedAttributes = new ArrayList<>();
+
 		if (attributes.size() == 0) {
 			tooltip.append("No Attributes.\n");
 		} else {// Append attributes as list
@@ -70,47 +76,64 @@ public class ExtendedFeature extends Feature {
 			inhreritedString.append("Inherited Attributes:\n");
 			for (int i = 0; i < attributes.size(); i++) {
 				IFeatureAttribute attribute = attributes.get(i);
-
 				if (attributes.get(i).isRecursive() && !attributes.get(i).isHeadOfRecursiveAttribute()) {
-					if (attributes.get(i).isRecursive()) {
-						inhreritedString.append("recursive ");
-					}
-					if (attributes.get(i).isConfigurable()) {
-						inhreritedString.append("configureable ");
-					}
-					inhreritedString.append(attribute.getType() + " ");
-					inhreritedString.append(attribute.getName() + " = ");
-					inhreritedString.append(attribute.getValue());
-					if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
-						inhreritedString.append(" ");
-						inhreritedString.append(attribute.getUnit());
-					}
-					if (i < attributes.size() - 1) {
-						inhreritedString.append("\n");
-					}
+					inheritedAttributes.add(attribute);
 				} else {
-					if (attributes.get(i).isRecursive()) {
-						attributesString.append("recursive ");
-					}
-					if (attributes.get(i).isConfigurable()) {
-						attributesString.append("configureable ");
-					}
-					attributesString.append(attribute.getType() + " ");
-					attributesString.append(attribute.getName() + " = ");
-					attributesString.append(attribute.getValue());
-					if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
-						attributesString.append(" ");
-						attributesString.append(attribute.getUnit());
-					}
-					if (i < attributes.size() - 1) {
-						attributesString.append("\n");
-					}
+					featureAttributes.add(attribute);
 				}
 			}
 
-			tooltip.append(attributesString.toString());
-			if (!inhreritedString.toString().equals("Inherited Attributes:\\n")) {
-				tooltip.append("\n" + inhreritedString.toString());
+			// Append attributes defined for this feature
+			for (int i = 0; i < featureAttributes.size(); i++) {
+				IFeatureAttribute iFeatureAttribute = featureAttributes.get(i);
+				if (iFeatureAttribute.isRecursive()) {
+					attributesString.append("recursive ");
+				}
+				if (iFeatureAttribute.isConfigurable()) {
+					attributesString.append("configureable ");
+				}
+				attributesString.append(iFeatureAttribute.getType() + " ");
+				attributesString.append(iFeatureAttribute.getName() + " = ");
+				attributesString.append(iFeatureAttribute.getValue());
+				if (iFeatureAttribute.getUnit() != null && !iFeatureAttribute.getUnit().equals("")) {
+					attributesString.append(" ");
+					attributesString.append(iFeatureAttribute.getUnit());
+				}
+				if (i < featureAttributes.size() - 1) {
+					attributesString.append("\n");
+				}
+			}
+
+			// Append attributes inherited of this feature
+			for (int i = 0; i < inheritedAttributes.size(); i++) {
+				IFeatureAttribute iFeatureAttribute = inheritedAttributes.get(i);
+				if (iFeatureAttribute.isRecursive()) {
+					inhreritedString.append("recursive ");
+				}
+				if (iFeatureAttribute.isConfigurable()) {
+					inhreritedString.append("configureable ");
+				}
+				inhreritedString.append(iFeatureAttribute.getType() + " ");
+				inhreritedString.append(iFeatureAttribute.getName() + " = ");
+				inhreritedString.append(iFeatureAttribute.getValue());
+				if (iFeatureAttribute.getUnit() != null && !iFeatureAttribute.getUnit().equals("")) {
+					inhreritedString.append(" ");
+					inhreritedString.append(iFeatureAttribute.getUnit());
+				}
+				if (i < inheritedAttributes.size() - 1) {
+					inhreritedString.append("\n");
+				}
+			}
+
+			if (!attributesString.toString().equals("Attributes:\n")) {
+				tooltip.append(attributesString.toString());
+				if (!inhreritedString.toString().equals("Inherited Attributes:\n")) {
+					tooltip.append("\n\n" + inhreritedString.toString());
+				}
+			} else {
+				if (!inhreritedString.toString().equals("Inherited Attributes:\\n")) {
+					tooltip.append(inhreritedString.toString());
+				}
 			}
 		}
 		return tooltip.toString();

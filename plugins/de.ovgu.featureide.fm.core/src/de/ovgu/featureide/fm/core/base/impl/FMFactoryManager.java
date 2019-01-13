@@ -99,7 +99,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/> <br/> <b>Important
+	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br> <br> <b>Important
 	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
 	 * factory is used for the underlying feature model file.
 	 *
@@ -115,7 +115,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given path (if none is specified an instance of the default factory is returned).<br/> <br/>
+	 * Returns the currently set default factory for the given path (if none is specified an instance of the default factory is returned).<br> <br>
 	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the
 	 * correct factory is used for the underlying feature model file.
 	 *
@@ -144,7 +144,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br/> <br/>
+	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br> <br>
 	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat<IFeatureModel>)} or {@link #getFactory(IFeatureModel)} instead to
 	 * ensure that the correct factory is used for the underlying feature model file.
 	 *

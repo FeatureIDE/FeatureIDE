@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.core.job;
 
 // @formatter:off
 /**
- * Strategies for handling jobs that want to wait for other jobs to be finished first.<br/>
- * Possible strategies:<br/>
+ * Strategies for handling jobs that want to wait for other jobs to be finished first.<br>
+ * Possible strategies:<br>
  * <pre>
  * {@link #RETURN}
  * {@link #WAIT}

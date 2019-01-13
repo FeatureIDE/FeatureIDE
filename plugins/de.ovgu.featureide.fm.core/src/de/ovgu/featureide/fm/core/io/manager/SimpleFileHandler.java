@@ -74,7 +74,7 @@ public class SimpleFileHandler<T> {
 	}
 
 	/**
-	 * Retrieves the file extension of a {@link Path}.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
+	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
 	 * extension, but ".file.txt" would return "txt".
 	 *
 	 * @param path the given path
@@ -88,7 +88,7 @@ public class SimpleFileHandler<T> {
 	}
 
 	/**
-	 * Retrieves the file extension from a file name.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * Retrieves the file extension from a file name.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
 	 * but ".file.txt" would return "txt".
 	 *
 	 * @param fileName the given file name

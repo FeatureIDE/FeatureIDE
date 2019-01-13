@@ -37,40 +37,40 @@ import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. <br/> <br/> A feature model contains of a
+ * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. <br> <br> A feature model contains of a
  * modifiable collection of <ul> <li>{@link de.ovgu.featureide.fm.core.base.IFeature Features}, and</li> <li>{@link de.ovgu.featureide.fm.core.base.IConstraint
- * Constraints of features}</li> </ul> <br/> Each <i>feature</i> in a feature model has a unique identifier and is related to other features over some
+ * Constraints of features}</li> </ul> <br> Each <i>feature</i> in a feature model has a unique identifier and is related to other features over some
  * expressions and relations which forms the feature model (such as parent-children relation with implication expression from one feature to another).
  * Additional to the structure of features (see {@link de.ovgu.featureide.fm.core.base.IFeature} and {@link de.ovgu.featureide.fm.core.base.IFeatureStructure}
  * for more details) inside the feature models tree, features relationships can be further expressed using <i>constraints</i>. While the feature structure is
- * bound to the actual feature model tree, constraints can be state restrictions and relations to arbitrary features inside the feature model. <br/> <br/>
+ * bound to the actual feature model tree, constraints can be state restrictions and relations to arbitrary features inside the feature model. <br> <br>
  * Features inside a feature model can by analyzed in order to determine feature properties which are implicated by the structure, the statements, and the
  * constraints. As a result of such an analysis, a set of <i>dead features</i> can be found for instance. For more information about analysis, see
- * {@link de.ovgu.featureide.fm.core.FeatureModelAnalyzer FeatureModelAnalyzer}. <br/> <br/> Additional to the collection mentioned above, the feature model
- * contains properties to express <ul> <li>Annotations</li> <li>Comments</li> <li>Feature Orders</li> </ul> <br/> A feature model is moreover related to it's
+ * {@link de.ovgu.featureide.fm.core.FeatureModelAnalyzer FeatureModelAnalyzer}. <br> <br> Additional to the collection mentioned above, the feature model
+ * contains properties to express <ul> <li>Annotations</li> <li>Comments</li> <li>Feature Orders</li> </ul> <br> A feature model is moreover related to it's
  * project, such that the <i>project's name</i> can be received, the related composer extension can be received, as well as certain event handling logic (such
  * as model data change event handling) can be made. Furthermore, each feature model is <i>required to has an own unique system-wide identifier</i> (at least
  * during runtime). Any implementation of this interface has to provide the corresponding {@link #getId()} method and have to implement the management of
- * identifiers among a set of feature models. <br/> <br/> Any feature model is intended to be instantiated by a corresponding factory, the
- * implementation-specific {@link IFeatureModelFactory feature model factory}. <br/> <br/> FeatureIDE provides a default implementation
+ * identifiers among a set of feature models. <br> <br> Any feature model is intended to be instantiated by a corresponding factory, the
+ * implementation-specific {@link IFeatureModelFactory feature model factory}. <br> <br> FeatureIDE provides a default implementation
  * {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel FeatureModel} which is used for default use-cases and can be customized via inheritance of
  * {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel feature model} and a user-defined {@IFeatureModelFactory feature model factory}. Internally, a
  * feature model is represented by an unique numeric identifier, which should be considered in the related {@link IFeatureModelFactory feature model factory} in
- * order to avoid confusion with other models. <br/> <br/> <b>Example</b><br/> The following example demonstrate the creation of a new feature model using
+ * order to avoid confusion with other models. <br> <br> <b>Example</b><br> The following example demonstrate the creation of a new feature model using
  * FeatureIDE's default <code>FeatureModel</code> implementation {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel FeatureModel}, and the corresponding
  * default factory {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
  * {@link FMFactoryManager}: <code> <pre> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); </pre> </code> A unified handling of certain
  * <code>IFeature</code>, and <code>IFeatureModel</code> implementations (in terms of conviennent methods) can be achieved with the use of
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br/> <br/> <b>Caching notes</b>: A feature model implementation using the
+ * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Caching notes</b>: A feature model implementation using the
  * <code>IFeatureModel</code> interface has to provide a map of feature names to the corresponding feature objects, the <i>feature table</i>. This data
  * structure is used in the {@link RenamingsManager} for instance. If the implementation utilizes this data structure for internal use, modifications to this
  * data structure must be protected against concurrent accesses. The default implementations {@link FeatureModel} uses a <code>ConcurrentHashMap</code> for this
- * purpose. <br/> <br/> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned
- * handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br/> <br/> <b>Notes on thread safeness</b>: At
+ * purpose. <br> <br> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned
+ * handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on thread safeness</b>: At
  * least the management of <code>IFeature</code> and </code>IFeatureModel</code> identifiers (e.g., getting the next free id) have to be thread safe. The
  * reference default implementation for feature models is <code> <pre> private static long NEXT_ID = 0;
  *
- * protected static final synchronized long getNextId() { return NEXT_ID++; } </pre> </code> <br/> <br/> <b>Compatibility Notes</b>: To provide compatibility to
+ * protected static final synchronized long getNextId() { return NEXT_ID++; } </pre> </code> <br> <br> <b>Compatibility Notes</b>: To provide compatibility to
  * earlier versions of FeatureIDE, the <i>out-dated</i> class {@link de.ovgu.featureide.fm.core.FeatureModel FeatureModel} is now a wrapper to an
  * <code>IFeatureModel</code> instance (but incompatible to it) and make use of convert-functionalities inside
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
@@ -227,12 +227,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Removes <code>feature</code> from this model. <code>feature</code> can not be removed, if it is the feature models <i>root</i> feature or if it is not
-	 * contained in this model. In both cases, the method returns <b>false</b>. Otherwise the method returns <b>true</b>. <br/> <br/> Implementations of this
+	 * contained in this model. In both cases, the method returns <b>false</b>. Otherwise the method returns <b>true</b>. <br> <br> Implementations of this
 	 * method must ensure, that after removing <code>feature</code>, the feature's <i>parent feature</i> is changed to an <i>and</i> ( <i>or</i>,
 	 * <i>alternative</i>) group if <code>feature</code> was an <i>and</i> (<i>or</i>, <i>alternative</i>) group. Additionally, removing <code>feature</code>
-	 * has to add the children of <code>feature</code> as children to the <i>parent feature</i>. <br/> <br/> Removing a feature also removes this feature from
+	 * has to add the children of <code>feature</code> as children to the <i>parent feature</i>. <br> <br> Removing a feature also removes this feature from
 	 * the <i>feature table</i> and the <i>feature order list</i>. Both must be consistent with {@link #getFeatureOrderList()} and
-	 * {@link #getFeatureOrderList()} <br/> <br/> <b>Note</b>If the structure should not be changed, use {@link #deleteFeatureFromTable(IFeature)}
+	 * {@link #getFeatureOrderList()} <br> <br> <b>Note</b>If the structure should not be changed, use {@link #deleteFeatureFromTable(IFeature)}
 	 *
 	 * @param feature the feature that should be removed. It is assumed to be <i>non-null</i>
 	 * @return <b>false</b> if <code>feature</code> is the models <i>root</i> feature, or if <code>feature</code> is not contained in this model. Otherwise
@@ -250,10 +250,10 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Removes the feature <code>feature</code> from the <i>feature table</i> by <code>feature</code>'s name with {@link IFeature#getName()}. If the <i>feature
-	 * table</i> does not contain a feature with such a name, there will be no changes. <br/> <br/> This method only affects the collection of features stored
-	 * in the feature model, but do not change the <i>structure</i> neither of <code>feature</code> nor it's <i>parent</i> or <i>children</i>. <br/> <br/>
+	 * table</i> does not contain a feature with such a name, there will be no changes. <br> <br> This method only affects the collection of features stored
+	 * in the feature model, but do not change the <i>structure</i> neither of <code>feature</code> nor it's <i>parent</i> or <i>children</i>. <br> <br>
 	 * <b>Note</b> There is no equality check over the identifiers between the feature to be deleted and the feature contained in the collection, expect for
-	 * equality in their names. To avoid confusion, this check should be done before calling this method. <br/> <b>Note</b> If the structure should be changed,
+	 * equality in their names. To avoid confusion, this check should be done before calling this method. <br> <b>Note</b> If the structure should be changed,
 	 * use {@link #deleteFeature(IFeature)}
 	 *
 	 * @see #setFeatureTable(Hashtable)
@@ -295,7 +295,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> if <code>constraint</code> is not
-	 * contained. <br/> <br/> <b>Note</b>:
+	 * contained. <br> <br> <b>Note</b>:
 	 *
 	 * @param constraint the element to be removed. It is assumed that this parameter is <i>non-null</i>
 	 * @throws NullPointerException - if <code>constraint</code> is null (optional)
@@ -317,7 +317,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	int getConstraintIndex(IConstraint constraint);
 
 	/**
-	 * Returns the list of constraints stored in this feature model. <br/> <br/> <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external
+	 * Returns the list of constraints stored in this feature model. <br> <br> <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external
 	 * access to internal data
 	 *
 	 * @see #addConstraint(IConstraint)
@@ -372,16 +372,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model. This method is intend to provide the iteration-concept directly.
-	 * <br/> <br/> <b>Example</b> <code> <pre> for (IFeature feature : featureModel.getFeatures()) { // ... } </pre> </code> If a list interface is required
+	 * <br> <br> <b>Example</b> <code> <pre> for (IFeature feature : featureModel.getFeatures()) { // ... } </pre> </code> If a list interface is required
 	 * rather than the iterable counterpart, the utility class {@link Functional} provides a set of useful methods. To convert the iterator directly into a
 	 * list, use {@link Functional#toList(Iterable)}. By using methods from the {@link Functional} utility class the advantages of a functional-like programming
 	 * style can be directly used. For instance, to convert the collection of features inside a feature model into a set of feature names, the following code
 	 * snippet can be used: <code> <pre> import static de.ovgu.featureide.fm.core.functional.Functional.*;
 	 *
 	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getFeatures()))) </pre> </code> If modification is required, use the related constructor
-	 * for collection implementations, e.g., <br/> <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));</pre></code>
-	 * <br/> <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns an iterator rather than a collection for
-	 * <i>lazy evaluation</i> purposes. <br/>
+	 * for collection implementations, e.g., <br> <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));</pre></code>
+	 * <br> <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns an iterator rather than a collection for
+	 * <i>lazy evaluation</i> purposes. <br>
 	 *
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
@@ -398,16 +398,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model, which are not hidden and not collapsed. This method is intend to
-	 * provide the iteration-concept directly. <br/> <br/> <b>Example</b> <code> <pre> for (IFeature feature : featureModel.getVisibleFeatures()) { // ... }
+	 * provide the iteration-concept directly. <br> <br> <b>Example</b> <code> <pre> for (IFeature feature : featureModel.getVisibleFeatures()) { // ... }
 	 * </pre> </code> If a list interface is required rather than the iterable counterpart, the utility class {@link Functional} provides a set of useful
 	 * methods. To convert the iterator directly into a list, use {@link Functional#toList(Iterable)}. By using methods from the {@link Functional} utility
 	 * class the advantages of a functional-like programming style can be directly used. For instance, to convert the collection of features inside a feature
 	 * model into a set of feature names, the following code snippet can be used: <code> <pre> import static de.ovgu.featureide.fm.core.functional.Functional.*;
 	 *
 	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getVisibleFeatures()))) </pre> </code> If modification is required, use the related
-	 * constructor for collection implementations, e.g., <br/> <code><pre>List<IFeature> list = new
-	 * LinkedList<IFeature>(Functional.toList(fm.getVisibleFeatures()));</pre></code> <br/> <b>Note</b>: Many operations of features in feature models runs over
-	 * iteration. This method returns an iterator rather than a collection for <i>lazy evaluation</i> purposes. <br/>
+	 * constructor for collection implementations, e.g., <br> <code><pre>List<IFeature> list = new
+	 * LinkedList<IFeature>(Functional.toList(fm.getVisibleFeatures()));</pre></code> <br> <b>Note</b>: Many operations of features in feature models runs over
+	 * iteration. This method returns an iterator rather than a collection for <i>lazy evaluation</i> purposes. <br>
 	 *
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
@@ -592,7 +592,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	/**
 	 * Sets the list of feature names for ordering purposed to the content provided by <code>featureOrderList</code>. Existing ordering will be removed before
 	 * this operation is executed. There is no check if the feature names provided by <code>featureOrderList</code> actually reflects names of features stored
-	 * in this model. <br/> <br/> The order of strings provided in <code>featureOrderList</code> provide the order of feature names.
+	 * in this model. <br> <br> The order of strings provided in <code>featureOrderList</code> provide the order of feature names.
 	 *
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderListItem(int, String)
@@ -714,7 +714,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	/**
 	 * Set the feature models source file to <code>file</code>. By definition, the feature model's unique identifier is bidirectional mapped to the source
 	 * files. Therefore, two feature model's based on the same file must have to same unique identifier. The feature model's identifier will not be changed, if
-	 * <code>file</code> is <b>null</b>. <br/><br/> The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that: <code> <pre>
+	 * <code>file</code> is <b>null</b>. <br><br> The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that: <code> <pre>
 	 * this.sourceFile = file; if (file != null) { id = ModelFileIdMap.getModelId(this, file); } </pre> </code> <b>Note</b>: The specification does not require
 	 * to reload the content of this feature model, when the source file is changes. Hence, using this method only will affect the return value of
 	 * {@link #getSourceFile()} and perhaps {@link #getId()}. However, it is not intended to notify listeners about this change.
@@ -739,7 +739,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Feature models are identified with their system-wide unique numeric identifier. This methods returns the <i>next</i> free identifier of the current
-	 * feature model and is a <b>state-full</b> operation, such that invoking the method twice will result in two other numeric identifiers. <br/> <br/> The
+	 * feature model and is a <b>state-full</b> operation, such that invoking the method twice will result in two other numeric identifiers. <br> <br> The
 	 * default implementations provides this by the following code snippet: <code> <pre> private static long NEXT_ID = 0;
 	 *
 	 * protected static final synchronized long getNextId() { return NEXT_ID++; } </pre> </code> <b>Notes to thread-safe execution</b>: The management of

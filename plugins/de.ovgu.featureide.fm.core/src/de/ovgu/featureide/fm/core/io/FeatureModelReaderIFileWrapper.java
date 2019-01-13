@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * This Wrapper makes it possible, to read feature models from IFiles, e.g. if working with Eclipse plugins Otherwise only the classes extending
  * {@link AbstractFeatureModelReader} are needed
  *
- * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/> {@link IFile} can be converted via
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br> {@link IFile} can be converted via
  *             {@code Paths.getPath(ifile.getLocationURI())}.
  *
  * @author Sönke Holthusen

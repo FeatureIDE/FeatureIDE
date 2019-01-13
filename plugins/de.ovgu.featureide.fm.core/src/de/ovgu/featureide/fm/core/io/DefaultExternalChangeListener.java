@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 
 /**
- * Default implementation of {@link ExternalChangeListener}.<br/> Calls the override function of the corresponding file manager.
+ * Default implementation of {@link ExternalChangeListener}.<br> Calls the override function of the corresponding file manager.
  *
  * @author Sebastian Krieter
  */

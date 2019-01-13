@@ -135,7 +135,7 @@ public class Clause {
 	 * @param clause1 first clause
 	 * @param clause2 second clause
 	 *
-	 * @return The larger clause (can then be removed from formula). <br/> If both clauses are equal, the first clause is returned.
+	 * @return The larger clause (can then be removed from formula). <br> If both clauses are equal, the first clause is returned.
 	 */
 	public static Clause contained(Clause clause1, Clause clause2) {
 		final int[] literals1 = clause1.literals;
