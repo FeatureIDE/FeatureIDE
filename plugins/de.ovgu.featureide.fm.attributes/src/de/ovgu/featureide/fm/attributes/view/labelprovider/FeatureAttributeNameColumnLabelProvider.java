@@ -8,6 +8,12 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
+/**
+ * Label provider for the name attribute.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeNameColumnLabelProvider extends FeatureAttributeColumnLabelProvider {
 
 	public FeatureAttributeNameColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {

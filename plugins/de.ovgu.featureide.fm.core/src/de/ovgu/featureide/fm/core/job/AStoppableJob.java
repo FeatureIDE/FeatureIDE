@@ -111,7 +111,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	}
 
 	/**
-	 * {@inheritDoc}</br></br> Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
+	 * {@inheritDoc}<br><br> Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
 	 */
 	protected abstract boolean work() throws Exception;
 

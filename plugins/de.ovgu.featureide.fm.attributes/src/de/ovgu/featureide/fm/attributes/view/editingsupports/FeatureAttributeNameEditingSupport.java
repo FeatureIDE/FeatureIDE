@@ -33,19 +33,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Editing support for the name column of the {@link FeatureAttributeView}.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeNameEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*

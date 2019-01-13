@@ -152,7 +152,7 @@ public class SetFeatureColorAction extends Action {
 	/**
 	 * Creates a featureList with the selected features of the feature diagram.
 	 *
-	 * @param selection
+	 * @param selection current selection
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {

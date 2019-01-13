@@ -91,10 +91,10 @@ import de.ovgu.featureide.munge.MungeCorePlugin;
  *
  * <p> To demonstrate this, our sample source has 1.1 and 1.2-specific code, with 1.1 as the default build: <pre><code> public void setSystemProperty(String
  * key, String value) { &#47;*if[JDK1.1]*&#47; Properties props = System.getProperties(); props.setProperty(key, value); System.setProperties(props);
- * &#47;*end[JDK1.1]*&#47; <p> &#47;*if[JDK1.2] // Use the new System method. System.setProperty(key, value); end[JDK1.2]*&#47; } </code></pre> <p> When the
- * above code is directly compiled, the code bracketed by the JDK1.1 tags will be used. If the file is run through Munge with the JDK1.2 tag defined, the second
- * code block will used instead. This code can also be written as: <pre><code> public void setSystemProperty(String key, String value) { &#47;*if[JDK1.2] // Use
- * the new System method. System.setProperty(key, value); else[JDK1.2]*&#47; <p> Properties props = System.getProperties(); props.setProperty(key, value);
+ * &#47;*end[JDK1.1]*&#47; &#47;*if[JDK1.2] // Use the new System method. System.setProperty(key, value); end[JDK1.2]*&#47; } </code></pre> <p> When the above
+ * code is directly compiled, the code bracketed by the JDK1.1 tags will be used. If the file is run through Munge with the JDK1.2 tag defined, the second code
+ * block will used instead. This code can also be written as: <pre><code> public void setSystemProperty(String key, String value) { &#47;*if[JDK1.2] // Use the
+ * new System method. System.setProperty(key, value); else[JDK1.2]*&#47; Properties props = System.getProperties(); props.setProperty(key, value);
  * System.setProperties(props); &#47;*end[JDK1.2]*&#47; } </code></pre>
  *
  * Munge also performs text substitution; the Swing build uses this to convert its package references from <code>javax.swing</code> to
@@ -467,6 +467,9 @@ public class Munge {
 
 	/**
 	 * Munge's main entry point.
+	 *
+	 * @param args passed arguments
+	 * @param featureProject passed project
 	 */
 	public void main(String[] args, IFeatureProject featureProject) {
 		this.featureProject = featureProject;

@@ -95,7 +95,7 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO ATTRIBUTE description
+ * A view to help the user of managing attributes of {@link ExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -526,7 +526,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	/**
 	 * Returns the current feature model when an valid view was opened before. Otherwise the feature model is null.
 	 *
-	 * @return
+	 * @return Current loaded feature model.
 	 */
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
@@ -553,12 +553,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.refresh(featureModel); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+				treeViewer.refresh(featureModel);
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getSource() instanceof IFeature) {
 				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.refresh((IFeature) event.getSource()); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+					treeViewer.refresh((IFeature) event.getSource());
 				}
 				treeViewer.expandAll();
 			}

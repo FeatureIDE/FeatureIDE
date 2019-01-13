@@ -241,9 +241,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
-	 * @param featureModelEditor the FeatureModelEditor
-	 * @param container Composite which contains the feature model
-	 * @param fm The feature model
+	 * @param fmManager feature model file manager
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
 	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, boolean isEditable) {

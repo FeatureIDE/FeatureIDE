@@ -217,7 +217,7 @@ public class FmOutlinePageContextMenu {
 	/**
 	 * fills the ContextMenu depending on the current selection
 	 *
-	 * @param manager
+	 * @param manager given manager
 	 */
 	public void fillContextMenu(IMenuManager manager) {
 		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
@@ -227,9 +227,6 @@ public class FmOutlinePageContextMenu {
 		}
 	}
 
-	/**
-	 * @param iToolBarManager
-	 */
 	public void addToolbar(IToolBarManager iToolBarManager) {
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
@@ -251,9 +248,6 @@ public class FmOutlinePageContextMenu {
 		fInput = fm;
 	}
 
-	/**
-	 * @param syncCollapsedFeaturesToggle
-	 */
 	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {
 		syncCollapsedFeatures = syncCollapsedFeaturesToggle;
 	}

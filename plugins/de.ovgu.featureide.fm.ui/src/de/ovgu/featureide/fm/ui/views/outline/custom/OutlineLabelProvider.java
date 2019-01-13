@@ -52,7 +52,7 @@ public abstract class OutlineLabelProvider implements ILabelProvider {
 	 * the current file
 	 *
 	 * @param treeItems the items that should be colored
-	 * @param file
+	 * @param file file
 	 */
 	public abstract void colorizeItems(TreeItem[] treeItems, IFile file);
 

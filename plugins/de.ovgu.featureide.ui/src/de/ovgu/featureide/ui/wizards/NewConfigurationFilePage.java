@@ -90,7 +90,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 *
-	 * @param pageName
+	 * @param configFolder folder for the config
 	 */
 	public NewConfigurationFilePage(IFolder configFolder) {
 		super("wizardPage");

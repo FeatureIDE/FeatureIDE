@@ -11,6 +11,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
+/**
+ * Represents extended features by extending {@link Feature}. Provides a list of {@link IFeatureAttribute}.
+ * 
+ * @author Joshua Sprey
+ * @author Chico Sundermann
+ */
 public class ExtendedFeature extends Feature {
 
 	protected List<IFeatureAttribute> attributes;

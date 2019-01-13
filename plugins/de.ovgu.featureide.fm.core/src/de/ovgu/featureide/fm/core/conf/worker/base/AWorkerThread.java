@@ -70,7 +70,7 @@ public abstract class AWorkerThread<T> implements Runnable {
 	}
 
 	/**
-	 * Is called once before the worker start to process its objects.</br> </br> Default implementation returns {@code true}.
+	 * Is called once before the worker start to process its objects.<br> <br> Default implementation returns {@code true}.
 	 *
 	 * @return {@code true} if the worker should start working, {@code false} otherwise
 	 */
@@ -79,7 +79,7 @@ public abstract class AWorkerThread<T> implements Runnable {
 	}
 
 	/**
-	 * Is called once after the worker processed all of its objects.</br> </br> Default implementation does nothing.
+	 * Is called once after the worker processed all of its objects.<br> <br> Default implementation does nothing.
 	 *
 	 * @param success result of {@link #beforeWork()}
 	 */

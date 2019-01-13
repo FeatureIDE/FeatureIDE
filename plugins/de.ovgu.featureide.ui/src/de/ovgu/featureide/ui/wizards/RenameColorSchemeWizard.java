@@ -43,6 +43,8 @@ public class RenameColorSchemeWizard extends Wizard {
 
 	/**
 	 * Constructor for RenameColorSchemeWizard.
+	 *
+	 * @param featureModel feature model
 	 */
 	public RenameColorSchemeWizard(IFeatureModel featureModel) {
 		super();

@@ -49,8 +49,9 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private final Set<String> unknownWords = new HashSet<String>();
 
 	/**
-	 * @param parent
-	 * @param style
+	 * @param parent parent composite
+	 * @param style number of style
+	 * @param keywords list of keywords
 	 */
 	public SimpleSyntaxHighlightEditor(Composite parent, int style, final String[] keywords) {
 		super(parent, style);

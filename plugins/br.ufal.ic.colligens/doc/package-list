@@ -1,0 +1,16 @@
+br.ufal.ic.colligens.activator
+br.ufal.ic.colligens.controllers
+br.ufal.ic.colligens.controllers.core
+br.ufal.ic.colligens.controllers.invalidconfigurations
+br.ufal.ic.colligens.controllers.invalidproducts
+br.ufal.ic.colligens.controllers.metrics
+br.ufal.ic.colligens.controllers.refactoring
+br.ufal.ic.colligens.controllers.semanticbugs
+br.ufal.ic.colligens.handler
+br.ufal.ic.colligens.models
+br.ufal.ic.colligens.models.cppchecker
+br.ufal.ic.colligens.preferences
+br.ufal.ic.colligens.util
+br.ufal.ic.colligens.util.metrics
+br.ufal.ic.colligens.views
+de.fosd.typechef

@@ -161,7 +161,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @param output The output from the compiler
 	 * @param files The compiled files
 	 * @param configurationName Name of the actual configuration
-	 * @return
+	 * @return list of files
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
 		final LinkedList<IFile> errorFiles = new LinkedList<IFile>();

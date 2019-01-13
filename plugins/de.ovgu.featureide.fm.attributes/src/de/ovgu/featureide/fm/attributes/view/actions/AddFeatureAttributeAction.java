@@ -34,9 +34,10 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Action used to create an attribute. Depending on the {@link #attributeType} the action creates an attribute of the given type.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class AddFeatureAttributeAction extends Action {
 

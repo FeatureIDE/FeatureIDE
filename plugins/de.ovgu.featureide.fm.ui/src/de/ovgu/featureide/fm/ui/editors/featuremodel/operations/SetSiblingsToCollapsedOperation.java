@@ -42,21 +42,12 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
 
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
 	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
 		this.feature = feature;
 		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
-	/**
-	 * @param feature
-	 * @return String to be used in undo/redo menu
-	 */
 	private static String getLabel(IFeature feature) {
 		return COLLAPSE_SIBLINGS;
 	}

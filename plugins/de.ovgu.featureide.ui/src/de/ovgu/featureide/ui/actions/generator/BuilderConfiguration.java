@@ -32,18 +32,11 @@ public class BuilderConfiguration extends Configuration {
 	private String name;
 	private long number;
 
-	/**
-	 * @param configuration
-	 */
 	public BuilderConfiguration(Configuration configuration, String name) {
 		super(configuration);
 		this.name = name;
 	}
 
-	/**
-	 * @param configuration
-	 * @param number
-	 */
 	public BuilderConfiguration(Configuration configuration, long number) {
 		super(configuration);
 		this.number = number;

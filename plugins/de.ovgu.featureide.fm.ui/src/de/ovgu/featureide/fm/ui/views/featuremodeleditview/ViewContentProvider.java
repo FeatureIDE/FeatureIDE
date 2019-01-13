@@ -490,7 +490,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	/**
 	 * Stops the calculation and the running job
 	 *
-	 * @param value
+	 * @param value to set
 	 */
 	public void setCanceled(boolean value) {
 		cancel = value;

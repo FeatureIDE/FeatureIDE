@@ -33,11 +33,6 @@ public class FilterOutlineAction extends Action {
 
 	private final IOutlineFilter filter;
 
-	/**
-	 * Constructor for FilterOutlineAction
-	 *
-	 * @param viewer
-	 */
 	public FilterOutlineAction(IOutlineFilter filter) {
 		super("", AS_CHECK_BOX);
 		this.filter = filter;
@@ -45,11 +40,6 @@ public class FilterOutlineAction extends Action {
 		setImageDescriptor(filter.getImage());
 	}
 
-	/**
-	 * Returns the outline provider
-	 *
-	 * @return
-	 */
 	public IOutlineFilter getFilter() {
 		return filter;
 	}

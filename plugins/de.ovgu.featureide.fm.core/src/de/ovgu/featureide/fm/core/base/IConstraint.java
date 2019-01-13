@@ -34,17 +34,17 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 /**
  * The <code>IConstraint</code> interface represents any class which acts in the sense of a <i>Constraint</i> in FeatureIDE. <br> <br> A constraint is a
  * propositional formula on {@link IFeature features} inside a {@link IFeatureModel feature model} which gives further conditions a valid configuration must
- * satisfy. A constraint allows conditions statements which are not directly expressibly using the {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor}
- * since feature models are typically modeled in a hierarchy here. <br> <br> A constraint can affect a set of features depending on the conditions given by
- * both the feature model and other constraints. For instance, a constraint can lead to a condition on features which is constant (un-)satisfied, or forces an
- * optional group of features to be mandatory. These affects can be analyzed such that it is known whenever a given constraint result in such effects (see
- * {@link ConstraintAttribute}). <br> <br> For ease of use, FeatureIDE provides an adapter for this interface, {@link AConstraint} which can be used as a
- * starting point for custom implementations. In a broader sense, constraints in FeatureIDE also satisfy the {@link IFeatureModelElement} element which deals
- * with identification of constraints and models. <br> <br> Instances of <code>IConstraint</code> are intended to be instantiated by a
- * {@link IFeatureModelFactory}. <br> <br> <b>Example</b> <br> The following example shows the instantiation of a <code>IConstraint</code> instance using
- * FeatureIDE's default {@link FeatureModel} and {@link Constraint} implementation over the standard factories. The constraint created give the condition, that
- * a feature <code>A</code> implies another feature <code>B</code>. <code> <pre> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
- * IConstraint c = FMFactoryManager.getFactory().createConstraint(model, new Implies(new Literal("A"), new Literal("B"))); </pre> </code>
+ * satisfy. A constraint allows conditions statements which are not directly expressibly using the FeatureDiagramEditor since feature models are typically
+ * modeled in a hierarchy here. <br> <br> A constraint can affect a set of features depending on the conditions given by both the feature model and other
+ * constraints. For instance, a constraint can lead to a condition on features which is constant (un-)satisfied, or forces an optional group of features to be
+ * mandatory. These affects can be analyzed such that it is known whenever a given constraint result in such effects (see {@link ConstraintAttribute}). <br>
+ * <br> For ease of use, FeatureIDE provides an adapter for this interface, {@link AConstraint} which can be used as a starting point for custom
+ * implementations. In a broader sense, constraints in FeatureIDE also satisfy the {@link IFeatureModelElement} element which deals with identification of
+ * constraints and models. <br> <br> Instances of <code>IConstraint</code> are intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br>
+ * <b>Example</b> <br> The following example shows the instantiation of a <code>IConstraint</code> instance using FeatureIDE's default {@link FeatureModel} and
+ * {@link Constraint} implementation over the standard factories. The constraint created give the condition, that a feature <code>A</code> implies another
+ * feature <code>B</code>. <code> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); IConstraint c =
+ * FMFactoryManager.getFactory().createConstraint(model, new Implies(new Literal("A"), new Literal("B"))); </code>
  *
  * @see de.ovgu.featureide.fm.core.base.impl.AConstraint Default implementation of <code>IConstraint</code> (as starting point for custom implementations)
  *
@@ -74,13 +74,13 @@ public interface IConstraint extends IFeatureModelElement {
 	 * created. Optional, the <code>feature model</code> can be changed. More in detail a new constraint <code>c'</code> is constructed based on this constraint
 	 * <code>c</code> such that at least <ul> <li><code>c</code> underlying {@link org.prop4j.Node node} <code>n</code> containing the propositional formula is
 	 * accessible by <code>c'</code>. A deep copy of <code>n</code> is not required.</li> <li>the flag indicating a selection of this constraint in the UI
-	 * (e.g., {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor}) is equal for <code>c</code> and <code>c'</code></li> <li>if <code>c</code> inherits
-	 * {@link IFeatureModelElement}, <code>c'</code> must deep copy the required members of this implementation</li> </ul> It holds <code>c' != c</code> and
-	 * <code>c.equals(c')</code>. <br> <br> <b>Note:</b> the parameter <b>newFeatureModel</b> is intended to change the feature model context of the newly
-	 * created, and affects members if this constraint implements {@link IFeatureModelElement}. <br><br> <b>Notes on side effects and <code>null</code>
-	 * references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>does <b>not</b> affect the
-	 * <b>parameter</b> <code>newFeatureModel</code>.</li> <li>the parameter <code>newFeature</code> is expected to be <b>non-null</b></li> <li>the returned
-	 * <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
+	 * (e.g., FeatureDiagramEditor) is equal for <code>c</code> and <code>c'</code></li> <li>if <code>c</code> inherits {@link IFeatureModelElement},
+	 * <code>c'</code> must deep copy the required members of this implementation</li> </ul> It holds <code>c' != c</code> and <code>c.equals(c')</code>. <br>
+	 * <br> <b>Note:</b> the parameter <b>newFeatureModel</b> is intended to change the feature model context of the newly created, and affects members if this
+	 * constraint implements {@link IFeatureModelElement}. <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>does <b>not</b> affect the <b>parameter</b> <code>newFeatureModel</code>.</li>
+	 * <li>the parameter <code>newFeature</code> is expected to be <b>non-null</b></li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and
+	 * <b>modifiable</b></li> </ul>
 	 *
 	 *
 	 * @param newFeatureModel a possible new context for this constraint
@@ -125,8 +125,8 @@ public interface IConstraint extends IFeatureModelElement {
 	 * these items. <br> <br> <b>Note</b>: The returned collection is intended to be cached. If the cache is empty, {@link IConstraint#setContainedFeatures()}
 	 * is called automatically. The return collection might be out-dated until a new call to {@link IConstraint#setContainedFeatures()} is done manually.
 	 *
-	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>affects</b> the <b>members</b> in
-	 * this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
+	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>affects</b> the <b>members</b> in this
+	 * object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
 	 *
 	 * @since 3.0
 	 *
@@ -137,11 +137,11 @@ public interface IConstraint extends IFeatureModelElement {
 	Collection<IFeature> getContainedFeatures();
 
 	/**
-	 * Returns the parameter of the last {@link #setDeadFeatures(Iterable)} call, or <code>null</code> if no such call happens before invoking this method.
-	 * <br> <br> <b>Note</b>: The dead feature collection is <u>not</u> calculated when calling this method. Therefore, a call to
-	 * {@link #setDeadFeatures(Iterable)} is required plus eventually a call to {@link #getDeadFeatures(SatSolver, IFeatureModel, Collection)}. <br> <br>
-	 * <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this
-	 * object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>unmodifiable</b></li> </ul>
+	 * Returns the parameter of the last {@link #setDeadFeatures(Iterable)} call, or <code>null</code> if no such call happens before invoking this method. <br>
+	 * <br> <b>Note</b>: The dead feature collection is <u>not</u> calculated when calling this method. Therefore, a call to {@link #setDeadFeatures(Iterable)}
+	 * is required plus eventually a call to {@link #getDeadFeatures(SatSolver, IFeatureModel, Collection)}. <br> <br> <b>Notes on side effects and
+	 * <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>the returned
+	 * <b>result</b> is guaranteed <b>non-null</b> and <b>unmodifiable</b></li> </ul>
 	 *
 	 * @see #setDeadFeatures(Iterable)
 	 * @see #getDeadFeatures(SatSolver, IFeatureModel, Collection)
@@ -181,9 +181,9 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * Returns the parameter of the last {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} call, or <code>null</code> if no such call happens before
 	 * invoking this method. <br> <br> <b>Note</b>: The false optional feature collection is <u>not</u> calculated when calling this method. Therefore, a call
-	 * to {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} is required. <br> <br> <b>Notes on side effects and <code>null</code>
-	 * references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>the returned <b>result</b> is
-	 * guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
+	 * to {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} is required. <br> <br> <b>Notes on side effects and <code>null</code> references</b><br>
+	 * Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b>
+	 * and <b>modifiable</b></li> </ul>
 	 *
 	 *
 	 * @see #setDeadFeatures(Iterable)
@@ -198,8 +198,8 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * @since 3.0
 	 *
-	 *        <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the
-	 *        <b>members</b> in this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
+	 *        <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b>
+	 *        in this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
 	 *
 	 * @return The underlying propositional formula node
 	 */
@@ -218,9 +218,9 @@ public interface IConstraint extends IFeatureModelElement {
 	void setNode(Node node);
 
 	/**
-	 * Returns whenever this constraints contains features which are marked as <i>hidden</i> <br> <br> Checks if one or more features contained in this
-	 * feature is marked as <i>hidden</i> by checking if one feature in the set of contained features is <i>hidden</i> or, if the parent of one feature in the
-	 * set of contained features is <i>hidden</i>. If such a feature is found, the method returns <b>true</b>, otherwise <b>false</b>.
+	 * Returns whenever this constraints contains features which are marked as <i>hidden</i> <br> <br> Checks if one or more features contained in this feature
+	 * is marked as <i>hidden</i> by checking if one feature in the set of contained features is <i>hidden</i> or, if the parent of one feature in the set of
+	 * contained features is <i>hidden</i>. If such a feature is found, the method returns <b>true</b>, otherwise <b>false</b>.
 	 *
 	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in
 	 * this object.</li> </ul>
@@ -232,10 +232,10 @@ public interface IConstraint extends IFeatureModelElement {
 	boolean hasHiddenFeatures();
 
 	/**
-	 * Sets the analysis attribute for this constraints which determine how this constraint affects features. <br><br> A constraint can affect a set of
-	 * features depending on the conditions given by both the feature model and other constraints. For instance, a constraint can lead to a condition on
-	 * features which is constant (un-)satisfied, or forces an optional group of features to be mandatory. These affects can be analyzed such that it is known
-	 * whenever a given constraint result in such effects (see {@link ConstraintAttribute}). <br><br>
+	 * Sets the analysis attribute for this constraints which determine how this constraint affects features. <br><br> A constraint can affect a set of features
+	 * depending on the conditions given by both the feature model and other constraints. For instance, a constraint can lead to a condition on features which
+	 * is constant (un-)satisfied, or forces an optional group of features to be mandatory. These affects can be analyzed such that it is known whenever a given
+	 * constraint result in such effects (see {@link ConstraintAttribute}). <br><br>
 	 *
 	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>affect</b> the <b>members</b> in this
 	 * object.</li> <li>does <b>not</b> affect the <b>parameters</b>.</li> <li>the parameters are expected to be <b>non-null</b></li> </ul>
@@ -294,8 +294,8 @@ public interface IConstraint extends IFeatureModelElement {
 	boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection);
 
 	/**
-	 * String representation of the constraint's propositional formula. <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling
-	 * this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and
+	 * String representation of the constraint's propositional formula. <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this
+	 * method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and
 	 * <b>modifiable</b></li> </ul>
 	 *
 	 * @return String representation of the constraint's propositional formula.
@@ -318,16 +318,16 @@ public interface IConstraint extends IFeatureModelElement {
 
 	/**
 	 * Set the description
+	 *
 	 * @param description
 	 */
 	void setDescription(String description);
-	
+
 	/**
 	 * Returns the description
+	 *
 	 * @return
 	 */
 	String getDescription();
 
 }
-
-

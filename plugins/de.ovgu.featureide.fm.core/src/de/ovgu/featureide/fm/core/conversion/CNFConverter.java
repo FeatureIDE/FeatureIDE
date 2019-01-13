@@ -31,7 +31,7 @@ import org.prop4j.Or;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * @brief Converter using conjunctive normal form.
+ * Converter using conjunctive normal form.
  *
  * @author Alexander Knueppel
  */

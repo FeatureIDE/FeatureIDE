@@ -33,9 +33,6 @@ import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
  *
  * The other related classes are:
  *
- * @see de.ovgu.featureide.ui.actions.DeleteProfileColorScheme.java
- * @see de.ovgu.featureide.ui.actions.RenameProfileColorScheme.java
- *
  * @author Jonas Weigt
  * @author Christian Harnisch
  * @author Marcus Pinnecke

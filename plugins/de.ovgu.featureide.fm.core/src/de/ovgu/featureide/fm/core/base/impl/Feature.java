@@ -45,12 +45,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
  * FeatureIDE's default <code>IFeature</code> ( <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the
  * corresponding default factory {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory
- * class {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> <pre> IFeatureModel model =
- * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A
- * unified handling of certain <code>Feature</code> (<code>AFeature</code>, <code>IFeature</code>) implementations (in terms of conviennent methods) can be
- * achieved with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
+ * class {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
+ * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A unified
+ * handling of certain <code>Feature</code> (<code>AFeature</code>, <code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved
+ * with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
  *
- * @see de.ovgu.featureide.fm.core.base.AFeature Default implementation of the interface for feature in FeatureIDE (<code>AFeature</code>)
+ * @see de.ovgu.featureide.fm.core.base.impl.AFeature Default implementation of the interface for feature in FeatureIDE (<code>AFeature</code>)
  *
  * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
  * @see IFeatureModel Interface for feature models (<code>IFeatureModel</code>)

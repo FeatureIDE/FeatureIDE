@@ -261,8 +261,8 @@ public class PPModelBuilder {
 	/**
 	 * This method should be implemented by preprocessor plug-ins. Adds directives to model.
 	 *
-	 * @param currentClass The current class.
-	 * @param res The current file.
+	 * @param lines lines
+	 * @return list of directives
 	 */
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return new LinkedList<FSTDirective>();

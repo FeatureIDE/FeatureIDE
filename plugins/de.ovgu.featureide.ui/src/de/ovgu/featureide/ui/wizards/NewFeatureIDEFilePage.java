@@ -989,7 +989,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	/**
-	 * @return
+	 * @return IFolder of source folder
 	 */
 	public IFolder getSourceFolder() {
 		return sourceFolder;

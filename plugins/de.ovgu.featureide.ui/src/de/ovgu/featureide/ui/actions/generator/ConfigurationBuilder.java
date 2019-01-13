@@ -160,7 +160,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	/**
 	 * Adds the given configuration to configurations.
 	 *
-	 * @param configuration
+	 * @param configuration to add
 	 */
 	public synchronized void addConfiguration(BuilderConfiguration configuration) {
 		sorter.addConfiguration(configuration);
@@ -179,6 +179,19 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param tOrder
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
+	 */
+	/**
+	 *
+	 * @param featureProject The feature project
+	 * @param buildType <code>true</code> if all possible valid configurations should be build<br> <code>false</code> if all current configurations should be
+	 *        build
+	 * @param createNewProjects <code>true</code> if the configurations should be built into separate projects
+	 * @param algorithm selected algorithmen
+	 * @param t t
+	 * @param buildOrder build order
+	 * @param runTests whether the tests should be run after the operation
+	 * @param max Maximal number of configurations to generate.
+	 * @param tOrder tOrder
 	 */
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
 			final int t, final BuildOrder buildOrder, boolean runTests, int max, int tOrder) {

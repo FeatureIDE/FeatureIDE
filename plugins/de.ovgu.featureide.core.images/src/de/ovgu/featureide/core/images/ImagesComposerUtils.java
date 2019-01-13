@@ -38,7 +38,7 @@ public class ImagesComposerUtils {
 	/**
 	 * The main file formats supported by javax.imageio
 	 *
-	 * @param name
+	 * @param name name of image format
 	 * @return null if it is not an image file or the file format
 	 */
 	public static String getImageFormat(String name) {
@@ -65,9 +65,9 @@ public class ImagesComposerUtils {
 	/**
 	 * Overlap a list of images in order (The first one will be at the background)
 	 *
-	 * @param image files
-	 * @param output image file
-	 * @throws Exception
+	 * @param imageFiles files
+	 * @param outputImageFile image file
+	 * @throws Exception exception
 	 */
 	public static void overlapImages(List<File> imageFiles, File outputImageFile) throws Exception {
 		// Get the images and calculate final size
@@ -105,8 +105,8 @@ public class ImagesComposerUtils {
 	/**
 	 * Get all files recursively
 	 *
-	 * @param dir
-	 * @return files
+	 * @param dir directory
+	 * @return files files
 	 */
 	public static List<File> getAllFiles(File dir) {
 		return getAllFiles(null, dir);
@@ -115,9 +115,9 @@ public class ImagesComposerUtils {
 	/**
 	 * getAllFiles recursively, initialize files with null
 	 *
-	 * @param files
-	 * @param dir
-	 * @return
+	 * @param files files
+	 * @param dir directory
+	 * @return list with files
 	 */
 	private static List<File> getAllFiles(List<File> files, File dir) {
 		if (files == null) {

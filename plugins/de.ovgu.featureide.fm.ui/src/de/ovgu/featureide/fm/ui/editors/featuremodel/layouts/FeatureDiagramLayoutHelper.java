@@ -45,7 +45,10 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 public class FeatureDiagramLayoutHelper {
 
 	/**
-	 * returns label texts (e.g. for the context menu)
+	 * @return label texts (e.g. for the context menu)
+	 *
+	 * @param layoutAlgorithmNum identifier of the algorithm
+	 *
 	 */
 	public static String getLayoutLabel(int layoutAlgorithmNum) {
 		switch (layoutAlgorithmNum) {
@@ -67,7 +70,8 @@ public class FeatureDiagramLayoutHelper {
 	}
 
 	/**
-	 * returns label texts (e.g. for the context menu)
+	 * @param layoutType layout type
+	 * @return label texts (e.g. for the context menu)
 	 */
 	public static String getNameTypeLabel(int layoutType) {
 		switch (layoutType) {
@@ -81,6 +85,9 @@ public class FeatureDiagramLayoutHelper {
 
 	/**
 	 * sets initial positions for new constraints needed for manual layout
+	 *
+	 * @param featureModel feature model
+	 * @param index index
 	 */
 	public static void initializeConstraintPosition(IGraphicalFeatureModel featureModel, int index) {
 		Point newLocation = new Point(0, 0);
@@ -112,6 +119,10 @@ public class FeatureDiagramLayoutHelper {
 
 	/**
 	 * sets initial positions for new features (above) needed for manual layout
+	 *
+	 * @param featureModel respective feature model
+	 * @param selectedFeatures selected feature
+	 * @param newCompound new compund
 	 */
 	public static void initializeCompoundFeaturePosition(IGraphicalFeatureModel featureModel, LinkedList<IGraphicalFeature> selectedFeatures,
 			IGraphicalFeature newCompound) {
@@ -137,6 +148,10 @@ public class FeatureDiagramLayoutHelper {
 
 	/**
 	 * sets initial positions for new features (below) needed for manual layout
+	 *
+	 * @param featureModel feature model
+	 * @param newLayer new graphical feature layer
+	 * @param feature graphical feature
 	 */
 	public static void initializeLayerFeaturePosition(IGraphicalFeatureModel featureModel, IGraphicalFeature newLayer, IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
@@ -164,8 +179,9 @@ public class FeatureDiagramLayoutHelper {
 	}
 
 	/**
-	 * returns the layout manager for the chosen algorithm(id)
-	 *
+	 * @param layoutAlgorithm layout algorithm
+	 * @param featureModel feature model
+	 * @return the layout manager for the chosen algorithm(id)
 	 */
 	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, IGraphicalFeatureModel featureModel) {
 		switch (layoutAlgorithm) {

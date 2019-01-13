@@ -84,7 +84,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private boolean hasFeatureOrder = true;
 
 	/**
-	 * @param featureModelEditor
+	 * @param fmManager file manager for the feature model
 	 */
 	public FeatureOrderEditor(IFileManager<IFeatureModel> fmManager) {
 		super(fmManager);
@@ -126,8 +126,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	/**
 	 * Updates the displayed feature list
-	 *
-	 * @param feature
 	 */
 	public void updateOrderEditor() {
 		if (hasFeatureOrder) {
@@ -159,7 +157,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			label.setText(USER_DEFINED_FEATURE_ORDER);
 			activate = new Button(comp, SWT.CHECK);
 			activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			
+
 				@Override
 				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 					final boolean selection = activate.getSelection();

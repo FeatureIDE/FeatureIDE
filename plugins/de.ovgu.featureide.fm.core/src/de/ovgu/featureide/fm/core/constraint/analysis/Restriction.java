@@ -68,7 +68,6 @@ abstract public class Restriction {
 	 * Returns an array of variable id's in the implementation-dependent order.
 	 *
 	 * @return The id's in the implementation-dependent order.
-	 * @category SAT4J representation
 	 */
 	public int[] getIds() {
 		final int[] ids = new int[terms.size()];
@@ -84,7 +83,6 @@ abstract public class Restriction {
 	 * Returns an array of coefficients in the implementation-dependent order.
 	 *
 	 * @return The coefficients in implementation-dependent order.
-	 * @category SAT4J representation
 	 */
 	public BigInteger[] getCoefficients() {
 		final BigInteger[] coefficients = new BigInteger[terms.size()];
@@ -119,7 +117,6 @@ abstract public class Restriction {
 	 * Returns the degree of the restriction.
 	 *
 	 * @return The degree of the restriction.
-	 * @category generic access
 	 */
 	public int getDegree() {
 		return degree;

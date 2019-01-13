@@ -40,7 +40,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 public class SettingsImport {
 
 	/**
-	 * @param persitentProperties Properties saving the import
 	 * @param file the file containing the properties
 	 */
 	public SettingsImport(File file) {

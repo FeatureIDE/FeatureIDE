@@ -153,7 +153,7 @@ public class FeatureUIHelper {
 	}
 
 	/**
-	 * @param zoomManager
+	 * @param zoomManager respective zoom manager
 	 */
 	public static void setZoomManager(ZoomManager zoomManager) {
 		FeatureUIHelper.zoomManager = zoomManager;
@@ -188,7 +188,7 @@ public class FeatureUIHelper {
 		featureModel.getLayout().showCollapsedConstraints(show);
 	}
 
-	public static Rectangle getBounds(IGraphicalElement  element) {
+	public static Rectangle getBounds(IGraphicalElement element) {
 		if ((element.getLocation() == null) || (element.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			element.getObject().getFeatureModel().handleModelDataChanged();
@@ -198,6 +198,10 @@ public class FeatureUIHelper {
 
 	/**
 	 * should not be used here
+	 * 
+	 * @param feature feature
+	 * @param viewer viewer
+	 * @return connection edit parts
 	 */
 	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
