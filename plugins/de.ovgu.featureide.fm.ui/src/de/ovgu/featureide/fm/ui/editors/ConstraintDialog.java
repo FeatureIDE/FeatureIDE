@@ -20,13 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_YOUR_NEW_CONSTRAINT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.BEFORE_THIS_PROCESS_HAS_ENDED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANCEL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONSTRAINT___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_CONTAINS_ONE_UNKNOWN_FEATURE_NAME_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_DIALOG;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_NEW_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_PROPOSITIONAL_CONSTRAINT;
@@ -34,15 +29,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_PROPOSITI
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_YOUR_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPERATORS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_INSERT_A_CONSTRAINT_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANCY_OCCURRED_INSIDE_YOUR_CONSTRAINT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_ANYWAY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_YOUR_CHANGES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE_FILTER_TEXT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_CONSTRAINT_IS_A_TAUTOLOGY_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_CONSTRAINT_IS_NOT_SATISFIABLE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_CONSTRAINT_VOIDS_THE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_;
 
@@ -107,9 +97,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
-import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog.HeaderPanel.HeaderDescriptionImage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
@@ -124,24 +114,60 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOp
  * @author Marcus Pinnecke
  * @author Marlen Bernier
  * @author Dawid Szczepanski
+ * @author Sebastian Krieter
  */
 public class ConstraintDialog implements GUIDefaults {
 
 	/**
-	 * The dialogs current state which correspond to the current validation process. Because some validation tests will take a long time span to be finished,
-	 * the dialog has three states.
-	 *
-	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this state everything is okay and the constraint is valid.
-	 *
-	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there are syntax errors for the constraint text or the validation process has finished
-	 * with an error found.
-	 *
-	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not recommended. However, some tests are running in this case.
+	 * Data class
 	 *
 	 * @author Marcus Pinnecke
 	 */
-	private enum DialogState {
-		SAVE_CHANGES_ENABLED, SAVE_CHANGES_DISABLED, SAVE_CHANGES_DONT_MIND
+	public static class ValidationMessage {
+
+		private final String message;
+		private final Severity severity;
+		private final DialogState saveState;
+		private Boolean initialAnalysisSuccess = null;
+
+		public ValidationMessage(String message) {
+			this(message, null, null);
+		}
+
+		public ValidationMessage(String message, Severity severity) {
+			this(message, severity, null);
+		}
+
+		public ValidationMessage(String message, DialogState saveState) {
+			this(message, null, saveState);
+		}
+
+		public ValidationMessage(String message, Severity severity, DialogState saveState) {
+			this.message = message;
+			this.severity = severity;
+			this.saveState = saveState;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public Severity getSeverity() {
+			return severity;
+		}
+
+		public DialogState getSaveState() {
+			return saveState;
+		}
+
+		public Boolean getInitialAnalysisSuccess() {
+			return initialAnalysisSuccess;
+		}
+
+		public void setInitialAnalysisSuccess(Boolean initialAnalysisSuccess) {
+			this.initialAnalysisSuccess = initialAnalysisSuccess;
+		}
+
 	}
 
 	/**
@@ -304,30 +330,7 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 	}
 
-	/**
-	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint should be edited and "CREATE" otherwise
-	 *
-	 * @author Marcus Pinnecke
-	 */
-	public enum Mode {
-		UPDATE, CREATE
-	}
-
 	static class StringTable {
-
-		static final String CONSTRAINT_VOIDS_MODEL = YOUR_CONSTRAINT_VOIDS_THE_MODEL;
-
-		static final String CONSTRAINT_FALSE_OPTIONAL = "Your constraint leads to false optional features.\n%s";
-
-		static final String CONSTRAINT_DEAD_FEATURES = "Your constraint leads to dead features.\n%s";
-
-		static final String CONSTRAINT_REDUNDANCE = REDUNDANCY_OCCURRED_INSIDE_YOUR_CONSTRAINT_;
-
-		static final String CONSTRAINT_CHECK_ENDED = "Click \"%s\" to %s .";
-
-		static final String CONSTRAINT_TAUTOLOGY = YOUR_CONSTRAINT_IS_A_TAUTOLOGY_;
-
-		static final String CONSTRAINT_NOT_SATISFIABLE = YOUR_CONSTRAINT_IS_NOT_SATISFIABLE_;
 
 		static final String DEFAULT_DETAILS_NEW_CONSTRAINT = CREATE_PROPOSITIONAL_CONSTRAINT;
 
@@ -343,13 +346,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String OK_BUTTON_TEXT = "%s Constraint";
 
-		static final String SAVE_CHANGES = SAVE_YOUR_CHANGES;
-
-		static final String ADD_NEW_CONSTRAINT = ADD_YOUR_NEW_CONSTRAINT;
-
 		static final String VERB_SAVE = SAVE;
-
-		static final String CONSTRAINT_IS_NOT_SATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE;
 
 		static final String HREF_HELP_LINK = "http://www.cs.utexas.edu/~schwartz/ATS/fopdocs/guidsl.html";
 
@@ -357,24 +354,51 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String KEYSTROKE_SHORTCUT_FOR_PROPOSAL = "Ctrl+Space";
 
-		static final String CHECKING_CONSTRAINTS = CHECKING_CONSTRAINT___;
-
 		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_;
 
-		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURE = CONSTRAINT_CONTAINS_ONE_UNKNOWN_FEATURE_NAME_;
-
-		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURES = "Constraint contains %s unknown feature names.";
-
-		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved:\n%s";
+		static final String CONSTRAINT_CONNOT_BE_SAVED = "Constraint is invalid and can not be saved:\n%s";
 
 	}
 
 	/**
-	 * Current constraint editing mode.
+	 * The dialogs current state which correspond to the current validation process. Because some validation tests will take a long time span to be finished,
+	 * the dialog has three states.
+	 *
+	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this state everything is okay and the constraint is valid.
+	 *
+	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there are syntax errors for the constraint text or the validation process has finished
+	 * with an error found.
+	 *
+	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not recommended. However, some tests are running in this case.
+	 *
+	 * @author Marcus Pinnecke
 	 */
-	private Mode mode = Mode.CREATE;
+	public static enum DialogState {
+		SAVE_CHANGES_ENABLED, SAVE_CHANGES_DISABLED, SAVE_CHANGES_DONT_MIND
+	}
+
+	/**
+	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint should be edited and "CREATE" otherwise
+	 *
+	 * @author Marcus Pinnecke
+	 */
+	public static enum Mode {
+		UPDATE, CREATE
+	}
 
 	private static final String FILTERTEXT = TYPE_FILTER_TEXT;
+
+	/**
+	 * The dialogs title text.
+	 */
+	private static final String DEFAULT_DIALOG_TITLE = CONSTRAINT_DIALOG;
+
+	private final static int PROPOSAL_AUTO_ACTIVATION_DELAY = 500;
+
+	/**
+	 * Current constraint editing mode.
+	 */
+	private final Mode mode;
 
 	/**
 	 * The panel on the top of this dialog showing useful information and details.
@@ -384,7 +408,9 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * An object which contains several validation functionalities used in this dialog to check if a given constraint text is valid.
 	 */
-	private static final ConstraintTextValidator VALIDATOR = new ConstraintTextValidator();
+	private final ConstraintTextValidator validator = new ConstraintTextValidator();
+	private final IFeatureModel featureModel;
+	private final List<String> featureNamesList;
 
 	private Shell shell;
 
@@ -399,7 +425,6 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
-	private final IFeatureModel featureModel;
 	private Button okButton;
 
 	private final IConstraint constraint;
@@ -410,143 +435,58 @@ public class ConstraintDialog implements GUIDefaults {
 	private Button cancelButton;
 
 	/**
-	 * The dialogs title text.
-	 */
-	private static final String DEFAULT_DIALOG_TITLE = CONSTRAINT_DIALOG;
-
-	/**
 	 * Content proposal pop up.
 	 */
-	ContentProposalAdapter adapter;
+	private ContentProposalAdapter adapter;
 
-	private final static int PROPOSAL_AUTO_ACTIVATION_DELAY = 500;
-
-	public static final int VALIDATION_TIME_OUT = 1000;
-
-	/**
-	 * Called when a validation test is just started.
-	 */
-	private final IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
-
+	private final IConsumer<ValidationMessage> onUpdate = new IConsumer<ValidationMessage>() {
 		@Override
-		public void invoke(ValidationMessage message) {
-			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
-			headerPanel.setDetails(String.format(BEFORE_THIS_PROCESS_HAS_ENDED,
-					(mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE), okButton.getText()),
-					HeaderPanel.HeaderDescriptionImage.NONE);
+		public void invoke(final ValidationMessage message) {
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (message.getSeverity() != null) {
+						switch (message.getSeverity()) {
+						case ERROR:
+							update(message.getMessage(), HeaderPanel.HeaderDescriptionImage.ERROR, message.getSaveState());
+							break;
+						case INFO:
+							update(message.getMessage(), HeaderPanel.HeaderDescriptionImage.INFO, message.getSaveState());
+							break;
+						case WARNING:
+							update(message.getMessage(), HeaderPanel.HeaderDescriptionImage.WARNING, message.getSaveState());
+							break;
+						default:
+							break;
+						}
+					} else {
+						update(message.getMessage(), HeaderPanel.HeaderDescriptionImage.NONE, message.getSaveState());
+						if ((message.getInitialAnalysisSuccess() != null) && message.getInitialAnalysisSuccess()) {
+							validate();
+						}
+					}
+				}
+
+			});
 		}
 	};
 
-	/**
-	 * Called when the validation test for VOIDS_MODEL has completed.
-	 */
-	private final IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(StringTable.CONSTRAINT_VOIDS_MODEL, HeaderPanel.HeaderDescriptionImage.WARNING);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for FALSE_OPTIONAL has completed.
-	 */
-	private final IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(String.format(StringTable.CONSTRAINT_FALSE_OPTIONAL, message.details), HeaderPanel.HeaderDescriptionImage.WARNING);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for DEAD_FEATURES has completed.
-	 */
-	private final IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(String.format(StringTable.CONSTRAINT_DEAD_FEATURES, message.details), HeaderPanel.HeaderDescriptionImage.WARNING);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for REDUNDANT_CHECK has completed.
-	 */
-	private final IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(StringTable.CONSTRAINT_REDUNDANCE, HeaderPanel.HeaderDescriptionImage.INFO);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test has finished.
-	 */
-	private final IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CHECK_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE),
-					(mode == Mode.UPDATE ? StringTable.SAVE_CHANGES : StringTable.ADD_NEW_CONSTRAINT)), HeaderPanel.HeaderDescriptionImage.NONE);
-			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
-		}
-	};
-
-	/**
-	 * Called when the validation test for "tautology" has completed.
-	 */
-	private final IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(StringTable.CONSTRAINT_TAUTOLOGY, HeaderPanel.HeaderDescriptionImage.WARNING);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for SATISFIABLE_TEST has completed.
-	 */
-	private final IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
-
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(StringTable.CONSTRAINT_NOT_SATISFIABLE, HeaderPanel.HeaderDescriptionImage.WARNING);
-			}
-		}
-	};
-
-	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
+	public ConstraintDialog(final IFeatureModel featureModel, final IConstraint constraint) {
+		this.featureModel = featureModel;
 		this.constraint = constraint;
-		featureModel = featuremodel;
-		String constraintDescriptionText;
 
+		final String constraintDescriptionText;
 		if (constraint == null) {
 			constraintDescriptionText = "";
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
 			initialConstraint = "";
 			mode = Mode.CREATE;
-
 		} else {
 			constraintDescriptionText = constraint.getDescription();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
-
 			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
-
 			mode = Mode.UPDATE;
 		}
 
@@ -558,22 +498,26 @@ public class ConstraintDialog implements GUIDefaults {
 		layoutData.horizontalAlignment = GridData.FILL;
 		layoutData.verticalAlignment = GridData.FILL;
 		layoutData.grabExcessVerticalSpace = true;
+		layoutData.grabExcessHorizontalSpace = true;
 		sashForm.setLayoutData(layoutData);
 
-		initFeatureGroup(featuremodel);
+		initFeatureGroup();
 		initConstraintDescriptionText(constraintDescriptionText);
 		initButtonGroup();
 		initConstraintText();
-		initBottom(featuremodel, constraint);
+		initBottom();
 		constraintText.setFocus();
 		constraintText.setSelection(constraintText.getCharCount());
+
 		shell.open();
+
+		update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
+		validator.init(this.featureModel, constraint, onUpdate);
+		featureNamesList = FeatureUtils.getFeatureNamesList(this.featureModel);
 
 		if (constraint != null) {
 			validate();
 		}
-
-		updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 	}
 
 	/**
@@ -587,7 +531,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Logic for pressing cancel-button. This method is called when pressing ESC or hit the cancel button.
 	 */
 	private void cancelButtonPressEvent() {
-		VALIDATOR.cancelValidation();
+		validator.cancelValidation();
 		shell.dispose();
 	}
 
@@ -600,11 +544,11 @@ public class ConstraintDialog implements GUIDefaults {
 	private void closeShell() {
 		final NodeReader nodeReader = new NodeReader();
 		final String input = constraintText.getText().trim();
-		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
+		final Node propNode = nodeReader.stringToNode(input, featureNamesList);
 		final String constraintDescription = constraintDescriptionText.getText().trim();
 
 		AbstractOperation op = null;
-		if ((constraint != null) && featureModel.getConstraints().contains(constraint)) {
+		if ((constraint != null)) {
 			for (final IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
 					op = new EditConstraintOperation(featureModel, c, propNode, constraintDescription);
@@ -626,11 +570,8 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Initializes the bottom part of the dialog
-	 *
-	 * @param featuremodel
-	 * @param constraint
 	 */
-	private void initBottom(final IFeatureModel featuremodel, final IConstraint constraint) {
+	private void initBottom() {
 		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		final Composite lastComposite = new Composite(shell, SWT.NONE);
@@ -645,7 +586,6 @@ public class ConstraintDialog implements GUIDefaults {
 		final ToolItem helpButton = new ToolItem(helpButtonBar, SWT.NONE);
 		helpButton.setImage(HELP_IMAGE);
 		helpButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				Program.launch(StringTable.HREF_HELP_LINK);
@@ -686,14 +626,10 @@ public class ConstraintDialog implements GUIDefaults {
 		lastComposite.setTabList(new Control[] { okButton, cancelButton });
 
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-
 				okButtonPressEvent();
-
 			}
-
 		});
 	}
 
@@ -750,24 +686,55 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setPossibleWords(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
-				if (constraintText.getText().trim().isEmpty()) {
-					headerPanel.setDetails(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE);
-					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
-				} else {
-					validate();
-				}
+				validate();
 			}
 		});
 
 	}
 
 	/**
+	 * Updates the dialogs state, displaying the given message, changing the default button, and setting the text for this button depending on the current
+	 * {@link ConstraintDialog.DialogState}.
+	 *
+	 * @param message The message to display
+	 * @param image The image to display
+	 * @param saveState The state to consider
+	 */
+	private void update(String message, HeaderDescriptionImage image, DialogState saveState) {
+		if (shell.isDisposed()) {
+			return;
+		}
+		if (message != null) {
+			headerPanel.setDetails(message, image);
+		}
+		if (saveState != null) {
+			switch (saveState) {
+			case SAVE_CHANGES_ENABLED:
+				okButton.setEnabled(true);
+				shell.setDefaultButton(okButton);
+				autoSetOkButtonText();
+				break;
+			case SAVE_CHANGES_DONT_MIND:
+				okButton.setEnabled(true);
+				shell.setDefaultButton(okButton);
+				okButton.setText(SAVE_ANYWAY);
+				break;
+			default:
+				okButton.setEnabled(false);
+				shell.setDefaultButton(cancelButton);
+				autoSetOkButtonText();
+				break;
+			}
+		}
+	}
+
+	/**
 	 * Initializes the text containing the descriptions.
 	 */
 	private void initConstraintDescriptionText(String description) {
+
 		descriptionGroup = new Group(sashForm, SWT.NONE);
 		descriptionGroup.setText("Description");
 		final GridData gridData = new GridData(GridData.FILL_BOTH);
@@ -777,18 +744,16 @@ public class ConstraintDialog implements GUIDefaults {
 		final GridLayout featureGroupLayout = new GridLayout();
 		featureGroupLayout.numColumns = 1;
 		descriptionGroup.setLayout(featureGroupLayout);
-
-		constraintDescriptionText = new Text(descriptionGroup, SWT.WRAP | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		constraintDescriptionText = new Text(descriptionGroup, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		constraintDescriptionText.setLayoutData(gridData);
 		constraintDescriptionText.setText(description);
+
 	}
 
 	/**
 	 * Initializes the group containing the searchText and featureTable.
-	 *
-	 * @param featuremodel
 	 */
-	private void initFeatureGroup(final IFeatureModel featuremodel) {
+	private void initFeatureGroup() {
 		featureGroup = new Group(sashForm, SWT.NONE);
 		featureGroup.setText("Features");
 		GridData gridData = new GridData(GridData.FILL);
@@ -962,7 +927,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void okButtonPressEvent() {
 		if (okButton.isEnabled()) {
-			VALIDATOR.cancelValidation();
+			validator.cancelValidation();
 			closeShell();
 		}
 	}
@@ -999,59 +964,24 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * Updates the dialogs state, changing the default button and setting the text for this button depending on the current
-	 * {@link ConstraintDialog.DialogState}.
-	 *
-	 * @param state The state to consider
-	 */
-	private void updateDialogState(DialogState state) {
-		switch (state) {
-		case SAVE_CHANGES_ENABLED:
-			okButton.setEnabled(true);
-			shell.setDefaultButton(okButton);
-			autoSetOkButtonText();
-			break;
-		case SAVE_CHANGES_DONT_MIND:
-			okButton.setEnabled(true);
-			shell.setDefaultButton(okButton);
-			okButton.setText(SAVE_ANYWAY);
-			break;
-		default:
-			okButton.setEnabled(false);
-			shell.setDefaultButton(cancelButton);
-			autoSetOkButtonText();
-			break;
-		}
-	}
-
-	/**
 	 * Validates the current constraint in constraintText.
-	 *
 	 */
 	private void validate() {
-		headerPanel.setDetails(StringTable.CHECKING_CONSTRAINTS, HeaderPanel.HeaderDescriptionImage.NONE);
-		Display.getDefault().syncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				final String text = constraintText.getText();
-				final List<String> featureNamesList = FeatureUtils.getFeatureNamesList(featureModel);
-				final NodeReader nodeReader = new NodeReader();
-				final boolean wellFormed = nodeReader.isWellFormed(text.trim(), featureNamesList);
-
-				constraintText.underlineEverything(!wellFormed && constraintText.getUnknownWords().isEmpty());
-
-				if (wellFormed) {
-					VALIDATOR.validateAsync(constraint, VALIDATION_TIME_OUT, featureModel, text, onCheckStarted, onVoidsModelCheckComplete,
-							onFalseOptionalCheckComplete, onDeadFeatureCheckComplete, onIsRedundantCheckComplete, onCheckEnded, onIsTautology,
-							onIsNotSatisfiable);
-					updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
-				} else {
-					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
-							HeaderPanel.HeaderDescriptionImage.ERROR);
-					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
+		final String text = constraintText.getText().trim();
+		if (text.isEmpty()) {
+			update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
+		} else {
+			final NodeReader nodeReader = new NodeReader();
+			final Node constraintNode = nodeReader.stringToNode(text, featureNamesList);
+			if (constraintNode == null) {
+				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
+						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
+				constraintText.underlineEverything(constraintText.getUnknownWords().isEmpty());
+			} else {
+				if (!validator.validateAsync(constraintNode, onUpdate)) {
+					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
 				}
 			}
-		});
+		}
 	}
 }

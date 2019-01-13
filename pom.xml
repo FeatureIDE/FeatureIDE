@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
-	<artifactId>de.ovgu.featureide</artifactId>
-	<version>3.5.0-SNAPSHOT</version>
+	<artifactId>de.ovgu.featureide.root</artifactId>
+	<version>3.5.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho-version>1.0.0</tycho-version>
-		<tycho-extras-version>1.0.0</tycho-extras-version>
+		<tycho-version>1.1.0</tycho-version>
+		<tycho-extras-version>1.1.0</tycho-extras-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -16,13 +16,12 @@
 	</properties>
 
 	<modules>
+		<!--Plugin-Modules-->
 		<module>plugins/de.ovgu.featureide.fm.core</module>
 		<module>plugins/de.ovgu.featureide.fm.ui</module>
 		<module>plugins/de.ovgu.featureide.fm.attributes</module>
-
 		<module>plugins/de.ovgu.featureide.core</module>
 		<module>plugins/de.ovgu.featureide.ui</module>
-
 		<module>plugins/br.ufal.ic.colligens</module>
 		<module>plugins/de.ovgu.featureide.core.ahead</module>
 		<module>plugins/de.ovgu.featureide.core.antenna</module>
@@ -40,12 +39,11 @@
 		<module>plugins/de.ovgu.featureide.migration</module>
 		<module>plugins/de.ovgu.featureide.ui.android</module>
 		<module>plugins/de.ovgu.featureide.ui.mpl</module>
-
+		
+		<!--Testmodules-->
 		<module>tests/de.ovgu.featureide.fm.core-test</module>
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
-
 		<module>tests/de.ovgu.featureide.ui-test</module>
-
 		<module>tests/de.ovgu.featureide.core.ahead-test</module>
 		<module>tests/de.ovgu.featureide.core.antenna-test</module>
 		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
@@ -53,18 +51,21 @@
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
 	</modules>
 
-	<!-- mvn -Pruntime -Pgui <phase> -OR- mvn -Pruntime <phase> -BUT NOT ONLY- mvn -Pgui <phase>-->
+	<!--The profiles are NightlyUpdates (nu) and GuiTests (gui)
+		run 'mvn -Pnu clean package' to build an update-site
+		run 'mvn -Pnu -Pgui clean verify' to build update-site and execute gui-tests
+		NOTE: 	Do not run 'mvn -Pgui clean verify'. 
+				Gui-Test-Module needs an installable FeatureIDE-Version from nu.-->
 	<profiles>
 		<profile>
-            <id>runtime</id>
+            <id>nu</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
-                <module>runtime</module>
+                <module>deploy</module>
             </modules>
         </profile>
-        
         <profile>
             <id>gui</id>
             <activation>
@@ -91,6 +92,23 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<pomDependencies>consider</pomDependencies>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 

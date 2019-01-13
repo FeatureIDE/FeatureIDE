@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -80,6 +81,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
+	private IFeatureNameValidator validator;
+
+	private final List<Problem> localProblems = new ArrayList<>();
+
+	public XmlFeatureModelFormat() {}
+
+	protected XmlFeatureModelFormat(XmlFeatureModelFormat oldFormat) {
+		factory = oldFormat.factory;
+		validator = oldFormat.validator;
+	}
 
 	@Override
 	public boolean supportsRead() {
@@ -115,6 +126,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		importCustomProperties(customProperties, object);
+		warnings.addAll(localProblems);
 	}
 
 	@Override
@@ -511,13 +523,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
-				String nodeValue = e.getFirstChild().getNodeValue();
-				if ((nodeValue != null) && !nodeValue.isEmpty()) {
-					nodeValue = nodeValue.replace("\t", "");
-					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
-					nodeValue = nodeValue.trim();
+				if (e.getFirstChild() != null) {
+					String nodeValue = e.getFirstChild().getNodeValue();
+					if ((nodeValue != null) && !nodeValue.isEmpty()) {
+						nodeValue = nodeValue.replace("\t", "");
+						nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
+						nodeValue = nodeValue.trim();
+					}
+					parent.getProperty().setDescription(nodeValue);
 				}
-				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
 			boolean mandatory = false;
@@ -551,10 +565,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			// TODO Consider feature name validity in all readers
-			// if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-			// throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			// }
+
+			if ((validator != null) && !validator.isValidFeatureName(name)) {
+				addToProblemsList(name + " is not a valid feature name", e);
+			}
+
 			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
@@ -604,6 +619,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
+	private void addToProblemsList(String message, org.w3c.dom.Node node) {
+		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+	}
+
 	// TODO implement warnings
 	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
@@ -631,7 +651,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	@Override
 	public XmlFeatureModelFormat getInstance() {
-		return new XmlFeatureModelFormat();
+		return new XmlFeatureModelFormat(this);
 	}
 
 	@Override
@@ -652,6 +672,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	public String getName() {
 		return "FeatureIDE";
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
 	}
 
 }

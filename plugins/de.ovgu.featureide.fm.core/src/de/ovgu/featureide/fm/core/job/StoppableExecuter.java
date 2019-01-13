@@ -31,27 +31,21 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
  */
 class StoppableExecuter<T> extends Executer<T> {
 
+	static final int DEFAULT_TIMEOUT = 300;
+
 	private class InnerThread extends Thread {
 
-		private final IMonitor workMonitor;
-
 		private T result = null;
-		private int success = 0;
-
-		public InnerThread(IMonitor monitor) {
-			super();
-			this.workMonitor = monitor;
-		}
+		private Exception exception = null;
 
 		@Override
 		public void run() {
 			try {
-				result = method.execute(workMonitor);
-				success = 1;
+				result = method.execute(monitor);
 			} catch (final MethodCancelException e) {
-				success = -1;
+				exception = e;
 			} catch (final Exception e) {
-				success = 0;
+				exception = e;
 				Logger.logError(e);
 			}
 		}
@@ -64,7 +58,7 @@ class StoppableExecuter<T> extends Executer<T> {
 
 	public StoppableExecuter(LongRunningMethod<T> method, int cancelingTimeout) {
 		super(method);
-		this.cancelingTimeout = (cancelingTimeout < 0) ? 300 : cancelingTimeout;
+		this.cancelingTimeout = (cancelingTimeout < 0) ? DEFAULT_TIMEOUT : cancelingTimeout;
 	}
 
 	public StoppableExecuter(LongRunningMethod<T> method) {
@@ -77,6 +71,7 @@ class StoppableExecuter<T> extends Executer<T> {
 			if (innerThread == null) {
 				return;
 			}
+			monitor.cancel();
 		}
 
 		if (cancelingTimeout > 0) {
@@ -104,14 +99,15 @@ class StoppableExecuter<T> extends Executer<T> {
 	public T execute(IMonitor monitor) throws Exception {
 		synchronized (this) {
 			// in case job was started and canceled at the same time
+			this.monitor = monitor;
 			monitor.checkCancel();
-			innerThread = new InnerThread(monitor);
+			innerThread = new InnerThread();
 			innerThread.start();
 		}
 		try {
 			innerThread.join();
-			if (innerThread.success == -1) {
-				throw new MethodCancelException();
+			if (innerThread.exception != null) {
+				throw innerThread.exception;
 			}
 			return innerThread.result;
 		} catch (final InterruptedException e) {

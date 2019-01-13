@@ -62,7 +62,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
 
-	private static final String SUFFIX = "xml";
+	public static final String FILE_EXTENSION = "xml";
 
 	protected T object;
 
@@ -84,7 +84,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 
 	@Override
 	public String getSuffix() {
-		return SUFFIX;
+		return FILE_EXTENSION;
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 			final TransformerFactory factory = TransformerFactory.newInstance();
 			factory.setAttribute("indent-number", new Integer(4));
 			final Transformer transformer = factory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, SUFFIX);
+			transformer.setOutputProperty(OutputKeys.METHOD, FILE_EXTENSION);
 			transformer.setOutputProperty(OutputKeys.INDENT, YES);
 			transformer.transform(new DOMSource(doc), streamResult);
 			return streamResult.getWriter().toString();

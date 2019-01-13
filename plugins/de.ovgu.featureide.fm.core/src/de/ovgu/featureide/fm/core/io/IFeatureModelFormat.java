@@ -33,4 +33,8 @@ public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
 
 	public static String extensionID = "fmFormat";
 
+	void setFeatureNameValidator(IFeatureNameValidator validator);
+
+	IFeatureNameValidator getFeatureNameValidator();
+
 }

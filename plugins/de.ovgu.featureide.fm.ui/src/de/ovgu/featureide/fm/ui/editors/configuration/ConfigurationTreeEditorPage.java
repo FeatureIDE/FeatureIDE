@@ -110,8 +110,11 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
@@ -156,6 +159,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 
+	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
+
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
 
@@ -185,7 +190,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private Label infoLabel;
 
-	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
+	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<>();
+
+	protected final JobToken infoLabelToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+	protected final JobToken updateToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+	protected final JobToken coloringToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	/**
 	 * The item the toolTip belongs to.
@@ -588,7 +597,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (configurationEditor.getConfiguration().getPropagator() == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = new LongRunningJob<>("", configurationEditor.getConfiguration().getPropagator().number(250, false));
+		final IRunner<Long> job = LongRunningWrapper.getRunner(configurationEditor.getConfiguration().getPropagator().number(250, false));
 		job.addJobFinishedListener(new JobFinishListener<Long>() {
 
 			@Override
@@ -621,7 +630,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				});
 			}
 		});
-		configurationEditor.getConfigJobManager().startJob(job, true);
+		LongRunningWrapper.startJob(infoLabelToken, job);
 	}
 
 	@Override
@@ -920,7 +929,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	/**
 	 * Colors all features if they lead to a valid configuration if current configuration is invalid. deselect:blue, select:green
 	 */
-	protected LongRunningJob<List<Node>> computeColoring(final Display currentDisplay) {
+	protected IRunner<List<Node>> computeColoring(final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
 			for (final SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 				selectableFeature.setRecommendationValue(-1);
@@ -976,8 +985,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 
 		final LongRunningMethod<List<Node>> jobs = configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
-		final LongRunningJob<List<Node>> job = new LongRunningJob<List<Node>>("FindClauses", jobs);
-		job.schedule();
+		final IRunner<List<Node>> job = LongRunningWrapper.getRunner(jobs, "FindClauses");
 
 		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
 
@@ -1080,14 +1088,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected LongRunningJob<Void> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected IRunner<Void> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
 		final TreeItem topItem = tree.getTopItem();
 		final SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
-		final LongRunningJob<Void> job = new LongRunningJob<>("", update);
+		final IRunner<Void> job = LongRunningWrapper.getRunner(update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 
 			@Override
@@ -1188,16 +1196,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final LongRunningJob<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
+		final IRunner<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
 		if (updateJob != null) {
-			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
+			updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
 
 				@Override
-				public void jobFinished(IJob<List<String>> finishedJob) {
+				public void jobFinished(IJob<Void> finishedJob) {
 					if (finishedJob.getStatus() == JobStatus.OK) {
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
-						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+
+						LongRunningWrapper.startJob(coloringToken, computeColoring(currentDisplay));
 						// XXX Prevents configuration files from being deleted (read/write conflict)
 //						if (configurationEditor instanceof ConfigurationEditor) {
 //							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
@@ -1236,7 +1245,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 				@Override
 				public Void invoke(Void t) {
-					configurationEditor.getConfigJobManager().startJob(updateJob, true);
+					LongRunningWrapper.startJob(updateToken, updateJob);
 					return null;
 				}
 			});
@@ -1298,34 +1307,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final StringBuilder sb = new StringBuilder();
 
 			if (!describ.isEmpty()) {
-				sb.append("Description:\n");
-				sb.append(describ);
+				addElement(sb, "Description:", describ);
 			}
 			if (!relConst.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Constraints:\n");
-				sb.append(relConst);
+				addElement(sb, "Constraints:", relConst);
 			}
 			final Collection<Node> openClauses = feature.getOpenClauses();
 			if (!openClauses.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Open Clauses:\n");
+				final StringBuilder elementBuilder = new StringBuilder();
 				for (final Node clause : openClauses) {
-					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
+					elementBuilder.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
 				}
+				addElement(sb, "Open Clauses:", elementBuilder.toString());
 			}
 
 			// Print the explanation.
 			final Explanation<?> explanation = getExplanation(feature);
 			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append(explanation.getWriter().getString());
+				addElement(sb, null, explanation.getWriter().getString());
 			}
 
 			if (sb.length() > 0) {
@@ -1335,6 +1334,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
+	}
+
+	private void addElement(final StringBuilder sb, final String header, final String element) {
+		if (sb.length() > 0) {
+			sb.append("\n\n");
+		}
+		if (header != null) {
+			sb.append(header);
+			sb.append("\n");
+		}
+		sb.append((element.length() <= MAX_TOOLTIP_ELEMENT_LENGTH) ? element : element.substring(0, MAX_TOOLTIP_ELEMENT_LENGTH) + "\n[...]");
 	}
 
 	private void newToolTip(Shell shell, CharSequence toolTipText, boolean autoHide, int x, int y) {

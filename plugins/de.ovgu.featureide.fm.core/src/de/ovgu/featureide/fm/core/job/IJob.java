@@ -91,19 +91,13 @@ public interface IJob<T> {
 	 */
 	void removeJobFinishedListener(JobFinishListener<T> listener);
 
-	/**
-	 * {@link org.eclipse.core.runtime.jobs.Job#cancel()}
-	 */
 	boolean cancel();
-
-	Class<?> getImplementationClass();
 
 	void join() throws InterruptedException;
 
-	/**
-	 * {@link org.eclipse.core.runtime.jobs.Job#schedule()}
-	 */
 	void schedule();
+
+	void setPriority(int priority);
 
 	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
 

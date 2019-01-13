@@ -74,7 +74,10 @@ import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -95,7 +98,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private static final QualifiedName MODEL_PATH =
 		new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
-	private final JobSynchronizer configJobManager = new JobSynchronizer();
+	private final JobToken configJobToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	private final List<IConfigurationEditorPage> allPages = new ArrayList<>(5);
 	private List<IConfigurationEditorPage> extensionPages;
@@ -127,7 +130,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			configJobManager.cancelAllJobs();
+			LongRunningWrapper.cancelAllJobs(configJobToken);
 			if (featureModelManager != null) {
 				featureModelManager.removeListener(ConfigurationEditor.this);
 			}
@@ -269,25 +272,26 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void loadPropagator() {
 		if (!configurationManager.editObject().getPropagator().isLoaded()) {
 			final Display currentDisplay = Display.getCurrent();
-			final LongRunningJob<Void> configJob = new LongRunningJob<>("Load Propagator", configurationManager.editObject().getPropagator().load());
+			final IRunner<Void> configJob = LongRunningWrapper.getRunner(configurationManager.editObject().getPropagator().load(), "Load Propagator");
 			configJob.addJobFinishedListener(new JobFinishListener<Void>() {
 
 				@Override
 				public void jobFinished(IJob<Void> finishedJob) {
 					autoSelectFeatures = true;
-					currentDisplay.asyncExec(new Runnable() {
-
-						@Override
-						public void run() {
-							final IConfigurationEditorPage page = getPage(getActivePage());
-							if (page != null) {
-								page.propertyChange(null);
+					if (finishedJob.getStatus() == JobStatus.OK) {
+						currentDisplay.asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								final IConfigurationEditorPage page = getPage(getActivePage());
+								if (page != null) {
+									page.propertyChange(null);
+								}
 							}
-						}
-					});
+						});
+					}
 				}
 			});
-			configJobManager.startJob(configJob, true);
+			LongRunningWrapper.startJob(configJobToken, configJob);
 		}
 	}
 
@@ -588,11 +592,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	@Override
 	public File getModelFile() {
 		return modelFile;
-	}
-
-	@Override
-	public JobSynchronizer getConfigJobManager() {
-		return configJobManager;
 	}
 
 	@Override

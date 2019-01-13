@@ -63,11 +63,8 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private final IFeatureModel featureModel;
-	{
-		final IFeatureProject curFeatureProject = getCurrentFeatureProject();
-		featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
-	}
+	private IFeatureModel featureModel;
+
 	private final boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {}
@@ -76,12 +73,9 @@ public class DynamicProfileMenu extends ContributionItem {
 		super(id);
 	}
 
-	/**
-	 * Creates dynamic menu
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
-		if (featureModel == null) {
+		if (!initFeatureModel()) {
 			return;
 		}
 		final MenuManager man = new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
@@ -99,6 +93,16 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		man.setVisible(true);
 		createActions();
+	}
+
+	private boolean initFeatureModel() {
+		try {
+			final IFeatureProject curFeatureProject = getCurrentFeatureProject();
+			featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
+			return featureModel != null;
+		} catch (final Exception e) {
+			return false;
+		}
 	}
 
 	/**
@@ -169,10 +173,7 @@ public class DynamicProfileMenu extends ContributionItem {
 
 	}
 
-	/**
-	 * Returns selected FeatureProject
-	 */
-	private static IFeatureProject getCurrentFeatureProject() {
+	private static IFeatureProject getCurrentFeatureProject() throws Exception {
 		if (getIStructuredCurrentSelection() != null) {
 			final Object element = getIStructuredCurrentSelection().getFirstElement();
 			if (element != null) {
@@ -190,7 +191,7 @@ public class DynamicProfileMenu extends ContributionItem {
 						return CorePlugin.getFeatureProject(project);
 					}
 				}
-				throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
+				throw new Exception("element " + element + "(" + element.getClass() + ") not covered");
 			}
 		}
 		return null;

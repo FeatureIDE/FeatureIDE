@@ -4,8 +4,8 @@ Element-Name: NoEntriesInErrorLog
 Element-Type: verification
 Element-Version: 2.0
 Id: _2o2TwKjoEeeuipbK_M3LHA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/28/17 3:17 PM
+Runtime-Version: 2.3.0.201803262333
+Save-Time: 6/13/18 6:19 PM
 Verification-Type: org.eclipse.rcptt.verifications.log
 
 ------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57
@@ -13,7 +13,10 @@ Content-Type: text/errorlog-verification
 Entry-Name: .errorlog.verification
 
 INCLUDE CONTEXTS: true
+ALLOWED:
+3 0 .* Message:.*
+7 0 org.eclipse.ui.monitoring Message:.*
 DENIED:
-7 0 .* Message:.*
+4 0 .* Message:.*
 
 ------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57--

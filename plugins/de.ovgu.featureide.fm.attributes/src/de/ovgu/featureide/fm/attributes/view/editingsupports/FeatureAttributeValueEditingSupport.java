@@ -21,9 +21,13 @@
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -52,7 +56,17 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new TextCellEditor((Composite) getViewer().getControl());
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
+			String[] items = { "", "false", "true" };
+			ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor((Composite) getViewer().getControl(), SWT.READ_ONLY);
+			cellEditor.setLabelProvider(new LabelProvider());
+			cellEditor.setContentProvider(ArrayContentProvider.getInstance());
+			cellEditor.setInput(items);
+			return cellEditor;
+		} else {
+			return new TextCellEditor((Composite) getViewer().getControl());
+		}
 	}
 
 	/*
@@ -81,7 +95,10 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			return;
 		}
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
-			if (value.toString().toLowerCase().equals(TRUE_STRING)) {
+			if (value.toString().toLowerCase().equals("")) {
+				((IFeatureAttribute) element).setValue(null);
+				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+			} else if (value.toString().toLowerCase().equals(TRUE_STRING)) {
 				((IFeatureAttribute) element).setValue(new Boolean(true));
 				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} else {
