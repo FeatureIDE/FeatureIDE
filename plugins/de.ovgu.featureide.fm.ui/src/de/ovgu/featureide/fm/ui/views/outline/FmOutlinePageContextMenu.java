@@ -46,19 +46,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 
 /**
@@ -79,19 +66,6 @@ public class FmOutlinePageContextMenu {
 	private IFeatureModel fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
-	private HiddenAction hAction;
-	private MandatoryAction mAction;
-	private AbstractAction aAction;
-	private DeleteAction dAction;
-	private DeleteAllAction dAAction;
-	private RenameAction reAction;
-	private CreateCompoundAction cAction;
-	private CreateLayerAction clAction;
-	private CreateConstraintAction ccAction;
-	private EditConstraintAction ecAction;
-	private OrAction oAction;
-	private AndAction andAction;
-	private AlternativeAction altAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	private boolean syncCollapsedFeatures = false;
@@ -172,10 +146,6 @@ public class FmOutlinePageContextMenu {
 
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
-
-		if (fTextEditor != null) {
-			reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
-		}
 
 		collapseAllAction = new Action() {
 
