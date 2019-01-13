@@ -149,7 +149,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
-	public boolean synchToFeatureDiagram = false;
+	public boolean synchToFeatureDiagram = true;
 	public ArrayList<IFeature> selectedManualFeatures;
 	public ArrayList<IFeature> selectedAutomaticFeatures;
 	public ArrayList<IFeature> selection;
@@ -302,10 +302,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		repackAllColumns();
 	}
 
-	private void repackColumn(int index) {
-		tree.getColumn(index).pack();
-	}
-
 	private void repackAllColumns() {
 		for (final TreeColumn col : tree.getColumns()) {
 			col.pack();
@@ -357,7 +353,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
 
 		IActionBars actionBars = getViewSite().getActionBars();
-		IMenuManager dropDownManage = actionBars.getMenuManager();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));

@@ -82,6 +82,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 	private final IGraphicalFeature feature;
 	private Figure toolTipFigure = null;
+	private String toolTipText = "";
 	private static GridLayout gl = new GridLayout();
 
 	private static String ABSTRACT = " Abstract";
@@ -197,12 +198,14 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	 */
 	@Override
 	public IFigure getToolTip() {
-		if (toolTipFigure == null) {
+		final IFeature feature = this.feature.getObject();
+		final StringBuilder toolTip = new StringBuilder();
+		toolTip.append(feature.createTooltip(new Object[0]));
 
-			final IFeature feature = this.feature.getObject();
-			final StringBuilder toolTip = new StringBuilder();
-			toolTip.append(feature.createTooltip(new Object[0]));
-
+		if ((toolTipFigure != null)) {// && toolTipText.equals(toolTip.toString())) {
+			return toolTipFigure;
+		} else {
+			toolTipText = toolTip.toString();
 			if (getActiveReason() != null) {
 				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
