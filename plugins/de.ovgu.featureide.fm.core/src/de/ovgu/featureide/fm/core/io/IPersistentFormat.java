@@ -68,11 +68,11 @@ public interface IPersistentFormat<T> extends IExtension {
 
 	/**
 	 * Returns an instance of this format. Clients should always call this method before calling {@link #read(Object, CharSequence)} or {@link #write(Object)}
-	 * and call these methods the returned value to avoid any unintended concurrent access.<br/><br/>
+	 * and call these methods the returned value to avoid any unintended concurrent access.<br><br>
 	 * <b>Example</b>
-	 * <code> <pre>
-	 * IPersistentFormat<?> format = getFormat();
-	 * format.getInstance().write(new Object())</pre></code>
+	 * <code>
+	 * IPersistentFormat&lt;?&gt; format = getFormat();
+	 * format.getInstance().write(new Object())</code>
 	 * Implementing classes may return {@code this}, if {@code read} and {@code write} are implemented in a static fashion (i.e., do not use any non-static
 	 * fields).
 	 *

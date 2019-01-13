@@ -150,11 +150,11 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 	}
 
 	/**
-	 * Creates the main file. This contains the converted Feature Diagram. <br> </br>
+	 * Creates the main file. This contains the converted Feature Diagram. <br>
 	 *
 	 * <b> Note: </b> The class <i> TikZHead </i> creates the styles and packages that are required to execute the resulting LaTeX Code correctly.
 	 *
-	 * @see {TikzHead}
+	 * @see TikZHeadFormat
 	 */
 	public class TikZMainFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
@@ -201,7 +201,6 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 	 * Processes a String to make special symbols LaTeX compatible.
 	 *
 	 * @param str a StringBuilder which content should be LaTeX code
-	 * @return a StringBuilder which contend has compatible LaTeX code
 	 */
 	public static void postProcessing(StringBuilder str) {
 		str.replace(0, str.length(), str.toString().replace("_", "\\_"));

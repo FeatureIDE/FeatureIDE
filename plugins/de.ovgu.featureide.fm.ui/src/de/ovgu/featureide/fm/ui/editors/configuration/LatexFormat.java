@@ -97,7 +97,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	/**
-	 * Creates the main file. This contains the converted configuration. <br> </br>
+	 * Creates the main file. This contains the converted configuration. <br>
 	 *
 	 * <b> Note: </b> The class <i> LaTeXHead </i> creates the styles and packages that are required to execute the resulting LaTeX Code correctly.
 	 *
@@ -155,7 +155,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		String fileName = new String();
 
 		/**
-		 * @param FileName The file name of the main file
+		 * @param fileName The file name of the main file
 		 */
 		public LaTeXBody(String fileName) {
 			this.fileName = fileName;
