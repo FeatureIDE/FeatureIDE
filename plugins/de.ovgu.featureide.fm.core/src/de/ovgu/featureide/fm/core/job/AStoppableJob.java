@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.Logger;
 /**
  * Abstract eclipse job which can be stopped.
  *
- * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/> A {@link IRunner} from the wrapper can be made stoppable via
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br> A {@link IRunner} from the wrapper can be made stoppable via
  *             {@link IRunner#setStoppable(boolean)}.
  *
  * @author Sebastian Krieter

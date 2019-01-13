@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core;
 import javax.annotation.Nonnull;
 
 /**
- * A FeatureIDE extension with its ID.<br/> <b>NOTE:</b> All extensions should provide a default/nullary constructor.
+ * A FeatureIDE extension with its ID.<br> <b>NOTE:</b> All extensions should provide a default/nullary constructor.
  *
  * @author Tom Brosch
  * @author Sebastian Krieter

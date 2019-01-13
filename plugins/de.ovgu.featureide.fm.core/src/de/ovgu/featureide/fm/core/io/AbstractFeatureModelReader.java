@@ -58,7 +58,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
 
 	/**
-	 * The source of the textual representation of the feature model.<br/><br/>
+	 * The source of the textual representation of the feature model.<br><br>
 	 *
 	 * <strong>Caution:</strong> This field can be null and is maybe not up to date.
 	 */
@@ -106,7 +106,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	}
 
 	/**
-	 * Reads a feature model from a string.<br/><br/>
+	 * Reads a feature model from a string.<br><br>
 	 *
 	 * Please use {@link #setFile(File)} if you know the source of the feature model.
 	 *

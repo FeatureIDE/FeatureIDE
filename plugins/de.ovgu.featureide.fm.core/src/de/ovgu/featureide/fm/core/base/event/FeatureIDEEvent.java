@@ -23,9 +23,9 @@ package de.ovgu.featureide.fm.core.base.event;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
- * Event triggered by changes to a feature model or its elements. <br/> <br/> Each event contains the following information: <ul> <li>an event type which
+ * Event triggered by changes to a feature model or its elements. <br> <br> Each event contains the following information: <ul> <li>an event type which
  * determine the kind of event</li> <li>the sender (source) of this event, i.e., which object fired this event</li> <li>the old value (if available), and the
- * new value</li> </ul> <br/> <br/> This events are intended to be processed by {@link IEventListener} instances. <br/> <br/> For usage to fire
+ * new value</li> </ul> <br> <br> This events are intended to be processed by {@link IEventListener} instances. <br> <br> For usage to fire
  * <code>FeatureIDEEvent</code>s, see {@link FeatureModel#fireEvent(FeatureIDEEvent)}.
  *
  * @author Sebastian Krieter

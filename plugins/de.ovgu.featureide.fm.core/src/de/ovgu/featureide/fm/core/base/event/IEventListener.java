@@ -23,15 +23,15 @@ package de.ovgu.featureide.fm.core.base.event;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
- * Interface for components listening to events fired by other components. <br/> Some classes of FeatureIDE use the observer-pattern, to notify listening
+ * Interface for components listening to events fired by other components. <br> Some classes of FeatureIDE use the observer-pattern, to notify listening
  * clients. For instance, a feature model fires a "model data changed" event when the model is changed. Listening clients, e.g., the diagram editor can react on
- * this event. <br/> <br/> The follow sketch outlines the observer-pattern usage in FeatureIDE, taken
+ * this event. <br> <br> The follow sketch outlines the observer-pattern usage in FeatureIDE, taken
  * {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor} and {@link FeatureModel} as example. <code><pre> IEventListener <--- propertyChange is called
  * --------- | | | | implements fires event | | V | FeatureDiagramEditor -- register as listener ---> FeatureModel </pre></code> An instance of
  * <code>FeatureMode</code> expects instances of <code>IEventListener</code> as listeners. Since <code>FeatureDiagramEditor</code> is instance of
  * </code>IEventListener</code>, it can be passed to the instance of <code>FeatureModel</code>. When a change in the data occurs, the instance of
- * <code>FeatureModel</code> will notify all attached <code>IEventListener</code> instances and, hence, the instance of <code>FeatureDiagramEditor</code>. <br/>
- * <br/> Please note that events fired and received over this interface are from type {@link FeatureIDEEvent}.
+ * <code>FeatureModel</code> will notify all attached <code>IEventListener</code> instances and, hence, the instance of <code>FeatureDiagramEditor</code>. <br>
+ * <br> Please note that events fired and received over this interface are from type {@link FeatureIDEEvent}.
  *
  * @author Sebastian Krieter
  */

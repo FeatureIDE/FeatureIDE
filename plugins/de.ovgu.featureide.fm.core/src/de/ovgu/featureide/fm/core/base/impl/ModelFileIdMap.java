@@ -44,7 +44,7 @@ public class ModelFileIdMap {
 	/**
 	 * Returns the feature models unique numeric identifier which is determined by the feature models physical file. A call to this method returns the id
 	 * associated with <b>modelFile</b> if the model identifier was already associated to this file name. Otherwise, the <b>featureModel</b>'s identifier is
-	 * returned and associated to <b>modelFile</b> for further usage. <br/> <br/> <b>Note</b>: There is no check if <b>featureModel.getId()</b> is unequal to
+	 * returned and associated to <b>modelFile</b> for further usage. <br> <br> <b>Note</b>: There is no check if <b>featureModel.getId()</b> is unequal to
 	 * the identifier associated with <b>modelFile</b>, i.e., if there is already an identifier associated with <b>modelFile</b> which is unequal to
 	 * <b>featureModel</b>'s model identifier, <b>modelFile</b>' identifier is returned.
 	 *
