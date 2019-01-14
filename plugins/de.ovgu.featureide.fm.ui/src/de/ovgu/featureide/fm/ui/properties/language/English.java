@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.properties.language;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE_GROUP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_TAUTOLOGY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENGLISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSE_OPTIONAL_FEATURE;
@@ -30,6 +31,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INDETERMINATE_HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR_GROUP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VOID_FEATURE_MODEL;
@@ -170,8 +172,18 @@ public class English implements ILanguage {
 	}
 
 	@Override
+	public String getAlternativeGroup() {
+		return ALTERNATIVE_GROUP;
+	}
+
+	@Override
 	public String getOr() {
 		return OR;
+	}
+
+	@Override
+	public String getOrGroup() {
+		return OR_GROUP;
 	}
 
 	@Override

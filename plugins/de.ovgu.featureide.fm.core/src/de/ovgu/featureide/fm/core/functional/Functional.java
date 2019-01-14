@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 public abstract class Functional {
 
 	/**
-	 * Represents a function that takes one argument of type <b>T</b> and returns a result of type <b>R</b>. <br/> <br/> <b>Example</b> The following example
+	 * Represents a function that takes one argument of type <b>T</b> and returns a result of type <b>R</b>. <br> <br> <b>Example</b> The following example
 	 * shows a function which takes an integer and converts this integer to its string representation (Java 1.8 syntax used). <code> <pre> IFunction<Integer,
 	 * String> toString = (integer) -> { integer.toString() }; String seven = toString(7); // seven.equals("7") </pre> </code>
 	 *
@@ -59,7 +59,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Represents a function that takes two arguments of type <b>T</b> and <b>U</b>. It returns a result of type <b>R</b>. <br/> <br/> <b>Example</b> The
+	 * Represents a function that takes two arguments of type <b>T</b> and <b>U</b>. It returns a result of type <b>R</b>. <br> <br> <b>Example</b> The
 	 * following example shows a function which takes two integer and converts the sum of these to its string representation (Java 1.8 syntax used). <code>
 	 * <pre> IBinaryFunction<Integer, Integer, String> toString = (a,b) -> { new Integer(a.intValue() + b.intValue()).toString() }; String seven =
 	 * toString(2,5); // seven.equals("7") </pre> </code>
@@ -80,7 +80,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Represents an operation that takes one arguments of type <b>T</b> and produces no result. <br/> <br/> <b>Example</b> The following example demonstrate
+	 * Represents an operation that takes one arguments of type <b>T</b> and produces no result. <br> <br> <b>Example</b> The following example demonstrate
 	 * the usage of <code>IConsumer</code>. For each element in a collection, the value is printed to the standard out (Java 1.8 syntax). <code> <pre>
 	 * IConsumer<MyClass> print = (myInstance) -> { System.out.println(myInstance) }; for (MyClass myInstance : collectionOfMyClassInstances)
 	 * print.invoke(myInstance); </pre> </code>
@@ -94,7 +94,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Represents an operation that takes no arguments but produces a result of type <b>T</b>. <br/> <br/> <b>Example</b> The following example demonstrate the
+	 * Represents an operation that takes no arguments but produces a result of type <b>T</b>. <br> <br> <b>Example</b> The following example demonstrate the
 	 * usage of <code>IProvider</code>. For each call, a new random number is created (Java 1.8 syntax). <code> <pre> IProvider<Integer> random = () -> { new
 	 * Random().nextInt() }; System.out.println(random.invoke()); // unlikely to print "42" to the console </pre> </code> This function is of interest when a
 	 * new instance of a complex should be generated on-demand.
@@ -114,7 +114,7 @@ public abstract class Functional {
 	};
 
 	/**
-	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type. <br/> <br/> <b>Example</b> The following example
+	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type. <br> <br> <b>Example</b> The following example
 	 * shows a function which takes an integer and applied 2 times this integer (Java 1.8 syntax used). <code> <pre> IdentityFunction<Integer> twoTimes =
 	 * (integer) -> { integer.intValue() * 2 }; Integer value = twoTimes(7); // seven.equals("14") </pre> </code>
 	 *
@@ -322,7 +322,7 @@ public abstract class Functional {
 	 * Filters an object named <b>source</b> that yields elements of type <b>T</b> by a given <b>predicate</b> over <b>U</b> and transforms all qualified
 	 * elements from <b>T</b> to <b>U</b> using a user-defined {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter}. This filtering is done in a lazy
 	 * manner using iterator logic. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>. </br> </br> It is assumed that
-	 * <b>source</b> and </b>predicate</b> are non-null. <br/> <br/> This is a <b>non-blocking</b> operation.
+	 * <b>source</b> and </b>predicate</b> are non-null. <br> <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @param predicate Filter condition
@@ -351,8 +351,8 @@ public abstract class Functional {
 	/**
 	 * Maps a user-defined {@link IFunction} that takes elements of type <b>T</b> and returns for each element a result of type <b>U</b> on each element of an
 	 * object named <b>source</b> that yields elements of type <b>T</b>. This mapping process is done in a lazy manner using iterator logic. Furthermore, it is
-	 * guaranteed not to remove any element from the iterator <i>i</i>. </br> </br> It is assumed that <b>source</b> and </b>function</b> are non-null. <br/>
-	 * <br/> This is a <b>non-blocking</b> operation.
+	 * guaranteed not to remove any element from the iterator <i>i</i>. </br> </br> It is assumed that <b>source</b> and </b>function</b> are non-null. <br>
+	 * <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @param function user-defined {@link IFunction}
@@ -366,8 +366,8 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator of type <b>T</b> into an iterator of type <b>String</b> by invoking <code>toString()</code> on each element. <br/> It is guaranteed
-	 * to not remove any element from the iterator. <br/> <br/> This is a <b>non-blocking</b> operation.
+	 * Converts the iterator of type <b>T</b> into an iterator of type <b>String</b> by invoking <code>toString()</code> on each element. <br> It is guaranteed
+	 * to not remove any element from the iterator. <br> <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @return An iterable object that yields all elements of <b>source</b> after invoking <code>toString</code> on them
@@ -382,8 +382,8 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>i</i> of type <b>T</b> into a list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br/> <br/> It is
-	 * guaranteed not to remove any element from the iterator. <br/> <br/> This is a <b>blocking</b> operation. The resulting list <b>is not modifiable</b>
+	 * Converts the iterator <i>i</i> of type <b>T</b> into a list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br> <br> It is
+	 * guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b> operation. The resulting list <b>is not modifiable</b>
 	 *
 	 * @param source Source of elements
 	 * @return A list of object that were yielded by <b>source</b>
@@ -400,8 +400,8 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>i</i> of type <b>T</b> into a set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br/> <br/> It is
-	 * guaranteed not to remove any element from the iterator. <br/> <br/> This is a <b>blocking</b> operation. The resulting set <b>is not modifiable</b>.
+	 * Converts the iterator <i>i</i> of type <b>T</b> into a set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br> <br> It is
+	 * guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b> operation. The resulting set <b>is not modifiable</b>.
 	 *
 	 * @param source Source of elements
 	 * @return A list of object that were yielded by <b>source</b>
@@ -427,7 +427,7 @@ public abstract class Functional {
 
 	/**
 	 * Converts the iterator <i>source</i> of type <b>T</b> into a list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
-	 * {@link #toList(Iterable)} on the result. <br/> <br/> It is guaranteed not to remove any element from the iterator. <br/> <br/> This is a <b>blocking</b>
+	 * {@link #toList(Iterable)} on the result. <br> <br> It is guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b>
 	 * operation.
 	 *
 	 * @param source Source of elements
@@ -442,7 +442,7 @@ public abstract class Functional {
 
 	/**
 	 * Converts the iterator <i>source</i> of type <b>T</b> into a set of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
-	 * {@link #toSet(Iterable)} on the result. <br/> <br/> It is guaranteed not to remove any element from the iterator. <br/> <br/> This is a <b>blocking</b>
+	 * {@link #toSet(Iterable)} on the result. <br> <br> It is guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b>
 	 * operation.
 	 *
 	 * @param source Source of elements
@@ -457,8 +457,8 @@ public abstract class Functional {
 
 	/**
 	 * Converts the iterator <i>source</i> of type <b>T</b> into a collection of <b>CharSequence</b> using a binary function invoking {@link Object#toString()}
-	 * on each element in <b>source</b> and finally {@link #toList(Iterable)} on the result. <br/> <br/> It is guaranteed not to remove any element from the
-	 * iterator. <br/> <br/> This is a <b>blocking</b> operation.
+	 * on each element in <b>source</b> and finally {@link #toList(Iterable)} on the result. <br> <br> It is guaranteed not to remove any element from the
+	 * iterator. <br> <br> This is a <b>blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @return A collection of CharSequence that were yielded by <b>source</b>
@@ -474,7 +474,7 @@ public abstract class Functional {
 
 	/**
 	 * Converts the enumeration <i>enumeration</i> of type <b>T</b> into an Iterable of <b>T</b>. The enumeration is read into a intermediate collection which
-	 * is then used to create the result value. <br/> It is guaranteed not to remove any element from the iterator. <br/> <br/> This is a <b>blocking</b>
+	 * is then used to create the result value. <br> It is guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b>
 	 * operation.
 	 *
 	 * @param enumeration Enumeration of elements
@@ -496,11 +496,11 @@ public abstract class Functional {
 	 * <code>source</code into a combined object of type <b>R</b>. The method first constructs a new instance of <b>R</b> as the <i>result</i> using the
 	 * <code>newInstanceOfR</code> parameter. Afterwards <code>source</code> is converted to a list of type <b>T</b>. For each element in this list the function
 	 * parameter <code>concat</code> is invoked with <i>result</i> as the first parameter and the current element of the list as second parameter. For each pair
-	 * of elements, <code>concat</code> is invoked again to add the delimiter. <br/> <br/> <b>Example</b><br/> The convenience method
+	 * of elements, <code>concat</code> is invoked again to add the delimiter. <br> <br> <b>Example</b><br> The convenience method
 	 * {@link Functional#join(Iterable, String, IFunction)} which takes the elements yielded by <code>source</code> and joins these elements into a string is
 	 * implemented using the general method {@link Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)}:. <code> <pre> <T> String
 	 * join(Iterable<T> source, String delimiter, IFunction<T, String> convert) { return join(source, delimiter, new IProvider<String>() { String invoke() {
-	 * return ""; } }, convert, new IBinaryFunction<String, String, String>() { String invoke(String t, String u) { return t + u; } }); } </pre> </code> <br/>
+	 * return ""; } }, convert, new IBinaryFunction<String, String, String>() { String invoke(String t, String u) { return t + u; } }); } </pre> </code> <br>
 	 *
 	 * @param <T> The type of elements whose iterable source should be joined to an object of type <b>R</b>
 	 * @param <R> The targeted type of the joined elements of <code>source</code>
@@ -531,7 +531,7 @@ public abstract class Functional {
 	/**
 	 * Takes the elements yielded by <code>source</code> and joins these elements into a string. The parameter <code>delimiter</code> is the delimiting element
 	 * between two elements in the string. Since <code>source</code> is a iterable over a arbitrary type <b>T</b>, the parameter <code>convert</code> of type
-	 * <code>IFunction</code> deals with the converting from <b>T</b> to <b>String</b>. <br/> <br/> <b>Example</b><br/> In the following example, the list of
+	 * <code>IFunction</code> deals with the converting from <b>T</b> to <b>String</b>. <br> <br> <b>Example</b><br> In the following example, the list of
 	 * double values <code>{7.7534, 2.322, 14.532}</code> is joined using {@link Functional#join(Iterable, String, IFunction)}. Each value is rounded to one
 	 * decimal place. The entire rounded values are then joined using a whitespace. The result <code>7,8 2,4 14,6</code> is printed to standard out. <code>
 	 * <pre> final DecimalFormat df = new DecimalFormat("#.#"); df.setRoundingMode(RoundingMode.CEILING); IFunction<Double, String> roundDoubleToString = new
@@ -539,7 +539,7 @@ public abstract class Functional {
 	 *
 	 * List<Double> list = new ArrayList<>(Arrays.asList(new Double[] {7.7534, 2.322, 14.532})); String joinedValues = Functional.join(list, " ",
 	 * roundDoubleToString); System.out.println(joinedValues); </pre> </code> It is good practise to store multiple occurrences of the function
-	 * <code>convert</code> into a static member of some class. The example above can be than reduced to the following. <br/> <br/> <code> <pre> List<Double>
+	 * <code>convert</code> into a static member of some class. The example above can be than reduced to the following. <br> <br> <code> <pre> List<Double>
 	 * list = new ArrayList<>(Arrays.asList(new Double[] {7.7534, 2.322, 14.532})); String joinedValues = Functional.join(list, " ", ROUND_DOUBLE_TO_STRING);
 	 * System.out.println(joinedValues); </pre> </code>
 	 *
@@ -581,7 +581,7 @@ public abstract class Functional {
 	 * @param lhs Iterable which should be checked of equality to <code>rhs</code>
 	 * @param rhs Iterable which should be checked of equality to <code>lhs</code>
 	 * @param map Converts elements from <b>T</b> to <b>U</b>
-	 * @return <b>true</b> if the elements in <code>lhs</code> are also in <b>rhs</b> and vice versa, otherwise <b>false</b>.<br/> <u><b>Note on
+	 * @return <b>true</b> if the elements in <code>lhs</code> are also in <b>rhs</b> and vice versa, otherwise <b>false</b>.<br> <u><b>Note on
 	 *         duplicates</b></u>: Duplicates in both <code>lhs</code> and <code>rhs</code> are eliminated <u>before</u> the test of equality.
 	 *
 	 * @author Marcus Pinnecke
@@ -595,7 +595,7 @@ public abstract class Functional {
 
 	/**
 	 * Returns an type-safe empty iterable of type <b>T</b> as convenience counterpart to {@link Collections#emptyIterator()} or
-	 * {@link Collections#emptyList()}. <br/> <br/> The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time. <br/> <br/>
+	 * {@link Collections#emptyList()}. <br> <br> The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time. <br> <br>
 	 * <b>Example</b> The following example shows how to create an empty iterable of type <code>IFeature</code>. <code> <pre> Iterable<IFeature> it =
 	 * Functional.getEmptyIterable(IFeature.class)); </pre> </code>
 	 *

@@ -443,7 +443,9 @@ public class StringTable {
 	public static final String SET_NAME_TYPE = "Set Name Type";
 	public static final String AND = "And";
 	public static final String OR = "Or";
+	public static final String OR_GROUP = "Or Group";
 	public static final String ALTERNATIVE = "Alternative";
+	public static final String ALTERNATIVE_GROUP = "Alternative Group";
 	public static final String DOUBLE_CLICK = " (Double Click)";
 	public static final String ANALYZE_FEATURE_MODEL = "Analyze feature model";
 	public static final String UPDATING_FEATURE_MODEL_ATTRIBUTES = "Updating feature model attributes";
@@ -591,6 +593,8 @@ public class StringTable {
 	public static final String EINGEKLAPPT = "Eingeklappt";
 	public static final String FALSCH_OPTIONALES_FEATURE = "Falsch-optionales Feature";
 	public static final String ODER = "Oder";
+	public static final String ODER_GRUPPE = "Oder-Gruppe";
+	public static final String ALTERNATIVE_GRUPPE = "Alternative-Gruppe";
 	public static final String UNBESTIMMBAR_VERSTECKTES_FEATURE = "Unbestimmbar verstecktes Feature";
 	public static final String REDUNDANTES_CONSTRAINT = "Redundantes Constraint";
 	public static final String CONSTRAINT_IST_TAUTOLOGIE = "Constraint ist Tautologie";

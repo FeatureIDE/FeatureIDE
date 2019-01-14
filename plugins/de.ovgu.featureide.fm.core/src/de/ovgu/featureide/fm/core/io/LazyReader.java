@@ -53,7 +53,7 @@ public class LazyReader implements CharSequence {
 	}
 
 	/**
-	 * Constructs a new reader with the given input stream as source.<br/> Does NOT close the stream.
+	 * Constructs a new reader with the given input stream as source.<br> Does NOT close the stream.
 	 *
 	 * @param stream the given source
 	 */

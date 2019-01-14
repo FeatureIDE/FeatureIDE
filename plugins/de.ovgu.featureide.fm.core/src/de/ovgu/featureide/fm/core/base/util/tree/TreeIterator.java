@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base.util.tree;
 import java.util.Iterator;
 
 /**
- * Iterates through a tree.<br/> Defines additional methods on the tree.
+ * Iterates through a tree.<br> Defines additional methods on the tree.
  *
  * @author Sebastian Krieter
  */

@@ -206,8 +206,8 @@ public interface IPropertyContainer {
 
 	/**
 	 * Sets a per-object user-defined property consisting of a <code>values</code> associated with a user-defined <code>key</code>. If <code>key</code> is
-	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. <br/> <br/> Properties are stored persistently such that an
-	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}. <br/> <br/> To receive the value behind a
+	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. <br> <br> Properties are stored persistently such that an
+	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}. <br> <br> To receive the value behind a
 	 * <code>key</code>, call {@link IPropertyContainer#get(String, Class)}.
 	 *
 	 * @author Marcus Pinnecke
