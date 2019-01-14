@@ -97,22 +97,27 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
 			if (value.toString().toLowerCase().equals("")) {
 				((IFeatureAttribute) element).setValue(null);
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 			} else if (value.toString().toLowerCase().equals(TRUE_STRING)) {
 				((IFeatureAttribute) element).setValue(new Boolean(true));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 			} else {
 				((IFeatureAttribute) element).setValue(new Boolean(false));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 			}
 		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
 			((IFeatureAttribute) element).setValue(value.toString());
-			view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
 			try {
 				final long temp = Long.parseLong(value.toString());
 				((IFeatureAttribute) element).setValue(new Long(temp));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a valid integer number.");
 			}
@@ -120,7 +125,8 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			try {
 				final double temp = Double.parseDouble(value.toString());
 				((IFeatureAttribute) element).setValue(new Double(temp));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a valid float number.");
 			}

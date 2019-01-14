@@ -314,6 +314,9 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case ACTIVE_REASON_CHANGED:
 			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
+		case FEATURE_ATTRIBUTE_CHANGED:
+			getFigure().ResetTooltip();
+			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
 			break;
