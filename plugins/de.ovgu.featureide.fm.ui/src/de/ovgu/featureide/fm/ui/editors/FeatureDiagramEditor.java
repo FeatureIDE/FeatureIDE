@@ -983,6 +983,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
 			setDirty(true);
+			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
+				final IFeature attributeChangedFeature = (IFeature) event.getNewValue();
+				final IGraphicalFeature graphicalAttributeChangedFeature = graphicalFeatureModel.getGraphicalFeature(attributeChangedFeature);
+				graphicalAttributeChangedFeature.update(event);
+			}
 			break;
 		case DEFAULT:
 			break;

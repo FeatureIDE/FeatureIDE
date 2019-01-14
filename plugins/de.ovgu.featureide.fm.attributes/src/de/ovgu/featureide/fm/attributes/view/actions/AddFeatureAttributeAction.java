@@ -63,23 +63,26 @@ public class AddFeatureAttributeAction extends Action {
 		case FeatureAttribute.BOOLEAN:
 			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeBoolean);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeBoolean, EventType.FEATURE_ATTRIBUTE_CHANGED, null, feature));
 			break;
 		case FeatureAttribute.DOUBLE:
 			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeDouble);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeDouble, EventType.FEATURE_ATTRIBUTE_CHANGED, null, feature));
 			break;
 		case FeatureAttribute.LONG:
 			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeLong);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeLong, EventType.FEATURE_ATTRIBUTE_CHANGED, null, feature));
 			break;
 		case FeatureAttribute.STRING:
 			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeString);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeString, EventType.FEATURE_ATTRIBUTE_CHANGED, null, feature));
 			break;
 		default:
 			break;
 		}
-		featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_ATTRIBUTE_CHANGED));
 	}
 
 	private String getUniqueAttributeName() {

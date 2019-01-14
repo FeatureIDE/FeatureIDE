@@ -68,7 +68,7 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected void setValue(Object element, Object value) {
 		((IFeatureAttribute) element).setUnit(value.toString());
-		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, null, ((IFeatureAttribute) element).getFeature()));
 		if (((IFeatureAttribute) element).isRecursive()) {
 			getViewer().refresh();
 		}
