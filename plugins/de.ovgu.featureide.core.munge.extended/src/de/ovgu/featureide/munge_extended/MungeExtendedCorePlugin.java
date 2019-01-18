@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge;
+package de.ovgu.featureide.munge_extended;
 
 import org.osgi.framework.BundleContext;
 
@@ -27,35 +27,27 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 /**
  * The activator class controls the plug-in life cycle
  *
- * @author Jens Meinicke
+ * @author Nicolas Hlad
  */
-public class MungeCorePlugin extends AbstractCorePlugin {
+public class MungeExtendedCorePlugin extends AbstractCorePlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "de.ovgu.featureide.core.munge"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "de.ovgu.featureide.core.munge-extended";
 
 	// The shared instance
-	private static MungeCorePlugin plugin;
+	private static MungeExtendedCorePlugin plugin;
 
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -67,7 +59,7 @@ public class MungeCorePlugin extends AbstractCorePlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static MungeCorePlugin getDefault() {
+	public static MungeExtendedCorePlugin getDefault() {
 		return plugin;
 	}
 

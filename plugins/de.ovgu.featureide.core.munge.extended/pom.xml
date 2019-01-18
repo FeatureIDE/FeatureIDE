@@ -7,6 +7,6 @@
 		<version>3.5.4-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
-	<artifactId>de.ovgu.featureide.core.munge</artifactId>
+	<artifactId>de.ovgu.featureide.core.munge.extended</artifactId>
 	<packaging>eclipse-plugin</packaging>
 </project>
