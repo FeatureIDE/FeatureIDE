@@ -56,8 +56,8 @@ public class ConstraintView implements GUIDefaults {
 
 	// Style parameters for the view
 	private final int BORDER_OFFSET = 4;
-	private final int CONSTRAINT_NAME_WIDTH = 800;
-	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
+	private final int CONSTRAINT_NAME_WIDTH = 500;
+	private final int CONSTRAINT_DESCRIPTION_WIDTH = 300;
 	private final int ALPHA_VALUE = 175;
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
@@ -245,7 +245,6 @@ public class ConstraintView implements GUIDefaults {
 		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
-
 		addColumns(treeViewer);
 	}
 
