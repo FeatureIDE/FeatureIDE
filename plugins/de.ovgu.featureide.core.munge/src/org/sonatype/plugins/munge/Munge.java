@@ -212,7 +212,8 @@ public class Munge {
 		job.schedule();
 	}
 
-	public void printErrorCount() {}
+	public void printErrorCount() {
+	}
 
 	public boolean hasErrors() {
 		return (errors > 0);
@@ -309,7 +310,12 @@ public class Munge {
 	 * If there's a preprocessor tag in this comment, act on it and return any text within it. If not, just return the whole comment unchanged.
 	 */
 	void processComment(String comment) throws IOException {
-		final String commentText = comment.substring(2, comment.length() - 2);
+		final String commentText;
+		if (comment.length() >= 4) {
+			commentText = comment.substring(2, comment.length() - 2);
+		} else {
+			commentText = "";
+		}
 		final StringTokenizer st = new StringTokenizer(commentText, "[] \t\r\n", true);
 		boolean foundTag = false;
 		final StringBuilder buffer = new StringBuilder();
@@ -385,6 +391,7 @@ public class Munge {
 			if (i == -1) {
 				// malformed comment, skip
 				block = source;
+				source = source.substring(block.length() - 1);
 				return CODE;
 			}
 			i += 2;  // include comment close

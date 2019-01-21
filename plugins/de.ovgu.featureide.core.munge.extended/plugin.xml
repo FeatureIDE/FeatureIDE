@@ -4,10 +4,10 @@
    <extension
          point="de.ovgu.featureide.core.composers">
       <composer
-            class="de.ovgu.featureide.munge_android.MungeAndroidPreprocessor"
-            description="Munge preprocessor for Android projects."
-            id="de.ovgu.featureide.preprocessor.munge-android"
-            name="Android (Munge)"
+            class="de.ovgu.featureide.munge_extended.MungeExtendedPreprocessor"
+            description="An Extension for Munge."
+            id="de.ovgu.featureide.preprocessor.munge-extended"
+            name="Munge (extended)"
             nature="FeatureIDE_Core.mungeNature">
       </composer>
    </extension>
@@ -15,8 +15,8 @@
          point="de.ovgu.featureide.fm.core.FMComposer">
       <fmComposer
             class="de.ovgu.featureide.munge.MungeFMComposerExtension"
-            composer="de.ovgu.featureide.preprocessor.munge-android"
-            id="de.ovgu.featureide.core.munge-android.fmcomposer"
+            composer="de.ovgu.featureide.preprocessor.munge-extended"
+            id="de.ovgu.featureide.core.munge-extended.fmcomposer"
             name="MungeFMComposer">
       </fmComposer>
    </extension>
