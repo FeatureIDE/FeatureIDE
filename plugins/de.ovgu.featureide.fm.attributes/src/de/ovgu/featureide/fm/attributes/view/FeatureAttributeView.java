@@ -137,7 +137,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_VALUE = "Value";
 	private final String COLUMN_UNIT = "Unit";
 	private final String COLUMN_RECURSIVE = "Recursive";
-	private final String COLUMN_CONFIGUREABLE = "Configureable";
+	private final String COLUMN_CONFIGURABLE = "Configureable";
 
 	private IWorkbenchPart currentEditor;
 	private ExtendedFeatureModel featureModel;
@@ -277,6 +277,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// create the columns
 		createColumns();
 
+		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
+		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
+		treeViewer.setUseHashlookup(true);
+
 		// make lines and header visible and set layout
 		tree = treeViewer.getTree();
 		tree.setHeaderVisible(true);
@@ -284,9 +288,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
 		gridData.horizontalSpan = 2;
 		tree.setLayoutData(gridData);
-
-		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
-		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
 
 		if (!treeViewer.getControl().isDisposed()) {
 			setEditorContent(null);
@@ -448,7 +449,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// Configureable
 		final TreeViewerColumn colConfigureable = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colConfigureable.getColumn().setWidth(200);
-		colConfigureable.getColumn().setText(COLUMN_CONFIGUREABLE);
+		colConfigureable.getColumn().setText(COLUMN_CONFIGURABLE);
 		colConfigureable.setEditingSupport(configureableEditingSupport);
 		colConfigureable.setLabelProvider(new FeatureAttributeConfigureableColumnLabelProvider(cachedImages, this));
 	}
@@ -502,7 +503,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 					if (!treeViewer.getControl().isDisposed()) {
 						treeViewer.setInput(featureModel);
 					}
-					treeViewer.expandAll();
+					treeViewer.collapseAll();
+					treeViewer.expandToLevel(2);
 					repackAllColumns();
 				} else {
 					setFeatureModel(null);
