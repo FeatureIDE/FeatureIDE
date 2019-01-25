@@ -105,7 +105,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		}
 		if (element instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) element;
-			return feature.getStructure().getParent().getFeature();
+			return feature.getStructure().getParent() != null ? feature.getStructure().getParent().getFeature() : null;
 		} else if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getFeature();
 		}
