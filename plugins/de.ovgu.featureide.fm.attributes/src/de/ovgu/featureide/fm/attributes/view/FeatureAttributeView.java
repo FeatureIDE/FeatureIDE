@@ -558,11 +558,13 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				treeViewer.refresh(featureModel);
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
-			if (event.getSource() instanceof IFeature) {
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.refresh((IFeature) event.getSource());
+			if (event.getOldValue() != null && event.getOldValue() instanceof Boolean && event.getNewValue() != null
+				&& event.getNewValue() instanceof IFeature) {
+				if ((Boolean) event.getOldValue()) {
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.refresh((IFeature) event.getNewValue());
+					}
 				}
-				treeViewer.expandAll();
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ADD) {
 			if (event.getSource() instanceof ExtendedFeatureModel) {

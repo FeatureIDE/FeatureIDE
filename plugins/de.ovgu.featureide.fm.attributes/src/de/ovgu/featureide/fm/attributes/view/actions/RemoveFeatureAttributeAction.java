@@ -58,7 +58,7 @@ public class RemoveFeatureAttributeAction extends Action {
 		for (final IFeatureAttribute featureAttribute : map.keySet()) {
 			map.get(featureAttribute).removeAttribute(featureAttribute);
 		}
-		featureModel.fireEvent(new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_ATTRIBUTE_CHANGED));
+		featureModel.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, featureModel.getStructure().getRoot().getFeature()));
 	}
 
 	@Override
