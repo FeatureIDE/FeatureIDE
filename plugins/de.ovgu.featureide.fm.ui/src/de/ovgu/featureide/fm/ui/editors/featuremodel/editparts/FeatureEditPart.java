@@ -315,7 +315,6 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
-			// Forces the features figure to remove the cached tooltip which was generated before.
 			getFigure().ResetTooltip();
 			break;
 		default:
