@@ -43,6 +43,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
+	public static final String PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM = StringTable.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
 	private Object[] features = EMPTY_ROOT;
@@ -130,6 +131,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			features = EMPTY_ROOT;
 		} else {
 			final ArrayList<Object> featureList = new ArrayList<>();
+			featureList.add(PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM);
 			featureList.add(featureModel.getStructure().getRoot().getFeature());
 			features = featureList.toArray();
 		}

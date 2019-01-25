@@ -1098,4 +1098,5 @@ public class StringTable {
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
+	public static final String PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM = "Please select a feature in the feature diagram";
 }
