@@ -25,10 +25,18 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (faView.selectedAutomaticFeatures == null || faView.selectedManualFeatures == null) {
-			return true;
+			if (faView.getFeatureModel() != null) {
+				return element == FeatureAttributeContentProvider.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM ? true : false;
+			} else {
+				return true;
+			}
 		} else {
 			if (faView.selectedAutomaticFeatures.size() == 0 || faView.selectedManualFeatures.size() == 0) {
-				return true;
+				if (faView.getFeatureModel() != null) {
+					return element == FeatureAttributeContentProvider.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM ? true : false;
+				} else {
+					return true;
+				}
 			} else {
 				if (viewer instanceof TreeViewer) {
 					if (element instanceof IFeature && faView.selectedAutomaticFeatures.contains(element)) {
