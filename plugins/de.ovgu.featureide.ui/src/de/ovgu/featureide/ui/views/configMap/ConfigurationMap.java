@@ -626,7 +626,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			updateTree();
 			break;
 		default:

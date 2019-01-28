@@ -59,7 +59,7 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		FeatureColorManager.notifyColorChange(featureList);
-		return new FeatureIDEEvent(featureNameList, EventType.COLOR_CHANGED);
+		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 			FeatureColorManager.setColor(feature, oldColor.get(i));
 		}
 		FeatureColorManager.notifyColorChange(featureList);
-		return new FeatureIDEEvent(featureNameList, EventType.COLOR_CHANGED);
+		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
 	}
 
 }

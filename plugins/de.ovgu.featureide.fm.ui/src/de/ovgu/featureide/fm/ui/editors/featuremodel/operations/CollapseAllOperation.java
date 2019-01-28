@@ -67,7 +67,7 @@ public class CollapseAllOperation extends AbstractGraphicalFeatureModelOperation
 				}
 			}
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, null);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class CollapseAllOperation extends AbstractGraphicalFeatureModelOperation
 		for (final IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, null);
 
 	}
 

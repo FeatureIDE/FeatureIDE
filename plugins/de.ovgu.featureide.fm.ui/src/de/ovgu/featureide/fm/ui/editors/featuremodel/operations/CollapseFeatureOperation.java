@@ -69,9 +69,9 @@ public class CollapseFeatureOperation extends AbstractGraphicalFeatureModelOpera
 			targetConnections.addAll(graphicalFeature.getTargetConnections());
 			graphicalFeature.getTargetConnections().clear();
 
-			return new FeatureModelOperationEvent(ID, EventType.COLLAPSED_CHANGED, feature, null, null);
+			return new FeatureModelOperationEvent(ID, EventType.FEATURE_COLLAPSED_CHANGED, feature, null, null);
 		}
-		return new FeatureModelOperationEvent(ID, EventType.COLLAPSED_CHANGED, feature, null, null);
+		return new FeatureModelOperationEvent(ID, EventType.FEATURE_COLLAPSED_CHANGED, feature, null, null);
 	}
 
 	@Override

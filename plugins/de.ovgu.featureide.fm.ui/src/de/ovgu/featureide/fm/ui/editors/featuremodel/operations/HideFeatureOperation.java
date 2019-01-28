@@ -52,7 +52,7 @@ public class HideFeatureOperation extends AbstractFeatureModelOperation {
 		final IFeature feature = featureModel.getFeature(featureName);
 		final IFeatureStructure structure = feature.getStructure();
 		structure.setHidden(!structure.isHidden());
-		return new FeatureModelOperationEvent(ID, EventType.HIDDEN_CHANGED, feature, null, null);
+		return new FeatureModelOperationEvent(ID, EventType.FEATURE_HIDDEN_CHANGED, feature, null, null);
 	}
 
 	@Override

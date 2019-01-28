@@ -114,6 +114,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		switch (prop) {
 		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
+		case CONSTRAINT_MOVE_LOCATION:
 			getFigure().setLocation(getModel().getLocation());
 			break;
 		case CONSTRAINT_MODIFY:

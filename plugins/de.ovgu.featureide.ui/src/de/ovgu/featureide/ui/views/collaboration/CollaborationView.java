@@ -271,7 +271,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			if (event.getEventType() == FeatureIDEEvent.EventType.COLOR_CHANGED) {
+			if (event.getEventType() == FeatureIDEEvent.EventType.FEATURE_COLOR_CHANGED) {
 				refresh();
 			}
 		}

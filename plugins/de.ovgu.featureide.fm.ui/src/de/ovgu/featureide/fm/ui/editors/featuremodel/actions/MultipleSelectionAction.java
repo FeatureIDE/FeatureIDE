@@ -164,7 +164,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop)
-			|| EventType.HIDDEN_CHANGED.equals(prop) || EventType.COLOR_CHANGED.equals(prop) || EventType.COLLAPSED_CHANGED.equals(prop)) {
+			|| EventType.FEATURE_HIDDEN_CHANGED.equals(prop) || EventType.FEATURE_COLOR_CHANGED.equals(prop) || EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

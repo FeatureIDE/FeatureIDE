@@ -145,9 +145,9 @@ public abstract class SingleSelectionAction extends AFeatureModelAction implemen
 		case GROUP_TYPE_CHANGED:
 		case MANDATORY_CHANGED:
 		case PARENT_CHANGED:
-		case HIDDEN_CHANGED:
-		case COLOR_CHANGED:
-		case COLLAPSED_CHANGED:
+		case FEATURE_HIDDEN_CHANGED:
+		case FEATURE_COLOR_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			updateProperties();
 			break;
 		default:

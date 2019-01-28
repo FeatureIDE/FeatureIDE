@@ -108,8 +108,9 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!newLocation.equals(location)) {
+			final Point oldLocation = location;
 			location = newLocation;
-			update(FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE));
+			update(new FeatureIDEEvent(correspondingConstraint, EventType.CONSTRAINT_MOVE_LOCATION, newLocation, oldLocation));
 		}
 	}
 

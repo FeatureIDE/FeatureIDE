@@ -360,7 +360,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		switch (evt.getEventType()) {
 		case MODEL_DATA_SAVED:
 		case MODEL_DATA_OVERWRITTEN:
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			if (evt.getSource() instanceof IFeatureModel) {
 				configurationManager.update();
 				if (configurationManager.hasChanged()) {

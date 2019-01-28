@@ -74,12 +74,12 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		super.operation(featureModel);
-		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		super.inverseOperation(featureModel);
-		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 }

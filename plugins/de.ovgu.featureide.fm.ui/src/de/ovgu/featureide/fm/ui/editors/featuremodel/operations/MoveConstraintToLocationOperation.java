@@ -52,14 +52,14 @@ public class MoveConstraintToLocationOperation extends AbstractGraphicalFeatureM
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		oldPos = graphicalFeatureModel.getGraphicalConstraint(constraint).getLocation();
 		graphicalFeatureModel.getGraphicalConstraint(constraint).setLocation(newPos);
-		return FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE_LOCATION, newPos, oldPos);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		graphicalFeatureModel.getGraphicalConstraint(constraint).setLocation(oldPos);
-		return FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE_LOCATION, oldPos, newPos);
 	}
 
 }

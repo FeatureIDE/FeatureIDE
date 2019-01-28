@@ -828,7 +828,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		case FEATURE_MODIFY: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
 		case FEATURE_NAME_CHANGED: // Required because feature names are used as variable names.
 		case GROUP_TYPE_CHANGED:
-		case HIDDEN_CHANGED: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+		case FEATURE_HIDDEN_CHANGED: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
 		case MANDATORY_CHANGED:
 		case MODEL_DATA_CHANGED:
 		case MODEL_DATA_LOADED:

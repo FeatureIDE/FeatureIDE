@@ -43,6 +43,10 @@ public class FeatureIDEEvent {
 		 */
 		CONSTRAINT_MOVE,
 		/**
+		 * A constraint's graphical position was modified.
+		 */
+		CONSTRAINT_MOVE_LOCATION,
+		/**
 		 * A constraint was modified.
 		 */
 		CONSTRAINT_MODIFY,
@@ -57,10 +61,12 @@ public class FeatureIDEEvent {
 		/**
 		 * A constraint was selected.
 		 */
+		@Deprecated
 		CONSTRAINT_SELECTED,
 		/**
 		 * A feature was modified.
 		 */
+		@Deprecated
 		FEATURE_MODIFY,
 		/**
 		 * A feature was deleted.
@@ -85,19 +91,19 @@ public class FeatureIDEEvent {
 		/**
 		 * A color was changed.
 		 */
-		COLOR_CHANGED,
+		FEATURE_COLOR_CHANGED,
 		/**
 		 * A hidden feature was changed.
 		 */
-		HIDDEN_CHANGED,
+		FEATURE_HIDDEN_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_CHANGED,
+		FEATURE_COLLAPSED_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_ALL_CHANGED,
+		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
 		 * The location of an object was changed.
 		 */

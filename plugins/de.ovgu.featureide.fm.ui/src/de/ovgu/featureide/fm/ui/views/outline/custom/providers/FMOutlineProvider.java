@@ -120,7 +120,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (!graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(true);
-				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.COLLAPSED_CHANGED));
+				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 
@@ -133,7 +133,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(false);
-				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.COLLAPSED_CHANGED));
+				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 	}
@@ -150,7 +150,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			for (final IFeature f : featureModel.getFeatures()) {
 				graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(false);
 			}
-			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 
@@ -163,7 +163,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 					graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(true);
 				}
 			}
-			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 

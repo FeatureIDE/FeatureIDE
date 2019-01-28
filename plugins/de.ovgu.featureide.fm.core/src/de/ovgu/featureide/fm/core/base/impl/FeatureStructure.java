@@ -161,7 +161,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.FEATURE_HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 

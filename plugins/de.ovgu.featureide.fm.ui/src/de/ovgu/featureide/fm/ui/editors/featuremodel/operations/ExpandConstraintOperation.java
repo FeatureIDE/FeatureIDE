@@ -81,7 +81,7 @@ public class ExpandConstraintOperation extends AbstractGraphicalFeatureModelOper
 			expandParents(feature);
 		}
 
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, constraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, constraint);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ExpandConstraintOperation extends AbstractGraphicalFeatureModelOper
 		for (final IGraphicalFeature f : affectedFeatureList) {
 			expandFeature(f);
 		}
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, constraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, constraint);
 	}
 
 	/**

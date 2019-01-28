@@ -258,13 +258,13 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.propertyChange(event);
 			break;
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
 			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
 			break;
-		case COLLAPSED_ALL_CHANGED:
-		case COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			/*
 			 * Reset the active reason in case we missed that it was set to null while this was collapsed. In case it should not be null, the active reason will
 			 * be set to the correct value in the upcoming feature model analysis anyway.
@@ -288,7 +288,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart.refreshVisuals();
 			connectionEditPart.propertyChange(event);
 			break;
-		case HIDDEN_CHANGED:
+		case FEATURE_HIDDEN_CHANGED:
 			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
 			registry = getViewer().getEditPartRegistry();

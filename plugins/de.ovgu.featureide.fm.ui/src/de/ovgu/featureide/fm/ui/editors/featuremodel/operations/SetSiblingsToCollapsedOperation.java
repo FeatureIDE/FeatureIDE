@@ -66,9 +66,9 @@ public class SetSiblingsToCollapsedOperation extends AbstractGraphicalFeatureMod
 			}
 		}
 		if (feature.getStructure().getParent() != null) {
-			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
+			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.FEATURE_COLLAPSED_CHANGED);
 		} else {
-			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
+			return new FeatureIDEEvent(feature, EventType.FEATURE_COLLAPSED_CHANGED);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractGraphicalFeatureMod
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}
-		return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
+		return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.FEATURE_COLLAPSED_CHANGED);
 	}
 
 }

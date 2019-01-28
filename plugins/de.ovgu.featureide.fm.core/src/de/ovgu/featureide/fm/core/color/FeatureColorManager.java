@@ -448,7 +448,7 @@ public class FeatureColorManager implements IEventListener {
 	public static void notifyColorChange(ArrayList<IFeature> features) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(features, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(features, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}
@@ -463,7 +463,7 @@ public class FeatureColorManager implements IEventListener {
 	public static void notifyColorChange(IFeature feature) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(feature, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(feature, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}

@@ -91,7 +91,7 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 
 			if (newParent.isCollapsed()) {
 				newParent.setCollapsed(false);
-				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED, null, null));
+				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 			}
 		}
 		// If there is only one child left, set the old parent group type to and

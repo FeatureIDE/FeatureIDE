@@ -597,7 +597,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				}
 
 			}
-		} else if (event.getEventType() == EventType.COLOR_CHANGED) {
+		} else if (event.getEventType() == EventType.FEATURE_COLOR_CHANGED) {
 			treeViewer.refresh();
 		}
 	}

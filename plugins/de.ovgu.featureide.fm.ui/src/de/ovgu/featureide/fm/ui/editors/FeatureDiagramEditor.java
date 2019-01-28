@@ -629,7 +629,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 							graphicalFeatureStructure.setCollapsed(true);
 						}
 					}
-					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED, null, null));
+					fm.fireEvent(new FeatureIDEEvent(parent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 				}
 				// Draws the connections
 				if (parent.getStructure().hasChildren()) {
@@ -704,6 +704,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setDirty();
 			break;
 		case CONSTRAINT_MOVE:
+		case CONSTRAINT_MOVE_LOCATION:
 			viewer.internRefresh(true);
 			setDirty();
 			break;
@@ -811,7 +812,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
-		case HIDDEN_CHANGED:
+		case FEATURE_HIDDEN_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
@@ -825,7 +826,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			break;
-		case COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			// Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			viewer.reload();
 			if (event.getNewValue() == null) {
@@ -843,7 +844,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
 			break;
-		case COLLAPSED_ALL_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
 			viewer.reload();
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
@@ -856,7 +857,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
 			break;
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
 				final List<?> srcList = (List<?>) event.getSource();
 
@@ -880,7 +881,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 
 					for (final IGraphicalFeature gf : features) {
-						gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
+						gf.update(FeatureIDEEvent.getDefault(EventType.FEATURE_COLOR_CHANGED));
 					}
 				}
 			} else {
