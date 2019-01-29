@@ -183,7 +183,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void setAutomatic(String name, Selection selection) {
-		final SelectableFeature feature = selectableFeatures.get(name);
+		final SelectableFeature feature = getSelectableFeature(name, featureModel == null);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
@@ -217,7 +217,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public SelectableFeature getSelectableFeature(String name) {
-		return selectableFeatures.get(name);
+		return getSelectableFeature(name, false);
 	}
 
 	public SelectableFeature getSelectableFeature(IFeature feature) {
@@ -377,7 +377,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void setManual(String name, Selection selection) {
-		final SelectableFeature feature = selectableFeatures.get(name);
+		final SelectableFeature feature = getSelectableFeature(name, featureModel == null);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}

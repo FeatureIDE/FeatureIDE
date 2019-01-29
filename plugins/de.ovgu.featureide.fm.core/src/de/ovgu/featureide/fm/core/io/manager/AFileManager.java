@@ -170,17 +170,18 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 		formats = formatManager.getFormatListForExtension(getAbsolutePath());
 		this.factoryManager = factoryManager;
 
-		T newPersistentObject = null;
 		if (FileSystem.exists(path)) {
 			try {
 				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 				detectFormat(content);
 				final ProblemList problems = format.getInstance().read(variableObject, content);
-				newPersistentObject = createObject();
+				final T newPersistentObject = createObject();
 				format.getInstance().read(newPersistentObject, content);
 				if (problems != null) {
 					lastProblems.addAll(problems);
 				}
+				persistentObjectSource = content;
+				this.persistentObject = newPersistentObject;
 			} catch (final Exception e) {
 				handleException(e);
 			}
@@ -189,12 +190,13 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 			try {
 				format = formats.get(0);
 				setVariableObject(createObject());
-				newPersistentObject = createObject();
+				final T newPersistentObject = createObject();
+				persistentObjectSource = format.getInstance().write(newPersistentObject);
+				this.persistentObject = newPersistentObject;
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
-		setPersistentObject(newPersistentObject);
 	}
 
 	private void detectFormat(final CharSequence content) throws Exception {
