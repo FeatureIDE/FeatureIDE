@@ -57,10 +57,6 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 	private IRunner<Boolean> number;
 
-	/**
-	 * @param builder
-	 * @param featureModel
-	 */
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 		number = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {

@@ -32,7 +32,7 @@ public interface IFeatureModelManager extends IManager<IFeatureModel> {
 
 	/**
 	 * Returns the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming
-	 * or feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
+	 * or feature removing over the user interface. The undo context is intended to work seamlessly with the eclipse framework used, e.g., in the
 	 * {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor feature model diagram editor}.
 	 *
 	 * @since 3.0
@@ -45,7 +45,7 @@ public interface IFeatureModelManager extends IManager<IFeatureModel> {
 
 	/**
 	 * Sets the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming or
-	 * feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
+	 * feature removing over the user interface. The undo context is intended to work seamlessly with the eclipse framework used, e.g., in the
 	 * {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor feature model diagram editor}.
 	 *
 	 * @since 3.0

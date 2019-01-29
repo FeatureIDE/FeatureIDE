@@ -49,7 +49,8 @@ abstract class DeprecatedFeatureModel {
 	abstract FMComposerManager getFMComposerManager(final IProject project);
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel(de.ovgu.featureide.fm.core.job.monitor.IMonitor)}
+	 *             instead.
 	 */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
@@ -65,7 +66,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(java.util.Collection, java.util.Collection)} instead.
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<IFeature> a, Set<IFeature> b) throws TimeoutException {
@@ -81,7 +82,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(java.util.Collection, java.util.Collection)} instead.
 	 */
 	@Deprecated
 	public boolean areMutualExclusive(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
@@ -89,7 +90,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(java.util.Collection, java.util.Collection)} instead.
 	 */
 	@Deprecated
 	public boolean mayBeMissing(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
@@ -97,7 +98,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(java.util.Collection)} instead.
 	 */
 	@Deprecated
 	public boolean exists(Set<IFeature> features) throws TimeoutException {
@@ -105,7 +106,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(java.util.Collection)} instead.
 	 */
 	@Deprecated
 	public Node conjunct(Set<IFeature> b) {
@@ -153,7 +154,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.getLegendPos()</code><br> instead.
 	 */
 	@Deprecated
 	public FMPoint getLegendPos() {
@@ -162,7 +163,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendPos(int, int)} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.setLegendPos(int, int)</code><br> instead.
 	 */
 	@Deprecated
 	public void setLegendPos(int x, int y) {
@@ -170,7 +171,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLegendAutoLayout(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.setLegendAutoLayout(boolean)</code><br> instead.
 	 */
 	@Deprecated
 	public void setLegendAutoLayout(boolean b) {
@@ -178,7 +179,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasLegendAutoLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.hasLegendAutoLayout()</code><br> instead.
 	 */
 	@Deprecated
 	public boolean hasLegendAutoLayout() {
@@ -187,7 +188,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#hasFeaturesAutoLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.hasFeaturesAutoLayout()</code><br> instead.
 	 */
 	@Deprecated
 	public boolean hasFeaturesAutoLayout() {
@@ -196,7 +197,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures()} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.showHiddenFeature()</code><br> instead.
 	 */
 	@Deprecated
 	public boolean showHiddenFeatures() {
@@ -205,7 +206,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#showHiddenFeatures(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.showHiddenFeatures(boolean)</code><br> instead.
 	 */
 	@Deprecated
 	public void showHiddenFeatures(boolean b) {
@@ -213,7 +214,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout()} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.verticalLayout()</code><br> instead.
 	 */
 	@Deprecated
 	public boolean verticalLayout() {
@@ -222,7 +223,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#verticalLayout(boolean)} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.verticalLayout(boolean)</code><br> instead.
 	 */
 	@Deprecated
 	public void verticalLayout(boolean b) {
@@ -235,7 +236,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
+	 * @deprecated Will be removed in a future release. Use <br><code>Use FeatureModelLayout.setLayout(int)</code><br> instead.
 	 */
 	@Deprecated
 	public void setLayout(int newLayoutAlgorithm) {
@@ -243,7 +244,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLayoutAlgorithm()} instead.
+	 * @deprecated Will be removed in a future release. <br><code>Use FeatureModelLayout.getLayoutAlgorithm()</code><br> instead.
 	 */
 	@Deprecated
 	public int getLayoutAlgorithm() {
@@ -292,7 +293,7 @@ abstract class DeprecatedFeatureModel {
 	}
 
 	/**
-	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(IFile)} instead.
+	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(java.io.File)} instead.
 	 */
 	@Deprecated
 	public void performRenamings(IFile file) {

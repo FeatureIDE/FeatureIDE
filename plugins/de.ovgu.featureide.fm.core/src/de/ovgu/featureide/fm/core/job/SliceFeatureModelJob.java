@@ -109,6 +109,9 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 	private static final String MARK1 = "?", MARK2 = "??";
 
+	private static final String SLICE_FEATURE_ROOT_NAME = "Root";
+	private static final String SLICE_FEATURE_ABSTRACT_NAME = "Abstract";
+
 	private boolean changed = false;
 
 	private IFeatureModel newInterfaceModel = null;
@@ -391,7 +394,11 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		monitor.setRemainingWork(2);
 		final IFeatureModel m = orgFeatureModel.clone();
 		// mark features
+		String newRootName = SLICE_FEATURE_ROOT_NAME;
 		for (final IFeature feat : m.getFeatures()) {
+			if (feat.getName().equals(newRootName)) {
+				newRootName += "0";
+			}
 			if (!selectedFeatureNames.contains(feat.getName())) {
 				feat.setName(MARK1);
 			}
@@ -403,7 +410,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		m.reset();
 
 		// set new abstract root
-		final IFeature nroot = factory.createFeature(m, "__root__");
+		final IFeature nroot = factory.createFeature(m, newRootName);
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -427,7 +434,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName("_Abstract_" + count++);
+				curFeature.setName(SLICE_FEATURE_ABSTRACT_NAME + count++);
 				curFeature.getStructure().setAbstract(true);
 			}
 			featureTable.put(curFeature.getName(), curFeature);

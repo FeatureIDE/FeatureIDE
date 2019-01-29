@@ -93,9 +93,9 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	/**
 	 * Opens a dialog to choose alternative features the given feature should be replaced with.
 	 *
-	 * @param featureModel
-	 * @param featureMap
-	 * @param deleteOperation
+	 * @param featureModel feature model
+	 * @param featureMap feature map
+	 * @param parent delete operation
 	 */
 	public DeleteOperationAlternativeDialog(IFeatureModelManager featureModelManager, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
 		this.featureMap = featureMap;

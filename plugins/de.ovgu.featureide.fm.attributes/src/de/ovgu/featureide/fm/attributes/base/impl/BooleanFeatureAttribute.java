@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * TODO description
+ * Class representing the boolean type of an feature model attribute.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -34,11 +34,15 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	private Boolean value;
 
 	/**
-	 * @param name
-	 * @param unit
-	 * @param value
-	 * @param recursive
-	 * @param configureable
+	 * Creates a new boolean attribute with the given values.
+	 * 
+	 * @param feature Assigned feature
+	 * @param name Name of the FeatureAttribute
+	 * @param unit Unit of the FeatureAttribute
+	 * @param value Value of the FeatureAttribute
+	 * @param recursive True, if the current Attribute should be inherited
+	 * @param configurable True, if the current FeatureAttribute needs be seting the configuration.
+	 * 
 	 */
 	public BooleanFeatureAttribute(IFeature feature, String name, String unit, Boolean value, boolean recursive, boolean configurable) {
 		super(feature, name, unit, recursive, configurable);
@@ -51,10 +55,6 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 		return value;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
-	 */
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
@@ -66,9 +66,6 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 		}
 	}
 
-	/**
-	 * Returns a copy of the attribute
-	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
 		return new BooleanFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
@@ -77,7 +74,7 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	/**
 	 * Creates a clone of a IFeatureAttribute with a new corresponding Feature and value as null
 	 * 
-	 * @param Feature that the attribute should be attached to
+	 * @param feature that the attribute should be attached to
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override

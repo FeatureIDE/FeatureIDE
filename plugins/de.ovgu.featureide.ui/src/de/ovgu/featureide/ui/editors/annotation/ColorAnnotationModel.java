@@ -176,6 +176,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * Attaches a coverage annotation model for the given editor if the editor can be annotated. Does nothing if the model is already attached.
 	 *
 	 * @param editor Editor to attach a annotation model to
+	 * @return return
 	 */
 	public static boolean attach(ITextEditor editor) {
 		final IDocumentProvider provider = editor.getDocumentProvider();
@@ -231,6 +232,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * Updates the annotations if the value changed.
 	 *
 	 * @param highlighting true: highlights directives in the editor
+	 * @param editor editor to check
 	 */
 	public static void setHighlighting(boolean highlighting, ITextEditor editor) {
 		if (ColorAnnotationModel.highlighting != highlighting) {

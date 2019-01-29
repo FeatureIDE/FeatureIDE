@@ -61,6 +61,13 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	protected boolean connectionSelected;
 	protected List<String> featureArray;
 
+	/**
+	 * Default constructor
+	 *
+	 * @param text of the action in context menu
+	 * @param viewer2 viewer
+	 * @param id id
+	 */
 	public MultipleSelectionAction(String text, Object viewer2, String id, IFeatureModelManager featureModelManager) {
 		super(text, id, featureModelManager);
 		viewer = viewer2;
@@ -164,7 +171,8 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop)
-			|| EventType.FEATURE_HIDDEN_CHANGED.equals(prop) || EventType.FEATURE_COLOR_CHANGED.equals(prop) || EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)) {
+			|| EventType.FEATURE_HIDDEN_CHANGED.equals(prop) || EventType.FEATURE_COLOR_CHANGED.equals(prop)
+			|| EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

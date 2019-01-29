@@ -38,6 +38,13 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public final class FMFactoryManager extends FactoryManager<IFeatureModel> {
 
+	/**
+	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br> <br> <b>Important
+	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
+	 * factory is used for the underlying feature model file.
+	 *
+	 * @return Returns the ID of the default feature model factory.
+	 */
 	@Override
 	protected String getDefaultID() {
 		return DefaultFeatureModelFactory.ID;
@@ -59,6 +66,13 @@ public final class FMFactoryManager extends FactoryManager<IFeatureModel> {
 		instance.setLoader(extensionLoader, factorySpaceLoader);
 	}
 
+	/**
+	 * Returns the feature model factory that was used to create the given model. (if the factory is not available the default factory is returned).
+	 *
+	 * @param featureModel the feature model
+	 *
+	 * @return Returns the feature model factory for the given feature model.
+	 */
 	@Override
 	public IFeatureModelFactory getFactory(IFeatureModel object) {
 		try {

@@ -41,9 +41,6 @@ import de.ovgu.featureide.core.CorePlugin;
  * Defining static fields for the ConfigurationBuilder
  *
  * @see ConfigurationBuilder
- * @see BuildAllCurrentConfigurationsAction
- * @see BuildAllValidConfigurationsAction
- * @see BuildProductsAction
  *
  * @author Jens Meinicke
  */

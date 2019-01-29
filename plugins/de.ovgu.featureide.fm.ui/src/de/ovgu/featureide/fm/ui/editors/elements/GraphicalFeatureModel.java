@@ -264,6 +264,17 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	@Override
+	public List<IGraphicalFeature> getVisibleRelations() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IGraphicalFeature f : getFeatures()) {
+			if (!f.isCollapsed() && !f.hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return Collections.unmodifiableList(features);
+	}
+
+	@Override
 	public int getConstraintIndex(Constraint constraint) {
 		final IGraphicalConstraint gConstarint = getGraphicalConstraint(constraint);
 
@@ -311,10 +322,10 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 		switch (fm.getProperty().get(LAYOUT, TYPE_GRAPHICS, "horizontal")) {
 		case "vertical":
-			getLayout().verticalLayout(true);
+			getLayout().setVerticalLayout(true);
 		case "horizontal":
 		default:
-			getLayout().verticalLayout(false);
+			getLayout().setVerticalLayout(false);
 		}
 
 		final Boolean hiddenFeatures = getBooleanProperty(fm.getProperty(), SHOW_HIDDEN_FEATURES);
@@ -459,7 +470,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	private void writeLayoutAlgorithm(final IFeatureModel fm) {
 		fm.getProperty().set(CHOSEN_LAYOUT_ALGORITHM, TYPE_GRAPHICS, Integer.toString(getLayout().getLayoutAlgorithm()));
-		if (getLayout().verticalLayout()) {
+		if (getLayout().hasVerticalLayout()) {
 			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, "vertical");
 		} else {
 			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, "horizontal");

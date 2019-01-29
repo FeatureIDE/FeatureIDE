@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * Converts .config files in example projects into .xml files.<br/> Uses the index file of the example plug-in.
+ * Converts .config files in example projects into .xml files.<br> Uses the index file of the example plug-in.
  *
  * @author Sebastian Krieter
  */

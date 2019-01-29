@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 import java.nio.file.Path;
 
 /**
- * Loads a {@link FactoryWorkspace} for given path.<br/> The purpose of this provider is to associate a certain factory workspace with a certain project /
+ * Provides a {@link FactoryWorkspace} for given path.<br> The purpose of this class is to associate a certain factory workspace with a certain project /
  * folder.
  *
  * @author Sebastian Krieter

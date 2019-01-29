@@ -78,9 +78,9 @@ public class TreeClickListener implements IDoubleClickListener {
 	}
 
 	/**
-	 * Performs actions depending on the type of the clicked note e.g. opening a dialog for {@link ConfigParentNode.ConfigNode} or expanding/collapsing
-	 * nodes(default operation).
+	 * Performs actions depending on the type of the clicked note e.g. opening a dialog for or expanding/collapsing nodes(default operation).
 	 *
+	 * @param event double click event
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {

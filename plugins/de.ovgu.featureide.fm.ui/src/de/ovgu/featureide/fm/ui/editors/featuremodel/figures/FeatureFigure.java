@@ -172,8 +172,16 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		final Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
-		toolTipFigure = null;
+		ResetTooltip();
 
+	}
+
+	/**
+	 * Resets the current tooltip. Should be called when the properties of a feature are changed and the old generated tooltip is obsolete.
+	 */
+	public void ResetTooltip() {
+
+		toolTipFigure = null;
 	}
 
 	/**
@@ -184,11 +192,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	@Override
 	public IFigure getToolTip() {
 		if (toolTipFigure == null) {
-
 			final IFeature feature = this.feature.getObject();
 			final StringBuilder toolTip = new StringBuilder();
 			toolTip.append(feature.createTooltip(new Object[0]));
-
 			if (getActiveReason() != null) {
 				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
@@ -328,7 +334,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	 * <p> Only does so in any of the following cases: <ul> <li> The new active reason is null. This makes it possible to reset the active reason. </li> <li>
 	 * The old active reason is null. After resetting, any new active reason is accepted. </li> <li> The new active reason has a greater
 	 * {@link Reason#getConfidence() confidence} than the old one. This means that, in case of graphically overlapping reasons, the greatest confidence is
-	 * displayed. </li> </ul> </p>
+	 * displayed. </li> </ul>
 	 *
 	 * @param activeReason the new active reason; null to reset
 	 */

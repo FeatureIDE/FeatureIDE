@@ -31,23 +31,23 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * FeatureIDE's default {@link IFeature} implementation as the starting point for user-defined implementations. <br/> <br/> This class implements the minimum
+ * FeatureIDE's default {@link IFeature} implementation as the starting point for user-defined implementations. <br> <br> This class implements the minimum
  * functionality required for a {@link IFeature} class and further functionality from {@link AFeatureModelElement}. The first provides getter and setter of the
  * feature's <i>properties</i>, <i>custom properties</i>, and the feature's <i>structure</i> (for more information, see {@link IFeature} documentation). The
  * second implements FeatureIDE's internal functionality to identify a given feature inside a feature model, and to provide event listening capabilities with
- * the listener/observer pattern. <br/> <br/> This class is intended to be a starting point for user-defined implementation, such that a subclass of
+ * the listener/observer pattern. <br> <br> This class is intended to be a starting point for user-defined implementation, such that a subclass of
  * <code>AFeature</code> only have to provide an implementation of {@link IFeature#clone(IFeatureModel, IFeatureStructure)}. FeatureIDE provides a default
- * non-abstract implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature} which extends <code>AFeature</code> in this sense. <br/> <br/> An
- * instance of a subclass of <code>AFeature</code> is intended to be instantiated by a {@link IFeatureModelFactory}. <br/> <br/> <b>Example</b><br/> The
+ * non-abstract implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature} which extends <code>AFeature</code> in this sense. <br> <br> An
+ * instance of a subclass of <code>AFeature</code> is intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The
  * following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>AFeature</code> implementation
  * {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
  * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
- * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> <pre> IFeatureModel model =
- * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A
+ * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
+ * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A
  * unified handling of certain <code>AFeature</code> (<code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved with the use of
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br/> <br/> <b>Notes on equals method</b>: The <code>AFeature</code>
+ * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Notes on equals method</b>: The <code>AFeature</code>
  * implementation inherits the {@link Object#equals(Object)} capability from {@link AFeatureModelElement}. The feature equality is defined as the equality of
- * the underlying internal identifiers per feature. <br/> <br/>
+ * the underlying internal identifiers per feature. <br> <br>
  *
  * @see de.ovgu.featureide.fm.core.base.IFeature Interface for feature in FeatureIDE (<code>IFeature</code>)
  *
@@ -75,7 +75,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>AFeature</code> given another feature <code>oldFeature</code>, a feature model
 	 * <code>featureModel</code>, and a feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see
-	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br/> <br/> <b>Note</b>: The parameter
+	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br> <br> <b>Note</b>: The parameter
 	 * <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as an subclass of
 	 * {@link AFeatureModelElement) can be <b>null</b>.
 	 *

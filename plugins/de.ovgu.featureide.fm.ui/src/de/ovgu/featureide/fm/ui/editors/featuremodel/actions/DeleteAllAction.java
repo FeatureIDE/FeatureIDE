@@ -49,6 +49,11 @@ public class DeleteAllAction extends MultipleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.deleteall";
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
+	/**
+	 *
+	 * @param viewer View that calls this action
+	 * @param featureModel respective feature model
+	 */
 	public DeleteAllAction(Object viewer, IFeatureModelManager featureModelManager) {
 		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID, featureModelManager);
 		setImageDescriptor(deleteImage);

@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Responsible to load and save all information from / to a file.<br/> To get an instance use the {@link FileManagerMap}.
+ * Responsible to load and save all information from / to a file.
  *
  * @author Sebastian Krieter
  */
@@ -384,7 +384,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	/**
-	 * Compares the persistent with the given object for equality.<br/> Subclasses could override this method.
+	 * Compares the persistent with the given object for equality.<br> Subclasses could override this method.
 	 *
 	 * @param newObject The given object.
 	 * @return {@code true} if objects differ, {@code false} otherwise.
@@ -394,7 +394,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	/**
-	 * Compares the persistent with the variable object for equality.<br/> Uses {@link #hasChanged(T)}.
+	 * Compares the persistent with the variable object for equality.<br> Uses {@link #hasChanged(Object)}.
 	 *
 	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */

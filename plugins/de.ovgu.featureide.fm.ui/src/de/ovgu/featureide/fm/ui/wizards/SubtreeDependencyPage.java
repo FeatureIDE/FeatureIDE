@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A wizard page to show implicit constraints of a sub feature model. Enables automated analysis on the sub feature model to explain implicit (redundant)
  * constraints.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
 public class SubtreeDependencyPage extends AbstractWizardPage {
 

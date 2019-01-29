@@ -37,9 +37,6 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 	private List<IFeature> deadFeatures;
 	private IFeatureModel featureModelFilterIsInitializedFor;
 
-	/**
-	 * @param name
-	 */
 	public DeadFeatureFilter(boolean isDefault) {
 		super("dead features", isDefault);
 		setImagePath(Image_Minus);

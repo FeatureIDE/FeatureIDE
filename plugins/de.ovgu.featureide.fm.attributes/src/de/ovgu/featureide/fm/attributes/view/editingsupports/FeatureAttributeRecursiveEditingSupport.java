@@ -35,20 +35,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Editing support for the recursive column of the {@link FeatureAttributeView}. The boolean value of the column is shown as checkbox.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
 public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeRecursiveEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	private static final String TRUE_STRING = "true";
@@ -92,8 +87,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		} else {
 			attribute.deleteRecursiveAttributes(feat);
 		}
-		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
-		getViewer().refresh();
+		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
 	}
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {

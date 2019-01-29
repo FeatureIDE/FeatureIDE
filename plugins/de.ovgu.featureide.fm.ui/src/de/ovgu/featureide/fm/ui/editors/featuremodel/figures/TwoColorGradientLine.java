@@ -37,6 +37,14 @@ public class TwoColorGradientLine extends Shape implements GUIDefaults {
 	private final Color left;
 	private final Color right;
 
+	/**
+	 * Creates a new color gradient that has two colors. One on the left and the other on the right side.
+	 *
+	 * @param left Color of the left side
+	 * @param right Color of the right side
+	 * @param width Width of the gradient
+	 * @param height Height of the gradient
+	 */
 	public TwoColorGradientLine(Color left, Color right, int width, int height) {
 		final XYLayout layout = new XYLayout();
 		setLayoutManager(layout);

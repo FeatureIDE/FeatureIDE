@@ -171,6 +171,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		final IFeature feature = getModel().getTarget().getObject();
 		final IFeatureModel featureModel = feature.getFeatureModel();
+		final IGraphicalFeature newModel = getModel().getTarget();
+
 		int groupType;
 
 		if (feature.getStructure().isAlternative()) {
@@ -181,7 +183,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
 		}
 
-		FeatureModelOperationWrapper.run(new ChangeFeatureGroupTypeOperation(groupType, feature.getName(), FeatureModelManager.getInstance(featureModel)));
+		// Blocks unintentional FeatureGroupTypeChange when Parent is collapsed (Issue #806)
+		if (!newModel.isCollapsed()) {
+			FeatureModelOperationWrapper.run(new ChangeFeatureGroupTypeOperation(groupType, feature.getName(), FeatureModelManager.getInstance(featureModel)));
+		}
 	}
 
 	@Override
@@ -230,8 +235,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 
 		if (graphicalSource == graphicalTarget) {
-			if (graphicalSource.isCollapsed()) {
+			if (graphicalSource.isCollapsed() && (graphicalSource.getCollapsedDecoration() == null)) {
 				sourceDecoration = new CollapsedDecoration(graphicalTarget);
+			} else if (graphicalSource.isCollapsed()) {
+				sourceDecoration = graphicalSource.getCollapsedDecoration();
+				graphicalSource.getCollapsedDecoration().refresh();
 			}
 		} else {
 			if (target.getStructure().isAnd()

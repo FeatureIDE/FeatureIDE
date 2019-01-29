@@ -8,6 +8,12 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 
+/**
+ * Label provider for the configurable attribute.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeConfigureableColumnLabelProvider extends FeatureAttributeColumnLabelProvider {
 
 	public FeatureAttributeConfigureableColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {

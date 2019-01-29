@@ -144,7 +144,8 @@ public class FeatureColorManager implements IEventListener {
 	/**
 	 * Checks whether the given scheme is active.
 	 *
-	 * @param newProfileColorSchemeName
+	 * @param featureModel the feature model
+	 * @param schmeName name of the scheme to check
 	 * @return
 	 */
 	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
@@ -458,7 +459,7 @@ public class FeatureColorManager implements IEventListener {
 	/**
 	 * Notify all listener that the color of a feature has changed
 	 *
-	 * @param features All features that colors were changed
+	 * @param feature The feature that color was changed.
 	 */
 	public static void notifyColorChange(IFeature feature) {
 		for (final IEventListener listener : colorListener) {

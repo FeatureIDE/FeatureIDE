@@ -85,7 +85,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private boolean hasFeatureOrder = true;
 
 	/**
-	 * @param featureModelEditor
+	 * @param fmManager file manager for the feature model
 	 */
 	public FeatureOrderEditor(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm) {
 		super(fmManager, gfm);
@@ -127,8 +127,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	/**
 	 * Updates the displayed feature list
-	 *
-	 * @param feature
 	 */
 	public void updateOrderEditor() {
 		if (hasFeatureOrder) {

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
@@ -54,7 +53,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	boolean parentAlternative = false;
 
 	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, LinkedList<String> selectedFeatures) {
-		super(featureModelManager, CREATE_COMPOUND);
+		super(featureModelManager, "Add Feature");
 		selectedFeatureNames = selectedFeatures;
 		childName = selectedFeatures.get(0);
 	}

@@ -30,9 +30,9 @@ import org.eclipse.core.resources.IFile;
 public class FSTContractedRole extends FSTRole {
 
 	/**
-	 * @param file
-	 * @param feature
-	 * @param fstClass
+	 * @param file file
+	 * @param feature feature
+	 * @param fstClass fstClass
 	 */
 	public FSTContractedRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		super(file, feature, fstClass);

@@ -219,7 +219,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		/**
 		 * Constructs a new header panel to the shell. This panel contains a header text ({@link #setHeader(String)}), a details text (
-		 * {@link #setDetails(String)}).
+		 * {@link #setDetails(String, HeaderDescriptionImage)}).
 		 *
 		 * By default a short info about possibilities with this dialog is display as details and that a new constraint will be created now. This should be
 		 * altered with the methods above depending on the current state.
@@ -286,6 +286,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * To set the header panels text, consider to use {@link #setHeader(String)}
 		 *
 		 * @param text Text to display
+		 * @param image Image to display
 		 */
 		public void setDetails(String text, HeaderDescriptionImage image) {
 			detailsLabel.setText(text);
@@ -295,8 +296,6 @@ public class ConstraintDialog implements GUIDefaults {
 		/**
 		 * Sets the header text for this panel. This text should highlight the current dialogs state, e.g. editing an existing constraint. More information
 		 * should be displayed in the details text are.
-		 *
-		 * {@link ConstraintDialog.HeaderPanel#setDetails(String)}
 		 *
 		 * @param text Text to display
 		 */

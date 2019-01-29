@@ -107,8 +107,9 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 										viewer.setInput(iFile);
 										viewer.getContentProvider().inputChanged(viewer, null, fmManager);
 										if (fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
-											if ((contextMenu == null) || (contextMenu
-													.getFeatureModelManager() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModelManager())) {
+											if ((contextMenu == null)
+												|| (contextMenu.getFeatureModelManager() != ((FeatureModelEditor) fTextEditor.getEditorInput())
+														.getFeatureModelManager())) {
 												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
 														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModelManager(), false);
 											}

@@ -67,7 +67,9 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	/**
 	 * Create the dialog.
 	 *
-	 * @param parentShell
+	 * @param parentShell Shell of parent
+	 * @param godfather godfather
+	 * @param oldTree old tree
 	 */
 	public CheckBoxTreeViewDialog(Shell parentShell, Parent godfather, TreeViewer oldTree) {
 		super(parentShell);

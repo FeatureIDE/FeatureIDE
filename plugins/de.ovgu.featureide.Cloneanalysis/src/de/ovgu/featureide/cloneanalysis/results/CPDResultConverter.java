@@ -11,6 +11,7 @@ import net.sourceforge.pmd.cpd.TokenEntry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.swt.widgets.Link;
 
 import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
@@ -33,8 +34,8 @@ public class CPDResultConverter {
 	 * Creates an Instance of {@link CloneAnalysisResults} and fills it with
 	 * information gained from the matches found by CPD.
 	 * 
-	 * @param matchesFound
-	 * @return
+	 * @param matchesFound matches found by CPD
+	 * @return instance of {@link CloneAnalysisResults}
 	 */
 	public static CloneAnalysisResults<VariantAwareClone> convertMatchesToReadableResults(
 			Iterator<Match> matchesFound) {
@@ -78,6 +79,12 @@ public class CPDResultConverter {
 	 * 
 	 * @see #checkForIntervariance(Set)
 	 */
+	/**
+	 * Convenience Function calling {@link #checkForIntervariance(Set)}.
+	 * 
+	 * @param clone clone
+	 * @return true if the clone is intervariant, false else.
+	 */
 	public static boolean checkForIntervariance(Clone clone) {
 		return checkForIntervariance(clone.getOccurences());
 	}
@@ -99,8 +106,11 @@ public class CPDResultConverter {
 	 * Creates a {@link Clone} object and fills it with information taken from
 	 * the given {@link Match}.
 	 * 
-	 * @see Clone
+	 * @see Clone clone
 	 * @see Match
+	 * 
+	 * @param match information as matches
+	 * @return instance of {@link Clone}
 	 */
 	public static VariantAwareClone convertMatchToClone(Match match) {
 		final int cloneLineCount = match.getLineCount();
@@ -132,6 +142,8 @@ public class CPDResultConverter {
 	}
 
 	/**
+	 * 
+	 * @param occurences Set of occurences
 	 * @return the number of different files in which the Snippet occurs.
 	 */
 	public static int countFiles(Set<CloneOccurence> occurences) {

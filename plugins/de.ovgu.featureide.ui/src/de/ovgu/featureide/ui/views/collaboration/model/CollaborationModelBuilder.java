@@ -76,7 +76,7 @@ public class CollaborationModelBuilder {
 	private static final String FALSE = "false";
 
 	/**
-	 * Sets the persistent property of <i>showUnselectedFeatures
+	 * Sets the persistent property of showUnselectedFeatures
 	 *
 	 * @param value The value to set
 	 */
@@ -141,7 +141,8 @@ public class CollaborationModelBuilder {
 	}
 
 	/**
-	 * Returns whether the given class should be diplayed.
+	 * @param c given class
+	 * @return true whether the given class should be diplayed.
 	 */
 	public static boolean showClass(FSTClass c) {
 		if (getClassFilter().isEmpty() || getClassFilter().contains(c.getName())) {
@@ -174,7 +175,8 @@ public class CollaborationModelBuilder {
 	}
 
 	/**
-	 * Returns whether the given class should be diplayed.
+	 * @param feature given feature
+	 * @return true whether the given feature should be diplayed.
 	 */
 	public static boolean showFeature(final FSTFeature feature) {
 		if (getFeatureFilter().isEmpty()) {

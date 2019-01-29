@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 /**
  * Option which uses feature model slicing to calculate dependencies of a sub feature model.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
 // TODO Move to other package. (This is no operation anymore)
 public class CalculateDependencyOperation implements LongRunningMethod<IFeature> {

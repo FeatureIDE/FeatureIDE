@@ -63,6 +63,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	private final boolean useValidMethod;
 
 	/**
+	 *
+	 * @param featureModel featureModel
 	 * @param useValidMethod Defines whether the valid() or the complete formula is used as requieres clause.
 	 */
 	public FeatureIDEModelInfo(final IFeatureModel featureModel, final boolean useValidMethod) {

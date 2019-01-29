@@ -39,7 +39,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 public class SettingsExport {
 
 	/**
-	 * @param persitentProperties Properties to export
 	 * @param file the file in that the properties should be exported
 	 */
 	public SettingsExport(File file) {

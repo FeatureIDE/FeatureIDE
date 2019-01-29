@@ -35,8 +35,11 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 
 /**
- * The FSTModel represents the projects structure.<br> {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}.<br> For a visualization of
- * the FSTModels structure see <i>lib/FSTModel.jpg<i>.
+ * The FSTModel represents the projects structure.<br>
+ *
+ * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}.<br>
+ *
+ * For a visualization of the FSTModels structure see lib/FSTModel.jpg.
  *
  * @author Jens Meinicke
  */
@@ -69,6 +72,9 @@ public class FSTModel {
 
 	/**
 	 * It is recommended {@link #addRole(String, String, IFile)} to generate a FST.
+	 *
+	 * @param name feature name
+	 * @return FSTFeature of the feature with the name
 	 */
 	public FSTFeature addFeature(String name) {
 		FSTFeature feature = getFeature(name);

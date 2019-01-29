@@ -152,7 +152,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	/**
 	 * Checks if the combined width including the spaces between features fits the editor's size. Based on the selected layout algorithm.
 	 *
-	 * @param list all features from a single level.
 	 * @return true if the level fits in the editor.
 	 */
 	public boolean isLevelSizeOverLimit() {
@@ -301,7 +300,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	/**
 	 * Scrolls to the given points and center the view
 	 *
-	 * @param centerFeature
+	 * @param feature centerFeature
 	 */
 	public void centerPointOnScreen(IFeature feature) {
 		final IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(feature);
@@ -322,7 +321,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
-	void refreshChildAll(IFeature parent) {
+	public void refreshChildAll(IFeature parent) {
 		for (final IFeatureStructure f : parent.getStructure().getChildren()) {
 			// Refresh children
 			refreshChildAll(f.getFeature());
@@ -364,7 +363,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	@Override
 	public boolean matches(IGraphicalFeature element, String searchString) {
-		return element.getObject().getName().toLowerCase().startsWith(searchString.toLowerCase());
+		return element.getObject().getName().toLowerCase().matches(".*" + searchString.toLowerCase() + ".*");
 	}
 
 	@Override

@@ -25,6 +25,14 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
+/**
+ * Implementation of the {@link AbstractFeatureAttributeFactory}.
+ * 
+ * @see AbstractFeatureAttributeFactory
+ *
+ * @author Joshua Sprey
+ * @author Chico SUndermann
+ */
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
 	@Override

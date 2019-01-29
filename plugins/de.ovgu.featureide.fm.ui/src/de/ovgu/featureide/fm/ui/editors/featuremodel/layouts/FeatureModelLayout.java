@@ -38,6 +38,8 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
 	private final Point legendPos;
+	private boolean leftRightInverted;
+	private boolean topDownInverted;
 
 	private int selectedLayoutAlgorithm;
 	private boolean showShortNames;
@@ -103,12 +105,12 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	}
 
 	@Override
-	public boolean verticalLayout() {
+	public boolean hasVerticalLayout() {
 		return hasVerticalLayout;
 	}
 
 	@Override
-	public void verticalLayout(boolean b) {
+	public void setVerticalLayout(boolean b) {
 		hasVerticalLayout = b;
 	}
 
@@ -161,6 +163,22 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public void setAbegoRootposition(Configuration.Location abegoRootposition) {
 		usesAbegoTreeLayout = true;
 		this.abegoRootposition = abegoRootposition;
+	}
+
+	public void setLeftRightInverted(boolean isLeftRightInverted) {
+		leftRightInverted = isLeftRightInverted;
+	}
+
+	public boolean getLeftRightInverted() {
+		return leftRightInverted;
+	}
+
+	public void setTopDownInverted(boolean isTopDownInverted) {
+		topDownInverted = isTopDownInverted;
+	}
+
+	public boolean getTopDownInverted() {
+		return topDownInverted;
 	}
 
 }

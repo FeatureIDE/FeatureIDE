@@ -117,7 +117,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	/**
 	 * Register the model for property changes.
 	 *
-	 * @param model
+	 * @param model model to register
 	 */
 	public static void registerEditor(FeatureModelEditor model) {
 		editors.add(model);
@@ -126,7 +126,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	/**
 	 * Removes the model from listener.
 	 *
-	 * @param model
+	 * @param model model tu unregister
 	 */
 	public static void unregisterEditor(FeatureModelEditor model) {
 		editors.remove(model);

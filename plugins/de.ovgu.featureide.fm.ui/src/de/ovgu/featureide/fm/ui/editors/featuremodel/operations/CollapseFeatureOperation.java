@@ -49,11 +49,6 @@ public class CollapseFeatureOperation extends AbstractGraphicalFeatureModelOpera
 	private final String featureName;
 	private final List<FeatureConnection> targetConnections = new ArrayList<>();
 
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
 	public CollapseFeatureOperation(String featureName, IGraphicalFeatureModel graphicalFeatureModel, String operationLabel) {
 		super(graphicalFeatureModel, operationLabel);
 		this.featureName = featureName;

@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 
 /**
- * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.</br> Is used for undo / redo support.
+ * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.<br> Is used for undo / redo support.
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke

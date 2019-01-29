@@ -124,6 +124,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	FeatureModelManager fmManager;
 	IGraphicalFeatureModel gfm;
 
+	// indicates if layout information had to be created
+	private boolean createdLayoutInformation;
 	private boolean closeEditor;
 
 	private int currentPageIndex;
@@ -367,7 +369,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	/**
 	 * This is just a call to the private method {@link #setActivePage(int)}.
 	 *
-	 * @param index
+	 * @param index index to set
 	 */
 	public void setActiveEditorPage(int index) {
 		setActivePage(index);
@@ -418,6 +420,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
+						if (createdLayoutInformation) {
+							diagramEditor.setAdjustModelToEditorSize();
+						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();
@@ -522,7 +527,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (fmManager != null) {
 			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
 			createModelFileMarkers(fmManager.getLastProblems());
-
 			final Path gfmPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
 			gfm = new GraphicalFeatureModel(fmManager);
 			if ((gfmPath != null) && FileSystem.exists(gfmPath)) {
@@ -533,6 +537,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			FMPropertyManager.registerEditor(this);
 
 			setPartName(getModelFile().getProject().getName() + MODEL);
+			createLayoutInformation();
 		} else {
 			setPartName(input.getName());
 		}
@@ -671,4 +676,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		fmManager.removeListener(listener);
 	}
 
+	private void createLayoutInformation() {
+		createdLayoutInformation = true;
+	}
 }

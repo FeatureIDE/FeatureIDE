@@ -6,6 +6,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
+/**
+ * Represents extended feature models. Extends the {@link FeatureModel} provided by FeatureIDE. Provides copy constructors and copy methods.
+ * 
+ * @author Joshua Sprey
+ * @author Chico SUndermann
+ */
 public class ExtendedFeatureModel extends FeatureModel {
 
 	IFeatureModelFactory factory;
@@ -61,7 +67,6 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	@Override
 	public FeatureModel clone() {
-		// TODO Auto-generated method stub
 		return new ExtendedFeatureModel(this, null);
 	}
 }

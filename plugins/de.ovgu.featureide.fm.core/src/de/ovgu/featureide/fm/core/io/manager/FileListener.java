@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.fm.core.Logger;
 
 /**
- * Responsible to load and save all information from / to a file.</br> To get an instance use the {@link FileManagerMap}.
+ * Responsible to load and save all information from / to a file.
  *
  * @author Sebastian Krieter
  */

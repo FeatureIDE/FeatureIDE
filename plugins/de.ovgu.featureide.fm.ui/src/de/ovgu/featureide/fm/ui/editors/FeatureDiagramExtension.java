@@ -77,7 +77,7 @@ public class FeatureDiagramExtension {
 
 	/**
 	 * @return all extensions of the feature diagram
-	 * @see de.ovgu.featureide.fm.ui.FeatureDiagram
+	 * @see FeatureDiagramEditor
 	 */
 	public static LinkedList<FeatureDiagramExtension> getExtensions() {
 		final LinkedList<FeatureDiagramExtension> extensions = new LinkedList<FeatureDiagramExtension>();

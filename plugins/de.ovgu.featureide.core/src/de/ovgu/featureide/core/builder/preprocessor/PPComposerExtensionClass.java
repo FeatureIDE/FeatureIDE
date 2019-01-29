@@ -163,6 +163,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * Sets the name of the plug-in
+	 *
+	 * @param pluginName name of the plugin
 	 */
 	public PPComposerExtensionClass(String pluginName) {
 		this.pluginName = pluginName;

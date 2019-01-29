@@ -44,11 +44,6 @@ public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 	private final boolean allCollapsed;
 	private final String operationLabel;
 
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
 	public SetFeatureToCollapseOperation(List<String> featureNames, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
 		super(graphicalFeatureModel.getFeatureModelManager(), operationLabel, featureNames);
 		this.graphicalFeatureModel = graphicalFeatureModel;

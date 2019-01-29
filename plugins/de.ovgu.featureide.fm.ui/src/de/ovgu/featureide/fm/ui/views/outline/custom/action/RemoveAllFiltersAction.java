@@ -33,22 +33,12 @@ public class RemoveAllFiltersAction extends Action {
 
 	private final OutlineProvider provider;
 
-	/**
-	 * Constructor for ChangeOutlineProviderAction
-	 *
-	 * @param viewer
-	 */
 	public RemoveAllFiltersAction(OutlineProvider provider) {
 		super();
 		this.provider = provider;
 		setText("Remove Filters");
 	}
 
-	/**
-	 * Returns the outline provider
-	 *
-	 * @return
-	 */
 	public OutlineProvider getProvider() {
 		return provider;
 	}

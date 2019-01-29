@@ -46,6 +46,11 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 
 	private int constraintCount = -1;
 
+	/**
+	 * @param node the node representing the constraint to be added
+	 * @param featureModel model that will be used to add the constraint
+	 * @param description description
+	 */
 	public CreateConstraintOperation(Node node, IFeatureModelManager featureModelManager, String description) {
 		super(featureModelManager, CREATE_CONSTRAINT);
 		this.node = node;

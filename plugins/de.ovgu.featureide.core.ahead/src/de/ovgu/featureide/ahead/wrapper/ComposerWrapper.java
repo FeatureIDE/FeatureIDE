@@ -107,7 +107,7 @@ public class ComposerWrapper {
 	/**
 	 * Creates a new instance of Composer
 	 *
-	 * @param featureProject
+	 * @param featureProject respective project
 	 */
 	public ComposerWrapper(IFeatureProject featureProject) {
 		this.featureProject = featureProject;
@@ -129,8 +129,9 @@ public class ComposerWrapper {
 	/**
 	 * Composes all jak files for a given configuration file
 	 *
-	 * @param configFile
+	 * @param configFile given config file
 	 * @return Array of composed jakfiles
+	 * @throws IOException file not found
 	 */
 	// @SuppressWarnings("unchecked")
 	public IFile[] composeAll(IFile configFile) throws IOException {

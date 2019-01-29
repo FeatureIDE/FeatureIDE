@@ -8,6 +8,12 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 
+/**
+ * Label provider for the recursive attribute.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeRecursiveColumnLabelProvider extends FeatureAttributeColumnLabelProvider {
 
 	public FeatureAttributeRecursiveColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {

@@ -47,7 +47,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	/**
 	 * Changes the composer of the given feature project to <code>FeatureHouse</code>.
 	 *
-	 * @param featureProject
+	 * @param featureProject FeatureIDE project
 	 */
 	public AHEADToFeatureHouseConversion(final IFeatureProject featureProject) {
 		if (featureProject == null) {

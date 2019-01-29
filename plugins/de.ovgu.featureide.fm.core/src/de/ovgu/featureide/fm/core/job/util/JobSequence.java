@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Class for starting jobs. {@link IRunner}s in a specific {@link JobSequence} are executed consecutively. {@link IRunner}s in different {@link JobSequence}s
- * are executed independent of each other. </br> It is possible to wait for a sequence to finish.
+ * are executed independent of each other. <br> It is possible to wait for a sequence to finish.
  *
  * @author Sebastian Krieter
  */

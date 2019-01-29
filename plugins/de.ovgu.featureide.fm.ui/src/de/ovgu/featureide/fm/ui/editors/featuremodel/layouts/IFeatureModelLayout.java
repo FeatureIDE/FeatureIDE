@@ -34,9 +34,9 @@ public interface IFeatureModelLayout {
 
 	public void showCollapsedConstraints(boolean b);
 
-	public boolean verticalLayout();
+	public boolean hasVerticalLayout();
 
-	public void verticalLayout(boolean b);
+	public void setVerticalLayout(boolean b);
 
 	public void setLayout(int newLayoutAlgorithm);
 

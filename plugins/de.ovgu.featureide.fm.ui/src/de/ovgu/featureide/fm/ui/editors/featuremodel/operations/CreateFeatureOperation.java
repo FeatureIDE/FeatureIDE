@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -36,14 +35,16 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Fabian Benduhn
  * @author Sebastian Krieter
  */
-public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
+public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 
 	private final String parentName;
 	private String newFeatureName;
+	private final int index;
 
-	public CreateFeatureBelowOperation(String parentName, IFeatureModelManager featureModelManager) {
-		super(featureModelManager, CREATE_LAYER);
+	public CreateFeatureOperation(String parentName, int index, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, "Create Feature");
 		this.parentName = parentName;
+		this.index = index;
 	}
 
 	@Override
@@ -52,9 +53,8 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, newFeatureName);
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
-		parent.getStructure().addChild(newFeature.getStructure());
-
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
+		parent.getStructure().addChildAtPosition(index, newFeature.getStructure());
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
 	}
 
 	@Override
@@ -63,4 +63,5 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		featureModel.deleteFeature(newFeature);
 		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
 	}
+
 }

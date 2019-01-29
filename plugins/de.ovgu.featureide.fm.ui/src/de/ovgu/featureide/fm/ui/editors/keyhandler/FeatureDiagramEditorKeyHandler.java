@@ -42,10 +42,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
- * The KeyHandler for the FeatureDiagramEditor. </br> At Manual-Layout: </br> to ensure that actions registered in {@link #createKeyBindings()} will be handled
- * first! default actions will be handled at last!
+ * The KeyHandler for the FeatureDiagramEditor. <br> At Manual-Layout: <br> to ensure that actions registered in will be handled first! default actions will be
+ * handled at last!
  *
- * Handles searching of features in the Tree. </br> At Automatic-Layout: run {@link GraphicalViewerKeyHandler} first
+ * Handles searching of features in the Tree. <br> At Automatic-Layout: run {@link GraphicalViewerKeyHandler} first
  *
  * @author Guenter Ulreich
  * @author Andy Koch
@@ -67,6 +67,9 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
+	 *
+	 * @param view view
+	 * @param featureModel feature model
 	 */
 	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel graphicalFeatureModel) {
 		super();
@@ -75,7 +78,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		viewer = view;
 
 		alternativeKeyHandler = new KeyHandler();
-		gvKeyHandler = new GraphicalViewerKeyHandler(view);
+		gvKeyHandler = new MovingKeyHandler(view);
 		gvKeyHandler.setParent(alternativeKeyHandler);
 		setParent(gvKeyHandler);
 		lastTime = 0;
@@ -141,7 +144,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	}
 
 	/**
-	 * To handle 2 key handlers (otherwise there would be an action loop)</br> {@inheritDoc}
+	 * To handle 2 key handlers (otherwise there would be an action loop)
 	 */
 	@Override
 	public void put(KeyStroke keystroke, IAction action) {

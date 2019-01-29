@@ -45,14 +45,6 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  */
 public class ConfigAnalysisUtils {
 
-	/**
-	 * Get a matrix configurations/features
-	 *
-	 * @param featureProject
-	 * @param featureList
-	 * @return boolean[][]
-	 * @throws CoreException
-	 */
 	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
 		final Collection<Configuration> configs = new ArrayList<>();
 		// check that they are config files
@@ -85,7 +77,7 @@ public class ConfigAnalysisUtils {
 	/**
 	 * No core nor hidden features
 	 *
-	 * @param featureProject
+	 * @param featureProject feature project
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {

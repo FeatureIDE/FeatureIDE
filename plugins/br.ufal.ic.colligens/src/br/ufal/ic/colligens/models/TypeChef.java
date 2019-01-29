@@ -157,15 +157,15 @@ public class TypeChef {
 	}
 
 	/**
-	 * @return
+	 * @return true if finished
 	 */
 	public boolean isFinish() {
 		return isFinish;
 	}
 
 	/**
-	 * @param resourceList
-	 * @throws TypeChefException
+	 * @param resourceList list of resources
+	 * @throws TypeChefException exception
 	 */
 	public void run(List<IResource> resourceList) throws TypeChefException {
 		isFinish = false;
@@ -249,7 +249,7 @@ public class TypeChef {
 	}
 
 	/**
-	 * @return
+	 * @return list with file proxies
 	 */
 	public List<FileProxy> getFilesLog() {
 		final List<FileProxy> list = new LinkedList<FileProxy>();

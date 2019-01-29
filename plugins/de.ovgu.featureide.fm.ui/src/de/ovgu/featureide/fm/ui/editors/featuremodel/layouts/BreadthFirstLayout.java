@@ -38,9 +38,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 
-	/**
-	 * @param manager
-	 */
 	public BreadthFirstLayout() {
 		super();
 	}

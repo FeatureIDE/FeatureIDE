@@ -67,7 +67,7 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	/**
 	 *
-	 * @param terminal body
+	 * @param body terminal
 	 * @return list(0) field modifiers<br> list(1) field type<br> ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
@@ -204,12 +204,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	/**
-	 * @param terminal
+	 * @param body terminal
+	 * @param name terminal
 	 * @return contract string if existent
-	 */
-	/**
-	 * @param body
-	 * @return
 	 */
 	public String getHead(String body, String name) {
 		// remove @annotations
@@ -282,7 +279,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	/**
-	 * @param terminal
+	 * @param terminal terminal
 	 */
 	@Override
 	public void caseClassDeclarationType(FSTTerminal terminal) {

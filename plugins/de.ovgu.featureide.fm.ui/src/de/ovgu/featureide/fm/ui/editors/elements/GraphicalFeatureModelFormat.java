@@ -63,9 +63,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		final String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
 		if (layout.equals(TRUE)) {
-			object.getLayout().verticalLayout(false);
+			object.getLayout().setVerticalLayout(false);
 		} else if (layout.equals(FALSE)) {
-			object.getLayout().verticalLayout(true);
+			object.getLayout().setVerticalLayout(true);
 		}
 		final String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
 		if (showHidden.equals(TRUE)) {
@@ -239,7 +239,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		final Element constraints = doc.createElement(CONSTRAINTS);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, Integer.toString(object.getLayout().getLayoutAlgorithm()));
 
-		if (object.getLayout().verticalLayout()) {
+		if (object.getLayout().hasVerticalLayout()) {
 			root.setAttribute(HORIZONTAL_LAYOUT, FALSE);
 		} else {
 			root.setAttribute(HORIZONTAL_LAYOUT, TRUE);

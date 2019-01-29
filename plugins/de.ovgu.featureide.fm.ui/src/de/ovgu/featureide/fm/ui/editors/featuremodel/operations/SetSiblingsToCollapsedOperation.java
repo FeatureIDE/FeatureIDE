@@ -42,11 +42,6 @@ public class SetSiblingsToCollapsedOperation extends AbstractGraphicalFeatureMod
 	private final String featureName;
 	private final LinkedList<Boolean> collapseStates = new LinkedList<>();
 
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
 	public SetSiblingsToCollapsedOperation(String featureName, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel, COLLAPSE_SIBLINGS);
 		this.featureName = featureName;

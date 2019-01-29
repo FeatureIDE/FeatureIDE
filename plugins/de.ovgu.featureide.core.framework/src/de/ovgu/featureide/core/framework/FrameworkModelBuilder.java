@@ -97,7 +97,7 @@ public class FrameworkModelBuilder {
 	 * Will build model depending on <code>info.xml</code> inside feature folders<br> <ul> <li>May take a moment <li>Only referenced interfaces inside
 	 * <code>info.xml</code> will be noted </ul>
 	 *
-	 * @throws CoreException
+	 * @throws CoreException exception
 	 */
 	public void buildModel() throws CoreException {
 		final IFolder featureFolder = featureProject.getSourceFolder();

@@ -218,8 +218,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	/**
 	 * Calculates new dependencies.
-	 *
-	 * @return
 	 */
 	public void setDependencies() {
 		dependencies = new FeatureDependencies(fm);
@@ -238,8 +236,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * <p> Returns whether the conjunction of A always implies the disjunction of B in the current feature model. </p>
 	 *
-	 * <p> In other words, the following satisfiability query is checked: <pre>TAUT(FM &rArr; ((&and;<sub>a&in;A</sub> a) &rArr; (&or;<sub>b&in;B</sub>
-	 * b)))</pre> </p>
+	 * <p> In other words, the following satisfiability query is checked:</p>
+	 *
+	 * TAUT(FM &rArr; ((&and;<sub>a&isin;A</sub> a) &rArr; (&or;<sub>b&isin;B</sub> b)))
 	 *
 	 * <p> Note that this formula is always true if B is empty. </p>
 	 *
@@ -290,7 +289,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * checks some condition against the feature model. use only if you know what you are doing!
 	 *
 	 * @return
-	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
 		try {
@@ -320,13 +318,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Checks whether the given featureSets are mutually exclusive in the given context and for the current feature model.
 	 *
-	 * In detail it is checked whether FM => (context => (at most one of the featureSets are present)) is a tautology.
+	 * In detail it is checked whether FM &rArr; (context &rArr; (at most one of the featureSets are present)) is a tautology.
 	 *
-	 * Here is an example for a truth table of AT_MOST_ONE_THE_FEATURESETS_ARE_PRESENT for three feature sets A, B and C:
+	 * <br><br> Here is an example for a truth table of AT_MOST_ONE_THE_FEATURESETS_ARE_PRESENT for three feature sets A, B and C:<br>
 	 *
 	 * A B C result ------------------------ T T T F T T F F T F T F T F F T F T T F F T F T F F T T F F F T
 	 *
-	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() && !mayBeMissing().
+	 * <br><br>If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() &amp;&amp; !mayBeMissing().
 	 *
 	 * @param context context in which everything is checked
 	 * @param featureSets list of feature sets that are checked to be mutually exclusive in the given context and for the current feature model
@@ -385,7 +383,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * In detail it is checked whether there exists a set F of features so that eval(FM, F) AND eval(context, F) AND NOT(eval(featureSet_1, F)) AND ... AND
 	 * NOT(eval(featureSet_n, F)) is true.
 	 *
-	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() && !mayBeMissing().
+	 * If you want to check XOR(featureSet_1, ..., featureSet_n) you can call areMutualExclusive() &amp;&amp; !mayBeMissing().
 	 *
 	 * @param context context in which everything is checked
 	 * @param featureSets list of feature sets
@@ -849,7 +847,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * returned object must be cloned first. </p>
 	 *
 	 * @return the feature model as a formula in conjunctive normal form; not null
-	 * @see {@link #getNode()} if the formula does not have to be in conjunctive normal form
 	 */
 	public Node getCnf() {
 		if (cnf == null) {

@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * @brief Converter using negation normal form.
+ * Converter using negation normal form.
  *
  * @author Alexander Knueppel
  */
