@@ -298,9 +298,14 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case PARENT_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
-			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
-			connectionEditPart.refreshVisuals();
-			connectionEditPart.propertyChange(event);
+			final EditPartViewer viewer = getViewer();
+			if (viewer != null) {
+				connectionEditPart = (ConnectionEditPart) viewer.getEditPartRegistry().get(sourceConnection);
+				if (connectionEditPart != null) {
+					connectionEditPart.refreshVisuals();
+					connectionEditPart.propertyChange(event);
+				}
+			}
 			break;
 		case HIDDEN_CHANGED:
 			getFigure().setProperties();
