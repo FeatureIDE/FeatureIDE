@@ -26,14 +26,14 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (faView.selectedAutomaticFeatures == null || faView.selectedManualFeatures == null) {
 			if (faView.getFeatureModel() != null) {
-				return element == FeatureAttributeContentProvider.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM ? true : false;
+				return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
 			} else {
 				return true;
 			}
 		} else {
 			if (faView.selectedAutomaticFeatures.size() == 0 || faView.selectedManualFeatures.size() == 0) {
 				if (faView.getFeatureModel() != null) {
-					return element == FeatureAttributeContentProvider.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM ? true : false;
+					return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
 				} else {
 					return true;
 				}
