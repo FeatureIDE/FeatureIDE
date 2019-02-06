@@ -128,6 +128,16 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		return EXTENSIONS;
 	}
 
+	protected boolean isExtensionFileCorrected(String fileExtension) {
+		// checked all extentions with the parameter fileExtension
+		for (final String validExtension : EXTENSIONS) {
+			if (fileExtension.equals(validExtension)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void performFullBuild(IFile config) {
 		if (!prepareFullBuild(config)) {
@@ -242,7 +252,6 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	 */
 	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
 		expressionStack = new Stack<Node>();
-
 		// count of if, ifelse and else to remove after processing of else from
 		// stack
 		ifelseCountStack = new Stack<Integer>();
@@ -250,15 +259,18 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 		commentSection = false;
 
-		// go line for line
-		for (int j = 0; j < lines.size(); ++j) {
-			final String line = lines.get(j);
+		// no need to check unwanted files
+		if (isExtensionFileCorrected(res.getFileExtension())) {
+			// go line for line
+			for (int j = 0; j < lines.size(); ++j) {
+				final String line = lines.get(j);
 
-			if (line.contains("/*") || line.contains("*/") || commentSection) {
+				if (line.contains("/*") || line.contains("*/") || commentSection) {
 
-				setMarkersContradictionalFeatures(line, res, j + 1);
+					setMarkersContradictionalFeatures(line, res, j + 1);
 
-				setMarkersNotConcreteFeatures(line, res, j + 1);
+					setMarkersNotConcreteFeatures(line, res, j + 1);
+				}
 			}
 		}
 	}

@@ -565,5 +565,6 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 *
 	 * @param folder The folder containing the preprocessed files
 	 */
-	public void postProcess(IFolder folder) {}
+	public void postProcess(IFolder folder) {
+	}
 }

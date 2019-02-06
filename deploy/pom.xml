@@ -22,6 +22,7 @@
 		<module>de.ovgu.featureide.featurehouse</module>
 		<module>de.ovgu.featureide.featuremodeling</module>
 		<module>de.ovgu.featureide.munge</module>
+		<module>de.ovgu.featureide.munge.extended</module>
 		<module>de.ovgu.featureide.munge.android</module>
 		<!--UpdateSiite-->
 		<module>NightlyUpdate</module>

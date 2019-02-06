@@ -20,24 +20,24 @@
  */
 package de.ovgu.featureide.munge_extended;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.LinkedList;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.sonatype.plugins.munge.Munge;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.munge.MungeCorePlugin;
 import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
  * Munge Preprocessor adapted for usage with all kind of code projects.
- *
- * Compatibility with the Android Toolkit is achieved by bundling the src and res folders the Android builder expects into the FeatureIDE source folder. The
- * composed files are copied to the project's root folder after every FeatureIDE build. Then they can be processed by the Android builders.
  *
  * @author Nicolas Hlad
  */
@@ -91,71 +91,55 @@ public class MungeExtendedPreprocessor extends MungePreprocessor {
 	}
 
 	@Override
-	public void copyNotComposedFiles(Configuration c, IFolder destination) {
-		final List<IFeature> selectedFeatures = c.getSelectedFeatures();
-		if (selectedFeatures != null) {
-			if (destination == null) {
-				destination = featureProject.getBuildFolder();
-			}
-
-			for (final IFeature feature : selectedFeatures) {
-				final IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
-				try {
-					if (!destination.exists()) {
-						destination.create(false, true, null);
+	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
+		final LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
+		boolean added = false;
+		try {
+			createBuildFolder(buildFolder);
+			for (final IResource res : sourceFolder.members()) {
+				if (res instanceof IFolder) {
+					runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
+				} else if (res instanceof IFile) {
+					final String extension = res.getFileExtension();
+					if ((extension != null) && (isExtensionFileCorrected(extension))) {
+						added = true;
+						packageArgs.add(res.getRawLocation().toOSString());
+					} else {
+						added = false;
+						final File source = new File(res.getRawLocation().toOSString());
+						final File dest = new File(buildFolder.getRawLocation().toOSString());
+						try {
+							FileUtils.copyFileToDirectory(source, dest);
+						} catch (final IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
-					copy(folder, destination);
-				} catch (final CoreException e) {
-					CorePlugin.getDefault().logError(e);
 				}
 			}
+		} catch (final CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
 		}
+		if (!added) {
+			return;
+		}
+		// add output directory
+		packageArgs.add(buildFolder.getRawLocation().toOSString());
+		// CommandLine syntax:
+		// -DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
+		runMunge(packageArgs);
 	}
-	/*
-	 * @Override
-	 * protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
-	 * final LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
-	 * boolean added = false;
-	 * try {
-	 * createBuildFolder(buildFolder);
-	 * for (final IResource res : sourceFolder.members()) {
-	 * if (res instanceof IFolder) {
-	 * runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
-	 * } else if (res instanceof IFile) {
-	 * final String extension = res.getFileExtension();
-	 * if ((extension != null) && (isExtensionFileCorrected(extension))) {
-	 * added = true;
-	 * packageArgs.add(res.getRawLocation().toOSString());
-	 * }
-	 * }
-	 * }
-	 * } catch (final CoreException e) {
-	 * MungeCorePlugin.getDefault().logError(e);
-	 * }
-	 * if (!added) {
-	 * return;
-	 * }
-	 * // add output directory
-	 * packageArgs.add(buildFolder.getRawLocation().toOSString());
-	 * // CommandLine syntax:
-	 * // -DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
-	 * runMunge(packageArgs);
-	 * }
-	 */
+
+	@Override
+	protected void runMunge(LinkedList<String> args) {
+		// run Munge
+		final Munge m = new Munge();
+		m.main(args.toArray(new String[0]), featureProject);
+	}
 
 	@Override
 	public LinkedHashSet<String> extensions() {
 		return EXTENSIONS;
-	}
-
-	private boolean isExtensionFileCorrected(String fileExtension) {
-		// checked all extentions with the parameter fileExtension
-		for (final String validExtension : EXTENSIONS) {
-			if (fileExtension.equals(validExtension)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 }
