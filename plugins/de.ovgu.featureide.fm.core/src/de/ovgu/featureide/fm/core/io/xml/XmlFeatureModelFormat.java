@@ -323,7 +323,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
 						object.getAnalyser().calculateTautologyConstraints = value;
 					} else {
-						throwError("Unknown calculations attribute: " + nodeName, e);
+						throwWarning("Unknown calculations attribute: " + nodeName, e);
 					}
 
 				}
@@ -347,7 +347,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (e.getNodeName().equals(C)) {
 				object.getProperty().addComment(e.getTextContent());
 			} else {
-				throwError("Unknown comment attribute: " + e.getNodeName(), e);
+				throwWarning("Unknown comment attribute: " + e.getNodeName(), e);
 			}
 		}
 	}
@@ -376,14 +376,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 								if (attributeName.equals(COORDINATES)) {
 									// Legacy case, for backwards compatibility
 								} else {
-									throwError("Unknown constraint attribute: " + attributeName, node);
+									throwWarning("Unknown constraint attribute: " + attributeName, node);
 								}
 							}
 						}
 						object.addConstraint(constraint);
 					}
 				} else {
-					throwError("Unknown constraint node: " + nodeName, child);
+					throwWarning("Unknown constraint node: " + nodeName, child);
 				}
 			}
 		}
@@ -545,7 +545,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				} else if (attributeName.equals(COORDINATES)) {
 					// Legacy case, for backwards compatibility
 				} else {
-					throwError("Unknown feature attribute: " + attributeName, e);
+					throwWarning("Unknown feature attribute: " + attributeName, e);
 				}
 
 			}
