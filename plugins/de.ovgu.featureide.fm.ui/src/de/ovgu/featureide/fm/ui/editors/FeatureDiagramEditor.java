@@ -32,6 +32,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +83,7 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -95,6 +98,9 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
@@ -103,6 +109,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
@@ -114,6 +121,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescri
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ConvertGraphicalFileAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
@@ -153,6 +161,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -209,6 +218,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private ZoomOutAction zoomOut;
 
 	private ExportFeatureModelAction exportFeatureModelAction;
+	private ConvertGraphicalFileAction convertGraphicalFileAction;
 	private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
 
@@ -325,6 +335,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Other actions
 		exportFeatureModelAction = addAction(new ExportFeatureModelAction(this));
+		convertGraphicalFileAction = addAction(new ConvertGraphicalFileAction(this));
 		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, graphicalFeatureModel.getFeatureModelManager()));
 
 		viewer.addSelectionChangedListener(new SelectionAction(graphicalFeatureModel));
@@ -477,6 +488,25 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 */
 	public Explanation<?> getActiveExplanation() {
 		return activeExplanation;
+	}
+
+	public void convertGraphicalFile(boolean deleteAfterwards) {
+		if (fmManager instanceof AFileManager<?>) {
+			final Path gfmPath = AFileManager.constructExtraPath(((AFileManager<?>) fmManager).getPath(), new GraphicalFeatureModelFormat());
+			if ((gfmPath != null) && FileSystem.exists(gfmPath)) {
+				FileHandler.load(gfmPath, graphicalFeatureModel, new GraphicalFeatureModelFormat());
+				graphicalFeatureModel.writeValues();
+				if (deleteAfterwards) {
+					try {
+						FileSystem.delete(gfmPath);
+					} catch (final IOException e) {
+						Logger.logError(e);
+					}
+				}
+				fmManager.fireEvent(new FeatureIDEEvent(fmManager.getObject(), EventType.MODEL_DATA_LOADED, null, null));
+				FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
+			}
+		}
 	}
 
 	public void analyzeFeatureModel() {
@@ -1207,6 +1237,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(legendAction);
 			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menuManager.add(exportFeatureModelAction);
+			menuManager.add(convertGraphicalFileAction);
 		}
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());

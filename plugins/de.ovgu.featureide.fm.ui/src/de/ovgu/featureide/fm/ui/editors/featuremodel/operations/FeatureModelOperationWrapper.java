@@ -51,6 +51,10 @@ public class FeatureModelOperationWrapper extends AbstractOperation {
 		}
 	}
 
+	public static final void clearHistory(IUndoContext context) {
+		PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().dispose(context, true, true, false);
+	}
+
 	protected final AbstractFeatureModelOperation operation;
 
 	protected Object editor = null;
