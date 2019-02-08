@@ -97,17 +97,6 @@ public interface IFeature extends IFeatureModelElement {
 	IFeatureProperty getProperty();
 
 	/**
-	 * Returns the feature's custom-defined properties. These properties can be get and set without changes to the code base, or the need for a custom
-	 * {@link IFeatureProperty} implementation (see {@link #getProperty()}). Custom-Properties do map a Java primitive value to a string key and can stored to
-	 * the file system.
-	 *
-	 * @since 3.0
-	 *
-	 * @return Implementation-independent custom feature properties.
-	 */
-	IPropertyContainer getCustomProperties();
-
-	/**
 	 * Returns the feature structure, in which this feature lives in. The structure gives information about (and setter to) the children and the parent of this
 	 * feature, and statement-related properties such as if this feature is part of an alternative group, or if it is abstract or hidden. <br> <br> <b>Note</b>:
 	 * The returned object have to be non-null.

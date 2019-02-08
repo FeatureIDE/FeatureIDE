@@ -292,9 +292,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	protected void addProperties(Document doc, IPropertyContainer properties, Element fnod) {
 		for (final Entry property : properties.getProperties()) {
 			if (property.getValue() != null) {
-				final Element propNode = doc.createElement(PROPERTY);
+				final Element propNode;
+				if (GRAPHICS.equals(property.getType())) {
+					propNode = doc.createElement(GRAPHICS);
+				} else {
+					propNode = doc.createElement(PROPERTY);
+					propNode.setAttribute(TYPE, property.getType());
+				}
 				propNode.setAttribute(KEY, property.getKey());
-				propNode.setAttribute(TYPE, property.getType());
 				propNode.setAttribute(VALUE, property.getValue());
 				fnod.appendChild(propNode);
 			}
@@ -402,20 +407,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					throwWarning("Misplaced description element", e);
 				}
 				break;
+			case GRAPHICS:
+				if (parent != null) {
+					parseProperty(parent.getCustomProperties(), e, GRAPHICS);
+				} else {
+					throwWarning("Misplaced graphics element", e);
+				}
+				break;
 			case PROPERTY:
 				if (parent != null) {
-					if (!e.hasAttribute(KEY) || !e.hasAttribute(VALUE)) {
-						throwWarning("Missing one of the required attributes: " + KEY + ", " + VALUE + "," + TYPE, e);
-					} else {
-						final String key = e.getAttribute(KEY);
-						final String type = e.hasAttribute(TYPE) ? e.getAttribute(TYPE) : TYPE_CUSTOM;
-						final String value = e.getAttribute(VALUE);
-						if (parent.getCustomProperties().has(key, type)) {
-							throwWarning("Redundant property definition for key: " + key, e);
-						} else {
-							parent.getCustomProperties().set(key, type, value);
-						}
-					}
+					parseProperty(parent.getCustomProperties(), e, null);
 				} else {
 					throwWarning("Misplaced property element", e);
 				}
@@ -507,8 +508,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			case DESCRIPTION:
 				parseDescription(parent, e);
 				break;
+			case GRAPHICS:
+				parseProperty(parent.getCustomProperties(), e, GRAPHICS);
+				break;
 			case PROPERTY:
-				parseProperty(parent, e);
+				parseProperty(parent.getCustomProperties(), e, null);
 				break;
 			case AND:
 			case OR:
@@ -591,17 +595,19 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
-	protected void parseProperty(IFeature parent, final Element e) {
+	protected void parseProperty(IPropertyContainer properties, final Element e, String type) {
 		if (!e.hasAttribute(KEY) || !e.hasAttribute(VALUE)) {
-			throwWarning("Missing one of the required attributes: " + KEY + ", " + VALUE + "," + TYPE, e);
+			throwWarning("Missing one of the required attributes: " + KEY + " or " + VALUE, e);
 		} else {
+			if (type == null) {
+				type = e.hasAttribute(TYPE) ? e.getAttribute(TYPE) : TYPE_CUSTOM;
+			}
 			final String key = e.getAttribute(KEY);
-			final String type = e.hasAttribute(TYPE) ? e.getAttribute(TYPE) : TYPE_CUSTOM;
 			final String value = e.getAttribute(VALUE);
-			if (parent.getCustomProperties().has(key, type)) {
+			if (properties.has(key, type)) {
 				throwWarning("Redundant property definition for key: " + key, e);
 			} else {
-				parent.getCustomProperties().set(key, type, value);
+				properties.set(key, type, value);
 			}
 		}
 	}
@@ -626,19 +632,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (final Element propertyElement : getElements(e.getChildNodes())) {
 				final String nodeName = propertyElement.getNodeName();
 				switch (nodeName) {
+				case GRAPHICS:
+					parseProperty(object.getProperty(), propertyElement, GRAPHICS);
+					break;
 				case PROPERTY:
-					if (!propertyElement.hasAttribute(KEY) || !propertyElement.hasAttribute(VALUE)) {
-						throwWarning("Missing one of the required attributes: " + KEY + ", " + VALUE + "," + TYPE, propertyElement);
-					} else {
-						final String key = propertyElement.getAttribute(KEY);
-						final String type = propertyElement.hasAttribute(TYPE) ? propertyElement.getAttribute(TYPE) : TYPE_CUSTOM;
-						final String value = propertyElement.getAttribute(VALUE);
-						if (object.getProperty().has(key, type)) {
-							throwWarning("Redundant property definition for key: " + key, propertyElement);
-						} else {
-							object.getProperty().set(key, type, value);
-						}
-					}
+					parseProperty(object.getProperty(), propertyElement, null);
 					break;
 				}
 			}

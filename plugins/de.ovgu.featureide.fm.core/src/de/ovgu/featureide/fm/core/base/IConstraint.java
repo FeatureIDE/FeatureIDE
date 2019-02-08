@@ -119,8 +119,6 @@ public interface IConstraint extends IFeatureModelElement {
 	 */
 	ConstraintAttribute getConstraintAttribute();
 
-	IPropertyContainer getCustomProperties();
-
 	/**
 	 * Returns the collection of features contained in the underlying formula of this constraint. <br> <br> A constraint contains one or more features. In the
 	 * default implementation, the propositional formula is constructed via nodes of a satisfiability solver (see {@link Node}). This method returns a view on

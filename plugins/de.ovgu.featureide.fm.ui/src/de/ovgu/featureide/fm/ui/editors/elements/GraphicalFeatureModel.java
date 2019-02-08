@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
@@ -50,7 +51,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of an {@link IFeatureModel} instance.
  *
  * @author Sebastian Krieter
- *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
@@ -299,31 +299,37 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Explanation<?> getActiveExplanation() {
-		// TODO Auto-generated method stub
 		return currentlyActiveExplanation;
 	}
 
-	private static final String CHOSEN_LAYOUT_ALGORITHM = "chosenLayoutAlgorithm";
-	private static final String TRUE = "true";
-	private static final String FALSE = "false";
-	private static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
-	private static final String SHOW_COLLAPSED_CONSTRAINTS = "showCollapsedConstraints";
-	private static final String LEGEND_AUTO_LAYOUT = "autoLayout";
-	private static final String LEGEND_HIDDEN = "hidden";
-	private static final String SHOW_SHORT_NAMES = "showShortNames";
-	private static final String TYPE_GRAPHICS = "graphics";
+	private static final String LAYOUT_ALGORITHM = "layoutalgorithm";
+	private static final String SHOW_HIDDEN_FEATURES = "showhiddenfeatures";
+	private static final String SHOW_COLLAPSED_CONSTRAINTS = "showcollapsedconstraints";
+	private static final String SHOW_SHORT_NAMES = "showshortnames";
+	private static final String LEGEND_AUTO_LAYOUT = "legendautolayout";
+	private static final String LEGEND_HIDDEN = "legendhidden";
+	private static final String LEGEND_POSITION = "legendposition";
 	private static final String LAYOUT = "layout";
+	private static final String POSITION = "position";
+	private static final String COLLAPSED = "collapsed";
+
+	private static final String VALUE_TRUE = "true";
+	private static final String VALUE_FALSE = "false";
+	private static final String VALUE_VERTICAL = "vertical";
+	private static final String VALUE_HORIZONTAL = "horizontal";
+
+	private static final String TYPE_GRAPHICS = "graphics";
 
 	@Override
 	public void readValues() {
 		final IFeatureModel fm = featureModelManager.editObject();
 
-		getLayout().setLayout(Integer.parseInt(fm.getProperty().get(CHOSEN_LAYOUT_ALGORITHM, TYPE_GRAPHICS, "1")));
+		getLayout().setLayout(Integer.parseInt(fm.getProperty().get(LAYOUT_ALGORITHM, TYPE_GRAPHICS, "1")));
 
-		switch (fm.getProperty().get(LAYOUT, TYPE_GRAPHICS, "horizontal")) {
-		case "vertical":
+		switch (fm.getProperty().get(LAYOUT, TYPE_GRAPHICS, VALUE_HORIZONTAL)) {
+		case VALUE_VERTICAL:
 			getLayout().setVerticalLayout(true);
-		case "horizontal":
+		case VALUE_HORIZONTAL:
 		default:
 			getLayout().setVerticalLayout(false);
 		}
@@ -345,8 +351,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 		if (!getLayout().hasLegendAutoLayout()) {
 			final Point legendPos = new Point();
-			legendPos.x = Integer.parseInt(fm.getProperty().get("legendx", TYPE_GRAPHICS, "0"));
-			legendPos.y = Integer.parseInt(fm.getProperty().get("legendy", TYPE_GRAPHICS, "0"));
+			final int[] coordinates = convertCoordinatesString(fm.getProperty().get(LEGEND_POSITION, TYPE_GRAPHICS, "0,0"), 2);
+			legendPos.x = coordinates[0];
+			legendPos.y = coordinates[1];
 			getLegend().setPos(legendPos);
 		}
 
@@ -355,23 +362,37 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
 			if (manualLayout) {
 				final Point location = new Point();
-				location.x = Integer.parseInt(customProperties.get("positionx", TYPE_GRAPHICS, "0"));
-				location.y = Integer.parseInt(customProperties.get("positiony", TYPE_GRAPHICS, "0"));
+				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+				location.x = coordinates[0];
+				location.y = coordinates[1];
 				graphicalFeature.setLocation(location);
 			}
 
-			final Boolean isCollapsed = getBooleanProperty(customProperties, "collapsed");
+			final Boolean isCollapsed = getBooleanProperty(customProperties, COLLAPSED);
 			graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
 		}
 		for (final IGraphicalConstraint constr : getConstraints()) {
 			final IPropertyContainer customProperties = constr.getObject().getCustomProperties();
 			if (manualLayout) {
 				final Point location = new Point();
-				location.x = Integer.parseInt(customProperties.get("positionx", TYPE_GRAPHICS, "0"));
-				location.y = Integer.parseInt(customProperties.get("positiony", TYPE_GRAPHICS, "0"));
+				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+				location.x = coordinates[0];
+				location.y = coordinates[1];
 				constr.setLocation(location);
 			}
 		}
+	}
+
+	private int[] convertCoordinatesString(final String coordinatesString, int dimensions) {
+		final String[] coordinates = coordinatesString.split(",");
+		if (coordinates.length != dimensions) {
+			throw new NumberFormatException(coordinatesString);
+		}
+		final int[] c = new int[dimensions];
+		for (int i = 0; i < dimensions; i++) {
+			c[i] = Integer.parseInt(coordinates[i]);
+		}
+		return c;
 	}
 
 	private Boolean getBooleanProperty(IPropertyContainer properties, String name) {
@@ -382,9 +403,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			return null;
 		}
 		switch (value) {
-		case FALSE:
+		case VALUE_FALSE:
 			return false;
-		case TRUE:
+		case VALUE_TRUE:
 			return true;
 		default:
 			return null;
@@ -406,74 +427,67 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	private void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
-		final IPropertyContainer customProperties = graphicalConstraint.getObject().getCustomProperties();
-		final Point location = graphicalConstraint.getLocation();
-		if (!getLayout().hasFeaturesAutoLayout()) {
-			customProperties.set("positionx", TYPE_GRAPHICS, Integer.toString(location.x));
-			customProperties.set("positiony", TYPE_GRAPHICS, Integer.toString(location.y));
-		} else {
-			customProperties.remove("positionx", TYPE_GRAPHICS);
-			customProperties.remove("positiony", TYPE_GRAPHICS);
-		}
+		writePosition(graphicalConstraint, graphicalConstraint.getObject().getCustomProperties());
 	}
 
 	private void writeFeature(final IFeatureModel fm, final IGraphicalFeature graphicalFeature) {
 		final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
+		writePosition(graphicalFeature, customProperties);
+		if (graphicalFeature.isCollapsed()) {
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_TRUE);
+		} else if (customProperties.has(COLLAPSED, TYPE_GRAPHICS)) {
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+	}
+
+	private void writePosition(final IGraphicalElement graphicalFeature, final IPropertyContainer customProperties) {
 		if (!getLayout().hasFeaturesAutoLayout()) {
 			final Point location = graphicalFeature.getLocation();
-			customProperties.set("positionx", TYPE_GRAPHICS, Integer.toString(location.x));
-			customProperties.set("positiony", TYPE_GRAPHICS, Integer.toString(location.y));
+			customProperties.set(POSITION, TYPE_GRAPHICS, location.x + "," + location.y);
 		} else {
-			customProperties.remove("positionx", TYPE_GRAPHICS);
-			customProperties.remove("positiony", TYPE_GRAPHICS);
-		}
-		if (graphicalFeature.isCollapsed()) {
-			customProperties.set("collapsed", TYPE_GRAPHICS, TRUE);
-		} else if (customProperties.has("collapsed", TYPE_GRAPHICS)) {
-			customProperties.set("collapsed", TYPE_GRAPHICS, FALSE);
+			customProperties.remove(POSITION, TYPE_GRAPHICS);
 		}
 	}
 
 	private void writeAttributes(final IFeatureModel fm) {
 		if (getLayout().showHiddenFeatures()) {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, TRUE);
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, FALSE);
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_FALSE);
 		}
 		if (getLayout().showShortNames()) {
-			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, TRUE);
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FALSE);
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_FALSE);
 		}
 		if (getLayout().showCollapsedConstraints()) {
-			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, TRUE);
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FALSE);
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_FALSE);
 		}
 	}
 
 	private void writeLegend(final IFeatureModel fm) {
 		if (isLegendHidden()) {
-			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, TRUE);
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_TRUE);
 		} else {
-			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, FALSE);
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_FALSE);
 		}
 		if (getLayout().hasLegendAutoLayout()) {
-			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, TRUE);
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_TRUE);
 		} else {
-			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, FALSE);
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_FALSE);
 			final Point legendPos = getLegend().getPos();
-			fm.getProperty().set("legendx", TYPE_GRAPHICS, Integer.toString(legendPos.x));
-			fm.getProperty().set("legendy", TYPE_GRAPHICS, Integer.toString(legendPos.y));
+			fm.getProperty().set(LEGEND_POSITION, TYPE_GRAPHICS, legendPos.x + "," + legendPos.y);
 		}
 	}
 
 	private void writeLayoutAlgorithm(final IFeatureModel fm) {
-		fm.getProperty().set(CHOSEN_LAYOUT_ALGORITHM, TYPE_GRAPHICS, Integer.toString(getLayout().getLayoutAlgorithm()));
+		fm.getProperty().set(LAYOUT_ALGORITHM, TYPE_GRAPHICS, Integer.toString(getLayout().getLayoutAlgorithm()));
 		if (getLayout().hasVerticalLayout()) {
-			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, "vertical");
+			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, VALUE_VERTICAL);
 		} else {
-			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, "horizontal");
+			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, VALUE_HORIZONTAL);
 		}
 	}
 

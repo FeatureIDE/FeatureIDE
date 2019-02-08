@@ -146,8 +146,11 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			case DESCRIPTION:
 				parseDescription(parent, e);
 				break;
+			case GRAPHICS:
+				parseProperty(parent.getCustomProperties(), e, GRAPHICS);
+				break;
 			case PROPERTY:
-				parseProperty(parent, e);
+				parseProperty(parent.getCustomProperties(), e, null);
 				break;
 			case ATTRIBUTE:
 				parseAttribute(parent, e);
