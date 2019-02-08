@@ -48,7 +48,6 @@ public class MapPropertyContainer implements IPropertyContainer {
 		final Entry retrievedEntry = properties.get(newEntry);
 		if (retrievedEntry == null) {
 			newEntry.setValue(defaultValue);
-			properties.put(newEntry, newEntry);
 			return defaultValue;
 		}
 		return retrievedEntry.getValue();

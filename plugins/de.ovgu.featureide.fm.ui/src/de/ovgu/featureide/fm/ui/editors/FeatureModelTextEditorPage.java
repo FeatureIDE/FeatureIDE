@@ -83,7 +83,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		final Lock fileOperationLock = manager.getFileOperationLock();
 		fileOperationLock.lock();
 		try {
-			featureModelEditor.gfm.writeValues();
 			text = featureModelEditor.fmManager.getFormat().getInstance().write(manager.editObject());
 		} finally {
 			fileOperationLock.unlock();
