@@ -71,6 +71,6 @@ public abstract class ConfigurationExplanationWriter<E extends ConfigurationExpl
 		default:
 			throw new IllegalStateException("Unknown feature selection state");
 		}
-		return String.format("%s is %s.", selection.getFeature().getName(), selectionString);
+		return String.format("%s is %s.", selection.getName(), selectionString);
 	}
 }

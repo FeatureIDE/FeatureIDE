@@ -93,7 +93,7 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 		if ((automatic == Selection.UNDEFINED) || (manual == Selection.UNDEFINED) || (manual == automatic)) {
 			this.automatic = automatic;
 		} else {
-			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
+			throw new AutomaticalSelectionNotPossibleException(getName(), automatic);
 		}
 	}
 
