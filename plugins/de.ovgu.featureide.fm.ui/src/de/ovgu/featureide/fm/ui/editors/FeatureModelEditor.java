@@ -518,9 +518,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	protected void setInput(IEditorInput input) {
 		// Cast is necessary, don't remove
 		markerHandler = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
-		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		super.setInput(input);
 
+		final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
 		fmManager = FeatureModelManager.getInstance(path);
 		if (fmManager != null) {
 			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));

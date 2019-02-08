@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
@@ -48,6 +50,16 @@ public class EclipseFileSystem implements IFileSystem {
 		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
 		return res;
+	}
+
+	public static final Path getPath(IResource res) {
+		if (res != null) {
+			final URI locationURI = res.getLocationURI();
+			if (locationURI != null) {
+				return Paths.get(locationURI);
+			}
+		}
+		return null;
 	}
 
 	private final JavaFileSystem JAVA = new JavaFileSystem();
