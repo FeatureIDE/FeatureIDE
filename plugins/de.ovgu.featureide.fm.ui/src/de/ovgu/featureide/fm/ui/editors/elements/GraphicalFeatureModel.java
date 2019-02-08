@@ -58,8 +58,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	protected final FeatureModelLayout layout;
 
-	protected Map<IFeature, IGraphicalFeature> features = new HashMap<IFeature, IGraphicalFeature>();
-	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<IConstraint, IGraphicalConstraint>();
+	protected Map<IFeature, IGraphicalFeature> features = new HashMap<>();
+	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<>();
 
 	protected boolean hiddenLegend = false;
 	protected Legend legend;
@@ -441,11 +441,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	private void writePosition(final IGraphicalElement graphicalFeature, final IPropertyContainer customProperties) {
-		if (!getLayout().hasFeaturesAutoLayout()) {
+		if (getLayout().hasFeaturesAutoLayout()) {
+			customProperties.remove(POSITION, TYPE_GRAPHICS);
+		} else {
 			final Point location = graphicalFeature.getLocation();
 			customProperties.set(POSITION, TYPE_GRAPHICS, location.x + "," + location.y);
-		} else {
-			customProperties.remove(POSITION, TYPE_GRAPHICS);
 		}
 	}
 
