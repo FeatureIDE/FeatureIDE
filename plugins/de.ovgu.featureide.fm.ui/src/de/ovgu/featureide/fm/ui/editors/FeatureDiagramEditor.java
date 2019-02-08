@@ -76,7 +76,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
@@ -769,15 +768,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
-			Display.getDefault().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					viewer.deregisterEditParts();
-					graphicalFeatureModel.init();
-					viewer.setContents(graphicalFeatureModel);
-				}
-			});
+			viewer.reload();
 			analyzeFeatureModel();
+			viewer.refreshChildAll(fmManager.editObject().getStructure().getRoot().getFeature());
+			viewer.internRefresh(true);
+			setDirty();
+			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
+				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+			}
 			break;
 		case MODEL_DATA_LOADED:
 			Display.getDefault().syncExec(new Runnable() {
@@ -800,7 +799,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.setContents(graphicalFeatureModel);
 				}
 			});
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().dispose((IUndoContext) fmManager.getUndoContext(), true, true, true);
+			FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:
