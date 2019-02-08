@@ -779,19 +779,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case MODEL_DATA_LOADED:
-			Display.getDefault().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					viewer.deregisterEditParts();
-					graphicalFeatureModel.init();
-					viewer.setContents(graphicalFeatureModel);
-				}
-			});
-			analyzeFeatureModel();
-			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
-
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
@@ -800,6 +789,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			});
 			FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:

@@ -493,8 +493,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void handlePropertyChange(int propertyId) {
 		if (propertyId == PROP_DIRTY) {
-			gfm.writeValues();
-			isPageModified = isPageModified || fmManager.hasChanged();
+			isPageModified = fmManager.hasChanged();
+			if (isPageModified) {
+				gfm.writeValues();
+			}
 		}
 		super.handlePropertyChange(propertyId);
 	}
