@@ -827,6 +827,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case MODEL_DATA_SAVED:
 			break;
 		case MODEL_LAYOUT_CHANGED:
+			gfm.writeValues();
 			viewer.setLayout();
 			viewer.reload();
 			setDirty();
@@ -843,6 +844,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
+			gfm.writeFeatureModel();
 			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
@@ -867,6 +869,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			if (event.getNewValue() == null) {
 				final IFeature selectedFeature = (IFeature) event.getSource();
 				viewer.refreshChildAll(selectedFeature);
+				gfm.writeFeature(gfm.getGraphicalFeature(selectedFeature));
 			}
 			viewer.internRefresh(false);
 			setDirty();
@@ -882,6 +885,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.reload();
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
+			gfm.writeValues();
 			setDirty();
 
 			// Center root feature after operation

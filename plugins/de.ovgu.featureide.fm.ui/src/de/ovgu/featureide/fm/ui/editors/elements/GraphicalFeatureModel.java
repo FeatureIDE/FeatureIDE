@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
 
 import org.eclipse.draw2d.geometry.Point;
 
@@ -414,23 +415,66 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void writeValues() {
-		final IFeatureModel fm = featureModelManager.editObject();
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			final IFeatureModel fm = featureModelManager.editObject();
+			writeFeatureModelInternal(fm);
+			for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
+				writeFeatureInternal(fm, graphicalFeature);
+			}
+			for (final IGraphicalConstraint graphicalConstraint : getConstraints()) {
+				writeConstraintInternal(graphicalConstraint);
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeFeatureModel() {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeFeatureModelInternal(featureModelManager.editObject());
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeConstraintInternal(graphicalConstraint);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeFeature(final IGraphicalFeature graphicalFeature) {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeFeatureInternal(featureModelManager.editObject(), graphicalFeature);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	private void writeFeatureModelInternal(IFeatureModel fm) {
 		writeLayoutAlgorithm(fm);
 		writeAttributes(fm);
 		writeLegend(fm);
-		for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
-			writeFeature(fm, graphicalFeature);
-		}
-		for (final IGraphicalConstraint graphicalConstraint : getConstraints()) {
-			writeConstraint(graphicalConstraint);
-		}
 	}
 
-	private void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
+	private void writeConstraintInternal(final IGraphicalConstraint graphicalConstraint) {
 		writePosition(graphicalConstraint, graphicalConstraint.getObject().getCustomProperties());
 	}
 
-	private void writeFeature(final IFeatureModel fm, final IGraphicalFeature graphicalFeature) {
+	private void writeFeatureInternal(final IFeatureModel fm, final IGraphicalFeature graphicalFeature) {
 		final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
 		writePosition(graphicalFeature, customProperties);
 		if (graphicalFeature.isCollapsed()) {
