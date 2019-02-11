@@ -198,6 +198,10 @@ public class Configuration implements Cloneable {
 		return featureModel;
 	}
 
+	public boolean hasFeatureModel() {
+		return featureModel != null;
+	}
+
 	public Collection<SelectableFeature> getFeatures() {
 		return Collections.unmodifiableCollection(selectableFeatures.values());
 	}
