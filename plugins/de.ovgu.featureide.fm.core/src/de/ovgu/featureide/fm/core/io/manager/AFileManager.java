@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -303,9 +304,6 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 
 	@Override
 	public ProblemList read() {
-		if (!FileSystem.exists(path)) {
-			return new ProblemList(Arrays.asList(new Problem(new NoSuchFileException(path.toString()))));
-		}
 		if (persistentObject == null) {
 			return new ProblemList(Arrays.asList(new Problem(new IllegalStateException("Initialization Problem"))));
 		}
@@ -316,25 +314,11 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 			if (modifying) {
 				return new ProblemList();
 			}
-			lastProblems.clear();
-			final T tempObject;
-			try {
-				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
-				detectFormat(content);
-				tempObject = createObject();
-				final List<Problem> problemList = format.getInstance().read(tempObject, content);
-				if (problemList != null) {
-					lastProblems.addAll(problemList);
-				}
-				changed = hasChanged(tempObject);
-			} catch (final Exception e) {
-				handleException(e);
-				return new ProblemList(lastProblems);
-			}
-			if (changed) {
-				setPersistentObject(tempObject);
-			}
+			changed = readInternal();
 			problems = new ProblemList(lastProblems);
+		} catch (final Exception e) {
+			handleException(e);
+			return new ProblemList(lastProblems);
 		} finally {
 			fileOperationLock.unlock();
 		}
@@ -342,6 +326,27 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 			ExternalChangeListener.update(this);
 		}
 		return problems;
+	}
+
+	private boolean readInternal() throws NoSuchFileException, IOException, Exception {
+		final boolean changed;
+		if (!FileSystem.exists(path)) {
+			throw new NoSuchFileException(path.toString());
+		}
+		lastProblems.clear();
+		final T tempObject;
+		final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+		detectFormat(content);
+		tempObject = createObject();
+		final List<Problem> problemList = format.getInstance().read(tempObject, content);
+		if (problemList != null) {
+			lastProblems.addAll(problemList);
+		}
+		changed = hasChanged(tempObject);
+		if (changed) {
+			setPersistentObject(tempObject);
+		}
+		return changed;
 	}
 
 	@Override
@@ -447,10 +452,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 				}
 				modifying = true;
 				externalSaveMethod.run();
-				final List<Problem> problemList = read();
-				if (problemList != null) {
-					lastProblems.addAll(problemList);
-				}
+				readInternal();
 			} catch (final Exception e) {
 				handleException(e);
 				return new ProblemList(lastProblems);

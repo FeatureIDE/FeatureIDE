@@ -166,8 +166,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		gfm.writeValues();
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
-			textEditor.executeSaveOperation();
-			// textEditor.updateDiagram();
 			fmManager.externalSave(new Runnable() {
 				@Override
 				public void run() {
