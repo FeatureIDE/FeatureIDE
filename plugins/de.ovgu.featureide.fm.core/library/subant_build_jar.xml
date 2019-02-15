@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
 
-	<!-- Path to Java Compiler (must be Java 1.7) -->
-	<property name="bin.javac.path" value="C:/Program Files/Java/jdk1.7.0_79/bin/javac.exe" />
-
 	<!-- Set JAR name -->
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
 	<property name="build.jar.version" value="3.4.0" />
@@ -29,7 +26,18 @@
 
 	</target>
 
-	<target name="compile" description="Compile Sources">
+	<target name="check-custom-properties">
+		<available file="build_jar.properties" property="custom.properties" />
+	</target>
+
+	<target name="load-custom-properties" depends="check-custom-properties" if="custom.properties">
+		<property file="build_jar.properties" />
+	</target> 
+
+	<target name="compile" description="Compile Sources" depends="load-custom-properties">
+
+		<!-- Path to Java Compiler (must be Java 1.7) -->
+		<property name="bin.javac.path" value="C:/Program Files/Java/jdk1.7.0_79/bin/javac.exe" />
 
 		<!-- Get all libraries in lib folder -->
 		<path id="classpath">
