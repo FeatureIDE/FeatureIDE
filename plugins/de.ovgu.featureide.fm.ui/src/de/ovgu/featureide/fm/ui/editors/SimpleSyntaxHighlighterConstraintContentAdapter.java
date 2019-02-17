@@ -82,10 +82,10 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	/**
-	 * @param currentText
-	 * @param selection
-	 * @param text
-	 * @return
+	 * @param currentText current text
+	 * @param selection selection point
+	 * @param textToInsert text to insert
+	 * @return return
 	 */
 	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert, final boolean isFeature) {
 		String before = "", after = "";

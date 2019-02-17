@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -54,6 +55,14 @@ import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
+/**
+ * Implements the {@link IFeatureModelFormat} and represents the format used to read and write {@link ExtendedFeatureModel} to XML files.
+ * 
+ * @see IFeatureModelFormat
+ * 
+ * @author Joshua Sprey
+ * @author Chico Sundermann
+ */
 public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = "de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat";

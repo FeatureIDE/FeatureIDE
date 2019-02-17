@@ -23,8 +23,9 @@ package de.ovgu.featureide.core.signature.base;
 import org.prop4j.Node;
 
 /**
- * Stores information about a {@link AbstractSignature} in a certain feature.</br> An instance of this class is stored in a signature instance for every feature
- * that implements the signature.
+ * Stores information about a {@link AbstractSignature} in a certain feature.<br>
+ *
+ * An instance of this class is stored in a signature instance for every feature that implements the signature.
  *
  * @author Sebastian Krieter
  */

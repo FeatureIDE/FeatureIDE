@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * Holds all preference values for FeatureIDE.</br> Stores the values persistently for each workspace. Loads all the values when this class is loaded.
+ * Holds all preference values for FeatureIDE.<br> Stores the values persistently for each workspace. Loads all the values when this class is loaded.
  *
  * @author Sebastian Krieter
  */

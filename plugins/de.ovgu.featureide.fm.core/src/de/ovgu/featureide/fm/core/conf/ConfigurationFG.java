@@ -80,7 +80,7 @@ public class ConfigurationFG extends Configuration {
 	 * Creates a new configuration object.
 	 *
 	 * @param featureModel the corresponding feature model.
-	 * @param options one or more of:</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
+	 * @param options one or more of:<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},<br>
 	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
 	public ConfigurationFG(IFeatureModel featureModel, IFeatureGraph featureGraph, int options) {

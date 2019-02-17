@@ -108,7 +108,7 @@ public class Clone implements Comparable<Clone> {
 	 * contain an occurence of the clone in a {@link List}. Each {@link IPath}
 	 * is only listed once, even if its file contains multiple occurences.
 	 * 
-	 * @return
+	 * @return List containing the {@link IPath} of every file.
 	 */
 	public List<IPath> getDistinctFiles() {
 		Set<IPath> files = new HashSet<IPath>();

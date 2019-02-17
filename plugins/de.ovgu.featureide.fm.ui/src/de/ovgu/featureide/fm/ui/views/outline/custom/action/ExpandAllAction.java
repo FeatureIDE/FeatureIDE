@@ -34,11 +34,6 @@ public class ExpandAllAction extends Action {
 
 	private final TreeViewer viewer;
 
-	/**
-	 * Constructor for ExpandAllAction
-	 *
-	 * @param viewer
-	 */
 	public ExpandAllAction(TreeViewer viewer) {
 		super();
 		this.viewer = viewer;

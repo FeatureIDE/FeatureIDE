@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>IFeature</code>
  * implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
  * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
- * {@link FMFactoryManager}: <code> <pre> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); IFeature feature =
- * FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A unified handling of certain <code>IFeature</code> implementations (in terms
- * of conviennent methods) can be achieved with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>API
+ * {@link FMFactoryManager}: <code> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); IFeature feature =
+ * FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A unified handling of certain <code>IFeature</code> implementations (in terms of
+ * conviennent methods) can be achieved with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>API
  * notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is available in
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on equals method</b>: Any implementation have to
  * provide a {@link Object#equals(Object)} implementation when the feature implementation should be fully useable in the FeatureIDE system (and therefore, have
@@ -109,8 +109,8 @@ public interface IFeature extends IFeatureModelElement {
 
 	/**
 	 * Returns the feature structure, in which this feature lives in. The structure gives information about (and setter to) the children and the parent of this
-	 * feature, and statement-related properties such as if this feature is part of an alternative group, or if it is abstract or hidden. <br> <br>
-	 * <b>Note</b>: The returned object have to be non-null.
+	 * feature, and statement-related properties such as if this feature is part of an alternative group, or if it is abstract or hidden. <br> <br> <b>Note</b>:
+	 * The returned object have to be non-null.
 	 *
 	 * @since 3.0
 	 *

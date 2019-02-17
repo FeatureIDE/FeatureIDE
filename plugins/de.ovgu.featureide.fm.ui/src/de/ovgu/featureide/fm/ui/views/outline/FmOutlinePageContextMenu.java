@@ -21,10 +21,6 @@
 package de.ovgu.featureide.fm.ui.views.outline;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
 import org.eclipse.gef.EditPart;
@@ -35,42 +31,23 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
-import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -91,22 +68,8 @@ public class FmOutlinePageContextMenu {
 	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	private SetFeatureColorAction setFeatureColorAction;
-	private HiddenAction hAction;
-	private MandatoryAction mAction;
-	private AbstractAction aAction;
-	private DeleteAction dAction;
-	private DeleteAllAction dAAction;
-	private CreateFeatureAboveAction cAction;
-	private CreateFeatureBelowAction clAction;
-	private CreateSiblingAction csAction;
-	private CreateConstraintAction ccAction;
-	private EditConstraintAction ecAction;
-	private OrAction oAction;
-	private AndAction andAction;
-	private AlternativeAction altAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
-	public IDoubleClickListener dblClickListener;
 	private boolean syncCollapsedFeatures = false;
 	private boolean registerContextMenu = true;
 
@@ -191,23 +154,6 @@ public class FmOutlinePageContextMenu {
 
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
-		mAction = new MandatoryAction(viewer, fInput);
-		hAction = new HiddenAction(viewer, fInput);
-		aAction = new AbstractAction(viewer, fInput);
-		dAction = new DeleteAction(viewer, fInput);
-		dAAction = new DeleteAllAction(viewer, fInput);
-		ccAction = new CreateConstraintAction(viewer, fInput);
-		ecAction = new EditConstraintAction(viewer, fInput);
-		if (graphicalFeatureModel != null) {
-			cAction = new CreateFeatureAboveAction(viewer, graphicalFeatureModel);
-			clAction = new CreateFeatureBelowAction(viewer, graphicalFeatureModel);
-			csAction = new CreateSiblingAction(viewer, graphicalFeatureModel);
-		}
-		oAction = new OrAction(viewer, fInput);
-		// TODO _interfaces Removed Code
-		// roAction = new ReverseOrderAction(viewer, fInput);
-		andAction = new AndAction(viewer, fInput);
-		altAction = new AlternativeAction(viewer, fInput);
 
 		collapseAllAction = new Action() {
 
@@ -229,28 +175,12 @@ public class FmOutlinePageContextMenu {
 		expandAllAction.setToolTipText(EXPAND_ALL);
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
 
-		dblClickListener = new IDoubleClickListener() {
-
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
-					if (syncCollapsedFeatures) {
-						// collapseAction.run();
-					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
-						ecAction.run();
-					}
-				}
-			}
-		};
-
 	}
 
 	/**
 	 * adds all listeners to the TreeViewer
 	 */
 	private void addListeners() {
-		viewer.removeDoubleClickListener(dblClickListener);
-		viewer.addDoubleClickListener(dblClickListener);
 
 		if (fTextEditor != null) {
 			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -295,71 +225,17 @@ public class FmOutlinePageContextMenu {
 	/**
 	 * fills the ContextMenu depending on the current selection
 	 *
-	 * @param manager
+	 * @param manager given manager
 	 */
 	public void fillContextMenu(IMenuManager manager) {
 		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
-		if (sel instanceof FmOutlineGroupStateStorage) {
-			final IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
-			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isFromExtern()) {
-				return;
-			}
-			manager.add(andAction);
-			manager.add(oAction);
-			manager.add(altAction);
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			// TODO _interfaces Removed Code
-			// manager.add(roAction);
-		}
 		if (sel instanceof IFeature) {
 
-			manager.add(cAction);
-
-			csAction.setText(CREATE_SIBLING);
-			manager.add(csAction);
-
-			clAction.setText(CREATE_FEATURE_BELOW);
-			manager.add(clAction);
-
-			dAction.setText(DELETE);
-			manager.add(dAction);
-
-			manager.add(dAAction);
-
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-			if (oAction.isEnabled() || altAction.isEnabled() || andAction.isEnabled()) {
-				manager.add(andAction);
-				manager.add(oAction);
-				manager.add(altAction);
-				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			}
-
-			manager.add(mAction);
-			manager.add(aAction);
-			manager.add(hAction);
-			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			// TODO _interfaces Removed Code
 			manager.add(setFeatureColorAction);
-		}
-		if (sel instanceof IConstraint) {
-			manager.add(ccAction);
-			manager.add(ecAction);
-
-			dAction.setText(DELETE);
-			manager.add(dAction);
-		}
-		if (sel instanceof String) {
-			if (sel.equals(CONSTRAINTS)) {
-				manager.add(ccAction);
-			}
 		}
 	}
 
-	/**
-	 * @param iToolBarManager
-	 */
 	public void addToolbar(IToolBarManager iToolBarManager) {
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
@@ -381,9 +257,6 @@ public class FmOutlinePageContextMenu {
 		fInput = fm;
 	}
 
-	/**
-	 * @param syncCollapsedFeaturesToggle
-	 */
 	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {
 		syncCollapsedFeatures = syncCollapsedFeaturesToggle;
 	}

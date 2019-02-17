@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.manager.EclipseFileManagerVisitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Implementation of {@link ExternalChangeListener} for an Eclipse UI environment.<br/> When there is an open editor with the changed file, this class asks the
+ * Implementation of {@link ExternalChangeListener} for an Eclipse UI environment.<br> When there is an open editor with the changed file, this class asks the
  * user, whether they want to override their file. Calls the override function of the corresponding file manager, unless the user decides to keep their changes.
  *
  * @author Sebastian Krieter

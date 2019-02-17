@@ -32,9 +32,6 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  *
  * The other related classes are:
  *
- * @see de.ovgu.featureide.ui.actions.AddProfileColorScheme.java
- * @see de.ovgu.featureide.ui.actions.RenameProfileColorScheme.java
- *
  * @author Jonas Weigt
  * @author Christian Harnisch
  * @author Marcus Pinnecke

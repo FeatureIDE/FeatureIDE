@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * TODO description
+ * Represents an attribute of type double.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -34,15 +34,18 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	private Long value;
 
 	/**
-	 * @param name
-	 * @param unit
-	 * @param value
-	 * @param recursive
-	 * @param configureable
+	 * Creates a new long attribute with the given values.
+	 * 
+	 * @param feature Assigned feature
+	 * @param name Name of the FeatureAttribute
+	 * @param unit Unit of the FeatureAttribute
+	 * @param value Value of the FeatureAttribute
+	 * @param recursive True, if the current Attribute should be inherited
+	 * @param configurable True, if the current FeatureAttribute needs be seting the configuration.
+	 * 
 	 */
-
-	public LongFeatureAttribute(IFeature feature, String name, String unit, Long value, boolean recursive, boolean configureable) {
-		super(feature, name, unit, recursive, configureable);
+	public LongFeatureAttribute(IFeature feature, String name, String unit, Long value, boolean recursive, boolean configurable) {
+		super(feature, name, unit, recursive, configurable);
 		this.value = value;
 		attributeType = FeatureAttribute.LONG;
 	}
@@ -78,7 +81,7 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	/**
 	 * Creates a clone of a IFeatureAttribute with a new corresponding Feature and value as null
 	 * 
-	 * @param Feature that the attribute should be attached to
+	 * @param feature that the attribute should be attached to
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override

@@ -142,7 +142,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * The first line of a jak file must not start with imports.<br> Removes derived layer declarations.
 	 *
 	 * @param fileContent The file content.
-	 * @return
+	 * @return return
 	 */
 	public static String correctFileText(String fileContent) {
 		boolean changed = false;

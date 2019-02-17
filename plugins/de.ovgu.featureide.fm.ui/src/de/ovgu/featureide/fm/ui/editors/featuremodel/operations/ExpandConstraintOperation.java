@@ -44,10 +44,6 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
 
-	/**
-	 * @param featureModel
-	 * @param label
-	 */
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
 		super(graphicalFeatureModel.getFeatureModel(), FOCUS_ON_CONTAINED_FEATURES);
 		this.iConstraint = iConstraint;

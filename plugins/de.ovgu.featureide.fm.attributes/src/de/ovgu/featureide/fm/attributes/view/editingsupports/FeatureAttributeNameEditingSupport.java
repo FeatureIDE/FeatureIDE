@@ -33,19 +33,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Editing support for the name column of the {@link FeatureAttributeView}.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeNameEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -81,9 +77,12 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 			}
 		}
 		((IFeatureAttribute) element).setName(value.toString());
-		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		if (((IFeatureAttribute) element).isRecursive()) {
-			getViewer().refresh();
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+		} else {
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 		}
 		getViewer().update(element, null);
 

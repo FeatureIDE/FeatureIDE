@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
 /**
- * Term represents a mathematical term in a (linear) pseudo-boolean restriction. The class describes terms like <code>a*x_id<code> where a is an integer unequal
- * 0, and id an integer greater 0. Additionally, the value of the boolean variable <code>x_id<code> can be inverted.
+ * Term represents a mathematical term in a (linear) pseudo-boolean restriction. The class describes terms like <code>a*x_id</code> where a is an integer
+ * unequal 0, and id an integer greater 0. Additionally, the value of the boolean variable <code>x_id</code> can be inverted.
  *
  * @author Sebastian Henneberg
  */

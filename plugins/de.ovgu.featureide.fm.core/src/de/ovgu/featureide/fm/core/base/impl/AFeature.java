@@ -42,8 +42,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>AFeature</code> implementation
  * {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
  * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
- * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> <pre> IFeatureModel model =
- * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A
+ * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
+ * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A
  * unified handling of certain <code>AFeature</code> (<code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved with the use of
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Notes on equals method</b>: The <code>AFeature</code>
  * implementation inherits the {@link Object#equals(Object)} capability from {@link AFeatureModelElement}. The feature equality is defined as the equality of

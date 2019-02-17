@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * @deprecated. Only used for legacy purposes.
+ * @deprecated Only used for legacy purposes.
  *
  * @author Sebastian Krieter
  */

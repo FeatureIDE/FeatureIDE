@@ -79,7 +79,7 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * Constructor.
 	 *
-	 * @param viewer
+	 * @param viewer viewer
 	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {

@@ -114,16 +114,15 @@ public interface IPropertyContainer {
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently if {@link ValueProtection#NORMAL_PERSISTENT} or
-	 * {@link ValueProtection#READ_ONLY_PERSISTENT} was used when calling
-	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} or temporarily. The latest (maybe volatile) state will
-	 * be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>),
-	 * the <code>defaultValue</code> will be returned.
+	 * {@link IPropertyContainer#set(String, Type, Object)} earlier. Properties are stored persistently if ValueProtection.NORMAL_PROTECTION or
+	 * ValueProtection.READ_ONLY_PERSISTENT was used when calling {@link IPropertyContainer#set(String, Type, Object)} or temporarily. The latest (maybe
+	 * volatile) state will be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key
+	 * is unknown</code>), the <code>defaultValue</code> will be returned.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
-	 * @see IPropertyContainer#get(String, Class)
+	 * @see IPropertyContainer#get(String, Object)
 	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#remove(String)
 	 *
@@ -137,11 +136,11 @@ public interface IPropertyContainer {
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it was
+	 * {@link IPropertyContainer#set(String, Type, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it was
 	 * not removed by calling {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>), a
 	 * <code>NoSuchPropertyException</code> will be thrown.
 	 *
-	 * @see IPropertyContainer#getProperty(String, Class, Object)
+	 * @see IPropertyContainer#get(String, Object)
 	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#remove(String)
 	 *
@@ -149,15 +148,13 @@ public interface IPropertyContainer {
 	 * @since 3.0
 	 *
 	 * @param key property name (case insensitive)
-	 * @param type type of returning value
-	 * @param defaultValue value to return if no property is set
 	 * @return value associated with <code>key</code> if set. If <code>key</code> is not known, throws <code>NoSuchPropertyException</code>.
 	 */
 	<T> T get(final String key) throws NoSuchPropertyException;
 
 	/**
 	 * Checks if this object contains a property associated with the given <code>key</code>. Returns <code>true</code> if at some point earlier
-	 * {@link IPropertyContainer#set(String, Class, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such that an
+	 * {@link IPropertyContainer#set(String, Type, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such that an
 	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}, and, hence, <code>key</code> will be alive.
 	 * If no property is associated to <code>key</code> the method will return <code>false</code>.
 	 *
@@ -189,15 +186,15 @@ public interface IPropertyContainer {
 
 	/**
 	 * Removes a per-object user-defined property identified by a custom <code>key</code> and value assigned by calling
-	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
-	 * this method does not remove the property. If this object does not contain any property associated to <code>key</code>, a
-	 * <code>NoSuchPropertyException</code> will be thrown.
+	 * {@link IPropertyContainer#set(String, Type, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long as it this
+	 * method does not remove the property. If this object does not contain any property associated to <code>key</code>, a <code>NoSuchPropertyException</code>
+	 * will be thrown.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
 	 * @see IPropertyContainer#has(String)
-	 * @see IPropertyContainer#setProperty(String)
+	 * @see IPropertyContainer#set(String, Type, Object)
 	 *
 	 * @param key property name (case insensitive)
 	 * @throws NoSuchPropertyException
@@ -208,7 +205,7 @@ public interface IPropertyContainer {
 	 * Sets a per-object user-defined property consisting of a <code>values</code> associated with a user-defined <code>key</code>. If <code>key</code> is
 	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. <br> <br> Properties are stored persistently such that an
 	 * assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}. <br> <br> To receive the value behind a
-	 * <code>key</code>, call {@link IPropertyContainer#get(String, Class)}.
+	 * <code>key</code>, call {@link IPropertyContainer#get(String, Object)}.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0

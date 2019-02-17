@@ -238,9 +238,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
-	 * @param featureModelEditor the FeatureModelEditor
-	 * @param container Composite which contains the feature model
-	 * @param fm The feature model
+	 * @param fmManager feature model file manager
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
 	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager, boolean isEditable) {
@@ -954,6 +952,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
 			setDirty();
+			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
+				final IFeature attributeChangedFeature = (IFeature) event.getNewValue();
+				final IGraphicalFeature graphicalAttributeChangedFeature = graphicalFeatureModel.getGraphicalFeature(attributeChangedFeature);
+				graphicalAttributeChangedFeature.update(event);
+			}
 			break;
 		case DEFAULT:
 			break;

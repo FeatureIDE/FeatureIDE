@@ -64,7 +64,7 @@ public interface IConfigurationPropagator {
 	/**
 	 * Counts the number of possible solutions.
 	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	LongRunningMethod<Long> number(long timeout, boolean includeHiddenFeatures);

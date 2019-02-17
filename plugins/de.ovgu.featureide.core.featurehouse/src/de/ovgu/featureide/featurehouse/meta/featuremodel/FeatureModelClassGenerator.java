@@ -54,8 +54,8 @@ public class FeatureModelClassGenerator {
 	/**
 	 * For test purpose only
 	 *
-	 * @param model
-	 * @param method
+	 * @param featureModel test
+	 * @param method test
 	 */
 	public FeatureModelClassGenerator(IFeatureModel featureModel, String method) {
 		if (method.equals(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML)) {
@@ -76,7 +76,7 @@ public class FeatureModelClassGenerator {
 	/**
 	 * Creates the feature model class of the metaproduct with the selected mechanism.
 	 *
-	 * @param featureProject
+	 * @param featureProject respective FeatureIDE project
 	 */
 	public FeatureModelClassGenerator(IFeatureProject featureProject) {
 		if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML)) {
@@ -103,7 +103,7 @@ public class FeatureModelClassGenerator {
 	/**
 	 * Saves the content of the {@link StringBuilder} to the given file.
 	 *
-	 * @param file
+	 * @param file file to save to
 	 */
 	@SuppressWarnings(DEPRECATION)
 	public void saveToFile(IFile file) {

@@ -63,7 +63,8 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 	 * Default constructor
 	 *
 	 * @param text of the action in context menu
-	 * @param viewer2
+	 * @param viewer2 viewer
+	 * @param id id
 	 */
 	public MultipleSelectionAction(String text, Object viewer2, String id) {
 		super(text);

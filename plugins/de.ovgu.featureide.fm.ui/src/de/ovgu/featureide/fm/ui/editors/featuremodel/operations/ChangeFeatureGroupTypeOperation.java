@@ -43,9 +43,6 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 	private final int groupType;
 	private final int oldGroupType;
 
-	/**
-	 * Grouptype of feature will be set to groupType when this operation is executed
-	 */
 	public ChangeFeatureGroupTypeOperation(int groupType, IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CHANGE_GROUP_TYPE);
 		this.groupType = groupType;

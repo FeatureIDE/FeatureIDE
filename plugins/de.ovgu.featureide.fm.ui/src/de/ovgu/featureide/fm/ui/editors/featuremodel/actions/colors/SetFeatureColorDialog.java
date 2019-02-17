@@ -3,15 +3,9 @@
  *
  * This file is part of FeatureIDE.
  *
-<<<<<<< HEAD
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
-=======
- * FeatureIDE is free software: you can redistributeinitialSelectedColor/or modify
- * it under the terms of the GNU LinitialSelectedColoreneral PuinitialSelectedColorcense as published by
- * the FreinitialSelectedColorare Foundation, either version 3 of the License, or
->>>>>>> bs_team3_configMap
  * (at your option) any later version.
  *
  * FeatureIDE is distributed in the hope that it will be useful,

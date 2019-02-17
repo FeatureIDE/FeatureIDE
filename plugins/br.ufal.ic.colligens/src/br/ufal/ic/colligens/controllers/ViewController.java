@@ -17,7 +17,7 @@ public abstract class ViewController {
 	private ViewPart view;
 
 	/**
-	 * @param ID
+	 * @param ID ID to set
 	 */
 	public ViewController(String ID) {
 		this.ID = ID;

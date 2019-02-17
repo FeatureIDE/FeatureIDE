@@ -30,16 +30,20 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
- * TODO description
+ * Implements the {@link ITreeContentProvider} and has the task to provide the content for the {@link FeatureAttributeView}. Structures the feature and their
+ * attributes in the same way as the {@link FeatureDiagramEditor}.
  *
  * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
+	public static final String PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM = StringTable.PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
 	private Object[] features = EMPTY_ROOT;
@@ -102,7 +106,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		}
 		if (element instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) element;
-			return feature.getStructure().getParent().getFeature();
+			return feature.getStructure().getParent() != null ? feature.getStructure().getParent().getFeature() : null;
 		} else if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getFeature();
 		}
@@ -127,6 +131,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			features = EMPTY_ROOT;
 		} else {
 			final ArrayList<Object> featureList = new ArrayList<>();
+			featureList.add(PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM);
 			featureList.add(featureModel.getStructure().getRoot().getFeature());
 			features = featureList.toArray();
 		}
