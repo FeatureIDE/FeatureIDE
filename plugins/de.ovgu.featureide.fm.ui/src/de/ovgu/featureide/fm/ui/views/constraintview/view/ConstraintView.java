@@ -55,10 +55,9 @@ public class ConstraintView implements GUIDefaults {
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
 	// Style parameters for the view
-	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 500;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 300;
-	private final int ALPHA_VALUE = 175;
+	private final int CIRCLE_DECORATION_SIZE = 16;
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
@@ -148,13 +147,13 @@ public class ConstraintView implements GUIDefaults {
 	 * @return
 	 */
 	private Image getColoredCircleIcon(Color color) {
-		final Image elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
-		final GC gc = new GC(elementImg);
+		final Image image = new Image(Display.getDefault(), CIRCLE_DECORATION_SIZE, CIRCLE_DECORATION_SIZE);
+		final GC gc = new GC(image);
 		gc.setBackground(color);
 		gc.setAntialias(SWT.ON);
-		gc.setAlpha(ALPHA_VALUE);
-		gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
-		return elementImg;
+		gc.fillOval(0, 0, CIRCLE_DECORATION_SIZE, CIRCLE_DECORATION_SIZE);
+		gc.dispose();
+		return image;
 	}
 
 	/**
