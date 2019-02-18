@@ -79,8 +79,10 @@ public class ConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
 					}
 				}
 			}
+			return solver.getAssignmentArray(assumptions.length, solver.getAssignment().size());
+		} else {
+			return null;
 		}
-		return solver.getAssignmentArray(assumptions.length, solver.getAssignment().size());
 	}
 
 }

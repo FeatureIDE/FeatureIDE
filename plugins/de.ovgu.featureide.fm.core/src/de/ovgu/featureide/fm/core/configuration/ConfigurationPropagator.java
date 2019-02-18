@@ -184,9 +184,12 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 		private void setToAutomatic(final int[] manualFeatures, final AbstractAnalysis<int[]> analysis) {
 			analysis.setAssumptions(manualFeatures);
-			for (final int feature : LongRunningWrapper.runMethod(analysis)) {
-				configuration.setAutomatic(configuration.getSelectableFeature((String) rootNode.getVariableObject(feature)),
-						feature > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+			final int[] result = LongRunningWrapper.runMethod(analysis);
+			if (result != null) {
+				for (final int feature : result) {
+					configuration.setAutomatic(configuration.getSelectableFeature((String) rootNode.getVariableObject(feature)),
+							feature > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+				}
 			}
 		}
 
