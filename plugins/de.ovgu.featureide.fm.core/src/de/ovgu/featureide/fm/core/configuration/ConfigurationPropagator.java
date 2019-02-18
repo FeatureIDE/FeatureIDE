@@ -728,11 +728,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	@Override
-	public FindUnsatisfiedClause findConflictingClauses(List<SelectableFeature> featureList) {
-		return new FindUnsatisfiedClause(featureList, false);
-	}
-
-	@Override
 	public FindUnsatisfiedClause findUnsatisfiedClauses(List<SelectableFeature> featureList, boolean includeOpenClauses) {
 		return new FindUnsatisfiedClause(featureList, includeOpenClauses);
 	}

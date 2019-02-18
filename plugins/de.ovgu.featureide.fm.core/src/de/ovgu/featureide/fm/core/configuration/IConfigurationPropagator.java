@@ -75,10 +75,27 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Void> update();
 
+	/**
+	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
+	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}).
+	 * Features that are undefined are considered deselected.
+	 *
+	 * @param featureList If not {@code null} only the features within the list will be marked.
+	 * @return A list of unsatisfied clauses.
+	 * @deprecated Use {@link #findUnsatisfiedClauses(List, boolean)} instead.
+	 */
+	@Deprecated
 	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
 
-	LongRunningMethod<List<Node>> findConflictingClauses(List<SelectableFeature> featureList);
-
+	/**
+	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
+	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}).
+	 *
+	 * @param featureList If not {@code null} only the features within the list will be marked.
+	 * @param includeOpenClauses if {@code false} only clauses that contain no undefined features are considered, if {@code true} also open clauses are
+	 *        considered (Features that are undefined are considered deselected).
+	 * @return A list of unsatisfied clauses.
+	 */
 	LongRunningMethod<List<Node>> findUnsatisfiedClauses(List<SelectableFeature> featureList, boolean includeOpenClauses);
 
 }
