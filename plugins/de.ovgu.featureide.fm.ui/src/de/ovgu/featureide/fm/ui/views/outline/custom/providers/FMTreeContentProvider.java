@@ -70,12 +70,14 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		final IFeatureModel fModel = featureModelManager.editObject();
-		if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
-			elements = new Object[2];
-			elements[0] = fModel.getStructure().getRoot().getFeature();
-			elements[1] = CONSTRAINTS;
-			return elements;
+		if (featureModelManager != null) {
+			final IFeatureModel fModel = featureModelManager.editObject();
+			if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
+				elements = new Object[2];
+				elements[0] = fModel.getStructure().getRoot().getFeature();
+				elements[1] = CONSTRAINTS;
+				return elements;
+			}
 		}
 
 		return new String[] { NO_DATA_TO_DISPLAY_AVAILABLE_ };
