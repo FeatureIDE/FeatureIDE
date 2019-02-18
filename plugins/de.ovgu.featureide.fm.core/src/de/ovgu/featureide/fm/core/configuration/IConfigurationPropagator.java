@@ -77,4 +77,8 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
 
+	LongRunningMethod<List<Node>> findConflictingClauses(List<SelectableFeature> featureList);
+
+	LongRunningMethod<List<Node>> findUnsatisfiedClauses(List<SelectableFeature> featureList, boolean includeOpenClauses);
+
 }

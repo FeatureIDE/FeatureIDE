@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AN_UNKNOWN_ERROR_OCCURRED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING____;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFLICTING_COMMA_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_COMMA_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
@@ -616,6 +617,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			return;
 		}
 		final boolean valid = configurationEditor.getConfiguration().isValid();
+		final boolean conflicting = !valid && !configurationEditor.getConfiguration().canBeValid();
 		if (configurationEditor.getConfiguration().getPropagator() == null) {
 			return;
 		}
@@ -625,7 +627,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			@Override
 			public void jobFinished(IJob<Long> finishedJob) {
 				final StringBuilder sb = new StringBuilder();
-				sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
+				sb.append(conflicting ? CONFLICTING_COMMA_ : valid ? VALID_COMMA_ : INVALID_COMMA_);
 
 				final Long number = finishedJob.getResults();
 				if (number != null) {
@@ -1008,8 +1010,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		}
-
-		final LongRunningMethod<List<Node>> jobs = configurationEditor.getConfiguration().getPropagator().findOpenClauses(manualFeatureList);
+		final boolean conflicting = !configurationEditor.getConfiguration().canBeValid();
+		final LongRunningMethod<List<Node>> jobs =
+			configurationEditor.getConfiguration().getPropagator().findUnsatisfiedClauses(manualFeatureList, !conflicting);
 		final IRunner<List<Node>> job = LongRunningWrapper.getRunner(jobs, "FindClauses");
 
 		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {

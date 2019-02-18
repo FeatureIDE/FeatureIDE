@@ -223,12 +223,14 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 	}
 
-	public class FindClause implements LongRunningMethod<List<Node>> {
+	public class FindUnsatisfiedClause implements LongRunningMethod<List<Node>> {
 
 		private final List<SelectableFeature> featureList;
+		private final boolean includeOpenClauses;
 
-		public FindClause(List<SelectableFeature> featureList) {
+		public FindUnsatisfiedClause(List<SelectableFeature> featureList, boolean includeOpenClauses) {
 			this.featureList = featureList;
+			this.includeOpenClauses = includeOpenClauses;
 		}
 
 		@Override
@@ -239,9 +241,24 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			final boolean[] results = new boolean[featureList.size()];
 			final List<Node> openClauses = new ArrayList<>();
 
-			final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.getFeatures().size() << 1);
+			final Map<String, Boolean> featureMap = new HashMap<>(configuration.getFeatures().size() << 1);
 			for (final SelectableFeature selectableFeature : getFeatures(visibleFilter)) {
-				featureMap.put(selectableFeature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+				final Selection selection = selectableFeature.getSelection();
+				switch (selection) {
+				case UNDEFINED:
+					if (includeOpenClauses) {
+						featureMap.put(selectableFeature.getName(), false);
+					}
+					break;
+				case SELECTED:
+					featureMap.put(selectableFeature.getName(), true);
+					break;
+				case UNSELECTED:
+					featureMap.put(selectableFeature.getName(), false);
+					break;
+				default:
+					throw new AssertionError(selection);
+				}
 			}
 
 			for (final SelectableFeature selectableFeature : featureList) {
@@ -269,15 +286,19 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				}
 
 				boolean satisfied = false;
+				boolean open = false;
 				for (final Literal literal : literalMap.values()) {
 					final Boolean selected = featureMap.get(literal.var);
-					if ((selected != null) && (selected == literal.positive)) {
+					if (selected == null) {
+						open = true;
+						break;
+					} else if (selected == literal.positive) {
 						satisfied = true;
 						break;
 					}
 				}
 
-				if (!satisfied) {
+				if ((includeOpenClauses && open) || (!open && !satisfied)) {
 					int c = 0;
 					boolean newLiterals = false;
 					for (final SelectableFeature selectableFeature : featureList) {
@@ -571,6 +592,9 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			// if there is a contradiction within the configuration
 			if (impliedFeatures == null) {
+				for (final SelectableFeature feature : configuration.getFeatures()) {
+					workMonitor.invoke(feature);
+				}
 				return null;
 			}
 
@@ -699,8 +723,18 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	@Override
-	public FindClause findOpenClauses(List<SelectableFeature> featureList) {
-		return new FindClause(featureList);
+	public FindUnsatisfiedClause findOpenClauses(List<SelectableFeature> featureList) {
+		return new FindUnsatisfiedClause(featureList, true);
+	}
+
+	@Override
+	public FindUnsatisfiedClause findConflictingClauses(List<SelectableFeature> featureList) {
+		return new FindUnsatisfiedClause(featureList, false);
+	}
+
+	@Override
+	public FindUnsatisfiedClause findUnsatisfiedClauses(List<SelectableFeature> featureList, boolean includeOpenClauses) {
+		return new FindUnsatisfiedClause(featureList, includeOpenClauses);
 	}
 
 	@Override

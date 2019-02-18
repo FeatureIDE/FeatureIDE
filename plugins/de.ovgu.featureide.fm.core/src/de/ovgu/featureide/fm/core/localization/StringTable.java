@@ -377,6 +377,7 @@ public class StringTable {
 	public static final String AUTOSELECT_FEATURES = "Autoselect Features";
 	public static final String CALCULATING____ = "Calculating ...";
 	public static final String VALID_COMMA_ = "valid, ";
+	public static final String CONFLICTING_COMMA_ = "conflicting, ";
 	public static final String MORE_THAN = "more than ";
 	public static final String POSSIBLE_CONFIGURATIONS = " possible configurations";
 	public static final String THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_ =
