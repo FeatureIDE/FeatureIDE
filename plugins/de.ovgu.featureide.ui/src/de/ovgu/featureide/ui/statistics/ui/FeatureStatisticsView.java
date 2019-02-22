@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -66,7 +65,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IEditorPart currentEditor;
-	private IResource currentInput;
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
 
@@ -86,7 +84,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
-		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
 
 		addButtons();
 	}
@@ -175,7 +172,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			case FEATURE_ADD:
 			case FEATURE_ADD_ABOVE:
 			case FEATURE_DELETE:
-			case FEATURE_MODIFY:
 			case GROUP_TYPE_CHANGED:
 			case MANDATORY_CHANGED:
 				refresh(true);
@@ -224,15 +220,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						if (currentEditor == null) {
 							contentProvider.defaultContent();
 						} else {
-							final IResource anyFile = ResourceUtil.getResource(currentEditor.getEditorInput());
-							// TODO is refresh really necessary? -> true?
-
-							if (force || (currentInput == null) || !anyFile.getProject().equals(currentInput.getProject())) {
-								contentProvider.calculateContent(anyFile, true);
-								currentInput = anyFile;
-							} else {
-								contentProvider.calculateContent(anyFile, false);
-							}
+							contentProvider.calculateContent(ResourceUtil.getResource(currentEditor.getEditorInput()), force);
 						}
 						return Status.OK_STATUS;
 					}

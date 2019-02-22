@@ -39,6 +39,9 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
@@ -62,7 +65,8 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	private static final Parent DEFAULT_TEXT = new Parent(OPEN_FILE, null);
 	private final TreeViewer viewer;
 	public Parent godfather = new Parent("godfather", null);
-	private IFeatureProject project;
+//	private IFeatureProject project;
+	private IResource input;
 	private boolean canceled;
 
 	public ContentProvider(TreeViewer viewer) {
@@ -125,59 +129,70 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * @see Parent
 	 * @see LazyParent
 	 * @param res Any file out of the current feature-project.
+	 * @param force to force an update
 	 */
-	public void calculateContent(IResource res) {
-		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-		final boolean hasChanged = (newProject != null) && (project != null) && !newProject.equals(project);
-		calculateContent(res, hasChanged);
-	}
-
-	public void calculateContent(IResource res, boolean hasChanged) {
-		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-
-		if (newProject == null) {
-			project = newProject;
-			defaultContent();
-		} else if (hasChanged || (project == null)) {
-			project = newProject;
-			addNodes();
+	public void calculateContent(IResource res, boolean force) {
+		if (res != null) {
+			if (force || !res.equals(input)) {
+				input = res;
+				addNodes();
+			}
 		}
 	}
 
 	private synchronized void addNodes() {
-		final IComposerExtensionClass composer = project.getComposer();
-		final FSTModel fstModel = getFSTModel(composer);
-		final IFeatureModel featModel = project.getFeatureModel();
-		JobDoneListener.getInstance().init(viewer);
+		if (input != null) {
+			final IFeatureProject project = CorePlugin.getFeatureProject(input);
+			if (project != null) {
+				final IFeatureModel featureModel;
+				final IComposerExtensionClass composer;
+				if (input.equals(project.getModelFile())) {
+					composer = project.getComposer();
+					featureModel = project.getFeatureModel();
+				} else {
+					final FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(EclipseFileSystem.getPath(input));
+					if ((fileHandler != null) && !fileHandler.getLastProblems().containsError()) {
+						composer = null;
+						featureModel = fileHandler.getObject();
+					} else {
+						composer = project.getComposer();
+						featureModel = project.getFeatureModel();
+					}
+				}
+				JobDoneListener.getInstance().init(viewer);
 
-		godfather = new Parent("GODFATHER", null);
-		final String composerName = composer.getName();
-		final Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
+				godfather = new Parent("GODFATHER", null);
 
-		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
-		godfather.addChild(composerParent);
-		final Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
-		featureModelStatistics.addChild(new StatisticsSyntacticalFeatureModel(SYNTACTICAL_STATISTICS, featModel));
-		featureModelStatistics.addChild(new StatisticsSemanticalFeatureModel(SEMANTICAL_STATISTICS, featModel));
-		godfather.addChild(featureModelStatistics);
+				godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
+				if (composer != null) {
+					final String composerName = composer.getName();
+					final Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
+					godfather.addChild(composerParent);
+				}
+				final Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
+				featureModelStatistics.addChild(new StatisticsSyntacticalFeatureModel(SYNTACTICAL_STATISTICS, featureModel));
+				featureModelStatistics.addChild(new StatisticsSemanticalFeatureModel(SEMANTICAL_STATISTICS, featureModel));
+				godfather.addChild(featureModelStatistics);
 
-		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel));
-			godfather.addChild(new StatisticsContractComplexityNew(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
+				if (composer != null) {
+					FSTModel fstModel = project.getFSTModel();
+					if ((fstModel == null) || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
+						composer.buildFSTModel();
+						fstModel = project.getFSTModel();
+					}
+					if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
+						godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+						godfather.addChild(new StatisticsContractComplexityNew(CONTRACT_COMPLEXITY, fstModel, featureModel, project.getContractComposition()));
+					}
+					if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
+						godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+					}
+				}
+				refresh();
+				return;
+			}
 		}
-		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
-			godfather.addChild(new DirectivesNode(PRODUCT_LINE_IMPLEMENTATION, fstModel));
-		}
-		refresh();
-	}
-
-	private FSTModel getFSTModel(IComposerExtensionClass composer) {
-		FSTModel fstModel = project.getFSTModel();
-		if ((fstModel == null) || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
-			composer.buildFSTModel();
-			fstModel = project.getFSTModel();
-		}
-		return fstModel;
+		defaultContent();
 	}
 
 	/**
