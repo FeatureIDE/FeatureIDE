@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import java.util.Collection;
+
 /**
  * Manages all additional properties of a feature model.
  *
@@ -33,9 +35,9 @@ public interface IFeatureModelProperty extends IPropertyContainer {
 
 	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
 
-	Iterable<String> getAnnotations();
+	Collection<String> getAnnotations();
 
-	Iterable<String> getComments();
+	Collection<String> getComments();
 
 	IFeatureModel getFeatureModel();
 

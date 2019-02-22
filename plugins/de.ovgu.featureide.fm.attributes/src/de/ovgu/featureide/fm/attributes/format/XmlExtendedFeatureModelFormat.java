@@ -79,13 +79,13 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 
 		factory = FMFactoryManager.getInstance().getFactory(object);
 
-		for (final Element e : getElements(doc.getElementsByTagName(EXTENDED_FEATURE_MODEL))) {
-			parseStruct(e.getElementsByTagName(STRUCT));
-			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
-			parseCalculations(e.getElementsByTagName(CALCULATIONS));
-			parseComments(e.getElementsByTagName(COMMENTS));
-			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
-			parseFeatureModelProperties(e.getElementsByTagName(PROPERTIES));
+		for (final Element e : getElement(doc, EXTENDED_FEATURE_MODEL, false)) {
+			parseStruct(getElement(e, STRUCT, false));
+			parseConstraints(getElement(e, CONSTRAINTS, true));
+			parseCalculations(getElement(e, CALCULATIONS, true));
+			parseComments(getElement(e, COMMENTS, true));
+			parseFeatureOrder(getElement(e, FEATURE_ORDER, true));
+			parseFeatureModelProperties(getElement(e, PROPERTIES, true));
 		}
 
 		if (object.getStructure().getRoot() == null) {

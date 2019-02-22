@@ -61,7 +61,6 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
-import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -96,13 +95,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		factory = FMFactoryManager.getInstance().getFactory(object);
 
-		for (final Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
-			parseStruct(e.getElementsByTagName(STRUCT));
-			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
-			parseCalculations(e.getElementsByTagName(CALCULATIONS));
-			parseComments(e.getElementsByTagName(COMMENTS));
-			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
-			parseFeatureModelProperties(e.getElementsByTagName(PROPERTIES));
+		for (final Element e : getElement(doc, FEATURE_MODEL, false)) {
+			parseStruct(getElement(e, STRUCT, false));
+			parseConstraints(getElement(e, CONSTRAINTS, true));
+			parseCalculations(getElement(e, CALCULATIONS, true));
+			parseComments(getElement(e, COMMENTS, true));
+			parseFeatureOrder(getElement(e, FEATURE_ORDER, true));
+			parseFeatureModelProperties(getElement(e, PROPERTIES, true));
 		}
 
 		if (object.getStructure().getRoot() == null) {
@@ -126,9 +125,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	protected void writeProperties(Document doc, final Element root) {
-		final Element properties = doc.createElement(PROPERTIES);
-		root.appendChild(properties);
-		addProperties(doc, object.getProperty(), properties);
+		if (!object.getProperty().getProperties().isEmpty()) {
+			final Element properties = doc.createElement(PROPERTIES);
+			root.appendChild(properties);
+			addProperties(doc, object.getProperty(), properties);
+		}
 	}
 
 	protected void writeFeatures(Document doc, final Element root) {
@@ -138,16 +139,18 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	protected void writeConstraints(Document doc, final Element root) {
-		final Element constraints = doc.createElement(CONSTRAINTS);
-		root.appendChild(constraints);
-		for (final IConstraint constraint : object.getConstraints()) {
-			Element rule;
-			rule = doc.createElement(RULE);
+		if (!object.getConstraints().isEmpty()) {
+			final Element constraints = doc.createElement(CONSTRAINTS);
+			root.appendChild(constraints);
+			for (final IConstraint constraint : object.getConstraints()) {
+				Element rule;
+				rule = doc.createElement(RULE);
 
-			constraints.appendChild(rule);
-			addDescription(doc, constraint.getDescription(), rule);
-			addProperties(doc, constraint.getCustomProperties(), rule);
-			createPropositionalConstraints(doc, rule, constraint.getNode());
+				constraints.appendChild(rule);
+				addDescription(doc, constraint.getDescription(), rule);
+				addProperties(doc, constraint.getCustomProperties(), rule);
+				createPropositionalConstraints(doc, rule, constraint.getNode());
+			}
 		}
 	}
 
@@ -162,21 +165,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	protected void writeComments(Document doc, final Element root) {
-		final Element comments = doc.createElement(COMMENTS);
-		root.appendChild(comments);
-		for (final String comment : object.getProperty().getComments()) {
-			final Element c = doc.createElement(C);
-			comments.appendChild(c);
-			final Text text = doc.createTextNode(comment);
-			c.appendChild(text);
+		if (!object.getProperty().getComments().isEmpty()) {
+			final Element comments = doc.createElement(COMMENTS);
+			root.appendChild(comments);
+			for (final String comment : object.getProperty().getComments()) {
+				final Element c = doc.createElement(C);
+				comments.appendChild(c);
+				final Text text = doc.createTextNode(comment);
+				c.appendChild(text);
+			}
 		}
 	}
 
 	protected void writeFeatureOrder(Document doc, final Element root) {
-		final Element order = doc.createElement(FEATURE_ORDER);
-		order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
-		root.appendChild(order);
 		if (object.isFeatureOrderUserDefined()) {
+			final Element order = doc.createElement(FEATURE_ORDER);
+			order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
+			root.appendChild(order);
 			Collection<String> featureOrderList = object.getFeatureOrderList();
 
 			if (featureOrderList.isEmpty()) {
@@ -309,8 +314,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	/**
 	 * Parses the calculations.
 	 */
-	protected void parseCalculations(NodeList nodeList) throws UnsupportedModelException {
-		for (final Element e : getElements(nodeList)) {
+	protected void parseCalculations(List<Element> elements) throws UnsupportedModelException {
+		for (final Element e : elements) {
 			if (e.hasAttributes()) {
 				final NamedNodeMap nodeMap = e.getAttributes();
 				for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -339,20 +344,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	/**
 	 * Parses the comment section.
 	 */
-	protected void parseComments(NodeList nodeList) throws UnsupportedModelException {
-		for (final Element e : getElements(nodeList)) {
+	protected void parseComments(List<Element> elements) throws UnsupportedModelException {
+		for (final Element e : elements) {
 			if (e.hasChildNodes()) {
-				parseComments2(e.getChildNodes());
-			}
-		}
-	}
-
-	protected void parseComments2(NodeList nodeList) throws UnsupportedModelException {
-		for (final Element e : getElements(nodeList)) {
-			if (e.getNodeName().equals(C)) {
-				object.getProperty().addComment(e.getTextContent());
-			} else {
-				throwWarning("Unknown comment attribute: " + e.getNodeName(), e);
+				for (final Element e1 : getElements(e.getChildNodes())) {
+					if (e1.getNodeName().equals(C)) {
+						object.getProperty().addComment(e1.getTextContent());
+					} else {
+						throwWarning("Unknown comment attribute: " + e1.getNodeName(), e1);
+					}
+				}
 			}
 		}
 	}
@@ -360,8 +361,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	/**
 	 * Parses the constraint section.
 	 */
-	protected void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
-		for (final Element e : getElements(nodeList)) {
+	protected void parseConstraints(List<Element> elements) throws UnsupportedModelException {
+		for (final Element e : elements) {
 			for (final Element child : getElements(e.getChildNodes())) {
 				final String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
@@ -469,9 +470,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	/**
 	 * Parses the feature order section.
 	 */
-	protected void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
+	protected void parseFeatureOrder(List<Element> elements) throws UnsupportedModelException {
 		final ArrayList<String> order = new ArrayList<>(object.getNumberOfFeatures());
-		for (final Element e : getElements(nodeList)) {
+		for (final Element e : elements) {
 			if (e.hasAttributes()) {
 				final NamedNodeMap nodeMap = e.getAttributes();
 				for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -493,7 +494,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				}
 			}
 			if (e.hasChildNodes()) {
-				parseFeatureOrder(e.getChildNodes());
+				parseFeatureOrder(getElements(e.getChildNodes()));
 			}
 		}
 		if (!order.isEmpty()) {
@@ -621,14 +622,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	/**
 	 * Parse the struct section to add features to the model.
 	 */
-	protected void parseStruct(NodeList struct) throws UnsupportedModelException {
-		for (final Element e : getElements(struct)) {
+	protected void parseStruct(List<Element> elements) throws UnsupportedModelException {
+		for (final Element e : elements) {
 			parseFeatures(e.getChildNodes(), null);
 		}
 	}
 
-	protected void parseFeatureModelProperties(NodeList propertiesNode) {
-		for (final Element e : getElements(propertiesNode)) {
+	protected void parseFeatureModelProperties(List<Element> elements) {
+		for (final Element e : elements) {
 			for (final Element propertyElement : getElements(e.getChildNodes())) {
 				final String nodeName = propertyElement.getNodeName();
 				switch (nodeName) {
@@ -644,23 +645,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	}
 
-	/**
-	 * Throws an error that will be used for error markers
-	 *
-	 * @param message The error message
-	 * @param tempNode The node that causes the error. this node is used for positioning.
-	 */
-	protected void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
-	}
-
-	protected void addToProblemsList(String message, org.w3c.dom.Node node) {
-		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
-				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
-	}
-
-	protected void throwWarning(String message, org.w3c.dom.Node node) {
-		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()), Severity.WARNING));
+	protected void addProblem(final Problem problem) {
+		localProblems.add(problem);
 	}
 
 	protected void writeAttributes(Element node, Element fnod, IFeature feat) {

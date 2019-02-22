@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -45,8 +46,7 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 	public boolean equals(Object obj) {
 		if (super.equals(obj)) {
 			final FeatureModelProperty other = (FeatureModelProperty) obj;
-			return (featureOrderInXML == other.featureOrderInXML) && Objects.equals(annotations, other.annotations)
-				&& Objects.equals(comments, other.comments);
+			return (featureOrderInXML == other.featureOrderInXML) && Objects.equals(annotations, other.annotations) && Objects.equals(comments, other.comments);
 		} else {
 			return false;
 		}
@@ -103,12 +103,12 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 	}
 
 	@Override
-	public Iterable<String> getAnnotations() {
+	public Collection<String> getAnnotations() {
 		return annotations;
 	}
 
 	@Override
-	public Iterable<String> getComments() {
+	public Collection<String> getComments() {
 		return comments;
 	}
 

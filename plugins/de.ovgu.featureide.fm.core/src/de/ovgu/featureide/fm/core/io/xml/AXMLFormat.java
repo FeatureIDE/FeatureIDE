@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -67,7 +68,9 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 	protected T object;
 
 	/**
-	 * @param nodeList
+	 * Returns a list of elements within the given node list.
+	 *
+	 * @param nodeList the node list.
 	 * @return The child nodes from type Element of the given NodeList.
 	 */
 	protected static final List<Element> getElements(NodeList nodeList) {
@@ -81,6 +84,56 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 		}
 		return elements;
 	}
+
+	protected List<Element> getElement(final Element element, final String nodeName, boolean allowEmpty) throws UnsupportedModelException {
+		final List<Element> elements = getElements(element.getElementsByTagName(nodeName));
+		if (elements.size() != 1) {
+			if (elements.size() > 1) {
+				throwWarning("Multiple nodes of " + nodeName + " defined.", element);
+			} else if (!allowEmpty) {
+				throwError("Node " + nodeName + " not defined!", element);
+			}
+		}
+		return elements;
+	}
+
+	protected List<Element> getElement(final Document document, final String nodeName, boolean allowEmpty) throws UnsupportedModelException {
+		final List<Element> elements = getElements(document.getElementsByTagName(nodeName));
+		if (elements.size() != 1) {
+			if (elements.size() > 1) {
+				addProblem(new Problem("Multiple nodes of " + nodeName + " defined.", 0, Severity.WARNING));
+			} else if (!allowEmpty) {
+				throw new UnsupportedModelException("Node " + nodeName + " not defined!", 0);
+			}
+		}
+		return elements;
+	}
+
+	/**
+	 * Throws an error that will be used for error markers
+	 *
+	 * @param message The error message
+	 * @param tempNode The node that causes the error. this node is used for positioning.
+	 */
+	protected static void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
+		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
+	}
+
+	protected void addToProblemsList(String message, org.w3c.dom.Node node) {
+		addProblem(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+	}
+
+	protected void throwWarning(String message, org.w3c.dom.Node node) {
+		addProblem(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()), Severity.WARNING));
+	}
+
+	/**
+	 * Can be overwritten be implementing classes to control how to handle problems. Does nothing on default.
+	 *
+	 * @param problem a problem.
+	 */
+	protected void addProblem(final Problem problem) {}
 
 	@Override
 	public String getSuffix() {
