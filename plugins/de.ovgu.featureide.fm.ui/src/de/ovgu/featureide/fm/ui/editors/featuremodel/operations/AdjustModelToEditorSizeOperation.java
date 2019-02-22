@@ -59,7 +59,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureMo
 		if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 			return new FeatureIDEEvent(null, EventType.DEFAULT);
 		}
-		new CollapseAllOperation(graphicalFeatureModel, true).redo();
+		new CollapseAllOperation(graphicalFeatureModel, true).operation(featureModel);
 		checkChildren(featureModel.getStructure().getRoot().getFeature());
 		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
