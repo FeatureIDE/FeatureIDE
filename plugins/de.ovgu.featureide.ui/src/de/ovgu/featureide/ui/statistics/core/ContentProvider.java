@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_STATIS
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_THE_FEATURE_MODEL;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -66,8 +67,9 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 	private static final Parent DEFAULT_TEXT = new Parent(OPEN_FILE, null);
 	private final TreeViewer viewer;
+
 	public Parent godfather = new Parent("godfather", null);
-//	private IFeatureProject project;
+
 	private IResource input;
 	private boolean canceled;
 
@@ -134,11 +136,9 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * @param force to force an update
 	 */
 	public void calculateContent(IResource res, boolean force) {
-		if (res != null) {
-			if (force || !res.equals(input)) {
-				input = res;
-				addNodes();
-			}
+		if (force || !Objects.equals(res, input)) {
+			input = res;
+			addNodes();
 		}
 	}
 
