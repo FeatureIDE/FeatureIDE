@@ -527,7 +527,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			gfm.init();
 			FMPropertyManager.registerEditor(this);
 
-			setPartName(getModelFile().getProject().getName() + MODEL);
+			final IFile modelFile = getModelFile();
+			final String modelFileName = modelFile.getName();
+			// XXX: There could be a more elegant solution here
+			if ("model.xml".equals(modelFileName) && (modelFile.getParent() instanceof IProject)) {
+				setPartName(modelFile.getProject().getName() + MODEL);
+			} else {
+				setPartName(modelFileName + " (" + modelFile.getProject().getName() + ")");
+			}
 			createLayoutInformation();
 		} else {
 			setPartName(input.getName());
