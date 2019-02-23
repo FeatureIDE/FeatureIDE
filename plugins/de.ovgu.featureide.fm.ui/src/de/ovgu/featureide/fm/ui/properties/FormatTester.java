@@ -20,33 +20,24 @@
  */
 package de.ovgu.featureide.fm.ui.properties;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
 public class FormatTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IFile res = SelectionWrapper.checkClass(receiver, IFile.class);
-		return checkFormat(getFormatManager(property), res, expectedValue);
+		return checkFormat(getFormatManager(property), SelectionWrapper.checkClass(receiver, IFile.class), expectedValue);
 	}
 
-	protected boolean checkFormat(final FormatManager<?> formatManager, final IFile res, Object expectedValue) {
-		if (res != null) {
-			if (formatManager != null) {
-				final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(Paths.get(res.getLocationURI()));
-				return (expectedValue == null) ? formatByContent != null : expectedValue.equals(formatByContent.getId());
-			}
-		}
-		return false;
+	protected boolean checkFormat(FormatManager<?> formatManager, final IFile res, Object expectedValue) {
+		return (formatManager != null) && (expectedValue instanceof String) && formatManager.hasFormat(EclipseFileSystem.getPath(res), (String) expectedValue);
 	}
 
 	private FormatManager<?> getFormatManager(String property) {

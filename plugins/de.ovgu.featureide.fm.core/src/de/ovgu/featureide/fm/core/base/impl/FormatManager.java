@@ -47,8 +47,30 @@ public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 		return getExtension(id);
 	}
 
+	/**
+	 * Checks, whether there is a compatible format for the given file.<br>
+	 * Convenience method for {@link #hasFormat(Path, String) hasFormat(file, null)}.
+	 *
+	 * @param file the given file.
+	 * @return {@code true} if the file is compatible with the format and {@code false} otherwise.
+	 */
 	public boolean hasFormat(Path file) {
-		return getFormatByContent(file) != null;
+		return hasFormat(file, null);
+	}
+
+	/**
+	 * Checks, whether there is a specific compatible format for the given file. Uses {@link #getFormatByContent(Path)}.
+	 *
+	 * @param file the given file.
+	 * @param expectedId the id of the expected {@link IPersistentFormat format} or {@code null} for any format.
+	 * @return {@code true} if the file is compatible with the format and {@code false} otherwise.
+	 */
+	public boolean hasFormat(Path file, String expectedId) {
+		if (file != null) {
+			final IPersistentFormat<?> formatByContent = getFormatByContent(file);
+			return (expectedId == null) ? formatByContent != null : expectedId.equals(formatByContent.getId());
+		}
+		return false;
 	}
 
 	/**
@@ -77,7 +99,7 @@ public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 
 	@CheckForNull
 	public IPersistentFormat<T> getFormatByContent(Path path) {
-		if (path != null) {
+		if ((path != null) && Files.isRegularFile(path) && Files.exists(path)) {
 			final String extension = SimpleFileHandler.getFileExtension(path);
 			final List<IPersistentFormat<T>> formatList = new LinkedList<>();
 			for (final IPersistentFormat<T> format : getExtensions()) {

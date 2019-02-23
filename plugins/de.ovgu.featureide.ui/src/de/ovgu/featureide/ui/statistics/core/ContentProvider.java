@@ -24,6 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_STATISTICS_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_THE_FEATURE_MODEL;
 
+import java.nio.file.Path;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,9 +41,9 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
@@ -150,10 +152,10 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 					composer = project.getComposer();
 					featureModel = project.getFeatureModel();
 				} else {
-					final FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(EclipseFileSystem.getPath(input));
-					if ((fileHandler != null) && !fileHandler.getLastProblems().containsError()) {
+					final Path path = EclipseFileSystem.getPath(input);
+					if (FMFormatManager.getInstance().hasFormat(path)) {
 						composer = null;
-						featureModel = fileHandler.getObject();
+						featureModel = FeatureModelManager.load(path);
 					} else {
 						composer = project.getComposer();
 						featureModel = project.getFeatureModel();
