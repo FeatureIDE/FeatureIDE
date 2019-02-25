@@ -242,6 +242,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (getSite().getPart() != part) {
+				clearSelection();
 				setEditorContent(part);
 			}
 		}
@@ -306,6 +307,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		for (final TreeColumn col : tree.getColumns()) {
 			col.pack();
 		}
+	}
+
+	private void clearSelection() {
+		selectedManualFeatures = new ArrayList<IFeature>();
+		selectedAutomaticFeatures = new ArrayList<IFeature>();
+		selection = new ArrayList<IFeature>();
 	}
 
 	private void createTreeViewerEditor() {
