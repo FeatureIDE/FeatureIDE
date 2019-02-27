@@ -50,7 +50,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Rahel Arens
  */
 public class ConstraintView implements GUIDefaults {
+
+	@SuppressWarnings("unused")
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
+	@SuppressWarnings("unused")
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
@@ -240,8 +243,9 @@ public class ConstraintView implements GUIDefaults {
 		treeData.verticalAlignment = SWT.FILL;
 		tree = treeViewer.getTree();
 		tree.setLayoutData(treeData);
-		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
-		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
+		// XXX Not available for Eclipse Neon or below
+//		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
+//		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 		addColumns(treeViewer);
