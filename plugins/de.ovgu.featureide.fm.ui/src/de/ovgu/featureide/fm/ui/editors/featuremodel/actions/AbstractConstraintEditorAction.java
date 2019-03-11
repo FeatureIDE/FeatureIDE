@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -40,13 +41,12 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 public abstract class AbstractConstraintEditorAction extends AFeatureModelAction {
 
 	protected Object viewer;
+	protected IStructuredSelection selection;
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
+			setSelection(event.getSelection());
 		}
 	};
 
@@ -55,9 +55,18 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 		this.viewer = viewer;
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		} else {
+			setSelection(((TreeViewer) viewer).getSelection());
+		} else if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+			setSelection(((GraphicalViewerImpl) viewer).getSelection());
+		} else {
+			setSelection(null);
 		}
+	}
+
+	protected void setSelection(final ISelection viewerSelection) {
+		selection = (viewerSelection instanceof IStructuredSelection) ? (IStructuredSelection) viewerSelection : null;
+		setEnabled(isValidSelection(selection));
 	}
 
 	protected void openEditor(IConstraint constraint) {

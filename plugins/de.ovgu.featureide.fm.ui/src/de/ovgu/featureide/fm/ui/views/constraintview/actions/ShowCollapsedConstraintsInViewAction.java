@@ -18,37 +18,44 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
+package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_COLLAPSED_CONSTRAINTS;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedConstraintsOperation;
 
 /**
- * Action to show/hide collapsed constraints
+ * A modified ShowCollapsedConstraintsAction for the ConstraintView
  *
- * @author Christopher Sontag
- * @author Maximilian Kühl
+ * @author Domenik Eichhorn
  */
-public class ShowCollapsedConstraintsAction extends Action {
+public class ShowCollapsedConstraintsInViewAction extends Action {
+	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
+	private IGraphicalFeatureModel featureModel;
 
-	public static final String ID = "de.ovgu.featureide.collapseconstraints";
-
-	private final IGraphicalFeatureModel featureModel;
-
-	public ShowCollapsedConstraintsAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
-		super(SHOW_COLLAPSED_CONSTRAINTS);
+	public ShowCollapsedConstraintsInViewAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
+		super(SHOW_COLLAPSED_CONSTRAINTS, ImageDescriptor.createFromImage(SHOW_HIDE_IMAGE));
 		this.featureModel = featureModel;
-		setId(ID);
 	}
 
 	@Override
 	public void run() {
 		FeatureModelOperationWrapper.run(new ShowCollapsedConstraintsOperation(featureModel));
 	}
+
+	/**
+	 * This method updates the feature model
+	 */
+	public void update(IGraphicalFeatureModel featureModel) {
+		this.featureModel = featureModel;
+	}
+
 }

@@ -23,10 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_WITH;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -47,28 +44,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 
 	public CreateConstraintWithAction(Object viewer, IFeatureModelManager featureModelManager) {
 		super(viewer, featureModelManager, ID);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		}
 	}
-
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-
-			if (selection.size() == 1) {
-				final Object editPart = selection.getFirstElement();
-
-				final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
-
-				if (feature != null) {
-					updateConstraintActionText(feature.getName());
-				}
-			}
-		}
-	};
 
 	protected void updateConstraintActionText(String featureName) {
 		selectedFeature = featureName;
@@ -78,12 +54,24 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	@Override
 	public void run() {
 		final ConstraintDialog dialog = new ConstraintDialog(featureModelManager, null);
-		dialog.setInputText(selectedFeature);
+		if (selectedFeature != null) {
+			dialog.setInputText(selectedFeature);
+		}
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		return selection.size() == 1;
+		if ((selection != null) && (selection.size() == 1)) {
+			final Object editPart = selection.getFirstElement();
+
+			final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
+
+			if (feature != null) {
+				updateConstraintActionText(feature.getName());
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

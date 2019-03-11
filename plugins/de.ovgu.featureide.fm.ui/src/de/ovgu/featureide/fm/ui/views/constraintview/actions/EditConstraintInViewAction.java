@@ -18,37 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
+package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
 
-import java.util.Iterator;
-
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
- * An action to edit a selected propositional constraint below the feature diagram.
+ * This action deletes constraints in the view
  *
- * @author Christian Becker
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author "Rosiak Kamil"
  */
-public class EditConstraintAction extends AbstractConstraintEditorAction {
+public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 
-	public static final String ID = "de.ovgu.featureide.editconstraint";
+	public static final String ID = "de.ovgu.featureide.editconstraintinview";
 
 	private IConstraint constraint;
 
-	public EditConstraintAction(Object viewer, IFeatureModelManager featureModelManager) {
-		super(viewer, featureModelManager, EDIT_CONSTRAINT, ID);
+	public EditConstraintInViewAction(Object viewer, FeatureModelManager fmManager) {
+		super(viewer, fmManager, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
-		setEnabled(false);
+
+		if (viewer instanceof TreeViewer) {
+			final IStructuredSelection selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+			constraint = (IConstraint) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			setEnabled(isValidSelection(selection));
+		}
 	}
 
 	@Override
@@ -56,23 +57,16 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 		openEditor(constraint);
 	}
 
+	/**
+	 * this method verifies the selection.
+	 *
+	 * @return returns true if this action can process the selected items else false.
+	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection == null) || ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart))) {
-			return false;
-		}
-
-		final Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			final Object editPart = iter.next();
-			if (editPart instanceof ConstraintEditPart) {
-				constraint = ((ConstraintEditPart) editPart).getModel().getObject();
-				return true;
-			}
-			if (editPart instanceof IConstraint) {
-				constraint = (IConstraint) editPart;
-				return true;
-			}
+		if ((selection != null) && (selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
+			constraint = (IConstraint) selection.getFirstElement();
+			return true;
 		}
 		return false;
 	}

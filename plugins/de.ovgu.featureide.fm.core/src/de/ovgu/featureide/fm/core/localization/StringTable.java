@@ -291,7 +291,8 @@ public class StringTable {
 	public static final String CHILD = "child";
 	public static final String ORDER = "order";
 	public static final String CLASSES = "classes";
-	public static final String YES = "yes";
+	public static final String YES = "Yes";
+	public static final String NO = "No";
 	public static final String META = "meta";
 	public static final String DATA = "data";
 	public static final String UNKNOWN_XML_TAG = "Unknown Xml-Tag";
@@ -467,6 +468,7 @@ public class StringTable {
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
 	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
+	public static final String ADD_GROUP_TAG_TO_DESCRIPTION = "Add Group Tag to Description";
 	public static final String EXPORT_AS = "Export As";
 	public static final String HIDE_LEGEND = "Hide Legend";
 	public static final String SHOW_LEGEND = "Show Legend";
@@ -558,6 +560,10 @@ public class StringTable {
 	public static final String UNABLE_TO_START_GUIDSL = "Unable to start GUIDSL";
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
+	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP =
+		"If this option is not selected, upon opening a feature diagram FeatureIDE will ask you if you want to open the ConstraintView. Uncheck this if you want to change the default behaviour.";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ =
 		"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ =
@@ -622,6 +628,7 @@ public class StringTable {
 	public static final String BUILD_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + BUILD_PATH + "\".";
 	public static final String CONFIG_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + CONFIG_PATH + "\".";
 	public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
+	public static final String OPEN_A_FEATURE_DIAGRAM = "Open a feature diagram.";
 	public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ =
 		"Start manual calculation or activate automatic calculation to show statistics.";
 	public static final String CALCULATING___ = "Calculating...";
@@ -1098,6 +1105,10 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
+	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
+	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
+	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 	public static final String PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM = "Please select a feature in the feature diagram";
 }

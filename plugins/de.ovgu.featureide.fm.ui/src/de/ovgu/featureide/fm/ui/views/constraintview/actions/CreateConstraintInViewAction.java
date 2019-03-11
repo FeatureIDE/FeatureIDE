@@ -18,9 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,37 +26,33 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
- * Creates a new propositional constraint below the feature diagram.
+ * A modified CreateConstraintAction for the ConstraintView
  *
- * @author Christian Becker
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Domenik Eichhorn
  */
-public class CreateConstraintAction extends AbstractConstraintEditorAction {
+public class CreateConstraintInViewAction extends AbstractConstraintEditorAction {
 
-	public static final String ID = "de.ovgu.featureide.createconstraint";
+	public static final String ID = "de.ovgu.featureide.createconstraintinview";
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	public CreateConstraintAction(Object viewer, IFeatureModelManager featureModelManager) {
-		this(viewer, featureModelManager, ID);
+	public CreateConstraintInViewAction(Object viewer, IFeatureModelManager fmManager) {
+		super(viewer, fmManager, StringTable.CREATE_CONSTRAINT, ID);
+		setImageDescriptor(createImage);
 	}
 
-	protected CreateConstraintAction(Object viewer, IFeatureModelManager featureModelManager, String id) {
-		super(viewer, featureModelManager, CREATE_CONSTRAINT, id);
-		setImageDescriptor(createImage);
+	@Override
+	public void run() {
+		new ConstraintDialog(featureModelManager, null);
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		return true;
 	}
-
-	@Override
-	public void run() {
-		openEditor(null);
-	}
-
 }
