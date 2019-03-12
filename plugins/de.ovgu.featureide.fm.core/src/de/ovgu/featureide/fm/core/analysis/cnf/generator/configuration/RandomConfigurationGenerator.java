@@ -60,10 +60,10 @@ public class RandomConfigurationGenerator extends AConfigurationGenerator {
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-		monitor.setRemainingWork(maxNumber);
+		monitor.setRemainingWork(maxSampleSize);
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
-		for (int i = 0; i < maxNumber; i++) {
+		for (int i = 0; i < maxSampleSize; i++) {
 			solver.shuffleOrder(rnd);
 			final int[] solution = solver.findSolution();
 			if (solution == null) {

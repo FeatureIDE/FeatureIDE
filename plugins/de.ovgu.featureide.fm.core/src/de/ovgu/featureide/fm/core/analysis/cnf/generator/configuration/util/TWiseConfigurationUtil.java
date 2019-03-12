@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,7 +48,7 @@ public class TWiseConfigurationUtil {
 
 	public static long seed = 123456789;
 
-	protected final LinkedList<TWiseConfiguration> incompleteSolutionList;
+	protected final List<TWiseConfiguration> incompleteSolutionList;
 	protected final Solution[] solverSolutions = new Solution[GLOBAL_SOLUTION_LIMIT];
 	protected final HashSet<Solution> solutionSet = new HashSet<>();
 	protected final Random rnd = new Random(seed);
@@ -59,7 +58,7 @@ public class TWiseConfigurationUtil {
 
 	protected ModalImplicationGraph mig;
 
-	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver, LinkedList<TWiseConfiguration> incompleteSolutionList) {
+	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver, List<TWiseConfiguration> incompleteSolutionList) {
 		this.cnf = cnf;
 		this.localSolver = localSolver;
 		this.incompleteSolutionList = incompleteSolutionList;

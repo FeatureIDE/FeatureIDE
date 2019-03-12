@@ -41,7 +41,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[
 	public static Order order = Order.SORTED;
 	public static Phase phase = Phase.SINGLE;
 
-	protected final int maxNumber;
+	protected final int maxSampleSize;
 
 	private final List<int[]> resultList = new ArrayList<>();
 	private final LinkedBlockingQueue<int[]> resultQueue;
@@ -58,15 +58,15 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[
 		this(cnf, maxNumber, false);
 	}
 
-	public AConfigurationGenerator(CNF cnf, int maxNumber, boolean incremental) {
+	public AConfigurationGenerator(CNF cnf, int maxSampleSize, boolean incremental) {
 		super(cnf);
-		this.maxNumber = maxNumber;
+		this.maxSampleSize = maxSampleSize;
 		resultQueue = incremental ? new LinkedBlockingQueue<int[]>() : null;
 	}
 
-	public AConfigurationGenerator(ISatSolver solver, int maxNumber, boolean incremental) {
+	public AConfigurationGenerator(ISatSolver solver, int maxSampleSize, boolean incremental) {
 		super(solver);
-		this.maxNumber = maxNumber;
+		this.maxSampleSize = maxSampleSize;
 		resultQueue = incremental ? new LinkedBlockingQueue<int[]>() : null;
 	}
 

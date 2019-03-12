@@ -80,7 +80,7 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 
 	protected final TWiseConfigurationUtil util;
 
-	protected final LinkedList<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
+	protected final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
 	protected final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
 	protected final List<LiteralSet> expressionCombinationList = new ArrayList<>();
 	protected final List<Integer> combinationLengthList = new ArrayList<>();
@@ -136,8 +136,8 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 		return 1 - (((double) count) / numberOfCombinations);
 	}
 
-	public TWiseConfigurationGeneratorPartion(CNF cnf, int maxNumber, int t, List<List<ClauseList>> nodes) {
-		super(cnf, maxNumber);
+	public TWiseConfigurationGeneratorPartion(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
+		super(cnf, maxSampleSize);
 		this.t = t;
 
 		incompleteSolutionList.clear();
@@ -377,7 +377,7 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 	}
 
 	private void newConfiguration(final LiteralSet literals) {
-		if (completeSolutionList.size() < maxNumber) {
+		if (completeSolutionList.size() < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(util);
 			select(configuration, Deduce.DP, literals);
 			configuration.updateSolverSolutions();
@@ -391,14 +391,14 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 		}
 	}
 
-	private Iterable<LiteralSet> nextCombination(final ICombinationIterator it, boolean get) {
+	private Iterable<LiteralSet> nextCombination(final ICombinationIterator it, boolean ignoreDNFsWithMultipleClauses) {
 		final ClauseList[] clauseArray = it.next();
 		count--;
 		index = (int) it.getIndex();
 		if (invalid.get(index) || covered.get(index)) {
 			return null;
 		}
-		if (get) {
+		if (ignoreDNFsWithMultipleClauses) {
 			for (final ClauseList expression : clauseArray) {
 				if (expression.size() > 1) {
 					return null;
@@ -428,7 +428,7 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 			return null;
 		}
 
-		return next(clauseArray);
+		return getNextCombinations(clauseArray);
 	}
 
 	public boolean selectionPossibleSAT(final LiteralSet literals, final TWiseConfiguration configuration) {
@@ -528,7 +528,7 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 		return true;
 	}
 
-	private Iterable<LiteralSet> next(ClauseList[] indexArray) {
+	private Iterable<LiteralSet> getNextCombinations(ClauseList[] indexArray) {
 		final int t = indexArray.length;
 		final int[] clauseIndex = new int[t];
 		clauseIndex[0] = -1;

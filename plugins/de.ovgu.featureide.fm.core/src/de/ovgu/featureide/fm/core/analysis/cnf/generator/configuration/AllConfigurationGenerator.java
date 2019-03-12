@@ -55,7 +55,7 @@ public class AllConfigurationGenerator extends AConfigurationGenerator {
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-		for (int i = 0; i < maxNumber; i++) {
+		for (int i = 0; i < maxSampleSize; i++) {
 			final int[] solution = solver.findSolution();
 			if (solution == null) {
 				break;
