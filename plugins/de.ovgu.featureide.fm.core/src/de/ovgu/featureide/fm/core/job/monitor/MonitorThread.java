@@ -53,9 +53,7 @@ public class MonitorThread extends Thread {
 				Thread.sleep(updateTime);
 				function.run();
 			}
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
+		} catch (final InterruptedException e) {}
 		function.run();
 	}
 
@@ -65,9 +63,7 @@ public class MonitorThread extends Thread {
 			monitorRun = false;
 			interrupt();
 			join();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
+		} catch (final InterruptedException e) {}
 	}
 
 	public long getUpdateTime() {
