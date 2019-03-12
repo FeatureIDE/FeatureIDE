@@ -162,7 +162,7 @@ public class CNFSlicer extends AbstractManipulator {
 
 		monitor.setRemainingWork(heuristic.size());
 		monitor.checkCancel();
-		monitorThread.start();
+//		monitorThread.start();
 
 		while (heuristic.hasNext()) {
 			final DeprecatedFeature nextFeature = heuristic.next();
@@ -196,7 +196,7 @@ public class CNFSlicer extends AbstractManipulator {
 		addCleanClauses();
 
 		release();
-		monitorThread.finish();
+//		monitorThread.finish();
 
 		return new CNF(mapping, cleanClauseList);
 	}
