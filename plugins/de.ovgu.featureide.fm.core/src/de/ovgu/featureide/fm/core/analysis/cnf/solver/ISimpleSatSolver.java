@@ -142,6 +142,8 @@ public interface ISimpleSatSolver extends Cloneable {
 
 	int[] getInternalSolution();
 
+	int[] getUnsatExplanation();
+
 	/**
 	 * @return The {@link CNF sat instance} given to the solver.
 	 */

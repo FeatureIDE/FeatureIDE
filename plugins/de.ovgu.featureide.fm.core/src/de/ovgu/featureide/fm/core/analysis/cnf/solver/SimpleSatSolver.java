@@ -26,9 +26,11 @@ import java.util.List;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
+import org.sat4j.minisat.core.SimplificationType;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
+import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -131,6 +133,13 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	}
 
 	@Override
+	public int[] getUnsatExplanation() {
+		final IVecInt unsatExplanation = solver.unsatExplanation();
+		solver.getSimplifier().simplify(unsatExplanation);
+		return internalMapping.convertToOriginal(Arrays.copyOf(unsatExplanation.toArray(), unsatExplanation.size()));
+	}
+
+	@Override
 	public SatResult hasSolution() {
 		try {
 			if (solver.isSatisfiable(false)) {
@@ -195,6 +204,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		final Solver<?> solver = createSolver();
 		configureSolver(solver);
 		initSolver(solver);
+		solver.setSimplifier(SimplificationType.EXPENSIVE_SIMPLIFICATION);
 		return solver;
 	}
 
