@@ -252,6 +252,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
 				break;
 			case FIXED:
+			case RANDOM2:
 				break;
 			default:
 				throw new AssertionError(strategy);
@@ -264,6 +265,13 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	public void setSelectionStrategy(int[] model, boolean min) {
 		strategy = SelectionStrategy.FIXED;
 		solver.setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model, min), order));
+		solver.getOrder().init();
+	}
+
+	@Override
+	public void setSelectionStrategy(double[] ratio) {
+		strategy = SelectionStrategy.RANDOM2;
+		solver.setOrder(new VarOrderHeap2(new AdjustableRandomSelectionStrategy(ratio), order));
 		solver.getOrder().init();
 	}
 
