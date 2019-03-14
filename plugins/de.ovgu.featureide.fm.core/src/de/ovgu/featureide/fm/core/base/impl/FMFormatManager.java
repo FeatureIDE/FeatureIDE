@@ -25,6 +25,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
+import de.ovgu.featureide.fm.core.io.propositionalModel.MODELFormat;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 
 	private FMFormatManager() {
-		super(XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class);
+		super(XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class, MODELFormat.class);
 	}
 
 	private static FMFormatManager instance = new FMFormatManager();

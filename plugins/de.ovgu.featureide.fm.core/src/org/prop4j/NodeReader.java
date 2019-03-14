@@ -48,6 +48,7 @@ public class NodeReader {
 	public final static String[] shortSymbols2 = new String[] { "<=>", "=>", "|", "&", "!" };
 	public final static String[] logicalSymbols = new String[] { "\u21D4", "\u21D2", "\u2228", "\u2227", "\u00AC" };
 	public final static String[] javaSymbols = new String[] { "==", "=>", "||", "&&", "!" };
+	public final static String[] propositionalModelSymbols = new String[] { "==", "=>", "|", "&", "!" };
 
 	private static final String featureNameMarker = "#";
 	private static final String subExpressionMarker = "$";
@@ -87,6 +88,10 @@ public class NodeReader {
 
 	public void activateJavaSymbols() {
 		symbols = javaSymbols;
+	}
+
+	public void activatePropositionalModelSymbols() {
+		symbols = propositionalModelSymbols;
 	}
 
 	public Collection<String> getFeatureNames() {
