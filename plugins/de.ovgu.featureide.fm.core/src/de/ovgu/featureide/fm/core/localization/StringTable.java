@@ -1109,5 +1109,5 @@ public class StringTable {
 	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
 	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
-	public static final String PLEASE_SELECT_A_FEATURE_IN_THE_FEATURE_DIAGRAM = "Please select a feature in the feature diagram";
+	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
 }

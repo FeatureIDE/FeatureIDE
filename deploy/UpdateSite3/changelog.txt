@@ -7,6 +7,14 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.4 (February 2019)
+* Hotfix containing only stability improvements over v3.5.3
+* Usability and stability of the feature attributes view improved (#847, #853, #856)
+* Performance and appearance of the feature diagram improved (#785, #831)
+* Fixed a bug due to which feature models have not been cloned properly (#859)
+* Fixed compilation problems with JavaDoc (#748)
+* Removed instable editing functionality in the feature model outline (#760)
+
 Release 3.5.3 (November 2018)
 * Hotfix containing only stability improvements over v3.5.2
 * Numerous issues with the FeatureHouse composer (#794)
