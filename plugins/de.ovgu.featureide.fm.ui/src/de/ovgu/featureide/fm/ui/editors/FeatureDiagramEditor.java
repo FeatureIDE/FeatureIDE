@@ -118,7 +118,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
@@ -177,7 +176,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private CreateSiblingAction createSiblingAction;
 	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
-	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
@@ -261,7 +259,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// FM structure modify actions
 		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
-		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
 		moveUpAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.UP));
 		moveRightAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.RIGHT));
@@ -1012,7 +1009,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createFeatureBelowAction);
-		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
 		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
 		handler.put(KeyStroke.getPressed((char) (('t' - 'a') + 1), 't', SWT.CTRL), selectSubtreeAction);
 		handler.put(KeyStroke.getPressed((char) (('g' - 'a') + 1), 'g', SWT.CTRL), createSiblingAction);
@@ -1148,7 +1144,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
-			menuManager.add(deleteAllAction);
 			menuManager.add(new Separator());
 			connectionEntries(menuManager);
 			menuManager.add(mandatoryAction);
