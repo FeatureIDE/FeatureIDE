@@ -302,7 +302,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private void findConstraints(IFeatureModel currentModel) {
 		for (final IConstraint constraint : currentModel.getConstraints()) {
 			final String lazyConstraint = constraint.getDisplayName().toLowerCase();
-			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
+			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ").replaceAll("\r", " ");
 			searchText = searchText.toLowerCase();
 			// RegEx search with part string: .* at the start and at the end enables part search automatically
 			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
