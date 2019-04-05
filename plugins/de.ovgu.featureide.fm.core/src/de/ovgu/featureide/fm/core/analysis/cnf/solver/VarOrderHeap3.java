@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,52 +20,36 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
-import static org.sat4j.core.LiteralsUtils.negLit;
-import static org.sat4j.core.LiteralsUtils.posLit;
+import java.util.List;
 
-import java.util.Random;
-
-import org.sat4j.minisat.core.IPhaseSelectionStrategy;
+import org.sat4j.minisat.orders.VarOrderHeap;
+import org.sat4j.specs.ISolver;
 
 /**
- * 
+ * Modified variable order for {@link ISolver}.</br> Uses the {@link UniformRandomSelectionStrategy}.
  *
  * @author Sebastian Krieter
  */
-public class AdjustableRandomSelectionStrategy implements IPhaseSelectionStrategy {
+public class VarOrderHeap3 extends VarOrderHeap {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Random RAND = new Random(123456789);
+	private final UniformRandomSelectionStrategy selectionStrategy;
 
-	private final double[] ratio;
-
-	public AdjustableRandomSelectionStrategy(double[] ratio) {
-		this.ratio = ratio;
+	public VarOrderHeap3(List<int[]> sample) {
+		super(new UniformRandomSelectionStrategy(sample));
+		selectionStrategy = (UniformRandomSelectionStrategy) phaseStrategy;
 	}
 
 	@Override
-	public void assignLiteral(int p) {}
-
-	@Override
-	public void init(int nlength) {}
-
-	@Override
-	public void init(int var, int p) {}
-
-	@Override
-	public int select(int var) {
-		return (RAND.nextDouble() > ratio[Math.abs(var) - 1]) ? posLit(var) : negLit(var);
+	public void undo(int x) {
+		super.undo(x);
+		selectionStrategy.undo(x);
 	}
 
 	@Override
-	public void updateVar(int p) {}
-
-	@Override
-	public void updateVarAtDecisionLevel(int q) {}
-
-	@Override
-	public String toString() {
-		return "modified random phase selection";
+	public void assignLiteral(int p) {
+		super.assignLiteral(p);
 	}
+
 }

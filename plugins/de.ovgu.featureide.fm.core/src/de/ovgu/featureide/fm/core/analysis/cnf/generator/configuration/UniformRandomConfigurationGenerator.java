@@ -36,52 +36,29 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class RandomSampleConfigurationGenerator extends AConfigurationGenerator {
+public class UniformRandomConfigurationGenerator extends AConfigurationGenerator {
 
-	private final Random rnd;
-	private final boolean allowDuplicates;
+	private Random rnd = new Random();
+	private boolean allowDuplicates = true;
+	private int sampleSize = 1000;
 
-	public RandomSampleConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates) {
-		this(cnf, maxNumber, allowDuplicates, new Random());
+	public UniformRandomConfigurationGenerator(CNF cnf, int maxNumber) {
+		super(cnf, maxNumber, true);
 	}
 
-	public RandomSampleConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, Random rnd) {
-		this(cnf, maxNumber, allowDuplicates, rnd, false);
-	}
-
-	public RandomSampleConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, boolean incremental) {
-		this(cnf, maxNumber, allowDuplicates, new Random(), incremental);
-	}
-
-	public RandomSampleConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, Random rnd, boolean incremental) {
+	public UniformRandomConfigurationGenerator(CNF cnf, int maxNumber, boolean incremental) {
 		super(cnf, maxNumber, incremental);
-		this.allowDuplicates = allowDuplicates;
-		this.rnd = rnd;
 	}
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-
-		final int iterations = 1000;
-		final double[] ratio = new double[solver.getSatInstance().getVariables().size()];
-		final AConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), iterations, false);
+		final AConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize, false, rnd);
 		final List<int[]> sample = LongRunningWrapper.runMethod(gen);
-		for (final int[] solution : sample) {
-			for (int i = 0; i < solution.length; i++) {
-				if (solution[i] > 0) {
-					ratio[i]++;
-				}
-			}
-		}
-		for (int i = 0; i < ratio.length; i++) {
-			ratio[i] /= sample.size();
-		}
 
 		monitor.setRemainingWork(maxSampleSize);
-		solver.setSelectionStrategy(ratio);
+		solver.setSelectionStrategy(sample);
 
 		for (int i = 0; i < maxSampleSize; i++) {
-			solver.shuffleOrder(rnd);
 			final int[] solution = solver.findSolution();
 			if (solution == null) {
 				break;
@@ -96,6 +73,30 @@ public class RandomSampleConfigurationGenerator extends AConfigurationGenerator 
 				}
 			}
 		}
+	}
+
+	public boolean isAllowDuplicates() {
+		return allowDuplicates;
+	}
+
+	public void setAllowDuplicates(boolean allowDuplicates) {
+		this.allowDuplicates = allowDuplicates;
+	}
+
+	public Random getRnd() {
+		return rnd;
+	}
+
+	public int getSampleSize() {
+		return sampleSize;
+	}
+
+	public void setRnd(Random rnd) {
+		this.rnd = rnd;
+	}
+
+	public void setSampleSize(int sampleSize) {
+		this.sampleSize = sampleSize;
 	}
 
 }

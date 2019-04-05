@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
+import java.util.List;
 import java.util.Random;
 
 import de.ovgu.featureide.fm.core.base.util.RingList;
@@ -34,7 +35,7 @@ public interface ISatSolver extends ISimpleSatSolver {
 	public static final int MAX_SOLUTION_BUFFER = 1000;
 
 	public static enum SelectionStrategy {
-		NEGATIVE, ORG, POSITIVE, RANDOM, RANDOM2, FIXED
+		NEGATIVE, ORG, POSITIVE, RANDOM, UNIFORM_RANDOM, FIXED
 	}
 
 	RingList<int[]> getSolutionList();
@@ -62,7 +63,7 @@ public interface ISatSolver extends ISimpleSatSolver {
 
 	void setSelectionStrategy(int[] model, boolean min);
 
-	void setSelectionStrategy(double[] ratio);
+	void setSelectionStrategy(List<int[]> sample);
 
 	void assignmentPop();
 

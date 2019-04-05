@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.sat4j.core.VecInt;
@@ -252,7 +253,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
 				break;
 			case FIXED:
-			case RANDOM2:
+			case UNIFORM_RANDOM:
 				break;
 			default:
 				throw new AssertionError(strategy);
@@ -269,9 +270,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void setSelectionStrategy(double[] ratio) {
-		strategy = SelectionStrategy.RANDOM2;
-		solver.setOrder(new VarOrderHeap2(new AdjustableRandomSelectionStrategy(ratio), order));
+	public void setSelectionStrategy(List<int[]> sample) {
+		strategy = SelectionStrategy.UNIFORM_RANDOM;
+		solver.setOrder(new VarOrderHeap3(sample));
 		solver.getOrder().init();
 	}
 

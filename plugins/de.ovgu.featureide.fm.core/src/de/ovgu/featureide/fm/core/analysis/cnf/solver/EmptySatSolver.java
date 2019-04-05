@@ -181,7 +181,7 @@ public class EmptySatSolver implements ISatSolver {
 	public void setSelectionStrategy(int[] model, boolean min) {}
 
 	@Override
-	public void setSelectionStrategy(double[] ratio) {}
+	public void setSelectionStrategy(List<int[]> sample) {}
 
 	@Override
 	public void useSolutionList(int size) {}
