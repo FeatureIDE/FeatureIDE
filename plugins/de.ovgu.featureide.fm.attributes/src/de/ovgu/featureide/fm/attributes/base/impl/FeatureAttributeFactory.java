@@ -84,18 +84,18 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 	}
 
 	@Override
-	public IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, boolean value, boolean recursive,
+	public IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
 			boolean configurable) {
 		return (new BooleanFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}
 
 	@Override
-	public IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, long value, boolean recursive, boolean configurable) {
+	public IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive, boolean configurable) {
 		return (new LongFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}
 
 	@Override
-	public IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, double value, boolean recursive,
+	public IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
 			boolean configurable) {
 		return (new DoubleFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}

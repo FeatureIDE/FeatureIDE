@@ -66,7 +66,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, boolean value, boolean recursive,
+	public abstract IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
 			boolean configurable);
 
 	/**
@@ -80,7 +80,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, long value, boolean recursive,
+	public abstract IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive,
 			boolean configurable);
 
 	/**
@@ -94,7 +94,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, double value, boolean recursive,
+	public abstract IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
 			boolean configurable);
 
 }

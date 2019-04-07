@@ -756,9 +756,9 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	@Override
 	public boolean initExtension() {
 		if (super.initExtension()) {
-			FMFactoryManager.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 		}
-		return false;
+		return true;
 	}
 
 }
