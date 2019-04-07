@@ -30,5 +30,71 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public abstract class AbstractFeatureAttributeFactory {
 
+	/**
+	 * Creates a new feature attribute by providing string based information, like the written xml source information, of an extended feature attribute. The
+	 * information is encapsulated into the interface {@link IFeatureAttributeParsedData}
+	 * 
+	 * @param attributeData The information about the attribute: name, type...
+	 * @param correspondingFeature The feature which the attribute should be attached to.
+	 * @return The instance of the feature attribute. Can return null when information contain invalid values. Like the value of an extended feature attribute
+	 *         of type double is set to "test".
+	 */
 	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature);
+
+	/**
+	 * Create an extended feature attribute of type string with the given parameters
+	 * 
+	 * @param correspondingFeature The feature which the attribute should be attached to.
+	 * @param name Name of the attribute
+	 * @param unit Unit of the attribute
+	 * @param value Value of the attribute
+	 * @param recursive true when the attribute should be recursive
+	 * @param configurable true when the attribute should be configurable
+	 * @return The instance of the created feature attribute.
+	 */
+	public abstract IFeatureAttribute createStringAttribute(IFeature correspondingFeature, String name, String unit, String value, boolean recursive,
+			boolean configurable);
+
+	/**
+	 * Create an extended feature attribute of type boolean with the given parameters
+	 * 
+	 * @param correspondingFeature The feature which the attribute should be attached to.
+	 * @param name Name of the attribute
+	 * @param unit Unit of the attribute
+	 * @param value Value of the attribute
+	 * @param recursive true when the attribute should be recursive
+	 * @param configurable true when the attribute should be configurable
+	 * @return The instance of the created feature attribute.
+	 */
+	public abstract IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, boolean value, boolean recursive,
+			boolean configurable);
+
+	/**
+	 * Create an extended feature attribute of type long with the given parameters
+	 * 
+	 * @param correspondingFeature The feature which the attribute should be attached to.
+	 * @param name Name of the attribute
+	 * @param unit Unit of the attribute
+	 * @param value Value of the attribute
+	 * @param recursive true when the attribute should be recursive
+	 * @param configurable true when the attribute should be configurable
+	 * @return The instance of the created feature attribute.
+	 */
+	public abstract IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, long value, boolean recursive,
+			boolean configurable);
+
+	/**
+	 * Create an extended feature attribute of type double with the given parameters
+	 * 
+	 * @param correspondingFeature The feature which the attribute should be attached to.
+	 * @param name Name of the attribute
+	 * @param unit Unit of the attribute
+	 * @param value Value of the attribute
+	 * @param recursive true when the attribute should be recursive
+	 * @param configurable true when the attribute should be configurable
+	 * @return The instance of the created feature attribute.
+	 */
+	public abstract IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, double value, boolean recursive,
+			boolean configurable);
+
 }

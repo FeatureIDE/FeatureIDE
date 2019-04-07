@@ -44,7 +44,6 @@ public class ExtendedFeature extends Feature {
 
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
-
 	}
 
 	public void removeAttribute(IFeatureAttribute attribute) {

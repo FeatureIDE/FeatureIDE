@@ -795,6 +795,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 	public boolean initExtension() {
 		if (super.initExtension()) {
 			FMFactoryManager.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			return true;
 		}
 		return false;
 	}
