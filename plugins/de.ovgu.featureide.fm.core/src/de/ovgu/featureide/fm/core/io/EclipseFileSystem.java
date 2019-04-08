@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
@@ -33,8 +35,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
 
 public class EclipseFileSystem implements IFileSystem {
@@ -133,6 +138,18 @@ public class EclipseFileSystem implements IFileSystem {
 			return JAVA.exists(path);
 		} else {
 			return res.isAccessible();
+		}
+	}
+
+	@Override
+	public Path getLib(Path path) {
+		URL url = FileLocator.find(FMCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("lib/cover.exe"), null);
+		try {
+			url = FileLocator.toFileURL(url);
+			return Paths.get(url.getPath().substring(1)).normalize();
+		} catch (final IOException e) {
+			Logger.logError(e);
+			return null;
 		}
 	}
 

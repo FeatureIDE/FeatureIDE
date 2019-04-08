@@ -74,7 +74,7 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
-	public List<List<ClauseList>> removeCoreDeadFeatures2(List<List<ClauseList>> expressions) {
+	public List<List<ClauseList>> removeCoreDeadFeatures(List<List<ClauseList>> expressions) {
 		final LiteralSet coreDeadFeature = getDeadCoreFeatures();
 
 		final List<List<ClauseList>> newGroupList = new ArrayList<>(expressions.size());
@@ -104,24 +104,6 @@ public class TWiseConfigurationUtil {
 			}
 		}
 		return newGroupList;
-	}
-
-	public List<LiteralSet> removeCoreDeadFeatures(List<LiteralSet> expressions) {
-		final LiteralSet coreDeadFeature = getDeadCoreFeatures();
-		if (!coreDeadFeature.isEmpty()) {
-			final ArrayList<LiteralSet> newNodeList = new ArrayList<>();
-			for (final LiteralSet exp : expressions) {
-				final LiteralSet literalSet = (LiteralSet) exp;
-				if ((literalSet.countConflicts(coreDeadFeature) == 0) && !coreDeadFeature.containsAll(literalSet)) {
-					newNodeList.add(literalSet);
-				}
-			}
-			expressions = newNodeList;
-		}
-		if (ITWiseConfigurationGenerator.VERBOSE) {
-			System.out.println("Done!");
-		}
-		return expressions;
 	}
 
 	private LiteralSet getDeadCoreFeatures() {

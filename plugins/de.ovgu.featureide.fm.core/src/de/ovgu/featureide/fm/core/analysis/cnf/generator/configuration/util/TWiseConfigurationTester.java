@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +31,7 @@ import org.sat4j.core.VecInt;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.LexicographicIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
@@ -44,7 +45,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Test whether a set of configurations achieves t-wise feature coverage.
  *
  * @author Sebastian Krieter
  */
@@ -55,11 +56,11 @@ public class TWiseConfigurationTester {
 	private final List<List<ClauseList>> nodeArray;
 	private final ISatSolver solver;
 	private final ModalImplicationGraph mig;
-	private final List<int[]> configurations;
+	private final List<Solution> configurations;
 
 	protected LiteralSet[] strongHull;
 
-	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<int[]> configurations) {
+	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<Solution> configurations) {
 		this.cnf = cnf;
 		this.t = t;
 		this.nodeArray = nodeArray;
@@ -211,7 +212,7 @@ public class TWiseConfigurationTester {
 	}
 
 	private boolean isCovered(final ClauseList[] clauseListArray) {
-		configurationLoop: for (final int[] solution : configurations) {
+		configurationLoop: for (final Solution solution : configurations) {
 			for (final ClauseList clauseList : clauseListArray) {
 				if (!containsAtLeastOne(solution, clauseList)) {
 					continue configurationLoop;
@@ -227,15 +228,8 @@ public class TWiseConfigurationTester {
 		if (solver != null) {
 			System.out.print("\tTesting configuration validity...");
 			final int c = 0;
-			for (final int[] is : configurations) {
-				int length = is.length;
-				for (int i = 0; i < length; i++) {
-					if (is[i] == 0) {
-						is[i] = is[--length];
-						i--;
-					}
-				}
-				final SatResult hasSolution = solver.hasSolution(Arrays.copyOf(is, length));
+			for (final Solution is : configurations) {
+				final SatResult hasSolution = solver.hasSolution(is.getLiterals());
 				switch (hasSolution) {
 				case FALSE:
 					System.out.println(" FAIL");
@@ -253,22 +247,13 @@ public class TWiseConfigurationTester {
 		}
 	}
 
-	private boolean containsAtLeastOne(final int[] solution, final ClauseList clauseList) {
+	private boolean containsAtLeastOne(final Solution solution, final ClauseList clauseList) {
 		for (final LiteralSet literalSet : clauseList) {
-			if (contains(solution, literalSet)) {
+			if (solution.containsAll(literalSet)) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean contains(final int[] solution, LiteralSet literalSet) {
-		for (final int literal : literalSet.getLiterals()) {
-			if (solution[Math.abs(literal) - 1] == -literal) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 }

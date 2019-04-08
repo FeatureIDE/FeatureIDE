@@ -29,7 +29,8 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -57,7 +58,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
 		try {
 			for (final IResource configuration : featureProject.getConfigFolder().members()) {
-				if (confs >= maxConfigs()) {
+				if (confs >= builder.configurationNumber) {
 					break;
 				}
 				try {
@@ -83,8 +84,8 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IMonitor monitor) {
-		SimpleFileHandler.load(Paths.get(configuration.getLocationURI()), this.configuration, ConfigFormatManager.getInstance());
-		builder.addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
+		final Configuration config = ConfigurationManager.load(Paths.get(configuration.getLocationURI()), snapshot.getObject());
+		builder.addConfiguration(new BuilderConfiguration(config, configuration.getName().split("[.]")[0]));
 	}
 
 	/**

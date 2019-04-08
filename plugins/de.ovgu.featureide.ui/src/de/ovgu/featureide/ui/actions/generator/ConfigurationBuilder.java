@@ -57,11 +57,13 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.configuration.AConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.AllConfigrationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.CASAConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.CHVATALConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.CurrentConfigurationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.ICPLConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.IncLingConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.ModuleConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.RandConfigurationGenerator;
-import de.ovgu.featureide.ui.actions.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.sorter.AbstractConfigurationSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.InteractionSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.PriorizationSorter;
@@ -145,7 +147,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 	TestResults testResults;
 
-	private AConfigurationGenerator configurationBuilder;
+	private AConfigurationGenerator configurationGenerator;
 
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is none.
@@ -232,28 +234,34 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		String jobName = "";
 		switch (buildType) {
 		case ALL_CURRENT:
-			configurationBuilder = new CurrentConfigurationsGenerator(this, featureProject);
+			configurationGenerator = new CurrentConfigurationsGenerator(this, featureProject);
 			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
-			configurationBuilder = new AllConfigrationsGenerator(this, featureProject);
+			configurationGenerator = new AllConfigrationsGenerator(this, featureProject);
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
 			if (algorithm.equals(INCLING)) {
-				configurationBuilder = new IncLingConfigurationGenerator(this, featureProject);
+				configurationGenerator = new IncLingConfigurationGenerator(this, featureProject);
+			} else if (algorithm.equals("ICPL")) {
+				configurationGenerator = new ICPLConfigurationGenerator(this, featureProject, t);
+			} else if (algorithm.equals("Chvatal")) {
+				configurationGenerator = new CHVATALConfigurationGenerator(this, featureProject, t);
+			} else if (algorithm.equals("CASA")) {
+				configurationGenerator = new CASAConfigurationGenerator(this, featureProject, t);
 			} else {
-				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureProject, algorithm, t);
+				throw new RuntimeException(buildType + " not supported");
 			}
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		case RANDOM:
-			configurationBuilder = new RandConfigurationGenerator(this, featureProject);
+			configurationGenerator = new RandConfigurationGenerator(this, featureProject);
 			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
 			configurationNumber = 2;
-			configurationBuilder = new ModuleConfigurationGenerator(this, featureProject, featureName);
+			configurationGenerator = new ModuleConfigurationGenerator(this, featureProject, featureName);
 			break;
 		default:
 			throw new RuntimeException(buildType + " not supported");
@@ -288,7 +296,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						newgeneratorJobs(1);
 					}
-					configurationBuilderJob = LongRunningWrapper.getRunner(configurationBuilder, "Create Configurations " + id++);
+					configurationBuilderJob = LongRunningWrapper.getRunner(configurationGenerator, "Create Configurations " + id++);
 					configurationBuilderJob.schedule();
 					showStatistics(monitor);
 					if (!createNewProjects) {

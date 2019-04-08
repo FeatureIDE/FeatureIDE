@@ -18,30 +18,52 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package de.ovgu.featureide.fm.core.io.dimacs;
 
-import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 
 /**
- * Creates random configurations.
+ * Reads and writes feature models in the DIMACS CNF format.
  *
- * @see RandomConfigurationGenerator
- *
- * @author Jens Meinicke
+ * @author Sebastian Krieter
+ * @author Timo G&uuml;nther
  */
-public class RandConfigurationGenerator extends ACNFConfigurationGenerator {
+public class DIMACSFormatCNF extends APersistentFormat<CNF> {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		super(builder, featureProject);
+	public static final String ID = PluginID.PLUGIN_ID + ".format.cnf." + DIMACSFormatCNF.class.getSimpleName();
+
+	@Override
+	public String write(CNF cnf) {
+		final DimacsWriterCNF w = new DimacsWriterCNF(cnf);
+		w.setWritingVariableDirectory(true);
+		return w.write();
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new RandomConfigurationGenerator(cnf, numberOfConfigurations, true);
+	public String getSuffix() {
+		return "dimacs";
+	}
+
+	@Override
+	public DIMACSFormatCNF getInstance() {
+		return this;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public String getName() {
+		return "DIMACS";
 	}
 
 }

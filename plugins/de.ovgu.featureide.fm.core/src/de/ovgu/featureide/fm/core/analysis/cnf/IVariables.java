@@ -47,6 +47,8 @@ public interface IVariables extends Cloneable {
 
 	LiteralSet convertToVariables(Collection<String> variableNames, boolean sign);
 
+	LiteralSet convertToLiterals(Collection<String> variableNames, boolean includePositive, boolean includeNegative);
+
 	int size();
 
 	int maxVariableID();

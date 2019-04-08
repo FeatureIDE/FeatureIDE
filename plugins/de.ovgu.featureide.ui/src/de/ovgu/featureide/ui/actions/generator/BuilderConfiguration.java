@@ -32,18 +32,11 @@ public class BuilderConfiguration extends Configuration {
 	private String name;
 	private long number;
 
-	/**
-	 * @param configuration
-	 */
 	public BuilderConfiguration(Configuration configuration, String name) {
 		super(configuration);
 		this.name = name;
 	}
 
-	/**
-	 * @param configuration
-	 * @param number
-	 */
 	public BuilderConfiguration(Configuration configuration, long number) {
 		super(configuration);
 		this.number = number;
@@ -54,26 +47,8 @@ public class BuilderConfiguration extends Configuration {
 		this.number = number;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
-		if (name == null) {
-			final String zeros;
-			if (number < 10) {
-				zeros = "0000";
-			} else if (number < 100) {
-				zeros = "000";
-			} else if (number < 1000) {
-				zeros = "00";
-			} else if (number < 10000) {
-				zeros = "0";
-			} else {
-				zeros = "";
-			}
-			return zeros + number;
-		}
-		return name;
+		return (name != null) ? name : String.format("%05d", number);
 	}
 
 	@Override

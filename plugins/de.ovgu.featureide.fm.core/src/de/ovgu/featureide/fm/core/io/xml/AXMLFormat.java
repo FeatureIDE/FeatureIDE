@@ -91,13 +91,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 		return elements;
 	}
 
-	/**
-	 * Inserts indentations into the text
-	 *
-	 * @param text
-	 * @return
-	 */
-	private static String prettyPrint(String text) {
+	protected String prettyPrint(String text) {
 		final StringBuilder result = new StringBuilder();
 		String line;
 		int indentLevel = 0;
@@ -200,7 +194,8 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 			Logger.logError(e);
 		}
 
-		return prettyPrint(result.getWriter().toString());
+		final String document = result.getWriter().toString();
+		return prettyPrint(document);
 	}
 
 	@Override

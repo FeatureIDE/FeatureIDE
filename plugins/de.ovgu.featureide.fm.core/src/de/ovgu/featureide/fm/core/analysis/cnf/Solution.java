@@ -31,7 +31,7 @@ public class Solution extends LiteralSet {
 
 	private static final long serialVersionUID = -3058742332393418632L;
 
-	public Solution(Solution clause) {
+	public Solution(LiteralSet clause) {
 		super(clause);
 	}
 
@@ -99,7 +99,7 @@ public class Solution extends LiteralSet {
 
 	@Override
 	public Solution negate() {
-		final int[] negLiterals = Arrays.copyOf(literals, literals.length);
+		final int[] negLiterals = new int[literals.length];
 		for (int i = 0; i < negLiterals.length; i++) {
 			negLiterals[i] = -literals[i];
 		}

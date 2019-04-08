@@ -18,14 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
+ * Generates certain configurations for a given propositional formulas.
  *
- * @author skrieter
+ * @author Sebastian Krieter
  */
-public class EmptyClauseException extends Exception {
+public interface IConfigurationGenerator extends IAnalysis<List<Solution>> {
 
-	private static final long serialVersionUID = -218852721987522485L;
+	List<Solution> analyze(IMonitor monitor) throws Exception;
+
+	LinkedBlockingQueue<Solution> getResultQueue();
 
 }

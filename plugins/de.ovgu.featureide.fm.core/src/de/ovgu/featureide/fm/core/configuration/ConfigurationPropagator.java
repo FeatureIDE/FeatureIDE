@@ -30,6 +30,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -280,8 +281,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (solver == null) {
 				return resultList;
 			}
-			final List<int[]> result = new AllConfigurationGenerator(solver, max, false).analyze(monitor);
-			for (final int[] is : result) {
+			final List<Solution> result = new AllConfigurationGenerator(solver, max).analyze(monitor);
+			for (final Solution is : result) {
 				resultList.add(solver.getSatInstance().getVariables().convertToString(is));
 			}
 
@@ -327,7 +328,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			oneWiseConfigurationGenerator.setFeatures(featureArray);
 
 			final List<List<String>> solutionList = new ArrayList<>();
-			final List<LiteralSet> solutions = LongRunningWrapper.runMethod(oneWiseConfigurationGenerator, workMonitor);
+			final List<Solution> solutions = LongRunningWrapper.runMethod(oneWiseConfigurationGenerator, workMonitor);
 			if (solutions == null) {
 				return solutionList;
 			}

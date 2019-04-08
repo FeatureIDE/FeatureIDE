@@ -20,26 +20,22 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Generates configurations for a given propositional formula such that one-wise feature coverage is achieved.
  *
  * @author Sebastian Krieter
  */
-public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<LiteralSet>> {
+public class OneWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
 	private int[] variables;
 	// TODO make enum
@@ -63,10 +59,24 @@ public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<Literal
 		setFeatures(features);
 	}
 
-	@Override
-	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
-		final ArrayList<LiteralSet> coverArray = new ArrayList<>();
+	public int[] getFeatures() {
+		return variables;
+	}
 
+	public void setFeatures(int[] features) {
+		variables = features;
+	}
+
+	public int getCoverMode() {
+		return coverMode;
+	}
+
+	public void setCoverMode(int coverMode) {
+		this.coverMode = coverMode;
+	}
+
+	@Override
+	protected void generate(IMonitor monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
 		if (coverMode == 1) {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
@@ -132,7 +142,7 @@ public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<Literal
 				}
 
 				if (lastSolution != null) {
-					coverArray.add(new LiteralSet(lastSolution));
+					addResult(new Solution(lastSolution));
 				}
 				solver.assignmentClear(initialAssignmentLength);
 
@@ -147,25 +157,6 @@ public class OneWiseConfigurationGenerator extends AbstractAnalysis<List<Literal
 			}
 
 		}
-
-		// return solver.getAssignmentArray(initialAssignmentLength, solver.getAssignment().size());
-		return coverArray;
-	}
-
-	public int[] getFeatures() {
-		return variables;
-	}
-
-	public void setFeatures(int[] features) {
-		variables = features;
-	}
-
-	public int getCoverMode() {
-		return coverMode;
-	}
-
-	public void setCoverMode(int coverMode) {
-		this.coverMode = coverMode;
 	}
 
 }

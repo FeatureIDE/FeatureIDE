@@ -133,6 +133,24 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return new LiteralSet(literals);
 	}
 
+	public LiteralSet convertToLiterals(Collection<String> variableNames, boolean includePositive, boolean includeNegative) {
+		if (!includeNegative && !includePositive) {
+			return new LiteralSet();
+		}
+		final int[] literals = new int[(includeNegative && includePositive) ? 2 * variableNames.size() : variableNames.size()];
+		int i = 0;
+		for (final String varName : variableNames) {
+			final int var = varToInt.get(varName);
+			if (includeNegative) {
+				literals[i++] = -var;
+			}
+			if (includePositive) {
+				literals[i++] = var;
+			}
+		}
+		return new LiteralSet(literals);
+	}
+
 	@Override
 	public int size() {
 		return intToVar.length - 1;

@@ -20,36 +20,49 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.List;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Generates a configuration containing the given feature and a configuration without it.
+ * Generates T-wise configurations using SPLATool.
  *
- * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class ModuleConfigurationGenerator extends ACNFConfigurationGenerator {
+public class CASAConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	private final String featureName;
+	private final int t;
 
-	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String featureName) {
+	public CASAConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, int t) {
 		super(builder, featureProject);
-		this.featureName = featureName;
+		this.t = t;
 	}
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		final int featureVariable = cnf.getVariables().getVariable(featureName);
-		final List<List<ClauseList>> expressions = de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator
-				.convertLiterals(new LiteralSet(featureVariable, -featureVariable));
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, 2, 1, expressions);
+		return new SPLCAToolConfigurationGenerator(cnf, numberOfConfigurations, t, "CASA");
+	}
+
+	@Override
+	protected void handleException(final Exception e) {
+		final Display display = Display.getDefault();
+		display.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				final String errorMessage = "CASA experienced an error during its execution.\nMessage: " + e.getMessage()
+					+ "\nMaybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)";
+				new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
+						new String[] { OK }, 0).open();
+			}
+		});
 	}
 
 }

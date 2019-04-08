@@ -20,16 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.util.List;
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-
 /**
  * Finds certain solutions of propositional formulas.
  *
  * @author Sebastian Krieter
  */
-public interface ITWiseConfigurationGenerator {
+public interface ITWiseConfigurationGenerator extends IConfigurationGenerator {
 
 	public static final boolean VERBOSE = true;
 
@@ -44,7 +40,5 @@ public interface ITWiseConfigurationGenerator {
 	static enum Phase {
 		MULTI, SINGLE
 	}
-
-	List<int[]> analyze(IMonitor monitor) throws Exception;
 
 }

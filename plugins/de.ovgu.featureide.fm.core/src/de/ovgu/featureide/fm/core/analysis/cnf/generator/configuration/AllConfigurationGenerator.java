@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionExcept
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Generates all configurations for a given propositional formula.
  *
  * @author Sebastian Krieter
  */
@@ -45,12 +45,8 @@ public class AllConfigurationGenerator extends AConfigurationGenerator {
 		super(cnf, maxNumber);
 	}
 
-	public AllConfigurationGenerator(CNF cnf, int maxNumber, boolean incremental) {
-		super(cnf, maxNumber, incremental);
-	}
-
-	public AllConfigurationGenerator(ISatSolver solver, int maxNumber, boolean incremental) {
-		super(solver, maxNumber, incremental);
+	public AllConfigurationGenerator(ISatSolver solver, int maxNumber) {
+		super(solver, maxNumber);
 	}
 
 	@Override
@@ -63,7 +59,7 @@ public class AllConfigurationGenerator extends AConfigurationGenerator {
 			final Solution result = new Solution(solution);
 			addResult(result);
 			try {
-				solver.addClause(result.negate());
+				solver.addInternalClause(result.negate());
 			} catch (final RuntimeContradictionException e) {
 				break;
 			}

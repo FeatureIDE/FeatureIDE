@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionExcept
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Generates random configurations for a given propositional formula.
  *
  * @author Sebastian Krieter
  */
@@ -45,15 +45,7 @@ public class RandomConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	public RandomConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, Random rnd) {
-		this(cnf, maxNumber, allowDuplicates, rnd, false);
-	}
-
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, boolean incremental) {
-		this(cnf, maxNumber, allowDuplicates, new Random(), incremental);
-	}
-
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, Random rnd, boolean incremental) {
-		super(cnf, maxNumber, incremental);
+		super(cnf, maxNumber);
 		this.allowDuplicates = allowDuplicates;
 		this.rnd = rnd;
 	}

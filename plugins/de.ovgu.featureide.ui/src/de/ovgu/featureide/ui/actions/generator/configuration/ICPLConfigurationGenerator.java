@@ -20,36 +20,29 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.List;
-
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Generates a configuration containing the given feature and a configuration without it.
+ * Generates T-wise configurations using SPLATool.
  *
- * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class ModuleConfigurationGenerator extends ACNFConfigurationGenerator {
+public class ICPLConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	private final String featureName;
+	private final int t;
 
-	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String featureName) {
+	public ICPLConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, int t) {
 		super(builder, featureProject);
-		this.featureName = featureName;
+		this.t = t;
 	}
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		final int featureVariable = cnf.getVariables().getVariable(featureName);
-		final List<List<ClauseList>> expressions = de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator
-				.convertLiterals(new LiteralSet(featureVariable, -featureVariable));
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, 2, 1, expressions);
+		return new SPLCAToolConfigurationGenerator(cnf, numberOfConfigurations, t, "ICPL");
 	}
 
 }

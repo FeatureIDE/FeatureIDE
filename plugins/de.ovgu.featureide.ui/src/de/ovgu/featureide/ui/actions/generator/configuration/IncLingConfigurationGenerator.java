@@ -20,14 +20,10 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.List;
-
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.PairWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -37,54 +33,15 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  *
  * @author Jens Meinicke
  */
-public class IncLingConfigurationGenerator extends AConfigurationGenerator {
+public class IncLingConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
 		super(builder, featureProject);
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
-		exec(cnf, getGenerator(), monitor);
-		return null;
-	}
-
-	protected PairWiseConfigurationGenerator getGenerator() {
-		return new PairWiseConfigurationGenerator(cnf, (int) builder.configurationNumber);
-	}
-
-	protected void exec(final CNF satInstance, final PairWiseConfigurationGenerator as, IMonitor monitor) {
-		final Thread consumer = new Thread() {
-
-			@Override
-			public void run() {
-				int foundConfigurations = 0;
-				while (true) {
-					try {
-						generateConfiguration(satInstance.getVariables().convertToString(as.q.take().getModel()));
-						foundConfigurations++;
-					} catch (final InterruptedException e) {
-						break;
-					}
-				}
-				foundConfigurations += as.q.size();
-				builder.configurationNumber = foundConfigurations;
-				for (final PairWiseConfigurationGenerator.Configuration c : as.q) {
-					generateConfiguration(satInstance.getVariables().convertToString(c.getModel()));
-				}
-			}
-
-			private void generateConfiguration(List<String> solution) {
-				configuration.resetValues();
-				for (final String selection : solution) {
-					configuration.setManual(selection, Selection.SELECTED);
-				}
-				addConfiguration(configuration);
-			}
-		};
-		consumer.start();
-		LongRunningWrapper.runMethod(as, monitor);
-		consumer.interrupt();
+	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+		return new PairWiseConfigurationGenerator(cnf, numberOfConfigurations);
 	}
 
 }

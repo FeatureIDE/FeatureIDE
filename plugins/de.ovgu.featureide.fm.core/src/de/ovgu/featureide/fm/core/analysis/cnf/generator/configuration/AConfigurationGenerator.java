@@ -28,6 +28,8 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Order;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Phase;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -36,46 +38,40 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[]>> implements ITWiseConfigurationGenerator {
+public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solution>> implements IConfigurationGenerator {
 
 	public static Order order = Order.SORTED;
 	public static Phase phase = Phase.SINGLE;
 
 	protected final int maxSampleSize;
 
-	private final List<int[]> resultList = new ArrayList<>();
-	private final LinkedBlockingQueue<int[]> resultQueue;
+	private final List<Solution> resultList = new ArrayList<>();
+	private final LinkedBlockingQueue<Solution> resultQueue;
 
 	public AConfigurationGenerator(CNF cnf) {
-		this(cnf, Integer.MAX_VALUE, false);
+		this(cnf, Integer.MAX_VALUE);
 	}
 
 	public AConfigurationGenerator(ISatSolver solver) {
-		this(solver, Integer.MAX_VALUE, false);
+		this(solver, Integer.MAX_VALUE);
 	}
 
-	public AConfigurationGenerator(CNF cnf, int maxNumber) {
-		this(cnf, maxNumber, false);
-	}
-
-	public AConfigurationGenerator(CNF cnf, int maxSampleSize, boolean incremental) {
+	public AConfigurationGenerator(CNF cnf, int maxSampleSize) {
 		super(cnf);
 		this.maxSampleSize = maxSampleSize;
-		resultQueue = incremental ? new LinkedBlockingQueue<int[]>() : null;
+		resultQueue = new LinkedBlockingQueue<>();
 	}
 
-	public AConfigurationGenerator(ISatSolver solver, int maxSampleSize, boolean incremental) {
+	public AConfigurationGenerator(ISatSolver solver, int maxSampleSize) {
 		super(solver);
 		this.maxSampleSize = maxSampleSize;
-		resultQueue = incremental ? new LinkedBlockingQueue<int[]>() : null;
+		resultQueue = new LinkedBlockingQueue<>();
 	}
 
 	@Override
-	public List<int[]> analyze(IMonitor monitor) throws Exception {
+	public List<Solution> analyze(IMonitor monitor) throws Exception {
 		resultList.clear();
-		if (resultQueue != null) {
-			resultQueue.clear();
-		}
+		resultQueue.clear();
 
 		generate(monitor);
 
@@ -85,17 +81,16 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[
 	protected abstract void generate(IMonitor monitor) throws Exception;
 
 	protected void addResult(Solution result) {
-		resultList.add(result.getLiterals());
-		if (resultQueue != null) {
-			try {
-				resultQueue.put(result.getLiterals());
-			} catch (final InterruptedException e) {
-				Logger.logError(e);
-			}
+		resultList.add(result);
+		try {
+			resultQueue.put(result);
+		} catch (final InterruptedException e) {
+			Logger.logError(e);
 		}
 	}
 
-	public LinkedBlockingQueue<int[]> getResultQueue() {
+	@Override
+	public LinkedBlockingQueue<Solution> getResultQueue() {
 		return resultQueue;
 	}
 

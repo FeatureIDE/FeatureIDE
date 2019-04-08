@@ -59,4 +59,9 @@ public class JavaFileSystem implements IFileSystem {
 		return Files.exists(path);
 	}
 
+	@Override
+	public Path getLib(Path path) {
+		return path;
+	}
+
 }

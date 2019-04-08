@@ -54,11 +54,11 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Generates configurations for a given propositional formula such that t-wise feature coverage is achieved.
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
+public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
 	private static class Pair<A, B> {
 		private final A key;
@@ -136,7 +136,47 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 		return 1 - (((double) count) / numberOfCombinations);
 	}
 
-	public TWiseConfigurationGeneratorPartion(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
+	/**
+	 * Converts a set of single literals into a grouped expression list.
+	 *
+	 * @param literalSet the literal set
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertLiterals(LiteralSet literalSet) {
+		return convertGroupedLiterals(Arrays.asList(literalSet));
+	}
+
+	/**
+	 * Converts a grouped set of single literals into a grouped expression list.
+	 *
+	 * @param groupedLiterals the grouped literal sets
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertGroupedLiterals(List<LiteralSet> groupedLiterals) {
+		final List<List<ClauseList>> groupedExpressions = new ArrayList<>(groupedLiterals.size());
+		for (final LiteralSet literalSet : groupedLiterals) {
+			final List<ClauseList> arrayList = new ArrayList<>(literalSet.size());
+			groupedExpressions.add(arrayList);
+			for (final Integer literal : literalSet.getLiterals()) {
+				final ClauseList clauseList = new ClauseList(1);
+				clauseList.add(new LiteralSet(literal));
+				arrayList.add(clauseList);
+			}
+		}
+		return groupedExpressions;
+	}
+
+	/**
+	 * Converts an expression list into a grouped expression set with a single group.
+	 *
+	 * @param expressions the expression list
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertExpressions(List<ClauseList> expressions) {
+		return Arrays.asList(expressions);
+	}
+
+	public TWiseConfigurationGenerator(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
 		super(cnf, maxSampleSize);
 		this.t = t;
 
@@ -186,7 +226,7 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 			}
 		}
 //		expressions = ExpressionConverter.convertToArray2(util.removeCoreDeadFeatures2(nodes));
-		expressions = util.removeCoreDeadFeatures2(nodes);
+		expressions = util.removeCoreDeadFeatures(nodes);
 
 		genHulls();
 

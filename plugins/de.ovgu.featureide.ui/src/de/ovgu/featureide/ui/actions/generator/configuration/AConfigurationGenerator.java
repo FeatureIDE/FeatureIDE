@@ -21,60 +21,44 @@
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractCNFCreator;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Abstract class to generater configurations.
+ * Abstract class to generate configurations.
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
 
-	protected IFeatureModel featureModel;
+	protected final FeatureModelSnapshot snapshot;
 
-	protected ConfigurationBuilder builder;
-
-	/**
-	 * This is the configuration where the {@link ConfigurationReader} saves the read configuration.
-	 */
-	protected Configuration configuration;
+	protected final ConfigurationBuilder builder;
 
 	/**
 	 * The count of found configurations.
 	 */
 	protected long confs = 0;
 
-	protected final IFeatureProject featureProject;
-	protected final ConfigurationPropagator configurationPropagator;
-	protected final CNF cnf;
-
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
 		this.builder = builder;
-		featureModel = snapshot.getObject();
-		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel);
-		configurationPropagator = snapshot.getPropagator(configuration);
-		cnf = snapshot.getFormula().getElement(new NoAbstractCNFCreator());
+		snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
 	}
 
 	protected void cancelGenerationJobs() {
 		builder.cancelGenerationJobs();
 	}
 
-	protected int maxConfigs() {
-		return (int) builder.configurationNumber;
+	protected final void setConfigurationNumber(int foundConfigurations) {
+		builder.configurationNumber = foundConfigurations;
 	}
 
-	protected void addConfiguration(Configuration configuration) {
+	protected final void addConfiguration(Configuration configuration) {
 		builder.addConfiguration(new BuilderConfiguration(configuration, ++confs));
 	}
+
 }

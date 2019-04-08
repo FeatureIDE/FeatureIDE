@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -35,21 +37,22 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class ModuleConfigurationGenerator extends ACNFConfigurationGenerator {
+public class TWiseConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	private final String featureName;
+	private final int t;
 
-	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String featureName) {
+	public TWiseConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, int t) {
 		super(builder, featureProject);
-		this.featureName = featureName;
+		this.t = t;
 	}
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		final int featureVariable = cnf.getVariables().getVariable(featureName);
-		final List<List<ClauseList>> expressions = de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator
-				.convertLiterals(new LiteralSet(featureVariable, -featureVariable));
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, 2, 1, expressions);
+		final LiteralSet literals =
+			cnf.getVariables().convertToLiterals(Functional.toList(FeatureUtils.getConcreteFeatureNames(snapshot.getObject())), true, true);
+		final List<List<ClauseList>> expressions =
+			de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator.convertLiterals(literals);
+		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, numberOfConfigurations, t, expressions);
 	}
 
 }
