@@ -90,12 +90,11 @@ public class TWiseConfigurationTester {
 		}
 	}
 
-	public void test() {
-		testSolutionValidity();
-		testCompleteness();
+	public boolean test() {
+		return testSolutionValidity() && testCompleteness();
 	}
 
-	private void testCompleteness() throws AssertionError {
+	public boolean testCompleteness() throws AssertionError {
 		final int[] clauseIndex = new int[t];
 		final ArrayList<LiteralSet> combinations = new ArrayList<>();
 
@@ -154,10 +153,12 @@ public class TWiseConfigurationTester {
 				}
 
 				System.out.println(" FAIL");
-				throw new RuntimeException("Uncovered combination. " + iterator.getIndex() + " - " + Arrays.toString(clauseListArray));
+				System.out.println("\tUncovered combination. " + iterator.getIndex() + " - " + Arrays.toString(clauseListArray));
+				return false;
 			}
 		}
 		System.out.println(" PASS");
+		return true;
 	}
 
 	private boolean checkSolver(final LiteralSet literalSet) throws AssertionError {
@@ -223,7 +224,7 @@ public class TWiseConfigurationTester {
 		return false;
 	}
 
-	private void testSolutionValidity() throws AssertionError {
+	public boolean testSolutionValidity() throws AssertionError {
 		System.out.println("Testing results...");
 		if (solver != null) {
 			System.out.print("\tTesting configuration validity...");
@@ -233,7 +234,8 @@ public class TWiseConfigurationTester {
 				switch (hasSolution) {
 				case FALSE:
 					System.out.println(" FAIL");
-					throw new RuntimeException("Invalid configuration.");
+					System.out.println("\tInvalid configuration: " + is);
+					return false;
 				case TIMEOUT:
 					System.err.println("Timeout! " + c);
 					break;
@@ -244,7 +246,10 @@ public class TWiseConfigurationTester {
 				}
 			}
 			System.out.println(" PASS");
+			return true;
 		}
+		System.out.println(" SKIPPED");
+		return false;
 	}
 
 	private boolean containsAtLeastOne(final Solution solution, final ClauseList clauseList) {
