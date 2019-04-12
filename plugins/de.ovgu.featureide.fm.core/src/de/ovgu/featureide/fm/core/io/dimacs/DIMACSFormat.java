@@ -22,12 +22,12 @@ package de.ovgu.featureide.fm.core.io.dimacs;
 
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
@@ -61,15 +61,17 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 		final DimacsReader r = new DimacsReader(source.toString());
 		r.setReadingVariableDirectory(true);
 		final Node read;
+		final Collection<Literal> variables;
 		try {
 			read = r.read();
+			variables = r.getVariables();
 		} catch (final ParseException e) {
 			problemList.add(new Problem(e));
 			return problemList;
 		}
 
 		// Add the propositional node to the feature model.
-		addNodeToFeatureModel(featureModel, read);
+		addNodeToFeatureModel(featureModel, read, variables);
 
 		return problemList;
 	}
@@ -80,8 +82,9 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 	 *
 	 * @param featureModel feature model to edit
 	 * @param node propositional node to add
+	 * @param variables the variables of the propositional node
 	 */
-	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
+	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, Collection<Literal> variables) {
 		// Add a dummy feature as root.
 		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
@@ -90,9 +93,8 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		// Add a feature for each variable.
-		final Set<String> variables = new LinkedHashSet<>(node.getContainedFeatures());
-		for (final String variable : variables) {
-			final IFeature feature = factory.createFeature(featureModel, variable);
+		for (final Literal variable : variables) {
+			final IFeature feature = factory.createFeature(featureModel, variable.toString());
 			featureModel.addFeature(feature);
 			rootFeature.getStructure().addChild(feature.getStructure());
 		}

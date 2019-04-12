@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io.dimacs;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,6 +128,10 @@ public class DimacsReader {
 			break; // ... until a non-comment token is found.
 		}
 		return token;
+	}
+
+	public Collection<Literal> getVariables() {
+		return indexVariables.values();
 	}
 
 	/**
