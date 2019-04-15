@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -750,6 +751,14 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	@Override
 	public IFeatureNameValidator getFeatureNameValidator() {
 		return validator;
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		}
+		return true;
 	}
 
 }
