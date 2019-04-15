@@ -51,7 +51,7 @@
                 	<!--<test>HandsOn5.test</test>-->
                 	<test>SelectingFeaturesInFeatureDiagram.test</test>
                 	<test>SetAbstractInFeatureDiagram.test</test>
-                	<test>SetCollapsedInFeatureDiagram.test</test>
+                	<!--<test>SetCollapsedInFeatureDiagram.test</test>-->
                 	<test>SetHiddenInFeatureDiagram.test</test>
                 	<!--<test>SetMandatoryInFeatureDiagram.test</test>-->
                 </tests>
