@@ -227,7 +227,13 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 //		expressions = ExpressionConverter.convertToArray2(util.removeCoreDeadFeatures2(nodes));
 		expressions = util.removeCoreDeadFeatures(nodes);
-
+		for (final List<ClauseList> list : expressions) {
+			for (int i = 1; i < t; i++) {
+				final ClauseList pseudoClauseList = new ClauseList();
+				pseudoClauseList.add(new LiteralSet());
+				list.add(pseudoClauseList);
+			}
+		}
 		genHulls();
 
 		numberOfCombinations = getIterator(IteratorID.Lexicographic).size();
