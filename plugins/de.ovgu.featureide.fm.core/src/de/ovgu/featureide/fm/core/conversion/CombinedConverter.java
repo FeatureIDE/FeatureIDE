@@ -76,7 +76,6 @@ public class CombinedConverter implements IConverterStrategy {
 			}
 			costs += estimatedCosts(node);
 		}
-		// System.out.println(costs);
 		return costs;
 	}
 

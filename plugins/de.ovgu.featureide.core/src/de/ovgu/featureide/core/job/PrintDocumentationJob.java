@@ -290,10 +290,6 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			System.arraycopy(args1, 0, javadocargs, defaultArguments + args0.length, args1.length);
 		}
 
-		for (int j = 0; j < javadocargs.length; j++) {
-			System.out.println(javadocargs[j]);
-		}
-
 		com.sun.tools.javadoc.Main.execute(javadocargs);
 		workMonitor.worked();
 
