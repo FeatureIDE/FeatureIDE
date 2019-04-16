@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.ovgu.featureide</groupId>
     <artifactId>de.ovgu.featureide.root</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.5.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>de.ovgu.featureide.fm.gui-test</artifactId>
@@ -41,7 +41,6 @@
                 	<test>CreateFeatureModelInFeatureIDEProject.test</test>
                 	<test>CreateFeatureModelInJavaProject.test</test>
                 	<!--<test>CreateFeaturesInFeatureDiagram.test</test>-->
-                	<!--<test>DeleteIncludingSubfeaturesInFeatureDiagram.test</test>-->
                 	<!--<test>EditAdvancedConfiguration.test</test>-->
                 	<test>EditConfiguration.test</test>
                 	<!--<test>EditFeatureModelInOutline.test</test>-->

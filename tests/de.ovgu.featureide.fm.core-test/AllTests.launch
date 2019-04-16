@@ -32,6 +32,10 @@
 <stringAttribute key="org.eclipse.cdt.launch.launchGroup.7.enabled" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.launchGroup.7.mode" value="run"/>
 <stringAttribute key="org.eclipse.cdt.launch.launchGroup.7.name" value="de.ovgu.featureide.ui-test"/>
+<stringAttribute key="org.eclipse.cdt.launch.launchGroup.8.action" value="WAIT_FOR_TERMINATION"/>
+<stringAttribute key="org.eclipse.cdt.launch.launchGroup.8.enabled" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.launchGroup.8.mode" value="run"/>
+<stringAttribute key="org.eclipse.cdt.launch.launchGroup.8.name" value="de.ovgu.featureide.fm.attributes-test"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>

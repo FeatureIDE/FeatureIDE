@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
 	<artifactId>de.ovgu.featureide.root</artifactId>
-	<version>3.5.4-SNAPSHOT</version>
+	<version>3.5.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -49,6 +49,7 @@
 		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
+		<module>tests/de.ovgu.featureide.fm.attributes-test</module>
 	</modules>
 
 	<!--The profiles are NightlyUpdates (nu) and GuiTests (gui)

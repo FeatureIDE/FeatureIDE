@@ -60,4 +60,9 @@ public final class FMFormatManager extends FormatManager<IFeatureModel> {
 		return new XmlFeatureModelFormat();
 	}
 
+	@Override
+	public boolean addExtension(IPersistentFormat<IFeatureModel> extension) {
+		return (extension instanceof IPersistentFormat) ? super.addExtension(extension) : false;
+	}
+
 }
