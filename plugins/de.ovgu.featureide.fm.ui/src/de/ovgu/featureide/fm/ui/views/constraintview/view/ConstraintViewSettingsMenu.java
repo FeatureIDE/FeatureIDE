@@ -25,8 +25,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.CreateConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshConstraintViewAction;
@@ -62,9 +62,10 @@ public class ConstraintViewSettingsMenu {
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
 		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
-			if (FeatureModelUtil.getActiveFMEditor() != null) {
+			final FeatureModelEditor featureModelEditor = controller.getFeatureModelEditor();
+			if (featureModelEditor != null) {
 				setStateOfActions(true);
-				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+				graphicalModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
 				refreshAction.update(controller);
 				collapseAction.update(graphicalModel);
 				if (graphicalModel.getLayout().showCollapsedConstraints()) {

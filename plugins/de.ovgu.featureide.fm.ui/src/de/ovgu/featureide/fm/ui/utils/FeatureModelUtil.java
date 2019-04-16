@@ -28,8 +28,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -62,25 +60,4 @@ public class FeatureModelUtil {
 		return null;
 	}
 
-	/**
-	 * This method returns the feature model manager of the active editor.
-	 *
-	 * @return the active feature model manager or {@code null} if none is available.
-	 */
-	@CheckForNull
-	public static FeatureModelManager getFeatureModelManager() {
-		final FeatureModelEditor fmEditor = getActiveFMEditor();
-		return (fmEditor == null) ? null : fmEditor.getFeatureModelManager();
-	}
-
-	/**
-	 * This method returns the original feature model of the active editor.
-	 *
-	 * @return the original feature model or {@code null} if none is available.
-	 */
-	@CheckForNull
-	public static IFeatureModel getOriginalFeatureModel() {
-		final FeatureModelEditor fmEditor = getActiveFMEditor();
-		return (fmEditor == null) ? null : fmEditor.getOriginalFeatureModel();
-	}
 }

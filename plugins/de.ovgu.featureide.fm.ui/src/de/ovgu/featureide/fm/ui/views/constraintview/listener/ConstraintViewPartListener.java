@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview.listener;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -33,6 +34,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author Rosiak Kamil
  */
 public class ConstraintViewPartListener implements IPartListener2 {
+
 	private final ConstraintViewController controller;
 
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
@@ -41,7 +43,14 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partOpened(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID) || part.getId().equals(FeatureModelEditor.ID)) {
+		final String partID = part.getId();
+		if (FeatureModelEditor.ID.equals(partID)) {
+			final IWorkbenchPart activePart = part.getPart(false);
+			if (activePart instanceof FeatureModelEditor) {
+				controller.setFeatureModelEditor((FeatureModelEditor) activePart);
+				controller.setConstraintsHidden(true);
+			}
+		} else if (ConstraintViewController.ID.equals(partID)) {
 			controller.setConstraintsHidden(true);
 		}
 	}
@@ -55,12 +64,15 @@ public class ConstraintViewPartListener implements IPartListener2 {
 			controller.getView().removeAll();
 			controller.getView().addNoFeatureModelItem();
 			controller.getSettingsMenu().setStateOfActions(false);
+			controller.setFeatureModelEditor(null);
 		}
 	}
 
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference part) {
-		if (part.getPart(false) instanceof FeatureModelEditor) {
+		final IWorkbenchPart activePart = part.getPart(false);
+		if (activePart instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
 			controller.checkForRefresh();
 		} else {
 			controller.getView().addNoFeatureModelItem();
@@ -70,10 +82,11 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partActivated(IWorkbenchPartReference part) {
-		if (part.getPart(false) instanceof FeatureModelEditor) {
+		final IWorkbenchPart activePart = part.getPart(false);
+		if (activePart instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
 			controller.checkForRefresh();
-		}
-		if (part.getPart(false) instanceof IEditorPart) {
+		} else if (activePart instanceof IEditorPart) {
 			controller.setConstraintsHidden(controller.isConstraintsHidden());
 		}
 	}

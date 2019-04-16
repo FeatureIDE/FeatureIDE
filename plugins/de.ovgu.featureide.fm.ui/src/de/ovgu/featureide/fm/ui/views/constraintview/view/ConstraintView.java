@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -260,19 +258,7 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn.setMoveable(true);
 		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		constraintColumn.addSelectionListener(new SelectionListener() {
 
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Constraint Header");
-
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
-		});
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);
