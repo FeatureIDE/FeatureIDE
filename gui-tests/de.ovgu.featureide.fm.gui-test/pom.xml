@@ -43,7 +43,6 @@
                 	<test>CreateFeaturesInFeatureDiagram.test</test>
                 	<test>EditAdvancedConfiguration.test</test>
                 	<test>EditConfiguration.test</test>
-                	<!--<test>EditFeatureModelInOutline.test</test>-->
                 	<test>ExplainingAnomaliesInFeatureDiagram.test</test>
                 	<!--<test>HandsOn1.test</test>-->
                 	<!--<test>HandsOn2.test</test>-->
@@ -51,7 +50,7 @@
                 	<!--<test>HandsOn4.test</test>-->
                 	<!--<test>HandsOn5.test</test>-->
                 	<test>SelectingFeaturesInFeatureDiagram.test</test>
-                	<test>SetAbstractInFeatureDiagram.test</test>!
+                	<test>SetAbstractInFeatureDiagram.test</test>
                 	<test>SetCollapsedInFeatureDiagram.test</test>
                 	<test>SetHiddenInFeatureDiagram.test</test>
                 	<!--<test>SetMandatoryInFeatureDiagram.test</test>-->

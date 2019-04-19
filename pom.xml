@@ -49,6 +49,7 @@
 		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
+		<module>tests/de.ovgu.featureide.fm.attributes-test</module>
 	</modules>
 
 	<!--The profiles are NightlyUpdates (nu) and GuiTests (gui)

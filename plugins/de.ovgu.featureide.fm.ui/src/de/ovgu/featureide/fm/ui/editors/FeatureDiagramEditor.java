@@ -1155,6 +1155,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(collapseAction);
 			menuManager.add(collapseFeaturesAction);
+			menuManager.add(calculateDependencyAction);
 			menuManager.add(focusOnExplanationAction);
 			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 				extension.extendContextMenu(menuManager, this);
