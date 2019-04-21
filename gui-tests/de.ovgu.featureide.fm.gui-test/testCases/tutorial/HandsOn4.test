@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _hDk9IOvTEee9ofvBkamr2g
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/28/17 4:59 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/21/19 3:31 PM
 Testcase-Type: ecl
 Verifications: _UKIhUOvaEee9ofvBkamr2g,_gkg-YOvaEee9ofvBkamr2g,_7uNdoOvcEee9ofvBkamr2g,_AxTkEOvdEee9ofvBkamr2g,_gxx6IOvhEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
 
@@ -66,7 +66,7 @@ with [get-view "Project Explorer"] {
             | double-click
     }
 }
-
+/*
 with [get-editor "Elevator-Antenna-v1.2 Model"] {
     click
     with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text ShortestPaht] {
@@ -85,6 +85,24 @@ with [get-editor "Elevator-Antenna-v1.2 Model"] {
     }
 }
 
+get-button "Save (M1+S)" | click*/
+with [get-editor "Elevator-Antenna-v1.2 Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text ShortestPaht] {
+            mouse-move 43 11 button3 -height 19 -width 73
+            mouse-press 43 11 button3 -height 19 -width 73
+            mouse-release 43 11 button3 2097152 -height 19 -width 73
+        }
+        get-menu -path "Rename (F2)" | click
+        get-edit-part -className ModelEditPart | get-edit-part -text ShortestPaht | activate-direct-edit
+        mouse-hover 219 333 -height 524 -width 727
+    }
+    with [get-editbox -index 1] {
+        set-text ShortestPath
+        key-type Enter
+    }
+    get-diagram | commit-direct-edit
+}
 get-button "Save (M1+S)" | click
 get-editor "ControlUnit.java" | click
 get-editor "Request.java" | click
@@ -97,7 +115,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 
 get-view Problems | get-tree 
-    | select "Warnings \\(6 items\\)/DirectionalCall is not defined in the feature model and, thus, always assumed to be false" 
+    | select "Warnings \\(5 items\\)/DirectionalCall is not defined in the feature model and, thus, always assumed to be false" 
     | double-click
 with [get-editor "Request.java" | get-text-viewer] {
     set-caret-pos 176 29
