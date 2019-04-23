@@ -74,36 +74,33 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
-	public List<List<ClauseList>> removeCoreDeadFeatures(List<List<ClauseList>> expressions) {
+	public List<List<ClauseList>> cleanClauses(List<List<ClauseList>> expressions) {
 		final LiteralSet coreDeadFeature = getDeadCoreFeatures();
 
 		final List<List<ClauseList>> newGroupList = new ArrayList<>(expressions.size());
 		for (final List<ClauseList> group : expressions) {
-			if (!coreDeadFeature.isEmpty()) {
-				final List<ClauseList> newNodeList = new ArrayList<>();
-				expressionLoop: for (final List<LiteralSet> clauses : group) {
-					final List<LiteralSet> variableClauses = new ArrayList<>();
-					for (final LiteralSet clause : clauses) {
-						// If clause can be satisfied
-						if ((clause.countConflicts(coreDeadFeature) == 0)) {
-							// If clause is already satisfied
-							if (coreDeadFeature.containsAll(clause)) {
-								continue expressionLoop;
-							} else {
-								variableClauses.add(clause);
-							}
+			final List<ClauseList> newNodeList = new ArrayList<>();
+			expressionLoop: for (final ClauseList clauses : group) {
+				final List<LiteralSet> newClauses = new ArrayList<>();
+				for (final LiteralSet clause : clauses) {
+					// If clause can be satisfied
+					if ((clause.countConflicts(coreDeadFeature) == 0)) {
+						// If clause is already satisfied
+						if (coreDeadFeature.containsAll(clause)) {
+							continue expressionLoop;
+						} else {
+							newClauses.add(clause.clone());
 						}
 					}
-					if (!variableClauses.isEmpty()) {
-						newNodeList.add(new ClauseList(variableClauses));
-					}
 				}
-				newGroupList.add(newNodeList);
-			} else {
-				newGroupList.add(group);
+				if (!newClauses.isEmpty()) {
+					newNodeList.add(new ClauseList(newClauses));
+				}
 			}
+			newGroupList.add(newNodeList);
 		}
 		return newGroupList;
+
 	}
 
 	private LiteralSet getDeadCoreFeatures() {

@@ -197,39 +197,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, solver, incompleteSolutionList);
 			util.computeMIG();
 			migComparator = new MIGComparator(util.getMig());
-			switch (order) {
-			case RANDOM:
-				for (final List<ClauseList> list : nodes) {
-					Collections.shuffle(list, util.getRandom());
-				}
-				break;
-			case SORTED:
-				for (final List<ClauseList> list : nodes) {
-					Collections.shuffle(list, util.getRandom());
-					// TODO use MIG
-					final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
-						@Override
-						public int compare(ClauseList o1, ClauseList o2) {
-							final int clauseCountDiff = o1.size() - o2.size();
-							if (clauseCountDiff != 0) {
-								return clauseCountDiff;
-							}
-							int clauseLengthDiff = 0;
-							for (int i = 0; i < o1.size(); i++) {
-								clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
-							}
-							return clauseLengthDiff;
-						}
-					};
-					Collections.sort(list, comparator);
-				}
-				break;
-			default:
-				throw new AssertionError();
-			}
 		}
-//		expressions = ExpressionConverter.convertToArray2(util.removeCoreDeadFeatures2(nodes));
-		expressions = util.removeCoreDeadFeatures(nodes);
+
+		expressions = util.cleanClauses(nodes);
 		for (final List<ClauseList> list : expressions) {
 			for (int i = 1; i < t; i++) {
 				final ClauseList pseudoClauseList = new ClauseList();
@@ -237,6 +207,38 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				list.add(pseudoClauseList);
 			}
 		}
+
+		switch (order) {
+		case RANDOM:
+			for (final List<ClauseList> list : nodes) {
+				Collections.shuffle(list, util.getRandom());
+			}
+			break;
+		case SORTED:
+			for (final List<ClauseList> list : nodes) {
+				Collections.shuffle(list, util.getRandom());
+				// TODO use MIG
+				final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
+					@Override
+					public int compare(ClauseList o1, ClauseList o2) {
+						final int clauseCountDiff = o1.size() - o2.size();
+						if (clauseCountDiff != 0) {
+							return clauseCountDiff;
+						}
+						int clauseLengthDiff = 0;
+						for (int i = 0; i < o1.size(); i++) {
+							clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
+						}
+						return clauseLengthDiff;
+					}
+				};
+				Collections.sort(list, comparator);
+			}
+			break;
+		default:
+			throw new AssertionError();
+		}
+
 		genHulls();
 
 		numberOfCombinations = getIterator(IteratorID.Lexicographic).size();

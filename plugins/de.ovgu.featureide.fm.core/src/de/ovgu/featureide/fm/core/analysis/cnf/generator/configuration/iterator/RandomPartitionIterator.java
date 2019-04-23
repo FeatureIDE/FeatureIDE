@@ -29,12 +29,11 @@ public class RandomPartitionIterator extends PartitionIterator {
 
 	private static final byte[] seed = new byte[32];
 	{
-		new SecureRandom().nextBytes(seed);
+		new SecureRandom(new byte[0]).nextBytes(seed);
 	}
 
 	public RandomPartitionIterator(int t, List<ClauseList> expressions) {
 		super(t, expressions, 4);
-		new SecureRandom().nextBytes(seed);
 
 		final SecureRandom rand = new SecureRandom(seed);
 		for (int i = 0; i < dim.length; i++) {
