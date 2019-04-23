@@ -518,7 +518,15 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	private void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
+			if (this.featureProject != null) {
+				// Deregister old listener
+				this.featureProject.getFeatureModel().removeListener(this);
+				this.featureProject.getFeatureModelManager().removeListener(this);
+			}
+
 			this.featureProject = featureProject;
+			this.featureProject.getFeatureModel().addListener(this);
+			this.featureProject.getFeatureModelManager().addListener(this);
 
 			if (isActive()) {
 				loadConfigurations();
@@ -614,6 +622,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	@Override
 	public void dispose() {
 		FeatureColorManager.removeListener(this);
+		if (featureProject != null) {
+			featureProject.getFeatureModel().removeListener(this);
+			featureProject.getFeatureModelManager().removeListener(this);
+		}
 		final IWorkbenchPage page = getSite().getPage();
 		page.removePartListener(partListener);
 		header.removeColumnSelectionListener(this);
@@ -628,6 +640,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		switch (prop) {
 		case COLOR_CHANGED:
 			updateTree();
+			break;
+		case MODEL_DATA_SAVED:
+			for (final IConfigurationMapFilter filter : getFilters()) {
+				filter.initialize(this);
+			}
+			updateElements();
 			break;
 		default:
 			break;
