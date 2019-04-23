@@ -36,9 +36,11 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -129,6 +131,9 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	// MODEL
 	private IFeatureProject featureProject;
 
+	// The scrolled composite is used to scroll the table and the headers
+	private ScrolledComposite scolledComposite;
+
 	public ConfigurationMap() {
 		final IConfigurationLoaderCallback configLoaderCallback = new IConfigurationLoaderCallback() {
 
@@ -211,21 +216,29 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent2) {
+		// Create the ScrolledComposite to scroll horizontally and vertically
+		final ScrolledComposite sc = new ScrolledComposite(parent2, SWT.H_SCROLL);
+
+		// Create a child composite to hold the controls
+		final Composite parent = new Composite(sc, SWT.NONE);
+
+		scolledComposite = sc;
 		gridColumns = 1;
 		this.parent = parent;
 		columnHighlightColor = new Color(parent.getDisplay(), 181, 181, 197);
 
-		final GridLayout layout = new GridLayout(gridColumns, true);
-		layout.verticalSpacing = 0;
-		layout.horizontalSpacing = 0;
-		parent.setLayout(layout);
+		// Set Layout for parent composite
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
+		parent.setLayout(gridLayout);
 
-		// HEADER
-		header = new CustomTableHeader(parent, SWT.FILL);
-		tableTree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		// Define header and tree
+		header = new CustomTableHeader(parent, SWT.NONE);
+		tableTree = new Tree(parent, SWT.V_SCROLL);
 		headerBackground = header.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 
+		// Layout Header
 		final GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		headerGridData.horizontalSpan = gridColumns;
 		header.setLayoutData(headerGridData);
@@ -235,8 +248,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		header.setHighlightColor(columnHighlightColor);
 		header.addColumnSelectionListener(this);
 
-		// TREE
-		final GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
+		// Layout Tree
+		final GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		tableTreeGridData.horizontalSpan = gridColumns;
 		tableTree.setLayoutData(tableTreeGridData);
 		tableTree.setHeaderVisible(false);
@@ -348,6 +361,16 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		} else {
 			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
 		}
+
+		// Set the child as the scrolled content of the ScrolledComposite
+		sc.setContent(parent);
+
+		// Calculate
+		sc.setMinSize(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+		// Expand both horizontally and vertically
+		sc.setExpandHorizontal(true);
+		sc.setExpandVertical(true);
 	}
 
 	private void createToolbar() {
@@ -460,9 +483,20 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		updateGUI();
 	}
 
+	private void resize() {
+		// Height is constant for the scrollable view because it must only
+		// scroll horizontally. Scrolling vertically is performed by the tree.
+		final int height = 500;
+		// The width is calculated of the child component
+		// containing the different headers for the configurations
+		final int width = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		scolledComposite.setMinSize(new Point(width, height));
+	}
+
 	public void refresh() {
 		loadConfigurations();
 		updateGUI(true);
+		resize();
 	}
 
 	public void updateGUI() {
@@ -478,10 +512,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public void updateTree() {
 		tree.refresh();
+		resize();
 	}
 
 	public void updateElements() {
 		treeViewerContentProvider.updateElements();
+		resize();
 	}
 
 	private void updateHeaderHeight() {
