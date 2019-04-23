@@ -210,12 +210,12 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		switch (order) {
 		case RANDOM:
-			for (final List<ClauseList> list : nodes) {
+			for (final List<ClauseList> list : expressions) {
 				Collections.shuffle(list, util.getRandom());
 			}
 			break;
 		case SORTED:
-			for (final List<ClauseList> list : nodes) {
+			for (final List<ClauseList> list : expressions) {
 				Collections.shuffle(list, util.getRandom());
 				// TODO use MIG
 				final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
