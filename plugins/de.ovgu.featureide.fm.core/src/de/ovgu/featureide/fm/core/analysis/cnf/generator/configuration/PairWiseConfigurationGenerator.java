@@ -164,9 +164,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 	protected final Deque<Integer> parentStack = new LinkedList<>();
 	protected byte[] recArray = new byte[0];
 
-//	protected final Deque<Configuration> tempConfigurationList = new LinkedList<>();
-//	public final BlockingQueue<Configuration> q = new LinkedBlockingQueue<>();
-
 	protected long time = 0;
 
 	private int[] allYesSolution, allNoSolution;
@@ -176,25 +173,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		this.maxNumber = maxNumber;
 		numVariables = solver.getSatInstance().getVariables().size();
 	}
-
-//	public List<LiteralSet> getConfigurations() {
-////		clearTempConfigurations();
-//		final ArrayList<LiteralSet> ret = new ArrayList<>(finalConfigurationList.size());
-//		for (final Configuration model : finalConfigurationList) {
-////			ret.add(new LiteralSet(model.getModel()));
-//			addResult(new Solution(model.getModel().getLiterals()));
-//		}
-//		return ret;
-//	}
-
-//	public LiteralSet getNextConfiguration() {
-//		final Configuration nextConfig;
-//		synchronized (tempConfigurationList) {
-//			nextConfig = tempConfigurationList.removeFirst();
-//		}
-//		finalConfigurationList.add(nextConfig);
-//		return new LiteralSet(nextConfig.getModel());
-//	}
 
 	protected void addCombinationsFromModel(int[] curModel) {
 		for (int i = 0; i < combinations2.length; i++) {
@@ -363,13 +341,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 		return (oldXY != combinations[combinationIndexXY]) || (oldYX != combinations[combinationIndexYX]);
 	}
-
-//	protected void clearTempConfigurations() {
-//		synchronized (tempConfigurationList) {
-//			finalConfigurationList.addAll(tempConfigurationList);
-//			tempConfigurationList.clear();
-//		}
-//	}
 
 	protected int count(int[] curModel) {
 		int partCount = 0;
@@ -583,11 +554,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 	protected int getLastCoverage() {
 		return (finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage();
-//		synchronized (tempConfigurationList) {
-//			return (tempConfigurationList.isEmpty())
-//				? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
-//				: tempConfigurationList.getLast().getTotalCoverage();
-//		}
 	}
 
 	protected int[] getModel(final Collection<int[]> solutions) {
@@ -604,48 +570,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		}
 		final int partCount = count(curModel) - fixedPartCount;
 		final Configuration config = new Configuration(new LiteralSet(curModel), partCount - getLastCoverage(), partCount);
-
-//		final int lesserCount = 0;
-//		synchronized (tempConfigurationList) {
-//			if (!tempConfigurationList.isEmpty() && config.isBetterThan(tempConfigurationList.getLast())) {
-//				while (config.isBetterThan(tempConfigurationList.getLast()) && ((count - lesserCount) > finalCount)) {
-//					final Configuration lastConfig = tempConfigurationList.removeLast();
-//					solver.removeClause(lastConfig.getBlockingClauseConstraint());
-//					lesserCount++;
-//				}
-//			}
-//		}
-//		if (lesserCount > 0) {
-//			count -= lesserCount;
-//
-//			for (int i = 0; i < comboIndex.length; i++) {
-//				if (comboIndex[i] >= count) {
-//					byte bit = 0;
-//					switch (i % 4) {
-//					case 0:
-//						bit = BIT_00;
-//						break;
-//					case 1:
-//						bit = BIT_01;
-//						break;
-//					case 2:
-//						bit = BIT_10;
-//						break;
-//					case 3:
-//						bit = BIT_11;
-//						break;
-//					}
-//					combinations2[i / 4] &= ~(bit);
-//					comboIndex[i] = 0;
-//				}
-//			}
-//			final int newPartCount = count(curModel) - fixedPartCount;
-//			config.setTotalCoverage(newPartCount);
-//			config.setDeltaCoverage(newPartCount - getLastCoverage());
-//		}
-//		synchronized (tempConfigurationList) {
-//			tempConfigurationList.add(config);
-//		}
 
 		addCombinationsFromModel(curModel);
 
@@ -679,7 +603,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 		config.time = System.nanoTime() - time;
 		addResult(new Solution(config.getModel()));
-//		q.offer(config);
 		time = System.nanoTime();
 
 		try {
@@ -905,9 +828,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			return;
 		}
 		time = System.nanoTime();
-//		synchronized (tempConfigurationList) {
-//			tempConfigurationList.clear();
-//		}
 
 		solver.useSolutionList(Math.min(solver.getSatInstance().getVariables().size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
@@ -942,7 +862,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		// allyes
 		handleNewConfig(allYesSolution, featuresUsedOrg);
 		if (maxNumber == 1) {
-//			getConfigurations();
 			return;
 		}
 		// allno
@@ -1010,7 +929,6 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			}
 			solver.assignmentClear(numberOfFixedFeatures);
 		}
-//		getConfigurations();
 	}
 
 }
