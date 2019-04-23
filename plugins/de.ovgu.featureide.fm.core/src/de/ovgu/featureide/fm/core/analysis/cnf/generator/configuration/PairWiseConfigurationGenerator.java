@@ -421,7 +421,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 					case TRUE:
 						solver.assignmentPop();
 						SatUtils.updateSolution(model1Copy, solver.getSolution());
-						solver.shuffleOrder();
+						solver.shuffleOrder(random);
 						break;
 					}
 				}
@@ -760,7 +760,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.shuffleOrder();
+						solver.shuffleOrder(random);
 						solver.assignmentPop();
 						break;
 					}

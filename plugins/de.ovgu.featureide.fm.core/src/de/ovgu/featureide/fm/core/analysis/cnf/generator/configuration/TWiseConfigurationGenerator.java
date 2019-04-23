@@ -256,11 +256,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
-//	@Override
-//	public LiteralSet[] getNodeArray() {
-//		return nodeArray;
-//	}
-
 	protected ICombinationIterator getIterator(IteratorID id) {
 		count = numberOfCombinations;
 		phaseCount++;
