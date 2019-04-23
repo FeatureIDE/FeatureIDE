@@ -28,8 +28,6 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Order;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Phase;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -39,9 +37,6 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  */
 public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solution>> implements IConfigurationGenerator {
-
-	public static Order order = Order.SORTED;
-	public static Phase phase = Phase.SINGLE;
 
 	protected final int maxSampleSize;
 

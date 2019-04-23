@@ -78,6 +78,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
+	public static Order order = Order.SORTED;
+	public static Phase phase = Phase.SINGLE;
+
 	protected final TWiseConfigurationUtil util;
 
 	protected final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
