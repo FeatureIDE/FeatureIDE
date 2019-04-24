@@ -108,6 +108,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		createXmlDoc(doc);
 	}
 
+	@Override
+	protected String prettyPrint(String text) {
+		return text;
+	}
+
 	/**
 	 * Creates the DOM Document Representation from the feature model fmodel by using createXmlDocRec
 	 *

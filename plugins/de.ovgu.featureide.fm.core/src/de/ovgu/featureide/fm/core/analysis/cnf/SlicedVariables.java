@@ -36,6 +36,8 @@ public class SlicedVariables extends Variables {
 	protected final int[] orgToInternal;
 	protected final int[] internalToOrg;
 
+	protected String[] intToVarSliced;
+
 	public SlicedVariables(Variables orgVariables, Collection<String> varNameList) {
 		super(orgVariables);
 
@@ -127,6 +129,22 @@ public class SlicedVariables extends Variables {
 	public int getVariable(String varName) {
 		final Integer var = varToInt.get(varName);
 		return var == null ? 0 : orgToInternal[var] == 0 ? 0 : var;
+	}
+
+	@Override
+	public String getName(final int x) {
+		return intToVar[internalToOrg[Math.abs(x)]];
+	}
+
+	@Override
+	public String[] getNames() {
+		if (intToVarSliced == null) {
+			intToVarSliced = new String[internalToOrg.length];
+			for (int i = 1; i < intToVarSliced.length; i++) {
+				intToVarSliced[i] = intToVar[internalToOrg[i]];
+			}
+		}
+		return intToVarSliced;
 	}
 
 	@Override

@@ -54,11 +54,11 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Generates configurations for a given propositional formula such that t-wise feature coverage is achieved.
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
+public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
 	private static class Pair<A, B> {
 		private final A key;
@@ -77,6 +77,9 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 			return value;
 		}
 	}
+
+	public static Order order = Order.SORTED;
+	public static Phase phase = Phase.SINGLE;
 
 	protected final TWiseConfigurationUtil util;
 
@@ -136,7 +139,47 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 		return 1 - (((double) count) / numberOfCombinations);
 	}
 
-	public TWiseConfigurationGeneratorPartion(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
+	/**
+	 * Converts a set of single literals into a grouped expression list.
+	 *
+	 * @param literalSet the literal set
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertLiterals(LiteralSet literalSet) {
+		return convertGroupedLiterals(Arrays.asList(literalSet));
+	}
+
+	/**
+	 * Converts a grouped set of single literals into a grouped expression list.
+	 *
+	 * @param groupedLiterals the grouped literal sets
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertGroupedLiterals(List<LiteralSet> groupedLiterals) {
+		final List<List<ClauseList>> groupedExpressions = new ArrayList<>(groupedLiterals.size());
+		for (final LiteralSet literalSet : groupedLiterals) {
+			final List<ClauseList> arrayList = new ArrayList<>(literalSet.size());
+			groupedExpressions.add(arrayList);
+			for (final Integer literal : literalSet.getLiterals()) {
+				final ClauseList clauseList = new ClauseList(1);
+				clauseList.add(new LiteralSet(literal));
+				arrayList.add(clauseList);
+			}
+		}
+		return groupedExpressions;
+	}
+
+	/**
+	 * Converts an expression list into a grouped expression set with a single group.
+	 *
+	 * @param expressions the expression list
+	 * @return a grouped expression list (can be used as an input for the configuration generator).
+	 */
+	public static List<List<ClauseList>> convertExpressions(List<ClauseList> expressions) {
+		return Arrays.asList(expressions);
+	}
+
+	public TWiseConfigurationGenerator(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
 		super(cnf, maxSampleSize);
 		this.t = t;
 
@@ -154,39 +197,47 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 			util = new TWiseConfigurationUtil(cnf, solver, incompleteSolutionList);
 			util.computeMIG();
 			migComparator = new MIGComparator(util.getMig());
-			switch (order) {
-			case RANDOM:
-				for (final List<ClauseList> list : nodes) {
-					Collections.shuffle(list, util.getRandom());
-				}
-				break;
-			case SORTED:
-				for (final List<ClauseList> list : nodes) {
-					Collections.shuffle(list, util.getRandom());
-					// TODO use MIG
-					final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
-						@Override
-						public int compare(ClauseList o1, ClauseList o2) {
-							final int clauseCountDiff = o1.size() - o2.size();
-							if (clauseCountDiff != 0) {
-								return clauseCountDiff;
-							}
-							int clauseLengthDiff = 0;
-							for (int i = 0; i < o1.size(); i++) {
-								clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
-							}
-							return clauseLengthDiff;
-						}
-					};
-					Collections.sort(list, comparator);
-				}
-				break;
-			default:
-				throw new AssertionError();
+		}
+
+		expressions = util.cleanClauses(nodes);
+		for (final List<ClauseList> list : expressions) {
+			for (int i = 1; i < t; i++) {
+				final ClauseList pseudoClauseList = new ClauseList();
+				pseudoClauseList.add(new LiteralSet());
+				list.add(pseudoClauseList);
 			}
 		}
-//		expressions = ExpressionConverter.convertToArray2(util.removeCoreDeadFeatures2(nodes));
-		expressions = util.removeCoreDeadFeatures2(nodes);
+
+		switch (order) {
+		case RANDOM:
+			for (final List<ClauseList> list : expressions) {
+				Collections.shuffle(list, util.getRandom());
+			}
+			break;
+		case SORTED:
+			for (final List<ClauseList> list : expressions) {
+				Collections.shuffle(list, util.getRandom());
+				// TODO use MIG
+				final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
+					@Override
+					public int compare(ClauseList o1, ClauseList o2) {
+						final int clauseCountDiff = o1.size() - o2.size();
+						if (clauseCountDiff != 0) {
+							return clauseCountDiff;
+						}
+						int clauseLengthDiff = 0;
+						for (int i = 0; i < o1.size(); i++) {
+							clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
+						}
+						return clauseLengthDiff;
+					}
+				};
+				Collections.sort(list, comparator);
+			}
+			break;
+		default:
+			throw new AssertionError();
+		}
 
 		genHulls();
 
@@ -206,11 +257,6 @@ public class TWiseConfigurationGeneratorPartion extends AConfigurationGenerator 
 			addResult(configuration.getSolution());
 		}
 	}
-
-//	@Override
-//	public LiteralSet[] getNodeArray() {
-//		return nodeArray;
-//	}
 
 	protected ICombinationIterator getIterator(IteratorID id) {
 		count = numberOfCombinations;

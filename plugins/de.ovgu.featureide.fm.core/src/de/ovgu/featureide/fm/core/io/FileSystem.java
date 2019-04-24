@@ -43,6 +43,8 @@ public final class FileSystem {
 		void delete(Path path) throws IOException;
 
 		boolean exists(Path path);
+
+		Path getLib(Path path);
 	}
 
 	public static IFileSystem INSTANCE = new JavaFileSystem();
@@ -77,6 +79,10 @@ public final class FileSystem {
 
 	public static String readtoString(Path path) throws IOException {
 		return new String(INSTANCE.read(path), Charset.forName("UTF-8"));
+	}
+
+	public static Path getLib(Path path) {
+		return INSTANCE.getLib(path);
 	}
 
 	private FileSystem() {}

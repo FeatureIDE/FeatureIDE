@@ -31,8 +31,17 @@ public class Solution extends LiteralSet {
 
 	private static final long serialVersionUID = -3058742332393418632L;
 
-	public Solution(Solution clause) {
-		super(clause);
+	public Solution(LiteralSet clause) {
+		super(sortLiterals(clause.getLiterals()), false);
+	}
+
+	private static int[] sortLiterals(int[] literals) {
+		final int[] sortedLiterals = new int[literals.length];
+		for (int i = 0; i < literals.length; i++) {
+			final int literal = literals[i];
+			sortedLiterals[Math.abs(literal) - 1] = literal;
+		}
+		return sortedLiterals;
 	}
 
 	public Solution(int... literals) {
@@ -99,7 +108,7 @@ public class Solution extends LiteralSet {
 
 	@Override
 	public Solution negate() {
-		final int[] negLiterals = Arrays.copyOf(literals, literals.length);
+		final int[] negLiterals = new int[literals.length];
 		for (int i = 0; i < negLiterals.length; i++) {
 			negLiterals[i] = -literals[i];
 		}

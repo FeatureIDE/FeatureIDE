@@ -155,7 +155,7 @@ public abstract class Node {
 
 	protected abstract Node eliminateNonCNFOperators(Node[] newChildren);
 
-	private static Node deMorgan(Node node) {
+	public static Node deMorgan(Node node) {
 		if (node instanceof Literal) {
 			return node;
 		} else if (node instanceof Not) {

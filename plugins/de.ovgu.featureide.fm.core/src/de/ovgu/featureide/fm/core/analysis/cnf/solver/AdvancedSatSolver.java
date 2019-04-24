@@ -47,6 +47,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	protected final int[] order;
 
 	protected RingList<int[]> solutionList = RingList.empytRingList();
+	protected boolean useSolutionList = false;
 	protected SelectionStrategy strategy = SelectionStrategy.ORG;
 
 	protected boolean globalTimeout = false;
@@ -167,7 +168,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	public SatResult hasSolution() {
 		try {
 			if (solver.isSatisfiable(assignment, globalTimeout)) {
-				// solutionList.add(solver.model());
+				addSolution();
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
@@ -190,7 +191,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 			// TODO why is this necessary?
 			solver.setKeepSolverHot(true);
 			if (solver.isSatisfiable(new VecInt(unitClauses), globalTimeout)) {
-				// solutionList.add(solver.model());
+				addSolution();
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
@@ -198,6 +199,12 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
+		}
+	}
+
+	private void addSolution() {
+		if (useSolutionList) {
+			solutionList.add(solver.model());
 		}
 	}
 
@@ -278,7 +285,13 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void useSolutionList(int size) {
-		solutionList = new RingList<>(size);
+		if (size > 0) {
+			solutionList = new RingList<>(size);
+			useSolutionList = true;
+		} else {
+			solutionList = RingList.empytRingList();
+			useSolutionList = false;
+		}
 	}
 
 	@Override

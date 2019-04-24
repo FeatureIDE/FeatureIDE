@@ -21,12 +21,11 @@
 package de.ovgu.featureide.fm.core.io.dimacs;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * Transforms instances of {@link Node} into DIMACS CNF file format.
@@ -34,10 +33,9 @@ import org.prop4j.Node;
  * @author Timo Günther
  * @author Sebastian Krieter
  */
-public class DimacsWriter extends ADimacsWriter {
+public class DimacsWriterCNF extends ADimacsWriter {
 
-	/** The clauses of the CNF to transform. */
-	private final List<Node> clauses;
+	private final CNF cnf;
 
 	/**
 	 * Constructs a new instance of this class with the given CNF.
@@ -45,9 +43,9 @@ public class DimacsWriter extends ADimacsWriter {
 	 * @param cnf the CNF to transform; not null
 	 * @throws IllegalArgumentException if the input is null or not in CNF
 	 */
-	public DimacsWriter(Node cnf) throws IllegalArgumentException {
-		super(cnf.getUniqueVariables());
-		clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
+	public DimacsWriterCNF(CNF cnf) throws IllegalArgumentException {
+		super(Arrays.asList(cnf.getVariables().getNames()).subList(1, cnf.getVariables().size() + 1));
+		this.cnf = cnf;
 	}
 
 	/**
@@ -56,8 +54,8 @@ public class DimacsWriter extends ADimacsWriter {
 	 * @param sb the string builder that builds the document
 	 * @param clause clause to transform; not null
 	 */
-	private void writeClause(StringBuilder sb, Node clause) {
-		for (final Literal l : clause.getUniqueLiterals()) {
+	private void writeClause(StringBuilder sb, LiteralSet clause) {
+		for (final int l : clause.getLiterals()) {
 			writeLiteral(sb, l);
 			sb.append(" ");
 		}
@@ -71,23 +69,20 @@ public class DimacsWriter extends ADimacsWriter {
 	 * @param sb the string builder that builds the document
 	 * @param l literal to transform; not null
 	 */
-	private void writeLiteral(StringBuilder sb, Literal l) {
-		int index = variableIndexes.get(l.var);
-		if (!l.positive) {
-			index = -index;
-		}
-		sb.append(String.valueOf(index));
+	private void writeLiteral(StringBuilder sb, int l) {
+		sb.append(String.valueOf(l));
 	}
 
 	@Override
 	protected int getNumberOfClauses() {
-		return clauses.size();
+		return cnf.getClauses().size();
 	}
 
 	@Override
 	protected void writeClauses(StringBuilder sb) {
-		for (final Node clause : clauses) {
-			writeClause(sb, clause);
+		for (final LiteralSet clause : cnf.getClauses()) {
+			writeClause(sb, cnf.getInternalVariables().convertToInternal(clause).clean());
 		}
 	}
+
 }

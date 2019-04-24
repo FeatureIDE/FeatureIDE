@@ -18,33 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.security.SecureRandom;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
-public class RandomPartitionIterator extends PartitionIterator {
+/**
+ * Generates certain configurations for a given propositional formulas.
+ *
+ * @author Sebastian Krieter
+ */
+public interface IConfigurationGenerator extends IAnalysis<List<Solution>> {
 
-	private static final byte[] seed = new byte[32];
-	{
-		new SecureRandom(new byte[0]).nextBytes(seed);
-	}
+	List<Solution> analyze(IMonitor monitor) throws Exception;
 
-	public RandomPartitionIterator(int t, List<ClauseList> expressions) {
-		super(t, expressions, 4);
-
-		final SecureRandom rand = new SecureRandom(seed);
-		for (int i = 0; i < dim.length; i++) {
-			final int[] dimArray = dim[i];
-			for (int j = dimArray.length - 1; j >= 0; j--) {
-				final int index = rand.nextInt(j + 1);
-				final int a = dimArray[index];
-				dimArray[index] = dimArray[j];
-				dimArray[j] = a;
-			}
-		}
-	}
+	LinkedBlockingQueue<Solution> getResultQueue();
 
 }

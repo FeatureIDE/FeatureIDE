@@ -12,7 +12,10 @@ Bundle-ClassPath: .,
  lib/guidsl.jar,
  lib/jakarta.jar,
  lib/org.sat4j.core.jar,
- lib/org.sat4j.pb.jar
+ lib/org.sat4j.pb.jar,
+ lib/splar.jar,
+ lib/SPLCAT.jar,
+ lib/commons-math-2.2.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
@@ -30,7 +33,6 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.analysis.cnf,
  de.ovgu.featureide.fm.core.analysis.cnf.analysis,
  de.ovgu.featureide.fm.core.analysis.cnf.formula,
- de.ovgu.featureide.fm.core.analysis.cnf.generator,
  de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration,
  de.ovgu.featureide.fm.core.analysis.cnf.manipulator,
  de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove,

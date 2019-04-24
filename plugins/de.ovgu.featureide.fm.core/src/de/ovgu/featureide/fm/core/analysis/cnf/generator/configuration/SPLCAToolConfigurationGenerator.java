@@ -18,32 +18,28 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
-import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
 
-import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.internal.util.BundleUtility;
-
-import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
+import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 import no.sintef.ict.splcatool.CoveringArray;
 import no.sintef.ict.splcatool.CoveringArrayCASA;
 import no.sintef.ict.splcatool.CoveringArrayGenerationException;
@@ -54,38 +50,31 @@ import splar.core.fm.FeatureModelException;
  * Generates T-wise configurations using SPLATool.
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-@SuppressWarnings("restriction")
-public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
+public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AConfigurationGenerator
+		implements ITWiseConfigurationGenerator {
 
+	private final IFeatureModel featureModel;
 	private final String algorithm;
 	private final int t;
 
-	public SPLCAToolConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String algorithm, int t) {
-		super(builder, featureProject);
+	public SPLCAToolConfigurationGenerator(CNF cnf, int maxSampleSize, int t, String algorithm) {
+		super(cnf, maxSampleSize);
+		featureModel = DefaultFeatureModelFactory.getInstance().createFeatureModel();
+		new DIMACSFormat().read(featureModel, new DIMACSFormatCNF().write(cnf));
 		this.algorithm = algorithm;
 		this.t = t;
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
-		runSPLCATool();
-		return null;
-	}
-
-	private void runSPLCATool() {
+	protected void generate(IMonitor monitor) throws Exception {
 		CoveringArray ca = null;
 		final boolean casa = algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
 		try {
 			if (casa) {
-				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
-				try {
-					url = FileLocator.toFileURL(url);
-				} catch (final IOException e) {
-					UIPlugin.getDefault().logError(e);
-				}
-				final Path path = new Path(url.getFile());
-				CoveringArrayCASA.CASA_PATH = path.toOSString();
+				final String string = FileSystem.getLib(Paths.get("lib/cover.exe")).toString();
+				CoveringArrayCASA.CASA_PATH = string;
 			}
 
 			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
@@ -94,20 +83,10 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 			}
 			ca.generate();
 		} catch (FeatureModelException | TimeoutException | CoveringArrayGenerationException e) {
-			UIPlugin.getDefault().logError(e);
+			Logger.logError(e);
 			return;
 		} catch (final Exception e) {
-			final Display display = Display.getDefault();
-			display.syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					final String errorMessage = algorithm + " experienced an error during its execution.\n"
-						+ (casa ? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
-					new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
-							new String[] { OK }, 0).open();
-				}
-			});
+			Logger.logError(e);
 			return;
 		}
 
@@ -115,15 +94,21 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		try {
 			solutions = removeDuplicates(ca);
 		} catch (final Exception e) {
-			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
+			Logger.logWarning("Problems occurred during the execution of " + algorithm);
 		}
-		builder.configurationNumber = solutions.size();
+		final IVariables variables = solver.getSatInstance().getVariables();
 		for (final List<String> solution : solutions) {
-			configuration.resetValues();
-			for (final String selection : solution) {
-				configuration.setManual(selection, Selection.SELECTED);
+			final int[] literals = new int[variables.size()];
+			for (int i = 0; i < literals.length; i++) {
+				literals[i] = -(i + 1);
 			}
-			addConfiguration(configuration);
+			for (final String selection : solution) {
+				final int variable = solver.getSatInstance().getInternalVariables().convertToInternal(variables.getVariable(selection));
+				if (variable != 0) {
+					literals[variable - 1] = variable;
+				}
+			}
+			addResult(new Solution(literals));
 		}
 	}
 
@@ -154,7 +139,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		}
 		final int difference = solutions.size() - duplicateFreeSolutions.size();
 		if (difference > 0) {
-			UIPlugin.getDefault().logInfo(difference + " duplicate solutions skipped!");
+			Logger.logInfo(difference + " duplicate solutions skipped!");
 		}
 		return duplicateFreeSolutionList;
 	}

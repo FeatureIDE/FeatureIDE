@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.Set;
 
 import org.sat4j.specs.ContradictionException;
@@ -77,6 +78,8 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final int numberOfVariables;
 
 	private ISatSolver solver;
+
+	protected Random random = new Random(112358);
 
 	public MIGBuilder(CNF satInstance, boolean detectStrong) {
 		this.satInstance = satInstance;
@@ -506,7 +509,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					case TRUE:
 						solver.assignmentPop();
 						SatUtils.updateSolution(firstSolution, solver.getSolution());
-						solver.shuffleOrder();
+						solver.shuffleOrder(random);
 						break;
 					}
 				}
@@ -580,7 +583,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.shuffleOrder();
+						solver.shuffleOrder(random);
 						solver.assignmentPop();
 						break;
 					}

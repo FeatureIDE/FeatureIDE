@@ -18,14 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
+ * Generates all configurations for a given propositional formula.
  *
- * @author skrieter
+ * @author Sebastian Krieter
  */
-public class EmptyClauseException extends Exception {
+public class NullConfigurationGenerator extends AConfigurationGenerator {
 
-	private static final long serialVersionUID = -218852721987522485L;
+	public NullConfigurationGenerator(CNF cnf) {
+		super(cnf);
+	}
+
+	public NullConfigurationGenerator(ISatSolver solver) {
+		super(solver);
+	}
+
+	public NullConfigurationGenerator(CNF cnf, int maxNumber) {
+		super(cnf, maxNumber);
+	}
+
+	public NullConfigurationGenerator(ISatSolver solver, int maxNumber) {
+		super(solver, maxNumber);
+	}
+
+	@Override
+	protected void generate(IMonitor monitor) throws Exception {}
 
 }
