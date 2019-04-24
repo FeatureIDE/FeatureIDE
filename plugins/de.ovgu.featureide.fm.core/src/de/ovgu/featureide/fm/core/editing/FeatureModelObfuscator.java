@@ -145,13 +145,13 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		digest.update(string.getBytes(StandardCharsets.UTF_8));
 		final byte[] hash = digest.digest();
 
-		return Base32Encoder.encode(result, 2, hash);
+		return Base32Encoder.encode(result, 0, hash);
 	}
 
 	public static String getRandomSalt() {
 		final byte[] saltArray = new byte[24];
 		secureRandom.nextBytes(saltArray);
-		return Base32Encoder.encode(new char[32], 0, saltArray);
+		return Base32Encoder.encode(new char[20], 0, saltArray);
 	}
 
 }
