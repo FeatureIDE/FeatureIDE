@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.util.Random;
-
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
@@ -35,19 +33,10 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class RandomConfigurationGenerator extends AConfigurationGenerator {
+public class RandomConfigurationGenerator extends ARandomConfigurationGenerator {
 
-	private final Random rnd;
-	private final boolean allowDuplicates;
-
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates) {
-		this(cnf, maxNumber, allowDuplicates, new Random());
-	}
-
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber, boolean allowDuplicates, Random rnd) {
+	public RandomConfigurationGenerator(CNF cnf, int maxNumber) {
 		super(cnf, maxNumber);
-		this.allowDuplicates = allowDuplicates;
-		this.rnd = rnd;
 	}
 
 	@Override
@@ -56,7 +45,7 @@ public class RandomConfigurationGenerator extends AConfigurationGenerator {
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
 		for (int i = 0; i < maxSampleSize; i++) {
-			solver.shuffleOrder(rnd);
+			solver.shuffleOrder(random);
 			final int[] solution = solver.findSolution();
 			if (solution == null) {
 				break;

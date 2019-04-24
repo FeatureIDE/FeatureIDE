@@ -30,6 +30,7 @@ import org.sat4j.specs.IConstr;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
@@ -181,7 +182,7 @@ public class EmptySatSolver implements ISatSolver {
 	public void setSelectionStrategy(int[] model, boolean min) {}
 
 	@Override
-	public void setSelectionStrategy(List<int[]> sample) {}
+	public void setSelectionStrategy(List<Solution> sample) {}
 
 	@Override
 	public void useSolutionList(int size) {}

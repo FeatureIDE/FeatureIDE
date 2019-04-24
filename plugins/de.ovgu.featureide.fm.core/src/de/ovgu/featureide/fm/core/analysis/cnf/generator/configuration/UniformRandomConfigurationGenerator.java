@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
 import java.util.List;
-import java.util.Random;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -36,24 +35,19 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class UniformRandomConfigurationGenerator extends AConfigurationGenerator {
+public class UniformRandomConfigurationGenerator extends ARandomConfigurationGenerator {
 
-	private Random rnd = new Random();
-	private boolean allowDuplicates = true;
 	private int sampleSize = 1000;
 
 	public UniformRandomConfigurationGenerator(CNF cnf, int maxNumber) {
-		super(cnf, maxNumber, true);
-	}
-
-	public UniformRandomConfigurationGenerator(CNF cnf, int maxNumber, boolean incremental) {
-		super(cnf, maxNumber, incremental);
+		super(cnf, maxNumber);
 	}
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-		final AConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize, false, rnd);
-		final List<int[]> sample = LongRunningWrapper.runMethod(gen);
+		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
+		gen.setRandom(random);
+		final List<Solution> sample = LongRunningWrapper.runMethod(gen);
 
 		monitor.setRemainingWork(maxSampleSize);
 		solver.setSelectionStrategy(sample);
@@ -75,24 +69,8 @@ public class UniformRandomConfigurationGenerator extends AConfigurationGenerator
 		}
 	}
 
-	public boolean isAllowDuplicates() {
-		return allowDuplicates;
-	}
-
-	public void setAllowDuplicates(boolean allowDuplicates) {
-		this.allowDuplicates = allowDuplicates;
-	}
-
-	public Random getRnd() {
-		return rnd;
-	}
-
 	public int getSampleSize() {
 		return sampleSize;
-	}
-
-	public void setRnd(Random rnd) {
-		this.rnd = rnd;
 	}
 
 	public void setSampleSize(int sampleSize) {

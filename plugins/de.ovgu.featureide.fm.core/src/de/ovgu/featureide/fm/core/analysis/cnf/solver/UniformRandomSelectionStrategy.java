@@ -31,6 +31,8 @@ import java.util.Random;
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+
 /**
  * Uses a sample of configurations to achieve a phase selection that corresponds to a uniform distribution of configurations in the configuration space.
  *
@@ -42,20 +44,21 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 
 	public static final Random RAND = new Random(123456789);
 
-	private final LinkedList<int[]> usedSamples = new LinkedList<>();
-	private final LinkedList<int[]> notUsedSamples = new LinkedList<>();
+	private final LinkedList<Solution> usedSamples = new LinkedList<>();
+	private final LinkedList<Solution> notUsedSamples = new LinkedList<>();
 
 	private final int[] model;
 	private final int[] ratio;
 
-	public UniformRandomSelectionStrategy(List<int[]> sample) {
+	public UniformRandomSelectionStrategy(List<Solution> sample) {
 		usedSamples.addAll(sample);
-		model = new int[sample.get(0).length];
-		ratio = new int[sample.get(0).length];
+		model = new int[sample.get(0).size()];
+		ratio = new int[sample.get(0).size()];
 
-		for (final int[] solution : usedSamples) {
-			for (int i = 0; i < solution.length; i++) {
-				if (solution[i] > 0) {
+		for (final Solution solution : usedSamples) {
+			final int[] literals = solution.getLiterals();
+			for (int i = 0; i < literals.length; i++) {
+				if (literals[i] > 0) {
 					ratio[i]++;
 				}
 			}
@@ -97,13 +100,14 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	private void updateRatioUnset(int literal) {
-		for (final Iterator<int[]> iterator = notUsedSamples.iterator(); iterator.hasNext();) {
-			final int[] solution = iterator.next();
-			if (solution[Math.abs(literal) - 1] == -literal) {
+		for (final Iterator<Solution> iterator = notUsedSamples.iterator(); iterator.hasNext();) {
+			final Solution solution = iterator.next();
+			final int[] literals = solution.getLiterals();
+			if (literals[Math.abs(literal) - 1] == -literal) {
 				iterator.remove();
 				usedSamples.addFirst(solution);
-				for (int j = 0; j < solution.length; j++) {
-					if (solution[j] > 0) {
+				for (int j = 0; j < literals.length; j++) {
+					if (literals[j] > 0) {
 						ratio[j]++;
 					}
 				}
@@ -112,13 +116,14 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	private void updateRatioSet(int literal) {
-		for (final Iterator<int[]> iterator = usedSamples.iterator(); iterator.hasNext();) {
-			final int[] solution = iterator.next();
-			if (solution[Math.abs(literal) - 1] == -literal) {
+		for (final Iterator<Solution> iterator = usedSamples.iterator(); iterator.hasNext();) {
+			final Solution solution = iterator.next();
+			final int[] literals = solution.getLiterals();
+			if (literals[Math.abs(literal) - 1] == -literal) {
 				iterator.remove();
 				notUsedSamples.addFirst(solution);
-				for (int j = 0; j < solution.length; j++) {
-					if (solution[j] > 0) {
+				for (int j = 0; j < literals.length; j++) {
+					if (literals[j] > 0) {
 						ratio[j]--;
 					}
 				}

@@ -41,7 +41,9 @@ public class RandConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new RandomConfigurationGenerator(cnf, numberOfConfigurations, true);
+		final RandomConfigurationGenerator gen = new RandomConfigurationGenerator(cnf, numberOfConfigurations);
+		gen.setAllowDuplicates(true);
+		return gen;
 	}
 
 }

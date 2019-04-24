@@ -122,4 +122,12 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		return new AnalysisResult<>(this.getClass().getName(), assumptions, result);
 	}
 
+	public Random getRandom() {
+		return random;
+	}
+
+	public void setRandom(Random random) {
+		this.random = random;
+	}
+
 }

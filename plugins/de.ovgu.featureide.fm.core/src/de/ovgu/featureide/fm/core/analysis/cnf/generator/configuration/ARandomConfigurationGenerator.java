@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,40 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.solver;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.util.List;
-
-import org.sat4j.minisat.orders.VarOrderHeap;
-import org.sat4j.specs.ISolver;
-
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 
 /**
- * Modified variable order for {@link ISolver}.</br> Uses the {@link UniformRandomSelectionStrategy}.
+ * Finds random valid solutions of propositional formulas.
  *
  * @author Sebastian Krieter
  */
-public class VarOrderHeap3 extends VarOrderHeap {
+public abstract class ARandomConfigurationGenerator extends AConfigurationGenerator {
 
-	private static final long serialVersionUID = 1L;
+	protected boolean allowDuplicates = false;
 
-	private final UniformRandomSelectionStrategy selectionStrategy;
-
-	public VarOrderHeap3(List<Solution> sample) {
-		super(new UniformRandomSelectionStrategy(sample));
-		selectionStrategy = (UniformRandomSelectionStrategy) phaseStrategy;
+	public ARandomConfigurationGenerator(CNF cnf, int maxNumber) {
+		super(cnf, maxNumber);
 	}
 
-	@Override
-	public void undo(int x) {
-		super.undo(x);
-		selectionStrategy.undo(x);
+	public boolean isAllowDuplicates() {
+		return allowDuplicates;
 	}
 
-	@Override
-	public void assignLiteral(int p) {
-		super.assignLiteral(p);
+	public void setAllowDuplicates(boolean allowDuplicates) {
+		this.allowDuplicates = allowDuplicates;
 	}
 
 }
