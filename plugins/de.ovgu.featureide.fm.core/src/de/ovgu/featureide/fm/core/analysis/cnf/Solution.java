@@ -39,7 +39,9 @@ public class Solution extends LiteralSet {
 		final int[] sortedLiterals = new int[literals.length];
 		for (int i = 0; i < literals.length; i++) {
 			final int literal = literals[i];
-			sortedLiterals[Math.abs(literal) - 1] = literal;
+			if (literal != 0) {
+				sortedLiterals[Math.abs(literal) - 1] = literal;
+			}
 		}
 		return sortedLiterals;
 	}

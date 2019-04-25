@@ -144,8 +144,8 @@ public class TWiseConfiguration {
 
 	public TWiseConfiguration(TWiseConfigurationUtil util) {
 		countLiterals = 0;
-		literals = new int[util.getCnf().getVariables().size()];
-		solution = new Solution(literals);
+		solution = new Solution(new int[util.getCnf().getVariables().size()]);
+		literals = solution.getLiterals();
 		this.util = util;
 		if (util.hasSolver()) {
 			for (final Vertex vertex : util.getMig().getAdjList()) {
