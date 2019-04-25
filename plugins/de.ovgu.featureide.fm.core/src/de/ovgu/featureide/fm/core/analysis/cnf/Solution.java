@@ -45,7 +45,7 @@ public class Solution extends LiteralSet {
 	}
 
 	public Solution(int... literals) {
-		super(literals, false);
+		super(sortLiterals(literals), false);
 	}
 
 	@Override

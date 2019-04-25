@@ -568,10 +568,11 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		if (curModel == null) {
 			return true;
 		}
-		final int partCount = count(curModel) - fixedPartCount;
-		final Configuration config = new Configuration(new LiteralSet(curModel), partCount - getLastCoverage(), partCount);
+		final Solution solution = new Solution(Arrays.copyOf(curModel, curModel.length));
+		final int partCount = count(solution.getLiterals()) - fixedPartCount;
+		final Configuration config = new Configuration(solution, partCount - getLastCoverage(), partCount);
 
-		addCombinationsFromModel(curModel);
+		addCombinationsFromModel(solution.getLiterals());
 
 		for (int i = 0; i < featureIndexArray.length; i++) {
 			final FeatureIndex featureIndex = featureIndexArray[i];
@@ -602,11 +603,11 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		}
 
 		config.time = System.nanoTime() - time;
-		addResult(new Solution(config.getModel()));
+		addResult(solution);
 		time = System.nanoTime();
 
 		try {
-			solver.addClause(new LiteralSet(curModel).negate());
+			solver.addClause(solution.negate());
 		} catch (final RuntimeContradictionException e) {
 			return true;
 		}
@@ -829,10 +830,10 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		}
 		time = System.nanoTime();
 
-		solver.useSolutionList(Math.min(solver.getSatInstance().getVariables().size(), ISatSolver.MAX_SOLUTION_BUFFER));
+		final int featureCount = solver.getSatInstance().getVariables().size();
+		solver.useSolutionList(Math.min(featureCount, ISatSolver.MAX_SOLUTION_BUFFER));
 
 		findInvalid();
-		final int featureCount = solver.getSatInstance().getVariables().size();
 
 		final int numberOfFixedFeatures = solver.getAssignmentSize();
 		final boolean[] featuresUsedOrg = new boolean[featureCount];
