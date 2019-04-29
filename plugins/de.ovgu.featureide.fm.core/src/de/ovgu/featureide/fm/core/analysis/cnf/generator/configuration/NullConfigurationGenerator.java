@@ -18,33 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.security.SecureRandom;
-import java.util.List;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+/**
+ * Generates all configurations for a given propositional formula.
+ *
+ * @author Sebastian Krieter
+ */
+public class NullConfigurationGenerator extends AConfigurationGenerator {
 
-public class RandomPartitionIterator extends PartitionIterator {
-
-	private static final byte[] seed = new byte[32];
-	{
-		new SecureRandom(new byte[0]).nextBytes(seed);
+	public NullConfigurationGenerator(CNF cnf) {
+		super(cnf);
 	}
 
-	public RandomPartitionIterator(int t, List<ClauseList> expressions) {
-		super(t, expressions, 4);
-
-		final SecureRandom rand = new SecureRandom(seed);
-		for (int i = 0; i < dim.length; i++) {
-			final int[] dimArray = dim[i];
-			for (int j = dimArray.length - 1; j >= 0; j--) {
-				final int index = rand.nextInt(j + 1);
-				final int a = dimArray[index];
-				dimArray[index] = dimArray[j];
-				dimArray[j] = a;
-			}
-		}
+	public NullConfigurationGenerator(ISatSolver solver) {
+		super(solver);
 	}
+
+	public NullConfigurationGenerator(CNF cnf, int maxNumber) {
+		super(cnf, maxNumber);
+	}
+
+	public NullConfigurationGenerator(ISatSolver solver, int maxNumber) {
+		super(solver, maxNumber);
+	}
+
+	@Override
+	protected void generate(IMonitor monitor) throws Exception {}
 
 }

@@ -32,11 +32,22 @@ public class Solution extends LiteralSet {
 	private static final long serialVersionUID = -3058742332393418632L;
 
 	public Solution(LiteralSet clause) {
-		super(clause);
+		super(sortLiterals(clause.getLiterals()), false);
+	}
+
+	private static int[] sortLiterals(int[] literals) {
+		final int[] sortedLiterals = new int[literals.length];
+		for (int i = 0; i < literals.length; i++) {
+			final int literal = literals[i];
+			if (literal != 0) {
+				sortedLiterals[Math.abs(literal) - 1] = literal;
+			}
+		}
+		return sortedLiterals;
 	}
 
 	public Solution(int... literals) {
-		super(literals, false);
+		super(sortLiterals(literals), false);
 	}
 
 	@Override

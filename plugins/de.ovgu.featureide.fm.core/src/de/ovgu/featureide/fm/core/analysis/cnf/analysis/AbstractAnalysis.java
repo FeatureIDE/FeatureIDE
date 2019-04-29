@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
+import java.util.Random;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
@@ -36,6 +38,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	protected ISatSolver solver;
+
+	protected Random random = new Random(112358);
 
 	protected LiteralSet assumptions = null;
 
@@ -116,6 +120,14 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 	@Override
 	public final AnalysisResult<T> getResult() {
 		return new AnalysisResult<>(this.getClass().getName(), assumptions, result);
+	}
+
+	public Random getRandom() {
+		return random;
+	}
+
+	public void setRandom(Random random) {
+		this.random = random;
 	}
 
 }

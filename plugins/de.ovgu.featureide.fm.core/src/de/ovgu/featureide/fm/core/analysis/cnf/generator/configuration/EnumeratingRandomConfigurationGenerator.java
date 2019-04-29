@@ -20,45 +20,47 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Generates random configurations for a given propositional formula.
+ * Finds certain solutions of propositional formulas.
  *
  * @author Sebastian Krieter
  */
-public class RandomConfigurationGenerator extends ARandomConfigurationGenerator {
+public class EnumeratingRandomConfigurationGenerator extends ARandomConfigurationGenerator {
 
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber) {
+	public EnumeratingRandomConfigurationGenerator(CNF cnf, int maxNumber) {
 		super(cnf, maxNumber);
 	}
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
 		monitor.setRemainingWork(maxSampleSize);
-		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
+
+		final AllConfigurationGenerator gen = new AllConfigurationGenerator(solver);
+		final List<Solution> allConfigurations = new ArrayList<>(LongRunningWrapper.runMethod(gen));
+		if (!allowDuplicates) {
+			Collections.shuffle(allConfigurations, random);
+		}
 
 		for (int i = 0; i < maxSampleSize; i++) {
-			solver.shuffleOrder(random);
-			final int[] solution = solver.findSolution();
-			if (solution == null) {
-				break;
-			}
-			addResult(new Solution(solution));
-			monitor.step();
-			if (!allowDuplicates) {
-				try {
-					solver.addClause(new LiteralSet(SatUtils.negateSolution(solution)));
-				} catch (final RuntimeContradictionException e) {
+			if (allowDuplicates) {
+				addResult(allConfigurations.get(random.nextInt(allConfigurations.size())));
+			} else {
+				if (i >= allConfigurations.size()) {
 					break;
+				} else {
+					addResult(allConfigurations.get(i));
 				}
 			}
+			monitor.step();
 		}
 	}
 

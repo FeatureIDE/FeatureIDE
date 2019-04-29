@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.sat4j.core.VecInt;
@@ -33,6 +34,7 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
@@ -46,6 +48,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	protected final int[] order;
 
 	protected RingList<int[]> solutionList = RingList.empytRingList();
+	protected boolean useSolutionList = false;
 	protected SelectionStrategy strategy = SelectionStrategy.ORG;
 
 	protected boolean globalTimeout = false;
@@ -166,7 +169,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	public SatResult hasSolution() {
 		try {
 			if (solver.isSatisfiable(assignment, globalTimeout)) {
-				// solutionList.add(solver.model());
+				addSolution();
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
@@ -189,7 +192,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 			// TODO why is this necessary?
 			solver.setKeepSolverHot(true);
 			if (solver.isSatisfiable(new VecInt(unitClauses), globalTimeout)) {
-				// solutionList.add(solver.model());
+				addSolution();
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
@@ -197,6 +200,12 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
+		}
+	}
+
+	private void addSolution() {
+		if (useSolutionList) {
+			solutionList.add(solver.model());
 		}
 	}
 
@@ -252,6 +261,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
 				break;
 			case FIXED:
+			case UNIFORM_RANDOM:
 				break;
 			default:
 				throw new AssertionError(strategy);
@@ -268,8 +278,21 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	}
 
 	@Override
+	public void setSelectionStrategy(List<Solution> sample) {
+		strategy = SelectionStrategy.UNIFORM_RANDOM;
+		solver.setOrder(new VarOrderHeap3(sample));
+		solver.getOrder().init();
+	}
+
+	@Override
 	public void useSolutionList(int size) {
-		solutionList = new RingList<>(size);
+		if (size > 0) {
+			solutionList = new RingList<>(size);
+			useSolutionList = true;
+		} else {
+			solutionList = RingList.empytRingList();
+			useSolutionList = false;
+		}
 	}
 
 	@Override

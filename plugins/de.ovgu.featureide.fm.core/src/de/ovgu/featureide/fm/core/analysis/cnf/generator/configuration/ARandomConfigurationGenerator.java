@@ -18,33 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
-import java.security.SecureRandom;
-import java.util.List;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+/**
+ * Finds random valid solutions of propositional formulas.
+ *
+ * @author Sebastian Krieter
+ */
+public abstract class ARandomConfigurationGenerator extends AConfigurationGenerator {
 
-public class RandomPartitionIterator extends PartitionIterator {
+	protected boolean allowDuplicates = false;
 
-	private static final byte[] seed = new byte[32];
-	{
-		new SecureRandom(new byte[0]).nextBytes(seed);
+	public ARandomConfigurationGenerator(CNF cnf, int maxNumber) {
+		super(cnf, maxNumber);
 	}
 
-	public RandomPartitionIterator(int t, List<ClauseList> expressions) {
-		super(t, expressions, 4);
+	public boolean isAllowDuplicates() {
+		return allowDuplicates;
+	}
 
-		final SecureRandom rand = new SecureRandom(seed);
-		for (int i = 0; i < dim.length; i++) {
-			final int[] dimArray = dim[i];
-			for (int j = dimArray.length - 1; j >= 0; j--) {
-				final int index = rand.nextInt(j + 1);
-				final int a = dimArray[index];
-				dimArray[index] = dimArray[j];
-				dimArray[j] = a;
-			}
-		}
+	public void setAllowDuplicates(boolean allowDuplicates) {
+		this.allowDuplicates = allowDuplicates;
 	}
 
 }

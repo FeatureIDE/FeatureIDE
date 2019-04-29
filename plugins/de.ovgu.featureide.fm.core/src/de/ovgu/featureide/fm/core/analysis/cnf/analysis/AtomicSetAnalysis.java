@@ -81,7 +81,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 					case TRUE:
 						solver.assignmentPop();
 						SatUtils.updateSolution(model1Copy, solver.getSolution());
-						solver.shuffleOrder();
+						solver.shuffleOrder(random);
 						break;
 					}
 				}
@@ -126,7 +126,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 							case TRUE:
 								SatUtils.updateSolution(xModel0, solver.getSolution());
 								// updateSolver(c++);
-								solver.shuffleOrder();
+								solver.shuffleOrder(random);
 								break;
 							}
 							solver.assignmentPop();
@@ -170,7 +170,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 									done[j] = 0;
 									SatUtils.updateSolution(xModel0, solver.getSolution());
 									// updateSolver(c++);
-									solver.shuffleOrder();
+									solver.shuffleOrder(random);
 									solver.assignmentPop();
 									break;
 								}

@@ -125,15 +125,20 @@ public final class Nodes {
 		return new Or(nodeLiterals);
 	}
 
-	public static Set<Object> getDistinctVariableObjects(Node cnf) {
+	public static Set<Object> getDistinctVariableObjects(Node node) {
 		final HashSet<Object> result = new HashSet<>();
-		for (final Node clause : cnf.getChildren()) {
-			final Node[] literals = clause.getChildren();
-			for (int i = 0; i < literals.length; i++) {
-				result.add(((Literal) literals[i]).var);
+		getDistinctVariableObjects(node, result);
+		return result;
+	}
+
+	private static void getDistinctVariableObjects(Node node, Set<Object> result) {
+		if (node instanceof Literal) {
+			result.add(((Literal) node).var);
+		} else {
+			for (final Node child : node.getChildren()) {
+				getDistinctVariableObjects(child, result);
 			}
 		}
-		return result;
 	}
 
 }

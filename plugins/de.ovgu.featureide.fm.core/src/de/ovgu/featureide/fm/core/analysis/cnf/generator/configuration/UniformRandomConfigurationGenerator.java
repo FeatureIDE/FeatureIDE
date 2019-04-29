@@ -20,32 +20,39 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Generates random configurations for a given propositional formula.
+ * Finds certain solutions of propositional formulas.
  *
  * @author Sebastian Krieter
  */
-public class RandomConfigurationGenerator extends ARandomConfigurationGenerator {
+public class UniformRandomConfigurationGenerator extends ARandomConfigurationGenerator {
 
-	public RandomConfigurationGenerator(CNF cnf, int maxNumber) {
+	private int sampleSize = 1000;
+
+	public UniformRandomConfigurationGenerator(CNF cnf, int maxNumber) {
 		super(cnf, maxNumber);
 	}
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
+		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
+		gen.setRandom(random);
+		final List<Solution> sample = LongRunningWrapper.runMethod(gen);
+
 		monitor.setRemainingWork(maxSampleSize);
-		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
+		solver.setSelectionStrategy(sample);
 
 		for (int i = 0; i < maxSampleSize; i++) {
-			solver.shuffleOrder(random);
 			final int[] solution = solver.findSolution();
 			if (solution == null) {
 				break;
@@ -60,6 +67,14 @@ public class RandomConfigurationGenerator extends ARandomConfigurationGenerator 
 				}
 			}
 		}
+	}
+
+	public int getSampleSize() {
+		return sampleSize;
+	}
+
+	public void setSampleSize(int sampleSize) {
+		this.sampleSize = sampleSize;
 	}
 
 }
