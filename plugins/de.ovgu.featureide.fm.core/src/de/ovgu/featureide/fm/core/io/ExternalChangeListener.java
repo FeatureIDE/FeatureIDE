@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.io.manager.FileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
  * Is executed by a {@link FileManager file manager} when new data was read from a file.
@@ -31,10 +31,10 @@ public abstract class ExternalChangeListener {
 
 	public static ExternalChangeListener listener = new DefaultExternalChangeListener();
 
-	public static void update(FileManager<?> fileManager) {
+	public static void update(IFileManager<?> fileManager) {
 		listener.doUpdate(fileManager);
 	}
 
-	protected abstract void doUpdate(FileManager<?> fileManager);
+	protected abstract void doUpdate(IFileManager<?> fileManager);
 
 }

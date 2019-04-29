@@ -26,9 +26,9 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
@@ -36,10 +36,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of a feature model.
  *
  * @author Sebastian Krieter
+ * @author Thomas Graave
+ * @author Rahel Arens
  */
 public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
-	IFeatureModel getFeatureModel();
+	IFeatureModelManager getFeatureModelManager();
 
 	FeatureModelLayout getLayout();
 
@@ -47,9 +49,11 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	void setLegendHidden(boolean hidden);
 
-	void setLegend(Legend legend);
-
 	Legend getLegend();
+
+	void setConstraintsHidden(boolean hideConstraints);
+
+	boolean getConstraintsHidden();
 
 	void handleLegendLayoutChanged();
 
@@ -78,28 +82,31 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void init();
 
 	/**
-	 * Returns the list of not collapsed constraints stored in this feature model. <br/> <br/> <b>Note</b>: The returned list should be <b>unmodifiable</b> to
-	 * avoid external access to internal data
+	 * Returns the list of not collapsed constraints stored in this feature model. <br>Note: The returned list should be unmodifiable to avoid external access
+	 * to internal data
 	 *
-	 * @see #addConstraint(IConstraint)
-	 * @see #addConstraint(IConstraint, int)
-	 * @see #getConstraintCount()
-	 * @see #getConstraintIndex(IConstraint)
-	 * @see #removeConstraint(IConstraint)
-	 * @see #removeConstraint(int)
-	 * @see #setConstraint(int, Constraint)
-	 * @see #setConstraints(Iterable)
-	 * @see #replaceConstraint(IConstraint, int)
+	 * @see #getConstraintIndex(Constraint)
+	 * @see #getVisibleConstraints()
+	 * @see #getVisibleFeatures()
 	 *
 	 * @since 3.3
 	 *
 	 * @return All not collapsed constraints stored in this feature model.
 	 */
+	List<IGraphicalConstraint> getNonCollapsedConstraints();
+
+	/**
+	 * Returns getNonCollapsedConstraints only if the Constraints are not supposed to be hidden.
+	 *
+	 * @see #getNonCollapsedConstraints()
+	 *
+	 * @return All not collapsed constraints stored in this feature model that shall be shown in the feature model editor.
+	 */
 	List<IGraphicalConstraint> getVisibleConstraints();
 
 	/**
-	 * Returns the list of not collapsed features stored in this feature model. <br/> <br/> <b>Note</b>: The returned list should be <b>unmodifiable</b> to
-	 * avoid external access to internal data
+	 * Returns the list of not collapsed features stored in this feature model. <br> <br> Note: The returned list should be unmodifiable to avoid external
+	 * access to internal data
 	 *
 	 * @since 3.3
 	 *
@@ -110,9 +117,21 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	/**
 	 * return the current index of the constraint. It will olny count constaints that are currently visible.
 	 *
-	 * @param constraint
-	 * @return
+	 * @param constraint constraint to search
+	 * @return index of constraint
 	 */
 	int getConstraintIndex(Constraint constraint);
+
+	void writeValues();
+
+	void writeFeatureModel();
+
+	void writeConstraint(final IGraphicalConstraint graphicalConstraint);
+
+	void writeFeature(final IGraphicalFeature graphicalFeature);
+
+	void readValues();
+
+	List<IGraphicalFeature> getVisibleRelations();
 
 }

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.dimacs;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,8 +46,11 @@ public class DimacsWriter extends ADimacsWriter {
 	 * @param cnf the CNF to transform; not null
 	 * @throws IllegalArgumentException if the input is null or not in CNF
 	 */
-	public DimacsWriter(Node cnf) throws IllegalArgumentException {
-		super(cnf.getUniqueVariables());
+	public DimacsWriter(Node cnf, Collection<String> variables) throws IllegalArgumentException {
+		super(variables);
+		if (!cnf.isConjunctiveNormalForm()) {
+			throw new IllegalArgumentException();
+		}
 		clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
 	}
 
@@ -61,7 +65,7 @@ public class DimacsWriter extends ADimacsWriter {
 			writeLiteral(sb, l);
 			sb.append(" ");
 		}
-		sb.append(CLAUSE_END);
+		sb.append(DIMACSFormat.CLAUSE_END);
 		sb.append(System.lineSeparator());
 	}
 
@@ -72,7 +76,7 @@ public class DimacsWriter extends ADimacsWriter {
 	 * @param l literal to transform; not null
 	 */
 	private void writeLiteral(StringBuilder sb, Literal l) {
-		int index = variableIndexes.get(l.var);
+		int index = variableIndexes.get(l.var.toString());
 		if (!l.positive) {
 			index = -index;
 		}
@@ -90,4 +94,5 @@ public class DimacsWriter extends ADimacsWriter {
 			writeClause(sb, clause);
 		}
 	}
+
 }

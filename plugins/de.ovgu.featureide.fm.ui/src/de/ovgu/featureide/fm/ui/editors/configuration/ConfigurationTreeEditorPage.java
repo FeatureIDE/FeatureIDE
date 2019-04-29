@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AN_UNKNOWN_ERROR_OCCURRED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING____;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFLICTING_COMMA_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_COMMA_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
@@ -35,13 +36,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
 import org.eclipse.swt.events.ArmListener;
@@ -51,6 +53,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -80,7 +83,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -97,7 +99,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
@@ -114,7 +116,9 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -160,6 +164,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getDefault().getImageDescriptor("icons/tree02.png").createImage();
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
+	private static final Image IMAGE_RESOLVE = FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif").createImage();
+	protected static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
+
+	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
@@ -176,7 +184,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected IConfigurationEditor configurationEditor = null;
 
-	protected ConfigurationPropagator propagator;
+	protected IConfigurationPropagator propagator;
 
 	protected boolean dirty = false;
 
@@ -191,8 +199,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private int index;
 
 	private Label infoLabel;
+	private ToolItem resolveButton;
 
-	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
+	protected final LinkedHashMap<SelectableFeature, TreeItem> itemMap = new LinkedHashMap<>();
+
+	protected final JobToken infoLabelToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+	protected final JobToken updateToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+	protected final JobToken coloringToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	/**
 	 * The item the toolTip belongs to.
@@ -234,7 +247,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (evt.getSource() instanceof IFeatureModel) {
 				switch (evt.getEventType()) {
 				case MODEL_DATA_SAVED:
-				case MODEL_DATA_OVERRIDDEN:
+				case MODEL_DATA_OVERWRITTEN:
 					refreshPage();
 					break;
 				default:
@@ -245,7 +258,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				case MODEL_DATA_SAVED:
 					dirty = false;
 					break;
-				case MODEL_DATA_OVERRIDDEN:
+				case MODEL_DATA_OVERWRITTEN:
 					refreshPage();
 					setDirty();
 					break;
@@ -351,6 +364,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.grabExcessHorizontalSpace = false;
 		final ToolBar toolbar = new ToolBar(compositeTop, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		toolbar.setLayoutData(gridData);
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
+		resolveButton = new ToolItem(toolbar, SWT.PUSH);
+		resolveButton.setImage(IMAGE_RESOLVE);
+		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
+		resolveButton.setEnabled(false);
+		resolveButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				computeTree(true, true);
+				resolveButton.setEnabled(false);
+				setDirty();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
@@ -521,6 +552,20 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
+
+		tree.addMouseTrackListener(new MouseTrackListener() {
+			@Override
+			public void mouseEnter(MouseEvent e) {}
+
+			@Override
+			public void mouseExit(MouseEvent e) {
+				tipItem = null;
+				disposeTooltip();
+			}
+
+			@Override
+			public void mouseHover(MouseEvent e) {}
+		});
 	}
 
 	private MenuItem createMenu(String text, final String toolTipText, final EXPAND_ALGORITHM algorithm) {
@@ -578,17 +623,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			infoLabel.setForeground(null);
 			return;
 		}
-		final boolean valid = LongRunningWrapper.runMethod(propagator.isValid());
-		if (configurationEditor.getPropagator() == null) {
+		if (propagator == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = new LongRunningJob<>("", propagator.number(250));
+		final boolean valid = LongRunningWrapper.runMethod(propagator.isValid());
+		final boolean conflicting = !valid && !LongRunningWrapper.runMethod(propagator.canBeValid());
+		final IRunner<Long> job = LongRunningWrapper.getRunner(propagator.number(250));
 		job.addJobFinishedListener(new JobFinishListener<Long>() {
 
 			@Override
 			public void jobFinished(IJob<Long> finishedJob) {
 				final StringBuilder sb = new StringBuilder();
-				sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
+				sb.append(conflicting ? CONFLICTING_COMMA_ : valid ? VALID_COMMA_ : INVALID_COMMA_);
 
 				final Long number = finishedJob.getResults();
 				if (number != null) {
@@ -615,7 +661,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				});
 			}
 		});
-		configurationEditor.getConfigJobManager().startJob(job, true);
+		LongRunningWrapper.startJob(infoLabelToken, job);
 	}
 
 	@Override
@@ -910,8 +956,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	/**
 	 * Colors all features if they lead to a valid configuration if current configuration is invalid. deselect:blue, select:green
 	 */
-	protected LongRunningJob<List<LiteralSet>> computeColoring(final Display currentDisplay) {
-		if (!configurationEditor.isAutoSelectFeatures() || LongRunningWrapper.runMethod(propagator.isValid())) {
+	protected IRunner<List<LiteralSet>> computeColoring(final Display currentDisplay) {
+		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
 			for (final SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
 				selectableFeature.setRecommendationValue(-1);
 				selectableFeature.clearOpenClauses();
@@ -947,12 +993,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						refreshItem(item);
 					}
 				}
+				if (configurationEditor.getConfiguration().getRoot().getSelection() == Selection.UNDEFINED) {
+					resolveButton.setEnabled(true);
+				}
 			}
 		});
 		curGroup = 0;
 
 		if (useRecommendation) {
-			final ConfigurationMatrix configurationMatrix = new ConfigurationMatrix(configurationEditor.getConfiguration().getFeatureModel(),
+			final ConfigurationMatrix configurationMatrix = new ConfigurationMatrix(configurationEditor.getConfiguration().getFeatureModelFormula(),
 					Paths.get(configurationEditor.getFile().getParent().getLocationURI()));
 			configurationMatrix.readConfigurations(configurationEditor.getFile().getName());
 			configurationMatrix.calcRec(configurationEditor.getConfiguration());
@@ -966,13 +1015,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 
 		final LongRunningMethod<List<LiteralSet>> jobs = propagator.findOpenClauses(manualFeatureList);
-		final LongRunningJob<List<LiteralSet>> job = new LongRunningJob<>("FindClauses", jobs);
+		final IRunner<List<LiteralSet>> job = LongRunningWrapper.getRunner(jobs, "FindClauses");
 		job.schedule();
 
-		job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
+		job.addJobFinishedListener(new JobFinishListener<List<LiteralSet>>() {
 
 			@Override
-			public void jobFinished(IJob<List<Node>> finishedJob) {
+			public void jobFinished(IJob<List<LiteralSet>> finishedJob) {
 				maxGroup = finishedJob.getResults().size() - 1;
 				for (final SelectableFeature feature : manualFeatureList) {
 					final TreeItem item = itemMap.get(feature);
@@ -1052,10 +1101,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 		if ((configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE)
 			|| (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE)) {
-			job.addJobFinishedListener(new JobFinishListener<List<Node>>() {
+			job.addJobFinishedListener(new JobFinishListener<List<LiteralSet>>() {
 
 				@Override
-				public void jobFinished(IJob<List<Node>> finishedJob) {
+				public void jobFinished(IJob<List<LiteralSet>> finishedJob) {
 					currentDisplay.asyncExec(new Runnable() {
 
 						@Override
@@ -1070,14 +1119,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected LongRunningJob<Boolean> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected IRunner<Boolean> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
 		final TreeItem topItem = tree.getTopItem();
 		final SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Boolean> update = propagator.update(redundantManual, Arrays.asList(feature));
-		final LongRunningJob<Boolean> job = new LongRunningJob<>("", update);
+		final IRunner<Boolean> job = LongRunningWrapper.getRunner(update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 
 			@Override
@@ -1171,64 +1220,71 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	protected void computeTree(boolean redundantManual) {
+		computeTree(redundantManual, false);
+	}
+
+	protected void computeTree(boolean redundantManual, boolean resolve) {
 		final Display currentDisplay = Display.getCurrent();
 		if (currentDisplay == null) {
 			return;
 		}
 		updateInfoLabel(null);
 
-		final LongRunningJob<Boolean> updateJob = computeFeatures(redundantManual, currentDisplay);
-		if (updateJob != null) {
-			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
-
+		if (resolve) {
+			final LongRunningMethod<Void> update = propagator.resolve();
+			final IRunner<Void> updateJob = LongRunningWrapper.getRunner(update);
+			updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
 				@Override
-				public void jobFinished(IJob<List<String>> finishedJob) {
+				public void jobFinished(IJob<Void> finishedJob) {
 					if (finishedJob.getStatus() == JobStatus.OK) {
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
-						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
-						// XXX Prevents configuration files from being deleted (read/write conflict)
-//						if (configurationEditor instanceof ConfigurationEditor) {
-//							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
-//							// Get current configuration
-//							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-//							// Cast is necessary, don't remove
-//							final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
-//
-//							byte[] content;
-//							try {
-//								content = new byte[document.getContents().available()];
-//								document.getContents().read(content);
-//								if (!source.equals(new String(content))) {
-//									setDirty();
-//								}
-//							} catch (final IOException e) {
-//								FMUIPlugin.getDefault().logError(e);
-//							} catch (final CoreException e) {
-//								FMUIPlugin.getDefault().logError(e);
-//							}
-//						}
+						currentDisplay.syncExec(new Runnable() {
+							@Override
+							public void run() {
+								for (final TreeItem item : itemMap.values()) {
+									refreshItem(item);
+								}
+							}
+						});
 					}
 				}
 			});
+			LongRunningWrapper.startJob(updateToken, updateJob);
+		} else {
+			final IRunner<Boolean> updateJob = computeFeatures(redundantManual, currentDisplay);
+			if (updateJob != null) {
+				updateJob.addJobFinishedListener(new JobFinishListener<Boolean>() {
 
-			updateFeatures.clear();
-			walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+					@Override
+					public void jobFinished(IJob<Boolean> finishedJob) {
+						if (finishedJob.getStatus() == JobStatus.OK) {
+							updateInfoLabel(currentDisplay);
+							autoExpand(currentDisplay);
+							LongRunningWrapper.startJob(coloringToken, computeColoring(currentDisplay));
+						}
+					}
+				});
 
-				@Override
-				public Void invoke(TreeItem item, SelectableFeature feature) {
-					// lockItem(item);
-					updateFeatures.add(feature);
-					return null;
-				}
-			}, new IFunction<Void, Void>() {
+				updateFeatures.clear();
+				walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 
-				@Override
-				public Void invoke(Void t) {
-					configurationEditor.getConfigJobManager().startJob(updateJob, true);
-					return null;
-				}
-			});
+					@Override
+					public Void invoke(TreeItem item, SelectableFeature feature) {
+						// lockItem(item);
+						updateFeatures.add(feature);
+						return null;
+					}
+				}, new IFunction<Void, Void>() {
+
+					@Override
+					public Void invoke(Void t) {
+						LongRunningWrapper.startJob(updateToken, updateJob);
+						return null;
+					}
+				});
+			}
+
 		}
 	}
 
@@ -1252,11 +1308,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final Object data = element.getData();
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) data;
-			if (searchString.startsWith("*")) {
-				return feature.getName().toLowerCase().contains(searchString.substring(1).toLowerCase());
-			} else {
-				return feature.getName().toLowerCase().startsWith(searchString.toLowerCase());
-			}
+			return feature.getName().toLowerCase().matches(".*" + searchString.toLowerCase() + ".*");
 		}
 		return false;
 	}
@@ -1279,6 +1331,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void createTooltip(TreeItem item, MouseEvent e) {
 		final Object data = item.getData();
+
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
 			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());
@@ -1286,36 +1339,26 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final StringBuilder sb = new StringBuilder();
 
 			if (!describ.isEmpty()) {
-				sb.append("Description:\n");
-				sb.append(describ);
+				addElement(sb, "Description:", describ);
 			}
 			if (!relConst.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Constraints:\n");
-				sb.append(relConst);
+				addElement(sb, "Constraints:", relConst);
 			}
 			final Collection<LiteralSet> openClauses = feature.getOpenClauses();
 			if (!openClauses.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Open Clauses:\n");
+				final StringBuilder elementBuilder = new StringBuilder();
 				for (final LiteralSet clause : openClauses) {
 					final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(feature.getVariables(), clause));
 					nodeWriter.setSymbols(NodeWriter.logicalSymbols);
-					sb.append(nodeWriter.nodeToString()).append('\n');
+					elementBuilder.append(nodeWriter.nodeToString()).append('\n');
 				}
+				addElement(sb, "Open Clauses:", elementBuilder.toString());
 			}
 
 			// Print the explanation.
 			final Explanation<?> explanation = getExplanation(feature);
 			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append(explanation.getWriter().getString());
+				addElement(sb, null, explanation.getWriter().getString());
 			}
 
 			if (sb.length() > 0) {
@@ -1325,6 +1368,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
+	}
+
+	private void addElement(final StringBuilder sb, final String header, final String element) {
+		if (sb.length() > 0) {
+			sb.append("\n\n");
+		}
+		if (header != null) {
+			sb.append(header);
+			sb.append("\n");
+		}
+		sb.append((element.length() <= MAX_TOOLTIP_ELEMENT_LENGTH) ? element : element.substring(0, MAX_TOOLTIP_ELEMENT_LENGTH) + "\n[...]");
 	}
 
 	private void newToolTip(Shell shell, CharSequence toolTipText, boolean autoHide, int x, int y) {

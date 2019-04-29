@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Simple configuration format.</br> Lists all selected features in the user-defined order (if specified).
+ * Simple configuration format.<br> Lists all selected features in the user-defined order (if specified).
  *
  * @author Sebastian Krieter
  *

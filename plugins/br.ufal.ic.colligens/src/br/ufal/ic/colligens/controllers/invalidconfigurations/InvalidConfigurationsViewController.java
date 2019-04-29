@@ -61,7 +61,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 	/**
 	 * Update view
 	 *
-	 * @param fileProxies
+	 * @param fileProxies list of file proxies
 	 */
 	public void setInput(List<FileProxy> fileProxies) {
 		treeViewer.setInput(fileProxies);

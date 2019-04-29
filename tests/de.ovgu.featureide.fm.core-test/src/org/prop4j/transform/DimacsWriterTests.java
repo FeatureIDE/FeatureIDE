@@ -85,27 +85,27 @@ public class DimacsWriterTests {
 	public void testNotNode() {
 		final Node in = new Not("A");
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter(in, in.getContainedFeatures()).write();
 	}
 
 	@Test
 	public void testImplies() {
 		final Node in = new Implies("A", "B");
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter(in, in.getContainedFeatures()).write();
 	}
 
 	@Test
 	public void testNull() {
 		final Node in = null;
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter(in, null).write();
 	}
 
 	@Test
 	public void testVariableDirectory() {
 		final Node in = new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
-		final DimacsWriter w = new DimacsWriter(in);
+		final DimacsWriter w = new DimacsWriter(in, in.getContainedFeatures());
 		w.setWritingVariableDirectory(true);
 		final String actual = w.write();
 		final String expected = "c 1 A" + LN + "c 2 B" + LN + "c 3 C" + LN + getDefaultExpected();
@@ -117,7 +117,7 @@ public class DimacsWriterTests {
 	}
 
 	private void testEquals(Node in, String expected) {
-		final DimacsWriter w = new DimacsWriter(in);
+		final DimacsWriter w = new DimacsWriter(in, in.getContainedFeatures());
 		final String actual = w.write();
 		assertEquals(expected, actual);
 	}

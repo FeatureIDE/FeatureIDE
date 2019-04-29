@@ -56,9 +56,15 @@ public class FeatureStructure implements IFeatureStructure {
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
+		this(oldStructure, newFeatureModel, false);
+	}
+
+	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel, boolean copySubtree) {
 		if (newFeatureModel != null) {
 			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
-			newFeatureModel.addFeature(correspondingFeature);
+			if (copySubtree) {
+				newFeatureModel.addFeature(correspondingFeature);
+			}
 		} else {
 			correspondingFeature = oldStructure.correspondingFeature;
 		}
@@ -69,8 +75,10 @@ public class FeatureStructure implements IFeatureStructure {
 		multiple = oldStructure.multiple;
 		hidden = oldStructure.hidden;
 
-		for (final IFeatureStructure child : oldStructure.children) {
-			addNewChild(child.cloneSubtree(newFeatureModel));
+		if (copySubtree) {
+			for (final IFeatureStructure child : oldStructure.children) {
+				addNewChild(child.cloneSubtree(newFeatureModel));
+			}
 		}
 	}
 
@@ -134,7 +142,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel) {
-		return new FeatureStructure(this, newFeatureModel);
+		return new FeatureStructure(this, newFeatureModel, true);
+	}
+
+	@Override
+	public IFeatureStructure clone(IFeatureModel newFeatureModel) {
+		return new FeatureStructure(this, newFeatureModel, false);
 	}
 
 	protected void fireAttributeChanged() {
@@ -148,7 +161,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.FEATURE_HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -257,7 +270,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAlternative() {
-		return !and && !multiple;
+		return !and && !multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
@@ -274,7 +287,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAnd() {
-		return and;
+		return and || (getChildrenCount() <= 1);
 	}
 
 	@Override
@@ -317,12 +330,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isMultiple() {
-		return multiple;
+		return multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
 	public boolean isOr() {
-		return !and && multiple;
+		return !and && multiple && (getChildrenCount() > 1);
 	}
 
 	@Override

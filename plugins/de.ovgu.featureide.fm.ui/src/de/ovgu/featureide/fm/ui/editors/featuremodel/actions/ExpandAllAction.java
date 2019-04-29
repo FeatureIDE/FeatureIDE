@@ -22,14 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
-// import static StringTable.*;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 
 /**
@@ -53,12 +50,7 @@ public class ExpandAllAction extends Action {
 
 	@Override
 	public void run() {
-		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, false);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new CollapseAllOperation(graphicalFeatureModel, false));
 	}
 
 }

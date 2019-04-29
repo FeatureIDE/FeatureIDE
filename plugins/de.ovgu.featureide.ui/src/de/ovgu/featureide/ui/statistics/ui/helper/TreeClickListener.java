@@ -51,6 +51,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ContractCountNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
@@ -58,7 +59,6 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Invar
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodContractNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodSubNodeParent;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsSemanticalFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.ui.statistics.ui.ConfigDialog;
 
@@ -78,16 +78,16 @@ public class TreeClickListener implements IDoubleClickListener {
 	}
 
 	/**
-	 * Performs actions depending on the type of the clicked note e.g. opening a dialog for {@link ConfigParentNode.ConfigNode} or expanding/collapsing
-	 * nodes(default operation).
+	 * Performs actions depending on the type of the clicked note e.g. opening a dialog for or expanding/collapsing nodes(default operation).
 	 *
+	 * @param event double click event
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
 
 		for (final Object selected : selectedObjects) {
-			if (selected instanceof StatisticsSemanticalFeatureModel.ConfigNode) {
+			if (selected instanceof ConfigNode) {
 				handleStatisticsSemanticalNodes(event, selected);
 			} else if ((selected instanceof AbstractSortModeNode) && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
@@ -138,7 +138,7 @@ public class TreeClickListener implements IDoubleClickListener {
 	 *
 	 */
 	private void handleStatisticsSemanticalNodes(DoubleClickEvent event, Object selected) {
-		final StatisticsSemanticalFeatureModel.ConfigNode clickedNode = (StatisticsSemanticalFeatureModel.ConfigNode) selected;
+		final ConfigNode clickedNode = (ConfigNode) selected;
 		if (!clickedNode.isCalculating()) {
 			final ConfigDialog dial = new ConfigDialog(event.getViewer().getControl().getShell(), clickedNode.getDescription());
 			if (dial.open() == Window.OK) {

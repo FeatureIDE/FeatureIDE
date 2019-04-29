@@ -20,18 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_CONTAINED_FEATURES;
 
 import java.util.Iterator;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -39,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Expands up to the level of the features of this constraint and collapses all other features.
@@ -62,7 +61,8 @@ public class ExpandConstraintAction extends Action {
 	};
 
 	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
-		super(EXPAND_CONSTRAINT);
+		super(FOCUS_ON_CONTAINED_FEATURES);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.graphcialFeatureModel = graphcialFeatureModel;
 		setId(ID);
 		if (viewer instanceof TreeViewer) {
@@ -74,12 +74,7 @@ public class ExpandConstraintAction extends Action {
 
 	@Override
 	public void run() {
-		final ExpandConstraintOperation op = new ExpandConstraintOperation(graphcialFeatureModel, constraint);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new ExpandConstraintOperation(graphcialFeatureModel, constraint));
 	}
 
 	protected boolean isValidSelection(IStructuredSelection selection) {

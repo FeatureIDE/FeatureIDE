@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -36,35 +37,8 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class Commons {
 
-	private static final String TEAMCITY_REMOTE_PATH = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH = "/home/travis/build/FeatureIDE/FeatureIDE/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK1 = "/home/travis/build/DawidSA2017/FeatureIDE/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK2 = "/home/travis/build/Henningson/FeatureIDETeam2/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
-
-	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.core-test/src/";
-
 	public static File getRemoteOrLocalFolder(String path) {
-		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
-		if (!folder.canRead()) {
-			folder = new File(TRAVIS_REMOTE_PATH_FORK1 + PLUGIN_PATH + path);
-			if (!folder.canRead()) {
-				folder = new File(TRAVIS_REMOTE_PATH_FORK2 + PLUGIN_PATH + path);
-				if (!folder.canRead()) {
-					folder = new File(TRAVIS_REMOTE_PATH_FORK3 + PLUGIN_PATH + path);
-					if (!folder.canRead()) {
-						folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
-						if (!folder.canRead()) {
-							folder = new File(ClassLoader.getSystemResource(path).getPath());
-						}
-					}
-				}
-			}
-		}
+		final File folder = new File("src/" + path);
 		return folder;
 	}
 
@@ -129,7 +103,8 @@ public class Commons {
 				return FeatureModelManager.load(f.toPath());
 			}
 		}
-		return FMFactoryManager.getEmptyFeatureModel();
+		fail();
+		return null;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

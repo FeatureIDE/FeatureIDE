@@ -24,11 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to move features. Provides redo/undo support.
@@ -36,18 +37,19 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class MoveFeatureOperation extends AbstractFeatureModelOperation {
+public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final FeatureOperationData data;
 	private final Point newPos;
 	private final Point oldPos;
+	private boolean or = false;
+	private boolean alternative = false;
 
-	public MoveFeatureOperation(FeatureOperationData data, Object editor, Point newPos, Point oldPos, IFeature feature) {
-		super(feature.getFeatureModel(), MOVE_FEATURE);
+	public MoveFeatureOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureOperationData data, Point newPos, Point oldPos) {
+		super(graphicalFeatureModel, MOVE_FEATURE);
 		this.data = data;
 		this.newPos = newPos;
 		this.oldPos = oldPos;
-		setEditor(editor);
 	}
 
 	public void newInnerOrder(Point newPos) {
@@ -55,11 +57,16 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IGraphicalFeature feature = data.getFeature();
-		if (feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
-			final IGraphicalFeature oldParent = data.getOldParent();
+		final IGraphicalFeature oldParent = data.getOldParent();
+		if (!feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+			newInnerOrder(newPos);
+		} else {
 			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+
+			or = oldParent.getObject().getStructure().isOr();
+			alternative = oldParent.getObject().getStructure().isAlternative();
 			oldParent.getObject().getStructure().removeChild(featureStructure);
 
 			final IGraphicalFeature newParent = data.getNewParent();
@@ -84,16 +91,20 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 			if (newParent.isCollapsed()) {
 				newParent.setCollapsed(false);
-				feature.getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED, null, null));
+				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 			}
-		} else {
-			newInnerOrder(newPos);
+		}
+		// If there is only one child left, set the old parent group type to and
+		if (oldParent != null) {
+			if (oldParent.getObject().getStructure().getChildrenCount() == 1) {
+				oldParent.getObject().getStructure().changeToAnd();
+			}
 		}
 		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 		} else {
@@ -103,8 +114,15 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
 				structure.addChildAtPosition(data.getOldIndex(), structure2);
 			}
+
 		}
-		return new FeatureIDEEvent(data.getFeature().getGraphicalModel().getFeatureModel(), EventType.STRUCTURE_CHANGED);
+		// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
+		if ((data.getOldParent() != null) && or) {
+			data.getOldParent().getObject().getStructure().changeToOr();
+		} else if ((data.getOldParent() != null) && alternative) {
+			data.getOldParent().getObject().getStructure().changeToAlternative();
+		}
+		return new FeatureIDEEvent(data.getFeature(), EventType.STRUCTURE_CHANGED);
 	}
 
 }

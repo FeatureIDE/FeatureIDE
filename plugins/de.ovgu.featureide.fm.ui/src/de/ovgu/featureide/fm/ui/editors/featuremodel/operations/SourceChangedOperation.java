@@ -25,36 +25,35 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 
 /**
- * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.</br> Is used for undo / redo support.
+ * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.<br> Is used for undo / redo support.
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
 public class SourceChangedOperation extends AbstractFeatureModelOperation {
 
-	private final FeatureModelEditor featureModelEditor;
 	private final String newText, oldText;
 
-	public SourceChangedOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
-		super(featureModel, SOURCE_CHANGE);
-		this.featureModelEditor = featureModelEditor;
+	public SourceChangedOperation(IFeatureModelManager featureModelManager, String newText, String oldText) {
+		super(featureModelManager, SOURCE_CHANGE);
 		this.newText = newText;
 		this.oldText = oldText;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		featureModelEditor.readModel(newText);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		featureModelManager.readFromSource(newText);
 		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModelEditor.readModel(oldText);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		featureModelManager.readFromSource(oldText);
 		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
 	}
 

@@ -112,7 +112,7 @@ public abstract class AWorkMonitor {
 	}
 
 	/**
-	 * Sets how many times {@link #worked()} has to be called within {@link #work()}.
+	 * Sets how many times {@link #worked()} has to be called within {@link #worked()}.
 	 *
 	 * @param maxAbsoluteWork the absolute amount of work this job has to do
 	 */

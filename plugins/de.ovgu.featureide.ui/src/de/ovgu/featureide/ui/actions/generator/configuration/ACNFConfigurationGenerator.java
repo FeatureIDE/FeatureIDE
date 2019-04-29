@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -44,7 +44,7 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 	private class Consumer implements Runnable {
 
 		private final IConfigurationGenerator gen;
-		private final Configuration configuration = new Configuration(snapshot.getObject());
+		private final Configuration configuration = new Configuration(snapshot);
 		private boolean run = true;
 
 		public Consumer(IConfigurationGenerator gen) {
@@ -84,9 +84,9 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 
 	protected final CNF cnf;
 
-	public ACNFConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		super(builder, featureProject);
-		cnf = snapshot.getFormula().getElement(new NoAbstractCNFCreator());
+	public ACNFConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
+		super(builder, formula);
+		cnf = snapshot.getElement(new NoAbstractCNFCreator());
 	}
 
 	@Override

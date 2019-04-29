@@ -36,4 +36,8 @@ public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
 	@Override
 	String getName();
 
+	void setFeatureNameValidator(IFeatureNameValidator validator);
+
+	IFeatureNameValidator getFeatureNameValidator();
+
 }

@@ -257,12 +257,6 @@ public final class FeatureUtils {
 		return Functional.map(list, FEATURE_TO_STRUCTURE);
 	}
 
-	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return FeatureModelManager.getAnalyzer(featureModel);
-	}
-
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
 		requireNonNull(featureModel);
 		requireNonNull(projectName);
@@ -323,8 +317,8 @@ public final class FeatureUtils {
 	 * object that yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy
 	 * filtering without modification of <b>features</b>.
 	 *
-	 * <br/> <br/> The extraction is done via
-	 * {@link de.ovgu.featureide.fm.core.base.util.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 * <br> <br> The extraction is done via
+	 * {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
 	 *
 	 * @since 3.0
 	 * @param features An iterable object providing features

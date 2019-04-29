@@ -28,7 +28,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.io.MIGAdjListFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -55,7 +54,7 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 
 				@Override
 				public ModalImplicationGraph execute(IMonitor monitor) throws Exception {
-					return ((FeatureModelSnapshot) project.getFeatureModelManager().getSnapshot()).getFormula().getElement(new ModalImplicationGraphCreator());
+					return project.getFeatureModelManager().getPersistentFormula().getElement(new ModalImplicationGraphCreator());
 				}
 			});
 			runner.addJobFinishedListener(new JobFinishListener<ModalImplicationGraph>() {

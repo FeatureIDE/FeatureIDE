@@ -32,12 +32,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -83,12 +81,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<>();
 		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
-		final ConfigurationPropagator propagator;
-		if (project != null) {
-			propagator = ((FeatureModelSnapshot) project.getFeatureModelManager().getSnapshot()).getPropagator(false);
-		} else {
-			propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator(false);
-		}
+		final ConfigurationPropagator propagator = (ConfigurationPropagator) new Configuration(featureModel).getPropagator();
 		final List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, false), monitor);
 		for (final List<String> solution : solutions) {
 			final Configuration configuration = new Configuration(featureModel);
@@ -106,14 +99,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		return confs;
 	}
 
-	/**
-	 * For testing purpose only.
-	 *
-	 * @param falseOptionalFeatures
-	 * @param fm
-	 * @return
-	 */
-	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
+	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, FeatureModelFormula fm) {
 		featureModel = fm;
 		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}

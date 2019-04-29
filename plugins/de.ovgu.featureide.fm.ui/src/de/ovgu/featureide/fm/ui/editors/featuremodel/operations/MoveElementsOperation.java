@@ -28,6 +28,7 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
@@ -41,35 +42,26 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  */
 public class MoveElementsOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private final Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
+	private final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
 
-	public MoveElementsOperation(IFeatureModel featureModel) {
-		super(featureModel, DELETE);
+	public MoveElementsOperation(IFeatureModelManager featureModelManager) {
+		super(featureModelManager, DELETE);
 	}
 
-	// @Override
-	// public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-	// return Status.OK_STATUS;
-	// }
-
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		for (final Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
 			final AbstractFeatureModelOperation operation = it.next();
-			if (operation.canRedo()) {
-				operation.redo();
-			}
+			operation.redo();
 		}
 		return null;
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		for (final Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
 			final AbstractFeatureModelOperation operation = it.next();
-			if (operation.canUndo()) {
-				operation.undo();
-			}
+			operation.undo();
 		}
 		return null;
 	}

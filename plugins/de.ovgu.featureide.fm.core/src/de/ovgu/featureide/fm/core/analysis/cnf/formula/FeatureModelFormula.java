@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -40,7 +41,7 @@ public class FeatureModelFormula {
 	private final HashMap<ACreator<?>, ACreator<?>> map = new HashMap<>();
 
 	/**
-	 * Get an arbitrary element that can be derived from the associated feature model.<br/> This methods first checks whether there is a cached instance and
+	 * Get an arbitrary element that can be derived from the associated feature model.<br> This methods first checks whether there is a cached instance and
 	 * only computes the requested object otherwise.
 	 *
 	 * @return a {@link Node} instance.
@@ -74,7 +75,7 @@ public class FeatureModelFormula {
 	}
 
 	/**
-	 * Get the CNF for the associated feature model.<br/> Convenience method, fully equivalent to {@code getElement(new CNFFormula())}.
+	 * Get the CNF for the associated feature model.<br> Convenience method, fully equivalent to {@code getElement(new CNFFormula())}.
 	 *
 	 * @return a {@link CNF} instance.
 	 */
@@ -83,12 +84,21 @@ public class FeatureModelFormula {
 	}
 
 	/**
-	 * Get the Node in CNF for the associated feature model.<br/> Convenience method, fully equivalent to {@code getElement(new CNFNode())}.
+	 * Get the Node in CNF for the associated feature model.<br> Convenience method, fully equivalent to {@code getElement(new CNFNode())}.
 	 *
 	 * @return a {@link Node} instance.
 	 */
 	public Node getCNFNode() {
 		return getElement(new CNFNodeCreator());
+	}
+
+	/**
+	 * Get an analyzer for the associated feature model.<br> Convenience method, fully equivalent to {@code getElement(new FMAnalyzerCreator())}.
+	 *
+	 * @return a {@link Node} instance.
+	 */
+	public FeatureModelAnalyzer getAnalyzer() {
+		return getElement(new FMAnalyzerCreator());
 	}
 
 	public void resetFormula() {

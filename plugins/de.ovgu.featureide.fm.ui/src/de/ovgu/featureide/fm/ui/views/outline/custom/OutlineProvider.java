@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
@@ -44,6 +45,10 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 
 	private OutlineTreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
+
+	protected TreeViewer viewer;
+	protected IFile file;
+	protected FeatureModelManager featureModelManager;
 
 	public OutlineProvider() {}
 
@@ -92,15 +97,13 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	/**
 	 * Checks whether the provider supports the file that is opened in the editor.
 	 *
-	 * @param file
-	 * @return
+	 * @param file file to check
+	 * @return true if the file is supported, false otherwise
 	 */
 	public abstract boolean isSupported(IFile file);
 
 	/**
-	 * Returns the label provider name
-	 *
-	 * @return
+	 * @return the label provider name
 	 */
 	public String getProviderName() {
 		return labelProvider.getLabelProvName();
@@ -110,22 +113,22 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	 * Handles all other updates that must be made when the input changes. Will be called before initContextMenuActions, initToolbarActions and getFilters but
 	 * after the inputChange call.
 	 *
-	 * @param viewer
-	 * @param iFile
+	 * @param viewer viewer
+	 * @param iFile file
 	 */
 	public abstract void handleUpdate(TreeViewer viewer, IFile iFile);
 
 	/**
 	 * Handles other things related to the expand all elements action. Not overridden, this method does nothing.
 	 *
-	 * @param event
+	 * @param event property change event
 	 */
 	public void handleExpandAll(PropertyChangeEvent event) {}
 
 	/**
 	 * Handles other things related to the collapse all elements action. Not overridden, this method does nothing.
 	 *
-	 * @param event
+	 * @param event property change event
 	 */
 	public void handleCollapseAll(PropertyChangeEvent event) {}
 }

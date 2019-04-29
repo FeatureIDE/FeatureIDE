@@ -43,9 +43,6 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private int featureDiagramBottom = 0;
 
-	/**
-	 * @param manager
-	 */
 	public LevelOrderLayout() {
 		super();
 	}
@@ -54,7 +51,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		layout(root);
-		Rectangle rootBounds = getBounds(root);
+		final Rectangle rootBounds = getBounds(root);
 		layoutConstraints(featureDiagramBottom, featureModel.getVisibleConstraints(), rootBounds);
 	}
 

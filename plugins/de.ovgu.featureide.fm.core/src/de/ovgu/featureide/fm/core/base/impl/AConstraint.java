@@ -30,6 +30,7 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -43,12 +44,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 
-	// protected ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+	protected final IPropertyContainer propertyContainer;
 
 	protected final Collection<IFeature> containedFeatureList = new ArrayList<>();
-	// protected final Collection<IFeature> deadFeatures = new LinkedList<>();
-
-	// protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 
 	protected Node propNode;
 	boolean featureSelected;
@@ -57,10 +55,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
-		propNode = oldConstraint.propNode;
+		propNode = oldConstraint.propNode.clone();
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
 		description = oldConstraint.description;
+		propertyContainer = new MapPropertyContainer(oldConstraint.propertyContainer);
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
@@ -69,12 +68,13 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		featureSelected = false;
 		isImplicit = false;
 		description = "";
+		propertyContainer = new MapPropertyContainer();
 	}
 
-	// @Override
-	// public ConstraintAttribute getConstraintAttribute() {
-	// return attribute;
-	// }
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return propertyContainer;
+	}
 
 	/**
 	 *
@@ -91,34 +91,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 			return new ArrayList<>(containedFeatureList);
 		}
 	}
-
-	// @Override
-	// public Collection<IFeature> getDeadFeatures() {
-	// return Collections.unmodifiableCollection(deadFeatures);
-	// }
-
-	// @Override
-	// public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
-	//
-	// final Collection<IFeature> deadFeatures;
-	// final Node propNode = getNode();
-	// final Comparator<IFeature> featComp = new FeatureComparator(true);
-	// if (propNode != null) {
-	// deadFeatures = ProjectManager.getAnalyzer(featureModel).getDeadFeatures(solver, propNode);
-	// } else {
-	// deadFeatures = new TreeSet<IFeature>(featComp);
-	// }
-	// final Collection<IFeature> deadFeaturesAfter = new TreeSet<>(featComp);
-	//
-	// deadFeaturesAfter.addAll(exlcudeFeatuers);
-	// deadFeaturesAfter.retainAll(deadFeatures);
-	// return deadFeaturesAfter;
-	// }
-
-	// @Override
-	// public Collection<IFeature> getFalseOptional() {
-	// return falseOptionalFeatures;
-	// }
 
 	@Override
 	public Node getNode() {
@@ -158,11 +130,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		this.description = description;
 	}
 
-	/**
-	 * Returns the description
-	 *
-	 * @return
-	 */
 	@Override
 	public String getDescription() {
 		return description;

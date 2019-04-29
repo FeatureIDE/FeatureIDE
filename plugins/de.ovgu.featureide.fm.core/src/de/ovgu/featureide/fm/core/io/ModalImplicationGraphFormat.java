@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
  *
  * @author Sebastian Krieter
  */
-public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat {
+public class ModalImplicationGraphFormat extends APersistentFormat<ModalImplicationGraph> implements IModalImplicationGraphFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.mig." + ModalImplicationGraphFormat.class.getSimpleName();
 
@@ -71,11 +71,6 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 	}
 
 	@Override
-	public ModalImplicationGraphFormat getInstance() {
-		return this;
-	}
-
-	@Override
 	public boolean supportsRead() {
 		return true;
 	}
@@ -91,18 +86,8 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 	}
 
 	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
-	}
-
-	@Override
 	public String getName() {
 		return "ModalImplicationGraph";
-	}
-
-	@Override
-	public boolean initExtension() {
-		return true;
 	}
 
 }

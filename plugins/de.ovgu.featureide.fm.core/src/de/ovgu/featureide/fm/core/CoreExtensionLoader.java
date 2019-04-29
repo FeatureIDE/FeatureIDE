@@ -38,10 +38,7 @@ public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension
 	public void loadProviders(ExtensionManager<T> extensionManager) {
 		for (final Class<? extends T> extensionClass : extensionArray) {
 			try {
-				final T newInstance = extensionClass.newInstance();
-				if (newInstance.initExtension()) {
-					extensionManager.addExtension(newInstance);
-				}
+				extensionManager.addExtension(extensionClass.newInstance());
 			} catch (final Throwable e) {
 				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
 			}

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * @brief Converter using cnf and nnf.
+ * Converter using cnf and nnf.
  *
  * @author Alexander Knueppel
  */
@@ -76,7 +76,6 @@ public class CombinedConverter implements IConverterStrategy {
 			}
 			costs += estimatedCosts(node);
 		}
-		// System.out.println(costs);
 		return costs;
 	}
 

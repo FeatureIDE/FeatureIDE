@@ -33,15 +33,6 @@ import java.util.Map.Entry;
  */
 public abstract class ADimacsWriter {
 
-	/** Token leading a (single-line) comment. */
-	protected static final String COMMENT = "c";
-	/** Token leading the problem definition. */
-	protected static final String PROBLEM = "p";
-	/** Token identifying the problem type as CNF. */
-	protected static final String CNF = "cnf";
-	/** Token denoting the end of a clause. */
-	protected static final String CLAUSE_END = "0";
-
 	/** Maps variables to indexes. */
 	protected final Map<Object, Integer> variableIndexes;
 
@@ -55,6 +46,9 @@ public abstract class ADimacsWriter {
 	 * @throws IllegalArgumentException if the input is null or not in CNF
 	 */
 	public ADimacsWriter(Collection<?> variables) {
+		if (variables == null) {
+			throw new IllegalArgumentException();
+		}
 		variableIndexes = new LinkedHashMap<>();
 		for (final Object variable : variables) {
 			addVariable(variable);
@@ -120,7 +114,11 @@ public abstract class ADimacsWriter {
 	 * @param index index of the variable
 	 */
 	private void writeVariableDirectoryEntry(StringBuilder sb, Object variable, int index) {
-		sb.append(String.format("%s %d %s%n", COMMENT, index, String.valueOf(variable)));
+		sb.append(DIMACSFormat.COMMENT_START);
+		sb.append(index);
+		sb.append(' ');
+		sb.append(String.valueOf(variable));
+		sb.append(System.lineSeparator());
 	}
 
 	/**
@@ -129,7 +127,14 @@ public abstract class ADimacsWriter {
 	 * @param sb the string builder that builds the document
 	 */
 	private void writeProblem(StringBuilder sb) {
-		sb.append(String.format("%s %s %d %d%n", PROBLEM, CNF, variableIndexes.size(), getNumberOfClauses()));
+		sb.append(DIMACSFormat.PROBLEM);
+		sb.append(' ');
+		sb.append(DIMACSFormat.CNF);
+		sb.append(' ');
+		sb.append(variableIndexes.size());
+		sb.append(' ');
+		sb.append(getNumberOfClauses());
+		sb.append(System.lineSeparator());
 	}
 
 	protected abstract int getNumberOfClauses();

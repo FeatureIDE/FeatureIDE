@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,19 +29,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -49,29 +47,39 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  * @author Timo G&uuml;nther
  */
-public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class DIMACSFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+
+	/** Token leading a (single-line) comment. */
+	static final String COMMENT = "c";
+	static final String COMMENT_START = COMMENT + " ";
+	/** Token leading the problem definition. */
+	static final String PROBLEM = "p";
+	/** Token identifying the problem type as CNF. */
+	static final String CNF = "cnf";
+	/** Token denoting the end of a clause. */
+	static final String CLAUSE_END = "0";
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
+		setFactory(featureModel);
 
 		// Transform the input into a propositional node.
-		final DimacsReader r = new DimacsReader(source.toString());
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node read;
-		final Collection<Literal> variables;
-		try {
-			read = r.read();
-			variables = r.getVariables();
-		} catch (final ParseException e) {
-			problemList.add(new Problem(e));
-			return problemList;
-		}
+		try (StringReader reader = new StringReader(source.toString())) {
+			final Node read = r.read(reader);
+			final Collection<String> variables = r.getVariables();
 
-		// Add the propositional node to the feature model.
-		addNodeToFeatureModel(featureModel, read, variables);
+			// Add the propositional node to the feature model.
+			addNodeToFeatureModel(featureModel, read, variables);
+		} catch (final ParseException e) {
+			problemList.add(new Problem(e, e.getErrorOffset()));
+		} catch (final IOException e) {
+			problemList.add(new Problem(e));
+		}
 
 		return problemList;
 	}
@@ -84,16 +92,15 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 	 * @param node propositional node to add
 	 * @param variables the variables of the propositional node
 	 */
-	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, Collection<Literal> variables) {
+	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, Collection<String> variables) {
 		// Add a dummy feature as root.
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		// Add a feature for each variable.
-		for (final Literal variable : variables) {
+		for (final String variable : variables) {
 			final IFeature feature = factory.createFeature(featureModel, variable.toString());
 			featureModel.addFeature(feature);
 			rootFeature.getStructure().addChild(feature.getStructure());
@@ -102,15 +109,13 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 		// Add a constraint for each conjunctive clause.
 		final List<Node> clauses = node instanceof And ? Arrays.asList(node.getChildren()) : Collections.singletonList(node);
 		for (final Node clause : clauses) {
-			final IConstraint constraint = factory.createConstraint(featureModel, clause);
-			featureModel.addConstraint(constraint);
+			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
 		}
 	}
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node in = AdvancedNodeCreator.createRegularCNF(featureModel);
-		final DimacsWriter w = new DimacsWriter(in);
+		final DimacsWriter w = new DimacsWriter(AdvancedNodeCreator.createRegularCNF(featureModel), FeatureUtils.getFeatureNames(featureModel));
 		w.setWritingVariableDirectory(true);
 		return w.write();
 	}

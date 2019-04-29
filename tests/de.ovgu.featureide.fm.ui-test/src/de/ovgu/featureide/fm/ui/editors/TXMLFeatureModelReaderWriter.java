@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 
 /**
@@ -41,9 +41,9 @@ public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel fmOrig = Commons.loadTestFeatureModelFromFile("basic.xml");
-		final IFeatureModel fmCollapsed = Commons.loadTestFeatureModelFromFile("basic_collapsed.xml");
-		final IFeatureModel fmNotCollapsed = Commons.loadTestFeatureModelFromFile("basic_not_collapsed.xml");
+		final FeatureModelManager fmOrig = Commons.loadTestFeatureModelFromFile("basic.xml");
+		final FeatureModelManager fmCollapsed = Commons.loadTestFeatureModelFromFile("basic_collapsed.xml");
+		final FeatureModelManager fmNotCollapsed = Commons.loadTestFeatureModelFromFile("basic_not_collapsed.xml");
 
 		final IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
 		gFM.init();

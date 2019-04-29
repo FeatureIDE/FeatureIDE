@@ -81,7 +81,7 @@ public class LegendLayoutAction extends Action {
 		} else {
 			featureModel.getLayout().setLegendAutoLayout(true);
 			setChecked(true);
-			featureModel.getFeatureModel().handleModelDataChanged();
+			featureModel.getFeatureModelManager().editObject().handleModelDataChanged();
 		}
 
 	}

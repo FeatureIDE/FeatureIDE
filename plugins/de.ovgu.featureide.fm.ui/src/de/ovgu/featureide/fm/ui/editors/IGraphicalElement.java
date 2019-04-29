@@ -53,4 +53,6 @@ public interface IGraphicalElement extends IGraphicItem {
 
 	void registerUIObject(IEventListener listener);
 
+	void deregisterUIObject();
+
 }

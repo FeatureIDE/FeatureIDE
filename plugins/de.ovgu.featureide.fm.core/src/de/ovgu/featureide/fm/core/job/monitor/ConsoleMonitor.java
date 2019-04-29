@@ -59,7 +59,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
-		if (canceled) {
+		if (canceled || Thread.currentThread().isInterrupted()) {
 			throw new MethodCancelException();
 		}
 	}

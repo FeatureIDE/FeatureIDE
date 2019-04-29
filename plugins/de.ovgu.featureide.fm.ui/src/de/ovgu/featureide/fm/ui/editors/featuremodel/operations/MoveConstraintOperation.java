@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to move Constraints. Provides undo/redo functionality.
@@ -35,30 +36,28 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 
-	private final IConstraint constraint;
-	private final int index;
+	private final int newIndex, oldIndex;
 
-	private final int oldIndex;
-
-	public MoveConstraintOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
-		super(featureModel, MOVE_CONSTRAINT);
-		this.constraint = constraint;
-		index = newIndex;
+	public MoveConstraintOperation(IFeatureModelManager featureModelManager, int newIndex, int oldIndex) {
+		super(featureModelManager, MOVE_CONSTRAINT);
+		this.newIndex = newIndex;
 		this.oldIndex = oldIndex;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		featureModel.removeConstraint(constraint);
-		featureModel.addConstraint(constraint, index);
-		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, oldIndex, index);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(oldIndex);
+		featureModel.removeConstraint(oldIndex);
+		featureModel.addConstraint(constraint, newIndex);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, oldIndex, newIndex);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModel.removeConstraint(constraint);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(newIndex);
+		featureModel.removeConstraint(newIndex);
 		featureModel.addConstraint(constraint, oldIndex);
-		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, index, oldIndex);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, newIndex, oldIndex);
 	}
 
 }

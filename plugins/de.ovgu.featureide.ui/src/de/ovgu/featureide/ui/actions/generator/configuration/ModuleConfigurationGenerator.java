@@ -22,10 +22,10 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import java.util.List;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -39,8 +39,8 @@ public class ModuleConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	private final String featureName;
 
-	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, String featureName) {
-		super(builder, featureProject);
+	public ModuleConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, String featureName) {
+		super(builder, formula);
 		this.featureName = featureName;
 	}
 

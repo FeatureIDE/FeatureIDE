@@ -140,7 +140,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	@Override
 	public void performFullBuild(IFile config) {
 		final Path configPath = Paths.get(config.getLocationURI());
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 
 		SimpleFileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());
 

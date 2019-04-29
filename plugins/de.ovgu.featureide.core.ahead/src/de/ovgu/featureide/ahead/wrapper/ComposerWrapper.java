@@ -53,8 +53,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import jampack.Jampack;
 import mixin.Mixin;
 
@@ -106,7 +106,7 @@ public class ComposerWrapper {
 	/**
 	 * Creates a new instance of Composer
 	 *
-	 * @param featureProject
+	 * @param featureProject respective project
 	 */
 	public ComposerWrapper(IFeatureProject featureProject) {
 		this.featureProject = featureProject;
@@ -128,8 +128,9 @@ public class ComposerWrapper {
 	/**
 	 * Composes all jak files for a given configuration file
 	 *
-	 * @param configFile
+	 * @param configFile given config file
 	 * @return Array of composed jakfiles
+	 * @throws IOException file not found
 	 */
 	// @SuppressWarnings("unchecked")
 	public IFile[] composeAll(IFile configFile) throws IOException {
@@ -167,15 +168,18 @@ public class ComposerWrapper {
 		allFeatureFolders.clear();
 		featureFolders.clear();
 
-		final ProblemList problems = new ProblemList();
-		final Configuration configuration = ConfigurationManager.load(Paths.get(configFile.getLocationURI()), featureProject.getFeatureModel(), problems);
-		if (!problems.containsError()) {
-			final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
-			for (final IFeature feature : selectedFeatures) {
-				if (feature.getStructure().isConcrete()) {
-					final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
-					if (f != null) {
-						featureFolders.add(f);
+		if (configFile != null) {
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(Paths.get(configFile.getLocationURI()));
+			if (!fileHandler.getLastProblems().containsError()) {
+				final Configuration configuration = fileHandler.getObject();
+				configuration.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
+				final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
+				for (final IFeature feature : selectedFeatures) {
+					if (feature.getStructure().isConcrete()) {
+						final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
+						if (f != null) {
+							featureFolders.add(f);
+						}
 					}
 				}
 			}

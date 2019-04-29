@@ -35,9 +35,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -56,9 +56,9 @@ public class QuickFixUnusedFeaturesTest {
 
 	protected String failureMessage;
 
-	private final FeatureModel fm;
+	private final FeatureModelFormula fm;
 
-	public QuickFixUnusedFeaturesTest(FeatureModel fm, String s) throws UnsupportedModelException {
+	public QuickFixUnusedFeaturesTest(FeatureModelFormula fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
 		failureMessage = "(" + s + ")";
 
@@ -71,7 +71,7 @@ public class QuickFixUnusedFeaturesTest {
 			final Object[] models = new Object[2];
 
 			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
-			models[0] = fm;
+			models[0] = new FeatureModelFormula(fm);
 			models[1] = f.getName();
 			params.add(models);
 		}
@@ -92,7 +92,7 @@ public class QuickFixUnusedFeaturesTest {
 
 	@Test
 	public void createConfigurationsTest() {
-		final Collection<IFeature> common = FeatureModelManager.getAnalyzer(fm).getCommonFeatures();
+		final Collection<IFeature> common = fm.getAnalyzer().getCommonFeatures();
 		final Collection<String> unusedFeatures = new LinkedList<>();
 
 		for (final IFeature feature : common) {

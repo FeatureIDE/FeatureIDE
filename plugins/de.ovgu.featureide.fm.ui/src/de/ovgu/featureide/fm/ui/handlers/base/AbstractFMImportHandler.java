@@ -25,7 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE_WASNT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
@@ -67,14 +68,14 @@ public abstract class AbstractFMImportHandler extends AFileHandler {
 		fileDialog.setOverwrite(false);
 		setFilter(fileDialog);
 
-		File inputFile;
+		Path inputFile;
 		while (true) {
 			final String filepath = fileDialog.open();
 			if (filepath == null) {
 				return;
 			}
-			inputFile = new File(filepath);
-			if (inputFile.exists()) {
+			inputFile = Paths.get(filepath);
+			if (Files.exists(inputFile)) {
 				break;
 			}
 			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
@@ -83,12 +84,12 @@ public abstract class AbstractFMImportHandler extends AFileHandler {
 		final IFeatureModelFormat modelFormat = setModelReader();
 		IFeatureModel fm = null;
 		try {
-			fm = FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
+			fm = FMFactoryManager.getInstance().getFactory(inputFile, modelFormat).create();
 		} catch (final NoSuchExtensionException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		if (fm != null) {
-			final ProblemList errors = SimpleFileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
+			final ProblemList errors = SimpleFileHandler.load(inputFile, fm, modelFormat).getErrors();
 			if (!errors.isEmpty()) {
 				final StringBuilder sb = new StringBuilder("Error while loading file: \n");
 				for (final Problem problem : errors) {

@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -35,7 +34,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  */
 public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
 
-	protected final FeatureModelSnapshot snapshot;
+	protected final FeatureModelFormula snapshot;
 
 	protected final ConfigurationBuilder builder;
 
@@ -44,9 +43,9 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 	 */
 	protected long confs = 0;
 
-	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
+	public AConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
 		this.builder = builder;
-		snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
+		snapshot = formula;
 	}
 
 	protected void cancelGenerationJobs() {

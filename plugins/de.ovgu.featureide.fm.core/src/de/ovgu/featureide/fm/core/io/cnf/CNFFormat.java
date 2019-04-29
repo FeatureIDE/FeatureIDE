@@ -27,23 +27,16 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 
 /**
  * Reads / Writes feature models in the DIMACS CNF format.
  *
  * @author Sebastian Krieter
  */
-public class CNFFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class CNFFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + CNFFormat.class.getSimpleName();
-
-	@Override
-	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public String write(IFeatureModel featureModel) {

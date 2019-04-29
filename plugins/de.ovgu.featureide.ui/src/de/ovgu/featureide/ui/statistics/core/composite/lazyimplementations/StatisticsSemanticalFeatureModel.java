@@ -20,22 +20,9 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
-
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
-import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
-import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
-import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
  * Parent for the actual {@link ConfigNode}s.
@@ -45,72 +32,19 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  */
 public class StatisticsSemanticalFeatureModel extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public static class ConfigNode extends Parent {
-
-		private final IFeatureModel innerModel;
-
-		public ConfigNode(String description, IFeatureModel innerModel) {
-			super(description, "(double-click to calculate)");
-			this.innerModel = innerModel;
-		}
-
-		/**
-		 * calculates the number of configurations/variants depending on ignoreAbstract. This method should be called by {@link TreeClickListener}.
-		 *
-		 * @param timeout defines how long the SAT-Solver may take to accomplish the task.
-		 * @param priority for the job.
-		 */
-		public void calculate(final int timeout, final int priority) {
-			final LongRunningMethod<Boolean> job = new TreeJob(this) {
-
-				private String calculateConfigs() {
-					final boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-					if (!ignoreAbstract && (FeatureUtils.getConcreteFeatures(innerModel).size() == 0)) {
-						// case: there is no concrete feature so there is only one program variant,
-						// without this the calculation least much to long
-						return "1";
-					}
-
-					final ConfigurationPropagator propagator = FeatureModelManager.getInstance(innerModel).getSnapshot().getPropagator(ignoreAbstract);
-					final long number = LongRunningWrapper.runMethod(propagator.number(timeout));
-
-					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
-				}
-
-				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
-					setValue(calculateConfigs());
-					return true;
-				}
-
-				@Override
-				public boolean cancel() {
-					return false;
-				}
-			};
-			final LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + description, job);
-			runner.setPriority(priority);
-			final JobDoneListener listener = JobDoneListener.getInstance();
-			if (listener != null) {
-				runner.addJobChangeListener(listener);
-			}
-			runner.schedule();
-		}
-	}
-
-	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
+	public StatisticsSemanticalFeatureModel(String description, FeatureModelFormula model) {
 		super(description);
 		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
+		// Cached validity for speed
+		final boolean isValid = model.getAnalyzer().isValid();
 
-		final Boolean isValid = FeatureModelManager.getAnalyzer(model).isValid();
-
-		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
+		addChild(new Parent(MODEL_VOID, isValid));
 
 		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
 

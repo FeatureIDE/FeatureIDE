@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRAKT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE_GRUPPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IST_TAUTOLOGIE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EINGEKLAPPT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSCH_OPTIONALES_FEATURE;
@@ -31,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTIERT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.KONKRET;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OBLIGATORISCH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ODER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ODER_GRUPPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANTES_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNBESTIMMBAR_VERSTECKTES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERSTECKT;
@@ -54,6 +56,7 @@ public class German implements ILanguage {
 	private static final String INHERITED = GEERBT;
 	private static final String INTERFACED = VON_INTERFACE;
 	private static final String CONCRETE = KONKRET;
+	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = VERSTECKT;
 	private static final String COLLAPSED = EINGEKLAPPT;
 	private static final String DEAD = "Unwählbar";
@@ -144,6 +147,11 @@ public class German implements ILanguage {
 	}
 
 	@Override
+	public String getFeature() {
+		return FEATURE;
+	}
+
+	@Override
 	public String getHidden() {
 		return HIDDEN;
 	}
@@ -169,8 +177,18 @@ public class German implements ILanguage {
 	}
 
 	@Override
+	public String getAlternativeGroup() {
+		return ALTERNATIVE_GRUPPE;
+	}
+
+	@Override
 	public String getOr() {
 		return OR;
+	}
+
+	@Override
+	public String getOrGroup() {
+		return ODER_GRUPPE;
 	}
 
 	@Override

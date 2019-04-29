@@ -20,20 +20,19 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERATION;
+
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERATION;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -51,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -98,15 +98,14 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
-	private DirectEditManager manager;
+	private DirectEditManager editManager;
 
 	public void showRenameManager() {
-		if (manager == null) {
-			final IGraphicalFeature f = getModel();
-			manager =
-				new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()), f.getGraphicalModel().getFeatureModel());
+		if (editManager == null) {
+			editManager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()),
+					getModel().getGraphicalModel().getFeatureModelManager());
 		}
-		manager.show();
+		editManager.show();
 	}
 
 	@Override
@@ -123,13 +122,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			final CollapseFeatureOperation op = new CollapseFeatureOperation(feature, featureModel, COLLAPSE_OPERATION);
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
-
-			}
+			FeatureModelOperationWrapper.run(new CollapseFeatureOperation(feature.getName(), featureModel, COLLAPSE_OPERATION));
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			for (final IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
@@ -190,6 +183,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void deactivate() {
+		getModel().deregisterUIObject();
 		super.deactivate();
 	}
 
@@ -206,8 +200,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case CHILDREN_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
 			for (final FeatureConnection connection : getModel().getTargetConnections()) {
-				final Map<?, ?> registry = getViewer().getEditPartRegistry();
-				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
 				}
@@ -215,15 +208,14 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case LOCATION_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
 			if (sourceConnection != null) {
 				final IGraphicalFeature target = sourceConnection.getTarget();
 				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getModel());
 				if (!equals(newTarget, target)) {
 					sourceConnection.setTarget(newTarget);
-					final Map<?, ?> registry = getViewer().getEditPartRegistry();
-					final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+					final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 					if (connectionEditPart != null) {
 						refresh();
 					}
@@ -231,18 +223,16 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 
 			for (final FeatureConnection connection : getModel().getTargetConnections()) {
-				final Map<?, ?> registry = getViewer().getEditPartRegistry();
-				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+				final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
 				}
 			}
 			break;
 		case GROUP_TYPE_CHANGED:
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
-			Map<?, ?> registry = getViewer().getEditPartRegistry();
-			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			if (connectionEditPart != null) {
 				connectionEditPart.refreshSourceDecoration();
 				connectionEditPart.refreshTargetDecoration();
@@ -258,14 +248,32 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			getFigure().setName(displayName);
 			getModel().setSize(getFigure().getSize());
+
+			sourceConnection = getModel().getSourceConnection();
+			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
+			connectionEditPart.propertyChange(event);
 			break;
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
+			if (getModel().isCollapsed()) {
+				final List<FeatureConnection> connections = getModel().getSourceConnectionAsList();
+				for (final FeatureConnection featureConnection : connections) {
+					if (featureConnection.getSource() == featureConnection.getTarget()) {
+						final EditPartViewer viewer = getViewer();
+						if (viewer != null) {
+							final ConnectionEditPart part = (ConnectionEditPart) viewer.getEditPartRegistry().get(featureConnection);
+							if (part != null) {
+								part.refreshSourceDecoration();
+							}
+						}
+					}
+				}
+			}
 			break;
-		case COLLAPSED_ALL_CHANGED:
-		case COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			/*
 			 * Reset the active reason in case we missed that it was set to null while this was collapsed. In case it should not be null, the active reason will
 			 * be set to the correct value in the upcoming feature model analysis anyway.
@@ -274,24 +282,28 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case MANDATORY_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
-			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
+			connectionEditPart.propertyChange(event);
 			break;
 		case FEATURE_DELETE:
 			deactivate();
 			break;
 		case PARENT_CHANGED:
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
-			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
-			connectionEditPart.refreshVisuals();
+			final EditPartViewer viewer = getViewer();
+			if (viewer != null) {
+				connectionEditPart = (ConnectionEditPart) viewer.getEditPartRegistry().get(sourceConnection);
+				if (connectionEditPart != null) {
+					connectionEditPart.refreshVisuals();
+					connectionEditPart.propertyChange(event);
+				}
+			}
 			break;
-		case HIDDEN_CHANGED:
-			getFigure().setProperties();
+		case FEATURE_HIDDEN_CHANGED:
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
-			registry = getViewer().getEditPartRegistry();
-			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
@@ -299,6 +311,10 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case ACTIVE_REASON_CHANGED:
 			setActiveReason((FeatureModelReason) event.getNewValue());
+			break;
+		case FEATURE_ATTRIBUTE_CHANGED:
+			// Forces the features figure to remove the cached tooltip which was generated before.
+			getFigure().ResetTooltip();
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");
@@ -319,7 +335,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		) || (activeReason.getSubject().getOrigin() == Origin.CHILD_HORIZONTAL)) {
 			final FeatureFigure figure = getFigure();
 			figure.setActiveReason(activeReason);
-			figure.setProperties();
+			figure.updateProperties();
 		}
 
 		// Update the source connection.

@@ -59,7 +59,7 @@ public class DimacsWriterCNF extends ADimacsWriter {
 			writeLiteral(sb, l);
 			sb.append(" ");
 		}
-		sb.append(CLAUSE_END);
+		sb.append(DIMACSFormat.CLAUSE_END);
 		sb.append(System.lineSeparator());
 	}
 

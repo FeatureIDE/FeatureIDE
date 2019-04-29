@@ -64,12 +64,12 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 		final VecInt resultList = new VecInt();
 		final List<LiteralSet> relevantClauses = new ArrayList<>();
 
+		final ModifiableSatSolver modSolver = new ModifiableSatSolver(solver.getSatInstance());
 		for (final int literal : variables.getLiterals()) {
 			final CNF slicedCNF = LongRunningWrapper.runMethod(new CNFSlicer(solver.getSatInstance(), variables.removeAll(new LiteralSet(literal))));
 			final List<LiteralSet> clauses = slicedCNF.getClauses();
-			final ModifiableSatSolver modSolver = new ModifiableSatSolver(slicedCNF);
 			for (final LiteralSet clause : clauses) {
-				if (clause.containsLiteral(literal)) {
+				if (clause.containsVariable(literal)) {
 					final LiteralSet newClause = clause.clean(literal);
 					if (newClause != null) {
 						relevantClauses.add(newClause);

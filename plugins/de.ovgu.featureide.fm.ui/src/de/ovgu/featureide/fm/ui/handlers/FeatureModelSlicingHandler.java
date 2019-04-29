@@ -48,8 +48,8 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(final IFile file) {
-		final FeatureModelManager project = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI()));
-		final IFeatureModel featureModel = project.getSnapshot().getObject();
+		final FeatureModelManager manager = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI()));
+		final IFeatureModel featureModel = manager.getObject();
 		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);

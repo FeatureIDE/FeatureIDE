@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -35,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.impl.FactoryWorkspace;
  *
  * @author Sebastian Krieter
  */
-public class FactoryWorkspaceFormat extends APersistentFormat<FactoryWorkspace> implements IPersistentFormat<FactoryWorkspace> {
+public class FactoryWorkspaceFormat extends APersistentFormat<FactoryWorkspace> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FactoryWorkspaceFormat.class.getSimpleName();
 
@@ -52,12 +53,17 @@ public class FactoryWorkspaceFormat extends APersistentFormat<FactoryWorkspace> 
 			list.add(new Problem(e));
 		}
 
-		workspace.setDefaultFactoryID(properties.getProperty(DEFAULT_KEY));
 		for (final Entry<Object, Object> entry : properties.entrySet()) {
 			final Object key = entry.getKey();
-			if (!DEFAULT_KEY.equals(key)) {
+			if (DEFAULT_KEY.equals(key)) {
+				workspace.setDefaultFactoryID(entry.getValue().toString());
+			} else {
 				workspace.assignID(key.toString().substring(PREFIX.length()), entry.getValue().toString());
 			}
+		}
+
+		if (workspace.getDefaultFactoryID() == null) {
+			list.add(new Problem(new ParseException("No default Factory specified.", 0)));
 		}
 
 		return list;
@@ -82,11 +88,6 @@ public class FactoryWorkspaceFormat extends APersistentFormat<FactoryWorkspace> 
 	@Override
 	public String getSuffix() {
 		return "properties";
-	}
-
-	@Override
-	public FactoryWorkspaceFormat getInstance() {
-		return this;
 	}
 
 	@Override

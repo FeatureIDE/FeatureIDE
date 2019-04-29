@@ -39,7 +39,7 @@ public interface ISPLMigrator {
 	 *
 	 * @see DefaultSPLMigrator#registerProjectsFromSelection(org.eclipse.jface.viewers.IStructuredSelection)
 	 *
-	 * @param projects
+	 * @param projects projects to register
 	 */
 	public abstract void registerProjectsForMigration(Set<IProject> projects);
 

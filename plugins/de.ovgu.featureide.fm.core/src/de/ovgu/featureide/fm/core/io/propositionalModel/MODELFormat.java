@@ -38,8 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -49,7 +48,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  * @author Timo G&uuml;nther
  */
-public class MODELFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class MODELFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + MODELFormat.class.getSimpleName();
 
@@ -86,7 +85,7 @@ public class MODELFormat extends APersistentFormat<IFeatureModel> implements IFe
 	 */
 	private void addNodeToFeatureModel(IFeatureModel featureModel, ArrayList<String> features, Node node) {
 		// Add a dummy feature as root.
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 
 		final IFeature rootFeature = factory.createFeature(featureModel, ROOT_IDENTIFIER);
 		FeatureUtils.setAbstract(rootFeature, true);
@@ -115,11 +114,6 @@ public class MODELFormat extends APersistentFormat<IFeatureModel> implements IFe
 	@Override
 	public String getSuffix() {
 		return "model";
-	}
-
-	@Override
-	public MODELFormat getInstance() {
-		return this;
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -35,9 +35,6 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 public class FMOutlineProvider extends OutlineProvider implements IEventListener {
 
-	private TreeViewer viewer;
-	private IFile file;
-	private IFeatureModel featureModel;
 	private SyncCollapsedStateAction syncCollapsedStateAction;
 	private IGraphicalFeatureModel graphicalFeatureModel;
 	private FmOutlinePageContextMenu contextMenu;
@@ -52,7 +49,10 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	public boolean isSupported(IFile file) {
-		return file.getFileExtension().equalsIgnoreCase("xml") && (FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null);
+		if (file != null) {
+			return "xml".equalsIgnoreCase(file.getFileExtension()) && (FeatureModelManager.getInstance(EclipseFileSystem.getPath(file)) != null);
+		}
+		return false;
 	}
 
 	@Override
@@ -66,15 +66,20 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor instanceof FeatureModelEditor) {
 			final FeatureModelEditor fTextEditor = (FeatureModelEditor) activeEditor;
-			featureModel = fTextEditor.getFeatureModel();
+			featureModelManager = fTextEditor.getFeatureModelManager();
+
+			// Remove Listener and add the listener again to minimize the listeners held by the provider to one. With a feature model check does not help here
+			// as otherwise SyncCollapsedStateAction does not work
+			final IFeatureModel featureModel = featureModelManager.editObject();
+			featureModel.removeListener(this);
 			featureModel.addListener(this);
 			graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 
 			getTreeProvider().inputChanged(viewer, null, featureModel);
 			setExpandedElements();
 
-			if ((contextMenu == null) || (contextMenu.getFeatureModel() != featureModel)) {
-				contextMenu = new FmOutlinePageContextMenu(fTextEditor.getSite(), fTextEditor, viewer, featureModel, true, false);
+			if ((contextMenu == null) || (contextMenu.getFeatureModelManager() != featureModelManager)) {
+				contextMenu = new FmOutlinePageContextMenu(fTextEditor.getSite(), fTextEditor, viewer, featureModelManager, true, false);
 			}
 		}
 	}
@@ -88,7 +93,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
-		syncCollapsedStateAction = new SyncCollapsedStateAction(viewer, true);
+		syncCollapsedStateAction = new SyncCollapsedStateAction(viewer);
 		syncCollapsedStateAction.setEnabled(true);
 		manager.add(syncCollapsedStateAction);
 	}
@@ -98,44 +103,29 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		return null;
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return featureModel;
-	}
-
 	private void setExpandedElements() {
-		final FMTreeContentProvider contentProvider = (FMTreeContentProvider) getTreeProvider();
 		final ArrayList<Object> expandedElements = new ArrayList<>();
-		if (contentProvider.getFeatureModel() != null) {
-			for (final IFeature f : contentProvider.getFeatureModel().getFeatures()) {
-				if (f.getStructure().hasChildren() && !graphicalFeatureModel.getGraphicalFeature(f).isCollapsed()) {
-					expandedElements.add(f);
-				}
+		for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
+			if (!f.isCollapsed()) {
+				expandedElements.add(f);
 			}
 			expandedElements.add("Constraints");
 			viewer.setExpandedElements(expandedElements.toArray());
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
 		if ((graphicalFeatureModel != null) && syncCollapsedStateAction.isChecked() && (event.getElement() instanceof IFeature)) {
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (!graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(true);
-				featureModel.fireEvent(new FeatureIDEEvent((event.getElement()), EventType.COLLAPSED_CHANGED));
+				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
 		((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), file);
@@ -143,15 +133,11 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(false);
-				featureModel.fireEvent(new FeatureIDEEvent((event.getElement()), EventType.COLLAPSED_CHANGED));
+				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		viewer.getContentProvider().inputChanged(viewer, null, file);
@@ -160,32 +146,28 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	@Override
 	public void handleExpandAll(PropertyChangeEvent event) {
 		if (syncCollapsedStateAction.isChecked()) {
+			final IFeatureModel featureModel = featureModelManager.getSnapshot();
 			for (final IFeature f : featureModel.getFeatures()) {
 				graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(false);
 			}
-			featureModel.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 
 	@Override
 	public void handleCollapseAll(PropertyChangeEvent event) {
 		if (syncCollapsedStateAction.isChecked()) {
+			final IFeatureModel featureModel = featureModelManager.getSnapshot();
 			for (final IFeature f : featureModel.getFeatures()) {
 				if (!f.getStructure().isRoot()) {
 					graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(true);
 				}
 			}
-			featureModel.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.COLLAPSED_ALL_CHANGED));
+			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
-
-	}
+	public void selectionChanged(SelectionChangedEvent event) {}
 
 }

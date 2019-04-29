@@ -93,8 +93,8 @@ public class FSTFeature {
 	}
 
 	/**
-	 * @param className
-	 * @param role
+	 * @param className Name of class
+	 * @param role FSTRole
 	 */
 	public void addRole(String className, FSTRole role) {
 		roles.put(className, role);

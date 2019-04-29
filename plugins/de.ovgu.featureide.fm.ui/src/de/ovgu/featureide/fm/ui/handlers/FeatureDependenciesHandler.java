@@ -22,6 +22,10 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_FEATURE_DEPENDENCIES;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -37,8 +41,11 @@ import org.eclipse.swt.widgets.Shell;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
 /**
@@ -47,6 +54,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
+//TODO implement own feature model format
 public class FeatureDependenciesHandler extends AFileHandler {
 
 	@Override
@@ -65,7 +73,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				final ModalImplicationGraph modalImplicationGraph = instance.getSnapshot().getFormula().getElement(new ModalImplicationGraphCreator());
+				final ModalImplicationGraph modalImplicationGraph = instance.getPersistentFormula().getElement(new ModalImplicationGraphCreator());
 				// TODO !!!
 				final String text = modalImplicationGraph.toString();
 				try {
@@ -79,6 +87,59 @@ public class FeatureDependenciesHandler extends AFileHandler {
 		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
+	}
+
+	/**
+	 * saves the given content to a text File at a given path(including filename)
+	 *
+	 * @param content
+	 * @param path
+	 */
+	private void saveFile(String content, String path) {
+		if (path == null) {
+			return;
+		}
+		final File outputFile = new File(path);
+		BufferedWriter out = null;
+		try {
+			out = new BufferedWriter(new FileWriter(outputFile));
+			out.write(content);
+		} catch (final IOException e) {} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (final IOException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
+		}
+
+		return;
+	}
+
+	/**
+	 * opens a File Dialog and returns the selected path
+	 *
+	 * @param text
+	 *
+	 */
+	private String openFileDialog() {
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		fileDialog.setFileName("*.txt");
+		fileDialog.setOverwrite(true);
+		return fileDialog.open();
+	}
+
+	/**
+	 * reads the featureModel from file
+	 *
+	 * @param inputFile
+	 * @return featureModel
+	 * @throws UnsupportedModelException
+	 * @throws FileNotFoundException
+	 */
+	private IFeatureModel readModel(IFile inputFile) {
+		return FeatureModelManager.load(Paths.get(inputFile.getLocationURI()));
 	}
 
 }

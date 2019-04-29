@@ -30,7 +30,7 @@ import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
@@ -44,10 +44,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 public class StatisticsContractComplexityNew extends LazyParent {
 
 	private final FSTModel fstModel;
-	private final IFeatureModel featModel;
+	private final FeatureModelFormula featModel;
 	private final String contractComposition;
 
-	public StatisticsContractComplexityNew(String description, FSTModel fstmodel, IFeatureModel featmodel, String contractComposition) {
+	public StatisticsContractComplexityNew(String description, FSTModel fstmodel, FeatureModelFormula featmodel, String contractComposition) {
 		super(description, null);
 		fstModel = fstmodel;
 		featModel = featmodel;
@@ -134,7 +134,7 @@ public class StatisticsContractComplexityNew extends LazyParent {
 					}
 				}
 
-				final LinkedList<String> featureOrderList = new LinkedList<String>(featModel.getFeatureOrderList());
+				final LinkedList<String> featureOrderList = new LinkedList<String>(featModel.getFeatureModel().getFeatureOrderList());
 				featureOrderList.retainAll(featureChildList);
 				for (final String s : featureOrderList) {
 					p.addChild(new Parent(s));

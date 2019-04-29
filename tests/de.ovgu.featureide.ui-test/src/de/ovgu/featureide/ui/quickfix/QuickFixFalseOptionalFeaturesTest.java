@@ -35,6 +35,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -56,9 +57,9 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	protected String failureMessage;
 
-	private final IFeatureModel fm;
+	private final FeatureModelFormula fm;
 
-	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s) throws UnsupportedModelException {
+	public QuickFixFalseOptionalFeaturesTest(FeatureModelFormula fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
 		failureMessage = "(" + s + ")";
 
@@ -71,7 +72,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 			final Object[] models = new Object[2];
 
 			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
-			models[0] = fm;
+			models[0] = new FeatureModelFormula(fm);
 			models[1] = f.getName();
 			params.add(models);
 		}
@@ -92,8 +93,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-		final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
+		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm.getFeatureModel());
+		final Collection<IFeature> core = fm.getAnalyzer().getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 
 		for (final IFeature feature : concrete) {

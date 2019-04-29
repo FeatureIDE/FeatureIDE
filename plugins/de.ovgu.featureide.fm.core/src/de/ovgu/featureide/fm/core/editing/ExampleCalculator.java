@@ -30,6 +30,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
@@ -113,7 +114,7 @@ public class ExampleCalculator {
 			exampleSolver = null;
 			return nextExample();
 		}
-		final Configuration configuration = new Configuration(fm);
+		final Configuration configuration = new Configuration(new FeatureModelFormula(fm));
 		final DefaultFormat format = new DefaultFormat();
 
 		format.read(configuration, solution);

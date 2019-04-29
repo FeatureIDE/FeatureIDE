@@ -84,6 +84,7 @@ import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationComm
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -458,7 +459,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final IFeatureModel featureModel = featureProject.getFeatureModel();
-				final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+				final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 				for (final FSTClass c : fstModel.getClasses()) {
 					for (final FSTRole r : c.getRoles()) {
 						final IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
@@ -603,7 +604,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addCompositionErrorListener(compositionErrorListener);
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = formula.getFeatureModel();
 		final Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		final LinkedList<String> deadFeatures = new LinkedList<String>();
@@ -622,7 +624,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		try {
 			final String[] args = getArguments(configPath, basePath, outputPath, getContractParameter());
 			final FeatureModelInfo modelInfo =
-				new FeatureIDEModelInfo(featureModel, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
+				new FeatureIDEModelInfo(formula, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
 			composerExtension.setModelInfo(modelInfo);
 			composerExtension.buildMetaProduct(args, features);
 		} catch (final TokenMgrError e) {} catch (final Error e) {

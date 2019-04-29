@@ -25,9 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -37,12 +35,12 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Creates a new feature with the currently selected features as children.
@@ -50,15 +48,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateCompoundAction extends Action {
+public class CreateCompoundAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.createcompound";
 
-	private final IFeatureModel featureModel;
-
 	private IFeature parent = null;
 
-	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
+	private final LinkedList<String> selectedFeatures = new LinkedList<>();
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
@@ -71,11 +67,10 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
-		super(CREATE_FEATURE_ABOVE, createImage);
-		this.featureModel = featureModel;
+	public CreateCompoundAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(CREATE_FEATURE_ABOVE, ID, featureModelManager);
 		setEnabled(false);
-		setId(ID);
+		setImageDescriptor(createImage);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		} else {
@@ -85,16 +80,7 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		// if (selectedFeatures.size() != 1)
-		// throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		final CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new CreateFeatureAboveOperation(featureModelManager, selectedFeatures));
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -129,7 +115,7 @@ public class CreateCompoundAction extends Action {
 				}
 			}
 
-			selectedFeatures.add(feature);
+			selectedFeatures.add(feature.getName());
 		}
 		return !selectedFeatures.isEmpty();
 	}

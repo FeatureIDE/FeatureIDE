@@ -23,7 +23,7 @@ package de.ovgu.featureide.ui.statistics.ui.helper.jobs;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * To communicate with both {@link TreeJob}s and {@link Stoppable}
+ * To communicate with both {@link TreeJob}s and {@link StoppableJob}
  *
  * @author Dominik Hamann
  */

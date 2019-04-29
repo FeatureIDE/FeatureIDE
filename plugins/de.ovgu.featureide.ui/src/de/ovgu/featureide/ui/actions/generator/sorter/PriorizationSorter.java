@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -48,10 +48,10 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
 	HashMap<String, Double> configsDistancesResult = new HashMap<String, Double>();
 
-	private final IFeatureModel featureModel;
+	private final FeatureModelFormula featureModel;
 
-	public PriorizationSorter(IFeatureModel featureModel) {
-		super(featureModel);
+	public PriorizationSorter(FeatureModelFormula featureModel) {
+		super(featureModel.getFeatureModel());
 		super.sorted = false;
 		this.featureModel = featureModel;
 	}

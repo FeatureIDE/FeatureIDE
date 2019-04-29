@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
  * Partial implementation of feature and constraint.
@@ -40,7 +42,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	protected String name;
 
 	protected final IFeatureModel featureModel;
-	protected final LinkedList<IEventListener> listenerList = new LinkedList<>();
+	protected final IEventManager eventManager = new DefaultEventManager();
 
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
@@ -79,21 +81,22 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	@Override
 	public final void addListener(IEventListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
+		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	@Override
 	public final void removeListener(IEventListener listener) {
-		listenerList.remove(listener);
+		eventManager.removeListener(listener);
 	}
 
 	@Override
 	public final void fireEvent(FeatureIDEEvent event) {
-		for (final IEventListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
+		eventManager.fireEvent(event);
 	}
 
 	@Override

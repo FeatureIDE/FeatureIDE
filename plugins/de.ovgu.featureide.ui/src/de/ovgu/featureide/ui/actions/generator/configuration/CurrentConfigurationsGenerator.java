@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 
 	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		super(builder, featureProject);
+		super(builder, featureProject.getFeatureModelManager().getPersistentFormula());
 		builder.configurationNumber = Math.min(builder.configurationNumber, countConfigurations(featureProject.getConfigFolder()));
 	}
 
@@ -84,7 +84,8 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IMonitor monitor) {
-		final Configuration config = ConfigurationManager.load(Paths.get(configuration.getLocationURI()), snapshot.getObject());
+		final Configuration config = ConfigurationManager.load(Paths.get(configuration.getLocationURI()));
+		config.initFeatures(snapshot);
 		builder.addConfiguration(new BuilderConfiguration(config, configuration.getName().split("[.]")[0]));
 	}
 
@@ -93,7 +94,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(res.getName());
+		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()));
 	}
 
 	/**

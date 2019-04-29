@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.filter.base;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Returns the conjunction of multiple {@link IFilter}s.
@@ -32,6 +33,18 @@ import java.util.ArrayList;
 public class AndFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
 	private static final long serialVersionUID = 1L;
+
+	public AndFilter() {
+		super();
+	}
+
+	public AndFilter(Collection<? extends IFilter<T>> c) {
+		super(c);
+	}
+
+	public AndFilter(int initialCapacity) {
+		super(initialCapacity);
+	}
 
 	@Override
 	public boolean isValid(T object) {

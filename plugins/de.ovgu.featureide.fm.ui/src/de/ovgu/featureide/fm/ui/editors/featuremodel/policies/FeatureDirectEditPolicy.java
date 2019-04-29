@@ -48,7 +48,7 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
 		final String newName = (String) request.getCellEditor().getValue();
-		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName(), newName);
+		return new FeatureRenamingCommand(featureModel.getFeatureModelManager(), feature.getObject().getName(), newName);
 	}
 
 	@Override

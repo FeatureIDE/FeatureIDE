@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_T
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOUBLE_CLICK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRAM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
@@ -31,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,6 +53,7 @@ import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.Action;
@@ -60,6 +64,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
@@ -76,7 +81,7 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.Features;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -91,18 +96,17 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileManager;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -114,18 +118,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllButExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ConvertGraphicalFileAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -136,6 +141,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAc
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
@@ -146,8 +152,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunMan
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -162,28 +173,25 @@ import de.ovgu.featureide.fm.ui.utils.SearchField;
 public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUIDefaults, IEventListener {
 
 	private static final String PAGE_TEXT = FEATURE_DIAGRAM;
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
-	private static final IPersistentFormat<IGraphicalFeatureModel> format = new GraphicalFeatureModelFormat();
-
-	private final Path extraPath;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
 
 	private final FeatureDiagramViewer viewer;
 
 	private Label infoLabel;
 
 	private CalculateDependencyAction calculateDependencyAction;
-	private CreateLayerAction createLayerAction;
-	private CreateCompoundAction createCompoundAction;
+	private CreateFeatureBelowAction createFeatureBelowAction;
+	private CreateFeatureAboveAction createFeatureAboveAction;
+	private CreateSiblingAction createSiblingAction;
+	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
-	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
 	private CollapseAction collapseAction;
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private ExpandAllAction expandAllAction;
-	private CollapseAllButExplanationAction collapseAllButExplanationAction;
+	private FocusOnExplanationAction focusOnExplanationAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
@@ -206,6 +214,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private ZoomOutAction zoomOut;
 
 	private ExportFeatureModelAction exportFeatureModelAction;
+	private ConvertGraphicalFileAction convertGraphicalFileAction;
 	private LegendAction legendAction;
 	private LegendLayoutAction legendLayoutAction;
 
@@ -223,60 +232,41 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private int index;
 
-	private IRunner<Boolean> analyzeJob;
-	private FeatureModelAnalyzer varAnalyzer;
-
-	private boolean waiting = false;
+	private final JobToken analysisToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	FeatureDiagramEditorKeyHandler editorKeyHandler;
 
 	/** The currently active explanation. */
 	private Explanation<?> activeExplanation;
 
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
-	 * @param featureModelEditor the FeatureModelEditor
-	 * @param container Composite which contains the feature model
-	 * @param fm The feature model
+	 * @param fmManager feature model file manager
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
-	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, boolean isEditable) {
-		super(fmManager);
+	public FeatureDiagramEditor(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm, boolean isEditable) {
+		super(fmManager, gfm);
 
-		graphicalFeatureModel = getGrapicalFeatureModel(getFeatureModel());
-
-		// 1. Check if the fmManager exists and is not a VirtualFileManager instance (path returns null)
-		// 2. read-only feature model is currently only a view on the editable feature model and not persistent
-		if ((fmManager != null) && (fmManager.getPath() != null)) {
-			extraPath = FileManager.constructExtraPath(fmManager.getPath(), format);
-			FileHandler.load(extraPath, graphicalFeatureModel, format);
-			fmManager.addListener(this);
-		} else {
-			extraPath = null;
-		}
-
+		graphicalFeatureModel = gfm;
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
+		fmManager.addListener(this);
 		createActions();
 
 		FeatureColorManager.addListener(this);
 	}
 
-	public static GraphicalFeatureModel getGrapicalFeatureModel(IFeatureModel featureModel) {
-		final GraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModel);
-		graphicalFeatureModel.init();
-		return graphicalFeatureModel;
-	}
-
 	private void createActions() {
-		final IFeatureModel featureModel = getFeatureModel();
+		final IFeatureModelManager featureModelManager = getFeatureModel();
 		actions.clear();
-
+		createFeatureBelowAction = addAction(new CreateFeatureBelowAction(viewer, graphicalFeatureModel));
+		createFeatureAboveAction = addAction(new CreateFeatureAboveAction(viewer, graphicalFeatureModel));
+		createSiblingAction = addAction(new CreateSiblingAction(viewer, graphicalFeatureModel));
 		// FM structure modify actions
-		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
-		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
-		deleteAction = addAction(new DeleteAction(viewer, featureModel));
-		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
+		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer, featureModelManager));
+		deleteAction = addAction(new DeleteAction(viewer, featureModelManager));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
 		moveUpAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.UP));
 		moveRightAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.RIGHT));
@@ -288,26 +278,26 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
 		collapseFeaturesAction = addAction(new CollapseSiblingsAction(viewer, graphicalFeatureModel));
 		collapseAllAction = addAction(new CollapseAllAction(graphicalFeatureModel));
-		collapseAllButExplanationAction = addAction(new CollapseAllButExplanationAction(getGraphicalFeatureModel()));
+		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
 		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
 		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
 		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
 		showCollapsedConstraintsAction = addAction(new ShowCollapsedConstraintsAction(viewer, graphicalFeatureModel));
 
 		// Feature property actions
-		mandatoryAction = addAction(new MandatoryAction(viewer, featureModel));
-		abstractAction = addAction(new AbstractAction(viewer, featureModel));
-		hiddenAction = addAction(new HiddenAction(viewer, featureModel));
-		andAction = addAction(new AndAction(viewer, featureModel));
-		orAction = addAction(new OrAction(viewer, featureModel));
-		alternativeAction = addAction(new AlternativeAction(viewer, featureModel));
-		renameAction = addAction(new RenameAction(viewer, featureModel, null));
-		changeFeatureDescriptionAction = addAction(new ChangeFeatureDescriptionAction(viewer, featureModel, null));
+		mandatoryAction = addAction(new MandatoryAction(viewer, featureModelManager));
+		abstractAction = addAction(new AbstractAction(viewer, featureModelManager));
+		hiddenAction = addAction(new HiddenAction(viewer, featureModelManager));
+		andAction = addAction(new AndAction(viewer, featureModelManager));
+		orAction = addAction(new OrAction(viewer, featureModelManager));
+		alternativeAction = addAction(new AlternativeAction(viewer, featureModelManager));
+		renameAction = addAction(new RenameAction(viewer, featureModelManager, null));
+		changeFeatureDescriptionAction = addAction(new ChangeFeatureDescriptionAction(viewer, featureModelManager, null));
 
 		// Constraint actions
-		createConstraintAction = addAction(new CreateConstraintAction(viewer, featureModel));
-		createConstraintWithAction = addAction(new CreateConstraintWithAction(viewer, featureModel));
-		editConstraintAction = addAction(new EditConstraintAction(viewer, featureModel));
+		createConstraintAction = addAction(new CreateConstraintAction(viewer, featureModelManager));
+		createConstraintWithAction = addAction(new CreateConstraintWithAction(viewer, featureModelManager));
+		editConstraintAction = addAction(new EditConstraintAction(viewer, featureModelManager));
 
 		// View actions
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
@@ -318,12 +308,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0)));
 
 		// Calculation actions
-		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModel));
+		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModelManager));
 		calculationActions = new ArrayList<>(4);
-		calculationActions.add(addAction(new AutomatedCalculationsAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new RunManualCalculationsAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(viewer, getFeatureModel())));
-		calculationActions.add(addAction(new ConstrainsCalculationsAction(viewer, getFeatureModel())));
+		calculationActions.add(addAction(new AutomatedCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new RunManualCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new ConstrainsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 
 		// Zoom actions
 		zoomIn = addAction(new ZoomInAction(viewer.getZoomManager()));
@@ -331,14 +321,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Layout actions
 		autoLayoutConstraintAction = addAction(new AutoLayoutConstraintAction(viewer, graphicalFeatureModel));
-		setLayoutActions = new ArrayList<>(5);
-		for (int i = 0; i < 5; i++) {
+		setLayoutActions = new ArrayList<>(FeatureDiagramLayoutHelper.NUMBER_OF_LAYOUT_ALGORITHMS);
+		for (int i = 0; i < FeatureDiagramLayoutHelper.NUMBER_OF_LAYOUT_ALGORITHMS; i++) {
 			setLayoutActions.add(addAction(new LayoutSelectionAction(graphicalFeatureModel, i)));
 		}
 
 		// Other actions
 		exportFeatureModelAction = addAction(new ExportFeatureModelAction(this));
-		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, getFeatureModel()));
+		convertGraphicalFileAction = addAction(new ConvertGraphicalFileAction(this));
+		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, graphicalFeatureModel.getFeatureModelManager()));
 
 		viewer.addSelectionChangedListener(new SelectionAction(graphicalFeatureModel));
 	}
@@ -397,7 +388,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		infoLabel.setText("");
 		infoLabel.setLayoutData(gridData);
 
-		new SearchField<>(compositeTop, viewer);
+		new SearchField<>(compositeTop, viewer, this);
 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
@@ -414,11 +405,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		toolBarManager.add(new Separator());
 
 		// 3. Layout
-		toolBarManager.add(createLayoutMenuManager());
+		toolBarManager.add(createLayoutMenuManager(false));
 		toolBarManager.add(new Separator());
 
 		// 3. Analysis
-		toolBarManager.add(createCalculationsMenuManager());
+		toolBarManager.add(createCalculationsMenuManager(false));
 		toolBarManager.add(new Separator());
 
 		// 4. Viewer Options
@@ -467,7 +458,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(null);
 			return;
 		}
-		final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(getFeatureModel());
+		final FeatureModelAnalyzer analyser = getFeatureModel().getVariableFormula().getAnalyzer();
 		setActiveExplanation(analyser.isValid() ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
 	}
 
@@ -480,7 +471,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);
-		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
+		getFeatureModel().editObject().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
 	}
 
 	/**
@@ -492,67 +483,54 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return activeExplanation;
 	}
 
-	public void analyzeFeatureModel() {
-		if ((getFeatureModel() == null) || (getFeatureModel().getStructure().getRoot() == null) || (viewer.getContents() == null)) {
-			return;
-		}
-		if (waiting) {
-			return;
-		}
-		waiting = true;
-		varAnalyzer = new FeatureModelAnalyzer(new FeatureModelFormula(getFeatureModel()));
-		/**
-		 * This extra job is necessary, else the UI will stop.
-		 */
-		final Job waiter = new Job("Analyze feature model (waiting)") {
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					if ((analyzeJob != null)) {
-						// waiting for analyzing job to finish
-						analyzeJob.cancel();
-						analyzeJob.join();
+	public void convertGraphicalFile(boolean deleteAfterwards) {
+		if (fmManager instanceof AFileManager<?>) {
+			final Path gfmPath = AFileManager.constructExtraPath(((AFileManager<?>) fmManager).getPath(), new GraphicalFeatureModelFormat());
+			if ((gfmPath != null) && FileSystem.exists(gfmPath)) {
+				FileHandler.load(gfmPath, graphicalFeatureModel, new GraphicalFeatureModelFormat());
+				graphicalFeatureModel.writeValues();
+				if (deleteAfterwards) {
+					try {
+						FileSystem.delete(gfmPath);
+					} catch (final IOException e) {
+						Logger.logError(e);
 					}
-				} catch (final InterruptedException e) {
-					FMUIPlugin.getDefault().logError(e);
-				} finally {
-					// avoid a dead lock
-					if (analyzeJob != null) {
-						analyzeJob.cancel();
-					}
-					waiting = false;
 				}
-				analyzeJob = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
-					@Override
-					public Boolean execute(IMonitor monitor) throws Exception {
-						if (waiting) {
-							return true;
-						}
-						refreshGraphics(null);
-
-						final FeatureModelAnalyzer localAnalyzer = varAnalyzer;
-
-						localAnalyzer.reset();
-
-						final AnalysesCollection generalAnalysesCollection = FeatureModelManager.getAnalyzer(fmManager.getObject()).getAnalysesCollection();
-						final AnalysesCollection localAnalysesCollection = localAnalyzer.getAnalysesCollection();
-						localAnalysesCollection.inheritSettings(generalAnalysesCollection);
-						if (!localAnalysesCollection.isRunCalculationAutomatically() && localAnalysesCollection.isCalculateFeatures()) {
-							return true;
-						}
-
-						final Map<IFeatureModelElement, Object> changedAttributes = localAnalyzer.analyzeFeatureModel(monitor);
-						refreshGraphics(changedAttributes);
-						return true;
-					}
-				}, ANALYZE_FEATURE_MODEL);
-				analyzeJob.schedule();
-				return Status.OK_STATUS;
+				fmManager.fireEvent(new FeatureIDEEvent(fmManager.getObject(), EventType.MODEL_DATA_CHANGED, null, null));
+				FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
 			}
-		};
-		waiter.setPriority(Job.DECORATE);
-		waiter.schedule();
+		}
+	}
+
+	public void analyzeFeatureModel() {
+		final IFeatureModel featureModel = fmManager.editObject();
+		final FeatureModelAnalyzer variableAnalyzer = fmManager.getVariableFormula().getAnalyzer();
+		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null) || (viewer.getContents() == null)) {
+			return;
+		}
+		final IRunner<Boolean> analyzeJob = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
+			@Override
+			public Boolean execute(IMonitor monitor) throws Exception {
+				refreshGraphics(null);
+
+				final FeatureModelAnalyzer localAnalyzer = variableAnalyzer;
+
+				localAnalyzer.reset();
+
+				final AnalysesCollection generalAnalysesCollection = fmManager.getPersistentFormula().getAnalyzer().getAnalysesCollection();
+				final AnalysesCollection localAnalysesCollection = localAnalyzer.getAnalysesCollection();
+				localAnalysesCollection.inheritSettings(generalAnalysesCollection);
+				if (!localAnalysesCollection.isRunCalculationAutomatically() && localAnalysesCollection.isCalculateFeatures()) {
+					return true;
+				}
+
+				final Map<IFeatureModelElement, Object> changedAttributes = localAnalyzer.analyzeFeatureModel(monitor);
+				refreshGraphics(changedAttributes);
+				return true;
+			}
+		}, ANALYZE_FEATURE_MODEL);
+		analyzeJob.setPriority(Job.LONG);
+		LongRunningWrapper.startJob(analysisToken, analyzeJob);
 	}
 
 	/**
@@ -560,13 +538,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 *
 	 * @param changedAttributes Result of analysis to only refresh special features, or null if all features should be refreshed.
 	 */
-	private void refreshGraphics(final Map<IFeatureModelElement, Object> changedAttributes) {
+	public void refreshGraphics(final Map<IFeatureModelElement, Object> changedAttributes) {
 		final UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (changedAttributes == null) {
-					for (final IFeature f : getFeatureModel().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+					for (final IFeature f : getFeatureModel().editObject().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 						graphicalFeatureModel.getGraphicalFeature(f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 					}
@@ -637,11 +615,25 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			}
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
+			break;
+		case FEATURE_ADD_SIBLING:
+			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
+				final IFeature parent = (IFeature) event.getOldValue();
+				if (parent != null) {
+					final IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
+					graphicalParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+					viewer.refreshChildAll(parent);
+				}
+			}
+			viewer.internRefresh(true);
+			setDirty();
+			analyzeFeatureModel();
+			break;
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
-			setDirty(true);
+			setDirty();
 			final IFeature newFeature = (IFeature) event.getNewValue();
 			final IFeature parent = (IFeature) event.getOldValue();
 			final IFeatureModel fm = (IFeatureModel) event.getSource();
@@ -656,7 +648,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 							graphicalFeatureStructure.setCollapsed(true);
 						}
 					}
-					fm.fireEvent(new FeatureIDEEvent(parent, EventType.COLLAPSED_CHANGED, null, null));
+					fm.fireEvent(new FeatureIDEEvent(parent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 				}
 				// Draws the connections
 				if (parent.getStructure().hasChildren()) {
@@ -675,8 +667,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+
 			if (newEditPart != null) {// TODO move to FeatureEditPart
-				viewer.refreshAll();
 				newEditPart.activate();
 				viewer.select(newEditPart);
 				// open the renaming command
@@ -687,7 +679,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_NAME_CHANGED:
 			final String newValue = (String) event.getNewValue();
-			final IFeature feature = graphicalFeatureModel.getFeatureModel().getFeature(newValue);
+			final IFeature feature = graphicalFeatureModel.getFeatureModelManager().editObject().getFeature(newValue);
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.update(event);
 			final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
@@ -699,7 +691,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			viewer.reload();
-			setDirty(true);
+			setDirty();
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -707,43 +699,40 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			viewer.internRefresh(true);
 			viewer.reload();
-			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
 			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
 				f.update(event);
 			}
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-			setDirty(true);
+			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
 		case LOCATION_CHANGED:
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			break;
 		case CONSTRAINT_MOVE:
+		case CONSTRAINT_MOVE_LOCATION:
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			break;
 		case CONSTRAINT_MODIFY:
 			final IConstraint c = (IConstraint) event.getSource();
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
@@ -755,51 +744,32 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case STRUCTURE_CHANGED:
 			viewer.reload();
 			analyzeFeatureModel();
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.refreshChildAll(fmManager.editObject().getStructure().getRoot().getFeature());
 			viewer.internRefresh(true);
-			setDirty(true);
-			viewer.refreshAll();
+			setDirty();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
 			break;
-		case MODEL_DATA_OVERRIDDEN:
-			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
+		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
-
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
 					graphicalFeatureModel.init();
-					if (extraPath != null) {
-						SimpleFileHandler.load(extraPath, graphicalFeatureModel, format);
-					}
-
 					viewer.setContents(graphicalFeatureModel);
-					viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-					viewer.reload();
 				}
 			});
-			setDirty(false);
+			FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
-			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			viewer.deregisterEditParts();
-			graphicalFeatureModel.init();
-			if (extraPath != null) {
-				SimpleFileHandler.load(extraPath, graphicalFeatureModel, format);
-			}
 			viewer.setContents(graphicalFeatureModel);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-			viewer.reload();
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case FEATURE_DELETE:
@@ -818,43 +788,40 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			} else {
 				// No old parent so the new feature was the root
 				// Now update roots parent
-				final IGraphicalFeature root =
-					graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				final IGraphicalFeature root = graphicalFeatureModel
+						.getGraphicalFeature(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				viewer.refreshChildAll(root.getObject());
 			}
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
 			break;
 		case MODEL_LAYOUT_CHANGED:
+			gfm.writeValues();
+			viewer.setLayout();
 			viewer.reload();
-			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			break;
 		case REDRAW_DIAGRAM:
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			viewer.reload();
 			refreshGraphics(null);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			analyzeFeatureModel();
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
-			// legendAction.refresh();
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
-			if ((event.getSource() instanceof Boolean) && ((Boolean) event.getSource())) {
-				setDirty(true);
-			}
+			gfm.writeFeatureModel();
+			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
-		case HIDDEN_CHANGED:
+		case FEATURE_HIDDEN_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
@@ -864,20 +831,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// leads to errors.
 			viewer.refreshChildAll((IFeature) event.getSource());
 			legendLayoutAction.refresh();
-			setDirty(true);
+			setDirty();
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			break;
-		case COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			// Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			viewer.reload();
 			if (event.getNewValue() == null) {
 				final IFeature selectedFeature = (IFeature) event.getSource();
 				viewer.refreshChildAll(selectedFeature);
+				gfm.writeFeature(gfm.getGraphicalFeature(selectedFeature));
 			}
 			viewer.internRefresh(false);
-			analyzeFeatureModel();
-			setDirty(true);
+			setDirty();
 			// Center collapsed feature after operation
 			if (event.getSource() instanceof IFeature) {
 				viewer.centerPointOnScreen((IFeature) event.getSource());
@@ -886,20 +853,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
 			break;
-		case COLLAPSED_ALL_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
 			viewer.reload();
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
-			analyzeFeatureModel();
-			setDirty(true);
+			gfm.writeValues();
+			setDirty();
 
 			// Center root feature after operation
-			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
 			break;
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			if (event.getSource() instanceof List) {
 				final List<?> srcList = (List<?>) event.getSource();
 
@@ -923,7 +890,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 
 					for (final IGraphicalFeature gf : features) {
-						gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
+						gf.update(FeatureIDEEvent.getDefault(EventType.FEATURE_COLOR_CHANGED));
 					}
 				}
 			} else {
@@ -934,7 +901,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			refreshGraphics(null);
 			break;
 		case DEPENDENCY_CALCULATED:
-			setDirty(false);
+			setDirty();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			// Deactivate the old active explanation.
@@ -945,8 +912,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final Reason<?> reason : oldActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
-						if (updatedElements.add(element)) {
-							element.update(event);
+						if (element.getObject() instanceof IFeature) {
+							if (graphicalFeatureModel.getVisibleFeatures()
+									.contains(graphicalFeatureModel.getGraphicalFeature((IFeature) element.getObject()))) {
+								if (updatedElements.add(element)) {
+									element.update(event);
+								}
+							}
+						} else if (element.getObject() instanceof IConstraint) {
+							if (graphicalFeatureModel.getVisibleConstraints()
+									.contains(graphicalFeatureModel.getGraphicalConstraint((IConstraint) element.getObject()))) {
+								if (updatedElements.add(element)) {
+									element.update(event);
+								}
+							}
 						}
 					}
 				}
@@ -959,7 +938,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
-						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+						if (element.getObject() instanceof IFeature) {
+							if (graphicalFeatureModel.getVisibleFeatures()
+									.contains(graphicalFeatureModel.getGraphicalFeature((IFeature) element.getObject()))) {
+								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+							}
+						} else if (element.getObject() instanceof IConstraint) {
+							if (graphicalFeatureModel.getVisibleConstraints()
+									.contains(graphicalFeatureModel.getGraphicalConstraint((IConstraint) element.getObject()))) {
+								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+							}
+						}
+
 					}
 				}
 			}
@@ -967,6 +957,14 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Refresh the legend.
 			if (!graphicalFeatureModel.isLegendHidden()) {
 				viewer.layoutLegendOnIntersect();
+			}
+			break;
+		case FEATURE_ATTRIBUTE_CHANGED:
+			setDirty();
+			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
+				final IFeature attributeChangedFeature = (IFeature) event.getNewValue();
+				final IGraphicalFeature graphicalAttributeChangedFeature = graphicalFeatureModel.getGraphicalFeature(attributeChangedFeature);
+				graphicalAttributeChangedFeature.update(event);
 			}
 			break;
 		case DEFAULT:
@@ -1022,9 +1020,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final KeyHandler handler = viewer.getKeyHandler();
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
-		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
-		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
+		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createFeatureBelowAction);
 		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
+		handler.put(KeyStroke.getPressed((char) (('t' - 'a') + 1), 't', SWT.CTRL), selectSubtreeAction);
+		handler.put(KeyStroke.getPressed((char) (('g' - 'a') + 1), 'g', SWT.CTRL), createSiblingAction);
 
 		handler.put(KeyStroke.getPressed(SWT.ARROW_UP, SWT.CTRL), moveUpAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL), moveRightAction);
@@ -1041,8 +1040,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.createMouseHandlers();
 	}
 
-	private MenuManager createLayoutMenuManager() {
-		final MenuManager menuManager = new ToolBarMenuManager(SET_LAYOUT);
+	private MenuManager createLayoutMenuManager(boolean showText) {
+		final MenuManager menuManager =
+			new ToolBarMenuManager(showText ? SET_LAYOUT : "", FMUIPlugin.getDefault().getImageDescriptor("icons/tree_mode.gif"), "");
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
 
@@ -1064,8 +1064,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
-	private MenuManager createCalculationsMenuManager() {
-		final MenuManager menuManager = new ToolBarMenuManager(SET_CALCULATIONS);
+	private MenuManager createCalculationsMenuManager(boolean showText) {
+		final MenuManager menuManager =
+			new ToolBarMenuManager(showText ? SET_CALCULATIONS : "", FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"), "");
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
 
@@ -1098,109 +1099,121 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	private boolean isFeatureMenu(IStructuredSelection selection) {
+		boolean featureMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof FeatureEditPart)) {
+				featureMenu = false;
+			}
+		}
+		return featureMenu;
+	}
+
+	private boolean isLegendMenu(IStructuredSelection selection) {
+		boolean legendMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof LegendEditPart)) {
+				legendMenu = false;
+			}
+		}
+		return legendMenu;
+	}
+
+	private boolean isConstraintMenu(IStructuredSelection selection) {
+		boolean constraintMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof ConstraintEditPart)) {
+				constraintMenu = false;
+			}
+		}
+		return constraintMenu;
+	}
+
+	private boolean isConnectionMenu(IStructuredSelection selection) {
+		boolean connectionMenu = false;
+		for (final Object obj : selection.toList()) {
+			if ((obj instanceof ConnectionEditPart)) {
+				connectionMenu = true;
+			}
+		}
+		return connectionMenu;
+
+	}
+
 	private void fillContextMenu(IMenuManager menuManager) {
-		if (getFeatureModel() instanceof ExtendedFeatureModel) {
-			menuManager.add(createLayoutMenuManager());
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
+		if (getFeatureModel().editObject() instanceof ExtendedFeatureModel) {
+			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createNameTypeMenuManager());
-		} else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !alternativeAction.isConnectionSelected()) {
-			// don't show menu to change group type of a feature in case a
-			// connection line is selected
-			menuManager.add(createCompoundAction);
-			menuManager.add(createLayerAction);
+		}
+		if (isFeatureMenu(selection)) {
+			menuManager.add(createFeatureAboveAction);
+			menuManager.add(createFeatureBelowAction);
+			menuManager.add(createSiblingAction);
 			menuManager.add(createConstraintWithAction);
+			menuManager.add(selectSubtreeAction);
 			menuManager.add(renameAction);
+			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
-			menuManager.add(deleteAllAction);
 			menuManager.add(new Separator());
-			connectionEntrys(menuManager);
+			connectionEntries(menuManager);
 			menuManager.add(mandatoryAction);
 			menuManager.add(abstractAction);
 			menuManager.add(hiddenAction);
+			menuManager.add(new Separator());
+			menuManager.add(new Separator());
+			menuManager.add(colorSelectedFeatureAction);
+			menuManager.add(new Separator());
 			menuManager.add(collapseAction);
 			menuManager.add(collapseFeaturesAction);
-			menuManager.add(collapseAllButExplanationAction);
-			menuManager.add(changeFeatureDescriptionAction);
-			menuManager.add(new Separator());
-			menuManager.add(createLayoutMenuManager());
-			menuManager.add(createCalculationsMenuManager());
-			menuManager.add(new Separator());
 			menuManager.add(calculateDependencyAction);
-			menuManager.add(reverseOrderAction);
-			menuManager.add(new Separator());
-			menuManager.add(legendAction);
-		} else if (editConstraintAction.isEnabled() && !alternativeAction.isConnectionSelected()) {
-			menuManager.add(createConstraintAction);
-			menuManager.add(expandConstraintAction);
-			menuManager.add(editConstraintAction);
-			menuManager.add(deleteAction);
-		} else if (legendLayoutAction.isEnabled()) {
-			menuManager.add(new Separator());
+			menuManager.add(focusOnExplanationAction);
+			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+				extension.extendContextMenu(menuManager, this);
+			}
+		} else if (isLegendMenu(selection)) {
 			menuManager.add(legendLayoutAction);
 			menuManager.add(legendAction);
-		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
-			connectionEntrys(menuManager);
+		} else if (isConstraintMenu(selection)) {
+			menuManager.add(createConstraintAction);
+			menuManager.add(expandConstraintAction);
+			menuManager.add(focusOnExplanationAction);
+			menuManager.add(editConstraintAction);
+			menuManager.add(deleteAction);
+		} else if (isConnectionMenu(selection)) {
+			connectionEntries(menuManager);
 		} else {
+			// nothing selected, build presentation menu
 			menuManager.add(createConstraintAction);
 			menuManager.add(new Separator());
 			menuManager.add(collapseAllAction);
 			menuManager.add(expandAllAction);
 			menuManager.add(adjustModelToEditorSizeAction);
 			menuManager.add(new Separator());
-			menuManager.add(createLayoutMenuManager());
-			menuManager.add(createCalculationsMenuManager());
+			menuManager.add(createLayoutMenuManager(true));
+			menuManager.add(createCalculationsMenuManager(true));
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
+			menuManager.add(showHiddenFeaturesAction);
+			menuManager.add(showCollapsedConstraintsAction);
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
+			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			menuManager.add(exportFeatureModelAction);
+			menuManager.add(convertGraphicalFileAction);
 		}
-
-		if (getFeatureModel().getStructure().hasHidden()) {
-			menuManager.add(showHiddenFeaturesAction);
-		}
-		menuManager.add(showCollapsedConstraintsAction);
-
-		for (final Object selected : viewer.getSelectedEditParts()) {
-			if ((selected instanceof FeatureEditPart) || (selected instanceof IFeature)) {
-				menuManager.add(new Separator());
-				menuManager.add(colorSelectedFeatureAction);
-				break;
-			}
-		}
-
-		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menuManager.add(exportFeatureModelAction);
-
-		// call of the FeatureDiagramExtensions (for features only)
-		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !alternativeAction.isConnectionSelected()) {
-			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
-				extension.extendContextMenu(menuManager, this);
-			}
-		}
-
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
-		// Get the primary selected element.
-		ModelElementEditPart primaryElement = null;
-		for (final Object selected : viewer.getSelectedEditParts()) {
-			if ((selected instanceof ModelElementEditPart) && (primaryElement == null)) {
-				primaryElement = (ModelElementEditPart) selected;
-			} else {
-				primaryElement = null; // multiple selected
-				break;
-			}
-		}
-		if (primaryElement instanceof FeatureEditPart) {
-			collapseAction.setEnabled(((FeatureEditPart) primaryElement).getModel().getObject().getStructure().hasChildren());
-		}
 	}
 
-	private void connectionEntrys(IMenuManager menu) {
+	private void connectionEntries(IMenuManager menu) {
 		if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			final boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
 				andAction.setText(AND);
 				if (connectionSelected) {
-					orAction.setText("Or (Double Click)");
+					orAction.setText(OR + DOUBLE_CLICK);
 				} else {
 					orAction.setText(OR);
 				}
@@ -1209,13 +1222,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				andAction.setText(AND);
 				orAction.setText(OR);
 				if (connectionSelected) {
-					alternativeAction.setText("Alternative (Double Click)");
+					alternativeAction.setText(ALTERNATIVE + DOUBLE_CLICK);
 				} else {
 					alternativeAction.setText(ALTERNATIVE);
 				}
 			} else if (alternativeAction.isChecked()) {
 				if (connectionSelected) {
-					andAction.setText("And (Double Click)");
+					andAction.setText(AND + DOUBLE_CLICK);
 				} else {
 					andAction.setText(AND);
 				}
@@ -1237,15 +1250,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
-		return new FeatureDiagramEditor(fmManager, true);
+		return new FeatureDiagramEditor(fmManager, gfm, true);
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (isDirty()) {
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			super.doSave(monitor);
 		}
 	}
@@ -1260,12 +1270,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 */
 	@Override
 	public void dispose() {
-		if (analyzeJob != null) {
-			analyzeJob.cancel();
-		}
+		LongRunningWrapper.cancelAllJobs(analysisToken);
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
-		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
+		graphicalFeatureModel.getFeatureModelManager().editObject().removeListener(editorKeyHandler);
+//		gfmManager.dispose();
 		super.dispose();
 	}
 
@@ -1278,12 +1287,76 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		for (final Action action : actions) {
-			if (action.getId().equals(workbenchActionID)) {
-				return action;
-			}
+		if (CreateFeatureBelowAction.ID.equals(workbenchActionID)) {
+			return createFeatureBelowAction;
+		}
+		if (CreateFeatureAboveAction.ID.equals(workbenchActionID)) {
+			return createFeatureAboveAction;
+		}
+		if (CreateSiblingAction.ID.equals(workbenchActionID)) {
+			return createSiblingAction;
+		}
+		if (SelectSubtreeAction.ID.equals(workbenchActionID)) {
+			return selectSubtreeAction;
+		}
+		if (DeleteAction.ID.equals(workbenchActionID)) {
+			return deleteAction;
+		}
+		if (MandatoryAction.ID.equals(workbenchActionID)) {
+			return mandatoryAction;
+		}
+		if (AbstractAction.ID.equals(workbenchActionID)) {
+			return abstractAction;
+		}
+		if (CollapseAction.ID.equals(workbenchActionID)) {
+			return collapseAction;
+		}
+		if (CollapseSiblingsAction.ID.equals(workbenchActionID)) {
+			return collapseFeaturesAction;
+		}
+		if (FocusOnExplanationAction.ID.equals(workbenchActionID)) {
+			return focusOnExplanationAction;
+		}
+		if (AbstractAction.ID.equals(workbenchActionID)) {
+			return abstractAction;
+		}
+		if (HiddenAction.ID.equals(workbenchActionID)) {
+			return hiddenAction;
+		}
+		if (AndAction.ID.equals(workbenchActionID)) {
+			return andAction;
+		}
+		if (OrAction.ID.equals(workbenchActionID)) {
+			return orAction;
+		}
+		if (AlternativeAction.ID.equals(workbenchActionID)) {
+			return alternativeAction;
+		}
+		if (RenameAction.ID.equals(workbenchActionID)) {
+			return renameAction;
+		}
+		if (CalculateDependencyAction.ID.equals(workbenchActionID)) {
+			return calculateDependencyAction;
+		}
+		if (GEFActionConstants.ZOOM_IN.equals(workbenchActionID)) {
+			return zoomIn;
+		}
+		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID)) {
+			return zoomOut;
 		}
 		return null;
+	}
+
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		viewer.addSelectionChangedListener(listener);
+	}
+
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		viewer.removeSelectionChangedListener(listener);
+	}
+
+	public void setAdjustModelToEditorSize() {
+		adjustModelToEditorSizeAction.run();
 	}
 
 }

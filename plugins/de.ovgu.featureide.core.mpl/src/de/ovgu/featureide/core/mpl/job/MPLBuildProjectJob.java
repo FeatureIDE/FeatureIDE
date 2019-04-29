@@ -39,6 +39,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
@@ -46,9 +47,8 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -169,7 +169,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 
 		// get mapping of other projects
 		final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) featureModel;
-		final Configuration mappedProjects = new Configuration(extFeatureModel.getMappingModel());
+		final Configuration mappedProjects = new Configuration(new FeatureModelFormula(extFeatureModel.getMappingModel()));
 		try {
 			String mappingFileName = externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
 			// XXX MPL save information in builder not as persistent property
@@ -246,9 +246,9 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				final UsedModel usedModel = efm.getExternalModel(varName);
 				final String prefix = usedModel.getPrefix() + ".";
 
-				final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) externalFeatureProject.getFeatureModelManager().getSnapshot();
-				final Configuration newConfiguration = new Configuration(snapshot.getObject());
-				final ConfigurationPropagator propagator = snapshot.getPropagator(newConfiguration);
+				final FeatureModelFormula snapshot = externalFeatureProject.getFeatureModelManager().getPersistentFormula();
+				final Configuration newConfiguration = new Configuration(snapshot);
+				final IConfigurationPropagator propagator = newConfiguration.getPropagator();
 
 				for (final SelectableFeature feature : configuration.getFeatures()) {
 					if (feature.getName().startsWith(prefix)) {

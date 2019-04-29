@@ -34,7 +34,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 public class CSClassBuilder extends ClassBuilder {
 
 	/**
-	 * @param modelBuilder
+	 * @param modelBuilder builder for the model
 	 */
 	public CSClassBuilder(FeatureHouseModelBuilder modelBuilder) {
 		super(modelBuilder);
@@ -65,7 +65,7 @@ public class CSClassBuilder extends ClassBuilder {
 
 	/**
 	 *
-	 * @param terminal body
+	 * @param body terminal
 	 * @return list(0) field modifiers list(1) field type ... field names
 	 */
 	public LinkedList<String> getFields(String body) {

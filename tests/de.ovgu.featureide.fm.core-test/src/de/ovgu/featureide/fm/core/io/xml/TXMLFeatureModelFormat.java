@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -65,7 +65,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTest.xml");
 		assertEquals(1, fm.getConstraints().size());
 
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Description");
 
@@ -79,7 +79,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml");
 		assertEquals(2, fm.getConstraints().size());
 		int i = 1;
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Description " + i);
 			i++;
@@ -88,10 +88,10 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	}
 
 	private IFeatureModel prepareFeatureModel() {
-		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+		final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 		// setup a test model
-		newFm = factory.createFeatureModel();
+		newFm = factory.create();
 		final IFeature root = factory.createFeature(newFm, "root");
 
 		newFm.addFeature(root);
@@ -130,11 +130,11 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testConstraintDescriptionWrite() throws FileNotFoundException, UnsupportedModelException {
-		IFeatureModel newFm = this.prepareFeatureModel();
+		final IFeatureModel newFm = prepareFeatureModel();
 
 		String constraintdescriptionFromXml = "";
 		int i = 1;
-		for (IConstraint constraint : newFm.getConstraints()) {
+		for (final IConstraint constraint : newFm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Write Description " + i);
 			i++;
@@ -149,7 +149,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("basic.xml");
 		assertEquals(1, fm.getConstraints().size());
 
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "");
 

@@ -20,14 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -40,39 +35,20 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
-import de.ovgu.featureide.fm.core.io.manager.FileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileManagerVisitor;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Implementation of {@link ExternalChangeListener} for an Eclipse UI environment.<br/> When there is an open editor with the changed file, this class asks the
+ * Implementation of {@link ExternalChangeListener} for an Eclipse UI environment.<br> When there is an open editor with the changed file, this class asks the
  * user, whether they want to override their file. Calls the override function of the corresponding file manager, unless the user decides to keep their changes.
  *
  * @author Sebastian Krieter
  */
 public class EclipseExternalChangeListener extends ExternalChangeListener implements IResourceChangeListener {
 
-	private static final class FileManagerVisitor implements IResourceDeltaVisitor {
-
-		@Override
-		public boolean visit(IResourceDelta delta) {
-			// only interested in removal changes
-			if ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT)) != 0)) {
-				final IResource resource = delta.getResource();
-				if (resource instanceof IFile) {
-					final IFileManager<?> instance = FileManagerMap.getInstance(Paths.get(resource.getLocationURI()));
-					if (instance != null) {
-						instance.read();
-					}
-				}
-			}
-			return true;
-		}
-	}
-
 	@Override
-	protected void doUpdate(final FileManager<?> fileManager) {
+	protected void doUpdate(final IFileManager<?> fileManager) {
 		final FileEditorInput input = new FileEditorInput((IFile) EclipseFileSystem.getResource(fileManager.getPath()));
 		Display.getDefault().syncExec(new Runnable() {
 
@@ -96,10 +72,10 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 							"The feature model file was modified in another editor. Do you like to load the new file and override your local changes?",
 							MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
 					if (dialog.open() == 0) {
-						fileManager.override();
+						fileManager.overwrite();
 					}
 				} else {
-					fileManager.override();
+					fileManager.overwrite();
 				}
 			}
 		});
@@ -109,7 +85,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 	public void resourceChanged(IResourceChangeEvent event) {
 		if ((event.getDelta() != null) && (event.getType() == IResourceChangeEvent.POST_CHANGE)) {
 			try {
-				event.getDelta().accept(new FileManagerVisitor());
+				event.getDelta().accept(new EclipseFileManagerVisitor());
 			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}

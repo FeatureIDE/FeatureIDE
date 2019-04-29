@@ -65,6 +65,8 @@ public class FeatureCppModelBuilder {
 
 	/**
 	 * Builds The full FSTModel
+	 *
+	 * @return false if info files are empty, true otherwise
 	 */
 	public boolean buildModel() {
 		final LinkedList<IFile> infoFiles = getInfoFiles();

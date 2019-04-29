@@ -33,9 +33,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -75,7 +74,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 				break;
 			}
 			final Configuration configuration = new Configuration(featureModel);
-			final ConfigurationPropagator c = FeatureModelManager.getPropagator(configuration, true);
+			final IConfigurationPropagator c = configuration.getPropagator();
 			for (final String feature : unusedFeatures) {
 				if (configuration.getSelectableFeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);

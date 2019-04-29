@@ -21,15 +21,17 @@
 package de.ovgu.featureide.fm.ui.properties.language;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE_GROUP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_TAUTOLOGY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENGLISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSE_OPTIONAL_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODELIS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_INTERFACE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INDETERMINATE_HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR_GROUP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VOID_FEATURE_MODEL;
@@ -47,9 +49,10 @@ public class English implements ILanguage {
 
 	private static final String LEGEND = "Legend:";
 	private static final String MANDATORY = "Mandatory";
-	private static final String ABSTRACT = "Abstract";
+	private static final String ABSTRACT = "Abstract feature";
 	private static final String INTERFACED = FROM_INTERFACE;
-	private static final String CONCRETE = "Concrete";
+	private static final String CONCRETE = "Concrete feature";
+	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = "Hidden";
 	private static final String COLLAPSED = "Collapsed";
 	private static final String DEAD = "Dead feature";
@@ -60,7 +63,7 @@ public class English implements ILanguage {
 	private static final String IMPLICIT = "Implicit constraint";
 	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
-	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String VOID_MODEL_CONST = FEATURE_MODELIS_VOID;
 
 	@Override
 	public String getRedundantConst() {
@@ -138,6 +141,12 @@ public class English implements ILanguage {
 	}
 
 	@Override
+	public String getFeature() {
+		return FEATURE;
+
+	}
+
+	@Override
 	public String getHidden() {
 		return HIDDEN;
 	}
@@ -163,8 +172,18 @@ public class English implements ILanguage {
 	}
 
 	@Override
+	public String getAlternativeGroup() {
+		return ALTERNATIVE_GROUP;
+	}
+
+	@Override
 	public String getOr() {
 		return OR;
+	}
+
+	@Override
+	public String getOrGroup() {
+		return OR_GROUP;
 	}
 
 	@Override

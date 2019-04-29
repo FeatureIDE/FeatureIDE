@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -41,9 +40,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -64,7 +65,7 @@ public class FeatureModel implements IFeatureModel {
 		return NEXT_ID++;
 	}
 
-	private long id;
+	protected long id;
 
 	private long nextElementId = 0;
 
@@ -87,7 +88,7 @@ public class FeatureModel implements IFeatureModel {
 	 */
 	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
-	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
+	protected final IEventManager eventManager = new DefaultEventManager();
 
 	protected final IFeatureModelProperty property;
 
@@ -95,8 +96,7 @@ public class FeatureModel implements IFeatureModel {
 
 	protected final IFeatureModelStructure structure;
 
-	protected Object undoContext = null;
-	private Path sourceFile;
+	protected Path sourceFile;
 
 	public FeatureModel(String factoryID) {
 		this.factoryID = factoryID;
@@ -167,15 +167,8 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void addListener(IEventListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
-	}
-
-	@Override
-	public ArrayList<IEventListener> getListenerList() {
-		return listenerList;
+	public List<IEventListener> getListenerList() {
+		return eventManager.getListeners();
 	}
 
 	@Override
@@ -246,14 +239,23 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void fireEvent(FeatureIDEEvent event) {
-		for (final IEventListener listener : listenerList) {
-			try {
-				listener.propertyChange(event);
-			} catch (final Exception e) {
-				Logger.logError(e);
-			}
-		}
+	public final void addListener(IEventListener listener) {
+		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
+	}
+
+	@Override
+	public final void removeListener(IEventListener listener) {
+		eventManager.removeListener(listener);
+	}
+
+	@Override
+	public final void fireEvent(FeatureIDEEvent event) {
+		eventManager.fireEvent(event);
 	}
 
 	protected void fireEvent(final EventType action) {
@@ -272,9 +274,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public List<IConstraint> getConstraints() {
-		final List<IConstraint> constraintList = new ArrayList<>();
-		constraintList.addAll(constraints);
-		return Collections.unmodifiableList(constraintList);
+		return Collections.unmodifiableList(constraints);
 	}
 
 	@Override
@@ -331,11 +331,6 @@ public class FeatureModel implements IFeatureModel {
 		return structure;
 	}
 
-	@Override
-	public Object getUndoContext() {
-		return undoContext;
-	}
-
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
@@ -376,11 +371,6 @@ public class FeatureModel implements IFeatureModel {
 	public void removeConstraint(int index) {
 		constraints.remove(index);
 
-	}
-
-	@Override
-	public void removeListener(IEventListener listener) {
-		listenerList.remove(listener);
 	}
 
 	@Override
@@ -429,11 +419,6 @@ public class FeatureModel implements IFeatureModel {
 	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
 		this.featureTable.clear();
 		this.featureTable.putAll(featureTable);
-	}
-
-	@Override
-	public void setUndoContext(Object undoContext) {
-		this.undoContext = undoContext;
 	}
 
 	@Override

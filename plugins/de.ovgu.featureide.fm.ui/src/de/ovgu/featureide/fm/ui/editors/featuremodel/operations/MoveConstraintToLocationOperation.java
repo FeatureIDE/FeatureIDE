@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAIN
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -34,31 +35,31 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Joshua Sprey
  */
-public class MoveConstraintToLocationOperation extends AbstractFeatureModelOperation {
+public class MoveConstraintToLocationOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final Point newPos;
 	private Point oldPos;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final IConstraint constraint;
+	private final int constraintIndex;
 
 	public MoveConstraintToLocationOperation(IGraphicalFeatureModel graphicalFeatureModel, Point newPos, IConstraint constraint) {
-		super(graphicalFeatureModel.getFeatureModel(), MOVE_CONSTRAINT);
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.constraint = constraint;
+		super(graphicalFeatureModel, MOVE_CONSTRAINT);
+		constraintIndex = featureModelManager.editObject().getConstraintIndex(constraint);
 		this.newPos = newPos;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		oldPos = graphicalFeatureModel.getGraphicalConstraint(constraint).getLocation();
 		graphicalFeatureModel.getGraphicalConstraint(constraint).setLocation(newPos);
-		return FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE_LOCATION, newPos, oldPos);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		graphicalFeatureModel.getGraphicalConstraint(constraint).setLocation(oldPos);
-		return FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE_LOCATION, oldPos, newPos);
 	}
 
 }

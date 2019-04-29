@@ -67,11 +67,11 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -154,8 +154,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		});
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return project.getFeatureModel();
+	public IFeatureModelManager getFeatureModelManager() {
+		return project.getFeatureModelManager();
 	}
 
 	public IFeature getFeature(int line) {
@@ -177,6 +177,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * Attaches a coverage annotation model for the given editor if the editor can be annotated. Does nothing if the model is already attached.
 	 *
 	 * @param editor Editor to attach a annotation model to
+	 * @return return
 	 */
 	public static boolean attach(ITextEditor editor) {
 		final IDocumentProvider provider = editor.getDocumentProvider();
@@ -232,6 +233,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * Updates the annotations if the value changed.
 	 *
 	 * @param highlighting true: highlights directives in the editor
+	 * @param editor editor to check
 	 */
 	public static void setHighlighting(boolean highlighting, ITextEditor editor) {
 		if (ColorAnnotationModel.highlighting != highlighting) {

@@ -16,7 +16,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import br.ufal.ic.colligens.controllers.metrics.MetricsViewController;
 import br.ufal.ic.colligens.util.metrics.CountDirectives;
 import br.ufal.ic.colligens.util.metrics.Metrics;
-import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class MetricsController {
 
@@ -34,9 +33,6 @@ public class MetricsController {
 		pkgExplorerController.setSelection(selection);
 	}
 
-	/**
-	 * @throws MetricsException
-	 */
 	public void run() {
 
 		try {

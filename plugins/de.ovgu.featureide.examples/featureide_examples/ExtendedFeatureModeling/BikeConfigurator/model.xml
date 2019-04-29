@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<extendedFeatureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="BikeConfigurator">
+				<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+				<alt mandatory="true" name="Frame">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Steel">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="1089.0"/>
+					</feature>
+					<feature name="Steel/Titanimum">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="1914.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Handlebar">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="S Type">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="M Type">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="P Type">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="H Type">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Frame Color">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Black">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Grey">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Raw Lacquer">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="174.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Mudguards">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Version E">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Version L">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="85.0"/>
+					</feature>
+					<feature name="Version R">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="197.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Number of Gears">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="1">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="2">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="77.0"/>
+					</feature>
+					<feature name="3">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="148.0"/>
+					</feature>
+					<feature name="6">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="281.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Gear Ratio">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Standard">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="+8%">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="20.0"/>
+					</feature>
+					<feature name="-12%">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="20.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Tyres">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Marathon Racer">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Kojak">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="32.0"/>
+					</feature>
+					<feature name="Marathon">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="32.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Lightning">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Reflectors Only">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Battery Lightning">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="92.0"/>
+					</feature>
+					<feature name="Shimano Hub Dynamo">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="140.0"/>
+					</feature>
+					<feature name="SON Hub Dynamo">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="430.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Saddle Height">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Standard Height">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Extended">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Telescopic">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="72.0"/>
+					</feature>
+				</alt>
+				<alt mandatory="true" name="Saddle Type">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Brompton">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Brompton with Light">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="25.0"/>
+					</feature>
+					<feature name="Special Men">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="96.0"/>
+					</feature>
+					<feature name="Special Ladies">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="96.0"/>
+					</feature>
+					<feature name="Brompton Wide">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					</feature>
+					<feature name="Brompton Wide with Light">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="25.0"/>
+					</feature>
+				</alt>
+				<feature name="Toolkit">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="64.9"/>
+				</feature>
+				<alt name="Front Luggage">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+					<feature name="Carrier Block only">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="39.0"/>
+					</feature>
+					<feature name="Tote Bag">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="124.0"/>
+					</feature>
+					<feature name="Roll Top Bag">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="154.0"/>
+					</feature>
+					<feature name="O Bag">
+						<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="314.0"/>
+					</feature>
+				</alt>
+				<feature name="B Bag">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+				</feature>
+				<feature name="Saddle Bag">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€" value="59.0"/>
+				</feature>
+				<feature name="Rack Sack">
+					<attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</extendedFeatureModel>

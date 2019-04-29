@@ -67,7 +67,6 @@ public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
 				filterAction.initializeImage(FMUIPlugin.getImage(filterAction.getFilter().getImagePath()));
 
 				final ActionContributionItem contributionItem = new ActionContributionItem(filterAction);
-				// contributionItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 				contributionItem.fill(filterMenu, -1 /* means insert at end */);
 			}
 		}

@@ -131,7 +131,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 
 		final LinkedList<String> selectedFeatures = new LinkedList<String>();
@@ -250,7 +250,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		featureModel = project.getFeatureModel();
-		fmFactory = FMFactoryManager.getFactory(featureModel);
+		fmFactory = FMFactoryManager.getInstance().getFactory(featureModel);
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
 				featureModel.getStructure().getRoot().removeChild(featureModel.getFeature("Base").getStructure());

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class CNF implements Serializable {
 	private static final long serialVersionUID = -5140589732063007073L;
 
 	protected final ClauseList clauses;
-	protected final Variables variables;
+	protected Variables variables;
 
 	public CNF(Variables mapping, List<LiteralSet> clauses) {
 		variables = mapping;
@@ -164,6 +165,30 @@ public class CNF implements Serializable {
 	@Override
 	public String toString() {
 		return "CNF\n\tvariables=" + variables + "\n\tclauses=" + clauses;
+	}
+
+	/**
+	 * Creates a new clause list from this CNF with all clauses adapted to a new variable mapping.
+	 *
+	 * @param newVariables the new variables
+	 * @return an adapted clause list, {@code null} if there are old variables names the are not contained in the new variables.
+	 */
+	public ClauseList adapt(IVariables newVariables) {
+		if (Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()))) {
+			final ClauseList newClauseList = new ClauseList(clauses.size());
+			for (final LiteralSet literalSet : clauses) {
+				final int[] oldLiterals = literalSet.getLiterals();
+				final int[] newLiterals = new int[oldLiterals.length];
+				for (int i = 0; i < oldLiterals.length; i++) {
+					final int oldLiteral = oldLiterals[i];
+					newLiterals[i] = newVariables.getVariable(variables.getName(oldLiteral), oldLiteral > 0);
+				}
+				newClauseList.add(new LiteralSet(newLiterals));
+			}
+			return newClauseList;
+		} else {
+			return null;
+		}
 	}
 
 }

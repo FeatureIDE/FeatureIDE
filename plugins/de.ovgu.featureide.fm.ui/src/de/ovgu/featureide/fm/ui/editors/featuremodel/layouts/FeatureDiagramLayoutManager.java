@@ -27,6 +27,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.abego.treelayout.Configuration;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -41,6 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureModelBounds;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -53,6 +55,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Edgard Schmidt
  * @author Stefanie Schober
  * @author Jann-Ole Henningson
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 abstract public class FeatureDiagramLayoutManager {
 
@@ -61,6 +65,8 @@ abstract public class FeatureDiagramLayoutManager {
 	protected boolean showHidden, showCollapsedConstraints;
 	protected ScrollingGraphicalViewer editor;
 	private boolean firstManualLayout = false;
+
+	private final FeatureModelBounds featureModelBound = new FeatureModelBounds();
 
 	public final void layout(IGraphicalFeatureModel featureModel, ScrollingGraphicalViewer editor) {
 		this.editor = editor;
@@ -78,8 +84,10 @@ abstract public class FeatureDiagramLayoutManager {
 				// does not change the position no event is performed and the connections are not drawn. So for the first
 				// start perform the location changed event to refresh the connection only in manual layout
 				entry.update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
-				firstManualLayout = true;
 			}
+			firstManualLayout = true;
+		} else if (featureModel.getLayout().getLayoutAlgorithm() != 0) {
+			firstManualLayout = false;
 		}
 
 		if (!featureModel.isLegendHidden()) {
@@ -142,8 +150,15 @@ abstract public class FeatureDiagramLayoutManager {
 		for (final IGraphicalConstraint constraint : constraints) {
 			final Dimension size = constraint.getSize();
 			int x;
-			if (depthFirst) {
-				x = 2 * FMPropertyManager.getFeatureSpaceX();
+			if (depthFirst || (constraint.getGraphicalModel().getLayout().getAbegoRootposition() == Configuration.Location.Left)) {
+				if (depthFirst) {
+					x = 2 * FMPropertyManager.getFeatureSpaceX();
+				} else {
+					x = rootBounds.x;
+				}
+			} else if (constraint.getGraphicalModel().getLayout().getAbegoRootposition() == Configuration.Location.Right) {
+				final int rootRight = rootBounds.x + rootBounds.width;
+				x = rootRight - size.width;
 			} else {
 				final int rootCenter = rootBounds.x + (rootBounds.width / 2);
 				x = rootCenter - (size.width / 2);
@@ -154,39 +169,12 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
-	public Rectangle getFeatureModelBounds(List<? extends IGraphicalElement> elements) {
-		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
-
-		/*
-		 * update lowest, highest, most left, most right coordinates for elements
-		 */
-
-		for (final IGraphicalElement element : elements) {
-			final Rectangle position = FeatureUIHelper.getBounds(element);
-			if (position.x < min.x) {
-				min.x = position.x;
-			}
-			if (position.y < min.y) {
-				min.y = position.y;
-			}
-			if ((position.x + position.width) > max.x) {
-				max.x = position.right();
-			}
-			if ((position.y + position.height) > max.y) {
-				max.y = position.bottom();
-			}
-		}
-
-		return new Rectangle(min, max);
-	}
-
 	/**
 	 * Checks whether the passed rectangle is crossed by a line in between source and target
 	 *
-	 * @param source
-	 * @param target
-	 * @param rect
+	 * @param source source
+	 * @param target tartget
+	 * @param rect rectangle to check
 	 * @return is there an intersection?
 	 */
 	public boolean rectangleConnectionIntersection(Point source, Point target, Rectangle rect) {
@@ -230,9 +218,9 @@ abstract public class FeatureDiagramLayoutManager {
 	 *
 	 * Should it happen that the passed elements are features, their connections will be checked for an intersection as well.
 	 *
-	 * @param elements
-	 * @param rects
-	 * @param verticalLayout
+	 * @param elements graphical elements to check
+	 * @param rects rectangles to check
+	 * @param verticalLayout true if any vertical layout is selected
 	 */
 	public void checkIntersections(List<? extends IGraphicalElement> elements, List<Rectangle> rects, boolean verticalLayout) {
 		final ListIterator<Rectangle> iter = rects.listIterator();
@@ -260,10 +248,10 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * Checks for a certain feature if its connections are intersecting the given rectangle
 	 *
-	 * @param targets
-	 * @param rect
-	 * @param verticalLayout
-	 * @return
+	 * @param targets target conenction list
+	 * @param rect rectangle
+	 * @param verticalLayout is vertical layout?
+	 * @return true if intersects
 	 */
 	public boolean checkConnectionIntersections(List<FeatureConnection> targets, Rectangle rect, boolean verticalLayout) {
 		for (int i = 0; i < targets.size(); i++) {
@@ -290,7 +278,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * Manages the placement of the legend
 	 *
-	 * @param featureModel
+	 * @param featureModel feature model
 	 * @return new location of the legend
 	 */
 	public Point layoutLegend(IGraphicalFeatureModel featureModel) {
@@ -298,7 +286,7 @@ abstract public class FeatureDiagramLayoutManager {
 			return null;
 		}
 
-		final Rectangle featureModelBounds = getFeatureModelBounds(featureModel.getVisibleFeatures());
+		final Rectangle featureModelBounds = featureModelBound.getFeatureModelBounds(featureModel.getVisibleFeatures());
 		final Point min = featureModelBounds.getTopLeft();
 		final Point max = featureModelBounds.getBottomRight();
 
@@ -327,25 +315,27 @@ abstract public class FeatureDiagramLayoutManager {
 		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 
 		// Check the first four positions for intersections with the features
-		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().hasVerticalLayout());
 
 		// Add the position next to the featureModel and check for hits with the constraints
 		rects.add(new Rectangle(new Point(max.x + FMPropertyManager.getFeatureSpaceX(), min.y), legendSize));
-		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().hasVerticalLayout());
 
 		if (rects.size() > 0) {
 			// At this point, rects does only contain positions for the legend that are acceptable. So we take the first
-			featureModel.getLayout().setLegendPos(rects.get(0).getLocation().x, rects.get(0).getLocation().y);
-			return featureModel.getLayout().getLegendPos();
+			final Point location = rects.get(0).getLocation();
+			featureModel.getLegend().setPos(location);
+			return location;
 		}
 
 		// It was not possible to find any empty space, probably there is an intersection with a constraint.
 		// So we position the legend next to the feature model and mind the constraints
-		final Rectangle boundsOfEverything = getFeatureModelBounds(featureModel.getVisibleConstraints());
+		final Rectangle boundsOfEverything = featureModelBound.getFeatureModelBounds(featureModel.getVisibleConstraints());
 		boundsOfEverything.union(featureModelBounds);
 
-		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
-		return featureModel.getLayout().getLegendPos();
+		final Point pos = new Point(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		featureModel.getLegend().setPos(pos);
+		return pos;
 	}
 
 	/**

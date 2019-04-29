@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_SIBLI
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -36,33 +37,20 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Maximilian Kühl
  */
-public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
+public class SetSiblingsToCollapsedOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private final IFeature feature;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
+	private final String featureName;
+	private final LinkedList<Boolean> collapseStates = new LinkedList<>();
 
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
-	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
-		this.feature = feature;
-		this.graphicalFeatureModel = graphicalFeatureModel;
-	}
-
-	/**
-	 * @param feature
-	 * @return String to be used in undo/redo menu
-	 */
-	private static String getLabel(IFeature feature) {
-		return COLLAPSE_SIBLINGS;
+	public SetSiblingsToCollapsedOperation(String featureName, IGraphicalFeatureModel graphicalFeatureModel) {
+		super(graphicalFeatureModel, COLLAPSE_SIBLINGS);
+		this.featureName = featureName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		collapseStates.clear();
+		final IFeature feature = featureModel.getFeature(featureName);
 		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
 				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
@@ -73,14 +61,15 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 			}
 		}
 		if (feature.getStructure().getParent() != null) {
-			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
+			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.FEATURE_COLLAPSED_CHANGED);
 		} else {
-			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
+			return new FeatureIDEEvent(feature, EventType.FEATURE_COLLAPSED_CHANGED);
 		}
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeature feature = featureModel.getFeature(featureName);
 		int i = 0;
 		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
@@ -88,7 +77,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}
-		return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
+		return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.FEATURE_COLLAPSED_CHANGED);
 	}
 
 }

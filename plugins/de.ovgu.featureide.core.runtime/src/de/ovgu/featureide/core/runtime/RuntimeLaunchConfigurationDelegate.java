@@ -55,7 +55,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 		if ((featureProject != null) && featureProject.getComposerID().equals(COMPOSER_ID)
 			&& RuntimeParameters.RUN_CONFIGURATION.equals(featureProject.getCompositionMechanism())) {
 
-			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
+			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 
 			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
 

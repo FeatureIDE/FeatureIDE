@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -125,12 +126,26 @@ public class FeatureColorManager implements IEventListener {
 		if (removedColorScheme.isCurrent()) {
 			setActive(project, DefaultColorScheme.defaultName, true);
 		}
+
+		// Update project explorer
+		try {
+			project.touch(null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		} catch (final CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		final ArrayList<IFeature> changedFeatures = new ArrayList<IFeature>();
+		for (final String featureName : removedColorScheme.getColors().keySet()) {
+			changedFeatures.add(featureModel.getFeature(featureName));
+		}
+		notifyColorChange(changedFeatures);
 	}
 
 	/**
 	 * Checks whether the given scheme is active.
 	 *
-	 * @param newProfileColorSchemeName
+	 * @param featureModel the feature model
+	 * @param schmeName name of the scheme to check
 	 * @return
 	 */
 	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
@@ -434,7 +449,7 @@ public class FeatureColorManager implements IEventListener {
 	public static void notifyColorChange(ArrayList<IFeature> features) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(features, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(features, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}
@@ -444,12 +459,12 @@ public class FeatureColorManager implements IEventListener {
 	/**
 	 * Notify all listener that the color of a feature has changed
 	 *
-	 * @param features All features that colors were changed
+	 * @param feature The feature that color was changed.
 	 */
 	public static void notifyColorChange(IFeature feature) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(feature, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(feature, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}

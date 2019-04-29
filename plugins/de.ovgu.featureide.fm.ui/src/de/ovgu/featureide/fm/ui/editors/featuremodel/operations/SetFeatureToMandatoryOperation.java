@@ -22,8 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY_OPERATION;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to set Features mandatory/concrete. Enables undo/redo functionality.
@@ -35,32 +38,36 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 
-	private final boolean allMandatory;
-	private final IFeature[] featureArray;
+	public static final String ID = ID_PREFIX + "SetFeatureToMandatoryOperation";
 
-	/**
-	 */
-	public SetFeatureToMandatoryOperation(IFeatureModel featureModel, boolean allMandatory, IFeature[] featureArray) {
-		super(featureModel, MANDATORY_OPERATION);
+	private final boolean allMandatory;
+
+	public SetFeatureToMandatoryOperation(IFeatureModelManager featureModelManager, boolean allMandatory, List<String> featureNames) {
+		super(featureModelManager, MANDATORY_OPERATION, featureNames);
 		this.allMandatory = allMandatory;
-		this.featureArray = featureArray;
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			// Never change mandatory status of root
 			if (tempFeature.getStructure().isRoot()) {
 				continue;
 			}
 			// If not all of the selected features are mandatory, change all that are not mandatory to mandatory
-			if(!allMandatory && !tempFeature.getStructure().isMandatory()) {
-				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(tempFeature, featureModel);
+			if (!allMandatory && !tempFeature.getStructure().isMandatory()) {
+				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(name, featureModelManager);
 				operations.add(op);
 			}
 			// If all selected features are mandatory, set all that can be optional to optional
-			if(allMandatory && tempFeature.getStructure().getParent().isAnd()) {
-				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(tempFeature, featureModel);
+			if (allMandatory && tempFeature.getStructure().getParent().isAnd()) {
+				final MandatoryFeatureOperation op = new MandatoryFeatureOperation(name, featureModelManager);
 				operations.add(op);
 			}
 		}

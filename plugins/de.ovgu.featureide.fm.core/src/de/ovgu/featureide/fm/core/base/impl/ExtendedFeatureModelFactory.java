@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.core.base.impl;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
@@ -62,8 +64,18 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedFeatureModel createFeatureModel() {
+	public ExtendedFeatureModel create() {
 		return new ExtendedFeatureModel(ID);
+	}
+
+	@Override
+	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
+		return (ExtendedFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+	}
+
+	@Override
+	public ExtendedConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
+		return (ExtendedConstraint) oldConstraint.clone(featureModel);
 	}
 
 }

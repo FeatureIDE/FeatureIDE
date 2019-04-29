@@ -59,7 +59,7 @@
           <command
                 commandId="de.ovgu.featureide.core.munge.ui.commands.signature"
                 id="de.ovgu.featureide.core.munge.ui.actions.munge"
-                label="Create Signature"
+                label="Enable Signatures"
                 style="toggle">
              <visibleWhen
                    checkEnabled="false">

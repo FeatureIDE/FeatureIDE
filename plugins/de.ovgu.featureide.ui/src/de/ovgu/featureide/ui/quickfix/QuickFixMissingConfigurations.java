@@ -37,10 +37,10 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -54,10 +54,10 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	private static final AbstractCorePlugin LOGGER = FMCorePlugin.getDefault();
 
 	protected final IFeatureProject project;
-	protected IFeatureModel featureModel;
+	protected FeatureModelFormula featureModel;
 	private int configurationNr = 0;
 
-	protected final IPersistentFormat<Configuration> configFormat = ConfigurationManager.getDefaultFormat();
+	protected final IPersistentFormat<Configuration> configFormat = ConfigFormatManager.getDefaultFormat();
 
 	@Override
 	public String getLabel() {
@@ -70,7 +70,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 			if (project == null) {
 				featureModel = null;
 			} else {
-				featureModel = project.getFeatureModel();
+				featureModel = project.getFeatureModelManager().getPersistentFormula();
 			}
 		} else {
 			featureModel = null;
@@ -78,7 +78,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 		}
 	}
 
-	public QuickFixMissingConfigurations(IFeatureModel model) {
+	public QuickFixMissingConfigurations(FeatureModelFormula model) {
 		featureModel = model;
 		project = null;
 	}

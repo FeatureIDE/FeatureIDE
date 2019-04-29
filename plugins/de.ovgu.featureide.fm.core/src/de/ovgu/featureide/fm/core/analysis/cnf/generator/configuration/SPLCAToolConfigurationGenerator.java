@@ -61,7 +61,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 
 	public SPLCAToolConfigurationGenerator(CNF cnf, int maxSampleSize, int t, String algorithm) {
 		super(cnf, maxSampleSize);
-		featureModel = DefaultFeatureModelFactory.getInstance().createFeatureModel();
+		featureModel = DefaultFeatureModelFactory.getInstance().create();
 		new DIMACSFormat().read(featureModel, new DIMACSFormatCNF().write(cnf));
 		this.algorithm = algorithm;
 		this.t = t;

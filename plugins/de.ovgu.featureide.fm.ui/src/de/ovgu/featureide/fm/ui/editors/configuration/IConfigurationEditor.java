@@ -25,7 +25,7 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 
 public interface IConfigurationEditor {
 
@@ -34,8 +34,6 @@ public interface IConfigurationEditor {
 	IFile getFile();
 
 	File getModelFile();
-
-	JobSynchronizer getConfigJobManager();
 
 	boolean isAutoSelectFeatures();
 
@@ -51,6 +49,6 @@ public interface IConfigurationEditor {
 
 	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
 
-	ConfigurationPropagator getPropagator();
+	IConfigurationPropagator getPropagator();
 
 }

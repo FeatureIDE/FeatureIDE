@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -35,8 +35,8 @@ public class ICPLConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	private final int t;
 
-	public ICPLConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, int t) {
-		super(builder, featureProject);
+	public ICPLConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, int t) {
+		super(builder, formula);
 		this.t = t;
 	}
 

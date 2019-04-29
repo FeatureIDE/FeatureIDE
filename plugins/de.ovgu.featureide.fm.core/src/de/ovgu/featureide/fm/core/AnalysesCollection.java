@@ -39,8 +39,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AClauseAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AnalysisResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis.Anomalies;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ClauseAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ClauseAnalysis.Anomalies;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ContradictionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
@@ -237,12 +237,12 @@ public class AnalysesCollection {
 
 	}
 
-	static final class CauseAnalysisWrapper extends AConstraintAnalysisWrapper<List<Anomalies>, CauseAnalysis> {
+	static final class CauseAnalysisWrapper extends AConstraintAnalysisWrapper<List<Anomalies>, ClauseAnalysis> {
 
 		private final AnalysisWrapper<LiteralSet, CoreDeadAnalysis> coreDeadAnalysis;
 		private final FalseOptionalAnalysisWrapper foAnalysis;
 
-		private CauseAnalysisWrapper(Class<CauseAnalysis> analysis, AnalysisWrapper<LiteralSet, CoreDeadAnalysis> coreDeadAnalysis,
+		private CauseAnalysisWrapper(Class<ClauseAnalysis> analysis, AnalysisWrapper<LiteralSet, CoreDeadAnalysis> coreDeadAnalysis,
 				FalseOptionalAnalysisWrapper foAnalysis) {
 			super(analysis, new FeatureTreeCNFCreator());
 			this.coreDeadAnalysis = coreDeadAnalysis;
@@ -256,7 +256,7 @@ public class AnalysesCollection {
 		}
 
 		@Override
-		protected void configureAnalysis(CNF cnf, CauseAnalysis analysis) {
+		protected void configureAnalysis(CNF cnf, ClauseAnalysis analysis) {
 			final Anomalies initialAnomalies = new Anomalies();
 			initialAnomalies.setDeadVariables(coreDeadAnalysis.getResult());
 
@@ -395,7 +395,7 @@ public class AnalysesCollection {
 		new ConstraintAnalysisWrapper<>(IndependentContradictionAnalysis.class, new EmptyCNFCreator());
 	final ConstraintAnalysisWrapper<ContradictionAnalysis> constraintVoidAnalysis =
 		new ConstraintAnalysisWrapper<>(ContradictionAnalysis.class, new FeatureTreeCNFCreator());
-	final CauseAnalysisWrapper constraintAnomaliesAnalysis = new CauseAnalysisWrapper(CauseAnalysis.class, coreDeadAnalysis, foAnalysis);
+	final CauseAnalysisWrapper constraintAnomaliesAnalysis = new CauseAnalysisWrapper(ClauseAnalysis.class, coreDeadAnalysis, foAnalysis);
 
 	private final List<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> list =
 		Arrays.asList(validAnalysis, atomicSetAnalysis, coreDeadAnalysis, foAnalysis, determinedAnalysis, constraintContradictionAnalysis,
@@ -513,6 +513,18 @@ public class AnalysesCollection {
 
 	public void setRunCalculationAutomatically(boolean runCalculationAutomatically) {
 		this.runCalculationAutomatically = runCalculationAutomatically;
+	}
+
+	public FeatureModelProperties getFeatureModelProperties() {
+		return featureModelProperties;
+	}
+
+	public Map<IFeature, FeatureProperties> getFeatureProperties() {
+		return featurePropertiesMap;
+	}
+
+	public Map<IConstraint, ConstraintProperties> getConstraintProperties() {
+		return constraintPropertiesMap;
 	}
 
 }

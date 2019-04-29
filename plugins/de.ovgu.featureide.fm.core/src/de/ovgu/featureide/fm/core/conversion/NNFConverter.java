@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * @brief Converter using negation normal form.
+ * Converter using negation normal form.
  *
  * @author Alexander Knueppel
  */
@@ -235,7 +235,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 		this.preserve = preserve;
 
 		if (nodes.isEmpty()) {

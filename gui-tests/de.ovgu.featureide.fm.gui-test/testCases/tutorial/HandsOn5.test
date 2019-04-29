@@ -1,0 +1,130 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,__Xr9MOvFEee9ofvBkamr2g
+Element-Name: HandsOn5
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _UfQGoOvjEee9ofvBkamr2g
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/28/17 5:20 PM
+Testcase-Type: ecl
+Verifications: _cNvKYOvlEee9ofvBkamr2g,_X5rUMOvlEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+1. Import example Elevator-Antenna-v1.3 using the menu File >New > Example >FeatureIDE Examples
+2. Generate and compile all six configurations by right click on project > FeatureIDE > Product Generator > All current configurations, deselect JUnit tests
+3. Fix compiler errors for configuration Starter by adding annotation //#if CallButtons around onRequestFinished and repeat 2. for validation
+4. Repeat 2. but with selection of JUnit tests to uncover problem with processing order of feature FIFO
+5. Assign a color to feature FIFO to identify and fix the problem in class Request and repeat 4. for validation
+6. Repeat 4. but select ICPL and Chvatal with different values of T to identify three lines that should be removed
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-menu "File/New/Example..." | click
+get-window "New Example" | get-tree | select "FeatureIDE/FeatureIDE Examples" | double-click
+with [get-window "FeatureIDE Example Import"] {
+    get-tree | select AHEAD | get-item "Antenna/Elevator-Antenna-v1.3" | check
+    get-button Finish | click
+}
+
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+with [get-window "Build Products"] {
+    get-group "Derive configurations" | get-combo -after [get-label "Strategy:"] | select "All current configurations"
+    get-button -after [get-label "Run JUnit tests:"] | uncheck
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree 
+    | select "Elevator-Antenna-v1.3/src/de.ovgu.featureide.examples.elevator.core.controller/ITickListener.java" 
+    | double-click
+with [get-editor "ITickListener.java" | get-text-viewer] {
+    set-caret-pos 28 5
+    key-type Enter
+    type-text "//#if CallB"
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Tab
+    type-text "//#endif"
+    key-type "M1+s"
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+get-window "Build Products" | get-button Finish | click
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+with [get-window "Build Products"] {
+    get-button -after [get-label "Run JUnit tests:"] | check
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3/model.xml" | double-click
+with [get-editor "Elevator-Antenna-v1.3 Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart | get-edit-part -text FIFO] {
+        mouse-move 15 9 button3 -height 21 -width 38
+        mouse-press 15 9 button3 -height 21 -width 38
+        mouse-release 15 9 button3 2097152 -height 21 -width 38
+    }
+    get-menu "Feature Color" | click
+}
+with [get-window "Set Feature Colors"] {
+    get-combo -after [get-label "Choose Color:"] | select Magenta
+    get-button OK | click
+}
+get-editor "Elevator-Antenna-v1.3 Model" | get-diagram | mouse-hover 162 73 -height 302 -width 747
+get-view "Package Explorer" | get-tree 
+    | select "Elevator-Antenna-v1.3/src/de.ovgu.featureide.examples.elevator.core.controller/Request.java" 
+    | double-click
+with [get-editor "Request.java" | get-text-viewer] {
+    set-caret-pos 47 31
+    key-type BackSpace
+    key-type End
+    set-caret-pos 47 72
+    key-type "M2+ARROW_LEFT" -times 15
+    key-type Del
+    key-type "M1+s"
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+get-window "Build Products" | get-button Finish | click
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+with [get-window "Build Products"] {
+    get-group "Derive configurations" | get-combo -after [get-label "Strategy:"] | select "T-wise configurations"
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+with [get-window "Build Products"] {
+    get-group "Derive configurations" | get-combo -after [get-label "Algorithm:"] | select Chvatal
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree 
+    | select "Elevator-Antenna-v1.3/src/de.ovgu.featureide.examples.elevator.core.controller/Request.java" 
+    | double-click
+with [get-editor "Request.java"] {
+    get-right-ruler | click-ruler -line 110
+    with [get-text-viewer] {
+        set-caret-pos 113 34
+        key-type Right
+        key-type "M2+ARROW_DOWN" -times 3
+        key-type Del
+        key-type "M1+s"
+    }
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.3" | get-menu "FeatureIDE/Product Generator" 
+    | click
+wait 1000 // necessary to avoid that window is not found (sporadically)
+get-window "Build Products" | get-button Finish | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

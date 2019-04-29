@@ -112,7 +112,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether there exist only constraints that can be refactored trivially.
 	 *
-	 * @param node
+	 * @param nodes List of nodes
 	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
 	 */
 	public static boolean trivialRefactoring(List<Node> nodes) {
@@ -141,7 +141,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Eliminates complex constraints according to a given strategy.
 	 *
-	 * @param fm
+	 * @param model
 	 * @return
 	 */
 	public IFeatureModel convert(IFeatureModel model, IConverterStrategy converter, Option... options) {
@@ -168,7 +168,7 @@ public class ComplexConstraintConverter {
 
 		// Work with a clone
 		fm = model.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 
 		// Basic cleaning
 		if (removeRedundncy && !prepare()) {

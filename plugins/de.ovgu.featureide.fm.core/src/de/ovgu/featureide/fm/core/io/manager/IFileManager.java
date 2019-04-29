@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
 
-import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -32,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  *
  * @author Sebastian Krieter
  */
-public interface IFileManager<T> extends IEventManager {
+public interface IFileManager<T> extends IManager<T> {
 
 	String getAbsolutePath();
 
@@ -42,49 +40,25 @@ public interface IFileManager<T> extends IEventManager {
 	ProblemList getLastProblems();
 
 	/**
-	 * Loads the content from the local file and stores it in the local object. To update the persistent and variable object, {@link #override()} must be
+	 * Loads the content from the local file and stores it in the local object. To update the persistent and variable object, {@link #overwrite()} must be
 	 * called.
 	 *
 	 * @return {@code true} if successful read, {@code false} otherwise.
 	 *
-	 * @see #override()
+	 * @see #overwrite()
 	 */
-	boolean read();
+	ProblemList read();
+
+	ProblemList readFromSource(CharSequence source);
 
 	/**
 	 * Save last modifications to the local file. Updates (overrides) local object and persistent object.
 	 *
 	 * @return {@code true} if successful write, {@code false} otherwise.
 	 */
-	boolean save();
-
-	/**
-	 * Overrides the variable and persistent object with the local object.
-	 */
-	void override();
-
-	/**
-	 * @return The persistent object.
-	 */
-	T getObject();
-
-	/**
-	 * @return The variable object.
-	 */
-	T editObject();
-
-	/**
-	 * @return a snapshot of the persistent object.
-	 */
-	Snapshot<T> getSnapshot();
+	ProblemList save();
 
 	IPersistentFormat<T> getFormat();
-
-	boolean externalSave(ICriticalConsumer<T> externalSaveMethod);
-
-	void dispose();
-
-	void setObject(T object);
 
 	Path getPath();
 

@@ -21,11 +21,13 @@
 package de.ovgu.featureide.fm.ui.handlers.base;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -35,18 +37,20 @@ public abstract class AbstractFMExportHandler extends AbstractExportHandler<IFea
 	@Override
 	protected IFeatureModel getObject(Path path, IPersistentFormat<IFeatureModel> format) {
 		IFeatureModelFactory factory;
+		final FMFactoryManager factoryManager = FMFactoryManager.getInstance();
 		try {
-			factory = FMFactoryManager.getFactory(path.toString(), format);
+			factory = factoryManager.getFactory(path, format);
 		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
+			factory = DefaultFeatureModelFactory.getInstance();
 		}
-		return factory.createFeatureModel();
+		return factory.create();
 	}
 
 	@Override
 	protected IPersistentFormat<IFeatureModel> getInputFormat(Path path) {
-		return FMFormatManager.getInstance().getFormatByFileName(path.getFileName().toString());
+		final List<IPersistentFormat<IFeatureModel>> formats = FMFormatManager.getInstance().getFormatListForExtension(path.getFileName());
+		return formats.isEmpty() ? null : formats.get(0);
 	}
 
 }

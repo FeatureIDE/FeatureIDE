@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
  *
@@ -74,9 +72,8 @@ public abstract class Node {
 	 * <p> Returns true iff this node evaluates to true under the given truth value assignment. The result of the evaluation is the same as if each positive
 	 * literal in the expression were replaced by the corresponding boolean value in the given map. </p>
 	 *
-	 * <p> For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied:
-	 * <pre><i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i></pre> Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the
-	 * node. </p>
+	 * For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied: <pre><i>c<sub>1</sub></i>
+	 * &and; &hellip; &and; <i>c<sub>n</sub></i></pre> Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the node.
 	 *
 	 * @param assignment truth value assignment from variable to true or false
 	 * @return the result of evaluation of this node
@@ -412,9 +409,9 @@ public abstract class Node {
 	/**
 	 * Returns a string representation of this node. The symbols for logical connectors, e.g. And, are given as a parameter.
 	 *
-	 * @see org.prop4j.NodeWriter.shortSymbols (default)
-	 * @see org.prop4j.NodeWriter.logicalSymbols
-	 * @see org.prop4j.NodeWriter.textualSymbols
+	 * @see org.prop4j.NodeWriter#shortSymbols (default)
+	 * @see org.prop4j.NodeWriter#logicalSymbols
+	 * @see org.prop4j.NodeWriter#textualSymbols
 	 *
 	 * @param symbols the symbols for logical connectors
 	 *
@@ -463,11 +460,11 @@ public abstract class Node {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
-	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature) {
+	public List<Node> replaceFeature(String feature, String replaceWithFeature) {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+	protected List<Node> replaceFeature(String feature, String replaceWithFeature, List<Node> list) {
 		for (final Node child : children) {
 			child.replaceFeature(feature, replaceWithFeature, list);
 		}
@@ -576,7 +573,7 @@ public abstract class Node {
 	 * @return all features contained in this node and its children; not null
 	 */
 	public List<String> getContainedFeatures() {
-		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
+		return getContainedFeatures(new ArrayList<String>());
 	}
 
 	/**
@@ -585,7 +582,7 @@ public abstract class Node {
 	 * @return all features contained in this node and its children; not null
 	 */
 	public Set<String> getUniqueContainedFeatures() {
-		return (Set<String>) getContainedFeatures(new LinkedHashSet<String>());
+		return getContainedFeatures(new LinkedHashSet<String>());
 	}
 
 	/**
@@ -594,7 +591,7 @@ public abstract class Node {
 	 * @param containedFeatures collection of previously found features to add to; not null
 	 * @return all features contained in this node and its children; not null
 	 */
-	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+	protected <T extends Collection<String>> T getContainedFeatures(T containedFeatures) {
 		for (final Node child : children) {
 			child.getContainedFeatures(containedFeatures);
 		}
@@ -607,7 +604,7 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	public List<Literal> getLiterals() {
-		return new ArrayList<>(getLiterals(new LinkedList<Literal>()));
+		return getLiterals(new LinkedList<Literal>());
 	}
 
 	/**
@@ -616,7 +613,7 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	public Set<Literal> getUniqueLiterals() {
-		return (Set<Literal>) getLiterals(new LinkedHashSet<Literal>());
+		return getLiterals(new LinkedHashSet<Literal>());
 	}
 
 	/**
@@ -625,7 +622,7 @@ public abstract class Node {
 	 * @param literals collection of previously found literals to add to; not null
 	 * @return all literals contained in this node and its children; not null
 	 */
-	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+	protected <T extends Collection<Literal>> T getLiterals(T literals) {
 		for (final Node child : children) {
 			child.getLiterals(literals);
 		}
@@ -638,7 +635,7 @@ public abstract class Node {
 	 * @return all variables contained in this node and its children; not null
 	 */
 	public List<Object> getVariables() {
-		return new ArrayList<>(getVariables(new LinkedList<>()));
+		return getVariables(new LinkedList<Object>());
 	}
 
 	/**
@@ -647,7 +644,7 @@ public abstract class Node {
 	 * @return all variables contained in this node and its children; not null
 	 */
 	public Set<Object> getUniqueVariables() {
-		return (Set<Object>) getVariables(new LinkedHashSet<>());
+		return getVariables(new LinkedHashSet<Object>());
 	}
 
 	/**
@@ -656,7 +653,7 @@ public abstract class Node {
 	 * @param variables collection of previously found variables to add to; not null
 	 * @return all variables contained in this node and its children; not null
 	 */
-	protected Collection<Object> getVariables(Collection<Object> variables) {
+	protected <T extends Collection<Object>> T getVariables(T variables) {
 		for (final Node child : children) {
 			child.getVariables(variables);
 		}

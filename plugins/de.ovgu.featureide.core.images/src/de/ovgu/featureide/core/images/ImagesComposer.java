@@ -121,7 +121,7 @@ public class ImagesComposer extends ComposerExtensionClass {
 	 */
 	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
 		final List<String> selectedFeatures = new ArrayList<String>();
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		for (final IFeature f : configuration.getSelectedFeatures()) {
 			if (!f.getStructure().isAbstract()) {

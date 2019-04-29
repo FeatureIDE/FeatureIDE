@@ -41,6 +41,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	private final LongRunningMethod<T> method;
 	private final IMonitor monitor;
+	private Executer<T> executer;
 
 	private int cancelingTimeout = -1;
 	private T methodResult = null;
@@ -63,8 +64,10 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	@Override
 	public boolean cancel() {
-		monitor.cancel();
-		return isAlive();
+		if (executer != null) {
+			executer.cancel();
+		}
+		return !isAlive();
 	}
 
 	public void fireEvent() {
@@ -109,9 +112,10 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	@Override
 	public void run() {
+		// TODO check fo cancel at beginning
 		status = JobStatus.RUNNING;
 		try {
-			final Executer<T> executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
+			executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
 			methodResult = executer.execute(monitor);
 			status = JobStatus.OK;
 		} catch (final Exception e) {
@@ -147,11 +151,6 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	@Override
 	public void setStoppable(boolean stoppable) {
 		this.stoppable = stoppable;
-	}
-
-	@Override
-	public Class<?> getImplementationClass() {
-		return method.getClass();
 	}
 
 }

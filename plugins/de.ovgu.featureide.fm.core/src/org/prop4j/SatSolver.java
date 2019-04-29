@@ -327,7 +327,6 @@ public class SatSolver {
 		if (test()) {
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
-			max = solver.nVars();
 
 			return atomicSuperSets(globalModel, done);
 		}
@@ -338,14 +337,12 @@ public class SatSolver {
 		if (test()) {
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
-			max = 0;
 
 			Arrays.fill(done, (byte) 2);
 			for (final String b : featureSet) {
 				final Integer x = varToInt.get(b);
 				if (x != null) {
 					done[x - 1] = 0;
-					max++;
 				} else {
 					throw new RuntimeException("Unkown Feature " + b);
 				}
@@ -356,8 +353,6 @@ public class SatSolver {
 		return Collections.emptyList();
 	}
 
-	private int max = 0;
-
 	private List<List<Literal>> atomicSuperSets(final int[] globalModel, final byte[] done) {
 		final List<List<Literal>> result = new ArrayList<>();
 		final ArrayList<Literal> coreList = new ArrayList<>();
@@ -365,12 +360,10 @@ public class SatSolver {
 
 		final IVecInt backbone = new VecInt();
 
-		int c = 0;
 		for (int i = 0; i < globalModel.length; i++) {
 			final int x = globalModel[i];
 			if (done[i] == 0) {
 				done[i] = 2;
-				System.out.println("\t\t" + ++c + " / " + max);
 
 				if (!sat(backbone, -x)) {
 					backbone.push(x);
@@ -400,7 +393,6 @@ public class SatSolver {
 							if (!sat(backbone, y)) {
 								done[j] = 2;
 								setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
-								System.out.println("\t\t" + ++c + " / " + max);
 							} else {
 								done[j] = 0;
 							}

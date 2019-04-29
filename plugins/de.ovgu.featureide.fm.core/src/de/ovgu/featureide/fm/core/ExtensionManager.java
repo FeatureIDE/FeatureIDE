@@ -30,7 +30,7 @@ import java.util.List;
  * @author Sebastian Krieter
  */
 // TODO Check synchronization for get and add extension methods
-public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
+public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {
 
@@ -45,18 +45,32 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	private IExtensionLoader<T> extensionLoader;
 
-	protected void setExtensionLoaderInternal(IExtensionLoader<T> extensionLoader) {
-		this.extensionLoader = extensionLoader;
+	private boolean initialized = false;
+
+	@SuppressWarnings("unchecked")
+	protected final boolean setLoader(IExtensionLoader<T> extensionLoader) {
+		if (!initialized) {
+			initialized = true;
+			this.extensionLoader = extensionLoader != null ? extensionLoader : new CoreExtensionLoader<T>((Class<? extends T>[]) getDefaultClasses());
+			getExtensions();
+			return true;
+		}
+		return false;
 	}
 
-	public boolean addExtension(T extension) {
-		for (final T t : extensions) {
-			if (t.getId().equals(extension.getId())) {
-				return false;
+	protected boolean addExtension(T extension) {
+		if (extension != null) {
+			for (final T t : extensions) {
+				if (t.getId().equals(extension.getId())) {
+					return false;
+				}
+			}
+			if (extension.initExtension()) {
+				extensions.add(extension);
+				return true;
 			}
 		}
-		extensions.add(extension);
-		return true;
+		return false;
 	}
 
 	public synchronized List<T> getExtensions() {
@@ -74,12 +88,15 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 	public T getExtension(String id) throws NoSuchExtensionException {
 		java.util.Objects.requireNonNull(id, "ID must not be null!");
 
-		for (final T factory : getExtensions()) {
-			if (id.equals(factory.getId())) {
-				return factory;
+		for (final T extension : getExtensions()) {
+			if (id.equals(extension.getId())) {
+				return extension;
 			}
 		}
 		throw new NoSuchExtensionException("No extension found for ID " + id);
 	}
 
+	protected Class<?>[] getDefaultClasses() {
+		return null;
+	}
 }

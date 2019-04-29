@@ -22,13 +22,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.ui.PlatformUI;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Turns a group type into an Or-group.
@@ -40,24 +36,13 @@ public class OrAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.or";
 
-	private final IFeatureModel featureModel;
-
-	public OrAction(Object viewer, IFeatureModel featureModel) {
-		super(OR, viewer, ID);
-		this.featureModel = featureModel;
+	public OrAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(OR, viewer, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.OR, feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.OR, feature.getName(), featureModelManager));
 	}
 
 	@Override

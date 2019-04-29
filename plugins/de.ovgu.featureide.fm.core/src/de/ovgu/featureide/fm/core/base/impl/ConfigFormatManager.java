@@ -21,32 +21,36 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import de.ovgu.featureide.fm.core.IExtensionLoader;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.configuration.EquationFormat;
 import de.ovgu.featureide.fm.core.configuration.ExpressionFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
  * Manages all formats for {@link de.ovgu.featureide.fm.core.configuration.Configuration configurations}.
  *
  * @author Sebastian Krieter
  */
-public final class ConfigFormatManager extends FormatManager<IConfigurationFormat> {
+public final class ConfigFormatManager extends FormatManager<Configuration> {
 
-	private ConfigFormatManager() {
-		super(XMLConfFormat.class, DefaultFormat.class, FeatureIDEFormat.class, EquationFormat.class, ExpressionFormat.class);
+	@Override
+	protected Class<?>[] getDefaultClasses() {
+		return new Class<?>[] { XMLConfFormat.class, DefaultFormat.class, FeatureIDEFormat.class, EquationFormat.class, ExpressionFormat.class };
 	}
 
 	private static ConfigFormatManager instance = new ConfigFormatManager();
 
 	public static ConfigFormatManager getInstance() {
+		instance.setLoader(null);
 		return instance;
 	}
 
-	public static void setExtensionLoader(IExtensionLoader<IConfigurationFormat> extensionLoader) {
-		instance.setExtensionLoaderInternal(extensionLoader);
+	public static void initialize(IExtensionLoader<IPersistentFormat<Configuration>> extensionLoader) {
+		instance.setLoader(extensionLoader);
 	}
 
 	public static IConfigurationFormat getDefaultFormat() {

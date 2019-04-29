@@ -370,7 +370,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				}
 			}
 			final HashSet<Integer> manualLiteralSet = new HashSet<>(manualLiterals);
-			for (final SelectableFeature feature : configuration.features) {
+			for (final SelectableFeature feature : configuration.getFeatures()) {
 				if ((feature.getManual() != Selection.UNDEFINED) && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					final Integer l = rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
 					if (manualLiteralSet.add(l)) {
@@ -402,7 +402,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
 			}
 			// only for update of configuration editor
-			for (final SelectableFeature feature : configuration.features) {
+			for (final SelectableFeature feature : configuration.getFeatures()) {
 				if (!manualLiteralSet
 						.contains(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED))) {
 					workMonitor.invoke(feature);
@@ -471,7 +471,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
-		this(formula, configuration, true);
+		this(formula, configuration, configuration.includeAbstractFeatures);
 	}
 
 	/**
@@ -507,7 +507,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		if (solver == null) {
 			return null;
 		}
-		for (final SelectableFeature feature : configuration.features) {
+		for (final SelectableFeature feature : configuration.getFeatures()) {
 			if ((deselectUndefinedFeatures || (feature.getSelection() != Selection.UNDEFINED))
 				&& (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())
 				&& (includeHiddenFeatures || !feature.getFeature().getStructure().hasHiddenParent())) {

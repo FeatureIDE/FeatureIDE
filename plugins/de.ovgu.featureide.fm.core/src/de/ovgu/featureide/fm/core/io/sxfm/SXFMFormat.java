@@ -71,6 +71,8 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -88,6 +90,16 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
 
+	private IFeatureNameValidator validator;
+
+	private final List<Problem> localProblems = new ArrayList<>();
+
+	public SXFMFormat() {}
+
+	protected SXFMFormat(SXFMFormat oldFormat) {
+		validator = oldFormat.validator;
+	}
+
 	@Override
 	public String getSuffix() {
 		return "xml";
@@ -95,7 +107,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	@Override
 	public SXFMFormat getInstance() {
-		return new SXFMFormat();
+		return new SXFMFormat(this);
 	}
 
 	@Override
@@ -274,6 +286,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		line = 0;
 		object.reset();
 		buildFModelRec(doc);
+		warnings.addAll(localProblems);
 	}
 
 	private int line;
@@ -364,7 +377,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			final IFeatureModelFactory factory = FMFactoryManager.getFactory(object);
+			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(object);
 			FeatureIndent lastFeat = new FeatureIndent(null, -1, null);
 			// List of Features with arbitrary cardinalities
 			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<>();
@@ -490,6 +503,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				}
 				idTable.put(featId, feat.getFeature());
 
+				if ((validator != null) && !validator.isValidFeatureName(featId)) {
+					localProblems.add(new Problem(featId + " is not a valid feature name", line, de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+				}
+
 				lastFeat = feat;
 				line++;
 			}
@@ -503,6 +520,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			handleArbitrayCardinality(arbCardGroupFeats);
 		} catch (final IOException e) {
 			Logger.logError(e);
+			localProblems.add(new Problem(e));
 		}
 	}
 
@@ -857,12 +875,27 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+		return super.supportsContent(content, CONTENT_REGEX);
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return super.supportsContent(reader, CONTENT_REGEX);
 	}
 
 	@Override
 	public String getName() {
 		return "SXFM";
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
 	}
 
 }

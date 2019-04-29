@@ -38,11 +38,6 @@ public class HashMapNode extends AbstractSortModeNode {
 
 	private final HashMap<String, Integer> countMap;
 
-	/**
-	 * @param description
-	 * @param value
-	 * @param countMap
-	 */
 	public HashMapNode(String description, Object value, HashMap<String, Integer> countMap) {
 		super(description, value);
 		this.countMap = countMap;

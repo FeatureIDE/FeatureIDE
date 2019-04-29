@@ -20,18 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.io.manager.FileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
- * Default implementation of {@link ExternalChangeListener}.<br/> Calls the override function of the corresponding file manager.
+ * Default implementation of {@link ExternalChangeListener}.<br> Calls the override function of the corresponding file manager.
  *
  * @author Sebastian Krieter
  */
 public class DefaultExternalChangeListener extends ExternalChangeListener {
 
 	@Override
-	protected void doUpdate(FileManager<?> fileManager) {
-		fileManager.override();
+	protected void doUpdate(IFileManager<?> fileManager) {
+		fileManager.overwrite();
 	}
 
 }

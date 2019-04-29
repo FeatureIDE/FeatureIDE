@@ -114,7 +114,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			}
 
 			try {
-				final Configuration config = new Configuration(featureProject.getFeatureModel());
+				final Configuration config = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 
 				final IFile configFile = featureProject.getCurrentConfiguration();
 				SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());

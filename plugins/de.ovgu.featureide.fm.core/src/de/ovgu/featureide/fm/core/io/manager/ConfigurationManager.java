@@ -23,151 +23,94 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.nio.file.Path;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
-import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Responsible to load and save all information for a feature model instance.
  *
  * @author Sebastian Krieter
  */
-public class ConfigurationManager extends FileManager<Configuration> {
+public class ConfigurationManager extends AFileManager<Configuration> {
 
-	private static class ObjectCreator extends FileManager.ObjectCreator<Configuration> {
-
-		private final Path modelFile;
-
-		public ObjectCreator(Path modelFile) {
-			super();
-			this.modelFile = modelFile;
-		}
-
-		@Override
-		protected Configuration createObject() {
-			final FeatureModelManager featureModelManager = FeatureModelManager.getInstance(modelFile);
-			return new Configuration(featureModelManager.getObject());
-		}
-
-		@Override
-		protected Snapshot<Configuration> createSnapshot(Configuration object) {
-			return new Snapshot<>(object.clone());
-		}
-	}
-
-	private static class ObjectCreator2 extends FileManager.ObjectCreator<Configuration> {
-
-		private final IFeatureModel model;
-
-		public ObjectCreator2(IFeatureModel model) {
-			super();
-			this.model = model;
-		}
-
-		@Override
-		protected Configuration createObject() {
-			return new Configuration(model);
-		}
-
-		@Override
-		protected Snapshot<Configuration> createSnapshot(Configuration object) {
-			return new Snapshot<>(object.clone());
-		}
-	}
-
-	@Nonnull
-	public static IPersistentFormat<Configuration> getDefaultFormat() {
-		return new XMLConfFormat();
+	@CheckForNull
+	public static ConfigurationManager getInstance(Path path) {
+		return getInstance(path, true);
 	}
 
 	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, Path modelFile) {
-		return FileManager.getInstance(path, new ObjectCreator(modelFile), ConfigurationManager.class, ConfigFormatManager.getInstance());
+	public static final ConfigurationManager getInstance(Path identifier, boolean createInstance) {
+		return getInstance(identifier, createInstance, ConfigurationManager.class);
 	}
 
-	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, IFeatureModel model) {
-		return FileManager.getInstance(path, new ObjectCreator2(model), ConfigurationManager.class, ConfigFormatManager.getInstance());
+	public static final Configuration load(Path path) {
+		return ConfigurationIO.getInstance().load(path);
 	}
 
-	public static FileHandler<Configuration> getFileHandler(Path configurationFile, Path modelFile) {
-		return SimpleFileHandler.getFileHandler(configurationFile, new ObjectCreator(modelFile), ConfigFormatManager.getInstance());
+	public static FileHandler<Configuration> getFileHandler(Path path) {
+		return ConfigurationIO.getInstance().getFileHandler(path);
 	}
 
-	public static FileHandler<Configuration> getFileHandler(Path configurationFile, IFeatureModel model) {
-		return SimpleFileHandler.getFileHandler(configurationFile, new ObjectCreator2(model), ConfigFormatManager.getInstance());
+	public static final boolean save(Configuration configuration, Path path, IPersistentFormat<Configuration> format) {
+		return ConfigurationIO.getInstance().save(configuration, path, format);
 	}
 
-	public static Configuration load(Path configurationFile, Path modelFile) {
-		return getFileHandler(configurationFile, modelFile).getObject();
+	protected ConfigurationManager(Path identifier) {
+		super(identifier, ConfigFormatManager.getInstance(), ConfigurationFactoryManager.getInstance());
 	}
 
-	public static Configuration load(Path configurationFile, Path modelFile, ProblemList problems) {
-		final FileHandler<Configuration> fileHandler = getFileHandler(configurationFile, modelFile);
-		problems.addAll(fileHandler.getLastProblems());
-		return fileHandler.getObject();
+	@Override
+	public IConfigurationFormat getFormat() {
+		return (IConfigurationFormat) super.getFormat();
 	}
 
-	public static Configuration load(Path configurationFile, IFeatureModel model) {
-		return getFileHandler(configurationFile, model).getObject();
-	}
-
-	public static Configuration load(Path configurationFile, IFeatureModel model, ProblemList problems) {
-		final FileHandler<Configuration> fileHandler = getFileHandler(configurationFile, model);
-		problems.addAll(fileHandler.getLastProblems());
-		return fileHandler.getObject();
-	}
-
-	public static boolean save(Configuration configuration, Path path, IPersistentFormat<Configuration> format) {
-		return !SimpleFileHandler.save(path, configuration, format).containsError();
-	}
-
-	// TODO !!! react on feature name change
-	private class FeatureModelChangeListner implements IEventListener {
-
-		@Override
-		public void propertyChange(FeatureIDEEvent evt) {
-			final EventType eventType = evt.getEventType();
-			switch (eventType) {
-			case FEATURE_NAME_CHANGED:
-				// TODO !!! react on feature name change
-				// String oldName = (String) evt.getOldValue();
-				// String newName = (String) evt.getNewValue();
-				// FeatureModelManager.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
-				break;
-			case MODEL_DATA_OVERRIDDEN:
-				// TODO !!! check correctness
-				editObject().setFeatureModel(featureModelManager.getObject());
-			default:
-				break;
-			}
-		}
+	@Override
+	protected Configuration copyObject(Configuration oldObject) {
+		return oldObject.clone();
 	}
 
 	private FeatureModelManager featureModelManager;
 
-	protected ConfigurationManager(SimpleFileHandler<Configuration> fileHandler, FileManager.ObjectCreator<Configuration> objectCreator) {
-		super(fileHandler, objectCreator);
+	public void linkFeatureModel(FeatureModelManager featureModelManager) {
+		this.featureModelManager = featureModelManager;
+		final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
+		fileOperationLock.lock();
+		try {
+			getObject().initFeatures(formula);
+			editObject().initFeatures(formula);
+		} finally {
+			fileOperationLock.unlock();
+		}
+	}
 
-		featureModelManager.addListener(new FeatureModelChangeListner());
+	public void update() {
+		if (featureModelManager != null) {
+			final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
+			fileOperationLock.lock();
+			try {
+				getObject().updateFeatures(formula);
+				final Configuration configuration = editObject();
+				configuration.updateFeatures(formula);
+				configuration.update();
+			} finally {
+				fileOperationLock.unlock();
+			}
+		}
 	}
 
 	@Override
-	public boolean externalSave(ICriticalConsumer<Configuration> externalSaveMethod) {
-		return true;
-	}
-
-	public FeatureModelManager getFeatureModelManager() {
-		return featureModelManager;
+	protected Configuration createObject() throws Exception {
+		final Configuration configuration = super.createObject();
+		configuration.setPropagate(true);
+		if (featureModelManager != null) {
+			configuration.initFeatures(featureModelManager.getPersistentFormula());
+		}
+		return configuration;
 	}
 
 }

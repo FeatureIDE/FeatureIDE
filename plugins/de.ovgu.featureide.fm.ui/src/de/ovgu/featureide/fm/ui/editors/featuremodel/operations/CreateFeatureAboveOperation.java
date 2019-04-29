@@ -20,20 +20,20 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo functionality.
@@ -43,69 +43,71 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  */
 public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
-	private final IFeature newCompound;
-	private final IFeature child;
-	LinkedList<IFeature> selectedFeatures;
-	HashMap<IFeature, Integer> children = new HashMap<>();
+	private final String childName;
+	private final LinkedList<String> selectedFeatureNames;
+	private final TreeMap<Integer, String> children = new TreeMap<>();
+
+	private String featureName;
 
 	boolean parentOr = false;
 	boolean parentAlternative = false;
 
-	public CreateFeatureAboveOperation(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
-		super(featureModel, CREATE_COMPOUND);
-		this.selectedFeatures = selectedFeatures;
-		child = selectedFeatures.get(0);
-		int number = 0;
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
-
-		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, LinkedList<String> selectedFeatures) {
+		super(featureModelManager, "Add Feature");
+		selectedFeatureNames = selectedFeatures;
+		childName = selectedFeatures.get(0);
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		featureName = getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		children.clear();
+		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, featureName);
+		final IFeature child = featureModel.getFeature(childName);
 		final IFeatureStructure parent = child.getStructure().getParent();
 		if (parent != null) {
 			parentOr = parent.isOr();
 			parentAlternative = parent.isAlternative();
 
-			newCompound.getStructure().setMultiple(parent.isMultiple());
+			newFeature.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
-			for (final IFeature iFeature : selectedFeatures) {
-				children.put(iFeature, parent.getChildIndex(iFeature.getStructure()));
-			}
-			for (final IFeature iFeature : selectedFeatures) {
+			for (final String name : selectedFeatureNames) {
+				final IFeature iFeature = featureModel.getFeature(name);
+				children.put(parent.getChildIndex(iFeature.getStructure()), iFeature.getName());
 				parent.removeChild(iFeature.getStructure());
 			}
-			parent.addChildAtPosition(index, newCompound.getStructure());
-			for (final IFeature iFeature : selectedFeatures) {
-				newCompound.getStructure().addChild(iFeature.getStructure());
+			parent.addChildAtPosition(index, newFeature.getStructure());
+			for (final String name : selectedFeatureNames) {
+				newFeature.getStructure().addChild(featureModel.getFeature(name).getStructure());
 			}
 
 			if (parentOr) {
-				newCompound.getStructure().changeToOr();
+				newFeature.getStructure().changeToOr();
 			} else if (parentAlternative) {
-				newCompound.getStructure().changeToAlternative();
+				newFeature.getStructure().changeToAlternative();
 			} else {
-				newCompound.getStructure().changeToAnd();
+				newFeature.getStructure().changeToAnd();
 			}
 			parent.changeToAnd();
-			featureModel.addFeature(newCompound);
+			featureModel.addFeature(newFeature);
 		} else {
-			newCompound.getStructure().addChild(child.getStructure());
-			featureModel.addFeature(newCompound);
-			featureModel.getStructure().setRoot(newCompound.getStructure());
+			newFeature.getStructure().addChild(child.getStructure());
+			featureModel.addFeature(newFeature);
+			featureModel.getStructure().setRoot(newFeature.getStructure());
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newCompound);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newFeature);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		final IFeatureStructure parent = newCompound.getStructure().getParent();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeature newFeature = featureModel.getFeature(featureName);
+		final IFeature child = featureModel.getFeature(childName);
+		final IFeatureStructure parent = newFeature.getStructure().getParent();
 		if (parent != null) {
-			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
-			featureModel.deleteFeature(newCompound);
-			for (final IFeature iFeature : children.keySet()) {
-				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());
+			newFeature.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
+			featureModel.deleteFeature(newFeature);
+			for (final Entry<Integer, String> childEntry : children.entrySet()) {
+				parent.addChildAtPosition(childEntry.getKey(), featureModel.getFeature(childEntry.getValue()).getStructure());
 			}
 
 			if (parentOr) {
@@ -117,9 +119,10 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			}
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());
-			return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, null);
+			newFeature.getStructure().removeChild(child.getStructure());
+			return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, null);
 		}
-		return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, parent.getFeature(), null);
+		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, parent.getFeature(), null);
 	}
 
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <feature automatic="selected" name="my_Root"/>
+    <feature automatic="selected" name="Optional"/>
+    <feature automatic="unselected" name="Alternative1"/>
+    <feature manual="selected" name="Alternative2"/>
+    <feature automatic="selected" name="Mandatory"/>
+    <feature automatic="selected" name="Or1"/>
+    <feature manual="unselected" name="Or2"/>
+</configuration>

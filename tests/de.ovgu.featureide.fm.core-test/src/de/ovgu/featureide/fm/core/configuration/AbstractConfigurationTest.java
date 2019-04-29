@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -40,10 +41,12 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public abstract class AbstractConfigurationTest {
 
 	public IFeatureModel fm;
+	public FeatureModelFormula formula;
 
 	@Before
 	public void setModel() {
 		fm = loadModel();
+		formula = new FeatureModelFormula(fm);
 	}
 
 	/**
@@ -81,7 +84,7 @@ public abstract class AbstractConfigurationTest {
 
 	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
 		try {
-			final IFeatureModel fm = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			final IFeatureModel fm = FMFactoryManager.getInstance().getFactory(format).create();
 			if (format.read(fm, xml).containsError()) {
 				fail();
 			}

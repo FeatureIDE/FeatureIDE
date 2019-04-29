@@ -1,8 +1,8 @@
 .classpath
 .project
+README.html
 configs/Spacewar Example.xml
 model.xml
-README.html
 src/coordination/Condition.java
 src/coordination/CoordinationAction.java
 src/coordination/Coordinator.aj
@@ -26,7 +26,7 @@ src/spacewar/Player.java
 src/spacewar/Registry.aj
 src/spacewar/RegistrySynchronization.aj
 src/spacewar/Robot.java
+src/spacewar/SWFrame.java
 src/spacewar/Ship.aj
 src/spacewar/SpaceObject.java
-src/spacewar/SWFrame.java
 src/spacewar/Timer.java

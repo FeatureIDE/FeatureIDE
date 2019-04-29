@@ -20,6 +20,8 @@
  */
 package org.prop4j;
 
+import java.util.Map;
+
 /**
  * Holds an unparsable sub expression from a formula that could not be parsed completely by the {@link NodeReader}.
  *
@@ -42,6 +44,11 @@ public class ErrorLiteral extends Literal {
 	@Override
 	public ErrorLiteral clone() {
 		return new ErrorLiteral(this);
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return false;
 	}
 
 }

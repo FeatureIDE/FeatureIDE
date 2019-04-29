@@ -147,6 +147,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		final ScrolledComposite scrlcomp = new ScrolledComposite(parent, SWT.V_SCROLL);
 		final Composite container = new Composite(scrlcomp, SWT.NONE);
 		scrlcomp.setExpandHorizontal(true);
+		scrlcomp.setExpandVertical(true);
 		scrlcomp.setContent(container);
 
 		final GridLayout layout = new GridLayout();
@@ -178,7 +179,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelGenerate.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelGenerate);
 		comboGenerate = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboGenerate.setLayoutData(gd_Fill_H);
 		for (final BuildType type : BuildType.values()) {
 			if (type == BuildType.INTEGRATION) {
 				continue;
@@ -193,7 +193,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelAlgorithm.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelAlgorithm);
 		comboAlgorithm = new Combo(groupDeriveConf, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboAlgorithm.setLayoutData(gd_Fill_H);
 
 		for (final TWise tWise : TWise.values()) {
 			final String tWiseText = getTWiseText(tWise);
@@ -207,6 +206,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelTWise = new Label(groupDeriveConf, SWT.NULL);
 		labelTWise.setText(LABEL_INTERACTIONS + "10");
 		labelTWise.setToolTipText(TOOL_TIP_T);
+		labelTWise.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelTWise);
 		scaleTWise = new Scale(groupDeriveConf, SWT.HORIZONTAL);
 		scaleTWise.setMaximum(5);
@@ -219,6 +219,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelMax.setText("Max Configurations:");
 		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
 		labelMax.setToolTipText(maxToolTip);
+		labelMax.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelMax);
 		textField = new Text(groupDeriveConf, SWT.BORDER);
 		textField.setToolTipText(maxToolTip);
@@ -244,7 +245,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelOrder.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelOrder);
 		comboOrder = new Combo(groupOrder, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		comboOrder.setLayoutData(gd_Fill_H);
 		for (final BuildOrder order : BuildOrder.values()) {
 			comboOrder.add(getOrderText(order));
 		}
@@ -253,6 +253,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelOrderInteraction = new Label(groupOrder, SWT.NULL);
 		labelOrderInteraction.setText(LABEL_INTERACTIONS + "1");
 		labelOrderInteraction.setToolTipText(TOOL_TIP_T_ORDER);
+		labelOrderInteraction.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelOrderInteraction);
 		scaleInteraction = new Scale(groupOrder, SWT.HORIZONTAL);
 		scaleInteraction.setMaximum(5);
@@ -262,14 +263,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		setScaleInteraction();
 
 		final Composite jUnitContainer = new Composite(container, SWT.NONE);
-		final Label labelProject = new Label(jUnitContainer, SWT.NULL);
-		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
-		labelProject.setToolTipText(TOOL_TIP_PROJECT);
-		labels.add(labelProject);
-		buttonBuildProject = new Button(jUnitContainer, SWT.CHECK);
-		buttonBuildProject.setLayoutData(gd_Fill_H);
-		buttonBuildProject.setSelection(buildProjects);
-
 		groupLayout = new GridLayout();
 		groupLayout.numColumns = 2;
 		groupLayout.verticalSpacing = 5;
@@ -279,13 +272,18 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		gridDataGroup.horizontalAlignment = GridData.FILL;
 		jUnitContainer.setLayoutData(gridDataGroup);
 
+		final Label labelProject = new Label(jUnitContainer, SWT.NULL);
+		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
+		labelProject.setToolTipText(TOOL_TIP_PROJECT);
+		labels.add(labelProject);
+		buttonBuildProject = new Button(jUnitContainer, SWT.CHECK);
+		buttonBuildProject.setSelection(buildProjects);
+
 		final Label labelTest = new Label(jUnitContainer, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
 		labelTest.setToolTipText(TOOL_TIP_TEST);
-		labelTest.setLayoutData(gd_LeftColumn);
 		labels.add(labelTest);
 		buttonTest = new Button(jUnitContainer, SWT.CHECK);
-		buttonTest.setLayoutData(gridDataGroup);
 		buttonTest.setSelection(test);
 
 		container.setSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -296,8 +294,21 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				widthOfLabel = label.getSize().x;
 			}
 		}
-		gd_LeftColumnInsideGroup.widthHint = widthOfLabel;
-		gd_LeftColumn.widthHint = gd_LeftColumnInsideGroup.widthHint + 3;
+		gd_LeftColumnInsideGroup.widthHint = widthOfLabel + 5;
+		gd_LeftColumn.widthHint = gd_LeftColumnInsideGroup.widthHint + 10;
+
+		labelProject.setLayoutData(gd_LeftColumn);
+		labelTest.setLayoutData(gd_LeftColumn);
+
+		comboGenerate.setLayoutData(gd_Fill_H);
+		comboAlgorithm.setLayoutData(gd_Fill_H);
+		scaleTWise.setLayoutData(gd_Fill_H);
+		comboOrder.setLayoutData(gd_Fill_H);
+		scaleInteraction.setLayoutData(gd_Fill_H);
+		buttonBuildProject.setLayoutData(gd_Fill_H);
+		buttonTest.setLayoutData(gd_Fill_H);
+
+		container.setSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		setControl(scrlcomp);
 		setPageComplete(false);

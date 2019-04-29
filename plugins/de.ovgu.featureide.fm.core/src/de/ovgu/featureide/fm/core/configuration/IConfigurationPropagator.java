@@ -54,7 +54,7 @@ public interface IConfigurationPropagator {
 	/**
 	 * Counts the number of possible solutions.
 	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	LongRunningMethod<Long> number(int timeout);
@@ -73,6 +73,16 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Void> resolve();
 
+	/**
+	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
+	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}).
+	 * Features that are undefined are considered deselected.
+	 *
+	 * @param featureList If not {@code null} only the features within the list will be marked.
+	 * @return A list of unsatisfied clauses.
+	 * @deprecated Use {@link #findUnsatisfiedClauses(List, boolean)} instead.
+	 */
+	@Deprecated
 	LongRunningMethod<List<LiteralSet>> findOpenClauses(List<SelectableFeature> featureList);
 
 }

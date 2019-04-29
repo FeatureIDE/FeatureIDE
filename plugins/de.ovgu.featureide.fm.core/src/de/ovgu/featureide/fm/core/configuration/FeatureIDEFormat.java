@@ -31,6 +31,7 @@ import java.io.StringReader;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -38,7 +39,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects.</br> Lists all features and indicates the manual and automatic selection.
+ * Extended configuration format for FeatureIDE projects.<br> Lists all features and indicates the manual and automatic selection.
  *
  * @author Sebastian Krieter
  */
@@ -52,7 +53,8 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
 		configuration.resetValues();
@@ -98,7 +100,7 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
-					final String name = renamingsManager.getNewName(line.substring(2));
+					final String name = renamingsManager == null ? line.substring(2) : renamingsManager.getNewName(line.substring(2));
 
 					final SelectableFeature feature = configuration.getSelectableFeature(name);
 					if (feature == null) {
