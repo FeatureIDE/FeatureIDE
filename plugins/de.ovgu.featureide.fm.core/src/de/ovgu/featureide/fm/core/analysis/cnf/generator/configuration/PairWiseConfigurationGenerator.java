@@ -720,13 +720,16 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 					break;
 				}
 			}
-			if (xModel1 == null) {
-				throw new RuntimeException();
-			}
 
 			int c = 0;
 
 			solver.assignmentPush(mx1);
+			if (xModel1 == null) {
+				xModel1 = solver.findSolution();
+				if (xModel1 == null) {
+					throw new RuntimeException();
+				}
+			}
 			final int rowIndex = i * numVariables;
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
