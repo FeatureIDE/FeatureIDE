@@ -172,21 +172,19 @@ public class CNF implements Serializable {
 	public CNF randomize(Random random) {
 		final List<String> shuffledVars = Arrays.asList(Arrays.copyOfRange(variables.intToVar, 1, variables.intToVar.length));
 		Collections.shuffle(shuffledVars, random);
-		final Variables shuffledVariables = new Variables(shuffledVars);
 
+		final CNF shuffledCNF = reorder(new Variables(shuffledVars));
+		Collections.shuffle(shuffledCNF.clauses, random);
+
+		return shuffledCNF;
+	}
+
+	public CNF reorder(Variables newVariables) {
 		final ArrayList<LiteralSet> newClauses = new ArrayList<>(clauses.size());
 		for (final LiteralSet oldClause : clauses) {
-			final int[] oldLiterals = oldClause.getLiterals();
-			final int[] newLiterals = new int[oldLiterals.length];
-			for (int i = 0; i < oldLiterals.length; i++) {
-				final int l = oldLiterals[i];
-				newLiterals[i] = shuffledVariables.getVariable(variables.getName(l), l > 0);
-			}
-			newClauses.add(new LiteralSet(newLiterals));
+			newClauses.add(oldClause.reorder(variables, newVariables));
 		}
-		Collections.shuffle(newClauses, random);
-
-		return new CNF(shuffledVariables, newClauses);
+		return new CNF(newVariables, newClauses);
 	}
 
 }

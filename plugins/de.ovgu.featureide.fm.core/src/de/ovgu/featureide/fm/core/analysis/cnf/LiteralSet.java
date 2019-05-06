@@ -324,4 +324,14 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return Arrays.toString(literals).compareTo(Arrays.toString(o.literals));
 	}
 
+	public LiteralSet reorder(IVariables oldVariables, IVariables newVariables) {
+		final int[] oldLiterals = literals;
+		final int[] newLiterals = new int[oldLiterals.length];
+		for (int i = 0; i < oldLiterals.length; i++) {
+			final int l = oldLiterals[i];
+			newLiterals[i] = newVariables.getVariable(oldVariables.getName(l), l > 0);
+		}
+		return new LiteralSet(newLiterals);
+	}
+
 }
