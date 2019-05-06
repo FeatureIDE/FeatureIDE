@@ -170,7 +170,7 @@ public class CNF implements Serializable {
 	}
 
 	public CNF randomize(Random random) {
-		final List<String> shuffledVars = Arrays.asList(Arrays.copyOf(variables.intToVar, variables.intToVar.length));
+		final List<String> shuffledVars = Arrays.asList(Arrays.copyOfRange(variables.intToVar, 1, variables.intToVar.length));
 		Collections.shuffle(shuffledVars, random);
 		final Variables shuffledVariables = new Variables(shuffledVars);
 
