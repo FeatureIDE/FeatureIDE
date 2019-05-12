@@ -87,13 +87,19 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		 */
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				if (!isRefreshWithDelete()) {
-					checkForRefresh();
-					setRefreshWithDelete(true);
-				} else {
-					checkForRefresh();
+			switch (event.getEventType()) {
+			case ACTIVE_EXPLANATION_CHANGED:
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					if (!isRefreshWithDelete()) {
+						checkForRefresh();
+						setRefreshWithDelete(true);
+					} else {
+						checkForRefresh();
+					}
 				}
+				break;
+			default:
+				break;
 			}
 		}
 	};

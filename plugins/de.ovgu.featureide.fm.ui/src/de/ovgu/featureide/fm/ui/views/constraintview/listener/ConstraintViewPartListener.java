@@ -60,9 +60,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference part) {
-		if (part.getPart(false) instanceof FeatureModelEditor) {
-			controller.checkForRefresh();
-		} else {
+		if (!(part.getPart(false) instanceof FeatureModelEditor)) {
 			controller.getView().addNoFeatureModelItem();
 			controller.getSettingsMenu().setStateOfActions(false);
 		}
