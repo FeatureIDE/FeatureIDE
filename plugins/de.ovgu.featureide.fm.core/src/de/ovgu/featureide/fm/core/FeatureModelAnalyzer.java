@@ -751,7 +751,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final IFeatureStructure structure = feature.getStructure();
 			if (!FeatureUtils.getRoot(fm).getName().equals(feature.getName())) { // this might be indeed the case within the analysis for subtree dependencies
 				final IFeature parent = FeatureUtils.getParent(feature);
-				if (!structure.isMandatory() && (parent != null) && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
+				if (!structure.isMandatorySet() && (parent != null) && solver.isImplied(new Literal(parent.getName(), false), new Literal(feature.getName()))) {
 					falseOptionalFeatures.add(feature);
 				}
 			}
