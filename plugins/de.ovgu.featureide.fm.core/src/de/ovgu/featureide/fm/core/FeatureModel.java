@@ -338,14 +338,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 *
 	 * @return a deep copy from the feature model
 	 *
-	 * @see #clone(boolean)
+	 * @see #clone()
 	 */
 	public FeatureModel deepClone() {
 		return (FeatureModel) model.clone();
 	}
 
 	/**
-	 * Clones the feature model. Makes a deep copy from all fields in the model.</br> Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)}
+	 * Clones the feature model. Makes a deep copy from all fields in the model.<br> Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)}
 	 * are {@code false} in every case.
 	 *
 	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout are set to {@code null} for a faster cloning process.

@@ -59,6 +59,8 @@ public class BasicSolver implements ISatSolver {
 	protected RingList<int[]> solutionList = null;
 	protected boolean globalTimeout = false;
 
+	protected boolean timeoutOccured = false;
+
 	public BasicSolver(SatInstance satInstance) throws ContradictionException {
 		this.satInstance = satInstance;
 		final int numberOfVariables = satInstance.getNumberOfVariables();
@@ -179,6 +181,7 @@ public class BasicSolver implements ISatSolver {
 				return SatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
+			timeoutOccured = true;
 			return SatResult.TIMEOUT;
 		}
 	}
@@ -242,6 +245,14 @@ public class BasicSolver implements ISatSolver {
 	@Override
 	public void setGlobalTimeout(boolean globalTimeout) {
 		this.globalTimeout = globalTimeout;
+	}
+
+	public boolean hasTimeoutOccured() {
+		return timeoutOccured;
+	}
+
+	public void resetTimeoutOccured() {
+		timeoutOccured = false;
 	}
 
 	@Override

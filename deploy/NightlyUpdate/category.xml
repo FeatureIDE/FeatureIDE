@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE site [
+  <!ENTITY version "3.5.5">
+  <!ENTITY category "FeatureIDE-&version;-UpdateSite">
+]>
+
+<site>
+	<category-def name="&category;" label="&category;">
+		<description name="&category;" url="http://featureide.cs.ovgu.de/update/v3/">FeatureIDE v3.x</description>
+		<version>3.5.5</version>
+	</category-def>
+
+	<feature url="features/br.ufal.ic.colligens.feature_1.1.4.qualifier.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.ahead_&version;.qualifier.jar" id="de.ovgu.featureide.ahead" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.antenna_&version;.qualifier.jar" id="de.ovgu.featureide.antenna" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.aspectj_&version;.qualifier.jar" id="de.ovgu.featureide.aspectj" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.exampleprojects_&version;.qualifier.jar" id="de.ovgu.featureide.exampleprojects" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide_&version;.qualifier.jar" id="de.ovgu.featureide" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.featurecpp_&version;.qualifier.jar" id="de.ovgu.featureide.featurecpp" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.featurehouse_&version;.qualifier.jar" id="de.ovgu.featureide.featurehouse" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.featuremodeling_&version;.qualifier.jar" id="de.ovgu.featureide.featuremodeling" version="&version;.qualifier">
+	   	<category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.munge_&version;.qualifier.jar" id="de.ovgu.featureide.munge" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+	<feature url="features/de.ovgu.featureide.munge.android_&version;.qualifier.jar" id="de.ovgu.featureide.munge.android" version="&version;.qualifier">
+	    <category name="&category;"/>
+	</feature>
+
+</site>
+
+

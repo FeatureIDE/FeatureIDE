@@ -29,9 +29,12 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * TODO description
+ * Implementation of the {@link AbstractFeatureAttributeFactory}.
+ * 
+ * @see AbstractFeatureAttributeFactory
  *
- * @author User
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
@@ -49,14 +52,14 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			if (attributeData.getValue() != null) {
 				valueBoolean = Boolean.parseBoolean(attributeData.getValue());
 			}
-			return (new BooleanFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
+			return createBooleanAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable);
 		case FeatureAttribute.LONG:
 			try {
 				Long valueLong = null;
 				if (attributeData.getValue() != null) {
 					valueLong = Long.parseLong(attributeData.getValue());
 				}
-				return (new LongFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
+				return createLongAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
@@ -67,16 +70,39 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				if (attributeData.getValue() != null) {
 					valueDouble = Double.parseDouble(attributeData.getValue());
 				}
-				return (new DoubleFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
+				return createDoubleAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
 			}
 		case FeatureAttribute.STRING:
-			return (new StringFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
+			return createStringAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable);
 		default:
 			FMCorePlugin.getDefault().logError(new UnknownFeatureAttributeTypeException(attributeData));
 			return null;
 		}
+	}
+
+	@Override
+	public IFeatureAttribute createStringAttribute(IFeature correspondingFeature, String name, String unit, String value, boolean recursive,
+			boolean configurable) {
+		return (new StringFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
+			boolean configurable) {
+		return (new BooleanFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive, boolean configurable) {
+		return (new LongFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
+			boolean configurable) {
+		return (new DoubleFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}
 }

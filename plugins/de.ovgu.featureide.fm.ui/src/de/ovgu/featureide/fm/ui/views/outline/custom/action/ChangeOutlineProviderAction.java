@@ -33,11 +33,6 @@ public class ChangeOutlineProviderAction extends Action {
 
 	private final OutlineProvider provider;
 
-	/**
-	 * Constructor for ChangeOutlineProviderAction
-	 *
-	 * @param viewer
-	 */
 	public ChangeOutlineProviderAction(OutlineProvider provider, boolean checked) {
 		super();
 		this.provider = provider;
@@ -46,9 +41,8 @@ public class ChangeOutlineProviderAction extends Action {
 	}
 
 	/**
-	 * Returns the outline provider
+	 * @return the outline provider
 	 *
-	 * @return
 	 */
 	public OutlineProvider getProvider() {
 		return provider;

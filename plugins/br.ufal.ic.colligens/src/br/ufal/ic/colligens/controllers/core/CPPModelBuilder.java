@@ -132,6 +132,10 @@ public class CPPModelBuilder extends PPModelBuilder {
 	/**
 	 * the Pattern: <ul> <li>set flag DOTALL</li> <li>match any characters</li> <li>match any whitespace characters</li> <li>match "//# if/...
 	 * [operators]feature[operators]"</li> <li>match any further characters</li> </ul>
+	 *
+	 * @param text text to search
+	 * @param feature feature to check
+	 * @return ture if contained
 	 */
 	public static boolean contains(String text, String feature) {
 		final Pattern pattern = Pattern.compile(String.format(REGEX, feature));

@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.ui,
  org.eclipse.ui.console,
  org.eclipse.cdt.core,
  org.eclipse.ltk.core.refactoring,
@@ -21,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.cdt.core.model,
- org.eclipse.cdt.internal.core.model
+ org.eclipse.cdt.internal.core.model,
+ org.eclipse.cdt.ui.text.contentassist
 Bundle-ClassPath: .,
  lib/TypeChef-0.3.6.jar,
  lib/jdom-2.0.4.jar,

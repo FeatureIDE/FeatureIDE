@@ -41,12 +41,16 @@ import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.part.EditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditorErrorPage;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
+import de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorPage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependencyAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
@@ -58,7 +62,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
+	private static final String[] DIAGRAM_ACTION_IDS = { CreateFeatureBelowAction.ID, CreateFeatureAboveAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
 		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
 		// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
 		// ActionFactory.PASTE.getId(),
@@ -75,19 +79,24 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		final FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
-		setActivePage(editor, editor.getActivePage());
+		final IFeatureModelEditorPage page = editor.getPage(editor.getActivePage());
+		if (page != null) {
+			setActivePage(editor, page.getID());
+		}
 	}
 
-	public void setActivePage(FeatureModelEditor editor, int pageIndex) {
+	public void setActivePage(FeatureModelEditor editor, String pageID) {
 		final IActionBars actionBars = getActionBars();
 		if (actionBars != null) {
-			switch (pageIndex) {
-			case 0:
+			switch (pageID) {
+			case FeatureDiagramEditor.ID:
 				hookGlobalDiagramActions(editor, actionBars);
 				break;
-			case 1:
+			case FeatureModelTextEditorPage.ID:
 				hookGlobalTextActions(editor, actionBars);
 				break;
+			case FeatureModelEditorErrorPage.ID:
+				return;
 			}
 			actionBars.updateActionBars();
 		}

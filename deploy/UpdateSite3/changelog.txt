@@ -1,0 +1,346 @@
+Change log for FeatureIDE
+
+Each release contains smaller changes, bug fixes, and performance improvements,
+which can be found here:
+
+https://github.com/FeatureIDE/FeatureIDE/milestones
+
+Here, is a list of high-level enhancements.
+
+Release 3.5.4 (February 2019)
+* Hotfix containing only stability improvements over v3.5.3
+* Usability and stability of the feature attributes view improved (#847, #853, #856)
+* Performance and appearance of the feature diagram improved (#785, #831)
+* Fixed a bug due to which feature models have not been cloned properly (#859)
+* Fixed compilation problems with JavaDoc (#748)
+* Removed instable editing functionality in the feature model outline (#760)
+
+Release 3.5.3 (November 2018)
+* Hotfix containing only stability improvements over v3.5.2
+* Numerous issues with the FeatureHouse composer (#794)
+* Improvements for execution of JUnit tests (#814, #819)
+* Illegal feature names in extended feature models after Eclipse restart (#833)
+* Removal of attributes when features are moved in the diagram (#829)
+* Improved layouting of feature models (#825)
+* Accidential change of siblings order (#803)
+* All kinds of void feature models supported when editing constraints (#823)
+
+Release 3.5.2 (September 2018)
+* Hotfix containing only stability improvements over v3.5.1
+* Improved loading and saving of feature models (#759, #761, #771, #773, #776, #799)
+* Better performance for feature models with large contraints (#780)
+* Configuration only marked as invalid if the feature model is not void (#797)
+* FeatureIDE library improved (#807)
+* Mac users find a README in the prepackaged Eclipse when having trouble running unsigned code (#801)
+* Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/26?closed=1
+
+Release 3.5.1 (June 2018)
+* Hotfix containing only stability improvements over v3.5.0
+* Better performance for analyses in constraint dialog (#736)
+* Unused and false-optional features renamed to never-selected and always-selected features to avoid confusion (#705)
+* Example projects added for extended feature models (#756)
+* Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/25?closed=1
+
+Release 3.5.0 (April 2018)
+* Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
+* New library without Eclipse dependencies for extended feature models (#714)
+* New tool bar and revised context menu for feature diagrams (#648, #651, #672, #720)
+* New notation for dead and false-optional features to avoid confusion with feature coloring (#649)
+* Descriptions for cross-tree constraints (#648)
+* Obfuscator for names in feature models (#667)
+* Added examples with real-world configurations, namely Agrib and Profile (#606)
+* Added examples for the FeatureIDE library (#664)
+* Wizards for feature models and constraints available when installing only feature modeling (#649)
+* Feature order can be changed by drag and drop (#649)
+* Improved performance of readers and writers for XML and DIMACS formats (#695)
+* Unified dialogs for importing and exporting feature models from/to different formats
+* Fixed problems:
+  * saving of feature models (#537, #591, #662, #677, #700)
+  * layouting after renaming features (#604, #612)
+  * wrong number of variants (#722)
+  * impossible feature coloring (#708)
+  * editing of redundant constraints (#622)
+
+Release 3.4.3 (February 2018)
+* Hotfix containing only stability improvements over v3.4.2
+* Void feature model detected in constraint dialog (#704) and correctly visualized in feature diagram (#681, #687, #484)
+* Project explorer shows traces to all features (#593) and is refreshed if color scheme is deactived (#592)
+* Renaming of features in configurations is fixed (#685) and tool tips disappear on Mac (#701)
+* New configuration format more concise (does not store undefined features anymore) (#683)
+* Markers for inconsistent mappings in Antenna projects fixed (#673)
+* Feature interaction when collapsing explanations in feature diagram fixed (#682)
+* Exceptions for feature diagrams (#703) and FeatureHouse projects (#680) fixed
+
+Release 3.4.2 (December 2017)
+* Hotfix containing only stability improvements over v3.4.1
+* Feature models created with v3.3.0 and v3.3.1 are correctly loaded (some or-groups we automatically transformed into mandatory features)
+* Fixed problems: missing markers for invalid configurations, opening multiple configurations in project explorer
+* Usability of feature diagram improved
+
+Release 3.4.1 (October 2017)
+* Hotfix containing only stability improvements over v3.4.0
+* Removed dependency from feature modeling to FeatureIDE
+* Numerous fixes with respect to new configuration format
+* Improvements for feature-model editor, configuration editor, explanations, and product generation
+
+Release 3.4.0 (September 2017)
+* All feature diagram anomalies can be explained now (based on SAT4J's minimal unsatisfiable subset computation) 
+* Visual explanations for feature diagrams improved
+* XML format is used as default for new configurations (storing manual and automatic selection and deselection of concrete and abstract features)
+* Configuration editor restores unchanged selection state when opened if configuration is saved in XML format
+* Outline view for feature models available if only feature modeling is installed
+* Numerous stability and performance improvements
+
+Release 3.3.2 (July 2017)
+* Hotfix containing merely stability improvements over v3.3.1
+* Improvements for FeatureIDE examples, feature-model editor, configuration editor, feature coloring, black-box frameworks, configuration map
+
+Release 3.3.1 (May 2017)
+* Hotfix containing only stability improvements over v3.3.0
+* Improvements for configuration editor, feature-model editor, configuration map, random and t-wise configuration generation
+
+Release 3.3.0 (April 2017)
+* Feature subtrees in feature diagram can be folded manually and automatically
+* Visual explanations for feature-model defects (e.g., dead features)
+* New view Configuration Map added for an overview on all user-defined configurations
+* New visualizations on feature usage in configurations added (e.g., feature relations graph)
+* Added new XML format to store configurations (including selection states of abstract features)
+* New short cuts added for feature diagrams
+* Improved usability of collaboration diagram, statistics view and colors in all views
+* Improved performance for explanations on feature-diagram defects
+* Improved feature-model slicing
+* Improved FeatureIDE library and its build scripts
+
+Release 3.2.0 (December 2016)
+* Refactored main FeatureIDE functionality into Jar without dependencies to Eclipse
+* New visualizations on the selection of features across configurations
+* Improved performance for analysis of dead and false-optional features
+* Improved warnings for unused and false-optional features and quick fix to create configurations automatically
+* Content assist for annotations improved for preprocessor Antenna
+* Improvements for product generation (to create and build products in batch mode)
+
+Release 3.1.2 (October 2016)
+* (Release used for FeatureIDE tutorial at SPLC in Beijing, China)
+* Hotfix for product generation under Unix operating systems
+
+Release 3.1.1 (September 2016)
+* Several hotfixes regarding:
+  * Example wizard and example projects (#393, #399)
+  * Feature model editor and constraint dialog (#383, #389, #404, #406, #409, #420, #422)
+  * Source code editor (#397, #402, #410)
+  * Collaboration diagram (#395, #397)
+  * Product generation (#384, #385, #413, #416)
+* Added warnings in "New Source File" Dialog (#256)
+* Added Automotive examples (large-scale feature models)
+* Further stability improvements
+
+Release 3.1.0 (July 2016)
+* New extension point to exchange classes for features, constraints, and feature models with the factory pattern
+* Explanations for anomalies in feature models
+* Support to compute implicit constraints for subtrees of the feature model
+* Export for feature models to the FAMA format
+* Algorithm to refactor complex constraints (e.g., A or B) into simple requires and excludes constraints
+* Several fixes for feature-model analysis, configuration checking, and legend of feature diagrams
+* Improved tool support for multi-product lines
+* Example wizard revised and new examples added
+
+Release 3.0.1 (May 2016)
+* Several Hotfixes:
+  * Configuration is updated when opening configuration editor (Fix #345).
+  * Feature model layout is saved properly (Fix #346).
+  * Changes in feature model editor trigger outline refresh.
+  * Feature models from outside the workspace can be save properly.
+* Further stability improvements
+
+Release 3.0.0 (April 2016)
+* Three new generators added for black-box frameworks, runtime parameters, and images
+* New interfaces for feature model, features, and constraints to improve extensibility (new extension points are planned for 3.1.0)
+* Improved performance for feature-model analyses and example wizard
+* Statistics on feature models added in statistics view
+* Usability improvements in feature-model editor
+* Usability improvements in configuration editor (e.g., search, folding, revised highlighting)
+* Feature-model slicing available
+
+Release 2.7.5 (December 2015)
+* Support for coloring features in project explorer, feature diagram, configuration, outline, collaboration diagram, and for generated files
+* Fixed wrong statistics for preprocessors
+* New functionality in outline for preprocessor Munge
+* Improved consistency of nomenclature used in menus
+* Improved short cuts of feature model editor
+* Fixed several bugs and null pointers
+
+Release 2.7.4 (June 2015)
+* Improved outline with support for further langauges (Haskell, C#), nested classes, and with new filters
+* Improved collaboration diagram with support for nested classes, new filters, and toolbar buttons
+* Improved statistics view with LOC, support for nested classes, and jump-to-file actions
+* Performance of automated analyses in the feature model editor improved (e.g., new calculation of dead and core features)
+* Update problem with feature-model legend and constraints fixed (e.g., wrong highlighting of redundant constraints)
+* Feature model outline revised
+
+Release 2.7.3 (March 2015)
+* Performance and appearance of constraint dialog for large feature models improved (automated analyses run asynchronously)
+* Performance of configuration editor for large feature models improved (automated analyses run asynchronously)
+* Improved support for multi product lines
+* Error propagation when generating multiple products (e.g., all products, all user-defined configurations, t-wise sampling)
+* Improved support for undo and redo in feature model editor
+* Added more restrictions to feature names in favor of stability (please report to us, if legacy FeatureIDE projects can no longer be built)
+* Deprecated action framework of Eclipse replaced
+* FeatureIDE requires Java 1.7 (was Java 1.6 before)
+
+Release 2.7.2 (October 2014)
+* Support for Android projects with preprocessor Munge
+* Family-based type checks with Fuji can be activated on demand (to overcome performance problems with large projects)
+* Feature-model import from S.P.L.O.T. improved (can deal with several group types)
+* Problems with preprocessor Antenna fixed
+* Manual layout of and search for features in feature diagram with keyboard
+* Graphical export of feature diagrams to SVG
+
+Release 2.7.1 (July 2014)
+* Example wizard improved by hierarchical structure and keyword search
+* Removed redundant calculations in composers that caused inconsistencies in threads
+* Performance of configuration editor improved
+
+Release 2.7.0 (April 2014)
+* Advanced support for contracts in FeatureHouse projects (e.g., collaboration diagram and outline, error markers, statistics on contracts, improved variability encoding)
+* Performance of feature-model editor and analyses improved
+* New support for prioritizing products in t-wise generation
+
+Release 2.6.7 (October 2013)
+* New view calculating statistics on FeatureIDE projects
+* New outline and content assist for FeatureHouse projects added
+* Colligens supports development with CPP (integrates TypeChef)
+* Feature model editor improved
+  * Feature descriptions can be edited using a new dialog
+  * Automated analyses optimized
+* Configuration editor improved
+  * Icons and tool tips added giving relevant information on the feature model
+
+Release 2.6.6 (September 2013)
+* Family-based type checks of FeatureHouse projects fith fuji
+* T-wise product generation with splcatool
+
+Release 2.6.5 (May 2013)
+* New AHEAD version integrated
+* AHEAD projects can be composed with Jampack or Mixin (based on the settings
+  in the project properties)
+* New DeltaJ version integrated (now available for Eclipse 3.7 and 4.2, was
+  only available for 3.6 before)
+* Support for metaproduct generation for FeatureHouse projects
+* Support for JML-based verification with KeY and JavaPathFinder
+* JML contracts added to the collaboration diagram for FeatureHouse projects
+
+Release 2.6.4 (December 2012)
+* Support for JML in FeatureHouse (contract composition can be configured using
+  right click on a FeatureIDE project -> Properties -> FeatureIDE -> Feature
+  Project -> Contract composition)
+* Syntax errors for JML in FeatureHouse projects
+
+Release 2.6.3 (September 2012)
+* Support for arbitrary feature names in feature diagram and constraint dialog
+  (features containing whitespace must be placed within quotation marks in the
+  constraint dialog; works only when no generator is selected for this project)
+* Enhanced removal of features that occur in cross-tree constraints (feature
+  references in constraints are replaced by other features if possible)
+* Warnings for indeterminate hidden features (a hidden feature H is
+  indeterminate if there is no constraint A <=> H, where A is a conjunction of
+  non-hidden features and there is no logically equivalent non-hidden feature
+  that can be used to determine the selection of H)
+* Enhanced collaboration diagram with support for printing, showing 
+  methods/fields
+* Support for colors in Antenna and Munge projects as known from
+  FeatureCommander
+* Detection of contradictions and tautologies in preprocessor directives for
+  Antenna and Munge
+* Efficiency of feature diagram drawing improved
+       
+Release 2.6.2 (June 2012)
+* Jak editor for AHEAD replaced with default Java editor
+
+Release 2.6.1 (March 2012)
+* New layout algorithms and manual layout at the feature model editor (right
+  click at the feature diagram -> Set Layout)
+* Automated analysis at the feature model editor (highlighting of dead and
+  false-optional features)
+* Preprocessor Antenna integrated as a new generator
+* FeatureIDE outline as a new view showing also the methods of other roles
+* Outline view for the feature model (better scalability for large models)
+* Automatic conversion of FeatureIDE projects from AHEAD to FeatureHouse (right
+  click on a FeatureIDE/AHEAD project -> Change composer to FeatureHouse) 
+* Property page for feature model editor to change appearance of the feature
+  diagram (right click on a FeatureIDE project -> Properties -> FeatureIDE -> 
+  Feature Model Editor)
+* Property page for FeatureIDE projects to change directories or the generator
+  (right click on a FeatureIDE project -> Properties -> FeatureIDE -> Feature
+  Project)
+* A new option to create FeatureIDE projects without generator for feature
+  modeling only
+
+Release 2.6.0 (September 2011)
+* Support for redo and undo at the feature model editor
+* Option to generate all products (right click on a FeatureIDE project ->
+  Variant Builder)
+* Error propagation for some languages of FeatureHouse
+
+Release 2.5.2 (June 2011)
+* Collaboration diagram supports further languages in FeatureHouse
+
+Release 2.5.1 (March 2011)
+* Warnings at feature folders indicating whether a feature is not implemented 
+  (potentially abstract feature) or does not exist
+* DeltaJ integrated as a new generator
+* AspectJ integrated as a new generator
+* Legend added at the feature model editor
+* Simple implementation of a collaboration diagram for preprocessors
+* Methods and fields are shown at collaboration diagram for FeatureHouse and FeatureC++
+
+Release 2.5.0 (December 2010)
+* Any Eclipse project can be converted to a FeatureIDE project (right click on
+  a project that is not a FeatureIDE project -> Add FeatureIDE nature)
+* FeatureIDE projects can be run using "Run as" of the host language (e.g., as 
+  "Java application")
+* A generic wizard to create new FeatureIDE source files (New -> FeatureIDE
+  file)
+* A generic composer encapsulating composer-specific code into plug-ins
+  (composer integration is easier and does not involve redundant effort)
+* Munge preprocessor integrated as a new generator
+
+Release 2.4.4 (September 2010)
+* Features can be marked as hidden at the feature model (indicating that they
+  are not visible at the configuration editor)
+
+Release 2.4.3 (August 2010)
+* Editor to create cross-tree constraints improved
+* New XML format to store feature models with support for abstract features
+* Editor for configurations is now a multi-page editor (including a source page
+  and a simple editor)
+* Features in the configuration editor are highlighted if their selection or
+  elimination leads to a valid configuration
+* Collaboration diagram shows method and fields
+
+Release 2.4.2 (May 2010)
+* Clean build is supported for FeatureIDE projects
+
+Release 2.4.1 (March 2010)
+* Configuration editor synchronized with feature model editor (you do not need
+  to close and reopen the configuration editor when changing the feature model)
+
+Release 2.4.0 (February 2010)
+* Collaboration diagram added as a new view
+
+Release 2.3.5 (November 2009)
+* Keyboard shortcuts for the feature model editor
+
+Release 2.3.4 (September 2009)
+
+Release 2.3.3 (August 2009)
+* Editor for feature order as part of the feature model editor
+
+Release 2.3.2 (July 2009)
+* Feature order can be specified
+
+Release 2.3.1 (June 2009)
+
+Release 2.3.0 icse (June 2009)
+* Welcome screen
+* FeatureIDE perspective
+* Edit view enhanced (shows added and removed products)

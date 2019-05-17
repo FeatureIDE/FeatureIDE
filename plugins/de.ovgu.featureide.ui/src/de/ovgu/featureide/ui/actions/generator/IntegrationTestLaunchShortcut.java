@@ -32,7 +32,7 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildType;
 
 /**
- * Launch shortcut for integration tests<br> See: Run As > Run as JUnit Integration Test.
+ * Launch shortcut for integration tests<br> See: Run As - Run as JUnit Integration Test.
  *
  * @author Jens Meinicke
  */

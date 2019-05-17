@@ -29,27 +29,22 @@ import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * TODO description
+ * Abstract class for the Editingsupports for the different columns of the {@link FeatureAttributeView}.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupport {
 
 	public boolean enabled = false;
 	protected FeatureAttributeView view;
 
-	/**
-	 * @param viewer
-	 */
 	public AbstractFeatureAttributeEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(viewer);
 		this.view = view;
 		this.enabled = enabled;
 	}
 
-	/**
-	 * @param viewer
-	 */
 	public AbstractFeatureAttributeEditingSupport(ColumnViewer viewer) {
 		super(viewer);
 		enabled = false;

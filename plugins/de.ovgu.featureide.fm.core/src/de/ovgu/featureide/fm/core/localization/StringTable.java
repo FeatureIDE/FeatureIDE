@@ -291,7 +291,8 @@ public class StringTable {
 	public static final String CHILD = "child";
 	public static final String ORDER = "order";
 	public static final String CLASSES = "classes";
-	public static final String YES = "yes";
+	public static final String YES = "Yes";
+	public static final String NO = "No";
 	public static final String META = "meta";
 	public static final String DATA = "data";
 	public static final String UNKNOWN_XML_TAG = "Unknown Xml-Tag";
@@ -407,7 +408,7 @@ public class StringTable {
 	public static final String CONSTRAINT_IS_UNSATISFIABLE = "constraint is unsatisfiable";
 	public static final String PLEASE_INSERT_A_CONSTRAINT_ = "Please insert a constraint.";
 	public static final String CHECKING_CONSTRAINT___ = "Checking constraint...";
-	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Your input contains syntax errors.";
+	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Input contains syntax errors.";
 	public static final String CONSTRAINT_CONTAINS_ONE_UNKNOWN_FEATURE_NAME_ = "Constraint contains unknown feature name.";
 	public static final String TYPE_FILTER_TEXT = "type filter text";
 	public static final String CONSTRAINT_DIALOG = "Constraint Dialog";
@@ -442,7 +443,9 @@ public class StringTable {
 	public static final String SET_NAME_TYPE = "Set Name Type";
 	public static final String AND = "And";
 	public static final String OR = "Or";
+	public static final String OR_GROUP = "Or Group";
 	public static final String ALTERNATIVE = "Alternative";
+	public static final String ALTERNATIVE_GROUP = "Alternative Group";
 	public static final String DOUBLE_CLICK = " (Double Click)";
 	public static final String ANALYZE_FEATURE_MODEL = "Analyze feature model";
 	public static final String UPDATING_FEATURE_MODEL_ATTRIBUTES = "Updating feature model attributes";
@@ -461,9 +464,9 @@ public class StringTable {
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String STARTING_WITH = "Starting with";
 	public static final String FOCUS_ON_CONTAINED_FEATURES = "Focus on contained Features";
-	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
 	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";
+	public static final String ADD_GROUP_TAG_TO_DESCRIPTION = "Add Group Tag to Description";
 	public static final String EXPORT_AS = "Export As";
 	public static final String HIDE_LEGEND = "Hide Legend";
 	public static final String SHOW_LEGEND = "Show Legend";
@@ -504,8 +507,7 @@ public class StringTable {
 		"Select only one feature in order to replace it with an equivalent one.";
 	public static final String IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_ = "It can not be replaced with an equivalent one.";
 	public static final String CHANGE_GROUP_TYPE = "Change Group Type";
-	public static final String CREATE_COMPOUND = "Create Compound";
-	public static final String CREATE_LAYER = "Create Layer";
+	public static final String CREATE_SIBLING = "Create Sibling Feature (CTRL + G)";
 	public static final String MOVE_FEATURE = "Move Feature";
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
@@ -546,6 +548,7 @@ public class StringTable {
 		"Eclipse plugin for exporting diagram in SVG format is not existing.";
 	public static final String SVG_EXPORT_FAILED = "SVG export failed";
 	public static final String NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___ = "Nothing has been saved for diagram export...";
+	public static final String NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___ = "Nothing has been saved for configuration export...";
 	public static final String FILE = "File ";
 	public static final String XML = "XML";
 	public static final String EXPORT_TO_CNF = "Export to CNF";
@@ -555,6 +558,10 @@ public class StringTable {
 	public static final String UNABLE_TO_START_GUIDSL = "Unable to start GUIDSL";
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
+	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP =
+		"If this option is not selected, upon opening a feature diagram FeatureIDE will ask you if you want to open the ConstraintView. Uncheck this if you want to change the default behaviour.";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ =
 		"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ =
@@ -585,6 +592,8 @@ public class StringTable {
 	public static final String EINGEKLAPPT = "Eingeklappt";
 	public static final String FALSCH_OPTIONALES_FEATURE = "Falsch-optionales Feature";
 	public static final String ODER = "Oder";
+	public static final String ODER_GRUPPE = "Oder-Gruppe";
+	public static final String ALTERNATIVE_GRUPPE = "Alternative-Gruppe";
 	public static final String UNBESTIMMBAR_VERSTECKTES_FEATURE = "Unbestimmbar verstecktes Feature";
 	public static final String REDUNDANTES_CONSTRAINT = "Redundantes Constraint";
 	public static final String CONSTRAINT_IST_TAUTOLOGIE = "Constraint ist Tautologie";
@@ -617,6 +626,7 @@ public class StringTable {
 	public static final String BUILD_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + BUILD_PATH + "\".";
 	public static final String CONFIG_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + CONFIG_PATH + "\".";
 	public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
+	public static final String OPEN_A_FEATURE_DIAGRAM = "Open a feature diagram.";
 	public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ =
 		"Start manual calculation or activate automatic calculation to show statistics.";
 	public static final String CALCULATING___ = "Calculating...";
@@ -1093,4 +1103,10 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
+	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
+	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
+	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
+	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
+	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
 }

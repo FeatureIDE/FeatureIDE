@@ -74,6 +74,8 @@ public class ClonePercentageData implements IClonePercentageData {
 	}
 
 	/**
+	 * 
+	 * @param feature the features
 	 * @param featureClonedLines
 	 *            the featureClonedLines to set
 	 */
@@ -89,6 +91,8 @@ public class ClonePercentageData implements IClonePercentageData {
 	}
 
 	/**
+	 * 
+	 * @param feature feature root location
 	 * @return the lineCount
 	 */
 	public int calculateClonedLineCount(FeatureRootLocation feature) {

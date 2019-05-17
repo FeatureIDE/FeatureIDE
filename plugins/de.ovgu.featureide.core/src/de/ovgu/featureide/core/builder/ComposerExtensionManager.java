@@ -73,6 +73,7 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 	/**
 	 * Gets a composer by an ID
 	 *
+	 * @param featureProject FeatureIDE project
 	 * @param composerID The ID of the composer
 	 * @return The composer or null if no composer with the specified ID was found
 	 */

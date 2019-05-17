@@ -85,6 +85,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 	};
 
+	private static final IFilter<SelectableFeature> invalidFeatureFilter = new IFilter<SelectableFeature>() {
+		@Override
+		public boolean isValid(SelectableFeature feature) {
+			return feature.getFeature() != null;
+		}
+	};
+
 	private static final IFilter<SelectableFeature> concreteFilter = new IFilter<SelectableFeature>() {
 		@Override
 		public boolean isValid(SelectableFeature feature) {
@@ -334,9 +341,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	/**
 	 * Creates solutions to cover the given features.
-	 *
-	 * @param features The features that should be covered.
-	 * @param selection true is the features should be selected, false otherwise.
 	 */
 	public class CoverFeaturesMethod implements LongRunningMethod<List<List<String>>> {
 
@@ -722,7 +726,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	/**
 	 * Counts the number of possible solutions.
 	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	@Override
@@ -751,8 +755,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	@SafeVarargs
 	private final Iterable<SelectableFeature> getFeatures(IFilter<SelectableFeature>... filter) {
-		final Iterable<SelectableFeature> source =
-			configuration.ignoreAbstractFeatures ? configuration.features : Functional.filter(configuration.features, concreteFilter);
+		final Iterable<SelectableFeature> source = configuration.ignoreAbstractFeatures ? Functional.filter(configuration.features, invalidFeatureFilter)
+			: Functional.filter(configuration.features, invalidFeatureFilter, concreteFilter);
 		return filter.length > 0 ? Functional.filter(source, filter) : source;
 	}
 

@@ -103,8 +103,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -381,6 +381,14 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * Setups the projects structure.<br> Starts composer specific changes of the project structure, after adding the FeatureIDE nature to a project.
+	 *
+	 * @param project project
+	 * @param compositionToolID Id of the composition tool
+	 * @param sourcePath source path
+	 * @param configPath config path
+	 * @param buildPath build path
+	 * @param shouldCreateSourceFolder true if source folder should be created
+	 * @param shouldCreateBuildFolder true if build folder should be created
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
 			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
@@ -403,7 +411,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 	}
 
 	/**
@@ -440,14 +448,24 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * Setups the project.<br> Creates folders<br> Adds the compiler(if necessary)<br> Adds the FeatureIDE nature<br> Creates the feature model
 	 *
-	 * @param addCompiler <code>false</code> if the project already has a compiler
+	 * @param project project
+	 * @param compositionToolID Id of the composition tool
+	 * @param sourcePath source path
+	 * @param configPath config path
+	 * @param buildPath build path
+	 * @param shouldCreateSourceFolder true if source folder should be created
+	 * @param shouldCreateBuildFolder true if build folder should be created
+	 * @param addCompiler true if compiler
+	 * @param addNature true if nature should be added
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
 			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		final IFeatureModel featureModel = createFeatureModelFile(project);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
+
+		final IFeatureModel featureModel = createFeatureModelFile(project, composer);
 		createConfigFile(project, configPath, featureModel, "default.");
 
 		if ((composer != null) && addCompiler) {
@@ -465,11 +483,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, addNature);
+		if (addNature) {
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void setProjectProperties(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addNature) {
+			final String buildPath) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
@@ -477,9 +497,6 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
-		}
-		if (addNature) {
-			addFeatureNatureToProject(project);
 		}
 	}
 
@@ -587,11 +604,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, configPath);
 	}
 
-	private static IFeatureModel createFeatureModelFile(IProject project) {
+	private static IFeatureModel createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
 		if (!modelPath.toFile().exists()) {
-			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
 				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
@@ -629,7 +646,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * returns an unmodifiable Collection of all ProjectData items, or <code>null</code> if plugin is not loaded
 	 *
-	 * @return
+	 * @return unmodifiable Collection of all ProjectData items
 	 */
 	public static Collection<IFeatureProject> getFeatureProjects() {
 		if (getDefault() == null) {
@@ -641,7 +658,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * returns the ProjectData object associated with the given resource
 	 *
-	 * @param res
+	 * @param res given resource
 	 * @return <code>null</code> if there is no associated project, no active instance of this plug-in or resource is the workspace root
 	 */
 	@CheckForNull
@@ -664,7 +681,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * A linear job to add a project. This is necessary if many projects will be add at the same time.
 	 *
-	 * @param project
+	 * @param project project to add
 	 */
 	public void addProjectToList(IProject project) {
 		if (!featureProjectMap.containsKey(project) && project.isOpen() && !projectsToAdd.contains(project)) {

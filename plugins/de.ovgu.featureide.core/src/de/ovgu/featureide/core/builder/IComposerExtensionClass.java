@@ -34,15 +34,15 @@ import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 
 /**
- * @brief Base interface of all composition tool classes.
+ * Base interface of all composition tool classes.<br><br>
  *
- *        Every plug-in which extends the de.ovgu.featureide.core.composers needs to provide a class, which implements this interface. Implementing this
- *        interface ensures that a given composition tool meets the requirements for composition tools, which are used by the
- * @c ExtensibleFeatureProjectBuilder. This requirements are: - Specifying a path for the composed files (usually "./build") - Specifying a path for the source
- *    files (usually "./src") if hasFeatureFolder() - Specifying a path to the current configuration file - Performing a full build for the current project with
- *    a given configuration file
+ * Every plug-in which extends the de.ovgu.featureide.core.composers needs to provide a class, which implements this interface. Implementing this interface
+ * ensures that a given composition tool meets the requirements for composition tools, which are used by the ExtensibleFeatureProjectBuilder. This requirements
+ * are: - Specifying a path for the composed files (usually "./build") - Specifying a path for the source files (usually "./src") if hasFeatureFolder() -
+ * Specifying a path to the current configuration file - Performing a full build for the current project with a given configuration file
  *
  * @author Tom Brosch
  */
@@ -104,11 +104,20 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 * Make some changes after adding the FeatureIDE nature.
 	 *
 	 * @return <code>true</code> if the source files not have to be moved to the feature folder anymore
+	 *
+	 * @param source source folder
+	 * @param destination destination folder
 	 */
 	boolean postAddNature(IFolder source, IFolder destination);
 
 	/**
+	 *
 	 * Adds the compiler to the project.
+	 *
+	 * @param project project to add the compiler
+	 * @param sourcePath source path
+	 * @param configPath config path
+	 * @param buildPath build path
 	 */
 	void addCompiler(IProject project, String sourcePath, String configPath, String buildPath);
 
@@ -144,8 +153,8 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	/**
 	 * Is called after changes at composition folder.
 	 *
-	 * @param delta
-	 * @param buildFile
+	 * @param delta Changes of the resourcea as delta
+	 * @param buildFile build file
 	 */
 	void postCompile(IResourceDelta delta, IFile buildFile);
 
@@ -198,4 +207,9 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 * @return The generation {@link Mechanism} of the generation tool, or null.
 	 */
 	Mechanism getGenerationMechanism();
+
+	/**
+	 * @return The format that should be used to create the feature model
+	 */
+	IFeatureModelFormat getFeatureModelFormat();
 }

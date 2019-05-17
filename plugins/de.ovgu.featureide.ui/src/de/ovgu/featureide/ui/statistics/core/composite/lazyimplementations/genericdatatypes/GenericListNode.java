@@ -35,11 +35,6 @@ public class GenericListNode<T> extends AbstractSortModeNode {
 
 	private final List<T> list;
 
-	/**
-	 * @param description
-	 * @param value
-	 * @param list
-	 */
 	public GenericListNode(String description, List<T> list) {
 		super(description, list.size());
 		this.list = list;

@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.functional.Base64Encoder;
+import de.ovgu.featureide.fm.core.functional.Base32Encoder;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -48,7 +48,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	private final static SecureRandom secureRandom = new SecureRandom();
 
 	private final static int LENGTH_FACTOR = 8;
-	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR) + 2;
+	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR);
 
 	private final IFeatureModel orgFeatureModel;
 	private final IFeatureModelFactory factory;
@@ -132,34 +132,26 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	}
 
 	private String getObfuscatedFeatureName(String name) {
-		final char[] result = new char[RESULT_LENGTH];
-		result[0] = 'F';
-
-		return obfuscate(name, result);
+		return obfuscate(name, new char[RESULT_LENGTH]);
 	}
 
 	private String getObfuscatedDescription(String description) {
-		final char[] result = new char[RESULT_LENGTH];
-		result[0] = 'D';
-
-		return obfuscate(description, result);
+		return obfuscate(description, new char[RESULT_LENGTH]);
 	}
 
 	private String obfuscate(String string, final char[] result) {
-		result[1] = '_';
-
 		digest.reset();
 		digest.update(salt);
 		digest.update(string.getBytes(StandardCharsets.UTF_8));
 		final byte[] hash = digest.digest();
 
-		return Base64Encoder.encode(result, 2, hash);
+		return Base32Encoder.encode(result, 0, hash);
 	}
 
 	public static String getRandomSalt() {
 		final byte[] saltArray = new byte[24];
 		secureRandom.nextBytes(saltArray);
-		return Base64Encoder.encode(new char[32], 0, saltArray);
+		return Base32Encoder.encode(new char[20], 0, saltArray);
 	}
 
 }

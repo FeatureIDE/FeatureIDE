@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -36,6 +37,7 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -43,6 +45,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AbstractGraphicalFeatureFilter;
@@ -118,6 +121,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String MODEL_CONST_TOOLTIP = StringTable.FEATURE_MODELIS_VOID;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
+	private static final String FEATURE_TOOLTIP = "Feature";
 
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
@@ -134,6 +138,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int EXPLANATION = 12;
 	private static final int REDUNDANT = 13;
 	private static final int VOID_MODEL = 14;
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private static final int FEATURECON = 15;
+	private static final int FEATUREABS = 16;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -193,20 +200,31 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		fmStructure.setShowHiddenFeatures(showHidden);
 
-		mandatory = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new MandatoryGraphicalFeatureFilter())).size() > 0;
-		optional = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OptionalGraphicalFeatureFilter())).size() > 0;
-		alternative = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AlternativeGroupFilter())).size() > 0;
-		or = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new OrGroupFilter())).size() > 0;
-		_abstract = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new AbstractGraphicalFeatureFilter())).size() > 0;
-		concrete = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new ConcreteGraphicalFeatureFilter())).size() > 0;
-		hidden = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new HiddenGraphicalFeatureFilter())).size() > 0;
+		// Retrieve visible features
+		final List<IGraphicalFeature> graphicalVisibleFeatures = graphicalFeatureModel.getVisibleFeatures();
+		final List<IFeature> visibleFeatures = new ArrayList<>();
+		for (final IGraphicalFeature iGraphicalFeature : graphicalVisibleFeatures) {
+			visibleFeatures.add(iGraphicalFeature.getObject());
+		}
+
+		mandatory = Functional.toList(Functional.filter(graphicalVisibleFeatures, new MandatoryGraphicalFeatureFilter())).size() > 0;
+		optional = Functional.toList(Functional.filter(graphicalVisibleFeatures, new OptionalGraphicalFeatureFilter())).size() > 0;
+		alternative = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleRelations(), new AlternativeGroupFilter())).size() > 0;
+		or = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleRelations(), new OrGroupFilter())).size() > 0;
+		_abstract = Functional.toList(Functional.filter(graphicalVisibleFeatures, new AbstractGraphicalFeatureFilter())).size() > 0;
+		concrete = Functional.toList(Functional.filter(graphicalVisibleFeatures, new ConcreteGraphicalFeatureFilter())).size() > 0;
+		hidden = Functional.toList(Functional.filter(graphicalVisibleFeatures, new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 		if (analyser.calculateDeadConstraints) {
-			dead = fmStructure.hasDeadFeatures();
+			final List<IFeature> deadFeatures = new ArrayList<>(analyser.getCachedDeadFeatures());
+			deadFeatures.retainAll(visibleFeatures);
+			dead = deadFeatures.size() > 0;
 		}
 		if (analyser.calculateFOConstraints) {
-			falseoptional = fmStructure.hasFalseOptionalFeatures();
+			final List<IFeature> falseOptionalFeatures = new ArrayList<>(analyser.getCachedFalseOptionalFeatures());
+			falseOptionalFeatures.retainAll(visibleFeatures);
+			falseoptional = falseOptionalFeatures.size() > 0;
 		}
 		indetHidden = fmStructure.hasIndetHidden();
 
@@ -251,11 +269,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAlternative());
 		}
-		if (_abstract) {
+		if (_abstract && !concrete) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (concrete && !_abstract) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (_abstract && concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAbstract());
-		}
-		if (concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getConcrete());
 		}
@@ -342,10 +366,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (alternative) {
 			createRowAlternative(row++);
 		}
-		if (_abstract) {
-			createRowAbstract(row++);
+		// necessary creating a legend with only abstract or concrete features which then are only named feature
+		if (_abstract && !concrete) {
+			createRowFeatureAbstract(row++);
 		}
-		if (concrete) {
+		if (concrete && !_abstract) {
+			createRowFeatureConcrete(row++);
+		}
+		// necessary for creating a legend where abstract and concrete features are present at the same time
+		if (_abstract && concrete) {
+			createRowAbstract(row++);
 			createRowConcrete(row++);
 		}
 		if (imported) {
@@ -443,14 +473,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void createRowAlternative(int row) {
 		createGroupTypeSymbol(row, ALTERNATIVE);
-		final Label labelOr = createLabel(row, language.getAlternative(), FMPropertyManager.getFeatureForgroundColor(), ALTERNATIVE_TOOLTIP);
+		final Label labelOr = createLabel(row, language.getAlternativeGroup(), FMPropertyManager.getFeatureForgroundColor(), ALTERNATIVE_TOOLTIP);
 
 		add(labelOr);
 	}
 
 	private void createRowOr(int row) {
 		createGroupTypeSymbol(row, OR);
-		final Label labelOr = createLabel(row, language.getOr(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
+		final Label labelOr = createLabel(row, language.getOrGroup(), FMPropertyManager.getFeatureForgroundColor(), OR_TOOLTIP);
 		add(labelOr);
 	}
 
@@ -468,6 +498,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelMandatory);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowAbstract(int row) {
 		createSymbol(row, ABSTRACT, true, ABSTRACT_TOOLTIP);
 		final Label labelAbstract = createLabel(row, language.getAbstract(), FMPropertyManager.getFeatureForgroundColor(), ABSTRACT_TOOLTIP);
@@ -492,10 +523,25 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelInterfaced);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowConcrete(int row) {
 		createSymbol(row, CONCRETE, true, CONCRETE_TOOLTIP);
 		final Label labelConcrete = createLabel(row, language.getConcrete(), FMPropertyManager.getFeatureForgroundColor(), CONCRETE_TOOLTIP);
 		add(labelConcrete);
+	}
+
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private void createRowFeatureConcrete(int row) {
+		createSymbol(row, FEATURECON, true, FEATURE_TOOLTIP);
+		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
+		add(labelFeature);
+	}
+
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private void createRowFeatureAbstract(int row) {
+		createSymbol(row, FEATUREABS, true, FEATURE_TOOLTIP);
+		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
+		add(labelFeature);
 	}
 
 	private void createRowHidden(int row) {
@@ -651,6 +697,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (CONCRETE):
 			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
 			rect.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+			break;
+		case (FEATURECON):
+			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+			break;
+		case (FEATUREABS):
+			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 			break;
 		case (HIDDEN):
 			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());

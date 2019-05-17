@@ -53,9 +53,7 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		this.configurationMap = configurationMap;
 
 		cachedImages = new HashMap<String, Image>();
-		FMUIPlugin.getDefault();
 		cachedImages.put(imgSelectedPath, FMUIPlugin.getImage(imgSelectedPath));
-		FMUIPlugin.getDefault();
 		cachedImages.put(imgUnselectedPath, FMUIPlugin.getImage(imgUnselectedPath));
 	}
 

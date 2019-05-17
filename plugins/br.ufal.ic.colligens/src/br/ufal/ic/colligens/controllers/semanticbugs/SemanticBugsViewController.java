@@ -50,7 +50,7 @@ public class SemanticBugsViewController extends ViewController {
 	/**
 	 * Update view
 	 *
-	 * @param fileProxies
+	 * @param fileProxies list of file proxies
 	 */
 	public void setInput(List<CppCheckerFileLogs> fileProxies) {
 		treeViewer.setInput(fileProxies);

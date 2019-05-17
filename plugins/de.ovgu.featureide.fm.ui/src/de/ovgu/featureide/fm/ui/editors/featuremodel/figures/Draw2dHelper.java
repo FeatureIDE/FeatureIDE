@@ -56,6 +56,10 @@ public class Draw2dHelper {
 	 * Draws a filled arc inside the rectangle.<br> Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
 	 *
 	 * @param graphics The graphics to draw in.
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param width width of the arc
+	 * @param height height of the arc
 	 * @param offset The start angle of the arc.
 	 * @param length The length of the arc.
 	 */

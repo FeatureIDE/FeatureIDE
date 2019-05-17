@@ -38,7 +38,7 @@ import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
  * This class implements most of the {@link SPLMigrationPlugin}s functionality. It is invoked by the {@link SPLMigrationCommandHandler}. The
  * {@link WizardDialog} consists of two pages: {@link SPLMigrationDialogNamePage} and {@link SPLMigrationDialogSettingsPage} .
  *
- * @see {@link #performFinish()}
+ * @see #performFinish()
  *
  * @author Konstantin Tonscheidt
  *

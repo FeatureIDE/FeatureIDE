@@ -64,7 +64,6 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	 * 
 	 * @param project
 	 *            an {@link IFeatureProject}.
-	 * @throws IOException
 	 */
 	public void addProjectToAnalysis(IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);

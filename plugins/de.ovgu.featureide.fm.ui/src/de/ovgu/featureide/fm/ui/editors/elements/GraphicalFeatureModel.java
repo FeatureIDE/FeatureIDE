@@ -46,6 +46,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of an {@link IFeatureModel} instance.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Thomas Graave
  *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
@@ -54,10 +56,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	protected final FeatureModelLayout layout;
 
-	protected Map<IFeature, IGraphicalFeature> features;
-	protected Map<IConstraint, IGraphicalConstraint> constraints;
+	protected Map<IFeature, IGraphicalFeature> features = new HashMap<IFeature, IGraphicalFeature>();
+	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<IConstraint, IGraphicalConstraint>();
 
-	protected boolean hiddenLegend;
+	protected boolean hiddenLegend = false;
+	protected boolean hiddenConstraints = false;
 	protected Legend legend;
 
 	/**
@@ -75,12 +78,18 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
 		correspondingFeatureModel = oldModel.correspondingFeatureModel;
-
 		layout = oldModel.layout;
+		hiddenLegend = oldModel.hiddenLegend;
+
+		if (oldModel.legend != null) {
+			legend = oldModel.legend;
+		}
+
 		features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
+
 		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
 		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());
@@ -148,6 +157,16 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	@Override
+	public void setConstraintsHidden(boolean hideConstraints) {
+		hiddenConstraints = hideConstraints;
+	}
+
+	@Override
+	public boolean getConstraintsHidden() {
+		return hiddenConstraints;
+	}
+
+	@Override
 	public void handleModelLayoutChanged() {
 		fireEvent(EventType.MODEL_LAYOUT_CHANGED);
 	}
@@ -201,6 +220,15 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getVisibleConstraints() {
+		final List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
+		if (hiddenConstraints) {
+			return constraints;
+		}
+		return getNonCollapsedConstraints();
+	}
+
+	@Override
+	public List<IGraphicalConstraint> getNonCollapsedConstraints() {
 		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
 		}
@@ -261,6 +289,17 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
 		for (final IGraphicalFeature f : getFeatures()) {
 			if (!f.hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return Collections.unmodifiableList(features);
+	}
+
+	@Override
+	public List<IGraphicalFeature> getVisibleRelations() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IGraphicalFeature f : getFeatures()) {
+			if (!f.isCollapsed() && !f.hasCollapsedParent()) {
 				features.add(f);
 			}
 		}

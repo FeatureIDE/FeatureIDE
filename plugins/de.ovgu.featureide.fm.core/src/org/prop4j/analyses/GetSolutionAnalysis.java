@@ -54,13 +54,13 @@ public class GetSolutionAnalysis extends AbstractAnalysis<List<int[]>> {
 	public List<int[]> analyze(IMonitor monitor) throws Exception {
 		final List<int[]> solutions = new ArrayList<>();
 		solutionLoop: for (int i = 0; i < maxSolutions; i++) {
-			final int[] model = solver.getModel();
 			switch (solver.isSatisfiable()) {
 			case TIMEOUT:
 				return Collections.emptyList();
 			case FALSE:
 				break solutionLoop;
 			case TRUE:
+				final int[] model = solver.getModel();
 				solutions.add(model);
 				if (uniqueSolutions) {
 					try {

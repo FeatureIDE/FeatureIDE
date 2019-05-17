@@ -23,31 +23,71 @@ package de.ovgu.featureide.fm.core.functional;
 import java.util.Arrays;
 
 /**
- * Takes a byte array and transforms it into a char array containing only the symbols A-Z and 0-7.
+ * Takes a byte array and transforms it into a char array containing only the symbols a-z and A-H.
  *
  * @author Sebastian Krieter
  */
 public abstract class Base32Encoder {
 
-	private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567";
+	private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGH";
 
-	public static String encode(final char[] result, int index, byte[] hash) {
-		final int length = ((result.length - index) >> 3) * 5;
-		if (hash.length < length) {
-			hash = Arrays.copyOf(hash, length);
+	public static String encode(final char[] result, int offset, byte[] message) {
+		final int length = ((result.length - offset) >> 3) * 5;
+		if (message.length != length) {
+			message = Arrays.copyOf(message, length);
 		}
-		for (int i = 0; i < length; i += 5) {
-			long x = 0xff & hash[i];
-			x |= (0xff & hash[i + 1]) << 8;
-			x |= (0xff & hash[i + 2]) << 16;
-			x |= (0xff & hash[i + 3]) << 24;
-			x |= (0xff & hash[i + 4]) << 32;
+		return encodeInternal(result, offset, message);
+	}
+
+	public static String encode(byte[] message) {
+		if ((message.length % 5) != 0) {
+			message = Arrays.copyOf(message, message.length + (5 - (message.length % 5)));
+		}
+		return encodeInternal(new char[(message.length / 5) * 8], 0, message);
+	}
+
+	private static String encodeInternal(final char[] result, int offset, byte[] message) {
+		for (int i = 0; i < message.length; i += 5) {
+			long x = 0xff & message[i];
+			x |= (0xff & message[i + 1]) << 8;
+			x |= (0xff & message[i + 2]) << 16;
+			x |= (0xff & message[i + 3]) << 24;
+			x |= (0xff & message[i + 4]) << 32;
 			for (int j = 0; j < 8; j++) {
-				result[index++] = ALPHABET.charAt((int) (x & 0x1f));
+				result[offset++] = ALPHABET.charAt((int) (x & 0x1f));
 				x >>>= 5;
 			}
 		}
 		return new String(result);
+	}
+
+	public static byte[] decode(String encodedMessage) {
+		return decodeInternal(encodedMessage);
+	}
+
+	private static byte[] decodeInternal(String encodedMessage) {
+		final char[] charArray = encodedMessage.toCharArray();
+		final int length = ((charArray.length) >> 3) * 5;
+		final byte[] result = new byte[length];
+
+		int index = 0;
+		for (int i = 0; i < charArray.length; i += 8) {
+			long x = 0;
+			for (int j = 0; j < 8; j++) {
+				final long indexOf = ALPHABET.indexOf(charArray[i + j]);
+				if (indexOf >= 0) {
+					x |= indexOf << (j * 5);
+				} else {
+					return null;
+				}
+			}
+			result[index++] = (byte) (0xff & x);
+			result[index++] = (byte) (0xff & (x >>> 8));
+			result[index++] = (byte) (0xff & (x >>> 16));
+			result[index++] = (byte) (0xff & (x >>> 24));
+			result[index++] = (byte) (0xff & (x >>> 32));
+		}
+		return result;
 	}
 
 }

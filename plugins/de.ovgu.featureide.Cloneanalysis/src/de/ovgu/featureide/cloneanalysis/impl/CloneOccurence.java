@@ -13,7 +13,8 @@ import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
  * begins.
  * 
  * 
- * @see {@link Clone}, {@link CloneAnalysisResults}
+ * @see Clone
+ * @see CloneAnalysisResults
  * 
  * @author Konstantin Tonscheidt
  * 

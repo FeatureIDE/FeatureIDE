@@ -33,16 +33,20 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
- * TODO description
+ * Implements the {@link ITreeContentProvider} and has the task to provide the content for the {@link FeatureAttributeView}. Structures the feature and their
+ * attributes in the same way as the {@link FeatureDiagramEditor}.
  *
  * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
+	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
 	private Configuration config;
@@ -129,7 +133,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		}
 		if (element instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) element;
-			return feature.getStructure().getParent().getFeature();
+			return feature.getStructure().getParent() != null ? feature.getStructure().getParent().getFeature() : null;
 		} else if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getFeature();
 		}
@@ -154,6 +158,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			features = EMPTY_ROOT;
 		} else {
 			final ArrayList<Object> featureList = new ArrayList<>();
+			featureList.add(SELECT_FEATURES_IN_FEATURE_DIAGRAM);
 			featureList.add(featureModel.getStructure().getRoot().getFeature());
 			features = featureList.toArray();
 		}

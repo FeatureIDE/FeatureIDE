@@ -22,8 +22,9 @@ package de.ovgu.featureide.ui.statistics.ui.helper;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_STATISTICS_VIEW;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -49,19 +50,16 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  */
 public class JobDoneListener implements IJobChangeListener {
 
-	protected static JobDoneListener instance = new JobDoneListener();
-	private final List<IJob<?>> runningJobs = new LinkedList<>();
-	protected List<TreeViewer> views = new LinkedList<TreeViewer>();
+	protected static final JobDoneListener instance = new JobDoneListener();
+
+	private final Collection<IJob<?>> runningJobs = new ConcurrentLinkedQueue<>();
+	private final Collection<TreeViewer> views = new ConcurrentLinkedQueue<>();
 
 	public void checkViews() {
-		synchronized (views) {
-			for (int i = 0; i < views.size();) {
-				final TreeViewer view = views.get(i);
-				if ((view == null) || (view.getControl() == null) || view.getControl().isDisposed()) {
-					views.remove(view);
-				} else {
-					i++;
-				}
+		for (final Iterator<TreeViewer> iterator = views.iterator(); iterator.hasNext();) {
+			final TreeViewer view = iterator.next();
+			if ((view == null) || (view.getControl() == null) || view.getControl().isDisposed()) {
+				iterator.remove();
 			}
 		}
 	}
@@ -104,12 +102,10 @@ public class JobDoneListener implements IJobChangeListener {
 						final Parent calc = ((TreeJob) method).getCalculated();
 						calc.startCalculating(false);
 						checkViews();
-						synchronized (views) {
-							for (final TreeViewer view : views) {
-								view.refresh(calc);
-								if (expand) {
-									view.expandToLevel(calc, 1);
-								}
+						for (final TreeViewer view : views) {
+							view.refresh(calc);
+							if (expand) {
+								view.expandToLevel(calc, 1);
 							}
 						}
 					}
@@ -140,10 +136,8 @@ public class JobDoneListener implements IJobChangeListener {
 					final Parent calc = ((TreeJob) treeJob.getMethod()).getCalculated();
 					calc.startCalculating(true);
 					checkViews();
-					synchronized (views) {
-						for (final TreeViewer view : views) {
-							view.refresh(calc);
-						}
+					for (final TreeViewer view : views) {
+						view.refresh(calc);
 					}
 				}
 				return Status.OK_STATUS;
@@ -160,5 +154,6 @@ public class JobDoneListener implements IJobChangeListener {
 		for (final IJob<?> job : runningJobs) {
 			job.cancel();
 		}
+		runningJobs.clear();
 	}
 }

@@ -13,6 +13,12 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
+/**
+ * Label provider for the value attribute.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeValueColumnLabelProvider extends FeatureAttributeColumnLabelProvider {
 
 	public FeatureAttributeValueColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {

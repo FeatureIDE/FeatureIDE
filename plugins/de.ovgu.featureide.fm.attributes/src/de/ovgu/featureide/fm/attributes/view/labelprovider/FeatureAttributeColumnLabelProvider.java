@@ -15,6 +15,12 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
+/**
+ * Abstract label provider that is subclassed by every label provider of the {@link FeatureAttributeView}.
+ * 
+ * @author Joshuas Sprey
+ * @author Chico Sundermann
+ */
 public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelProvider implements IColorProvider {
 
 	protected HashMap<String, Image> cachedImages;

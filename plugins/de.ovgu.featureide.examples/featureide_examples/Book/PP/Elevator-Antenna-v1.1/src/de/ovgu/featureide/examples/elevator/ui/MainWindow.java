@@ -44,6 +44,10 @@ import de.ovgu.featureide.examples.elevator.core.controller.ITickListener;
 import de.ovgu.featureide.examples.elevator.core.model.Elevator;
 import de.ovgu.featureide.examples.elevator.core.model.ElevatorState;
 
+//#if FloorPermission
+import java.util.Arrays;
+//#endif
+
 //#if Service
 import java.awt.Dimension;
 //#endif
@@ -94,7 +98,7 @@ public class MainWindow implements ITickListener
 		frmElevatorSample.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//#if FloorPermission
-		FloorChooseDialog permissionDialog = new FloorChooseDialog(maxFloors, new ArrayList<Integer>(), "Choose disabled floors");
+		FloorChooseDialog permissionDialog = new FloorChooseDialog(maxFloors, Arrays.asList(0), "Choose disabled floors");
 		List<Integer> disabledFloors = permissionDialog.getSelectedFloors();
 		sim.setDisabledFloors(disabledFloors);
 		permissionDialog.dispose();

@@ -31,7 +31,7 @@ import org.prop4j.solver.SatInstance;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Creates a complete implication graph.</br> This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
+ * Creates a complete implication graph.<br> This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
  *
  * @author Sebastian Krieter AtomicSetAnalysis
  */

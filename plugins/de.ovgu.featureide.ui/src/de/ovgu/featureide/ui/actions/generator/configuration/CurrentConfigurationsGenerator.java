@@ -93,7 +93,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(res.getName());
+		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()));
 	}
 
 	/**

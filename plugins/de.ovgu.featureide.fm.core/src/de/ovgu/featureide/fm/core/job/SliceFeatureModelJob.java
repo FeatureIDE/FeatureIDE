@@ -29,8 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.And;
+import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
@@ -47,6 +49,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -65,6 +68,11 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final Path modelFile;
+		private final String newModelName;
+		private final IPersistentFormat<IFeatureModel> newModelFormat;
+		private final boolean omitAbstractFeatures;
+		private final boolean omitRootIfPossible;
+		private final boolean simplifyImplications;
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
@@ -72,11 +80,37 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			this.featuremodel = featuremodel;
 			this.featureNames = featureNames;
 			this.considerConstraints = considerConstraints;
+			newModelName = "";
+			newModelFormat = null;
+			omitAbstractFeatures = false;
+			omitRootIfPossible = false;
+			simplifyImplications = false;
 		}
+
+		/**
+		 * Do not delete. This constructor is used externally.
+		 */
+		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints, String newModelName,
+				IPersistentFormat<IFeatureModel> newModelFormat, boolean omitAbstractFeatures, boolean omitRootIfPossible, boolean simplifyImplications) {
+			super(Arguments.class);
+			this.modelFile = modelFile;
+			this.featuremodel = featuremodel;
+			this.featureNames = featureNames;
+			this.considerConstraints = considerConstraints;
+			this.newModelName = newModelName;
+			this.newModelFormat = newModelFormat;
+			this.omitAbstractFeatures = omitAbstractFeatures;
+			this.omitRootIfPossible = omitRootIfPossible;
+			this.simplifyImplications = simplifyImplications;
+		}
+
 	}
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 	private static final String MARK1 = "?", MARK2 = "??";
+
+	private static final String SLICE_FEATURE_ROOT_NAME = "Root";
+	private static final String SLICE_FEATURE_ABSTRACT_NAME = "Abstract";
 
 	private boolean changed = false;
 
@@ -207,6 +241,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	@Override
 	public IFeatureModel execute(IMonitor monitor) throws Exception {
 		newInterfaceModel = sliceModel(arguments.featuremodel, arguments.featureNames, monitor);
+		newInterfaceModel = postProcessModel(newInterfaceModel);
 		saveModel();
 		return newInterfaceModel;
 	}
@@ -336,13 +371,12 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final Path filePath = arguments.modelFile.getFileName();
 		final Path root = arguments.modelFile.getRoot();
 		if ((filePath != null) && (root != null)) {
-			String fileName = filePath.toString();
-			final int extIndex = fileName.lastIndexOf('.');
-			fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-				: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+			final IPersistentFormat<IFeatureModel> format =
+				arguments.newModelFormat != null ? arguments.newModelFormat : FMFormatManager.getInstance().getFormatByContent(filePath);
+			final String fileName = !arguments.newModelName.isEmpty() ? arguments.newModelName
+				: SimpleFileHandler.getFileName(filePath) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
 			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
-
-			SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
+			SimpleFileHandler.save(outputPath, newInterfaceModel, format);
 		}
 	}
 
@@ -360,7 +394,11 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		monitor.setRemainingWork(2);
 		final IFeatureModel m = orgFeatureModel.clone();
 		// mark features
+		String newRootName = SLICE_FEATURE_ROOT_NAME;
 		for (final IFeature feat : m.getFeatures()) {
+			if (feat.getName().equals(newRootName)) {
+				newRootName += "0";
+			}
 			if (!selectedFeatureNames.contains(feat.getName())) {
 				feat.setName(MARK1);
 			}
@@ -372,7 +410,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		m.reset();
 
 		// set new abstract root
-		final IFeature nroot = factory.createFeature(m, "__root__");
+		final IFeature nroot = factory.createFeature(m, newRootName);
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -396,7 +434,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName("_Abstract_" + count++);
+				curFeature.setName(SLICE_FEATURE_ABSTRACT_NAME + count++);
 				curFeature.getStructure().setAbstract(true);
 			}
 			featureTable.put(curFeature.getName(), curFeature);
@@ -426,6 +464,75 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		monitor.step();
 
 		return m;
+	}
+
+	private IFeatureModel postProcessModel(IFeatureModel slicedModel) {
+		// Postprocess remove all '_Abstract*' features
+		if (arguments.omitAbstractFeatures) {
+			for (final IFeature feature : slicedModel.getFeatures()) {
+				if (feature.getName().startsWith("_Abstract_")) {
+					// Now move the children of the abstract feature to the parent
+					for (final IFeatureStructure featureStruc : feature.getStructure().getChildren()) {
+						feature.getStructure().getParent().addChild(featureStruc);
+					}
+
+					// At first set parent group to the group of the abstract feature
+					if (feature.getStructure().getParent() != null) {
+						if (feature.getStructure().isOr()) {
+							feature.getStructure().getParent().changeToOr();
+							feature.getStructure().getParent().setOr();
+						} else if (feature.getStructure().isAlternative()) {
+							feature.getStructure().getParent().changeToAlternative();
+							feature.getStructure().getParent().setAlternative();
+						} else {
+							feature.getStructure().getParent().changeToAnd();
+							feature.getStructure().getParent().setAnd();
+						}
+					}
+
+					// Now remove abstract feature
+					feature.getStructure().getParent().removeChild(feature.getStructure());
+				}
+			}
+		}
+		// Remove '__root__' if it only has one child
+		if (arguments.omitRootIfPossible) {
+			if (slicedModel.getStructure().getRoot().getChildrenCount() == 1) {
+				// Save old root feature
+				final IFeature oldRoot = slicedModel.getStructure().getRoot().getFeature();
+
+				// Set new root
+				slicedModel.getStructure().setRoot(slicedModel.getStructure().getRoot().getChildren().get(0));
+
+				// Remove old root from model
+				slicedModel.deleteFeature(oldRoot);
+			}
+		}
+
+		// Simplify 'NodeA or not NodeB' to 'NodeA implies NodeB'
+		if (arguments.simplifyImplications) {
+			for (final IConstraint con : slicedModel.getConstraints()) {
+				final Node constraintNode = con.getNode();
+				constraintNode.getChildren();
+				if (constraintNode instanceof Or) {
+					final Or orNode = (Or) constraintNode;
+					if (orNode.getChildren().length == 2) {
+						if (orNode.getChildren()[1] instanceof Not) {
+							final Node newNode = new Implies(orNode.getChildren()[0], orNode.getChildren()[1].getChildren()[0]);
+							con.setNode(newNode);
+						} else if (orNode.getChildren()[1] instanceof Literal) {
+							final Literal literal = (Literal) orNode.getChildren()[1];
+							if (!literal.positive) {
+								literal.positive = true;
+								final Node newNode = new Implies(orNode.getChildren()[0], literal);
+								con.setNode(newNode);
+							}
+						}
+					}
+				}
+			}
+		}
+		return slicedModel;
 	}
 
 }

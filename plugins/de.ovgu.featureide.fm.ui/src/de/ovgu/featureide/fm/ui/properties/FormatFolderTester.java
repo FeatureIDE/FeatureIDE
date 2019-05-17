@@ -37,8 +37,9 @@ public class FormatFolderTester extends PropertyTester {
 				}, IResource.DEPTH_ONE, IResource.NONE);
 				if (!files.isEmpty()) {
 					final FormatManager<?> formatManager = getFormatManager(property);
+					final FormatTester formatTester = new FormatTester();
 					for (final IFile file : files) {
-						if (FormatTester.checkFormat(formatManager, file)) {
+						if (formatTester.checkFormat(formatManager, file, expectedValue)) {
 							return true;
 						}
 					}

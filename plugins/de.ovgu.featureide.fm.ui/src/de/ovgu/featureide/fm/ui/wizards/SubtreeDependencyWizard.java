@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 /**
  * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only and not persistent.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
 public class SubtreeDependencyWizard extends AbstractWizard {
 

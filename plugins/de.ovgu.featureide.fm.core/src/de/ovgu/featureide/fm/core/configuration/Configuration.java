@@ -86,7 +86,6 @@ public class Configuration implements Cloneable {
 	 *
 	 * @param configuration
 	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
-	 * @param propagate
 	 */
 	public Configuration(Configuration configuration, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
@@ -120,7 +119,7 @@ public class Configuration implements Cloneable {
 	 * Creates a new configuration object.
 	 *
 	 * @param featureModel the corresponding feature model.
-	 * @param options one or more of:</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
+	 * @param options one or more of:<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},<br>
 	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
 	public Configuration(IFeatureModel featureModel, int options) {
@@ -315,7 +314,7 @@ public class Configuration implements Cloneable {
 	 *
 	 * @return number of possible solutions
 	 *
-	 * @see #number(long)
+	 * @see #number(boolean)
 	 * @see #number(long, boolean)
 	 */
 	public long number() {
@@ -342,7 +341,7 @@ public class Configuration implements Cloneable {
 	 * @param timeout Timeout in milliseconds.
 	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
 	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occured) that
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occured) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout, boolean includeHiddenFeatures) {

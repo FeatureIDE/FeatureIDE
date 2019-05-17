@@ -70,7 +70,7 @@ public class Translator {
 	/**
 	 * Extends the given bijective mapping by all features present in the passed model which are not yet in the mapping.
 	 *
-	 * @param map 1-to-1 mapping of natural numbers to features.
+	 * @param m 1-to-1 mapping of natural numbers to features.
 	 * @param fm The feature model.
 	 * @param idGen
 	 */
@@ -105,9 +105,6 @@ public class Translator {
 		return rs;
 	}
 
-	/**
-	 * @category tree
-	 */
 	public static <T> List<T> translateFmTree(Map<String, Integer> map, IFeatureModel fm, RestrictionFactory<T> factory) {
 		final List<T> rs = new ArrayList<T>();
 
@@ -119,9 +116,6 @@ public class Translator {
 		return rs;
 	}
 
-	/**
-	 * @category constraints
-	 */
 	public static <T> List<T> translateFmConstraints(Map<String, Integer> m, IFeatureModel fm, RestrictionFactory<T> factory) {
 		final List<T> rs = new ArrayList<T>();
 
@@ -130,9 +124,6 @@ public class Translator {
 		return rs;
 	}
 
-	/**
-	 * @category tree
-	 */
 	private static <T> void translateFmTree(Map<String, Integer> m, IFeatureStructure feature, List<T> rs, RestrictionFactory<T> factory) {
 
 		if (feature.isAlternative()) {
@@ -148,9 +139,6 @@ public class Translator {
 		}
 	}
 
-	/**
-	 * @category tree helper
-	 */
 	private static <T> void translateFmTreeAlternative(Map<String, Integer> m, IFeatureStructure f, List<T> rs, RestrictionFactory<T> factory) {
 
 		final List<Term> terms = new ArrayList<Term>();
@@ -164,9 +152,6 @@ public class Translator {
 		factory.createAndAdd(terms, RelationOperator.EQUAL, 0, rs);
 	}
 
-	/**
-	 * @category tree helper
-	 */
 	private static <T> void translateFmTreeOr(Map<String, Integer> m, IFeatureStructure f, List<T> rs, RestrictionFactory<T> factory) {
 
 		final int numChildren = f.getChildren().size();
@@ -185,9 +170,6 @@ public class Translator {
 
 	}
 
-	/**
-	 * @category tree helper
-	 */
 	private static <T> void translateFmTreeAnd(Map<String, Integer> m, IFeatureStructure f, List<T> rs, RestrictionFactory<T> factory) {
 
 		for (final IFeatureStructure child : f.getChildren()) {
@@ -206,9 +188,6 @@ public class Translator {
 		}
 	}
 
-	/**
-	 * @category constraints
-	 */
 	private static <T> void translateFmConstraints(Map<String, Integer> map, List<IConstraint> fmConstraints, List<T> rs, RestrictionFactory<T> factory) {
 
 		for (final IConstraint fmConstraint : fmConstraints) {
@@ -234,8 +213,6 @@ public class Translator {
 
 	/**
 	 * Translates a CNF literal into a pseudo boolean restriction.
-	 *
-	 * @category constraints helper
 	 */
 	private static <T> void literal2Constraint(Map<String, Integer> map, List<T> rs, Literal l, RestrictionFactory<T> factory) {
 
@@ -247,8 +224,6 @@ public class Translator {
 
 	/**
 	 * Translates a CNF clause into a pseudo boolean restriction
-	 *
-	 * @category constraints helper
 	 */
 	private static <T> void clause2Constraint(Map<String, Integer> map, List<T> rs, Or clause, RestrictionFactory<T> factory) {
 
@@ -261,9 +236,6 @@ public class Translator {
 		factory.createAndAdd(terms, RelationOperator.GREATER_EQUAL, 1, rs);
 	}
 
-	/**
-	 * @category equations
-	 */
 	public static <T> List<T> translateEquations(Map<String, Integer> map, IFeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Equation> equations,
 			RestrictionFactory<T> factory) {
 
@@ -284,9 +256,6 @@ public class Translator {
 		return rs;
 	}
 
-	/**
-	 * @category equations helper
-	 */
 	private static void transformVars(Map<String, Integer> map, IFeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Term> terms,
 			WeightedTerm term) {
 
@@ -315,9 +284,6 @@ public class Translator {
 		}
 	}
 
-	/**
-	 * @category equations helper
-	 */
 	private static List<String> getSubtreeFeatureNames(IFeatureModel fm, String featureName) {
 
 		final List<String> result = new ArrayList<String>();

@@ -65,7 +65,7 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	/**
 	 * Changes the composer of the given feature project to <code>AHEAD</code>.
 	 *
-	 * @param featureProject
+	 * @param featureProject project
 	 */
 	public FeatureHouseToAHEADConversion(final IFeatureProject featureProject) {
 		if (featureProject == null) {

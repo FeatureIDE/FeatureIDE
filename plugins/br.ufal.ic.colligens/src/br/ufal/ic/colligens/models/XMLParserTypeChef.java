@@ -30,14 +30,14 @@ public class XMLParserTypeChef {
 	}
 
 	/**
-	 * @param fileProxie
+	 * @param fileProxie list of file proxies
 	 */
 	public void setFile(FileProxy fileProxie) {
 		this.fileProxie = fileProxie;
 	}
 
 	/**
-	 * @param xmlFile
+	 * @param xmlFile XML file to set
 	 */
 	public void setXMLFile(File xmlFile) {
 		this.xmlFile = xmlFile != null ? xmlFile : this.xmlFile;

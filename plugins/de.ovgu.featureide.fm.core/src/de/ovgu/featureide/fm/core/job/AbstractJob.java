@@ -79,7 +79,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	private IConsumer<Object> intermediateFunction;
 
-	private T methodResult = null;
+	protected T methodResult = null;
 
 	private JobStatus status = JobStatus.NOT_STARTED;
 
@@ -140,11 +140,6 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		this.intermediateFunction = intermediateFunction;
 	}
 
-	@Override
-	public Class<?> getImplementationClass() {
-		return getClass();
-	}
-
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not. The default method is empty.
 	 *
@@ -153,8 +148,8 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	protected void finalWork() {}
 
 	/**
-	 * In this method all the work of the job is done.</br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.</br>
-	 * </br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
+	 * In this method all the work of the job is done.<br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.<br>
+	 * <br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
 	 *
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)
