@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
@@ -80,22 +81,16 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return (FeatureModelManager) AFileManager.getInstance(path, objectCreator, createInstance);
 	}
 
-	public static IFeatureModelFormat getFormat(String fileName) {
-		return FMFormatManager.getInstance().getFormatByFileName(fileName);
-	}
-
-	public static boolean save(IFeatureModel featureModel, Path path) {
-		final String pathString = path.toAbsolutePath().toString();
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+	public static boolean save(IFeatureModel featureModel, Path path, IFeatureModelFormat format) {
 		return !SimpleFileHandler.save(path, featureModel, format).containsError();
 	}
 
-	public static boolean convert(Path inPath, Path outPath) {
+	public static boolean convert(Path inPath, Path outPath, IFeatureModelFormat format) {
 		final IFeatureModel featureModel = load(inPath).getObject();
 		if (featureModel == null) {
 			return false;
 		}
-		return save(featureModel, outPath);
+		return save(featureModel, outPath, format);
 	}
 
 	protected FeatureModelManager(IFeatureModel model, FileIdentifier<IFeatureModel> identifier) {
@@ -127,6 +122,19 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	public static FileHandler<IFeatureModel> load(Path path) {
 		return getFileHandler(path, objectCreator);
+	}
+
+	@CheckForNull
+	public static IFeatureModel load(CharSequence source, String fileName) {
+		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName);
+		try {
+			final IFeatureModel featureModel = FMFactoryManager.getFactory(fileName, format).createFeatureModel();
+			format.read(featureModel, source);
+			return featureModel;
+		} catch (final NoSuchExtensionException e) {
+			Logger.logError(e);
+			return null;
+		}
 	}
 
 }

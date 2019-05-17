@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ui.editors;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -47,7 +45,6 @@ import de.ovgu.featureide.ui.UIPlugin;
 /*
  * TODO maybe the BasicJavaEditorActionContributor should used at plugin.xml TODO the images for composed and source files should differ(?)
  */
-@SuppressWarnings(RESTRICTION)
 public class JavaEditor extends CompilationUnitEditor {
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".editors.JavaEditor";

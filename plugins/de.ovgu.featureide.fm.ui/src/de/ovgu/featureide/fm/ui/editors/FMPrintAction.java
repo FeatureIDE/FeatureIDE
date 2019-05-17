@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 public class FMPrintAction extends PrintAction {
 
 	/**
-	 * @param part
+	 * @param part workbench part
 	 */
 	public FMPrintAction(IWorkbenchPart part) {
 		super(part);

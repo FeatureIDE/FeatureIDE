@@ -32,8 +32,8 @@ public interface IConfigurationMapFilter {
 	public void initialize(ConfigurationMap configurationMap);
 
 	/**
-	 * @param configurationMap
-	 * @param feature
+	 * @param configurationMap configuration map
+	 * @param feature feature
 	 * @return True, if the given IFeature is valid, false if it should be filtered out.
 	 */
 	public boolean test(ConfigurationMap configurationMap, IFeature feature);
@@ -42,8 +42,5 @@ public interface IConfigurationMapFilter {
 
 	public String getImagePath();
 
-	/**
-	 * @return
-	 */
 	public boolean isDefault();
 }

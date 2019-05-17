@@ -89,7 +89,6 @@ public interface IComposerExtensionBase extends IExtension {
 	/**
 	 * @return {@code true} if migration is supported for this composition tool.
 	 *
-	 * @see de.ovgu.featureide.ui.variantimport.SPLMigrationWizard
 	 */
 	boolean supportsMigration();
 

@@ -31,12 +31,12 @@ public abstract class Base64Encoder {
 
 	private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	public static String encode(final char[] result, int index, byte[] message) {
-		final int length = ((result.length - index) >> 2) * 3;
+	public static String encode(final char[] result, int offset, byte[] message) {
+		final int length = ((result.length - offset) >> 2) * 3;
 		if (message.length != length) {
 			message = Arrays.copyOf(message, length);
 		}
-		return encodeInternal(result, index, message);
+		return encodeInternal(result, offset, message);
 	}
 
 	public static String encode(byte[] message) {
@@ -46,13 +46,13 @@ public abstract class Base64Encoder {
 		return encodeInternal(new char[(message.length / 3) * 4], 0, message);
 	}
 
-	private static String encodeInternal(final char[] result, int index, byte[] message) {
+	private static String encodeInternal(final char[] result, int offset, byte[] message) {
 		for (int i = 0; i < message.length; i += 3) {
 			int x = 0xff & message[i];
 			x |= (0xff & message[i + 1]) << 8;
 			x |= (0xff & message[i + 2]) << 16;
 			for (int j = 0; j < 4; j++) {
-				result[index++] = ALPHABET.charAt(x & 0x3f);
+				result[offset++] = ALPHABET.charAt(x & 0x3f);
 				x >>>= 6;
 			}
 		}

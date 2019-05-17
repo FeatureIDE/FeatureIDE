@@ -38,8 +38,9 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -54,15 +55,11 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics;
  */
 public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
-	private LongRunningJob<Boolean> number;
+	private IRunner<Boolean> number;
 
-	/**
-	 * @param builder
-	 * @param featureModel
-	 */
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
-		number = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
+		number = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
@@ -73,7 +70,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				}
 				return true;
 			}
-		});
+		}, IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS);
 		number.setPriority(Job.LONG);
 		number.schedule();
 	}
@@ -112,6 +109,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		build(root, "", selectedFeatures2, monitor);
 	}
 
+	// TODO use intermediate function of monitor object instead of producer-consumer pattern
 	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
 		try {
 			monitor.checkCancel();

@@ -40,8 +40,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SYNCHRONIZE_FE
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,7 +48,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 
@@ -79,6 +77,10 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
+import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.ISatSolver.SatResult;
+import org.prop4j.solver.SatInstance;
+import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -92,7 +94,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMComposerManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -103,10 +104,14 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.filter.HashSetFilter;
+import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -117,7 +122,8 @@ import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -154,6 +160,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					checkFeatureCoverage();
 					checkConfigurations(getAllConfigurations());
 					createAndDeleteFeatureFolders();
+					composerExtension.postModelChanged();
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -172,7 +179,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private FSTModel fstModel;
 
 	/**
-	 * a folder for the generated files (only needed if the Prject has only the FeatureIDE Nature)
+	 * a folder for the generated files (only needed if the project has only the FeatureIDE Nature)
 	 */
 	private IFolder binFolder;
 
@@ -220,6 +227,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IFile currentConfiguration = null;
 
+	private final JobToken syncModulesToken = LongRunningWrapper.createToken(JobStartingStrategy.WAIT_ONE);
+	private final JobToken checkConfigurationToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+
 	private final LongRunningMethod<Boolean> syncModulesJob = new LongRunningMethod<Boolean>() {
 
 		@Override
@@ -253,63 +263,62 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	};
 
-	private final LongRunningJob<Boolean> configurationChecker =
-		new LongRunningJob<>(CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES, new LongRunningMethod<Boolean>() {
+	private final LongRunningMethod<Boolean> configurationChecker = new LongRunningMethod<Boolean>() {
 
-			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
-				final IFolder folder = configFolder;
-				deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
-				workMonitor.setRemainingWork(7);
-				next(CALCULATE_CORE_AND_DEAD_FEATURES, workMonitor);
-				final List<String> concreteFeatures = (List<String>) getOptionalConcreteFeatures();
-				next(GET_SELECTION_MATRIX, workMonitor);
-				final boolean[][] selectionMatrix = getSelectionMatrix(concreteFeatures);
-				next(GET_FALSE_OPTIONAL_FEATURES, workMonitor);
-				final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix, concreteFeatures);
-				next(GET_UNUSED_FEATURES, workMonitor);
-				workMonitor.checkCancel();
-				final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix, concreteFeatures);
-				next("create marker: dead features", workMonitor);
-				if (!deadFeatures.isEmpty()) {
-					createConfigurationMarker(folder, MARKER_UNUSED + deadFeatures.size() + (deadFeatures.size() > 1 ? " features are " : " feature is ")
-						+ "not used: " + createShortMessage(deadFeatures), -1, IMarker.SEVERITY_INFO);
-				}
+		@Override
+		public Boolean execute(IMonitor workMonitor) throws Exception {
+			final IFolder folder = configFolder;
+			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
+			workMonitor.setRemainingWork(7);
+			next(CALCULATE_CORE_AND_DEAD_FEATURES, workMonitor);
+			final List<String> concreteFeatures = getOptionalConcreteFeatures();
+			next(GET_SELECTION_MATRIX, workMonitor);
+			final boolean[][] selectionMatrix = getSelectionMatrix(concreteFeatures);
+			next(GET_FALSE_OPTIONAL_FEATURES, workMonitor);
+			final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix, concreteFeatures);
+			next(GET_UNUSED_FEATURES, workMonitor);
+			workMonitor.checkCancel();
+			final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix, concreteFeatures);
+			next("create marker: dead features", workMonitor);
+			if (!deadFeatures.isEmpty()) {
+				createConfigurationMarker(folder, MARKER_NEVER_SELECTED + deadFeatures.size() + (deadFeatures.size() > 1 ? " features are " : " feature is ")
+					+ "not used: " + createShortMessage(deadFeatures), -1, IMarker.SEVERITY_INFO);
 				next("create marker: false optional features", workMonitor);
-				if (!falseOptionalFeatures.isEmpty()) {
-					createConfigurationMarker(folder,
-							MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + (falseOptionalFeatures.size() > 1 ? " features are " : " feature is ")
-								+ "optional but used in all configurations: " + createShortMessage(falseOptionalFeatures),
-							-1, IMarker.SEVERITY_INFO);
+			}
+			if (!falseOptionalFeatures.isEmpty()) {
+				createConfigurationMarker(folder,
+						MARKER_ALWAYS_SELECTED + falseOptionalFeatures.size() + (falseOptionalFeatures.size() > 1 ? " features are " : " feature is ")
+							+ "optional but used in all configurations: " + createShortMessage(falseOptionalFeatures),
+						-1, IMarker.SEVERITY_INFO);
+			}
+			next(REFESH_CONFIGURATION_FOLER, workMonitor);
+			workMonitor.done();
+			return true;
+		}
+
+		private void next(String subTaskName, IMonitor workMonitor) {
+			workMonitor.step();
+			workMonitor.setTaskName(subTaskName);
+		}
+
+		private String createShortMessage(Collection<String> features) {
+			final StringBuilder message = new StringBuilder();
+			int addedFeatures = 0;
+			for (final String feature : features) {
+				message.append(feature);
+				message.append(", ");
+				if (addedFeatures++ >= 10) {
+					message.append("...");
+					break;
 				}
-				next(REFESH_CONFIGURATION_FOLER, workMonitor);
-				workMonitor.done();
-				return true;
+			}
+			if ((addedFeatures < 10) && (addedFeatures > 0)) {
+				message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ") + 2);
 			}
 
-			private void next(String subTaskName, IMonitor workMonitor) {
-				workMonitor.step();
-				workMonitor.setTaskName(subTaskName);
-			}
-
-			private String createShortMessage(Collection<String> features) {
-				final StringBuilder message = new StringBuilder();
-				int addedFeatures = 0;
-				for (final String feature : features) {
-					message.append(feature);
-					message.append(", ");
-					if (addedFeatures++ >= 10) {
-						message.append("...");
-						break;
-					}
-				}
-				if ((addedFeatures < 10) && (addedFeatures > 0)) {
-					message.delete(message.lastIndexOf(", "), message.lastIndexOf(", ") + 2);
-				}
-
-				return message.toString();
-			}
-		});
+			return message.toString();
+		}
+	};
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist, registering workspace listeners and initialization of the wrapper object.
@@ -450,12 +459,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final IFile orderFile = project.getFile(".order");
 		final IFeatureModel featureModel = featureModelManager.getObject();
 		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
-
 			SimpleFileHandler.load(Paths.get(orderFile.getLocationURI()), featureModel, new FeatureOrderFormat());
 			// write feature order to model
 			// XmlFeatureModelWriter modelWriter = new
 			// XmlFeatureModelWriter(featureModel);
-			FeatureModelManager.save(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
+			final java.nio.file.Path path = Paths.get(modelFile.getModelFile().getLocationURI());
+			FeatureModelManager.save(featureModel, path, FMFormatManager.getInstance().getFormatByContent(path));
 		}
 		/*
 		 * TODO delete .order file in 2013 delete de.ovgu.featureide.fm.ui.editors .FeatureOrderEditor#writeToOrderFile() and corresponding call see TODOs
@@ -471,7 +480,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void guidslToXML() {
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
-			FeatureModelManager.convert(Paths.get(project.getFile("model.m").getLocationURI()), Paths.get(project.getFile("model.xml").getLocationURI()));
+			FeatureModelManager.convert(Paths.get(project.getFile("model.m").getLocationURI()), Paths.get(project.getFile("model.xml").getLocationURI()),
+					new XmlFeatureModelFormat());
 			// TODO GUIDSL Annotations, should be handled in guidsl format #write
 			// if (!guidslReader.getAnnLine().isEmpty()) {
 			// ModelMarkerHandler<IFile> modelFile = new ModelMarkerHandler<>(project.getFile("model.m"));
@@ -832,9 +842,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * this is that a synchronization can't be executed unnecessarily multiple times.
 	 */
 	// TODO this should not be called if only markers are changed
-	private synchronized void setAllFeatureModuleMarkers() {
+	private void setAllFeatureModuleMarkers() {
 		if (composerExtension.createFolderForFeatures()) {
-			LongRunningWrapper.getRunner(syncModulesJob, SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES).schedule();
+			LongRunningWrapper.startJob(syncModulesToken, LongRunningWrapper.getRunner(syncModulesJob, SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES));
 		}
 	}
 
@@ -950,7 +960,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
 				if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
 					// ignore changes in unselected feature folders
-					final List<String> selectedFeatures = readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
+					final Configuration currentConfiguration = new Configuration(getFeatureModel(), true);
+					final FileHandler<Configuration> fileHandler =
+						ConfigurationManager.load(currentConfig.getLocation().toFile().toPath(), currentConfiguration);
+
+					final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
 					for (final IResource res : sourceFolder.members()) {
 						if (res instanceof IFolder) {
 							if (selectedFeatures.contains(res.getName())) {
@@ -1051,7 +1065,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		try {
 			for (final IResource res : configFolder.members()) {
-				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(res.getName())) {
+				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()))) {
 					configs.add((IFile) res);
 				}
 			}
@@ -1074,45 +1088,58 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				workMonitor.setRemainingWork(2);
-				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
-				try {
-					IMonitor subTask = workMonitor.subTask(1);
-					subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
-					subTask.setRemainingWork(files.size());
-					for (final IFile file : files) {
-						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
-						subTask.step();
-					}
-					subTask.done();
-					subTask = workMonitor.subTask(1);
-					subTask.setRemainingWork(files.size());
-					// check validity
-					for (final IFile file : files) {
-						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-						final ProblemList lastProblems = SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
-						if (!config.isValid()) {
-							String name = file.getName();
-							final int extIndex = name.lastIndexOf('.');
-							if (extIndex > 0) {
-								name = name.substring(0, extIndex);
-							}
-							final String message = CONFIGURATION_ + name + IS_INVALID;
-							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
+				final SatInstance instance = new SatInstance(featureModelManager.getObject().getAnalyser().getCnf());
 
+				try {
+					final BasicSolver solver = new BasicSolver(instance);
+					solver.isSatisfiable();
+
+					if (solver.isSatisfiable() == SatResult.TRUE) {
+						workMonitor.setRemainingWork(2);
+						final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
+						try {
+							IMonitor subTask = workMonitor.subTask(1);
+							subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
+							subTask.setRemainingWork(files.size());
+							for (final IFile file : files) {
+								deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+								subTask.step();
+							}
+							subTask.done();
+							subTask = workMonitor.subTask(1);
+							subTask.setRemainingWork(files.size());
+							// check validity
+							for (final IFile file : files) {
+								subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
+								final ProblemList lastProblems =
+									SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
+								if (!config.isValid()) {
+									String name = file.getName();
+									final int extIndex = name.lastIndexOf('.');
+									if (extIndex > 0) {
+										name = name.substring(0, extIndex);
+									}
+									final String message = CONFIGURATION_ + name + IS_INVALID;
+									createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
+
+								}
+								// create warnings (e.g., for features that are not available anymore)
+								for (final Problem warning : lastProblems) {
+									createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
+								}
+								subTask.step();
+							}
+							subTask.done();
+						} catch (final OutOfMemoryError e) {
+							LOGGER.logError(e);
+							return false;
+						} finally {
+							workMonitor.done();
 						}
-						// create warnings (e.g., for features that are not available anymore)
-						for (final Problem warning : lastProblems) {
-							createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
-						}
-						subTask.step();
+						return true;
 					}
-					subTask.done();
-				} catch (final OutOfMemoryError e) {
-					LOGGER.logError(e);
-					return false;
-				} finally {
-					workMonitor.done();
+				} catch (final ContradictionException cE) {
+
 				}
 				return true;
 			}
@@ -1125,8 +1152,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	// should also be called if a configuration file was removed
 	private void checkFeatureCoverage() {
-		configurationChecker.cancel();
-		configurationChecker.schedule();
+		LongRunningWrapper.startJob(checkConfigurationToken, LongRunningWrapper.getRunner(configurationChecker, CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES));
 	}
 
 	@Override
@@ -1151,18 +1177,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> falseOptionalFeatures = new LinkedList<String>();
-		for (int column = 0; column < concreteFeatures.size(); column++) {
-			boolean invalid = true;
+		final List<String> falseOptionalFeatures = new ArrayList<>();
+		columnLoop: for (int column = 0; column < concreteFeatures.size(); column++) {
 			for (int conf = 0; conf < selections.length; conf++) {
 				if (selections[conf][column] == selectionState) {
-					invalid = false;
-					break;
+					continue columnLoop;
 				}
 			}
-			if (invalid) {
-				falseOptionalFeatures.add(concreteFeatures.get(column));
-			}
+			falseOptionalFeatures.add(concreteFeatures.get(column));
 		}
 		return falseOptionalFeatures;
 	}
@@ -1175,16 +1197,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<IFile> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
+		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 
 		int row = 0;
 		for (final IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
-			try {
-				SimpleFileHandler.load(Paths.get(file.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-			} catch (final Exception e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+			ConfigurationManager.load(Paths.get(file.getLocationURI()), configuration);
 
 			int column = 0;
 			for (final String feature : concreteFeatures) {
@@ -1198,17 +1216,18 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return selections;
 	}
 
-	private Collection<String> getOptionalConcreteFeatures() {
+	private List<String> getOptionalConcreteFeatures() {
 		final IFeatureModel featureModel = featureModelManager.getObject();
-		final Collection<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
+
 		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (final IFeature feature : deadCoreList.get(0)) {
-			concreteFeatures.remove(feature.getName());
-		}
-		for (final IFeature feature : deadCoreList.get(1)) {
-			concreteFeatures.remove(feature.getName());
-		}
-		return concreteFeatures;
+		final List<IFeature> coreList = deadCoreList.get(0);
+		final List<IFeature> deadList = deadCoreList.get(1);
+		final HashSetFilter<IFeature> deadCoreFilter = new HashSetFilter<>((coreList.size() + deadList.size()) << 1);
+		deadCoreFilter.addAll(coreList);
+		deadCoreFilter.addAll(deadList);
+
+		return Functional
+				.mapToStringList(Functional.filter(featureModel.getFeatures(), FeatureUtils.CONCRETE_FEATURE_FILTER, new InverseFilter<>(deadCoreFilter)));
 	}
 
 	@Override
@@ -1393,34 +1412,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	@Override
 	public void built() {
 		buildRelevantChanges = false;
-	}
-
-	// TODO move to configuration reader
-	public List<String> readFeaturesfromConfigurationFile(File file) {
-		if (!file.exists()) {
-			return new ArrayList<String>();
-		}
-		Scanner scanner = null;
-		try {
-			ArrayList<String> list;
-			scanner = new Scanner(file, "UTF-8");
-			if (scanner.hasNext()) {
-				list = new ArrayList<String>();
-				while (scanner.hasNext()) {
-					list.add(scanner.next());
-				}
-				return list;
-			} else {
-				return new ArrayList<String>();
-			}
-		} catch (final FileNotFoundException e) {
-			LOGGER.logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-		}
-		return new ArrayList<String>();
 	}
 
 	@Override

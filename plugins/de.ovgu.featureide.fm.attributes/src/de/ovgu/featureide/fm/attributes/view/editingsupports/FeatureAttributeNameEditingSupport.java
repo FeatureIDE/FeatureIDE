@@ -29,23 +29,20 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Editing support for the name column of the {@link FeatureAttributeView}.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeNameEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -74,6 +71,15 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected void setValue(Object element, Object value) {
 		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
+		for (IFeature f : feat.getFeatureModel().getFeatures()) {
+			ExtendedFeature ext = (ExtendedFeature) f;
+			for (IFeatureAttribute att : ext.getAttributes()) {
+				if (att.getName().equals(value.toString()) && !((IFeatureAttribute) element).getType().equals(att.getType())) {
+					MessageDialog.openError(null, "Invalid input", "The inserted attribute name is used on a different attribute type");
+					return;
+				}
+			}
+		}
 		for (IFeatureAttribute att : feat.getAttributes()) {
 			if (att.getName().equals(value.toString()) && att != (IFeatureAttribute) element) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");
@@ -81,9 +87,12 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 			}
 		}
 		((IFeatureAttribute) element).setName(value.toString());
-		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		if (((IFeatureAttribute) element).isRecursive()) {
-			getViewer().refresh();
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+		} else {
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 		}
 		getViewer().update(element, null);
 

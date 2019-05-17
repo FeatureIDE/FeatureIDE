@@ -34,34 +34,34 @@ public class NodeWriter {
 	 * @author Timo G&uuml;nther
 	 */
 	public enum Notation {
-		/**
-		 * <p> The infix notation. Operators are written between operands where possible. </p>
-		 *
-		 * <p> Examples: <ul> <li><em>A & B & C</em></li> <li><em>A => B <=> -A | B</em></li> <li><em>atleast2(A, B, C, D) & atmost3(A, B, C, D)</em></li> </ul>
-		 * </p>
-		 */
-		INFIX,
-		/**
-		 * <p> The prefix notation. Operators are written before the operands. </p>
-		 *
-		 * <p> Examples: <ul> <li><em>(& A B C)</em></li> <li><em>(<=> (=> A B) (| (- A) B)</em></li> <li><em>(& (atleast2 A B C D) (atmost3 A B C D))</em></li>
-		 * </ul> </p>
-		 */
-		PREFIX,
-		/**
-		 * <p> The postfix notation. Operators are written after the operands. </p>
-		 *
-		 * <p> Examples: <ul> <li><em>(A B C &)</em></li> <li><em>((A B =>) ((A -) B |) <=>)</em></li> <li><em>((A B C D atleast2) (A B C D atmost3)
-		 * &)</em></li> </ul> </p>
-		 */
-		POSTFIX,
+	/**
+	 * <p> The infix notation. Operators are written between operands where possible.
+	 *
+	 * <p> Examples: <ul> <li><em>A &amp; B &amp; C</em></li> <li><em>A =&gt; B &lt;=&gt; -A | B</em></li> <li><em>atleast2(A, B, C, D) &amp; atmost3(A, B, C,
+	 * D)</em></li> </ul>
+	 */
+	INFIX,
+	/**
+	 * <p> The prefix notation. Operators are written before the operands.
+	 *
+	 * <p> Examples: <ul> <li><em>(&amp; A B C)</em></li> <li><em>(&lt;=&gt; (=&gt; A B) (| (- A) B)</em></li> <li><em>(&amp; (atleast2 A B C D) (atmost3 A B C
+	 * D))</em></li> </ul>
+	 */
+	PREFIX,
+	/**
+	 * <p> The postfix notation. Operators are written after the operands.
+	 *
+	 * <p> Examples: <ul> <li><em>(A B C &amp;)</em></li> <li><em>((A B =&gt;) ((A -) B |) &lt;=&gt;)</em></li> <li><em>((A B C D atleast2) (A B C D atmost3)
+	 * &gt;)</em></li> </ul>
+	 */
+	POSTFIX,
 	}
 
 	/** Denotes an unsupported symbol. */
 	public static final String noSymbol = "?";
 	/**
 	 * Symbols for a logical representation. These are best used for displaying to the user due to brevity and beauty. Since they consist of unwieldy Unicode
-	 * characters, do not use them for editing or serialization; in these cases, instead use {@link #textual long} or {@link #shortSymbols short textual
+	 * characters, do not use them for editing or serialization; in these cases, instead use {@link #textualSymbols long} or {@link #shortSymbols short textual
 	 * symbols} respectively.
 	 */
 	public static final String[] logicalSymbols = new String[] { "\u00AC", "\u2227", "\u2228", "\u21D2", "\u21D4", ", ", "choose", "atleast", "atmost" };
@@ -96,7 +96,7 @@ public class NodeWriter {
 	 * Constructs a new instance of this class with the given node to transform. By default, the set of short symbols and infix notation are used, brackets are
 	 * only placed if necessary, and variables containing whitespace will not be enquoted.
 	 *
-	 * @param propositional node to transform; not null
+	 * @param root node to transform; not null
 	 */
 	public NodeWriter(Node root) {
 		this.root = root;

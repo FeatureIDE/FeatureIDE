@@ -29,19 +29,27 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
- * TODO description
+ * Implements the {@link ITreeContentProvider} and has the task to provide the content for the {@link FeatureAttributeView}. Structures the feature and their
+ * attributes in the same way as the {@link FeatureDiagramEditor}.
  *
  * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
+	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
+	private Configuration config;
 	private Object[] features = EMPTY_ROOT;
 	private TreeViewer viewer;
 
@@ -56,13 +64,20 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof ExtendedFeatureModel) {
+			config = null;
 			featureModel = (ExtendedFeatureModel) inputElement;
 			refreshElements();
 			return features;
 		} else if (inputElement instanceof Object[]) {
+			config = null;
 			featureModel = null;
 			refreshElements();
 			return (Object[]) inputElement;
+		} else if (inputElement instanceof Configuration) {
+			config = (Configuration) inputElement;
+			featureModel = (ExtendedFeatureModel) config.getFeatureModel();
+			refreshElements();
+			return features;
 		} else {
 			featureModel = null;
 			refreshElements();
@@ -82,9 +97,25 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (parentElement instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
-			featureList.addAll(feature.getAttributes());
+			if (config != null) {
+				for (IFeatureAttribute att : feature.getAttributes()) {
+					if (att.isConfigurable()) {
+						featureList.add(att);
+					}
+				}
+			} else {
+				featureList.addAll(feature.getAttributes());
+			}
 			for (final IFeatureStructure structure : feature.getStructure().getChildren()) {
-				featureList.add(structure.getFeature());
+				if (config == null) {
+					featureList.add(structure.getFeature());
+				} else {
+					SelectableFeature selectableF = config.getSelectablefeature(structure.getFeature().getName());
+					if (selectableF.getSelection() == Selection.SELECTED) {
+						featureList.add(structure.getFeature());
+					}
+				}
+
 			}
 			return featureList.toArray();
 		}
@@ -102,7 +133,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		}
 		if (element instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) element;
-			return feature.getStructure().getParent().getFeature();
+			return feature.getStructure().getParent() != null ? feature.getStructure().getParent().getFeature() : null;
 		} else if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getFeature();
 		}
@@ -126,10 +157,10 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (featureModel == null) {
 			features = EMPTY_ROOT;
 		} else {
-			features = EMPTY_ROOT;
-//			final ArrayList<Object> featureList = new ArrayList<>();
-//			featureList.add(featureModel.getStructure().getRoot().getFeature());
-//			features = featureList.toArray();
+			final ArrayList<Object> featureList = new ArrayList<>();
+			featureList.add(SELECT_FEATURES_IN_FEATURE_DIAGRAM);
+			featureList.add(featureModel.getStructure().getRoot().getFeature());
+			features = featureList.toArray();
 		}
 	}
 

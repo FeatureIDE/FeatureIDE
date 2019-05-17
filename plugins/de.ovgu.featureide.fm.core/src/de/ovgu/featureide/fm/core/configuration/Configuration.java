@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -74,6 +75,8 @@ public class Configuration implements Cloneable {
 		for (final SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
+			final SelectableFeature newFeature = table.get(f.getName());
+			newFeature.cloneProperties(f);
 		}
 		propagate = configuration.propagate;
 	}
@@ -83,7 +86,6 @@ public class Configuration implements Cloneable {
 	 *
 	 * @param configuration
 	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
-	 * @param propagate
 	 */
 	public Configuration(Configuration configuration, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
@@ -96,6 +98,7 @@ public class Configuration implements Cloneable {
 			final SelectableFeature newFeature = table.get(oldFeature.getName());
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
+				newFeature.cloneProperties(oldFeature);
 			}
 		}
 	}
@@ -116,7 +119,7 @@ public class Configuration implements Cloneable {
 	 * Creates a new configuration object.
 	 *
 	 * @param featureModel the corresponding feature model.
-	 * @param options one or more of:</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
+	 * @param options one or more of:<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},<br>
 	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
 	public Configuration(IFeatureModel featureModel, int options) {
@@ -137,7 +140,7 @@ public class Configuration implements Cloneable {
 			table.put(sFeature.getName(), sFeature);
 
 			for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-				final SelectableFeature sChild = new SelectableFeature(child.getFeature());
+				final SelectableFeature sChild = FMFactoryManager.getFactory(featureModel).createSelectableFeature(child.getFeature());
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child.getFeature());
 			}
@@ -147,8 +150,7 @@ public class Configuration implements Cloneable {
 	private SelectableFeature initRoot() {
 
 		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
-		final SelectableFeature root = new SelectableFeature(featureRoot);
-
+		final SelectableFeature root = FMFactoryManager.getFactory(featureModel).createSelectableFeature(featureRoot);
 		if (featureRoot != null) {
 			initFeatures(root, featureRoot);
 		} else {
@@ -312,7 +314,7 @@ public class Configuration implements Cloneable {
 	 *
 	 * @return number of possible solutions
 	 *
-	 * @see #number(long)
+	 * @see #number(boolean)
 	 * @see #number(long, boolean)
 	 */
 	public long number() {
@@ -339,7 +341,7 @@ public class Configuration implements Cloneable {
 	 * @param timeout Timeout in milliseconds.
 	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
 	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occured) that
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occured) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout, boolean includeHiddenFeatures) {

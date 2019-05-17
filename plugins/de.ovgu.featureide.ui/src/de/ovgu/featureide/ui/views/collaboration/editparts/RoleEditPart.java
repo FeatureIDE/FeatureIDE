@@ -258,8 +258,8 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	/**
 	 * Jumps to a line in the given editor
 	 *
-	 * @param editorPart
-	 * @param lineNumber
+	 * @param editorPart fiven editor
+	 * @param lineNumber number of line to scroll to
 	 */
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || (lineNumber <= 0)) {
@@ -281,7 +281,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	/**
 	 * Highlights the whole if-Block for a FSTDirective
 	 *
-	 * @param editorPart
+	 * @param editorPart part of editor
 	 * @param startLine the first line of a directive
 	 * @param endLine the last line of a directive
 	 * @param startOffset characters before the statement starts

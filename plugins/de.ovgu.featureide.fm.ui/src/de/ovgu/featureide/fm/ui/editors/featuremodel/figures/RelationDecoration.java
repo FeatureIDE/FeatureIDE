@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -71,10 +72,30 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
-			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
-				super.setLocation(p.translate(0, (-getBounds().width >> 1)));
-			} else {
-				super.setLocation(p.translate((-getBounds().width >> 1), 0));
+			if (featureModel != null) {
+				final FeatureModelLayout layout = featureModel.getLayout();
+				if (layout.isUsesAbegoTreeLayout()) {
+					switch (layout.getAbegoRootposition()) {
+					case Bottom:
+						super.setLocation(p.translate((-getBounds().width >> 1), (-getBounds().height >> 1)));
+						break;
+					case Left:
+						super.setLocation(p.translate(0, (-getBounds().width >> 1)));
+						break;
+					case Right:
+						super.setLocation(p.translate((-getBounds().width >> 1), (-getBounds().width >> 1)));
+						break;
+					case Top:
+						super.setLocation(p.translate((-getBounds().width >> 1), 0));
+						break;
+					default:
+						break;
+					}
+				} else if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+					super.setLocation(p.translate(0, (-getBounds().width >> 1)));
+				} else {
+					super.setLocation(p.translate((-getBounds().width >> 1), 0));
+				}
 			}
 		}
 	}
@@ -106,13 +127,40 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 		}
 		double minAngle = Double.MAX_VALUE;
 		double maxAngle = Double.MIN_VALUE;
-		final Rectangle r;
+		Rectangle r;
 		if (verticalLayout) {
 			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
 			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
 		}
-		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
+		Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
+		boolean abegoRight = false;
+		if (featureModel != null) {
+			final FeatureModelLayout layout = featureModel.getLayout();
+			if (layout.isUsesAbegoTreeLayout()) {
+				switch (layout.getAbegoRootposition()) {
+				case Bottom:
+					r = new Rectangle(getBounds()).translate(0, 0).shrink(1, 1);
+					center = getBounds().getCenter();
+					break;
+				case Left:
+					r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
+					center = getBounds().getLeft();
+					break;
+				case Right:
+					r = new Rectangle(getBounds()).translate(0, 0).shrink(1, 1);
+					center = getBounds().getCenter();
+					abegoRight = true;
+					break;
+				case Top:
+					r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
+					center = getBounds().getTop();
+					break;
+				default:
+					break;
+				}
+			}
+		}
 
 		if (this instanceof LegendRelationDecoration) {
 			maxAngle = calculateAngle(center, getFeatureLocation());
@@ -122,7 +170,10 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
 					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
-					final double currentAngle = calculateAngle(center, featureLocation);
+					double currentAngle = calculateAngle(center, featureLocation);
+					if (abegoRight && (currentAngle > 360)) {
+						currentAngle -= 360;
+					}
 					if (currentAngle < minAngle) {
 						minAngle = currentAngle;
 					}

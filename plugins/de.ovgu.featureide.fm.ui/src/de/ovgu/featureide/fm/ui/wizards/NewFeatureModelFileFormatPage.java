@@ -57,8 +57,6 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 *
-	 * @param pageName
 	 */
 	public NewFeatureModelFileFormatPage() {
 		super("format");

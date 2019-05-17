@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDepende
  * Action to calculate implicit dependencies of a sub feature model after selecting a feature and choosing to "calculate implicit dependencies". This feature
  * will be the root of the new sub feature model.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
 public class CalculateDependencyAction extends Action {
 
@@ -79,7 +79,7 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * Constructor.
 	 *
-	 * @param viewer
+	 * @param viewer viewer
 	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {

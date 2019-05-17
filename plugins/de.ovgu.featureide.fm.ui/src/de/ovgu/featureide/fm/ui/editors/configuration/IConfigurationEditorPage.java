@@ -43,12 +43,12 @@ public interface IConfigurationEditorPage extends IEditorPart, IEventListener {
 	public int getIndex();
 
 	/**
-	 * @param the index of this page.
+	 * @param index the index of this page.
 	 */
 	public void setIndex(int index);
 
 	/**
-	 * @param the configuration editor containing the page.
+	 * @param configurationEditor the configuration editor containing the page.
 	 */
 	public void setConfigurationEditor(IConfigurationEditor configurationEditor);
 
@@ -60,14 +60,14 @@ public interface IConfigurationEditorPage extends IEditorPart, IEventListener {
 	/**
 	 * Called if the tab has been changed from this page.
 	 *
-	 * @param index of the new page
+	 * @param newPageIndex index of the new page
 	 */
 	public void pageChangeFrom(int newPageIndex);
 
 	/**
 	 * Called if the tab has been changed to this page.
 	 *
-	 * @param index of the old page
+	 * @param oldPageIndex index of the old page
 	 */
 	public void pageChangeTo(int oldPageIndex);
 
@@ -79,7 +79,7 @@ public interface IConfigurationEditorPage extends IEditorPart, IEventListener {
 	/**
 	 * Called if this page is about to change to another page.
 	 *
-	 * @param newPageIndex
+	 * @param newPageIndex new page index
 	 *
 	 * @return {@code true} if the user is allowed to change the page
 	 */

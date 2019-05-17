@@ -37,9 +37,6 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 	private List<IFeature> coreFeatures;
 	private IFeatureModel featureModelFilterIsInitializedFor;
 
-	/**
-	 * @param name
-	 */
 	public CoreFeatureFilter(boolean isDefault) {
 		super("core features", isDefault);
 		setImagePath(Image_Plus);

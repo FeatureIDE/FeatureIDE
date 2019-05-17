@@ -42,7 +42,6 @@ public interface RestrictionFactory<T> {
 	 * @param op The operator which is either LEQ, EQ or GEQ.
 	 * @param degree The degree is an integer number on the right hand side.
 	 * @param restrictions The collection where the new restriction will be stored.
-	 * @return An instance representing an equivalent restriction.
 	 */
 	void createAndAdd(List<Term> terms, RelationOperator op, int degree, Collection<T> restrictions);
 

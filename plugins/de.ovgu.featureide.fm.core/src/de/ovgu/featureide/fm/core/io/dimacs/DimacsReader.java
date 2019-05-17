@@ -70,7 +70,7 @@ public class DimacsReader {
 	 *
 	 * <p> Defaults to false. </p>
 	 *
-	 * @param readingVariables whether to read the variable directory
+	 * @param readVariableDirectory whether to read the variable directory
 	 */
 	public void setReadingVariableDirectory(boolean readVariableDirectory) {
 		this.readVariableDirectory = readVariableDirectory;

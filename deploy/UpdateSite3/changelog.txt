@@ -7,6 +7,40 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.4 (February 2019)
+* Hotfix containing only stability improvements over v3.5.3
+* Usability and stability of the feature attributes view improved (#847, #853, #856)
+* Performance and appearance of the feature diagram improved (#785, #831)
+* Fixed a bug due to which feature models have not been cloned properly (#859)
+* Fixed compilation problems with JavaDoc (#748)
+* Removed instable editing functionality in the feature model outline (#760)
+
+Release 3.5.3 (November 2018)
+* Hotfix containing only stability improvements over v3.5.2
+* Numerous issues with the FeatureHouse composer (#794)
+* Improvements for execution of JUnit tests (#814, #819)
+* Illegal feature names in extended feature models after Eclipse restart (#833)
+* Removal of attributes when features are moved in the diagram (#829)
+* Improved layouting of feature models (#825)
+* Accidential change of siblings order (#803)
+* All kinds of void feature models supported when editing constraints (#823)
+
+Release 3.5.2 (September 2018)
+* Hotfix containing only stability improvements over v3.5.1
+* Improved loading and saving of feature models (#759, #761, #771, #773, #776, #799)
+* Better performance for feature models with large contraints (#780)
+* Configuration only marked as invalid if the feature model is not void (#797)
+* FeatureIDE library improved (#807)
+* Mac users find a README in the prepackaged Eclipse when having trouble running unsigned code (#801)
+* Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/26?closed=1
+
+Release 3.5.1 (June 2018)
+* Hotfix containing only stability improvements over v3.5.0
+* Better performance for analyses in constraint dialog (#736)
+* Unused and false-optional features renamed to never-selected and always-selected features to avoid confusion (#705)
+* Example projects added for extended feature models (#756)
+* Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/25?closed=1
+
 Release 3.5.0 (April 2018)
 * Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
 * New library without Eclipse dependencies for extended feature models (#714)

@@ -123,6 +123,7 @@ public class AheadBuildErrorEvent {
 	 * Calculates the corresponding line of the composed jak file to the java file
 	 *
 	 * @param javaLine The line at the java file
+	 * @param contentString content string
 	 * @return the line at the composed jak file
 	 */
 	public int calculateComposedJakLine(int javaLine, String contentString) {
@@ -173,6 +174,9 @@ public class AheadBuildErrorEvent {
 	/**
 	 * Initializes {@link AheadBuildErrorEvent#matcher} and {@link AheadBuildErrorEvent#fileName}.
 	 *
+	 * @param contentString contentString
+	 * @param composedJakLine composedJakLine
+	 * @return integer
 	 */
 	public int setSourceFile(String contentString, int composedJakLine) {
 		final PosString content = new PosString(contentString);
@@ -289,8 +293,10 @@ public class AheadBuildErrorEvent {
 	/**
 	 * Returns a string containing the contents of the given file.
 	 *
-	 * @throws CoreException
-	 * @throws IOException
+	 * @param file file you want the contents of.
+	 * @throws CoreException CoreException
+	 * @throws IOException IOException
+	 * @return contents of the file
 	 */
 	public static String getString(IFile file) throws CoreException, IOException {
 

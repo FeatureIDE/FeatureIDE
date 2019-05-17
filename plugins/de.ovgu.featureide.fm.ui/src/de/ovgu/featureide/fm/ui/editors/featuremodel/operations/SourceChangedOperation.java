@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 
 /**
- * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.</br> Is used for undo / redo support.
+ * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.<br> Is used for undo / redo support.
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
@@ -49,13 +49,13 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModelEditor.readModel(newText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		featureModelEditor.readModel(oldText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
 	}
 
 }

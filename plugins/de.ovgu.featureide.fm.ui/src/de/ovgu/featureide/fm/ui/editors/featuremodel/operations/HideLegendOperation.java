@@ -37,9 +37,6 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 
 	IGraphicalFeatureModel model;
 
-	/**
-	 * @param label
-	 */
 	public HideLegendOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel.getFeatureModel(), LABEL);
 		model = featureModel;

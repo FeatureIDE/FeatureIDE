@@ -34,9 +34,10 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Action used to create an attribute. Depending on the {@link #attributeType} the action creates an attribute of the given type.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class AddFeatureAttributeAction extends Action {
 
@@ -57,35 +58,39 @@ public class AddFeatureAttributeAction extends Action {
 	 */
 	@Override
 	public void run() {
-		String name = getUniqueAttributeName();
+		String name = getUniqueAttributeName(attributeType);
 		switch (attributeType) {
 		case FeatureAttribute.BOOLEAN:
 			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeBoolean);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeBoolean, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
 			break;
 		case FeatureAttribute.DOUBLE:
 			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeDouble);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeDouble, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
 			break;
 		case FeatureAttribute.LONG:
 			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeLong);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeLong, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
 			break;
 		case FeatureAttribute.STRING:
 			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeString);
+			featureModel.fireEvent(new FeatureIDEEvent(attributeString, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
 			break;
 		default:
 			break;
 		}
-		featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_ATTRIBUTE_CHANGED));
 	}
 
-	private String getUniqueAttributeName() {
+	private String getUniqueAttributeName(String type) {
 		int amountOfAttributes = 0;
 		while (true) {
 			boolean isUnique = true;
-			String attributeName = "Attribute" + amountOfAttributes++;
+			String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
+			String attributeName = capitalizedType + "Attribute" + amountOfAttributes++;
 			for (IFeatureAttribute att : feature.getAttributes()) {
 				if (att.getName().equals(attributeName)) {
 					isUnique = false;

@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOpe
  */
 public class FeatureModelTextEditorPage extends TextEditor implements IFeatureModelEditorPage {
 
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
 	private static final String PAGE_TEXT = SOURCE;
 
 	private final FeatureModelEditor featureModelEditor;

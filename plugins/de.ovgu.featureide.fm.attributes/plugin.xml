@@ -46,12 +46,80 @@
                name="de.ovgu.featureide.fm.ui.contentType.format">
          </property>
       </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xml"
+            id="de.ovgu.featureide.contenttype.extendedConfiguration"
+            name="ExtendedConfigurationFormat"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element"
+                  value="extendedConfiguration">
+            </parameter>
+         </describer>
+      </content-type>
    </extension>
    <extension
-			point="org.eclipse.ui.editors">
-  <editorContentTypeBinding
-        contentTypeId="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
-        editorId="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor">
-  </editorContentTypeBinding>
-	</extension>
+         point="de.ovgu.featureide.fm.core.ConfigFormat">
+      <configFormat
+            class="de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat"
+            id="de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat"
+            name="XmlExtendedConfFormat">
+      </configFormat>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry">
+      <configurationOutlineEntry
+            class="de.ovgu.featureide.fm.attributes.outlineentry.AttributeComputationBundle"
+            id="de.ovgu.featureide.fm.attributes.outlineentry.AttributeComputationBundle"
+            name="AttributeComputations">
+      </configurationOutlineEntry>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="de.ovgu.featureide.fm.attributes.isExtendedFeatureModel">
+         <adapt
+               type="org.eclipse.core.resources.IResource">
+            <test
+                  property="de.ovgu.featureide.fm.ui.properties.featuremodel"
+                  value="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat">
+            </test>
+         </adapt>
+      </definition>
+      <definition
+            id="de.ovgu.featureide.fm.ui.expressions.containsExtendedFeatureModel">
+         <with
+               variable="activeMenuSelection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <reference
+                     definitionId="de.ovgu.featureide.fm.attributes.isExtendedFeatureModel">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModelingFMExtension"
+            composer="de.ovgu.featureide.core.ExtendedFeatureModeling"
+            id="de.ovgu.featureide.core.ExtendedFeatureModelingFMExtension"
+            name="Extended FeatureModeling FMExtension">
+      </fmComposer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModeling"
+            description="Creation of Extended Feature Models and Configurations."
+            id="de.ovgu.featureide.core.ExtendedFeatureModeling"
+            name="Extended Feature Modeling"
+            nature="FeatureIDE_Core.FeatureModelingNature">
+      </composer>
+   </extension>
 </plugin>

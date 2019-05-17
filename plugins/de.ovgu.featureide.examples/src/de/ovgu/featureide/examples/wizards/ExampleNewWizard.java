@@ -253,7 +253,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing resource at the given
 	 * path should be overwritten.
 	 *
-	 * @param pathString
+	 * @param pathString path as string
 	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, or <code>"CANCEL"</code>
 	 */
 	@Override

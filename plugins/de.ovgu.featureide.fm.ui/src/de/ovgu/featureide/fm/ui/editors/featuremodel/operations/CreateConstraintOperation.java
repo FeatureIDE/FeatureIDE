@@ -46,6 +46,7 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	/**
 	 * @param node the node representing the constraint to be added
 	 * @param featureModel model that will be used to add the constraint
+	 * @param description description
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel, String description) {
 		super(featureModel, CREATE_CONSTRAINT);

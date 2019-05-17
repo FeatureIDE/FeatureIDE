@@ -21,16 +21,21 @@
 package de.ovgu.featureide.fm.attributes.base.exceptions;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
 
 /**
- * TODO description
+ * Exception is thrown if the value of a parsed attribute cannot be casted to the appropriated type stated in the parsed data..
  *
- * @author Joshua
+ * @see XmlExtendedFeatureModelFormat
+ *
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeParseException extends Exception {
 
 	private static final long serialVersionUID = 6366719326744299124L;
 
+	/** Data of the 'invalid' attribute */
 	IFeatureAttributeParsedData data;
 
 	public FeatureAttributeParseException(IFeatureAttributeParsedData data) {

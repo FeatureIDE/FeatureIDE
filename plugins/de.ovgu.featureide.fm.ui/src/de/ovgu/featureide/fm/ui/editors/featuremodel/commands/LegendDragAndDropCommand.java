@@ -61,7 +61,7 @@ public class LegendDragAndDropCommand extends Command {
 	/**
 	 * Checks whether the movement is valid.
 	 *
-	 * @returns {@code false} if the legend overlaps with a feature or constraint, {@code true} otherwise
+	 * @return {@code false} if the legend overlaps with a feature or constraint, {@code true} otherwise
 	 */
 	@Override
 	public boolean canExecute() {

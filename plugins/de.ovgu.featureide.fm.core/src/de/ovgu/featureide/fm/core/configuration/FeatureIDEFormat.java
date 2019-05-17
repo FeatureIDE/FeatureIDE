@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects.</br> Lists all features and indicates the manual and automatic selection.
+ * Extended configuration format for FeatureIDE projects.<br> Lists all features and indicates the manual and automatic selection.
  *
  * @author Sebastian Krieter
  */

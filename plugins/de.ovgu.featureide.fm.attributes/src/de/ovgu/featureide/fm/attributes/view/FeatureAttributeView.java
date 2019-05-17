@@ -68,7 +68,6 @@ import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
 import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
 import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
 import de.ovgu.featureide.fm.attributes.view.actions.RemoveFeatureAttributeAction;
-import de.ovgu.featureide.fm.attributes.view.actions.SynchFeatureAttributesToFeatureDiagramAction;
 import de.ovgu.featureide.fm.attributes.view.actions.TestSolver;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeConfigureableEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeNameEditingSupport;
@@ -92,11 +91,12 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * TODO ATTRIBUTE description
+ * A view to help the user of managing attributes of {@link ExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -138,7 +138,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_VALUE = "Value";
 	private final String COLUMN_UNIT = "Unit";
 	private final String COLUMN_RECURSIVE = "Recursive";
-	private final String COLUMN_CONFIGUREABLE = "Configureable";
+	private final String COLUMN_CONFIGURABLE = "Configureable";
 
 	private IWorkbenchPart currentEditor;
 	private ExtendedFeatureModel featureModel;
@@ -150,10 +150,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
-	public boolean synchToFeatureDiagram = false;
-	public ArrayList<IFeature> selectedManualFeatures = new ArrayList<>();
-	public ArrayList<IFeature> selectedAutomaticFeatures = new ArrayList<>();
-	public ArrayList<IFeature> selection = new ArrayList<>();
+	public boolean synchToFeatureDiagram = true;
+	public ArrayList<IFeature> selectedManualFeatures;
+	public ArrayList<IFeature> selectedAutomaticFeatures;
+	public ArrayList<IFeature> selection;
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 
 		@Override
@@ -167,7 +167,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				return;
 			}
 			selectedManualFeatures = new ArrayList<>();
-			for (Object obj : ((IStructuredSelection) event.getSelection()).toList()) {
+			for (Object obj : event.getStructuredSelection().toList()) {
 				if (!(obj instanceof FeatureEditPart)) {
 					selectedManualFeatures = null;
 					treeViewer.refresh();
@@ -244,6 +244,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (getSite().getPart() != part) {
+				clearSelection();
 				setEditorContent(part);
 			}
 		}
@@ -278,6 +279,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// create the columns
 		createColumns();
 
+		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
+		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
+		treeViewer.setUseHashlookup(true);
+
 		// make lines and header visible and set layout
 		tree = treeViewer.getTree();
 		tree.setHeaderVisible(true);
@@ -285,9 +290,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
 		gridData.horizontalSpan = 2;
 		tree.setLayoutData(gridData);
-
-		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
-		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
 
 		if (!treeViewer.getControl().isDisposed()) {
 			setEditorContent(null);
@@ -303,14 +305,16 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		repackAllColumns();
 	}
 
-	private void repackColumn(int index) {
-		tree.getColumn(index).pack();
-	}
-
 	private void repackAllColumns() {
 		for (final TreeColumn col : tree.getColumns()) {
 			col.pack();
 		}
+	}
+
+	private void clearSelection() {
+		selectedManualFeatures = new ArrayList<IFeature>();
+		selectedAutomaticFeatures = new ArrayList<IFeature>();
+		selection = new ArrayList<IFeature>();
 	}
 
 	private void createTreeViewerEditor() {
@@ -358,13 +362,15 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
 
 		IActionBars actionBars = getViewSite().getActionBars();
-		IMenuManager dropDownManage = actionBars.getMenuManager();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
-		toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
+
+		// TODO REMOVED_THIS (Next two lines)
 		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature)), false));
 		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgAttributeRecurisve)), true));
+		// Removed because the sync feature should always be active
+		// toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
@@ -373,7 +379,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				final IStructuredSelection selection = treeViewer.getStructuredSelection();
-				if (!selection.isEmpty()) {
+				if (!selection.isEmpty() && currentEditor instanceof FeatureModelEditor) {
 					if ((selection.size() == 1) && (selection.getFirstElement() instanceof ExtendedFeature)) {
 						final ExtendedFeature feature = (ExtendedFeature) selection.getFirstElement();
 						// Add actions to create new attributes
@@ -456,7 +462,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// Configureable
 		final TreeViewerColumn colConfigureable = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colConfigureable.getColumn().setWidth(200);
-		colConfigureable.getColumn().setText(COLUMN_CONFIGUREABLE);
+		colConfigureable.getColumn().setText(COLUMN_CONFIGURABLE);
 		colConfigureable.setEditingSupport(configureableEditingSupport);
 		colConfigureable.setLabelProvider(new FeatureAttributeConfigureableColumnLabelProvider(cachedImages, this));
 	}
@@ -494,7 +500,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			editor.diagramEditor.addSelectionChangedListener(selectionListener);
 			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-			setEditorContent(null);
+			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
+			editor.addPageChangedListener(pageListener);
+			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
 			&& !(activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
 			setEditorContent(null);
@@ -510,7 +519,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 					if (!treeViewer.getControl().isDisposed()) {
 						treeViewer.setInput(featureModel);
 					}
-					treeViewer.expandAll();
+					treeViewer.collapseAll();
+					treeViewer.expandToLevel(2);
 					repackAllColumns();
 				} else {
 					setFeatureModel(null);
@@ -529,12 +539,39 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				return;
 			}
 		}
+		if (currentEditor instanceof ConfigurationEditor) {
+			if (page instanceof ConfigurationPage) {
+				final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
+				if (editor.getConfiguration().getFeatureModel() instanceof ExtendedFeatureModel) {
+					setFeatureModel(null);
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput(editor.getConfiguration());
+					}
+					treeViewer.expandAll();
+					repackAllColumns();
+				} else {
+					setFeatureModel(null);
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
+					}
+					repackAllColumns();
+					return;
+				}
+			} else {
+				setFeatureModel(null);
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
+				}
+				repackAllColumns();
+				return;
+			}
+		}
 	}
 
 	/**
 	 * Returns the current feature model when an valid view was opened before. Otherwise the feature model is null.
 	 *
-	 * @return
+	 * @return Current loaded feature model.
 	 */
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
@@ -561,14 +598,16 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.refresh(featureModel); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+				treeViewer.refresh(featureModel);
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
-			if (event.getSource() instanceof IFeature) {
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.refresh((IFeature) event.getSource()); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+			if (event.getOldValue() != null && event.getOldValue() instanceof Boolean && event.getNewValue() != null
+				&& event.getNewValue() instanceof IFeature) {
+				if ((Boolean) event.getOldValue()) {
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.refresh((IFeature) event.getNewValue());
+					}
 				}
-				treeViewer.expandAll();
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ADD) {
 			if (event.getSource() instanceof ExtendedFeatureModel) {
@@ -578,13 +617,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						feature.addAttribute(att.cloneRecursive(feature));
 					}
 				}
+				treeViewer.refresh();
 			}
 		} else if (event.getEventType() == EventType.STRUCTURE_CHANGED) {
 			if (event.getSource() instanceof GraphicalFeature) {
 				GraphicalFeature graphFeat = (GraphicalFeature) event.getSource();
 				ExtendedFeature feat = (ExtendedFeature) graphFeat.getObject();
 				for (IFeatureAttribute att : feat.getAttributes()) {
-					if (!((ExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
+					if (att.isRecursive() && !((ExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
 						feat.removeAttribute(att);
 					}
 				}
@@ -595,7 +635,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						}
 					}
 				}
-
+				treeViewer.refresh();
 			}
 		} else if (event.getEventType() == EventType.COLOR_CHANGED) {
 			treeViewer.refresh();
@@ -623,5 +663,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 		currentEditor = null;
 		super.dispose();
+	}
+
+	/**
+	 * Returns current editor of the view
+	 * 
+	 * @return current editor
+	 */
+	public IWorkbenchPart getCurrentEditor() {
+		return currentEditor;
 	}
 }

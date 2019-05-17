@@ -139,9 +139,6 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	}
 
-	/**
-	 *
-	 */
 	public Point getLeftPoint() {
 		final int index = calculateNewIndex();
 

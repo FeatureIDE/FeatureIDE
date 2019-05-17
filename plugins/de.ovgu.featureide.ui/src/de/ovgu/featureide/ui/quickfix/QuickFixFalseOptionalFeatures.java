@@ -104,13 +104,6 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		return confs;
 	}
 
-	/**
-	 * For testing purpose only.
-	 *
-	 * @param falseOptionalFeatures
-	 * @param fm
-	 * @return
-	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		featureModel = fm;
 		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);

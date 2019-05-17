@@ -89,7 +89,7 @@ public class MoveAction extends Action {
 	 * @param viewer the object which for the MoveAction has been registered
 	 * @param featureModel the according FeatureModel object
 	 * @param graphicalViewer the according GraphicalViewerImpl
-	 * @param direction
+	 * @param direction direction to move
 	 */
 	public MoveAction(Object viewer, IGraphicalFeatureModel featureModel, Object graphicalViewer, int direction) {
 		super(MOVING);

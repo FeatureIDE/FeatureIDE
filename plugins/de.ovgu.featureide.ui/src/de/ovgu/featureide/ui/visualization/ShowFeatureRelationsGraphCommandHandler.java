@@ -111,12 +111,6 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		return numerator / denominator;
 	}
 
-	/**
-	 * Show frog
-	 *
-	 * @param featureProject
-	 * @param featureCenter
-	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
 
 		// Get feature in the center

@@ -23,12 +23,17 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * TODO description
+ * Implementation of the {@link AbstractFeatureAttributeFactory}.
+ * 
+ * @see AbstractFeatureAttributeFactory
  *
- * @author User
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
@@ -37,7 +42,8 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 	 * @see de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory#createFeatureAttribute(java.lang.String)
 	 */
 	@Override
-	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature) {
+	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature)
+			throws FeatureAttributeParseException, UnknownFeatureAttributeTypeException {
 		final Boolean configurable = Boolean.parseBoolean(attributeData.isConfigurable());
 		final Boolean recursive = Boolean.parseBoolean(attributeData.isRecursive());
 		switch (attributeData.getType()) {
@@ -46,16 +52,16 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			if (attributeData.getValue() != null) {
 				valueBoolean = Boolean.parseBoolean(attributeData.getValue());
 			}
-			return (new BooleanFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
+			return createBooleanAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable);
 		case FeatureAttribute.LONG:
 			try {
 				Long valueLong = null;
 				if (attributeData.getValue() != null) {
 					valueLong = Long.parseLong(attributeData.getValue());
 				}
-				return (new LongFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
+				return createLongAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
-				return null;
+				throw new FeatureAttributeParseException(attributeData);
 			}
 		case FeatureAttribute.DOUBLE:
 			try {
@@ -63,14 +69,37 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				if (attributeData.getValue() != null) {
 					valueDouble = Double.parseDouble(attributeData.getValue());
 				}
-				return (new DoubleFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
+				return createDoubleAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
-				return null;
+				throw new FeatureAttributeParseException(attributeData);
 			}
 		case FeatureAttribute.STRING:
-			return (new StringFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
+			return createStringAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable);
 		default:
-			return null;
+			throw new UnknownFeatureAttributeTypeException(attributeData);
 		}
+	}
+
+	@Override
+	public IFeatureAttribute createStringAttribute(IFeature correspondingFeature, String name, String unit, String value, boolean recursive,
+			boolean configurable) {
+		return (new StringFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
+			boolean configurable) {
+		return (new BooleanFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive, boolean configurable) {
+		return (new LongFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
+	}
+
+	@Override
+	public IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
+			boolean configurable) {
+		return (new DoubleFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}
 }

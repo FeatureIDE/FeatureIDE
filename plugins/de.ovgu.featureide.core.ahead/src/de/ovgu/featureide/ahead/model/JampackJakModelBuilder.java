@@ -54,7 +54,7 @@ import jampack.MthDector;
 public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program> {
 
 	/**
-	 * @param featureProject
+	 * @param featureProject project
 	 */
 	public JampackJakModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);

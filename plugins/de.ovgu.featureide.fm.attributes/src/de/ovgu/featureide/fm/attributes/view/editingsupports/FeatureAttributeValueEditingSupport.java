@@ -21,31 +21,35 @@
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
- * TODO description
+ * Editing support for the value column of the {@link FeatureAttributeView}.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeValueEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	private static final String TRUE_STRING = "true";
@@ -56,7 +60,17 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new TextCellEditor((Composite) getViewer().getControl());
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
+			String[] items = { "", "false", "true" };
+			ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor((Composite) getViewer().getControl(), SWT.READ_ONLY);
+			cellEditor.setLabelProvider(new LabelProvider());
+			cellEditor.setContentProvider(ArrayContentProvider.getInstance());
+			cellEditor.setInput(items);
+			return cellEditor;
+		} else {
+			return new TextCellEditor((Composite) getViewer().getControl());
+		}
 	}
 
 	/*
@@ -66,6 +80,19 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (view.getCurrentEditor() instanceof ConfigurationEditor) {
+			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfiguration();
+			for (SelectableFeature feat : config.getFeatures()) {
+				if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
+					if (feat instanceof ExtendedSelectableFeature) {
+						ExtendedSelectableFeature extSelectable = (ExtendedSelectableFeature) feat;
+						if (extSelectable.getConfigurableAttributes().containsKey(attribute.getName())) {
+							return extSelectable.getConfigurableAttributes().get(attribute.getName()).toString();
+						}
+					}
+				}
+			}
+		}
 		if (attribute.getValue() != null) {
 			return attribute.getValue().toString();
 		}
@@ -85,21 +112,29 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			return;
 		}
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
-			if (value.toString().toLowerCase().equals(TRUE_STRING)) {
+			if (value.toString().toLowerCase().equals("")) {
+				((IFeatureAttribute) element).setValue(null);
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
+			} else if (value.toString().toLowerCase().equals(TRUE_STRING)) {
 				((IFeatureAttribute) element).setValue(new Boolean(true));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 			} else {
 				((IFeatureAttribute) element).setValue(new Boolean(false));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 			}
 		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
 			((IFeatureAttribute) element).setValue(value.toString());
-			view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+			view.getFeatureModel()
+					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
 			try {
 				final long temp = Long.parseLong(value.toString());
 				((IFeatureAttribute) element).setValue(new Long(temp));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a valid integer number.");
 			}
@@ -107,7 +142,8 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			try {
 				final double temp = Double.parseDouble(value.toString());
 				((IFeatureAttribute) element).setValue(new Double(temp));
-				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+				view.getFeatureModel()
+						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a valid float number.");
 			}
