@@ -15,6 +15,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -199,7 +200,12 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+		return super.supportsContent(content, CONTENT_REGEX);
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader content) {
+		return super.supportsContent(content, CONTENT_REGEX);
 	}
 
 }
