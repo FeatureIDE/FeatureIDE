@@ -25,13 +25,13 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.analyses.ConditionallyCoreDeadAnalysis;
-import org.prop4j.analyses.CoreDeadAnalysis;
-import org.prop4j.analyses.ImplicationAnalysis;
-import org.prop4j.analyses.ValidAnalysis;
-import org.prop4j.solver.BasicSolver;
-import org.prop4j.solver.ISatSolver.SatResult;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.analysesOld.ConditionallyCoreDeadAnalysis;
+import org.prop4j.analysesOld.CoreDeadAnalysis;
+import org.prop4j.analysesOld.ImplicationAnalysis;
+import org.prop4j.analysesOld.ValidAnalysis;
+import org.prop4j.solverOld.BasicSolver;
+import org.prop4j.solverOld.ISatSolver.SatResult;
+import org.prop4j.solverOld.SatInstance;
 import org.sat4j.specs.ContradictionException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -112,8 +112,8 @@ public final class ConstraintTextValidator {
 	private static class InitialAnalysis implements LongRunningMethod<InitialAnalysis.InitialResult> {
 
 		private static class InitialResult {
-			SatInstance satInstance;
-			BasicSolver solver;
+			org.prop4j.solverOld.SatInstance satInstance;
+			org.prop4j.solverOld.BasicSolver solver;
 
 			boolean valid;
 			int[] deadCore;

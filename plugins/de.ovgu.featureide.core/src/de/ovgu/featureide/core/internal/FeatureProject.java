@@ -77,9 +77,9 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
-import org.prop4j.solver.BasicSolver;
-import org.prop4j.solver.ISatSolver.SatResult;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.BasicSolver;
+import org.prop4j.solverOld.ISatSolver.SatResult;
+import org.prop4j.solverOld.SatInstance;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.TimeoutException;
 
@@ -1088,7 +1088,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				final SatInstance instance = new SatInstance(featureModelManager.getObject().getAnalyser().getCnf());
+				final org.prop4j.solverOld.SatInstance instance = new SatInstance(featureModelManager.getObject().getAnalyser().getCnf());
 
 				try {
 					final BasicSolver solver = new BasicSolver(instance);
