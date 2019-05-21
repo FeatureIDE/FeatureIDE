@@ -105,6 +105,7 @@ import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -345,8 +346,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (instance != null) {
 			featureModelManager = instance;
 		} else {
-			featureModelManager =
-				new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
+			final DefaultFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
+			final FeatureModel errorFeatureModel = factory.createFeatureModel();
+			factory.createFeature(errorFeatureModel, "__Error__");
+			featureModelManager = new VirtualFileManager<IFeatureModel>(errorFeatureModel, new XmlFeatureModelFormat());
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
