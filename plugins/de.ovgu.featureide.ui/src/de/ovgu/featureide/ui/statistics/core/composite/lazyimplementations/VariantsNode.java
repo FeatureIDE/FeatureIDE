@@ -20,42 +20,28 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
-/**
- * Parent for the actual {@link ConfigNode}s.
- *
- * @author Dominik Hamann
- * @author Patrick Haese
- */
-public class StatisticsSemanticalFeatureModel extends LazyParent {
+public class VariantsNode extends ConfigNode {
 
-	private final IFeatureModel model;
-
-	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
-		super(description);
-		this.model = model;
+	public VariantsNode(String description, IFeatureModel innerModel) {
+		super(description, innerModel);
 	}
 
 	@Override
-	protected void initChildren() {
-		// Cached validity for speed
-		final boolean isValid = model.getAnalyser().valid();
-
-		addChild(new Parent(MODEL_VOID, isValid));
-
-		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
-
-		addChild(new DeadFeaturesParentNode(DEAD_FEATURES, model));
-
-		addChild(new FalseOptionalFeaturesParentNode(FO_FEATURES, model));
-
-		addChild(new AtomicParentNode(ATOMIC_SETS, model));
-
-		addChild(new ConfigNode(DESC_CONFIGS, model));
-
-		addChild(new VariantsNode(DESC_VARIANTS, model));
+	public void startCalculating(boolean start) {
+		if (start) {
+			setImage(null);
+			setNote(null);
+			super.startCalculating(start);
+		} else {
+			super.startCalculating(start);
+			if (FeatureUtils.hasHidden(innerModel)) {
+				setImage(WARNING_IMAGE);
+				setNote("(Note: Indeterminate hidden features in the feature model may distort this value.)");
+			}
+		}
 	}
+
 }
