@@ -48,6 +48,7 @@ public class MonitorThread extends Thread {
 
 	@Override
 	public void run() {
+		function.run();
 		try {
 			while (monitorRun) {
 				Thread.sleep(updateTime);
