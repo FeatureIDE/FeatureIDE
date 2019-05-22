@@ -216,7 +216,10 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	}
 
 	public boolean hasConflicts(LiteralSet variables) {
-		final int[] otherLiterals = variables.getLiterals();
+		return hasConflicts(variables.getLiterals());
+	}
+
+	public boolean hasConflicts(final int[] otherLiterals) {
 		for (int i = 0; i < otherLiterals.length; i++) {
 			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
 				return true;
