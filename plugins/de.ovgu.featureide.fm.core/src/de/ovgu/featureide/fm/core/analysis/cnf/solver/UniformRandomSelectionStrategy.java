@@ -66,8 +66,11 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	public void undo(int var) {
-		updateRatioUnset(model[var - 1]);
-		model[var - 1] = 0;
+		final int literal = model[var - 1];
+		if (literal != 0) {
+			updateRatioUnset(literal);
+			model[var - 1] = 0;
+		}
 	}
 
 	@Override
