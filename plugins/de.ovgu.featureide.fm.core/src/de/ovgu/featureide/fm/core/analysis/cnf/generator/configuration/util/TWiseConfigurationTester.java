@@ -91,14 +91,13 @@ public class TWiseConfigurationTester {
 	}
 
 	public boolean test() {
-		return testSolutionValidity() && testCompleteness();
+		return (testSolutionValidity() == null) && (testCompleteness() == null);
 	}
 
-	public boolean testCompleteness() throws AssertionError {
+	public ClauseList[] testCompleteness() throws AssertionError {
 		final int[] clauseIndex = new int[t];
 		final ArrayList<LiteralSet> combinations = new ArrayList<>();
 
-		System.out.print("\tTesting combination completeness...");
 		for (final List<ClauseList> expressions : nodeArray) {
 			comboLoop: for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
 				final ClauseList[] clauseListArray = iterator.next();
@@ -152,13 +151,10 @@ public class TWiseConfigurationTester {
 					continue comboLoop;
 				}
 
-				System.out.println(" FAIL");
-				System.out.println("\tUncovered combination. " + iterator.getIndex() + " - " + Arrays.toString(clauseListArray));
-				return false;
+				return clauseListArray;
 			}
 		}
-		System.out.println(" PASS");
-		return true;
+		return null;
 	}
 
 	private boolean checkSolver(final LiteralSet literalSet) throws AssertionError {
@@ -224,18 +220,14 @@ public class TWiseConfigurationTester {
 		return false;
 	}
 
-	public boolean testSolutionValidity() throws AssertionError {
-		System.out.println("Testing results...");
+	public Solution testSolutionValidity() throws AssertionError {
 		if (solver != null) {
-			System.out.print("\tTesting configuration validity...");
 			final int c = 0;
 			for (final Solution is : configurations) {
 				final SatResult hasSolution = solver.hasSolution(is.getLiterals());
 				switch (hasSolution) {
 				case FALSE:
-					System.out.println(" FAIL");
-					System.out.println("\tInvalid configuration: " + is);
-					return false;
+					return is;
 				case TIMEOUT:
 					System.err.println("Timeout! " + c);
 					break;
@@ -245,11 +237,8 @@ public class TWiseConfigurationTester {
 					throw new AssertionError();
 				}
 			}
-			System.out.println(" PASS");
-			return true;
 		}
-		System.out.println(" SKIPPED");
-		return false;
+		return null;
 	}
 
 	private boolean containsAtLeastOne(final Solution solution, final ClauseList clauseList) {
