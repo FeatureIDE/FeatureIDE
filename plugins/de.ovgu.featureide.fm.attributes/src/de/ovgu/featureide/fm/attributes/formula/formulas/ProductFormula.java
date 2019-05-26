@@ -44,7 +44,7 @@ public class ProductFormula implements AggregateFormula {
 
 		}
 
-		result = result.substring(3, result.length());
+		result = result.substring(2, result.length());
 		return result;
 	}
 
