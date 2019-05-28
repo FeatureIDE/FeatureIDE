@@ -93,7 +93,7 @@ public class ConstraintView implements GUIDefaults {
 		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
 		}
-		if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperties().get(element).hasStatus(ConstraintStatus.REDUNDANT)) {
+		if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element).hasStatus(ConstraintStatus.REDUNDANT)) {
 			item.setImage(FM_INFO);
 		}
 		tree.setHeaderVisible(true);
@@ -168,7 +168,7 @@ public class ConstraintView implements GUIDefaults {
 		for (final TreeItem item : tree.getItems()) {
 			if (item.getData() instanceof IConstraint) {
 				if (item.getData().equals(constraint)) {
-					if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperties().get(constraint)
+					if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint)
 							.hasStatus(ConstraintStatus.REDUNDANT)) {
 						item.setImage(FM_INFO);
 					} else {

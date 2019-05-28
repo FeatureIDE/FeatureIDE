@@ -29,7 +29,7 @@ import java.util.Random;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
@@ -49,8 +49,8 @@ public class TWiseConfigurationUtil {
 	public static long seed = 123456789;
 
 	protected final List<TWiseConfiguration> incompleteSolutionList;
-	protected final Solution[] solverSolutions = new Solution[GLOBAL_SOLUTION_LIMIT];
-	protected final HashSet<Solution> solutionSet = new HashSet<>();
+	protected final LiteralSet[] solverSolutions = new LiteralSet[GLOBAL_SOLUTION_LIMIT];
+	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
 	protected final Random rnd = new Random(seed);
 
 	protected final CNF cnf;
@@ -141,11 +141,11 @@ public class TWiseConfigurationUtil {
 	protected int solverSolutionEndIndex = -1;
 
 	public void addSolverSolution(int[] literals) {
-		final Solution solution = new Solution(literals);
+		final LiteralSet solution = new LiteralSet(literals, Order.INDEX, false);
 		if (solutionSet.add(solution)) {
 			solverSolutionEndIndex++;
 			solverSolutionEndIndex %= GLOBAL_SOLUTION_LIMIT;
-			final Solution oldSolution = solverSolutions[solverSolutionEndIndex];
+			final LiteralSet oldSolution = solverSolutions[solverSolutionEndIndex];
 			if (oldSolution != null) {
 				solutionSet.remove(oldSolution);
 			}
@@ -157,11 +157,11 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
-	public Solution getSolverSolution(int index) {
+	public LiteralSet getSolverSolution(int index) {
 		return solverSolutions[index];
 	}
 
-	public Solution[] getSolverSolutions() {
+	public LiteralSet[] getSolverSolutions() {
 		return solverSolutions;
 	}
 

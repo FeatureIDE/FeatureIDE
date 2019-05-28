@@ -31,7 +31,6 @@ import org.sat4j.core.VecInt;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.LexicographicIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
@@ -56,11 +55,11 @@ public class TWiseConfigurationTester {
 	private final List<List<ClauseList>> nodeArray;
 	private final ISatSolver solver;
 	private final ModalImplicationGraph mig;
-	private final List<Solution> configurations;
+	private final List<LiteralSet> configurations;
 
 	protected LiteralSet[] strongHull;
 
-	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<Solution> configurations) {
+	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<LiteralSet> configurations) {
 		this.cnf = cnf;
 		this.t = t;
 		this.nodeArray = nodeArray;
@@ -213,7 +212,7 @@ public class TWiseConfigurationTester {
 	}
 
 	private boolean isCovered(final ClauseList[] clauseListArray) {
-		configurationLoop: for (final Solution solution : configurations) {
+		configurationLoop: for (final LiteralSet solution : configurations) {
 			for (final ClauseList clauseList : clauseListArray) {
 				if (!containsAtLeastOne(solution, clauseList)) {
 					continue configurationLoop;
@@ -229,7 +228,7 @@ public class TWiseConfigurationTester {
 		if (solver != null) {
 			System.out.print("\tTesting configuration validity...");
 			final int c = 0;
-			for (final Solution is : configurations) {
+			for (final LiteralSet is : configurations) {
 				final SatResult hasSolution = solver.hasSolution(is.getLiterals());
 				switch (hasSolution) {
 				case FALSE:
@@ -252,7 +251,7 @@ public class TWiseConfigurationTester {
 		return false;
 	}
 
-	private boolean containsAtLeastOne(final Solution solution, final ClauseList clauseList) {
+	private boolean containsAtLeastOne(final LiteralSet solution, final ClauseList clauseList) {
 		for (final LiteralSet literalSet : clauseList) {
 			if (solution.containsAll(literalSet)) {
 				return true;

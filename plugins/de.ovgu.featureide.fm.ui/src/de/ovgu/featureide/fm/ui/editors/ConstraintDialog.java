@@ -91,7 +91,6 @@ import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -787,7 +786,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((IFeature) cell.getElement()).getName());
+				cell.setText((String) cell.getElement());
 				cell.setImage(FEATURE_SYMBOL);
 			}
 		});

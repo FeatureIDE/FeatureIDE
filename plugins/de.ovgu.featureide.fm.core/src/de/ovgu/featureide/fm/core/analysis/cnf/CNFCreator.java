@@ -21,23 +21,17 @@
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
@@ -55,28 +49,18 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 
 	private IFeatureModel featureModel;
 
-	private ModelType modelType;
+	private ModelType modelType = ModelType.All;
 
-	private boolean optionalRoot;
-	private boolean useOldNames;
+	private boolean optionalRoot = false;
+	private boolean useOldNames = false;
+	private boolean keepLiteralOrder = true;
+
+	public static CNF createNodes(IFeatureModel featureModel2) {
+		return new CNFCreator(featureModel2).createNodes();
+	}
 
 	public CNFCreator(IFeatureModel featureModel) {
-		this(featureModel, ModelType.All, false, false);
-	}
-
-	public CNFCreator(IFeatureModel featureModel, ModelType modelType) {
-		this(featureModel, modelType, false, false);
-	}
-
-	public CNFCreator(IFeatureModel featureModel, ModelType modelType, boolean useOldNames, boolean optionalRoot) {
-		this.modelType = modelType;
-		this.useOldNames = useOldNames;
-		setOptionalRoot(optionalRoot);
 		this.featureModel = featureModel;
-	}
-
-	public static CNF createNodes(IFeatureModel featureModel) {
-		return new CNFCreator(featureModel).createNodes(new NullMonitor());
 	}
 
 	public CNF createNodes() {
@@ -146,6 +130,10 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		return useOldNames;
 	}
 
+	public boolean isKeepLiteralOrder() {
+		return keepLiteralOrder;
+	}
+
 	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
@@ -162,25 +150,17 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		this.useOldNames = useOldNames;
 	}
 
+	public void setKeepLiteralOrder(boolean keepLiteralOrder) {
+		this.keepLiteralOrder = keepLiteralOrder;
+	}
+
 	private List<LiteralSet> createConstraintNodes(IVariables s) {
 		final List<LiteralSet> clauses = new ArrayList<>(featureModel.getConstraints().size());
 		for (final IConstraint constraint : featureModel.getConstraints()) {
 			final Node node = constraint.getNode();
-			getClauseFromNode(s, clauses, node);
+			Nodes.getClauseFromNode(s, clauses, node, keepLiteralOrder);
 		}
 		return clauses;
-	}
-
-	public static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node) {
-		final Node cnfNode = Node.buildCNF(node);
-		// final Node cnfNode = node.toCNF();
-		if (cnfNode instanceof And) {
-			for (final Node andChild : cnfNode.getChildren()) {
-				clauses.add(getClause(s, andChild));
-			}
-		} else {
-			clauses.add(getClause(s, cnfNode));
-		}
 	}
 
 	private List<LiteralSet> createStructuralNodes(IVariables s) {
@@ -235,52 +215,4 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		}
 		return Collections.emptyList();
 	}
-
-	private static LiteralSet getClause(IVariables s, Node andChild) {
-		int absoluteValueCount = 0;
-		boolean valid = true;
-
-		final Literal[] children = (andChild instanceof Or) ? Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class)
-			: new Literal[] { (Literal) andChild };
-
-		for (int j = 0; j < children.length; j++) {
-			final Literal literal = children[j];
-
-			// sort out obvious tautologies
-			if (literal.var.equals(NodeCreator.varTrue)) {
-				if (literal.positive) {
-					valid = false;
-				} else {
-					absoluteValueCount++;
-					children[j] = null;
-				}
-			} else if (literal.var.equals(NodeCreator.varFalse)) {
-				if (literal.positive) {
-					absoluteValueCount++;
-					children[j] = null;
-				} else {
-					valid = false;
-				}
-			}
-		}
-
-		if (valid) {
-			if (children.length == absoluteValueCount) {
-				throw new RuntimeException("Model is void!");
-			}
-			final int[] newChildren = new int[children.length - absoluteValueCount];
-			int k = 0;
-			for (int j = 0; j < children.length; j++) {
-				final Literal literal = children[j];
-				if (literal != null) {
-					final int variable = s.getVariable(literal.var.toString());
-					newChildren[k++] = literal.positive ? variable : -variable;
-				}
-			}
-			return new LiteralSet(newChildren);
-		} else {
-			return null;
-		}
-	}
-
 }

@@ -49,8 +49,8 @@ import org.prop4j.Or;
  */
 public class DimacsReader {
 
-	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSFormat.COMMENT + "\\s*(.*)\\Z");
-	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSFormat.PROBLEM + "\\s+" + DIMACSFormat.CNF + "\\s+(\\d+)\\s+(\\d+)");
+	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSConstants.COMMENT + "\\s*(.*)\\Z");
+	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSConstants.PROBLEM + "\\s+" + DIMACSConstants.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
 	private final Map<Integer, String> indexVariables = new LinkedHashMap<>();
@@ -242,7 +242,7 @@ public class DimacsReader {
 				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
 				readClausesCount++;
 
-				if (!DIMACSFormat.CLAUSE_END.equals(literalQueue.removeFirst())) {
+				if (!DIMACSConstants.CLAUSE_END.equals(literalQueue.removeFirst())) {
 					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
 				}
 				literalList = literalQueue;

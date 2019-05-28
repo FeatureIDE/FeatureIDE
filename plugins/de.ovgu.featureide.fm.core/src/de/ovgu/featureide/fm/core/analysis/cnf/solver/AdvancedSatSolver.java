@@ -34,7 +34,7 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
@@ -278,7 +278,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void setSelectionStrategy(List<Solution> sample) {
+	public void setSelectionStrategy(List<LiteralSet> sample) {
 		strategy = SelectionStrategy.UNIFORM_RANDOM;
 		solver.setOrder(new VarOrderHeap3(sample));
 		solver.getOrder().init();

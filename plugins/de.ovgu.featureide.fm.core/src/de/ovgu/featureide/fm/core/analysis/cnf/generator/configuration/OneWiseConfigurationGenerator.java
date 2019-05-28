@@ -24,7 +24,7 @@ import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IInternalVariables;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
@@ -142,7 +142,7 @@ public class OneWiseConfigurationGenerator extends AConfigurationGenerator imple
 				}
 
 				if (lastSolution != null) {
-					addResult(new Solution(lastSolution));
+					addResult(new LiteralSet(lastSolution, LiteralSet.Order.INDEX, false));
 				}
 				solver.assignmentClear(initialAssignmentLength);
 

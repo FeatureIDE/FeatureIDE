@@ -142,7 +142,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		final FeatureModelAnalyzer analyzer = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer();
 		final IFeature feature = this.feature.getObject();
-		final FeatureProperties featureProperties = analyzer.getAnalysesCollection().getFeatureProperties().get(feature);
+		final FeatureProperties featureProperties = analyzer.getAnalysesCollection().getFeatureProperty(feature);
 
 		// First draw custom color
 		final FeatureColor color = FeatureColorManager.getColor(feature);
@@ -255,7 +255,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		toolTip.append(structure.isRoot() ? ROOT : FEATURE);
 
-		final FeatureProperties featureProperties = analyser.getAnalysesCollection().getFeatureProperties().get(feature.getObject());
+		final FeatureProperties featureProperties = analyser.getAnalysesCollection().getFeatureProperty(feature.getObject());
 		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 			toolTip.append(DEAD);
 		} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {

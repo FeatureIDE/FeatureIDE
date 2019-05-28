@@ -67,6 +67,7 @@ public class MODELFormat extends AFeatureModelFormat {
 		final ModelReader r = new ModelReader();
 		try {
 			r.read(source.toString());
+			featureModel.reset();
 			addNodeToFeatureModel(featureModel, r.getFeatures(source.toString()), r.getClauses(source.toString()));
 		} catch (final IllegalStateException | IOException e) {
 			problemList.add(new Problem(e));

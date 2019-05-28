@@ -18,24 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
-
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+package de.ovgu.featureide.fm.core.io.dimacs;
 
 /**
- * Generates certain configurations for a given propositional formulas.
+ * Constants for the DIMACS format.
  *
  * @author Sebastian Krieter
  */
-public interface IConfigurationGenerator extends IAnalysis<List<LiteralSet>> {
+public class DIMACSConstants {
 
-	List<LiteralSet> analyze(IMonitor monitor) throws Exception;
-
-	LinkedBlockingQueue<LiteralSet> getResultQueue();
+	/** Token leading a (single-line) comment. */
+	static final String COMMENT = "c";
+	static final String COMMENT_START = COMMENT + " ";
+	/** Token leading the problem definition. */
+	static final String PROBLEM = "p";
+	/** Token identifying the problem type as CNF. */
+	static final String CNF = "cnf";
+	/** Token denoting the end of a clause. */
+	static final String CLAUSE_END = "0";
 
 }

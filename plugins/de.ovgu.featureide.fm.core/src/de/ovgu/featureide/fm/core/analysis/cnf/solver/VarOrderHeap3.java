@@ -25,7 +25,7 @@ import java.util.List;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ISolver;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * Modified variable order for {@link ISolver}.</br> Uses the {@link UniformRandomSelectionStrategy}.
@@ -38,7 +38,7 @@ public class VarOrderHeap3 extends VarOrderHeap {
 
 	private final UniformRandomSelectionStrategy selectionStrategy;
 
-	public VarOrderHeap3(List<Solution> sample) {
+	public VarOrderHeap3(List<LiteralSet> sample) {
 		super(new UniformRandomSelectionStrategy(sample));
 		selectionStrategy = (UniformRandomSelectionStrategy) phaseStrategy;
 	}

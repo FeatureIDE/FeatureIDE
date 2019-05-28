@@ -24,8 +24,8 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -47,7 +47,7 @@ public class UniformRandomConfigurationGenerator extends ARandomConfigurationGen
 	protected void generate(IMonitor monitor) throws Exception {
 		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
 		gen.setRandom(random);
-		final List<Solution> sample = LongRunningWrapper.runMethod(gen);
+		final List<LiteralSet> sample = LongRunningWrapper.runMethod(gen);
 
 		monitor.setRemainingWork(maxSampleSize);
 		solver.setSelectionStrategy(sample);
@@ -57,7 +57,7 @@ public class UniformRandomConfigurationGenerator extends ARandomConfigurationGen
 			if (solution == null) {
 				break;
 			}
-			addResult(new Solution(solution));
+			addResult(new LiteralSet(solution, Order.INDEX, false));
 			monitor.step();
 			if (!allowDuplicates) {
 				try {

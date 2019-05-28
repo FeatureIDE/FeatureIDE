@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 import javax.annotation.CheckForNull;
@@ -33,12 +32,12 @@ public class SatUtils {
 
 	/**
 	 * Returns a copy of the given array with all entries negated.
-	 * 
+	 *
 	 * @param solution the given array
 	 * @return Array with negated entries.
 	 */
 	public static int[] negateSolution(int[] solution) {
-		final int[] negSolution = Arrays.copyOf(solution, solution.length);
+		final int[] negSolution = new int[solution.length];
 		for (int i = 0; i < solution.length; i++) {
 			negSolution[i] = -solution[i];
 		}

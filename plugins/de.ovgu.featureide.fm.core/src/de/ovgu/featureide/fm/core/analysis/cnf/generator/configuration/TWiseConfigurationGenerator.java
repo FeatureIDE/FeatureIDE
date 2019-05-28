@@ -35,7 +35,6 @@ import org.sat4j.core.VecInt;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.IteratorFactory.IteratorID;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.MergeIterator;
@@ -547,7 +546,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	protected boolean isCombinationValidSAT(LiteralSet literals) {
 		if (util.hasSolver()) {
-			for (final Solution s : util.getSolverSolutions()) {
+			for (final LiteralSet s : util.getSolverSolutions()) {
 				if (s == null) {
 					break;
 				}

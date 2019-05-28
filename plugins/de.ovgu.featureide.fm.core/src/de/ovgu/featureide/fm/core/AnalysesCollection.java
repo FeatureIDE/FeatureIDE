@@ -519,12 +519,14 @@ public class AnalysesCollection {
 		return featureModelProperties;
 	}
 
-	public Map<IFeature, FeatureProperties> getFeatureProperties() {
-		return featurePropertiesMap;
+	public FeatureProperties getFeatureProperty(IFeature feature) {
+		final FeatureProperties featureProperties = featurePropertiesMap.get(feature);
+		return featureProperties != null ? featureProperties : new FeatureProperties(feature);
 	}
 
-	public Map<IConstraint, ConstraintProperties> getConstraintProperties() {
-		return constraintPropertiesMap;
+	public ConstraintProperties getConstraintProperty(IConstraint constraint) {
+		final ConstraintProperties constraintProperties = constraintPropertiesMap.get(constraint);
+		return constraintProperties != null ? constraintProperties : new ConstraintProperties(constraint);
 	}
 
 }

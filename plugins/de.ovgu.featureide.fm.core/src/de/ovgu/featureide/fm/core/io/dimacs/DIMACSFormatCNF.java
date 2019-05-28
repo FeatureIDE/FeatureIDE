@@ -36,7 +36,7 @@ public class DIMACSFormatCNF extends APersistentFormat<CNF> {
 
 	@Override
 	public String write(CNF cnf) {
-		final DimacsWriterCNF w = new DimacsWriterCNF(cnf);
+		final DimacsWriter w = new DimacsWriter(cnf);
 		w.setWritingVariableDirectory(true);
 		return w.write();
 	}
