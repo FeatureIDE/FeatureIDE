@@ -1,7 +1,16 @@
 void setBuildStatus(String message, String context, String state) {
-  sh '''
-    echo "Methode aufgerufen \n"
-  '''
+    // add a Github token as a global 'secret text' credential on Jenkins with the id 'github-commit-status-token'
+    withCredentials([string(credentialsId: 'github-commit-status-token', variable: 'TOKEN')]) {
+      // 'set -x' for debugging. Don't worry the access token won't be actually logged
+      // Also, the sh command actually executed is not properly logged, it will be further escaped when written to the log
+        sh """
+            set -x
+            curl \"https://api.github.com/repos/FeatureIDE/FeatureIDE/statuses/$GIT_COMMIT?access_token=$TOKEN\" \
+                -H \"Content-Type: application/json\" \
+                -X POST \
+                -d \"{\\\"description\\\": \\\"$message\\\", \\\"state\\\": \\\"$state\\\", \\\"context\\\": \\\"$context\\\", \\\"target_url\\\": \\\"$BUILD_URL\\\"}\"
+        """
+    } 
 }
 
 pipeline {
