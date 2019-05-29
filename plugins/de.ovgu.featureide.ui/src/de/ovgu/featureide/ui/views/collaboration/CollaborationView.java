@@ -116,7 +116,6 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
-import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -124,6 +123,8 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -218,15 +219,17 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private IToolBarManager toolbarManager;
 
-	private final Vector<IFile> configurations = new Vector<IFile>();
-	private final Job updateGUIJob = new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
+	private final Vector<IFile> configurations = new Vector<>();
 
+	private final JobToken updateGuiToken = LongRunningWrapper.createToken(JobStartingStrategy.WAIT_ONE);
+
+	private final LongRunningMethod<Void> updateGUIMethod = new LongRunningMethod<Void>() {
 		@Override
-		public IStatus execute(IProgressMonitor monitor) {
+		public Void execute(IMonitor monitor) throws Exception {
 			disableToolbarFilterItems();
 			if (configurations.isEmpty()) {
 				refreshButton.setEnabled(true);
-				return Status.OK_STATUS;
+				return null;
 			}
 			final IFile configurationFile = configurations.lastElement();
 			configurations.clear();
@@ -236,14 +239,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			final FSTModel model = builder.buildCollaborationModel(CorePlugin.getFeatureProject(configurationFile));
 			if (model == null) {
 				refreshButton.setEnabled(true);
-				return Status.OK_STATUS;
+				return null;
 			}
 
 			if (!configurations.isEmpty()) {
-				return Status.OK_STATUS;
+				return null;
 			}
 			final UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
-
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					viewer.setContents(model);
@@ -263,7 +265,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			} catch (final InterruptedException e) {
 				UIPlugin.getDefault().logError(e);
 			}
-			return Status.OK_STATUS;
+			return null;
 		}
 	};
 
@@ -291,6 +293,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			if (this.featureProject != null) {
 				featureModel = this.featureProject.getFeatureModel();
+				setFeatureColourAction.setFeatureModelManager(featureProject.getFeatureModelManager());
 			}
 		}
 	}
@@ -642,7 +645,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
-		setFeatureColourAction = new SetFeatureColorAction(viewer);
+		setFeatureColourAction = new SetFeatureColorAction(viewer, null);
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
 			setFieldsMethodsActions[i] = new ShowFieldsMethodsAction(FIELD_METHOD_LABEL_NAMES[i], FIELD_METHOD_IMAGES[i], this, i);
 		}
@@ -855,8 +858,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			} else {
 				configurations.add(configurationFile);
 			}
-			updateGUIJob.setPriority(Job.LONG);
-			updateGUIJob.schedule();
+			final IRunner<Void> updateGUIRunner = LongRunningWrapper.getRunner(updateGUIMethod, UPDATE_COLLABORATION_VIEW);
+			updateGUIRunner.setPriority(Job.LONG);
+			LongRunningWrapper.startJob(updateGuiToken, updateGUIRunner);
 		}
 	}
 

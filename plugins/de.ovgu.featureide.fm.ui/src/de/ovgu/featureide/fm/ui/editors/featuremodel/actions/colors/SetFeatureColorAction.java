@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -54,7 +55,6 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
 
@@ -69,7 +69,7 @@ import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
  * @author Mohammed Mahhouk
  * @author Antje Moench
  */
-public class SetFeatureColorAction extends AFeatureModelAction {
+public class SetFeatureColorAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.setfeaturecolor";
 
@@ -78,33 +78,33 @@ public class SetFeatureColorAction extends AFeatureModelAction {
 
 	private boolean undoRedoEnabled = false;
 
-	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isSelectionValid(selection));
-			if (isEnabled()) {
-				updateFeatureList(selection);
-			}
-		}
-	};
-
-	public SetFeatureColorAction(ISelectionProvider viewer) {
-		this(viewer, null);
-	}
+	private IFeatureModelManager featureModelManager;
 
 	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModelManager featureModelManager) {
-		super(COLORATION, ID, featureModelManager);
-		viewer.addSelectionChangedListener(selectionListener);
-		setImageDescriptor(colorImage);
-		setEnableUndoRedo(true);
+		this(featureModelManager);
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				final boolean validSelection = isSelectionValid(selection);
+				setEnabled(validSelection);
+				if (validSelection) {
+					updateFeatureList(selection);
+				}
+			}
+		});
 	}
 
 	public SetFeatureColorAction(IStructuredSelection selection, IFeatureModelManager featureModelManager) {
-		super(COLORATION, ID, featureModelManager);
+		this(featureModelManager);
 		updateFeatureList(selection);
+	}
+
+	private SetFeatureColorAction(IFeatureModelManager featureModelManager) {
+		super(COLORATION);
+		setId(ID);
 		setImageDescriptor(colorImage);
+		this.featureModelManager = featureModelManager;
 		setEnableUndoRedo(true);
 	}
 
@@ -113,26 +113,38 @@ public class SetFeatureColorAction extends AFeatureModelAction {
 	}
 
 	private boolean isSelectionValid(IStructuredSelection selection) {
-		final IFeatureModel featureModel = featureModelManager.editObject();
-		for (final Object object : selection.toList()) {
-			if (object instanceof IFeature) {
-				continue;
-			} else if (object instanceof AbstractGraphicalEditPart) {
-				final AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) object;
-				IFeature feature = null;
-				if ((agep.getModel() != null) && (agep.getModel() instanceof IGraphicalFeature)) {
-					feature = featureModel.getFeature(agep.getModel().toString());
-				}
-				if (feature != null) {
+		if (featureModelManager != null) {
+			final IFeatureModel featureModel = featureModelManager.editObject();
+			for (final Object object : selection.toList()) {
+				if (object instanceof IFeature) {
 					continue;
+				} else if (object instanceof AbstractGraphicalEditPart) {
+					final AbstractGraphicalEditPart agep = (AbstractGraphicalEditPart) object;
+					IFeature feature = null;
+					if ((agep.getModel() != null) && (agep.getModel() instanceof IGraphicalFeature)) {
+						feature = featureModel.getFeature(agep.getModel().toString());
+					}
+					if (feature != null) {
+						continue;
+					}
+				} else if (object instanceof FeatureEditPart) {
+					continue;
+				} else {
+					return false;
 				}
-			} else if (object instanceof FeatureEditPart) {
-				continue;
-			} else {
-				return false;
 			}
 		}
 		return true;
+	}
+
+	public IFeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
+	}
+
+	public void setFeatureModelManager(IFeatureModelManager featureModelManager) {
+		this.featureModelManager = featureModelManager;
+		featureList.clear();
+		setEnabled(false);
 	}
 
 	/**
@@ -141,7 +153,7 @@ public class SetFeatureColorAction extends AFeatureModelAction {
 	 * @param selection current selection
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
-		if (!selection.isEmpty()) {
+		if ((featureModelManager != null) && !selection.isEmpty()) {
 			final IFeatureModel featureModel = featureModelManager.editObject();
 			featureList.clear();
 			final Object[] editPartArray = selection.toArray();
@@ -168,58 +180,60 @@ public class SetFeatureColorAction extends AFeatureModelAction {
 	// TODO implement as operation
 	@Override
 	public void run() {
-		FeatureColor selectedColor = null;
-		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		final List<IFeature> features = new ArrayList<>(featureList);
+		if (featureModelManager != null) {
+			FeatureColor selectedColor = null;
+			final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			final List<IFeature> features = new ArrayList<>(featureList);
 
-		if (!features.isEmpty()) {
-			final IFeatureModel featureModel = featureModelManager.editObject();
-			if (featureModel != null) {
-				// only allow coloration if the active profile is not the default profile
-				if (FeatureColorManager.isDefault(featureModel)) {
-					// skip color scheme wizard if there is only one color scheme available
-					if (FeatureColorManager.getColorSchemes(featureModel).size() == 1) {
-						final Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
-						final WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
-						dialog.create();
-						final int dialogExitCode = dialog.open();
-						if (dialogExitCode == Window.CANCEL) {
-							return;
-						} else if ((dialogExitCode == Window.OK) && FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
-							MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED,
-									StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
-							return;
+			if (!features.isEmpty()) {
+				final IFeatureModel featureModel = featureModelManager.editObject();
+				if (featureModel != null) {
+					// only allow coloration if the active profile is not the default profile
+					if (FeatureColorManager.isDefault(featureModel)) {
+						// skip color scheme wizard if there is only one color scheme available
+						if (FeatureColorManager.getColorSchemes(featureModel).size() == 1) {
+							final Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
+							final WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
+							dialog.create();
+							final int dialogExitCode = dialog.open();
+							if (dialogExitCode == Window.CANCEL) {
+								return;
+							} else if ((dialogExitCode == Window.OK) && FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
+								MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED,
+										StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
+								return;
+							}
 						}
-					}
-					if (FeatureColorManager.getColorSchemes(featureModel).size() == 2) {
-						// if there is one non-default color scheme, set it active
-						final Collection<ColorScheme> colorSchemes = FeatureColorManager.getColorSchemes(featureModel);
-						for (final ColorScheme colorScheme : colorSchemes) {
-							if (!colorScheme.isDefault()) {
-								FeatureColorManager.setActive(featureModel, colorScheme.getName());
+						if (FeatureColorManager.getColorSchemes(featureModel).size() == 2) {
+							// if there is one non-default color scheme, set it active
+							final Collection<ColorScheme> colorSchemes = FeatureColorManager.getColorSchemes(featureModel);
+							for (final ColorScheme colorScheme : colorSchemes) {
+								if (!colorScheme.isDefault()) {
+									FeatureColorManager.setActive(featureModel, colorScheme.getName());
+								}
 							}
 						}
 					}
 				}
-			}
 
-			// If the color of only one object should be changed, its color is selected in the dialog initially.
-			if (features.size() == 1) {
-				final IFeature selectedFeature = features.get(0);
-				selectedColor = FeatureColorManager.getColor(selectedFeature);
-			}
+				// If the color of only one object should be changed, its color is selected in the dialog initially.
+				if (features.size() == 1) {
+					final IFeature selectedFeature = features.get(0);
+					selectedColor = FeatureColorManager.getColor(selectedFeature);
+				}
 
-			final SetFeatureColorDialog dialog =
-				new SetFeatureColorDialog(shell, featureModelManager, Functional.mapToStringList(features), selectedColor, undoRedoEnabled);
+				final SetFeatureColorDialog dialog =
+					new SetFeatureColorDialog(shell, featureModelManager, Functional.mapToStringList(features), selectedColor, undoRedoEnabled);
 
-			// inform ui to update
-			if (dialog.open() == Window.OK) {
-				final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
-				try {
-					project.touch(null);
-					project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-				} catch (final CoreException e) {
-					FMUIPlugin.getDefault().logError(e);
+				// inform ui to update
+				if (dialog.open() == Window.OK) {
+					final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
+					try {
+						project.touch(null);
+						project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+					} catch (final CoreException e) {
+						FMUIPlugin.getDefault().logError(e);
+					}
 				}
 			}
 		}
