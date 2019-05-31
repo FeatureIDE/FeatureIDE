@@ -10,7 +10,7 @@ import org.osgi.framework.BundleContext;
  */
 public class RoadPlugin extends AbstractUIPlugin {
 
-	// The plug-in ID
+	// The plug-in Id
 	public static final String PLUGIN_ID = "au.edu.swin.featureide.road"; //$NON-NLS-1$
 
 	// The shared instance
