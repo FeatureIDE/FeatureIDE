@@ -68,7 +68,6 @@ import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
 import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
 import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
 import de.ovgu.featureide.fm.attributes.view.actions.RemoveFeatureAttributeAction;
-import de.ovgu.featureide.fm.attributes.view.actions.TestSolver;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeConfigureableEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeNameEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeRecursiveEditingSupport;
@@ -358,19 +357,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createContexMenu() {
-		// Test toolbar
-		// menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
-
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
-
-		// TODO REMOVED_THIS (Next two lines)
-		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature)), false));
-		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgAttributeRecurisve)), true));
-		// Removed because the sync feature should always be active
-		// toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
