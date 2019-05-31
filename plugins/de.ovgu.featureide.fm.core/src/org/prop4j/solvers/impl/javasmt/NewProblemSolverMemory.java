@@ -32,7 +32,8 @@ import org.prop4j.Node;
 import org.prop4j.solver.ISolverProblem;
 
 /**
- * TODO description
+ * Represents the memory for the solver. It is possible to push and pop Nodes with a given representation of the constraints that are used for the specific
+ * Solver. Also manges the mapping from nodes to index and index to nodes.
  *
  * @author Joshua Sprey
  */

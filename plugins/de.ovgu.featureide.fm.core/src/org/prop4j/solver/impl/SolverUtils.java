@@ -71,6 +71,12 @@ public class SolverUtils {
 		return objectModel;
 	}
 
+	/**
+	 * Updates the first model by calculating the intersection with the second model.
+	 *
+	 * @param model1 Array should only contain 1 or 0.
+	 * @param model2 Array should only contain 1 or 0.
+	 */
 	public static void updateModel(final int[] model1, int[] model2) {
 		for (int i = 0; i < model1.length; i++) {
 			final int x = model1[i];
@@ -81,6 +87,12 @@ public class SolverUtils {
 		}
 	}
 
+	/**
+	 * Updates the first model by calculating the intersection with every model of the given model list iterator.
+	 *
+	 * @param model1 Array should only contain 1 or 0.
+	 * @param models Iterator containing arrays that should only contain 1 or 0.
+	 */
 	public static void updateModel(final int[] model1, Iterable<int[]> models) {
 		for (int i = 0; i < model1.length; i++) {
 			final int x = model1[i];
@@ -94,6 +106,12 @@ public class SolverUtils {
 		}
 	}
 
+	/**
+	 * Negates the model.
+	 *
+	 * @param Starting Model
+	 * @return Negated Model
+	 */
 	public static int[] negateModel(int[] ar) {
 		if (ar == null) {
 			return new int[0];
@@ -105,6 +123,12 @@ public class SolverUtils {
 		return nar;
 	}
 
+	/**
+	 * Creates a pretty printed version of an model list
+	 *
+	 * @param list List of models
+	 * @return String to print
+	 */
 	public static String getListArrayString(List<int[]> list) {
 		String listSTring = "[";
 		for (final int[] is : list) {
@@ -117,6 +141,13 @@ public class SolverUtils {
 		return listSTring;
 	}
 
+	/**
+	 * TODO SOLVER
+	 * 
+	 * @param problem
+	 * @param values
+	 * @return
+	 */
 	public static String getNamesOfIndexes(ISolverProblem problem, int[] values) {
 		if (values == null) {
 			return "EMPTY VALUES";
