@@ -1065,9 +1065,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 		deadFeatureExplanations.clear();
 		falseOptionalFeatureExplanations.clear();
 		redundantConstraintExplanations.clear();
-		// deadFeatureExplanationCreator.setFeatureModel(fm);
-		// falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
-		// redundantConstraintExplanationCreator.setFeatureModel(fm);
+		deadFeatureExplanationCreator.setFeatureModel(fm);
+		falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+		redundantConstraintExplanationCreator.setFeatureModel(fm);
 
 	}
 
