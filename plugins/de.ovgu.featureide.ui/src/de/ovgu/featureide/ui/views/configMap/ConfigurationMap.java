@@ -74,6 +74,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapRefreshAction;
 import de.ovgu.featureide.ui.views.configMap.actions.OpenFileAction;
+import de.ovgu.featureide.ui.views.configMap.filters.AllDeselectedFeatureFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.AllSelectedFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
@@ -209,6 +211,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new DeadFeatureFilter(true));
 		getFilters().add(new FeatureUnusedFilter(true));
+		getFilters().add(new AllSelectedFeatureFilter(false));
+		getFilters().add(new AllDeselectedFeatureFilter(false));
 
 		final List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(getFilters());
 
