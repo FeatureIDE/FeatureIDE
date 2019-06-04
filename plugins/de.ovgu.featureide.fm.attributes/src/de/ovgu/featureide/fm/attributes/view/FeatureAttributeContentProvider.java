@@ -29,6 +29,9 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
@@ -46,6 +49,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
+	private Configuration config;
 	private Object[] features = EMPTY_ROOT;
 	private TreeViewer viewer;
 
@@ -60,13 +64,20 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof ExtendedFeatureModel) {
+			config = null;
 			featureModel = (ExtendedFeatureModel) inputElement;
 			refreshElements();
 			return features;
 		} else if (inputElement instanceof Object[]) {
+			config = null;
 			featureModel = null;
 			refreshElements();
 			return (Object[]) inputElement;
+		} else if (inputElement instanceof Configuration) {
+			config = (Configuration) inputElement;
+			featureModel = (ExtendedFeatureModel) config.getFeatureModel();
+			refreshElements();
+			return features;
 		} else {
 			featureModel = null;
 			refreshElements();
@@ -86,9 +97,25 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (parentElement instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
-			featureList.addAll(feature.getAttributes());
+			if (config != null) {
+				for (IFeatureAttribute att : feature.getAttributes()) {
+					if (att.isConfigurable()) {
+						featureList.add(att);
+					}
+				}
+			} else {
+				featureList.addAll(feature.getAttributes());
+			}
 			for (final IFeatureStructure structure : feature.getStructure().getChildren()) {
-				featureList.add(structure.getFeature());
+				if (config == null) {
+					featureList.add(structure.getFeature());
+				} else {
+					SelectableFeature selectableF = config.getSelectablefeature(structure.getFeature().getName());
+					if (selectableF.getSelection() == Selection.SELECTED) {
+						featureList.add(structure.getFeature());
+					}
+				}
+
 			}
 			return featureList.toArray();
 		}

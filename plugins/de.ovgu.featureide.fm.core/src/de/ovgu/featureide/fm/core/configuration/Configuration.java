@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -74,6 +75,8 @@ public class Configuration implements Cloneable {
 		for (final SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
+			final SelectableFeature newFeature = table.get(f.getName());
+			newFeature.cloneProperties(f);
 		}
 		propagate = configuration.propagate;
 	}
@@ -95,6 +98,7 @@ public class Configuration implements Cloneable {
 			final SelectableFeature newFeature = table.get(oldFeature.getName());
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
+				newFeature.cloneProperties(oldFeature);
 			}
 		}
 	}
@@ -136,7 +140,7 @@ public class Configuration implements Cloneable {
 			table.put(sFeature.getName(), sFeature);
 
 			for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-				final SelectableFeature sChild = new SelectableFeature(child.getFeature());
+				final SelectableFeature sChild = FMFactoryManager.getFactory(featureModel).createSelectableFeature(child.getFeature());
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child.getFeature());
 			}
@@ -146,8 +150,7 @@ public class Configuration implements Cloneable {
 	private SelectableFeature initRoot() {
 
 		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
-		final SelectableFeature root = new SelectableFeature(featureRoot);
-
+		final SelectableFeature root = FMFactoryManager.getFactory(featureModel).createSelectableFeature(featureRoot);
 		if (featureRoot != null) {
 			initFeatures(root, featureRoot);
 		} else {

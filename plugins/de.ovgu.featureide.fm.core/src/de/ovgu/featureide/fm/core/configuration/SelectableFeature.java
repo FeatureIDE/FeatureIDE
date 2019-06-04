@@ -147,4 +147,8 @@ public class SelectableFeature extends TreeElement {
 		return Collections.emptySet();
 	}
 
+	public void cloneProperties(SelectableFeature feat) {
+
+	}
+
 }

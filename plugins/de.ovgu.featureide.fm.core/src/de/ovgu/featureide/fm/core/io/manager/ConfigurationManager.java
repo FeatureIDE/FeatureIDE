@@ -64,6 +64,11 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	}
 
 	@CheckForNull
+	public static ConfigurationManager getInstance(Path path, boolean createNewIfNeeded) {
+		return AFileManager.getInstance(path, new ObjectCreator(null), createNewIfNeeded);
+	}
+
+	@CheckForNull
 	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
 		return AFileManager.getInstance(path, new ObjectCreator(configuration), true);
 	}
