@@ -149,7 +149,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		setBuildpaths(project);
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+			featureProject.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 		} catch (final CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
