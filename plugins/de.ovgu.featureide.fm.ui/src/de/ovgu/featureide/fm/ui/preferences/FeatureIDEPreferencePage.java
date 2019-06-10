@@ -135,7 +135,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		constraintViewDecisionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewDecisionButton.getSelection()));
+				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, String.valueOf(constraintViewDecisionButton.getSelection()));
 			}
 		});
 
