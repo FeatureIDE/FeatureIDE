@@ -36,9 +36,9 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
  * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
@@ -69,7 +69,7 @@ public class ConstraintView implements GUIDefaults {
 	private Tree tree;
 	private Text searchBox;
 
-	private final FeatureModelManager fmManager;
+	private final ConstraintViewController controller;
 
 	private TreeColumn constraintColumn, descriptionColumn;
 
@@ -77,8 +77,8 @@ public class ConstraintView implements GUIDefaults {
 		treeViewer.getTree().dispose();
 	}
 
-	public ConstraintView(Composite parent, FeatureModelManager fmManager) {
-		this.fmManager = fmManager;
+	public ConstraintView(Composite parent, ConstraintViewController controller) {
+		this.controller = controller;
 		init(parent);
 	}
 
@@ -93,7 +93,7 @@ public class ConstraintView implements GUIDefaults {
 		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
 		}
-		if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element).hasStatus(ConstraintStatus.REDUNDANT)) {
+		if (controller.getConstraintProperty(element).hasStatus(ConstraintStatus.REDUNDANT)) {
 			item.setImage(FM_INFO);
 		}
 		tree.setHeaderVisible(true);
@@ -168,8 +168,7 @@ public class ConstraintView implements GUIDefaults {
 		for (final TreeItem item : tree.getItems()) {
 			if (item.getData() instanceof IConstraint) {
 				if (item.getData().equals(constraint)) {
-					if (fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint)
-							.hasStatus(ConstraintStatus.REDUNDANT)) {
+					if (controller.getConstraintProperty(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
 						item.setImage(FM_INFO);
 					} else {
 						item.setImage(IMAGE_EMPTY);

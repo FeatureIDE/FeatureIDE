@@ -40,6 +40,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -126,7 +127,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		viewer = new ConstraintView(parent, fmManager);
+		viewer = new ConstraintView(parent, this);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
 		if (featureModelEditor != null) {
@@ -168,6 +169,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			}
 			if (fmManager != null) {
 				this.fmManager = fmManager;
+				fmManager.getVariableFormula().getAnalyzer().analyzeFeatureModel(null);
 				this.fmManager.addListener(eventListener);
 			}
 		}
@@ -486,6 +488,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
 		this.featureModelEditor = featureModelEditor;
+	}
+
+	public ConstraintProperties getConstraintProperty(IConstraint element) {
+		return fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element);
 	}
 
 }
