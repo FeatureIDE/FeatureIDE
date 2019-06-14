@@ -59,13 +59,53 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 
 	@Override
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
-		monitor.setRemainingWork(variables.getLiterals().length + 1);
+		monitor.setRemainingWork(2 * variables.getLiterals().length);
 
-		final VecInt resultList = new VecInt();
+		final VecInt potentialResultList = new VecInt();
 		final List<LiteralSet> relevantClauses = new ArrayList<>();
 
 		final ModifiableSatSolver modSolver = new ModifiableSatSolver(solver.getSatInstance());
 		for (final int literal : variables.getLiterals()) {
+			final List<LiteralSet> clauses = solver.getSatInstance().getClauses();
+			for (final LiteralSet clause : clauses) {
+				if (clause.containsVariable(literal)) {
+					final LiteralSet newClause = clause.clean(literal);
+					if (newClause != null) {
+						relevantClauses.add(newClause);
+					}
+				}
+			}
+			try {
+				modSolver.addClauses(relevantClauses);
+			} catch (final RuntimeContradictionException e) {
+				relevantClauses.clear();
+				monitor.step();
+				continue;
+			}
+
+			final SatResult hasSolution = modSolver.hasSolution();
+			switch (hasSolution) {
+			case FALSE:
+				break;
+			case TIMEOUT:
+				reportTimeout();
+				break;
+			case TRUE:
+				potentialResultList.push(literal);
+				break;
+			default:
+				throw new AssertionError(hasSolution);
+			}
+			modSolver.removeLastClauses(relevantClauses.size());
+
+			relevantClauses.clear();
+			monitor.step();
+		}
+
+		final VecInt resultList = new VecInt();
+		while (!potentialResultList.isEmpty()) {
+			final int literal = potentialResultList.last();
+			potentialResultList.pop();
 			final CNF slicedCNF = LongRunningWrapper.runMethod(new CNFSlicer(solver.getSatInstance(), variables.removeAll(new LiteralSet(literal))));
 			final List<LiteralSet> clauses = slicedCNF.getClauses();
 			for (final LiteralSet clause : clauses) {
