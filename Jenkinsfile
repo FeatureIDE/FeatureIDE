@@ -1,7 +1,7 @@
 void setBuildStatus(String message, String context, String state) {
     // add a Github token as a global 'secret text' credential on Jenkins with the id 'github-commit-status-token'
     withCredentials([string(credentialsId: 'github-commit-status-token', variable: 'TOKEN')]) {
-      // 'set -x' for debugging. Don't worry the access token won't be actually logged
+      // 'set -x' for debugging. Don't worry the access token won't be logged
       // Also, the sh command actually executed is not logged
         sh """
             set -x
