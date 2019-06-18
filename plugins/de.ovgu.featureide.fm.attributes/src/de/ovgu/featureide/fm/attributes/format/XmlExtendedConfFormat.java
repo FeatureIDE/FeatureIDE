@@ -36,13 +36,11 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "ExtendedXML";
 	}
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
 		return ID;
 	}
 

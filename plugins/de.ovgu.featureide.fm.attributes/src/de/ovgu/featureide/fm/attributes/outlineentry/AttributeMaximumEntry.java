@@ -29,6 +29,10 @@ public class AttributeMaximumEntry implements IOutlineEntry {
 		labelSuffix = EST;
 	}
 
+	public Double getResult() {
+		return result;
+	}
+
 	@Override
 	public String getLabel() {
 		if (attribute instanceof LongFeatureAttribute) {

@@ -28,7 +28,7 @@ public class CountAttributeComputation implements IOutlineEntry {
 		this.attribute = attribute;
 	}
 
-	private int calculateCount() {
+	public int calculateCount() {
 		int count = 0;
 		if (config.getFeatureModel() instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel fm = (ExtendedFeatureModel) config.getFeatureModel();
