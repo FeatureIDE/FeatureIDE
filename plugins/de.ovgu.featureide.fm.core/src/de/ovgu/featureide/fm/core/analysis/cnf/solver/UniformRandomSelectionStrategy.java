@@ -50,10 +50,10 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	private final int[] model;
 	private final int[] ratio;
 
-	public UniformRandomSelectionStrategy(List<LiteralSet> sample) {
+	public UniformRandomSelectionStrategy(int numberOfVariables, List<LiteralSet> sample) {
 		usedSamples.addAll(sample);
-		model = new int[sample.get(0).size()];
-		ratio = new int[sample.get(0).size()];
+		model = new int[numberOfVariables];
+		ratio = new int[numberOfVariables];
 
 		for (final LiteralSet solution : usedSamples) {
 			final int[] literals = solution.getLiterals();
@@ -66,8 +66,11 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	public void undo(int var) {
-		updateRatioUnset(model[var - 1]);
-		model[var - 1] = 0;
+		final int literal = model[var - 1];
+		if (literal != 0) {
+			updateRatioUnset(literal);
+			model[var - 1] = 0;
+		}
 	}
 
 	@Override
@@ -85,7 +88,12 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 
 	@Override
 	public int select(int var) {
-		return (RAND.nextInt(usedSamples.size()) < ratio[var - 1]) ? posLit(var) : negLit(var);
+		final int size = usedSamples.size();
+		if (size == 0) {
+			return RAND.nextBoolean() ? posLit(var) : negLit(var);
+		} else {
+			return RAND.nextInt(size) < ratio[var - 1] ? posLit(var) : negLit(var);
+		}
 	}
 
 	@Override

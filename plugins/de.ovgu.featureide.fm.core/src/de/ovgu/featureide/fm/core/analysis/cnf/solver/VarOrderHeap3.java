@@ -38,8 +38,8 @@ public class VarOrderHeap3 extends VarOrderHeap {
 
 	private final UniformRandomSelectionStrategy selectionStrategy;
 
-	public VarOrderHeap3(List<LiteralSet> sample) {
-		super(new UniformRandomSelectionStrategy(sample));
+	public VarOrderHeap3(int numberOfVariables, List<LiteralSet> sample) {
+		super(new UniformRandomSelectionStrategy(numberOfVariables, sample));
 		selectionStrategy = (UniformRandomSelectionStrategy) phaseStrategy;
 	}
 
