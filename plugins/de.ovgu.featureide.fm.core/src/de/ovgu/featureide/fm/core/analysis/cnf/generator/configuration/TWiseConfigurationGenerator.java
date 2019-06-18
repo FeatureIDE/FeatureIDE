@@ -22,33 +22,30 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.IteratorFactory.IteratorID;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.MergeIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.MIGComparator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.CandidateLengthComparator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationLengthComparator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationUtil;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
-import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
-import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
-import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 
@@ -58,85 +55,6 @@ import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
  * @author Sebastian Krieter
  */
 public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
-
-	private static class Pair<A, B> {
-		private final A key;
-		private final B value;
-
-		public Pair(A key, B value) {
-			this.key = key;
-			this.value = value;
-		}
-
-		public A getKey() {
-			return key;
-		}
-
-		public B getValue() {
-			return value;
-		}
-	}
-
-	public static Order order = Order.SORTED;
-	public static Phase phase = Phase.SINGLE;
-
-	protected final TWiseConfigurationUtil util;
-
-	protected final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
-	protected final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
-	protected final List<LiteralSet> expressionCombinationList = new ArrayList<>();
-	protected final List<Integer> combinationLengthList = new ArrayList<>();
-
-	protected final Comparator<TWiseConfiguration> lengthComparator = new TWiseConfigurationLengthComparator();
-
-	protected final int t;
-	protected List<List<ClauseList>> expressions;
-	protected LiteralSet[] strongHull;
-
-	protected long numberOfCombinations, count, coveredCount, invalidCount, phaseCount;
-
-	private MIGComparator migComparator;
-
-	private int index;
-	private BitSet invalid, valid, covered;
-
-	protected final MonitorThread monitorThread = new MonitorThread(new Runnable() {
-		@Override
-		public void run() {
-			if (VERBOSE) {
-				final double phaseProgress = ((int) Math.floor(getPhaseProgress() * 1000)) / 10.0;
-				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final StringBuilder sb = new StringBuilder();
-
-				sb.append(phaseCount);
-				sb.append(" - ");
-				sb.append(phaseProgress);
-				sb.append(" (");
-				sb.append(count);
-				sb.append(") -- Configurations: ");
-				sb.append(incompleteSolutionList.size());
-				sb.append(" | ");
-				sb.append(completeSolutionList.size());
-				sb.append(" -- Covered: ");
-				sb.append(coverProgress);
-				sb.append(" (");
-				sb.append(coveredCount);
-				sb.append(")");
-				sb.append(" -- Invalid: ");
-				sb.append(invalidProgress);
-				sb.append(" (");
-				sb.append(invalidCount);
-				sb.append(")");
-				System.out.println(sb.toString());
-			}
-		}
-
-	});
-
-	private double getPhaseProgress() {
-		return 1 - (((double) count) / numberOfCombinations);
-	}
 
 	/**
 	 * Converts a set of single literals into a grouped expression list.
@@ -178,24 +96,82 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return Arrays.asList(expressions);
 	}
 
+	private static enum CombinationStatus {
+		NOT_COVERED, COVERED, INVALID,
+	}
+
+	protected final static Comparator<TWiseConfiguration> configurationLengthComparator = new TWiseConfigurationLengthComparator();
+	protected final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
+
+	protected final TWiseConfigurationUtil util;
+
+	protected final List<LiteralSet> randomSample;
+
+	protected final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
+	protected final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
+
+	private final List<Pair<LiteralSet, TWiseConfiguration>> candidatesList = new ArrayList<>();
+	private final Set<Pair<LiteralSet, TWiseConfiguration>> candidatesList2 = new HashSet<>();
+
+	private int[] features;
+	private final VecInt lits = new VecInt();
+
+	protected final int t;
+	protected List<List<ClauseList>> expressions;
+
+	protected long numberOfCombinations, count, coveredCount, invalidCount, phaseCount;
+
+	protected final MonitorThread samplingMonitor = new MonitorThread(new Runnable() {
+		@Override
+		public void run() {
+			if (VERBOSE) {
+				final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
+				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final StringBuilder sb = new StringBuilder();
+
+				sb.append(phaseCount);
+				sb.append(" - ");
+				sb.append(phaseProgress);
+				sb.append(" (");
+				sb.append(count);
+				sb.append(") -- Configurations: ");
+				sb.append(incompleteSolutionList.size());
+				sb.append(" | ");
+				sb.append(completeSolutionList.size());
+				sb.append(" -- Covered: ");
+				sb.append(coverProgress);
+				sb.append(" (");
+				sb.append(coveredCount);
+				sb.append(")");
+				sb.append(" -- Invalid: ");
+				sb.append(invalidProgress);
+				sb.append(" (");
+				sb.append(invalidCount);
+				sb.append(")");
+				System.out.println(sb.toString());
+			}
+		}
+	});
+
 	public TWiseConfigurationGenerator(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
 		super(cnf, maxSampleSize);
 		this.t = t;
-
-		incompleteSolutionList.clear();
-		completeSolutionList.clear();
-
-		coveredCount = 0;
-		invalidCount = 0;
-		phaseCount = -1;
-		count = 0;
 
 		if (cnf.getClauses().isEmpty()) {
 			util = new TWiseConfigurationUtil(cnf, null, null);
 		} else {
 			util = new TWiseConfigurationUtil(cnf, solver, incompleteSolutionList);
 			util.computeMIG();
-			migComparator = new MIGComparator(util.getMig());
+		}
+
+		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
+		randomGenerator.setAllowDuplicates(false);
+		randomGenerator.setSampleSize(1000);
+		randomSample = LongRunningWrapper.runMethod(randomGenerator);
+
+		for (final LiteralSet solution : randomSample) {
+			util.addSolverSolution(solution.getLiterals());
 		}
 
 		expressions = util.cleanClauses(nodes);
@@ -207,45 +183,39 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			}
 		}
 
-		switch (order) {
-		case RANDOM:
-			for (final List<ClauseList> list : expressions) {
-				Collections.shuffle(list, util.getRandom());
-			}
-			break;
-		case SORTED:
-			for (final List<ClauseList> list : expressions) {
-				Collections.shuffle(list, util.getRandom());
-				// TODO use MIG
-				final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
-					@Override
-					public int compare(ClauseList o1, ClauseList o2) {
-						final int clauseCountDiff = o1.size() - o2.size();
-						if (clauseCountDiff != 0) {
-							return clauseCountDiff;
-						}
-						int clauseLengthDiff = 0;
-						for (int i = 0; i < o1.size(); i++) {
-							clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
-						}
-						return clauseLengthDiff;
+		for (final List<ClauseList> list : expressions) {
+			final Comparator<ClauseList> comparator = new Comparator<ClauseList>() {
+				@Override
+				public int compare(ClauseList o1, ClauseList o2) {
+					final int clauseCountDiff = o1.size() - o2.size();
+					if (clauseCountDiff != 0) {
+						return clauseCountDiff;
 					}
-				};
-				Collections.sort(list, comparator);
-			}
-			break;
-		default:
-			throw new AssertionError();
+					int clauseLengthDiff = 0;
+					for (int i = 0; i < o1.size(); i++) {
+						clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
+					}
+					return clauseLengthDiff;
+				}
+			};
+			Collections.sort(list, comparator);
 		}
 
-		genHulls();
-
-		numberOfCombinations = getIterator(IteratorID.Lexicographic).size();
+		solver.useSolutionList(0);
+		solver.setSelectionStrategy(SelectionStrategy.ORG);
 	}
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-		coverCombinations();
+		incompleteSolutionList.clear();
+		completeSolutionList.clear();
+
+		coveredCount = 0;
+		invalidCount = 0;
+		phaseCount = 0;
+		count = 0;
+
+		buildCombinations(expressions);
 
 		final ArrayList<TWiseConfiguration> resultList = new ArrayList<>(completeSolutionList.size() + incompleteSolutionList.size());
 		resultList.addAll(incompleteSolutionList);
@@ -257,127 +227,125 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
-	protected ICombinationIterator getIterator(IteratorID id) {
-		count = numberOfCombinations;
-		phaseCount++;
-		return new MergeIterator(t, expressions, id);
+	private CombinationStatus coverCombinationAll(final ClauseList nextCondition) {
+		if (isCovered(nextCondition, completeSolutionList) || isCovered(nextCondition, incompleteSolutionList)) {
+			return CombinationStatus.COVERED;
+		}
+
+		candidatesList.clear();
+		for (final LiteralSet literals : nextCondition) {
+			for (final Iterator<TWiseConfiguration> iterator = incompleteSolutionList.iterator(); iterator.hasNext();) {
+				final TWiseConfiguration candidate = isCandidate(literals, iterator);
+				if (candidate != null) {
+					candidatesList.add(new Pair<>(literals, candidate));
+				}
+			}
+		}
+
+//		Collections.shuffle(candidatesList, random);
+		Collections.sort(candidatesList, candidateLengthComparator);
+
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (isSelectionPossibleWithinSolverSolution(pair.getKey(), pair.getValue())) {
+				select(pair.getValue(), Deduce.NONE, pair.getKey());
+				return CombinationStatus.COVERED;
+			}
+		}
+
+		int validCount = nextCondition.size();
+		for (final LiteralSet literals : nextCondition) {
+			if (!isCombinationValidSAT(literals.getLiterals())) {
+				validCount--;
+				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
+					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
+					if (pair.getKey().equals(literals)) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+		if (validCount == 0) {
+			return CombinationStatus.INVALID;
+		}
+
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (isSelectionPossibleSAT(pair.getKey(), pair.getValue())) {
+				select(pair.getValue(), Deduce.NONE, pair.getKey());
+				return CombinationStatus.COVERED;
+			}
+		}
+
+		newConfiguration(nextCondition.get(0));
+		return CombinationStatus.COVERED;
 	}
 
-	protected void coverCombinations() {
-		valid = new BitSet(Math.toIntExact(numberOfCombinations));
-		invalid = new BitSet(Math.toIntExact(numberOfCombinations));
-		covered = new BitSet(Math.toIntExact(numberOfCombinations));
-		try {
-			monitorThread.start();
-
-			{
-				final ICombinationIterator it = getIterator(IteratorID.Lexicographic);
-				comboLoop: while (it.hasNext()) {
-					final Iterable<LiteralSet> nextCombinations = nextCombination(it, true);
-					if (nextCombinations == null) {
-						continue comboLoop;
-					}
-
-					final List<Pair<LiteralSet, List<TWiseConfiguration>>> candidatesList = new LinkedList<>();
-
-					for (final LiteralSet literals : nextCombinations) {
-						final List<TWiseConfiguration> candidates = new ArrayList<>();
-						candidatesList.add(new Pair<>(literals, candidates));
-						for (final Iterator<TWiseConfiguration> iterator = incompleteSolutionList.iterator(); iterator.hasNext();) {
-							final TWiseConfiguration addCandidate = isCandidate(literals, iterator);
-							if (addCandidate != null) {
-								candidates.add(addCandidate);
-							}
-						}
-						Collections.sort(candidates, lengthComparator);
-
-						for (final TWiseConfiguration configuration : candidates) {
-							if (selectionPossibleWithinSolverSolution(configuration, literals)) {
-								select(configuration, Deduce.NONE, literals);
-								continue comboLoop;
-							}
-						}
-					}
-
-					for (final Iterator<Pair<LiteralSet, List<TWiseConfiguration>>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-						final Pair<LiteralSet, List<TWiseConfiguration>> pair = iterator.next();
-						final LiteralSet literals = pair.getKey();
-						if (isCombinationValidSAT(literals)) {
-							for (final TWiseConfiguration configuration : pair.getValue()) {
-								if (selectionPossibleSAT(literals, configuration)) {
-									select(configuration, Deduce.NONE, literals);
-									continue comboLoop;
-								}
-							}
-						} else {
-							iterator.remove();
-						}
-					}
-
-					if (candidatesList.isEmpty()) {
-						invalid.set(index);
-						invalidCount++;
-					} else {
-						newConfiguration(candidatesList.get(0).getKey());
-						continue comboLoop;
-					}
-				}
-			}
-
-			// -- 4 --
-			{
-				final ICombinationIterator it = getIterator(IteratorID.Lexicographic);
-				comboLoop: while (it.hasNext()) {
-					final Iterable<LiteralSet> nextCombinations = nextCombination(it, false);
-					if (nextCombinations == null) {
-						continue comboLoop;
-					}
-
-					final List<Pair<LiteralSet, List<TWiseConfiguration>>> candidatesList = new LinkedList<>();
-
-					for (final LiteralSet literals : nextCombinations) {
-						final List<TWiseConfiguration> candidates = new ArrayList<>();
-						candidatesList.add(new Pair<>(literals, candidates));
-						for (final Iterator<TWiseConfiguration> iterator = incompleteSolutionList.iterator(); iterator.hasNext();) {
-							final TWiseConfiguration addCandidate = isCandidate(literals, iterator);
-							if (addCandidate != null) {
-								candidates.add(addCandidate);
-							}
-						}
-						Collections.sort(candidates, lengthComparator);
-
-						for (final TWiseConfiguration configuration : candidates) {
-							if (selectionPossibleWithinSolverSolution(configuration, literals)) {
-								select(configuration, Deduce.NONE, literals);
-								continue comboLoop;
-							}
-						}
-					}
-
-					for (final Iterator<Pair<LiteralSet, List<TWiseConfiguration>>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-						final Pair<LiteralSet, List<TWiseConfiguration>> pair = iterator.next();
-						final LiteralSet literals = pair.getKey();
-						if (isCombinationValidSAT(literals)) {
-							for (final TWiseConfiguration configuration : pair.getValue()) {
-								if (selectionPossibleSAT(literals, configuration)) {
-									select(configuration, Deduce.NONE, literals);
-									continue comboLoop;
-								}
-							}
-						} else {
-							iterator.remove();
-						}
-					}
-
-					if (!candidatesList.isEmpty()) {
-						newConfiguration(candidatesList.get(0).getKey());
-						continue comboLoop;
-					}
-				}
-			}
-		} finally {
-			monitorThread.finish();
+	private CombinationStatus coverCombinationSingle(final ClauseList nextCondition) {
+		if (isCovered(nextCondition, completeSolutionList) || isCovered(nextCondition, incompleteSolutionList)) {
+			return CombinationStatus.COVERED;
 		}
+
+		candidatesList.clear();
+		for (final LiteralSet literals : nextCondition) {
+			for (final Iterator<TWiseConfiguration> iterator = incompleteSolutionList.iterator(); iterator.hasNext();) {
+				final TWiseConfiguration addCandidate = isCandidate(literals, iterator);
+				if (addCandidate != null) {
+					candidatesList.add(new Pair<>(literals, addCandidate));
+				}
+			}
+		}
+
+//		Collections.shuffle(candidatesList, random);
+		Collections.sort(candidatesList, candidateLengthComparator);
+
+		candidatesList2.clear();
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (isSelectionPossibleWithinSolverSolution(pair.getKey(), pair.getValue())) {
+				if (candidatesList2.size() == 1) {
+					return CombinationStatus.NOT_COVERED;
+				}
+				candidatesList2.add(pair);
+			}
+		}
+
+		if (candidatesList2.size() > 1) {
+			return CombinationStatus.NOT_COVERED;
+		}
+
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (!candidatesList2.contains(pair) && isSelectionPossibleSAT(pair.getKey(), pair.getValue())) {
+				if (candidatesList2.size() == 1) {
+					return CombinationStatus.NOT_COVERED;
+				}
+				candidatesList2.add(pair);
+			}
+		}
+
+		if (candidatesList2.size() == 0) {
+			for (final LiteralSet literals : nextCondition) {
+				if (isCombinationValidSAT(literals.getLiterals())) {
+					newConfiguration(nextCondition.get(0));
+					return CombinationStatus.COVERED;
+				}
+			}
+			return CombinationStatus.INVALID;
+		} else if (candidatesList2.size() == 1) {
+			final Pair<LiteralSet, TWiseConfiguration> first = candidatesList2.iterator().next();
+			select(first.getValue(), Deduce.NONE, first.getKey());
+			return CombinationStatus.COVERED;
+		}
+		return CombinationStatus.NOT_COVERED;
+	}
+
+	private boolean isCovered(ClauseList condition, Iterable<TWiseConfiguration> solutionList) {
+		for (final TWiseConfiguration configuration : solutionList) {
+			final LiteralSet solution = configuration.getSolution();
+			for (final LiteralSet literals : condition) {
+				if (solution.containsAll(literals)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private TWiseConfiguration isCandidate(final LiteralSet literals, final Iterator<TWiseConfiguration> iterator) {
@@ -392,35 +360,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
-	private void generateRandomSolutions(int count) {
-		final ISatSolver solver = util.getSolver();
-		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
-		final int orgAssignmentSize = solver.getAssignmentSize();
-		try {
-			for (int i = 0; i < count; i++) {
-				util.addSolverSolution(solver.findSolution());
-				solver.shuffleOrder(util.getRandom());
-			}
-		} finally {
-			solver.assignmentClear(orgAssignmentSize);
-		}
-	}
-
-	private void genHulls() {
-		strongHull = new LiteralSet[util.getMig().getAdjList().size()];
-
-		for (final Vertex vertex : util.getMig().getAdjList()) {
-			final int literalSet = vertex.getVar();
-			final Traverser traverser = new Traverser(util.getMig());
-			traverser.setModel(new int[util.getMig().getAdjList().size()]);
-			final CollectingVisitor visitor = new CollectingVisitor();
-			traverser.setVisitor(visitor);
-			traverser.traverse(literalSet);
-			final VecInt strong = visitor.getResult()[0];
-			strongHull[vertex.getId()] = new LiteralSet(Arrays.copyOf(strong.toArray(), strong.size()));
-		}
-	}
-
 	private void newConfiguration(final LiteralSet literals) {
 		if (completeSolutionList.size() < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(util);
@@ -431,90 +370,149 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				completeSolutionList.add(configuration);
 			} else {
 				incompleteSolutionList.add(configuration);
-				Collections.sort(incompleteSolutionList, lengthComparator);
+//				Collections.sort(incompleteSolutionList, configurationLengthComparator);
 			}
 		}
 	}
 
-	private Iterable<LiteralSet> nextCombination(final ICombinationIterator it, boolean ignoreDNFsWithMultipleClauses) {
-		final ClauseList[] clauseArray = it.next();
-		count--;
-		index = (int) it.getIndex();
-		if (invalid.get(index) || covered.get(index)) {
-			return null;
-		}
-		if (ignoreDNFsWithMultipleClauses) {
-			for (final ClauseList expression : clauseArray) {
-				if (expression.size() > 1) {
-					return null;
-				}
-			}
-		}
-
-		completeSolutionLoop: for (final TWiseConfiguration configuration : completeSolutionList) {
-			for (int l = 0; l < clauseArray.length; l++) {
-				if (!isSelected(configuration, clauseArray[l])) {
-					continue completeSolutionLoop;
-				}
-			}
-			coveredCount++;
-			covered.set(index);
-			return null;
-		}
-
-		solutionLoop: for (final TWiseConfiguration configuration : incompleteSolutionList) {
-			for (int l = 0; l < clauseArray.length; l++) {
-				if (!isSelected(configuration, clauseArray[l])) {
-					continue solutionLoop;
-				}
-			}
-			coveredCount++;
-			covered.set(index);
-			return null;
-		}
-
-		return getNextCombinations(clauseArray);
-	}
-
-	public boolean selectionPossibleSAT(final LiteralSet literals, final TWiseConfiguration configuration) {
-		if (util.hasSolver()) {
-			final ISatSolver localSolver = util.getSolver();
-			localSolver.setSelectionStrategy(SelectionStrategy.RANDOM);
-			final int orgAssignmentSize = configuration.setUpSolver(localSolver);
-			try {
-				final int[] configurationLiterals = configuration.getSolution().getLiterals();
-				for (final int literal : literals.getLiterals()) {
-					if (configurationLiterals[Math.abs(literal) - 1] == 0) {
-						localSolver.assignmentPush(literal);
+	private void buildCombinations(List<List<ClauseList>> expressions) {
+		final MergeIterator it = new MergeIterator(t, expressions, IteratorID.Lexicographic);
+		numberOfCombinations = it.size();
+		features = new int[solver.getSatInstance().getVariables().size() + 1];
+		lits.clear();
+		try {
+			samplingMonitor.start();
+			final List<ClauseList> combinationListSingle = new ArrayList<>();
+			ClauseList combinedCondition = new ClauseList();
+			count = coveredCount;
+			phaseCount++;
+			while (it.hasNext()) {
+				combineConditions(it.next(), 0, combinedCondition);
+				if (combinedCondition.isEmpty()) {
+					invalidCount++;
+				} else {
+					final CombinationStatus covered = coverCombinationAll(combinedCondition);
+					switch (covered) {
+					case NOT_COVERED:
+						combinationListSingle.add(combinedCondition);
+						combinedCondition = new ClauseList();
+						break;
+					case COVERED:
+						coveredCount++;
+						combinedCondition.clear();
+						break;
+					case INVALID:
+						invalidCount++;
+						combinedCondition.clear();
+						break;
+					default:
+						break;
 					}
 				}
-				if (orgAssignmentSize < localSolver.getAssignmentSize()) {
-					if (localSolver.hasSolution() != SatResult.TRUE) {
-						return false;
+				count++;
+			}
+
+			int coveredIndex = -1;
+			boolean changed = true;
+			while (changed && ((phaseCount - 1) < 0)) {
+				phaseCount++;
+				count = coveredCount + invalidCount;
+				changed = false;
+				for (int i = coveredIndex + 1; i < combinationListSingle.size(); i++) {
+					final ClauseList combination = combinationListSingle.get(i);
+					final CombinationStatus covered = coverCombinationSingle(combination);
+					switch (covered) {
+					case COVERED:
+						Collections.swap(combinationListSingle, i, ++coveredIndex);
+						coveredCount++;
+						changed = true;
+						break;
+					case NOT_COVERED:
+						break;
+					case INVALID:
+						Collections.swap(combinationListSingle, i, ++coveredIndex);
+						invalidCount++;
+						break;
+					default:
+						break;
+					}
+					count++;
+				}
+			}
+
+			phaseCount++;
+			count = coveredCount + invalidCount;
+			for (int i = coveredIndex + 1; i < combinationListSingle.size(); i++) {
+				final ClauseList combination = combinationListSingle.get(i);
+				final CombinationStatus covered = coverCombinationAll(combination);
+				switch (covered) {
+				case COVERED:
+					coveredCount++;
+					break;
+				case NOT_COVERED:
+					break;
+				case INVALID:
+					invalidCount++;
+					break;
+				default:
+					break;
+				}
+				count++;
+			}
+		} finally {
+			samplingMonitor.finish();
+		}
+	}
+
+	private boolean combineConditions(ClauseList[] conditionArray, int t, ClauseList combinedCondition) {
+		if (t == conditionArray.length) {
+			final int[] combinedLiteralsArray = Arrays.copyOfRange(lits.toArray(), 0, lits.size());
+			combinedCondition.add(new LiteralSet(combinedLiteralsArray));
+		} else {
+			clauseLoop: for (final LiteralSet clause : conditionArray[t]) {
+				final int[] literals = clause.getLiterals();
+				for (int i = 0; i < literals.length; i++) {
+					final int literal = literals[i];
+					final int var = Math.abs(literal);
+					final int x = features[var];
+					if ((x != 0) && ((literal ^ x) < 0)) {
+						for (i--; i >= 0; i--) {
+							final int undoLiteral = literals[i];
+							final int var2 = Math.abs(undoLiteral);
+							final int y = features[var2];
+							final int y2 = y - ((undoLiteral >>> 31) == 0 ? 1 : -1);
+							features[var2] = y2;
+							if (y2 == 0) {
+								lits.pop();
+							}
+						}
+						continue clauseLoop;
 					} else {
-						util.addSolverSolution(localSolver.getInternalSolution());
-						localSolver.shuffleOrder(util.getRandom());
+						features[var] = x + ((literal >>> 31) == 0 ? 1 : -1);
+						if (x == 0) {
+							lits.push(literal);
+						}
 					}
 				}
-			} finally {
-				localSolver.assignmentClear(orgAssignmentSize);
+				if (!combineConditions(conditionArray, t + 1, combinedCondition)) {
+					return false;
+				}
+				for (int i = 0; i < literals.length; i++) {
+					final int literal = literals[i];
+					final int var = Math.abs(literal);
+					final int y = features[var];
+					final int y2 = y - ((literal >>> 31) == 0 ? 1 : -1);
+					features[var] = y2;
+					if (y2 == 0) {
+						lits.pop();
+					}
+				}
 			}
 		}
 		return true;
 	}
 
-	private boolean isSelected(TWiseConfiguration configuration, ClauseList clauseList) {
-		for (final LiteralSet clause : clauseList) {
-			if (configuration.getSolution().containsAll(clause)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	protected void select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
-		coveredCount++;
-		covered.set(index);
+	private void select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
 		solution.setLiteral(literals.getLiterals());
 		if (util.hasSolver()) {
 			switch (deduce) {
@@ -530,9 +528,31 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
-	protected boolean selectionPossibleWithinSolverSolution(TWiseConfiguration solution, LiteralSet literals) {
+	private boolean isSelectionPossibleSAT(final LiteralSet literals, final TWiseConfiguration configuration) {
 		if (util.hasSolver()) {
-			// test whether there is a possible solution that already contains the combination
+			final ISatSolver localSolver = util.getSolver();
+			final int orgAssignmentSize = configuration.setUpSolver(localSolver);
+			try {
+				final int[] configurationLiterals = configuration.getSolution().getLiterals();
+				for (final int literal : literals.getLiterals()) {
+					if (configurationLiterals[Math.abs(literal) - 1] == 0) {
+						localSolver.assignmentPush(literal);
+					}
+				}
+				if (orgAssignmentSize < localSolver.getAssignmentSize()) {
+					if (localSolver.hasSolution() != SatResult.TRUE) {
+						return false;
+					}
+				}
+			} finally {
+				localSolver.assignmentClear(orgAssignmentSize);
+			}
+		}
+		return true;
+	}
+
+	private boolean isSelectionPossibleWithinSolverSolution(LiteralSet literals, TWiseConfiguration solution) {
+		if (util.hasSolver()) {
 			final VecInt solverSolutionIndex = solution.getSolverSolutionIndex();
 			for (int i = 0; i < solverSolutionIndex.size(); i++) {
 				if (!util.getSolverSolution(solverSolutionIndex.get(i)).hasConflicts(literals)) {
@@ -544,7 +564,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return true;
 	}
 
-	protected boolean isCombinationValidSAT(LiteralSet literals) {
+	private boolean isCombinationValidSAT(int[] literals) {
 		if (util.hasSolver()) {
 			for (final LiteralSet s : util.getSolverSolutions()) {
 				if (s == null) {
@@ -555,16 +575,19 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				}
 			}
 			final ISatSolver solver = util.getSolver();
-			solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 			final int orgAssingmentLength = solver.getAssignmentSize();
-			solver.assignmentPushAll(literals.getLiterals());
+			solver.assignmentPushAll(literals);
 			try {
-				if (solver.hasSolution() != SatResult.TRUE) {
-					invalidCount++;
+				final SatResult hasSolution = solver.hasSolution();
+				switch (hasSolution) {
+				case TRUE:
+					util.addSolverSolution(solver.getSolution());
+					break;
+				case FALSE:
+				case TIMEOUT:
 					return false;
-				} else {
-					util.addSolverSolution(solver.getInternalSolution());
-					solver.shuffleOrder(util.getRandom());
+				default:
+					break;
 				}
 			} finally {
 				solver.assignmentClear(orgAssingmentLength);
@@ -572,133 +595,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 		return true;
 	}
-
-	private Iterable<LiteralSet> getNextCombinations(ClauseList[] indexArray) {
-		final int t = indexArray.length;
-		final int[] clauseIndex = new int[t];
-		clauseIndex[0] = -1;
-		int i = 0;
-		expressionCombinationList.clear();
-		combinationLengthList.clear();
-		combinationLoop: while (i < t) {
-			// TODO gray code may be faster
-			for (i = 0; i < t; i++) {
-				final int cindex = clauseIndex[i];
-				if (cindex == (indexArray[i].size() - 1)) {
-					clauseIndex[i] = 0;
-				} else {
-					clauseIndex[i] = cindex + 1;
-
-					final TreeSet<Integer> newLiteralSet = new TreeSet<>();
-					for (int j = 0; j < t; j++) {
-						for (final int literal : indexArray[j].get(clauseIndex[j]).getLiterals()) {
-							newLiteralSet.add(literal);
-						}
-					}
-
-					final int[] combinationLiterals = new int[newLiteralSet.size()];
-					int j = 0;
-					for (final Integer literal : newLiteralSet) {
-						combinationLiterals[j++] = literal;
-					}
-					final LiteralSet literalSet = new LiteralSet(combinationLiterals);
-
-					for (final int literal : combinationLiterals) {
-						final LiteralSet stronglyConnectedLiterals = strongHull[util.getMig().getVertex(literal).getId()];
-						if (stronglyConnectedLiterals.hasConflicts(literalSet)) {
-							continue combinationLoop;
-						}
-						for (final int stronglyConnectedLiteral : stronglyConnectedLiterals.getLiterals()) {
-							newLiteralSet.add(stronglyConnectedLiteral);
-						}
-					}
-
-					expressionCombinationList.add(literalSet);
-					combinationLengthList.add(newLiteralSet.size());
-				}
-			}
-		}
-		final Integer[] sortedIndex = Functional.getSortedIndex(combinationLengthList, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return o1 - o2;
-			}
-		});
-
-		final List<LiteralSet> sortedList = new ArrayList<>(expressionCombinationList.size());
-		for (int j = 0; j < sortedIndex.length; j++) {
-			sortedList.add(expressionCombinationList.get(sortedIndex[j]));
-		}
-		return sortedList;
-	}
-
-//	private class ExpressionCombination implements Iterator<LiteralSet> {
-//		private final int[] clauseIndex;
-//		private final int t;
-//
-//		private ClauseList[] tempExpressions;
-//		private int i;
-//
-//		public ExpressionCombination(int t) {
-//			t = t;
-//			clauseIndex = new int[t];
-//		}
-//
-//		public void init(ClauseList[] indexArray) {
-//			tempExpressions = indexArray;
-//		}
-//
-//		public LiteralSet reset() {
-//			Arrays.fill(clauseIndex, 0);
-//			clauseIndex[0] = -1;
-//			i = 0;
-//			return next();
-//		}
-//
-//		@Override
-//		public boolean hasNext() {
-//			return i < t;
-//		}
-//
-//		@Override
-//		public LiteralSet next() {
-//			combinationLoop: while (i < t) {
-//				// TODO gray code may be faster
-//				for (i = 0; i < t; i++) {
-//					final int cindex = clauseIndex[i];
-//					if (cindex == (tempExpressions[i].size() - 1)) {
-//						clauseIndex[i] = 0;
-//					} else {
-//						clauseIndex[i] = cindex + 1;
-//
-//						final TreeSet<Integer> newLiteralSet = new TreeSet<>();
-//						for (int j = 0; j < t; j++) {
-//							for (final int literal : tempExpressions[j].get(clauseIndex[j]).getLiterals()) {
-//								newLiteralSet.add(literal);
-//							}
-//						}
-//
-//						final int[] combinationLiterals = new int[newLiteralSet.size()];
-//						int j = 0;
-//						for (final Integer literal : newLiteralSet) {
-//							combinationLiterals[j++] = literal;
-//						}
-//						final LiteralSet literalSet = new LiteralSet(combinationLiterals);
-//
-//						for (final int literal : combinationLiterals) {
-//							if (strongHull[util.getMig().getVertex(literal).getId()].hasConflicts(literalSet)) {
-//								continue combinationLoop;
-//							}
-//						}
-//
-//						return literalSet;
-//					}
-//				}
-//			}
-//			return null;
-//		}
-//
-//	}
 
 	public TWiseConfigurationUtil getUtil() {
 		return util;

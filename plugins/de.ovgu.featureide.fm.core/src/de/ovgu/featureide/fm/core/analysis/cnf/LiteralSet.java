@@ -304,7 +304,10 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	}
 
 	public boolean hasConflicts(LiteralSet variables) {
-		final int[] otherLiterals = variables.getLiterals();
+		return hasConflicts(variables.getLiterals());
+	}
+
+	public boolean hasConflicts(final int[] otherLiterals) {
 		for (int i = 0; i < otherLiterals.length; i++) {
 			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
 				return true;
@@ -458,6 +461,16 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	public int compareTo(LiteralSet o) {
 		// TODO implement more efficient comparison
 		return Arrays.toString(literals).compareTo(Arrays.toString(o.literals));
+	}
+
+	public LiteralSet reorder(IVariables oldVariables, IVariables newVariables) {
+		final int[] oldLiterals = literals;
+		final int[] newLiterals = new int[oldLiterals.length];
+		for (int i = 0; i < oldLiterals.length; i++) {
+			final int l = oldLiterals[i];
+			newLiterals[i] = newVariables.getVariable(oldVariables.getName(l), l > 0);
+		}
+		return new LiteralSet(newLiterals);
 	}
 
 }

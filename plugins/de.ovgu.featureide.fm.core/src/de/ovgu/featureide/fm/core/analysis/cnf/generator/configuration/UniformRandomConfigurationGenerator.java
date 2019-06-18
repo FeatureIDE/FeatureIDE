@@ -46,8 +46,17 @@ public class UniformRandomConfigurationGenerator extends ARandomConfigurationGen
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
 		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
+		gen.setAllowDuplicates(false);
 		gen.setRandom(random);
 		final List<LiteralSet> sample = LongRunningWrapper.runMethod(gen);
+		if (sample.size() < maxSampleSize) {
+			for (final LiteralSet solution : sample) {
+				addResult(solution);
+			}
+			return;
+		} else if (sample.isEmpty()) {
+			return;
+		}
 
 		monitor.setRemainingWork(maxSampleSize);
 		solver.setSelectionStrategy(sample);

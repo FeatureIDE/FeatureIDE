@@ -24,7 +24,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Represents an instance of a satisfiability problem in CNF.
@@ -173,22 +175,33 @@ public class CNF implements Serializable {
 	 * @param newVariables the new variables
 	 * @return an adapted clause list, {@code null} if there are old variables names the are not contained in the new variables.
 	 */
-	public ClauseList adapt(IVariables newVariables) {
-		if (Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()))) {
-			final ClauseList newClauseList = new ClauseList(clauses.size());
-			for (final LiteralSet literalSet : clauses) {
-				final int[] oldLiterals = literalSet.getLiterals();
-				final int[] newLiterals = new int[oldLiterals.length];
-				for (int i = 0; i < oldLiterals.length; i++) {
-					final int oldLiteral = oldLiterals[i];
-					newLiterals[i] = newVariables.getVariable(variables.getName(oldLiteral), oldLiteral > 0);
-				}
-				newClauseList.add(new LiteralSet(newLiterals));
-			}
-			return newClauseList;
-		} else {
-			return null;
+	public ClauseList adaptClauseList(IVariables newVariables) {
+		final boolean validFeatureSet = Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()));
+		return validFeatureSet ? createAdaptedClauseList(newVariables) : null;
+	}
+
+	public CNF adapt(Variables newVariables) {
+		final boolean validFeatureSet = Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()));
+		return validFeatureSet ? new CNF(newVariables, createAdaptedClauseList(newVariables)) : null;
+	}
+
+	public CNF randomize(Random random) {
+		final List<String> shuffledVars = Arrays.asList(Arrays.copyOfRange(variables.intToVar, 1, variables.intToVar.length));
+		Collections.shuffle(shuffledVars, random);
+		final Variables newVariables = new Variables(shuffledVars);
+
+		final ClauseList adaptedClauseList = createAdaptedClauseList(newVariables);
+		Collections.shuffle(adaptedClauseList, random);
+
+		return new CNF(newVariables, adaptedClauseList);
+	}
+
+	private ClauseList createAdaptedClauseList(IVariables newVariables) {
+		final ClauseList newClauses = new ClauseList(clauses.size());
+		for (final LiteralSet oldClause : clauses) {
+			newClauses.add(oldClause.reorder(variables, newVariables));
 		}
+		return newClauses;
 	}
 
 }

@@ -954,8 +954,15 @@ public final class ConstraintTextValidator {
 			satResult = SatResult.FALSE;
 			try {
 				solver = new AdvancedSatSolver(initialResult.satInstance);
-				solver.addClauses(constraintCNF.adapt(initialResult.satInstance.getVariables()));
-				satResult = solver.hasSolution();
+				final ClauseList adaptClauseList = constraintCNF.adaptClauseList(initialResult.satInstance.getVariables());
+				if (adaptClauseList != null) {
+					solver.addClauses(adaptClauseList);
+					satResult = solver.hasSolution();
+				} else {
+					onUpdate.invoke(
+							new ValidationMessage("Constraint contains invalid feature names\n", Problem.Severity.ERROR, DialogState.SAVE_CHANGES_DISABLED));
+					return null;
+				}
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
@@ -976,8 +983,15 @@ public final class ConstraintTextValidator {
 			satResult = SatResult.FALSE;
 			try {
 				final AdvancedSatSolver redundantSolver = new AdvancedSatSolver(initialResult.satInstance);
-				redundantSolver.addClauses(reverseConstraintCNF.adapt(initialResult.satInstance.getVariables()));
-				satResult = redundantSolver.hasSolution();
+				final ClauseList adaptClauseList = reverseConstraintCNF.adaptClauseList(initialResult.satInstance.getVariables());
+				if (adaptClauseList != null) {
+					redundantSolver.addClauses(adaptClauseList);
+					satResult = redundantSolver.hasSolution();
+				} else {
+					onUpdate.invoke(
+							new ValidationMessage("Constraint contains invalid feature names\n", Problem.Severity.ERROR, DialogState.SAVE_CHANGES_DISABLED));
+					return null;
+				}
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
