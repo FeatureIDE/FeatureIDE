@@ -280,7 +280,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	@Override
 	public void setSelectionStrategy(List<LiteralSet> sample) {
 		strategy = SelectionStrategy.UNIFORM_RANDOM;
-		solver.setOrder(new VarOrderHeap3(sample));
+		solver.setOrder(new VarOrderHeap3(satInstance.getVariables().size(), sample));
 		solver.getOrder().init();
 	}
 
