@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public class IteratorFactory {
 
@@ -30,7 +30,7 @@ public class IteratorFactory {
 		InverseDefault, Default, Lexicographic, InverseLexicographic, RandomPartition, Partition
 	}
 
-	public static ICombinationIterator getIterator(IteratorID id, List<ClauseList> expressions, int t) {
+	public static ICombinationIterator getIterator(IteratorID id, List<PresenceCondition> expressions, int t) {
 		switch (id) {
 		case Default:
 			return new InverseDefaultIterator(t, expressions);

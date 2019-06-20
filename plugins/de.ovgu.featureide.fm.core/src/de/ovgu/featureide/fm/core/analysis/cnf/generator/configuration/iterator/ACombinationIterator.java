@@ -23,12 +23,12 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 import java.util.Iterator;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public abstract class ACombinationIterator implements ICombinationIterator {
 
-	protected final List<ClauseList> expressions;
-	protected final ClauseList[] nextCombination;
+	protected final List<PresenceCondition> expressions;
+	protected final PresenceCondition[] nextCombination;
 
 	protected final int t, n;
 	protected final long numCombinations;
@@ -37,16 +37,16 @@ public abstract class ACombinationIterator implements ICombinationIterator {
 	protected long counter = 0;
 	private long index = 0;
 
-	public ACombinationIterator(int t, List<ClauseList> expressions) {
+	public ACombinationIterator(int t, List<PresenceCondition> expressions) {
 		this(t, expressions, new BinomialCalculator(t, expressions.size()));
 	}
 
-	public ACombinationIterator(int t, List<ClauseList> expressions, BinomialCalculator binomialCalculator) {
+	public ACombinationIterator(int t, List<PresenceCondition> expressions, BinomialCalculator binomialCalculator) {
 		this.t = t;
 		this.expressions = expressions;
 		n = expressions.size();
 		this.binomialCalculator = binomialCalculator;
-		nextCombination = new ClauseList[t];
+		nextCombination = new PresenceCondition[t];
 		numCombinations = binomialCalculator.binomial(n, t);
 	}
 
@@ -56,7 +56,7 @@ public abstract class ACombinationIterator implements ICombinationIterator {
 	}
 
 	@Override
-	public ClauseList[] next() {
+	public PresenceCondition[] next() {
 		if (counter++ >= numCombinations) {
 			return null;
 		}
@@ -103,7 +103,7 @@ public abstract class ACombinationIterator implements ICombinationIterator {
 	}
 
 	@Override
-	public Iterator<ClauseList[]> iterator() {
+	public Iterator<PresenceCondition[]> iterator() {
 		return this;
 	}
 

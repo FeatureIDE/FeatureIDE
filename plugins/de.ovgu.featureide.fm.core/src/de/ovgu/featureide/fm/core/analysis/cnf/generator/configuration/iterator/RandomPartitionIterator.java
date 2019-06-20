@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 import java.security.SecureRandom;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public class RandomPartitionIterator extends PartitionIterator {
 
@@ -32,7 +32,7 @@ public class RandomPartitionIterator extends PartitionIterator {
 		new SecureRandom(new byte[0]).nextBytes(seed);
 	}
 
-	public RandomPartitionIterator(int t, List<ClauseList> expressions) {
+	public RandomPartitionIterator(int t, List<PresenceCondition> expressions) {
 		super(t, expressions, 4);
 
 		final SecureRandom rand = new SecureRandom(seed);

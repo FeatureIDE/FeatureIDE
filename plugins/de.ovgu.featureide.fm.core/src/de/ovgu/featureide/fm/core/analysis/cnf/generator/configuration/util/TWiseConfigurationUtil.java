@@ -23,15 +23,22 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
@@ -48,20 +55,34 @@ public class TWiseConfigurationUtil {
 
 	public static long seed = 123456789;
 
-	protected final List<TWiseConfiguration> incompleteSolutionList;
 	protected final Solution[] solverSolutions = new Solution[GLOBAL_SOLUTION_LIMIT];
 	protected final HashSet<Solution> solutionSet = new HashSet<>();
 	protected final Random rnd = new Random(seed);
+
+	protected final List<Solution> randomSample;
+
+	private final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
+	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
 
 	protected final CNF cnf;
 	protected final ISatSolver localSolver;
 
 	protected ModalImplicationGraph mig;
 
-	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver, List<TWiseConfiguration> incompleteSolutionList) {
+	protected int maxSampleSize;
+
+	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver) {
 		this.cnf = cnf;
 		this.localSolver = localSolver;
-		this.incompleteSolutionList = incompleteSolutionList;
+
+		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
+		randomGenerator.setAllowDuplicates(false);
+		randomGenerator.setSampleSize(1000);
+		randomSample = LongRunningWrapper.runMethod(randomGenerator);
+
+		for (final Solution solution : randomSample) {
+			addSolverSolution(solution.getLiterals());
+		}
 	}
 
 	public void computeMIG() {
@@ -74,36 +95,10 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
-	public List<List<ClauseList>> cleanClauses(List<List<ClauseList>> expressions) {
-		final LiteralSet coreDeadFeature = getDeadCoreFeatures();
-
-		final List<List<ClauseList>> newGroupList = new ArrayList<>(expressions.size());
-		for (final List<ClauseList> group : expressions) {
-			final List<ClauseList> newNodeList = new ArrayList<>();
-			expressionLoop: for (final ClauseList clauses : group) {
-				final List<LiteralSet> newClauses = new ArrayList<>();
-				for (final LiteralSet clause : clauses) {
-					// If clause can be satisfied
-					if ((clause.countConflicts(coreDeadFeature) == 0)) {
-						// If clause is already satisfied
-						if (coreDeadFeature.containsAll(clause)) {
-							continue expressionLoop;
-						} else {
-							newClauses.add(clause.clone());
-						}
-					}
-				}
-				if (!newClauses.isEmpty()) {
-					newNodeList.add(new ClauseList(newClauses));
-				}
-			}
-			newGroupList.add(newNodeList);
+	public LiteralSet getDeadCoreFeatures() {
+		if (localSolver == null) {
+			return new LiteralSet();
 		}
-		return newGroupList;
-
-	}
-
-	private LiteralSet getDeadCoreFeatures() {
 		final int[] coreDead = new int[localSolver.getSatInstance().getVariables().size()];
 		int index = 0;
 		for (final Vertex vertex : mig.getAdjList()) {
@@ -151,7 +146,7 @@ public class TWiseConfigurationUtil {
 			}
 			solverSolutions[solverSolutionEndIndex] = solution;
 
-			for (final TWiseConfiguration configuration : incompleteSolutionList) {
+			for (final TWiseConfiguration configuration : getIncompleteSolutionList()) {
 				configuration.updateSolverSolutions(literals, solverSolutionEndIndex);
 			}
 		}
@@ -163,6 +158,164 @@ public class TWiseConfigurationUtil {
 
 	public Solution[] getSolverSolutions() {
 		return solverSolutions;
+	}
+
+	public boolean isCombinationValidSAT(int[] literals) {
+		if (hasSolver()) {
+			for (final Solution s : randomSample) {
+				if (!s.hasConflicts(literals)) {
+					return true;
+				}
+			}
+			final ISatSolver solver = getSolver();
+			final int orgAssingmentLength = solver.getAssignmentSize();
+			solver.assignmentPushAll(literals);
+			try {
+				final SatResult hasSolution = solver.hasSolution();
+				switch (hasSolution) {
+				case TRUE:
+					addSolverSolution(solver.getSolution());
+					break;
+				case FALSE:
+				case TIMEOUT:
+					return false;
+				default:
+					break;
+				}
+			} finally {
+				solver.assignmentClear(orgAssingmentLength);
+			}
+		}
+		return true;
+	}
+
+	public boolean isSelectionPossible(final LiteralSet literals, final TWiseConfiguration configuration, boolean useSolver) {
+		if (hasSolver()) {
+			if (useSolver) {
+				final ISatSolver localSolver = getSolver();
+				final int orgAssignmentSize = configuration.setUpSolver(localSolver);
+				try {
+					final int[] configurationLiterals = configuration.getSolution().getLiterals();
+					for (final int literal : literals.getLiterals()) {
+						if (configurationLiterals[Math.abs(literal) - 1] == 0) {
+							localSolver.assignmentPush(literal);
+						}
+					}
+					if (orgAssignmentSize < localSolver.getAssignmentSize()) {
+						if (localSolver.hasSolution() != SatResult.TRUE) {
+							return false;
+						}
+					}
+				} finally {
+					localSolver.assignmentClear(orgAssignmentSize);
+				}
+			} else {
+				final VecInt solverSolutionIndex = configuration.getSolverSolutionIndex();
+				for (int i = 0; i < solverSolutionIndex.size(); i++) {
+					if (!getSolverSolution(solverSolutionIndex.get(i)).hasConflicts(literals)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean isCovered(ClauseList condition, Iterable<TWiseConfiguration> solutionList) {
+		for (final TWiseConfiguration configuration : solutionList) {
+			final Solution solution = configuration.getSolution();
+			for (final LiteralSet literals : condition) {
+				if (solution.containsAll(literals)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean isCovered(ClauseList condition) {
+		return isCovered(condition, completeSolutionList) || isCovered(condition, incompleteSolutionList);
+	}
+
+	public boolean select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
+		solution.setLiteral(literals.getLiterals());
+		if (hasSolver()) {
+			switch (deduce) {
+			case AC:
+				solution.autoComplete();
+				break;
+			case DP:
+				solution.propagation();
+				break;
+			case NONE:
+				break;
+			}
+		}
+
+		if (solution.isComplete()) {
+			solution.clear();
+			for (final Iterator<TWiseConfiguration> iterator = incompleteSolutionList.iterator(); iterator.hasNext();) {
+				if (iterator.next() == solution) {
+					iterator.remove();
+					completeSolutionList.add(solution);
+					break;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isCandidate(final LiteralSet literals, TWiseConfiguration solution) {
+		return solution.getSolution().hasConflicts(literals);
+	}
+
+	public void addCandidates(final LiteralSet literals, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		for (final TWiseConfiguration candidate : getIncompleteSolutionList()) {
+			if (isCandidate(literals, candidate)) {
+				candidatesList.add(new Pair<>(literals, candidate));
+			}
+		}
+	}
+
+	public void newConfiguration(final LiteralSet literals) {
+		if (completeSolutionList.size() < maxSampleSize) {
+			final TWiseConfiguration configuration = new TWiseConfiguration(this);
+			select(configuration, Deduce.DP, literals);
+			configuration.updateSolverSolutions();
+			if (configuration.isComplete()) {
+				configuration.clear();
+				completeSolutionList.add(configuration);
+			} else {
+				incompleteSolutionList.add(configuration);
+//				Collections.sort(incompleteSolutionList, configurationLengthComparator);
+			}
+		}
+	}
+
+	public List<TWiseConfiguration> getIncompleteSolutionList() {
+		return incompleteSolutionList;
+	}
+
+	public List<TWiseConfiguration> getCompleteSolutionList() {
+		return completeSolutionList;
+	}
+
+	public List<TWiseConfiguration> getResultList() {
+		final ArrayList<TWiseConfiguration> resultList = new ArrayList<>(completeSolutionList.size() + incompleteSolutionList.size());
+		resultList.addAll(incompleteSolutionList);
+		resultList.addAll(completeSolutionList);
+		return resultList;
+	}
+
+	public int getMaxSampleSize() {
+		return maxSampleSize;
+	}
+
+	public void setMaxSampleSize(int maxSampleSize) {
+		this.maxSampleSize = maxSampleSize;
 	}
 
 }

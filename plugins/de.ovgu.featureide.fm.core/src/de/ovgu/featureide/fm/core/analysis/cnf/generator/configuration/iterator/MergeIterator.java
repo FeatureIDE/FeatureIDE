@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.IteratorFactory.IteratorID;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public class MergeIterator implements ICombinationIterator {
 
@@ -35,11 +35,11 @@ public class MergeIterator implements ICombinationIterator {
 
 	private int iteratorIndex = -1;
 
-	public MergeIterator(int t, List<List<ClauseList>> expressionSets, IteratorID id) {
+	public MergeIterator(int t, List<List<PresenceCondition>> expressionSets, IteratorID id) {
 		this.t = t;
 		setIterators = new ArrayList<>(expressionSets.size());
 		long sumNumberOfCombinations = 0;
-		for (final List<ClauseList> expressions : expressionSets) {
+		for (final List<PresenceCondition> expressions : expressionSets) {
 			final ICombinationIterator iterator = IteratorFactory.getIterator(id, expressions, t);
 			setIterators.add(iterator);
 			sumNumberOfCombinations += iterator.size();
@@ -58,12 +58,12 @@ public class MergeIterator implements ICombinationIterator {
 	}
 
 	@Override
-	public ClauseList[] next() {
+	public PresenceCondition[] next() {
 		for (int i = 0; i < setIterators.size(); i++) {
 			iteratorIndex = (iteratorIndex + 1) % setIterators.size();
 			final ICombinationIterator iterator = setIterators.get(iteratorIndex);
 			if (iterator.hasNext()) {
-				final ClauseList[] next = iterator.next();
+				final PresenceCondition[] next = iterator.next();
 				if (next != null) {
 					return next;
 				}
@@ -90,7 +90,7 @@ public class MergeIterator implements ICombinationIterator {
 	}
 
 	@Override
-	public Iterator<ClauseList[]> iterator() {
+	public Iterator<PresenceCondition[]> iterator() {
 		return this;
 	}
 

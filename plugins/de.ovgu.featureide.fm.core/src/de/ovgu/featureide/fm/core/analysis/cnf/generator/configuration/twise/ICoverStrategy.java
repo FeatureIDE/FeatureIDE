@@ -18,21 +18,28 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.List;
+import java.util.Comparator;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
+import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.CandidateLengthComparator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
 
-public class InverseDefaultIterator extends ACombinationIterator {
+/**
+ *
+ * @author Sebastian Krieter
+ */
+public interface ICoverStrategy {
 
-	public InverseDefaultIterator(int t, List<PresenceCondition> expressions) {
-		super(t, expressions);
+	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
+
+	static enum CombinationStatus {
+		NOT_COVERED, COVERED, INVALID,
 	}
 
-	@Override
-	protected long nextIndex() {
-		return numCombinations - counter;
-	}
+	CombinationStatus cover(final ClauseList nextCondition);
 
 }

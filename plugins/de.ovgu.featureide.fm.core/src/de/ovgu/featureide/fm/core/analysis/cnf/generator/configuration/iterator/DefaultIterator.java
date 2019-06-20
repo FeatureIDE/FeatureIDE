@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public class DefaultIterator extends ACombinationIterator {
 
-	public DefaultIterator(int t, List<ClauseList> expressions) {
+	public DefaultIterator(int t, List<PresenceCondition> expressions) {
 		super(t, expressions);
 	}
 

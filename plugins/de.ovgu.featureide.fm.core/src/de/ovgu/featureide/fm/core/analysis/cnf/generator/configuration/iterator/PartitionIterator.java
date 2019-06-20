@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 public class PartitionIterator extends ACombinationIterator {
 
@@ -30,11 +30,11 @@ public class PartitionIterator extends ACombinationIterator {
 	private final int[] pos;
 	private final int radix;
 
-	public PartitionIterator(int t, List<ClauseList> expressions) {
+	public PartitionIterator(int t, List<PresenceCondition> expressions) {
 		this(t, expressions, 2);
 	}
 
-	protected PartitionIterator(int t, List<ClauseList> expressions, int dimNumber) {
+	protected PartitionIterator(int t, List<PresenceCondition> expressions, int dimNumber) {
 		super(t, expressions);
 
 		final int numDim = dimNumber * t;

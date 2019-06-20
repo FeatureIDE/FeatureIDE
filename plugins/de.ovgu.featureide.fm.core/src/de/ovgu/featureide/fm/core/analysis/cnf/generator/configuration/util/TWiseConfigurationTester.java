@@ -20,11 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.sat4j.core.VecInt;
 
@@ -34,15 +32,15 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.LexicographicIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceConditionManager;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
-import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Test whether a set of configurations achieves t-wise feature coverage.
@@ -53,7 +51,7 @@ public class TWiseConfigurationTester {
 
 	private final int t;
 	private final CNF cnf;
-	private final List<List<ClauseList>> nodeArray;
+	private final PresenceConditionManager presenceConditionManager;
 	private final ISatSolver solver;
 	private final ModalImplicationGraph mig;
 	private final List<Solution> configurations;
@@ -63,15 +61,18 @@ public class TWiseConfigurationTester {
 	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<Solution> configurations) {
 		this.cnf = cnf;
 		this.t = t;
-		this.nodeArray = nodeArray;
 		this.configurations = configurations;
 		if (!this.cnf.getClauses().isEmpty()) {
 			solver = new AdvancedSatSolver(this.cnf);
-			mig = LongRunningWrapper.runMethod(new MIGBuilder(solver.getSatInstance(), false));
+			final TWiseConfigurationUtil util = new TWiseConfigurationUtil(cnf, solver);
+			util.computeMIG();
+			presenceConditionManager = new PresenceConditionManager(util, nodeArray);
+			mig = util.getMig();
 			genHulls();
 		} else {
 			solver = null;
 			mig = null;
+			presenceConditionManager = new PresenceConditionManager(new TWiseConfigurationUtil(cnf, null), nodeArray);
 		}
 	}
 
@@ -94,13 +95,13 @@ public class TWiseConfigurationTester {
 		return (testSolutionValidity() == null) && (testCompleteness() == null);
 	}
 
-	public ClauseList[] testCompleteness() throws AssertionError {
-		final int[] clauseIndex = new int[t];
-		final ArrayList<LiteralSet> combinations = new ArrayList<>();
+	public PresenceCondition[] testCompleteness() throws AssertionError {
+		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
+		final ClauseList combinations = new ClauseList();
 
-		for (final List<ClauseList> expressions : nodeArray) {
+		for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
 			comboLoop: for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
-				final ClauseList[] clauseListArray = iterator.next();
+				final PresenceCondition[] clauseListArray = iterator.next();
 				if (clauseListArray == null) {
 					break;
 				}
@@ -109,27 +110,8 @@ public class TWiseConfigurationTester {
 					continue comboLoop;
 				}
 
-				Arrays.fill(clauseIndex, 0);
-				clauseIndex[0] = -1;
 				combinations.clear();
-
-				int i = 0;
-				loop: while (i < t) {
-					for (i = 0; i < t; i++) {
-						final int cindex = clauseIndex[i];
-						if (cindex == (clauseListArray[i].size() - 1)) {
-							clauseIndex[i] = 0;
-						} else {
-							clauseIndex[i] = cindex + 1;
-
-							final LiteralSet literalSet = getCombinationLiterals(clauseIndex, clauseListArray);
-							if (literalSet != null) {
-								combinations.add(literalSet);
-								continue loop;
-							}
-						}
-					}
-				}
+				combiner.combineConditions(clauseListArray, combinations);
 
 				if (solver != null) {
 					for (final Iterator<LiteralSet> it = combinations.iterator(); it.hasNext();) {
@@ -187,31 +169,10 @@ public class TWiseConfigurationTester {
 		return false;
 	}
 
-	private LiteralSet getCombinationLiterals(final int[] clauseIndex, final ClauseList[] clauseListArray) {
-		final TreeSet<Integer> newLiteralSet = new TreeSet<>();
-		for (int j = 0; j < t; j++) {
-			for (final int literal : clauseListArray[j].get(clauseIndex[j]).getLiterals()) {
-				if (newLiteralSet.contains(-literal)) {
-					return null;
-				} else {
-					newLiteralSet.add(literal);
-				}
-			}
-		}
-
-		final int[] combinationLiterals = new int[newLiteralSet.size()];
-		int j = 0;
-		for (final Integer literal : newLiteralSet) {
-			combinationLiterals[j++] = literal;
-		}
-		final LiteralSet literalSet = new LiteralSet(combinationLiterals);
-		return literalSet;
-	}
-
-	private boolean isCovered(final ClauseList[] clauseListArray) {
+	private boolean isCovered(final PresenceCondition[] clauseListArray) {
 		configurationLoop: for (final Solution solution : configurations) {
-			for (final ClauseList clauseList : clauseListArray) {
-				if (!containsAtLeastOne(solution, clauseList)) {
+			for (final PresenceCondition condition : clauseListArray) {
+				if (!containsAtLeastOne(solution, condition.getClauses())) {
 					continue configurationLoop;
 				}
 			}

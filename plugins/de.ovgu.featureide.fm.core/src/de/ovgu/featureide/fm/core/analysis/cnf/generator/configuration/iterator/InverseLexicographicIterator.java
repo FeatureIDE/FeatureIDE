@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 /**
  *
@@ -32,7 +32,7 @@ public class InverseLexicographicIterator extends ACombinationIterator {
 
 	private final int[] c;
 
-	public InverseLexicographicIterator(int t, List<ClauseList> expressions) {
+	public InverseLexicographicIterator(int t, List<PresenceCondition> expressions) {
 		super(t, expressions);
 		c = new int[t];
 		for (int i = t; i > 0; i--) {

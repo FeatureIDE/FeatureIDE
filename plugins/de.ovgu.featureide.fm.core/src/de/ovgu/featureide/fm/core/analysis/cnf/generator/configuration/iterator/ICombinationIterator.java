@@ -22,9 +22,9 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator
 
 import java.util.Iterator;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
-public interface ICombinationIterator extends Iterator<ClauseList[]>, Iterable<ClauseList[]> {
+public interface ICombinationIterator extends Iterator<PresenceCondition[]>, Iterable<PresenceCondition[]> {
 
 	long getIndex();
 
