@@ -20,25 +20,39 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.Objects;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class PresenceCondition {
+public class PresenceCondition extends ClauseList {
+
+	private static final long serialVersionUID = 1L;
 
 	private final TreeSet<Integer> groups = new TreeSet<>();
 
-	private final ClauseList clauses;
 	private int index;
 
-	public PresenceCondition(ClauseList clauses) {
-		this.clauses = clauses;
+	public PresenceCondition() {
+		super();
+	}
+
+	public PresenceCondition(ClauseList otherClauseList) {
+		super(otherClauseList);
+	}
+
+	public PresenceCondition(Collection<? extends LiteralSet> c) {
+		super(c);
+	}
+
+	public PresenceCondition(int size) {
+		super(size);
 	}
 
 	public void addGroup(int group) {
@@ -47,10 +61,6 @@ public class PresenceCondition {
 
 	public Set<Integer> getGroups() {
 		return groups;
-	}
-
-	public ClauseList getClauses() {
-		return clauses;
 	}
 
 	public int getIndex() {
@@ -62,24 +72,8 @@ public class PresenceCondition {
 	}
 
 	@Override
-	public int hashCode() {
-		return ((clauses == null) ? 0 : clauses.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if ((obj == null) || (getClass() != obj.getClass())) {
-			return false;
-		}
-		return Objects.equals(clauses, ((PresenceCondition) obj).clauses);
-	}
-
-	@Override
 	public String toString() {
-		return "PresenceCondition [groups=" + groups + ", clauses=" + clauses + ", index=" + index + "]";
+		return "PresenceCondition [groups=" + groups + ", clauses=" + super.toString() + ", index=" + index + "]";
 	}
 
 }

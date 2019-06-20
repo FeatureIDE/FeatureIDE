@@ -68,7 +68,7 @@ public class CoverAll implements ICoverStrategy {
 
 		int validCount = nextCondition.size();
 		for (final LiteralSet literals : nextCondition) {
-			if (!util.isCombinationValidSAT(literals.getLiterals())) {
+			if (!util.isCombinationValid(literals)) {
 				validCount--;
 				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
 					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();

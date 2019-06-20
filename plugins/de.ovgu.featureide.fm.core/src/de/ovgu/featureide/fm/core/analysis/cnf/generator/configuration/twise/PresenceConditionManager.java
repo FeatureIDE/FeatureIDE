@@ -77,7 +77,7 @@ public class PresenceConditionManager {
 						presenceConditionList.add(mappedPc);
 						presenceConditionSet.put(mappedPc, mappedPc);
 
-						for (final LiteralSet literalSet : mappedPc.getClauses()) {
+						for (final LiteralSet literalSet : mappedPc) {
 							for (final int literal : literalSet.getLiterals()) {
 								final int dictionaryIndex = literal < 0 ? numberOfVariables - literal : literal;
 								dictonary.get(dictionaryIndex).add(mappedPc);
@@ -96,13 +96,13 @@ public class PresenceConditionManager {
 			final Comparator<PresenceCondition> comparator = new Comparator<PresenceCondition>() {
 				@Override
 				public int compare(PresenceCondition o1, PresenceCondition o2) {
-					final int clauseCountDiff = o1.getClauses().size() - o2.getClauses().size();
+					final int clauseCountDiff = o1.size() - o2.size();
 					if (clauseCountDiff != 0) {
 						return clauseCountDiff;
 					}
 					int clauseLengthDiff = 0;
-					for (int i = 0; i < o1.getClauses().size(); i++) {
-						clauseLengthDiff += o2.getClauses().get(i).size() - o1.getClauses().get(i).size();
+					for (int i = 0; i < o1.size(); i++) {
+						clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
 					}
 					return clauseLengthDiff;
 				}

@@ -151,7 +151,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		for (final TWiseConfiguration configuration : util.getResultList()) {
 			configuration.autoComplete();
-			addResult(configuration.getSolution());
+			addResult(configuration);
 		}
 	}
 

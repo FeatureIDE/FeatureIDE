@@ -25,7 +25,6 @@ import java.util.Arrays;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
@@ -39,15 +38,15 @@ import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfiguration {
+public class TWiseConfiguration extends LiteralSet {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final byte SELECTION_IMPOSSIBLE = 1;
 	public static final byte SELECTION_SELECTED = 2;
 
 	public static int SOLUTION_COUNT_THRESHOLD = 10;
 
-	protected int[] literals;
-	protected LiteralSet solution;
 	protected VecInt solutionLiterals;
 
 	protected int countLiterals, rank = 0;
@@ -99,7 +98,7 @@ public class TWiseConfiguration {
 					SatUtils.updateSolution(unkownValues, model2);
 					solver.setSelectionStrategy(unkownValues, true);
 
-					final int[] literals = solution.getLiterals();
+					final int[] literals = TWiseConfiguration.this.literals;
 					for (int k = 0; k < literals.length; k++) {
 						final int var = literals[k];
 						if ((var != 0) && (unkownValues[k] != 0)) {
@@ -107,7 +106,7 @@ public class TWiseConfiguration {
 						}
 					}
 				} else {
-					System.out.println(solution);
+					System.out.println(this);
 					throw new RuntimeException();
 				}
 			}
@@ -144,9 +143,8 @@ public class TWiseConfiguration {
 	}
 
 	public TWiseConfiguration(TWiseConfigurationUtil util) {
+		super(new int[util.getCnf().getVariables().size()], Order.INDEX, false);
 		countLiterals = 0;
-		solution = new LiteralSet(new int[util.getCnf().getVariables().size()], Order.INDEX, false);
-		literals = solution.getLiterals();
 		this.util = util;
 		if (util.hasSolver()) {
 			for (final Vertex vertex : util.getMig().getAdjList()) {
@@ -160,7 +158,7 @@ public class TWiseConfiguration {
 			solutionLiterals = new VecInt(numberOfVariableLiterals);
 			countLiterals = 0;
 			traverser = new Traverser(util.getMig());
-			traverser.setModel(solution.getLiterals());
+			traverser.setModel(literals);
 			visitor = new DefaultVisitor() {
 				@Override
 				public VisitResult visitStrong(int curLiteral) {
@@ -241,14 +239,12 @@ public class TWiseConfiguration {
 						final int[] s = solver.findSolution();
 						if (s != null) {
 							literals = s;
-							solution = new LiteralSet(s, Order.INDEX, false);
 						}
 					} finally {
 						solver.assignmentClear(orgAssignmentSize);
 					}
 				} else {
-					solution = util.getSolverSolution(solverSolutionIndex.last());
-					literals = solution.getLiterals();
+					literals = util.getSolverSolution(solverSolutionIndex.last()).getLiterals();
 					solverSolutionIndex.clear();
 				}
 			} else {
@@ -304,10 +300,6 @@ public class TWiseConfiguration {
 
 	public void setRank(int rank) {
 		this.rank = rank;
-	}
-
-	public LiteralSet getSolution() {
-		return solution;
 	}
 
 	public void updateSolverSolutions() {

@@ -86,7 +86,7 @@ public class CoverSingle implements ICoverStrategy {
 
 		if (candidatesList2.size() == 0) {
 			for (final LiteralSet literals : nextCondition) {
-				if (util.isCombinationValidSAT(literals.getLiterals())) {
+				if (util.isCombinationValid(literals)) {
 					util.newConfiguration(nextCondition.get(0));
 					return CombinationStatus.COVERED;
 				}

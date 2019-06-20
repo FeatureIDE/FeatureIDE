@@ -39,7 +39,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	private static final long serialVersionUID = 8948014814795787431L;
 
-	protected final int[] literals;
+	protected int[] literals;
 
 	private int hashCode;
 

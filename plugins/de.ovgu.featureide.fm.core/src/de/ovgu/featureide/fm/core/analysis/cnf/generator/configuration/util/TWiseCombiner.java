@@ -93,7 +93,7 @@ public class TWiseCombiner {
 			final int[] combinedLiteralsArray = Arrays.copyOfRange(lits.toArray(), 0, lits.size());
 			combinedCondition.add(new LiteralSet(combinedLiteralsArray));
 		} else {
-			clauseLoop: for (final LiteralSet clause : conditionArray[t].getClauses()) {
+			clauseLoop: for (final LiteralSet clause : conditionArray[t]) {
 				final int[] literals = clause.getLiterals();
 				for (int i = 0; i < literals.length; i++) {
 					final int literal = literals[i];
@@ -144,7 +144,7 @@ public class TWiseCombiner {
 		loop: while (i < clauseIndex.length) {
 			for (i = 0; i < clauseIndex.length; i++) {
 				final int cindex = clauseIndex[i];
-				if (cindex == (conditionArray[i].getClauses().size() - 1)) {
+				if (cindex == (conditionArray[i].size() - 1)) {
 					clauseIndex[i] = 0;
 				} else {
 					clauseIndex[i] = cindex + 1;
@@ -163,7 +163,7 @@ public class TWiseCombiner {
 	private LiteralSet getCombinationLiterals(final int[] clauseIndex, final PresenceCondition[] clauseListArray) {
 		final TreeSet<Integer> newLiteralSet = new TreeSet<>();
 		for (int j = 0; j < clauseIndex.length; j++) {
-			for (final int literal : clauseListArray[j].getClauses().get(clauseIndex[j]).getLiterals()) {
+			for (final int literal : clauseListArray[j].get(clauseIndex[j]).getLiterals()) {
 				if (newLiteralSet.contains(-literal)) {
 					return null;
 				} else {
@@ -186,7 +186,7 @@ public class TWiseCombiner {
 			final int[] combinedLiteralsArray = Arrays.copyOfRange(lits.toArray(), 0, lits.size());
 			combinedCondition.add(new LiteralSet(combinedLiteralsArray));
 		} else {
-			clauseLoop: for (final LiteralSet clause : conditionArray[t].getClauses()) {
+			clauseLoop: for (final LiteralSet clause : conditionArray[t]) {
 				final int[] literals = clause.getLiterals();
 				for (int i = 0; i < literals.length; i++) {
 					final int literal = literals[i];
@@ -236,7 +236,7 @@ public class TWiseCombiner {
 			final int[] combinedLiteralsArray = Arrays.copyOfRange(lits.toArray(), 0, lits.size());
 			combinedCondition.add(new LiteralSet(combinedLiteralsArray));
 		} else {
-			clauseLoop: for (final LiteralSet clause : conditionArray[t].getClauses()) {
+			clauseLoop: for (final LiteralSet clause : conditionArray[t]) {
 				final int[] literals = clause.getLiterals();
 				for (int i = 0; i < literals.length; i++) {
 					final int literal = literals[i];

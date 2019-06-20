@@ -20,11 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
@@ -34,12 +31,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceConditionManager;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
-import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
-import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
-import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 
 /**
  * Test whether a set of configurations achieves t-wise feature coverage.
@@ -48,166 +39,142 @@ import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
  */
 public class TWiseConfigurationTester {
 
-	private final int t;
 	private final CNF cnf;
-	private final PresenceConditionManager presenceConditionManager;
-	private final ISatSolver solver;
-	private final ModalImplicationGraph mig;
+	private final int t;
 	private final List<LiteralSet> configurations;
+	private final PresenceConditionManager presenceConditionManager;
 
-	protected LiteralSet[] strongHull;
+	private final TWiseConfigurationUtil util;
 
 	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<LiteralSet> configurations) {
 		this.cnf = cnf;
 		this.t = t;
 		this.configurations = configurations;
 		if (!this.cnf.getClauses().isEmpty()) {
-			solver = new AdvancedSatSolver(this.cnf);
-			final TWiseConfigurationUtil util = new TWiseConfigurationUtil(cnf, solver);
+			util = new TWiseConfigurationUtil(cnf, new AdvancedSatSolver(this.cnf));
 			util.computeMIG();
-			presenceConditionManager = new PresenceConditionManager(util, nodeArray);
-			mig = util.getMig();
-			genHulls();
 		} else {
-			solver = null;
-			mig = null;
-			presenceConditionManager = new PresenceConditionManager(new TWiseConfigurationUtil(cnf, null), nodeArray);
+			util = new TWiseConfigurationUtil(cnf, null);
 		}
-	}
-
-	private void genHulls() {
-		strongHull = new LiteralSet[mig.getAdjList().size()];
-
-		for (final Vertex vertex : mig.getAdjList()) {
-			final int literalSet = vertex.getVar();
-			final Traverser traverser = new Traverser(mig);
-			traverser.setModel(new int[mig.getAdjList().size()]);
-			final CollectingVisitor visitor = new CollectingVisitor();
-			traverser.setVisitor(visitor);
-			traverser.traverse(literalSet);
-			final VecInt strong = visitor.getResult()[0];
-			strongHull[vertex.getId()] = new LiteralSet(Arrays.copyOf(strong.toArray(), strong.size()));
-		}
+		presenceConditionManager = new PresenceConditionManager(util, nodeArray);
 	}
 
 	public boolean test() {
-		return (testSolutionValidity() == null) && (testCompleteness() == null);
+		return (hasInvalidSolutions() == null) && (hasUncoveredConditions() == null);
 	}
 
-	public PresenceCondition[] testCompleteness() throws AssertionError {
+	/**
+	 * Creates statistic values about covered combinations.<br>
+	 * To get a percentage value of covered combinations use:<br
+	 * <pre>{@code
+	 * 	long[] coverage = getCoverage();
+	 * 	double covered = (double) coverage[2] / coverage[0];
+	 * }</pre>
+	 *
+	 * @return an array containing four values:<br>
+	 *         <ul>
+	 *         <li>[0] - number of valid combinations
+	 *         <li>[1] - number of invalid combinations
+	 *         <li>[2] - number of covered combinations
+	 *         <li>[3] - number of uncovered combinations
+	 *         <ul/>
+	 */
+	public long[] getCoverage() {
+		long numberOfValidConditions = 0;
+		long numberOfInvalidConditions = 0;
+		long numberOfCoveredConditions = 0;
+		long numberOfUncoveredConditions = 0;
+
 		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
-		final ClauseList combinations = new ClauseList();
+		final ClauseList combinedCondition = new ClauseList();
 
 		for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
-			comboLoop: for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
+			for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
+				final PresenceCondition[] clauseListArray = iterator.next();
+				if (clauseListArray == null) {
+					numberOfInvalidConditions++;
+					break;
+				}
+
+				combinedCondition.clear();
+				combiner.combineConditions(clauseListArray, combinedCondition);
+
+				if (TWiseConfigurationUtil.isCovered(combinedCondition, configurations)) {
+					numberOfValidConditions++;
+					numberOfCoveredConditions++;
+					continue;
+				}
+
+				if (util.isCombinationValid(combinedCondition)) {
+					numberOfValidConditions++;
+					numberOfUncoveredConditions++;
+				} else {
+					numberOfInvalidConditions++;
+				}
+
+			}
+		}
+		return new long[] { numberOfValidConditions, numberOfInvalidConditions, numberOfCoveredConditions, numberOfUncoveredConditions };
+	}
+
+	public ClauseList hasUncoveredConditions() {
+		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
+		return uncoveredConditions.isEmpty() ? null : uncoveredConditions.get(0);
+	}
+
+	public List<ClauseList> getUncoveredConditions() {
+		return getUncoveredConditions(false);
+	}
+
+	public List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
+		final ArrayList<ClauseList> uncoveredConditions = new ArrayList<>();
+		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
+		ClauseList combinedCondition = new ClauseList();
+
+		groupLoop: for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
+			for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
 				final PresenceCondition[] clauseListArray = iterator.next();
 				if (clauseListArray == null) {
 					break;
 				}
 
-				if (isCovered(clauseListArray)) {
-					continue comboLoop;
-				}
-
-				combinations.clear();
-				combiner.combineConditions(clauseListArray, combinations);
-
-				if (solver != null) {
-					for (final Iterator<LiteralSet> it = combinations.iterator(); it.hasNext();) {
-						if (checkMig(it.next())) {
-							it.remove();
-						}
-					}
-
-					for (final Iterator<LiteralSet> it = combinations.iterator(); it.hasNext();) {
-						if (checkSolver(it.next())) {
-							it.remove();
-						} else {
-							break;
-						}
+				combinedCondition.clear();
+				combiner.combineConditions(clauseListArray, combinedCondition);
+				if (!TWiseConfigurationUtil.isCovered(combinedCondition, configurations) && util.isCombinationValid(combinedCondition)) {
+					uncoveredConditions.add(combinedCondition);
+					combinedCondition = new ClauseList();
+					if (cancelAfterFirst) {
+						break groupLoop;
 					}
 				}
 
-				if (combinations.isEmpty()) {
-					continue comboLoop;
-				}
-
-				return clauseListArray;
 			}
 		}
-		return null;
+		return uncoveredConditions;
 	}
 
-	private boolean checkSolver(final LiteralSet literalSet) throws AssertionError {
-		for (final Integer literal : literalSet.getLiterals()) {
-			solver.assignmentPush(literal);
-		}
-		final SatResult hasSolution = solver.hasSolution();
-		switch (hasSolution) {
-		case FALSE:
-			solver.assignmentClear(0);
-			return true;
-		case TIMEOUT:
-			System.err.println("Timeout!");
-			solver.assignmentClear(0);
-			return true;
-		case TRUE:
-			solver.assignmentClear(0);
-			return false;
-		default:
-			throw new AssertionError();
-		}
+	public LiteralSet hasInvalidSolutions() {
+		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
+		return invalidSolutions.isEmpty() ? null : invalidSolutions.get(0);
 	}
 
-	private boolean checkMig(final LiteralSet literalSet) {
-		for (final int literal : literalSet.getLiterals()) {
-			if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literalSet)) {
-				return true;
-			}
-		}
-		return false;
+	public List<LiteralSet> getInvalidSolutions() {
+		return getInvalidSolutions(false);
 	}
 
-	private boolean isCovered(final PresenceCondition[] clauseListArray) {
-		configurationLoop: for (final LiteralSet solution : configurations) {
-			for (final PresenceCondition condition : clauseListArray) {
-				if (!containsAtLeastOne(solution, condition.getClauses())) {
-					continue configurationLoop;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public LiteralSet testSolutionValidity() throws AssertionError {
-		if (solver != null) {
-			final int c = 0;
-			for (final LiteralSet is : configurations) {
-				final SatResult hasSolution = solver.hasSolution(is.getLiterals());
-				switch (hasSolution) {
-				case FALSE:
-					return is;
-				case TIMEOUT:
-					System.err.println("Timeout! " + c);
-					break;
-				case TRUE:
-					break;
-				default:
-					throw new AssertionError();
+	public List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
+		final ArrayList<LiteralSet> invalidSolutions = new ArrayList<>();
+		configLoop: for (final LiteralSet solution : configurations) {
+			for (final LiteralSet clause : cnf.getClauses()) {
+				if (!solution.hasDuplicates(clause)) {
+					invalidSolutions.add(solution);
+					if (cancelAfterFirst) {
+						break configLoop;
+					}
 				}
 			}
 		}
-		return null;
-	}
-
-	private boolean containsAtLeastOne(final LiteralSet solution, final ClauseList clauseList) {
-		for (final LiteralSet literalSet : clauseList) {
-			if (solution.containsAll(literalSet)) {
-				return true;
-			}
-		}
-		return false;
+		return invalidSolutions;
 	}
 
 }

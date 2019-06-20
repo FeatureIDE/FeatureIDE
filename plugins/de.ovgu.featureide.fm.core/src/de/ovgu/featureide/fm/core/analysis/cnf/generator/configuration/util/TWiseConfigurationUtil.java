@@ -39,8 +39,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseCon
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
@@ -68,6 +70,7 @@ public class TWiseConfigurationUtil {
 	protected final ISatSolver localSolver;
 
 	protected ModalImplicationGraph mig;
+	protected LiteralSet[] strongHull;
 
 	protected int maxSampleSize;
 
@@ -90,6 +93,18 @@ public class TWiseConfigurationUtil {
 			System.out.print("Init graph... ");
 		}
 		mig = LongRunningWrapper.runMethod(new MIGBuilder(localSolver.getSatInstance(), false));
+		strongHull = new LiteralSet[mig.getAdjList().size()];
+
+		for (final Vertex vertex : mig.getAdjList()) {
+			final int literalSet = vertex.getVar();
+			final Traverser traverser = new Traverser(mig);
+			traverser.setModel(new int[mig.getAdjList().size()]);
+			final CollectingVisitor visitor = new CollectingVisitor();
+			traverser.setVisitor(visitor);
+			traverser.traverse(literalSet);
+			final VecInt strong = visitor.getResult()[0];
+			strongHull[vertex.getId()] = new LiteralSet(Arrays.copyOf(strong.toArray(), strong.size()));
+		}
 		if (ITWiseConfigurationGenerator.VERBOSE) {
 			System.out.println("Done!");
 		}
@@ -160,16 +175,49 @@ public class TWiseConfigurationUtil {
 		return solverSolutions;
 	}
 
-	public boolean isCombinationValidSAT(int[] literals) {
+	public boolean isCombinationValid(LiteralSet literals) {
+		return isCombinationValidMIG(literals) && isCombinationValidSAT(literals);
+	}
+
+	public boolean isCombinationValid(ClauseList clauses) {
+		if (hasSolver()) {
+			for (final LiteralSet literalSet : clauses) {
+				if (isCombinationValidMIG(literalSet)) {
+					return true;
+				}
+			}
+			for (final LiteralSet literalSet : clauses) {
+				if (isCombinationValidSAT(literalSet)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public boolean isCombinationValidMIG(LiteralSet literals) {
+		if (hasSolver()) {
+			for (final int literal : literals.getLiterals()) {
+				if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literals)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean isCombinationValidSAT(LiteralSet literals) {
 		if (hasSolver()) {
 			for (final LiteralSet s : randomSample) {
 				if (!s.hasConflicts(literals)) {
 					return true;
 				}
 			}
+
 			final ISatSolver solver = getSolver();
 			final int orgAssingmentLength = solver.getAssignmentSize();
-			solver.assignmentPushAll(literals);
+			solver.assignmentPushAll(literals.getLiterals());
 			try {
 				final SatResult hasSolution = solver.hasSolution();
 				switch (hasSolution) {
@@ -195,7 +243,7 @@ public class TWiseConfigurationUtil {
 				final ISatSolver localSolver = getSolver();
 				final int orgAssignmentSize = configuration.setUpSolver(localSolver);
 				try {
-					final int[] configurationLiterals = configuration.getSolution().getLiterals();
+					final int[] configurationLiterals = configuration.getLiterals();
 					for (final int literal : literals.getLiterals()) {
 						if (configurationLiterals[Math.abs(literal) - 1] == 0) {
 							localSolver.assignmentPush(literal);
@@ -222,11 +270,10 @@ public class TWiseConfigurationUtil {
 		return true;
 	}
 
-	public static boolean isCovered(ClauseList condition, Iterable<TWiseConfiguration> solutionList) {
-		for (final TWiseConfiguration configuration : solutionList) {
-			final LiteralSet solution = configuration.getSolution();
+	public static boolean isCovered(ClauseList condition, Iterable<? extends LiteralSet> solutionList) {
+		for (final LiteralSet configuration : solutionList) {
 			for (final LiteralSet literals : condition) {
-				if (solution.containsAll(literals)) {
+				if (configuration.containsAll(literals)) {
 					return true;
 				}
 			}
@@ -269,7 +316,7 @@ public class TWiseConfigurationUtil {
 	}
 
 	public boolean isCandidate(final LiteralSet literals, TWiseConfiguration solution) {
-		return solution.getSolution().hasConflicts(literals);
+		return solution.hasConflicts(literals);
 	}
 
 	public void addCandidates(final LiteralSet literals, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
