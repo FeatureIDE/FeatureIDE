@@ -69,8 +69,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 
 /**
  * Prints a feature model in SPLConqueror format.
@@ -80,13 +79,21 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class ConquererFMWriter extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class ConquererFMWriter extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
 
 	private IFeatureModel featureModel;
 
 	private Map<String, Set<String>> require, exclude;
+
+	public ConquererFMWriter() {
+		super();
+	}
+
+	public ConquererFMWriter(AFeatureModelFormat oldFormat) {
+		super(oldFormat);
+	}
 
 	/**
 	 * Creates XML-Document
@@ -400,7 +407,7 @@ public class ConquererFMWriter extends APersistentFormat<IFeatureModel> implemen
 
 	@Override
 	public ConquererFMWriter getInstance() {
-		return new ConquererFMWriter();
+		return new ConquererFMWriter(this);
 	}
 
 	@Override

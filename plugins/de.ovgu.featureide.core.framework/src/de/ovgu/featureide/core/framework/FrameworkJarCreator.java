@@ -44,10 +44,10 @@ public class FrameworkJarCreator {
 	/**
 	 * Adding given file to jar
 	 *
-	 * @param jarStream
+	 * @param jarStream stream
 	 * @param res - file
 	 * @param path - String representation for path inside jar
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	public static void addFileToJar(JarOutputStream jarStream, IFile res, String path) throws IOException {
 		jarStream.putNextEntry(new ZipEntry(path + res.getName()));
@@ -69,10 +69,10 @@ public class FrameworkJarCreator {
 	/**
 	 * recursive method caller
 	 *
-	 * @param jarStream
-	 * @param bin
-	 * @throws CoreException
-	 * @throws IOException
+	 * @param jarStream stream
+	 * @param bin - bin
+	 * @throws CoreException exception
+	 * @throws IOException exception
 	 */
 	public static void addToJar(JarOutputStream jarStream, IResource bin) throws CoreException, IOException {
 		if (bin instanceof IFolder) {
@@ -85,11 +85,11 @@ public class FrameworkJarCreator {
 	/**
 	 * recursive method<br> calls other methods depending on type (file or folder)
 	 *
-	 * @param jarStream
-	 * @param res
-	 * @param path
-	 * @throws IOException
-	 * @throws CoreException
+	 * @param jarStream stream
+	 * @param res - res
+	 * @param path - path
+	 * @throws IOException exception
+	 * @throws CoreException exception
 	 */
 	public static void addToJar(JarOutputStream jarStream, IResource res, String path) throws IOException, CoreException {
 		if (res instanceof IFolder) {

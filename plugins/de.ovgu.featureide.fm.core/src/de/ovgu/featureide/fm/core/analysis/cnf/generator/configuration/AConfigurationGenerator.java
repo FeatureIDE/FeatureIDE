@@ -26,7 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -36,12 +36,12 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solution>> implements IConfigurationGenerator {
+public abstract class AConfigurationGenerator extends AbstractAnalysis<List<LiteralSet>> implements IConfigurationGenerator {
 
 	protected final int maxSampleSize;
 
-	private final List<Solution> resultList = new ArrayList<>();
-	private final LinkedBlockingQueue<Solution> resultQueue;
+	private final List<LiteralSet> resultList = new ArrayList<>();
+	private final LinkedBlockingQueue<LiteralSet> resultQueue;
 
 	public AConfigurationGenerator(CNF cnf) {
 		this(cnf, Integer.MAX_VALUE);
@@ -64,7 +64,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solu
 	}
 
 	@Override
-	public List<Solution> analyze(IMonitor monitor) throws Exception {
+	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
 		resultList.clear();
 		resultQueue.clear();
 
@@ -75,7 +75,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solu
 
 	protected abstract void generate(IMonitor monitor) throws Exception;
 
-	protected void addResult(Solution result) {
+	protected void addResult(LiteralSet result) {
 		resultList.add(result);
 		try {
 			resultQueue.put(result);
@@ -85,7 +85,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Solu
 	}
 
 	@Override
-	public LinkedBlockingQueue<Solution> getResultQueue() {
+	public LinkedBlockingQueue<LiteralSet> getResultQueue() {
 		return resultQueue;
 	}
 

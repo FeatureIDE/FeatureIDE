@@ -58,9 +58,9 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 	private static final String PRESERVE_CONFIGS_TOOLTIP =
 		"Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
 
-	private static final String REDUNDANT_LABEL = "Remove redundant constraints:";
+	private static final String REDUNDANT_LABEL = "Remove redundant constraints before conversion:";
 	private static final String REDUNDANT_TOOLTIP =
-		"Whether to remove redundant and tautological constraints. Requires SAT-analysis and " + "and can therefore be time consuming.";
+		"Whether to remove redundant and tautological constraints before conversion. Requires SAT-analysis and " + "and can therefore be time consuming.";
 
 	private final IFile inputModelFile;
 	private Combo methodCombo;

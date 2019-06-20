@@ -61,6 +61,16 @@
             id="de.ovgu.featureide.fm.core.format.FAMAFormat"
             name="FAMA">
       </fmFormat>
+      <fmFormat
+            class="de.ovgu.featureide.fm.core.io.cnf.CNFFormat"
+            id="de.ovgu.featureide.fm.core.format.CNFFormat"
+            name="CNF">
+      </fmFormat>
+      <fmFormat
+            class="de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter"
+            id="de.ovgu.featureide.fm.core.format.ConquererFMWriter"
+            name="SPLConquerer">
+      </fmFormat>
    </extension>
    <extension
          point="de.ovgu.featureide.fm.core.ConfigFormat">

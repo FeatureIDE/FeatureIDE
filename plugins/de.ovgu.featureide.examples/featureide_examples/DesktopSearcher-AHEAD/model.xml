@@ -37,21 +37,21 @@
 		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="true">
-			<feature name="HTML"/>
-			<feature name="TXT"/>
-			<feature name="LATEX"/>
-			<feature name="Base"/>
-			<feature name="User_Interface"/>
-			<feature name="GUI"/>
-			<feature name="Query_History"/>
-			<feature name="Index_History"/>
-			<feature name="Single_Directory"/>
-			<feature name="Multi_Directory"/>
-			<feature name="Gui_Preferences"/>
-			<feature name="Tree_View"/>
-			<feature name="Normal_View"/>
-			<feature name="Commandline"/>
-			<feature name="Windows"/>
-			<feature name="Linux"/>
+        	<feature name="Base"/>
+        	<feature name="User_Interface"/>
+        	<feature name="GUI"/>
+        	<feature name="Commandline"/>
+        	<feature name="Single_Directory"/>
+        	<feature name="Multi_Directory"/>
+        	<feature name="Query_History"/>
+        	<feature name="Index_History"/>
+        	<feature name="Tree_View"/>
+        	<feature name="Normal_View"/>
+        	<feature name="HTML"/>
+        	<feature name="TXT"/>
+        	<feature name="LATEX"/>
+        	<feature name="Gui_Preferences"/>
+        	<feature name="Windows"/>
+        	<feature name="Linux"/>
 		</featureOrder>
 	</featureModel>

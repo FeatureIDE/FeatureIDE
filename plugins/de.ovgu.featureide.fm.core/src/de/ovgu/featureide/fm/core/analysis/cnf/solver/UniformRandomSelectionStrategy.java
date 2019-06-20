@@ -31,7 +31,7 @@ import java.util.Random;
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * Uses a sample of configurations to achieve a phase selection that corresponds to a uniform distribution of configurations in the configuration space.
@@ -44,18 +44,18 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 
 	public static final Random RAND = new Random(123456789);
 
-	private final LinkedList<Solution> usedSamples = new LinkedList<>();
-	private final LinkedList<Solution> notUsedSamples = new LinkedList<>();
+	private final LinkedList<LiteralSet> usedSamples = new LinkedList<>();
+	private final LinkedList<LiteralSet> notUsedSamples = new LinkedList<>();
 
 	private final int[] model;
 	private final int[] ratio;
 
-	public UniformRandomSelectionStrategy(List<Solution> sample) {
+	public UniformRandomSelectionStrategy(List<LiteralSet> sample) {
 		usedSamples.addAll(sample);
 		model = new int[sample.get(0).size()];
 		ratio = new int[sample.get(0).size()];
 
-		for (final Solution solution : usedSamples) {
+		for (final LiteralSet solution : usedSamples) {
 			final int[] literals = solution.getLiterals();
 			for (int i = 0; i < literals.length; i++) {
 				if (literals[i] > 0) {
@@ -103,8 +103,8 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	private void updateRatioUnset(int literal) {
-		for (final Iterator<Solution> iterator = notUsedSamples.iterator(); iterator.hasNext();) {
-			final Solution solution = iterator.next();
+		for (final Iterator<LiteralSet> iterator = notUsedSamples.iterator(); iterator.hasNext();) {
+			final LiteralSet solution = iterator.next();
 			final int[] literals = solution.getLiterals();
 			if (literals[Math.abs(literal) - 1] == -literal) {
 				iterator.remove();
@@ -119,8 +119,8 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 	}
 
 	private void updateRatioSet(int literal) {
-		for (final Iterator<Solution> iterator = usedSamples.iterator(); iterator.hasNext();) {
-			final Solution solution = iterator.next();
+		for (final Iterator<LiteralSet> iterator = usedSamples.iterator(); iterator.hasNext();) {
+			final LiteralSet solution = iterator.next();
 			final int[] literals = solution.getLiterals();
 			if (literals[Math.abs(literal) - 1] == -literal) {
 				iterator.remove();

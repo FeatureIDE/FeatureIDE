@@ -34,7 +34,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
@@ -269,10 +269,10 @@ public class TModelComparator {
 
 	private Comparison compare(String fm1, String fm2) throws UnsupportedModelException {
 		final ModelComparator comperator = new ModelComparator(TIMEOUT);
-		final IFeatureModel oldModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
+		final IFeatureModel oldModel = DefaultFeatureModelFactory.getInstance().create();
 		final GuidslFormat reader = new GuidslFormat();
 		reader.read(oldModel, fm1);
-		final IFeatureModel newModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
+		final IFeatureModel newModel = DefaultFeatureModelFactory.getInstance().create();
 		reader.read(newModel, fm2);
 		return comperator.compare(oldModel, newModel);
 	}

@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
@@ -44,7 +45,6 @@ import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -54,21 +54,13 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  */
 public class ConfigAnalysisUtils {
 
-	/**
-	 * Get a matrix configurations/features
-	 *
-	 * @param featureProject
-	 * @param featureList
-	 * @return boolean[][]
-	 * @throws CoreException
-	 */
 	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
 		final Collection<Configuration> configs = new ArrayList<>();
 		// check that they are config files
 		final IFolder configsFolder = featureProject.getConfigFolder();
 		for (final IResource res : configsFolder.members()) {
 			if ((res instanceof IFile) && res.isAccessible()) {
-				final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+				final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 				final ProblemList problems = SimpleFileHandler.load(Paths.get(res.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 				if (!problems.containsError()) {
 					configs.add(configuration);
@@ -94,14 +86,14 @@ public class ConfigAnalysisUtils {
 	/**
 	 * No core nor hidden features
 	 *
-	 * @param featureProject
+	 * @param featureProject feature project
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
-		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
+		final FeatureModelFormula snapshot = featureProject.getFeatureModelManager().getPersistentFormula();
 		final IFilter<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures());
 		final IFilter<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
 		final IFilter<IFeature> noCoreNoHiddenFilter = new InverseFilter<>(new OrFilter<>(Arrays.asList(hiddenFeatureFilter, coreFeatureFilter)));
-		return Functional.mapToList(snapshot.getObject().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
+		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
 	}
 }

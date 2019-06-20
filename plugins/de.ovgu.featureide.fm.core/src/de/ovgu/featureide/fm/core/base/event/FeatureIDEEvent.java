@@ -23,9 +23,9 @@ package de.ovgu.featureide.fm.core.base.event;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
- * Event triggered by changes to a feature model or its elements. <br/> <br/> Each event contains the following information: <ul> <li>an event type which
+ * Event triggered by changes to a feature model or its elements. <br> <br> Each event contains the following information: <ul> <li>an event type which
  * determine the kind of event</li> <li>the sender (source) of this event, i.e., which object fired this event</li> <li>the old value (if available), and the
- * new value</li> </ul> <br/> <br/> This events are intended to be processed by {@link IEventListener} instances. <br/> <br/> For usage to fire
+ * new value</li> </ul> <br> <br> This events are intended to be processed by {@link IEventListener} instances. <br> <br> For usage to fire
  * <code>FeatureIDEEvent</code>s, see {@link FeatureModel#fireEvent(FeatureIDEEvent)}.
  *
  * @author Sebastian Krieter
@@ -37,10 +37,15 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
+		FEATURE_MODEL_OPERATION,
 		/**
 		 * The constraint was moved.
 		 */
 		CONSTRAINT_MOVE,
+		/**
+		 * A constraint's graphical position was modified.
+		 */
+		CONSTRAINT_MOVE_LOCATION,
 		/**
 		 * A constraint was modified.
 		 */
@@ -56,10 +61,12 @@ public class FeatureIDEEvent {
 		/**
 		 * A constraint was selected.
 		 */
+		@Deprecated
 		CONSTRAINT_SELECTED,
 		/**
 		 * A feature was modified.
 		 */
+		@Deprecated
 		FEATURE_MODIFY,
 		/**
 		 * A feature was deleted.
@@ -74,6 +81,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_ADD,
 		/**
+		 * A sibling was added.
+		 */
+		FEATURE_ADD_SIBLING,
+		/**
 		 * A feature's name was changed.
 		 */
 		FEATURE_NAME_CHANGED,
@@ -84,19 +95,19 @@ public class FeatureIDEEvent {
 		/**
 		 * A color was changed.
 		 */
-		COLOR_CHANGED,
+		FEATURE_COLOR_CHANGED,
 		/**
 		 * A hidden feature was changed.
 		 */
-		HIDDEN_CHANGED,
+		FEATURE_HIDDEN_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_CHANGED,
+		FEATURE_COLLAPSED_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_ALL_CHANGED,
+		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
 		 * The location of an object was changed.
 		 */
@@ -144,7 +155,7 @@ public class FeatureIDEEvent {
 		/**
 		 * The model data loaded from a file has overridden the internal model instance.
 		 */
-		MODEL_DATA_OVERRIDDEN,
+		MODEL_DATA_OVERWRITTEN,
 		/**
 		 * The diagram was redrawn.
 		 */
@@ -165,6 +176,10 @@ public class FeatureIDEEvent {
 		 * The active explanation changed.
 		 */
 		ACTIVE_EXPLANATION_CHANGED,
+		/**
+		 * Any feature attribute was added or altered.
+		 */
+		FEATURE_ATTRIBUTE_CHANGED,
 		/**
 		 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
 		 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as

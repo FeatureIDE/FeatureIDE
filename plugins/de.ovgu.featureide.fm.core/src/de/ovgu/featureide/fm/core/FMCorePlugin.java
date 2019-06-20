@@ -20,43 +20,29 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.PRINTED_OUTPUT_FILE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_FILE___;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.EclipseFactoryWorkspaceProvider;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -83,123 +69,27 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 		FileSystem.INSTANCE = new EclipseFileSystem();
 		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
-
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
-				IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
-				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
-				IConfigurationFormat.extensionID, IConfigurationFormat.class));
-
-		// ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new
-		// ExpressionFormat()));
-		// FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(),
-		// new SXFMFormat(), new GuidslFormat()));
-		// FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
-
 		Logger.logger = new EclipseLogger();
-		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
 
-		if (!FMFactoryManager.factoryWorkspaceProvider.load()) {
-			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
-		}
+		FMFactoryManager.initialize(new EclipseExtensionLoader<IFactory<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
+				IFeatureModelFactory.extensionID, IFeatureModelFactory.class), new EclipseFactoryWorkspaceProvider());
+		ConfigurationFactoryManager.initialize(null, null);
+		FMFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
+				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<Configuration>>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
+				IConfigurationFormat.extensionID, IConfigurationFormat.class));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		FMFactoryManager.factoryWorkspaceProvider.save();
+		FMFactoryManager.getInstance().save();
+		ConfigurationFactoryManager.getInstance().save();
 		plugin = null;
 		super.stop(context);
 	}
 
 	public static FMCorePlugin getDefault() {
 		return plugin;
-	}
-
-	public void analyzeModel(IFile file) {
-		logInfo(READING_MODEL_FILE___);
-		final IContainer outputDir = file.getParent();
-		if ((outputDir == null) || !(outputDir instanceof IFolder)) {
-			return;
-		}
-
-		final IFeatureModelFormat format = FeatureModelManager.getFormat(file.getName());
-		if (format == null) {
-			return;
-		}
-
-		final FeatureModelSnapshot snapshot = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI())).getSnapshot();
-		final IFeatureModel fm = snapshot.getObject();
-		try {
-			final FeatureModelAnalyzer fma = snapshot.getAnalyzer();
-			fma.analyzeFeatureModel(null);
-
-			final StringBuilder sb = new StringBuilder();
-			sb.append("Number Features: ");
-			sb.append(fm.getNumberOfFeatures());
-			sb.append(" (");
-			sb.append(fma.countConcreteFeatures());
-			sb.append(")\n");
-
-			if (fm instanceof ExtendedFeatureModel) {
-				final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
-				int countInherited = 0;
-				int countInstances = 0;
-				for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-					switch (usedModel.getType()) {
-					case ExtendedFeature.TYPE_INHERITED:
-						countInherited++;
-						break;
-					case ExtendedFeature.TYPE_INSTANCE:
-						countInstances++;
-						break;
-					}
-				}
-				sb.append("Number Instances: ");
-				sb.append(countInstances);
-				sb.append("\n");
-				sb.append("Number Inherited: ");
-				sb.append(countInherited);
-				sb.append("\n");
-			}
-
-			Collection<IFeature> analyzedFeatures = fma.getCoreFeatures();
-			sb.append("Core Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (final IFeature coreFeature : analyzedFeatures) {
-				sb.append(coreFeature.getName());
-				sb.append(", ");
-			}
-			analyzedFeatures = fma.getDeadFeatures();
-			sb.append("\nDead Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (final IFeature deadFeature : analyzedFeatures) {
-				sb.append(deadFeature.getName());
-				sb.append(", ");
-			}
-			analyzedFeatures = fma.getFalseOptionalFeatures();
-			sb.append("\nFO Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (final IFeature foFeature : analyzedFeatures) {
-				sb.append(foFeature.getName());
-				sb.append(", ");
-			}
-			sb.append("\n");
-
-			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
-			final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
-			if (outputFile.isAccessible()) {
-				outputFile.setContents(inputStream, false, true, null);
-			} else {
-				outputFile.create(inputStream, true, null);
-			}
-			logInfo(PRINTED_OUTPUT_FILE_);
-		} catch (final Exception e) {
-			logError(e);
-		}
 	}
 
 	@CheckForNull

@@ -31,6 +31,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_GI
 import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -96,11 +97,13 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -159,7 +162,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		super.start(context);
 		plugin = this;
 
-		featureProjectMap = new HashMap<IProject, IFeatureProject>();
+		featureProjectMap = new HashMap<>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			try {
 				if (project.isOpen()) {
@@ -220,25 +223,29 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void addProject(IProject project) {
-		if (featureProjectMap.containsKey(project) || !project.isOpen()) {
+		if (project == null) {
 			return;
 		}
+		synchronized (project) {
+			if (!featureProjectMap.containsKey(project) && project.isOpen()) {
+				featureProjectMap.put(project, null);
+				final IFeatureProject data = new FeatureProject(project);
+				featureProjectMap.put(project, data);
+				logInfo("Feature project " + project.getName() + " added");
 
-		final IFeatureProject data = new FeatureProject(project);
-		featureProjectMap.put(project, data);
-		logInfo("Feature project " + project.getName() + " added");
+				for (final IProjectListener listener : projectListeners) {
+					listener.projectAdded(data);
+				}
 
-		for (final IProjectListener listener : projectListeners) {
-			listener.projectAdded(data);
-		}
+				final IStatus status = isComposable(project);
 
-		final IStatus status = isComposable(project);
-
-		if (status.getCode() != IStatus.OK) {
-			for (final IStatus child : status.getChildren()) {
-				data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				if (status.getCode() != IStatus.OK) {
+					for (final IStatus child : status.getChildren()) {
+						data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+					}
+					data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				}
 			}
-			data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
 		}
 	}
 
@@ -283,18 +290,21 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void removeProject(IProject project) {
-		if (!featureProjectMap.containsKey(project)) {
+		if (project == null) {
 			return;
 		}
+		synchronized (project) {
+			if (featureProjectMap.containsKey(project)) {
+				final IFeatureProject featureProject = featureProjectMap.remove(project);
+				// Quick fix #402
+				featureProject.dispose();
 
-		final IFeatureProject featureProject = featureProjectMap.remove(project);
-		// Quick fix #402
-		featureProject.dispose();
+				logInfo(project.getName() + REMOVED);
 
-		logInfo(project.getName() + REMOVED);
-
-		for (final IProjectListener listener : projectListeners) {
-			listener.projectRemoved(featureProject);
+				for (final IProjectListener listener : projectListeners) {
+					listener.projectRemoved(featureProject);
+				}
+			}
 		}
 	}
 
@@ -370,14 +380,19 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * Setups the projects structure.<br> Starts composer specific changes of the project structure, after adding the FeatureIDE nature to a project.
+	 *
+	 * @param project project
+	 * @param compositionToolID Id of the composition tool
+	 * @param sourcePath source path
+	 * @param configPath config path
+	 * @param buildPath build path
+	 * @param shouldCreateSourceFolder true if source folder should be created
+	 * @param shouldCreateBuildFolder true if build folder should be created
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
 			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
-
-		final IFeatureModel featureModel = createFeatureModelFile(project);
-		createConfigFile(project, configPath, featureModel, project.getName().split("[-]")[0] + ".");
 
 		if (composer != null) {
 			final ISafeRunnable runnable = new ISafeRunnable() {
@@ -395,7 +410,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, false);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 	}
 
 	/**
@@ -432,14 +447,24 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * Setups the project.<br> Creates folders<br> Adds the compiler(if necessary)<br> Adds the FeatureIDE nature<br> Creates the feature model
 	 *
-	 * @param addCompiler <code>false</code> if the project already has a compiler
+	 * @param project project
+	 * @param compositionToolID Id of the composition tool
+	 * @param sourcePath source path
+	 * @param configPath config path
+	 * @param buildPath build path
+	 * @param shouldCreateSourceFolder true if source folder should be created
+	 * @param shouldCreateBuildFolder true if build folder should be created
+	 * @param addCompiler true if compiler
+	 * @param addNature true if nature should be added
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
 			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		final IFeatureModel featureModel = createFeatureModelFile(project);
+		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
+
+		final FeatureModelManager featureModel = createFeatureModelFile(project, composer);
 		createConfigFile(project, configPath, featureModel, "default.");
 
 		if ((composer != null) && addCompiler) {
@@ -457,11 +482,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			};
 			SafeRunner.run(runnable);
 		}
-		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath, addNature);
+		if (addNature) {
+			addFeatureNatureToProject(project);
+		}
 	}
 
 	private static void setProjectProperties(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addNature) {
+			final String buildPath) {
 		try {
 			project.setPersistentProperty(IFeatureProject.composerConfigID, compositionToolID);
 			project.setPersistentProperty(IFeatureProject.buildFolderConfigID, buildPath);
@@ -469,9 +496,6 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
-		}
-		if (addNature) {
-			addFeatureNatureToProject(project);
 		}
 	}
 
@@ -540,32 +564,30 @@ public class CorePlugin extends AbstractCorePlugin {
 		FMCorePlugin.createFolder(project, configPath);
 	}
 
-	private static IFeatureModel createFeatureModelFile(IProject project) {
+	private static FeatureModelManager createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
-		if (!modelPath.toFile().exists()) {
-			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+		if (!Files.exists(modelPath)) {
+			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
-				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
+				factory = FMFactoryManager.getInstance().getFactory(modelPath, format);
 			} catch (final NoSuchExtensionException e) {
 				Logger.logError(e);
-				factory = FMFactoryManager.getDefaultFactory();
+				factory = DefaultFeatureModelFactory.getInstance();
 			}
-			final IFeatureModel featureModel = factory.createFeatureModel();
+			final IFeatureModel featureModel = factory.create();
 			FMComposerManager.getFMComposerExtension(project);
 			featureModel.createDefaultValues(project.getName());
-
 			SimpleFileHandler.save(modelPath, featureModel, format);
-			return featureModel;
 		}
-		return null;
+		return FeatureModelManager.getInstance(modelPath);
 	}
 
-	private static Configuration createConfigFile(IProject project, String configPath, IFeatureModel featureModel, final String configName) {
+	private static Configuration createConfigFile(IProject project, String configPath, FeatureModelManager featureModel, final String configName) {
 		final XMLConfFormat configFormat = new XMLConfFormat();
 		final IFile file = project.getFolder(configPath).getFile(configName + configFormat.getSuffix());
-		final Configuration config = new Configuration(featureModel);
+		final Configuration config = new Configuration(featureModel.getPersistentFormula());
 		SimpleFileHandler.save(Paths.get(file.getLocationURI()), config, configFormat);
 		return config;
 	}
@@ -582,7 +604,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * returns an unmodifiable Collection of all ProjectData items, or <code>null</code> if plugin is not loaded
 	 *
-	 * @return
+	 * @return unmodifiable Collection of all ProjectData items
 	 */
 	public static Collection<IFeatureProject> getFeatureProjects() {
 		if (getDefault() == null) {
@@ -594,7 +616,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * returns the ProjectData object associated with the given resource
 	 *
-	 * @param res
+	 * @param res given resource
 	 * @return <code>null</code> if there is no associated project, no active instance of this plug-in or resource is the workspace root
 	 */
 	@CheckForNull
@@ -617,15 +639,13 @@ public class CorePlugin extends AbstractCorePlugin {
 	/**
 	 * A linear job to add a project. This is necessary if many projects will be add at the same time.
 	 *
-	 * @param project
+	 * @param project project to add
 	 */
 	public void addProjectToList(IProject project) {
-		if (featureProjectMap.containsKey(project) || !project.isOpen() || projectsToAdd.contains(project)) {
-			return;
+		if (!featureProjectMap.containsKey(project) && project.isOpen() && !projectsToAdd.contains(project)) {
+			projectsToAdd.offer(project);
+			scheduleAddJob();
 		}
-
-		projectsToAdd.offer(project);
-		scheduleAddJob();
 	}
 
 	private void scheduleAddJob() {
@@ -637,11 +657,10 @@ public class CorePlugin extends AbstractCorePlugin {
 					@Override
 					public void jobFinished(IJob<Void> finishedJob) {
 						synchronized (CorePlugin.this) {
-							if (!projectsToAdd.isEmpty()) {
-								scheduleAddJob();
-							} else {
-								job = null;
-							}
+							job = null;
+						}
+						if (!projectsToAdd.isEmpty()) {
+							scheduleAddJob();
 						}
 					}
 				});

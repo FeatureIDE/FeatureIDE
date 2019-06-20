@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
  *
  * @author Sebastian Krieter
  */
-public class MIGAdjListFormat implements IPersistentFormat<ModalImplicationGraph> {
+public class MIGAdjListFormat extends APersistentFormat<ModalImplicationGraph> implements IPersistentFormat<ModalImplicationGraph> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + MIGAdjListFormat.class.getSimpleName();
 
@@ -70,11 +70,6 @@ public class MIGAdjListFormat implements IPersistentFormat<ModalImplicationGraph
 	}
 
 	@Override
-	public IPersistentFormat<ModalImplicationGraph> getInstance() {
-		return this;
-	}
-
-	@Override
 	public boolean supportsRead() {
 		return true;
 	}
@@ -90,18 +85,8 @@ public class MIGAdjListFormat implements IPersistentFormat<ModalImplicationGraph
 	}
 
 	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
-	}
-
-	@Override
 	public String getName() {
 		return "ModalImplicationGraph Adjacency Matrix";
-	}
-
-	@Override
-	public boolean initExtension() {
-		return true;
 	}
 
 }

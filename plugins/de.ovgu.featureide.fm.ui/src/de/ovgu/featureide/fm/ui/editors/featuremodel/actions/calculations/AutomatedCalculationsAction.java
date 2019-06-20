@@ -22,14 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.AUTOMATED_CALCULATIONS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import java.util.concurrent.locks.Lock;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * An action to activate/deactivate automated calculations on changes to the feature model.
@@ -37,34 +38,43 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class AutomatedCalculationsAction extends Action {
+public class AutomatedCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.automatedcalculations";
 
-	private final IFeatureModel featureModel;
-
-	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(AUTOMATED_CALCULATIONS);
-		this.featureModel = featureModel;
-		setChecked(FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().isRunCalculationAutomatically());
-		setId(ID);
+	public AutomatedCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(AUTOMATED_CALCULATIONS, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		if (analyzer.getAnalysesCollection().isRunCalculationAutomatically()) {
-			for (final IFeature f : featureModel.getFeatures()) {
-				analyzer.getFeatureProperties(f).resetStatus();
+		final IFeatureModel featureModel;
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
+			final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
+			featureModel = variableFormula.getFeatureModel();
+			if (analyzer.getAnalysesCollection().isRunCalculationAutomatically()) {
+				for (final IFeature f : featureModel.getFeatures()) {
+					analyzer.getFeatureProperties(f).resetStatus();
+				}
+				for (final IConstraint c : featureModel.getConstraints()) {
+					analyzer.getConstraintProperties(c).resetStatus();
+				}
+				analyzer.getAnalysesCollection().setRunCalculationAutomatically(false);
+			} else {
+				analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
 			}
-			for (final IConstraint c : featureModel.getConstraints()) {
-				analyzer.getConstraintProperties(c).resetStatus();
-			}
-			analyzer.getAnalysesCollection().setRunCalculationAutomatically(false);
-		} else {
-			analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
+		} finally {
+			lock.unlock();
 		}
 		featureModel.handleModelDataChanged();
+	}
+
+	@Override
+	public void update() {
+		setChecked(featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().isRunCalculationAutomatically());
 	}
 
 }

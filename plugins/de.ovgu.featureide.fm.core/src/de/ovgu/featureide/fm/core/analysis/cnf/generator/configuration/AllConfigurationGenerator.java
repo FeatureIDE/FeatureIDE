@@ -21,7 +21,8 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -56,7 +57,7 @@ public class AllConfigurationGenerator extends AConfigurationGenerator {
 			if (solution == null) {
 				break;
 			}
-			final Solution result = new Solution(solution);
+			final LiteralSet result = new LiteralSet(solution, Order.INDEX, false);
 			addResult(result);
 			try {
 				solver.addInternalClause(result.negate());

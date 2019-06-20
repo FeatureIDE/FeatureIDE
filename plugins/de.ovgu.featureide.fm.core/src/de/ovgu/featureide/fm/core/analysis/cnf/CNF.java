@@ -38,7 +38,7 @@ public class CNF implements Serializable {
 	private static final long serialVersionUID = -5140589732063007073L;
 
 	protected final ClauseList clauses;
-	protected final Variables variables;
+	protected Variables variables;
 
 	public CNF(Variables mapping, List<LiteralSet> clauses) {
 		variables = mapping;
@@ -169,22 +169,39 @@ public class CNF implements Serializable {
 		return "CNF\n\tvariables=" + variables + "\n\tclauses=" + clauses;
 	}
 
+	/**
+	 * Creates a new clause list from this CNF with all clauses adapted to a new variable mapping.
+	 *
+	 * @param newVariables the new variables
+	 * @return an adapted clause list, {@code null} if there are old variables names the are not contained in the new variables.
+	 */
+	public ClauseList adaptClauseList(IVariables newVariables) {
+		final boolean validFeatureSet = Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()));
+		return validFeatureSet ? createAdaptedClauseList(newVariables) : null;
+	}
+
+	public CNF adapt(Variables newVariables) {
+		final boolean validFeatureSet = Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()));
+		return validFeatureSet ? new CNF(newVariables, createAdaptedClauseList(newVariables)) : null;
+	}
+
 	public CNF randomize(Random random) {
 		final List<String> shuffledVars = Arrays.asList(Arrays.copyOfRange(variables.intToVar, 1, variables.intToVar.length));
 		Collections.shuffle(shuffledVars, random);
+		final Variables newVariables = new Variables(shuffledVars);
 
-		final CNF shuffledCNF = reorder(new Variables(shuffledVars));
-		Collections.shuffle(shuffledCNF.clauses, random);
+		final ClauseList adaptedClauseList = createAdaptedClauseList(newVariables);
+		Collections.shuffle(adaptedClauseList, random);
 
-		return shuffledCNF;
+		return new CNF(newVariables, adaptedClauseList);
 	}
 
-	public CNF reorder(Variables newVariables) {
-		final ArrayList<LiteralSet> newClauses = new ArrayList<>(clauses.size());
+	private ClauseList createAdaptedClauseList(IVariables newVariables) {
+		final ClauseList newClauses = new ClauseList(clauses.size());
 		for (final LiteralSet oldClause : clauses) {
 			newClauses.add(oldClause.reorder(variables, newVariables));
 		}
-		return new CNF(newVariables, newClauses);
+		return newClauses;
 	}
 
 }

@@ -48,12 +48,8 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 	private final int strictcomplex;
 	private final String fileExtension;
 
-	/**
-	 * @param title
-	 */
 	public EliminateConstraintsWizard(IFile file, String title, boolean trivial, int pseudocomplex, int strictcomplex, String fileExtension) {
 		super(title);
-		// TODO Auto-generated constructor stub
 		inputModelFile = file;
 		this.trivial = trivial;
 		this.pseudocomplex = pseudocomplex;

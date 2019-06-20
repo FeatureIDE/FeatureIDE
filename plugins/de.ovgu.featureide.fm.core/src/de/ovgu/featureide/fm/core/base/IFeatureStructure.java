@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Manages all structural information of a feature.</br> Intended for tree structures (features are represented by tree nodes).
+ * Manages all structural information of a feature.<br> Intended for tree structures (features are represented by tree nodes).
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
@@ -122,4 +122,6 @@ public interface IFeatureStructure {
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
+
+	IFeatureStructure clone(IFeatureModel newFeatureModel);
 }

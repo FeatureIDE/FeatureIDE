@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
@@ -40,6 +41,39 @@ public class FeatureModelProperties {
 	public FeatureModelProperties(Collection<FeatureProperties> featureProperties, Collection<ConstraintProperties> constraintProperties) {
 		this.featureProperties = featureProperties;
 		this.constraintProperties = constraintProperties;
+	}
+
+	private final HashMap<FeatureStatus, Boolean> cachedFeatureStatus = new HashMap<>();
+	private final HashMap<ConstraintStatus, Boolean> cachedConstraintStatus = new HashMap<>();
+
+	public boolean hasProperty(FeatureStatus status) {
+		Boolean chachedResult = cachedFeatureStatus.get(status);
+		if (chachedResult == null) {
+			chachedResult = false;
+			for (final FeatureProperties f : featureProperties) {
+				if (f.hasStatus(status)) {
+					chachedResult = true;
+					break;
+				}
+			}
+			cachedFeatureStatus.put(status, chachedResult);
+		}
+		return chachedResult;
+	}
+
+	public boolean hasProperty(ConstraintStatus status) {
+		Boolean chachedResult = cachedConstraintStatus.get(status);
+		if (chachedResult == null) {
+			chachedResult = false;
+			for (final ConstraintProperties c : constraintProperties) {
+				if (c.hasStatus(status)) {
+					chachedResult = true;
+					break;
+				}
+			}
+			cachedConstraintStatus.put(status, chachedResult);
+		}
+		return chachedResult;
 	}
 
 	private Boolean hasFalseOptionalFeatures;

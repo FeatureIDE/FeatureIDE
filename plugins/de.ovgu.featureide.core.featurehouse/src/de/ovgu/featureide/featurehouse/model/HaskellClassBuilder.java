@@ -60,7 +60,7 @@ public class HaskellClassBuilder extends ClassBuilder {
 
 	/**
 	 *
-	 * @param terminal body
+	 * @param body terminal
 	 * @return list(0) method name list(1) method type
 	 */
 	public LinkedList<String> getMethod(String body) {

@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 import java.util.List;
 import java.util.Random;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
@@ -64,7 +64,7 @@ public interface ISatSolver extends ISimpleSatSolver {
 
 	void setSelectionStrategy(int[] model, boolean min);
 
-	void setSelectionStrategy(List<Solution> sample);
+	void setSelectionStrategy(List<LiteralSet> sample);
 
 	void assignmentPop();
 

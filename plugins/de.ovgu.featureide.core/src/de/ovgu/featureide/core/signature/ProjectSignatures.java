@@ -294,7 +294,6 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 					count(signature, allCounters[1], fs, 1);
 				} else {
 					count(signature, allCounters[0], fs, 0);
-					System.out.println(signature.getFullName());
 				}
 			}
 		}

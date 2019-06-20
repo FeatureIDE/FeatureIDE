@@ -32,17 +32,14 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * Converts .config files in example projects into .xml files.<br/> Uses the index file of the example plug-in.
+ * Converts .config files in example projects into .xml files.<br> Uses the index file of the example plug-in.
  *
  * @author Sebastian Krieter
  */
@@ -96,24 +93,15 @@ public class ConfigurationFormatConverter {
 				e.printStackTrace();
 				return;
 			}
-			if (!configurationFiles.isEmpty()) {
-				final ProblemList problems = new ProblemList();
-				final IFeatureModel featureModel = FeatureModelManager.load(relativePath.resolve("model.xml"), problems);
-				if (!problems.containsError()) {
-					final Configuration object = new Configuration(featureModel);
-					for (final Path oldFile : configurationFiles) {
-						if (!SimpleFileHandler.load(oldFile, object, OLD_FORMAT).containsError()) {
-							final String oldFileName = oldFile.getFileName().toString();
-							final String newFileName = oldFileName.substring(0, oldFileName.length() - SUFFIX.length()) + "." + NEW_FORMAT.getSuffix();
-							final Path newFile = oldFile.subpath(0, oldFile.getNameCount() - 1).resolve(newFileName);
-							if (!SimpleFileHandler.save(newFile, object, NEW_FORMAT).containsError()) {
-								try {
-									Files.delete(oldFile);
-								} catch (final IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}
+			for (final Path oldFile : configurationFiles) {
+				final String oldFileName = oldFile.getFileName().toString();
+				final String newFileName = oldFileName.substring(0, oldFileName.length() - SUFFIX.length()) + "." + NEW_FORMAT.getSuffix();
+				final Path newFile = oldFile.subpath(0, oldFile.getNameCount() - 1).resolve(newFileName);
+				if (ConfigurationIO.getInstance().convert(oldFile.getFileName(), newFile, NEW_FORMAT)) {
+					try {
+						Files.delete(oldFile);
+					} catch (final IOException e) {
+						e.printStackTrace();
 					}
 				}
 			}

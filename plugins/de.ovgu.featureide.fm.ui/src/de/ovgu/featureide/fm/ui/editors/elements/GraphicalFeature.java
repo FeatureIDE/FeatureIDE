@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
 /**
  * Graphical representation of an {@link IFeature} instance.
@@ -62,6 +63,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	private IEventListener uiObject;
 
+	private CollapsedDecoration deco;
+
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		feature = correspondingFeature;
@@ -69,6 +72,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	public GraphicalFeature(GraphicalFeature graphicalFeature) {
+		collapsed = graphicalFeature.collapsed;
 		constraintSelected = graphicalFeature.constraintSelected;
 		location = graphicalFeature.location;
 		dimension = graphicalFeature.dimension;
@@ -166,7 +170,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public String toString() {
-		return feature.toString();
+		if (feature != null) {
+			return feature.toString();
+		} else {
+			return "";
+		}
 	}
 
 	@Override
@@ -222,6 +230,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
+	public void deregisterUIObject() {
+		uiObject = null;
+	}
+
+	@Override
 	public boolean isCollapsed() {
 		if (!getObject().getStructure().hasChildren()) {
 			return false;
@@ -263,6 +276,34 @@ public class GraphicalFeature implements IGraphicalFeature {
 			}
 		}
 		return Collections.unmodifiableList(features);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#setCollapsedDecoration(de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration)
+	 */
+	@Override
+	public void setCollapsedDecoration(CollapsedDecoration decoration) {
+		deco = decoration;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#getCollapsedDecoration()
+	 */
+	@Override
+	public CollapsedDecoration getCollapsedDecoration() {
+		return deco;
+	}
+
+	@Override
+	public List<IGraphicalFeature> getAllGraphicalChildren() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
+			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			features.add(gf);
+		}
+		return features;
 	}
 
 }

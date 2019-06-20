@@ -20,17 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveFeatureOperation;
 
@@ -116,15 +114,7 @@ public class FeatureDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		final FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		final MoveFeatureOperation op = new MoveFeatureOperation(data, editPart.getViewer(), newLocation, feature.getLocation().getCopy(), feature.getObject());
-		// TODO _interfaces Removed Code
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new MoveFeatureOperation(featureModel, data, newLocation, feature.getLocation().getCopy()));
 	}
 
 	private boolean calculateNewParentAndIndex(IGraphicalFeature next) {

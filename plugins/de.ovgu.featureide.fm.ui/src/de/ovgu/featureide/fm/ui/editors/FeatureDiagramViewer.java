@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -35,7 +34,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -51,6 +54,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintViewDialog;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature diagrams and cross-tree constraints.
@@ -144,6 +149,30 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
 		}
+		openConstraintDecision();
+	}
+
+	/**
+	 * Opens a dialog and asks the user if they want to show the constraint view.
+	 */
+	public void openConstraintDecision() {
+		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
+			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
+			if (!dialog.isRemember()) {
+				dialog.open();
+
+			} else {
+				if (dialog.getDecision()) {
+					try {
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
+					} catch (final PartInitException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	public FeatureDiagramViewer(IGraphicalFeatureModel graphicalFeatureModel) {
@@ -153,7 +182,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	/**
 	 * Checks if the combined width including the spaces between features fits the editor's size. Based on the selected layout algorithm.
 	 *
-	 * @param list all features from a single level.
 	 * @return true if the level fits in the editor.
 	 */
 	public boolean isLevelSizeOverLimit() {
@@ -183,6 +211,40 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		return false;
 	}
 
+	public boolean isNodeOutOfSight(IGraphicalFeature feature) {
+		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
+		final double editorWidth = (getFigureCanvas().getViewport().getSize().width / getZoomManager().getZoom());
+		final double editorHeight = (getFigureCanvas().getViewport().getSize().height / getZoomManager().getZoom());
+
+		final double rootMidX = root.getLocation().x + (root.getSize().width / 2);
+		final double rootMidY = root.getLocation().y - (root.getSize().height / 2);
+
+		final double borderLeft = rootMidX - (editorWidth / 2);
+		double borderRight = rootMidX + (editorWidth / 2);
+		if (borderLeft < -rootMidY) {
+			borderRight = editorWidth - rootMidX;
+
+		}
+		double height = editorHeight;
+
+		if (((int) editorHeight / 4) == (int) rootMidY) {
+			height = editorHeight + rootMidY;
+		}
+
+		final int Xright = feature.getLocation().x + (feature.getSize().width / 2);
+		if ((Xright > borderRight) || (feature.getLocation().x < borderLeft)) {
+			getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
+			return true;
+		}
+		final int YTop = feature.getLocation().y + (feature.getSize().height / 2);
+		if ((YTop > height) || (feature.getLocation().y < 0)) {
+			getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
+			return true;
+		}
+
+		return false;
+	}
+
 	public void internRefresh(boolean onlyLayout) {
 		if (getContents() == null) {
 			return;
@@ -204,7 +266,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void reload() {// TODO do not layout twice
 		// internRefresh(true);
-		((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
+		final Map<?, ?> editPartRegistry = getEditPartRegistry();
+		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) editPartRegistry.get(graphicalFeatureModel);
+		abstractGraphicalEditPart.refresh();
 		internRefresh(true);
 	}
 
@@ -215,9 +279,10 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			final Point size = getControl().getSize();
 			layoutManager.setControlSize(size.x, size.y);
 		}
+
 		layoutManager.layout(graphicalFeatureModel, this);
 
-		if (!graphicalFeatureModel.isLegendHidden()) {
+		if (!graphicalFeatureModel.isLegendHidden() && graphicalFeatureModel.getLayout().hasLegendAutoLayout()) {
 			for (final Object obj : getEditPartRegistry().values()) {
 				if (obj instanceof LegendEditPart) {
 					final LegendFigure fig = ((LegendEditPart) obj).getFigure();
@@ -251,10 +316,21 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	public void deregisterEditParts(IGraphicalFeature feature) {
+		final Map<?, ?> registry = getEditPartRegistry();
+		registry.remove(feature);
+		registry.remove(feature.getSourceConnection());
+	}
+
+	public void deregisterEditParts(IGraphicalConstraint constraint) {
+		final Map<?, ?> registry = getEditPartRegistry();
+		registry.remove(constraint);
+	}
+
 	/**
 	 * Scrolls to the given points and center the view
 	 *
-	 * @param centerFeature
+	 * @param feature centerFeature
 	 */
 	public void centerPointOnScreen(IFeature feature) {
 		final IGraphicalFeature graphFeature = graphicalFeatureModel.getGraphicalFeature(feature);
@@ -275,20 +351,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
-	public void refreshAll() {
-		refresh(graphicalFeatureModel.getFeatures(), true);
-	}
-
-	public void refresh(Collection<IGraphicalFeature> features, boolean checkModification) {
-		for (final IGraphicalFeature f : features) {
-			if (!checkModification) {
-				final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
-				editPart.refresh();
-			}
-		}
-	}
-
-	void refreshChildAll(IFeature parent) {
+	public void refreshChildAll(IFeature parent) {
 		for (final IFeatureStructure f : parent.getStructure().getChildren()) {
 			// Refresh children
 			refreshChildAll(f.getFeature());
@@ -308,10 +371,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		// Refresh Connection
 		for (final FeatureConnection connection : graphicalFeature.getTargetConnections()) {
-			final Map<?, ?> registry2 = getEditPartRegistry();
-			final ConnectionEditPart connectionEditPart2 = (ConnectionEditPart) registry2.get(connection);
-			if (connectionEditPart2 != null) {
-				connectionEditPart2.refresh();
+			final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getEditPartRegistry().get(connection);
+			if (connectionEditPart != null) {
+				connectionEditPart.refresh();
 			}
 		}
 		// Refresh Feature
@@ -322,7 +384,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	 * Stops the analyzing job when the editor is closed.
 	 */
 	public void dispose() {
-		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
+		graphicalFeatureModel.getFeatureModelManager().editObject().removeListener(editorKeyHandler);
 	}
 
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {
@@ -331,7 +393,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	@Override
 	public boolean matches(IGraphicalFeature element, String searchString) {
-		return element.getObject().getName().toLowerCase().startsWith(searchString.toLowerCase());
+		return element.getObject().getName().toLowerCase().matches(".*" + searchString.toLowerCase() + ".*");
 	}
 
 	@Override

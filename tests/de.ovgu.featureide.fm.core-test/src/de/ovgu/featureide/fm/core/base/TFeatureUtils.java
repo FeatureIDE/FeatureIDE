@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 
 /**
  * Test class for {@link FeatureUtils}
@@ -34,14 +34,14 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class TFeatureUtils {
 
-	final static IFeatureModelFactory FACTORY = FMFactoryManager.getDefaultFactory();
+	final static IFeatureModelFactory FACTORY = DefaultFeatureModelFactory.getInstance();
 
 	/**
 	 * Test method for {@link de.ovgu.featureide.fm.core.base.FeatureUtils#getParent(de.ovgu.featureide.fm.core.base.IFeature)}.
 	 */
 	@Test
 	public void testGetParent() {
-		final IFeatureModel model = FACTORY.createFeatureModel();
+		final IFeatureModel model = FACTORY.create();
 		final IFeature featureA = FACTORY.createFeature(model, "A");
 		model.addFeature(featureA);
 		model.getStructure().setRoot(featureA.getStructure());

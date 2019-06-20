@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -37,17 +38,18 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A wizard page to show implicit constraints of a sub feature model. Enables automated analysis on the sub feature model to explain implicit (redundant)
  * constraints.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
 public class SubtreeDependencyPage extends AbstractWizardPage {
 
@@ -102,7 +104,10 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		gridLayout.marginWidth = 0;
 		parent.setLayout(gridLayout);
 
-		final IGraphicalFeatureModel graphicalFeatureModel = FeatureDiagramEditor.getGrapicalFeatureModel(subtreeModel);
+		final VirtualFeatureModelManager featureModelManager = new VirtualFeatureModelManager(subtreeModel);
+		featureModelManager.setUndoContext(new UndoContext());
+		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModelManager);
+		graphicalFeatureModel.init();
 		final FeatureDiagramViewer viewer = new FeatureDiagramViewer(graphicalFeatureModel);
 
 		final GridData gridData = new GridData();
@@ -140,7 +145,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		for (final IConstraint redundantC : getImplicitConstraints()) {
 			final ConstraintProperties constraintProperties = subTreeAnalyzer.getConstraintProperties(redundantC);
 			constraintProperties.setStatus(ConstraintStatus.IMPLICIT);
-			subTreeAnalyzer.getExplanation(redundantC, FeatureModelManager.getInstance(completeFm).getSnapshot().getFormula());
+			subTreeAnalyzer.getExplanation(redundantC, FeatureModelManager.getInstance(completeFm).getPersistentFormula());
 
 			// remember if an implicit constraint exists to adapt legend
 			for (final IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {

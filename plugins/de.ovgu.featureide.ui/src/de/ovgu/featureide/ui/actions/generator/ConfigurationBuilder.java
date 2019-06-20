@@ -47,7 +47,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -79,7 +79,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
 	public IFeatureProject featureProject;
-	private IFeatureModel featureModel;
+	private FeatureModelFormula featureModel;
 
 	/**
 	 * This is the place where all configurations should be generated if no new projects should be generated.
@@ -162,7 +162,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	/**
 	 * Adds the given configuration to configurations.
 	 *
-	 * @param configuration
+	 * @param configuration to add
 	 */
 	public synchronized void addConfiguration(BuilderConfiguration configuration) {
 		sorter.addConfiguration(configuration);
@@ -181,6 +181,19 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param tOrder
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
+	 */
+	/**
+	 *
+	 * @param featureProject The feature project
+	 * @param buildType <code>true</code> if all possible valid configurations should be build<br> <code>false</code> if all current configurations should be
+	 *        build
+	 * @param createNewProjects <code>true</code> if the configurations should be built into separate projects
+	 * @param algorithm selected algorithmen
+	 * @param t t
+	 * @param buildOrder build order
+	 * @param runTests whether the tests should be run after the operation
+	 * @param max Maximal number of configurations to generate.
+	 * @param tOrder tOrder
 	 */
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
 			final int t, final BuildOrder buildOrder, boolean runTests, int max, int tOrder) {
@@ -213,21 +226,21 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		this.createNewProjects = createNewProjects;
 		this.buildType = buildType;
 
-		featureModel = featureProject.getFeatureModel();
+		featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
 
 		switch (buildOrder) {
 		case DEFAULT:
-			sorter = new AbstractConfigurationSorter(featureModel);
+			sorter = new AbstractConfigurationSorter(featureModel.getFeatureModel());
 			break;
 		case DISSIMILARITY:
 			sorter = new PriorizationSorter(featureModel);
 			break;
 		case INTERACTION:
-			sorter = new InteractionSorter(tOrder, featureModel, buildType == BuildType.T_WISE);
+			sorter = new InteractionSorter(tOrder, featureModel.getFeatureModel(), buildType == BuildType.T_WISE);
 			break;
 		default:
 			LOGGER.logWarning("Case statement missing for: " + buildOrder);
-			sorter = new AbstractConfigurationSorter(featureModel);
+			sorter = new AbstractConfigurationSorter(featureModel.getFeatureModel());
 			break;
 		}
 
@@ -238,30 +251,30 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
-			configurationGenerator = new AllConfigrationsGenerator(this, featureProject);
+			configurationGenerator = new AllConfigrationsGenerator(this, featureModel);
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
 			if (algorithm.equals(INCLING)) {
-				configurationGenerator = new IncLingConfigurationGenerator(this, featureProject);
+				configurationGenerator = new IncLingConfigurationGenerator(this, featureModel);
 			} else if (algorithm.equals("ICPL")) {
-				configurationGenerator = new ICPLConfigurationGenerator(this, featureProject, t);
+				configurationGenerator = new ICPLConfigurationGenerator(this, featureModel, t);
 			} else if (algorithm.equals("Chvatal")) {
-				configurationGenerator = new CHVATALConfigurationGenerator(this, featureProject, t);
+				configurationGenerator = new CHVATALConfigurationGenerator(this, featureModel, t);
 			} else if (algorithm.equals("CASA")) {
-				configurationGenerator = new CASAConfigurationGenerator(this, featureProject, t);
+				configurationGenerator = new CASAConfigurationGenerator(this, featureModel, t);
 			} else {
 				throw new RuntimeException(buildType + " not supported");
 			}
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		case RANDOM:
-			configurationGenerator = new RandConfigurationGenerator(this, featureProject);
+			configurationGenerator = new RandConfigurationGenerator(this, featureModel);
 			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
 			configurationNumber = 2;
-			configurationGenerator = new ModuleConfigurationGenerator(this, featureProject, featureName);
+			configurationGenerator = new ModuleConfigurationGenerator(this, featureModel, featureName);
 			break;
 		default:
 			throw new RuntimeException(buildType + " not supported");

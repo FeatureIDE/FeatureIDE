@@ -22,8 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_OPERATION;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to set Features hidden. Enables undo/redo functionality.
@@ -35,22 +38,28 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
-	private final boolean allHidden;
-	private final IFeature[] featureArray;
+	public static final String ID = ID_PREFIX + "SetFeatureToHiddenOperation";
 
-	public SetFeatureToHiddenOperation(IFeatureModel featureModel, boolean allHidden, IFeature[] featureArray) {
-		super(featureModel, HIDE_OPERATION);
+	private final boolean allHidden;
+
+	public SetFeatureToHiddenOperation(IFeatureModelManager featureModelManager, boolean allHidden, List<String> featureNames) {
+		super(featureModelManager, HIDE_OPERATION, featureNames);
 		this.allHidden = allHidden;
-		this.featureArray = featureArray;
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
-			if(allHidden || !tempFeature.getStructure().isHidden()) {
-				final HideFeatureOperation op = new HideFeatureOperation(tempFeature, featureModel);
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (allHidden || !tempFeature.getStructure().isHidden()) {
+				final HideFeatureOperation op = new HideFeatureOperation(name, featureModelManager);
 				operations.add(op);
 			}
-		}		
+		}
 	}
 }

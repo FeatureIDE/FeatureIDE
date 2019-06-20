@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,31 +26,38 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
- * Required to execute compound operations 
- * 
+ * Required to execute compound operations
+ *
  * @author Chico Sundermann
  * @author Paul Westphal
  */
 public class AbstractFeatureOperation extends AbstractFeatureModelOperation {
-	
-	private final IFeature feature;
 
-	public AbstractFeatureOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, ABSTRACT_OPERATION);
-		this.feature = feature;
+	public static final String ID = ID_PREFIX + "AbstractFeatureOperation";
+
+	private final String featureName;
+
+	public AbstractFeatureOperation(String featureName, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, ABSTRACT_OPERATION);
+		this.featureName = featureName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
-		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IFeature feature = featureModel.getFeature(featureName);
+		final boolean oldValue = feature.getStructure().isAbstract();
+		final boolean newValue = !oldValue;
+		feature.getStructure().setAbstract(newValue);
+		return new FeatureModelOperationEvent(ID, EventType.ATTRIBUTE_CHANGED, feature, oldValue, newValue);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
 }

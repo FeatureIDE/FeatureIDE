@@ -132,11 +132,6 @@ public class SlicedVariables extends Variables {
 	}
 
 	@Override
-	public String getName(final int x) {
-		return intToVar[internalToOrg[Math.abs(x)]];
-	}
-
-	@Override
 	public String[] getNames() {
 		if (intToVarSliced == null) {
 			intToVarSliced = new String[internalToOrg.length];

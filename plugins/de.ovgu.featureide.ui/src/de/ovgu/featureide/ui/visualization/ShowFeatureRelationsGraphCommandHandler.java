@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCrea
 import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -116,23 +115,16 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		return numerator / denominator;
 	}
 
-	/**
-	 * Show frog
-	 *
-	 * @param featureProject
-	 * @param featureCenter
-	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
-		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
 
 		// Get feature in the center
-		final IFeature fc = snapshot.getObject().getFeature(featureCenter);
+		final IFeature fc = formula.getFeatureModel().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
 		final List<String> formalizedRequires = new ArrayList<>();
 		final List<String> formalizedExcludes = new ArrayList<>();
 
-		final FeatureModelFormula formula = snapshot.getFormula();
 		final IVariables variables = formula.getVariables();
 		final int variable = variables.getVariable(fc.getName());
 

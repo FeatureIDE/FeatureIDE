@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis.Anomalies;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ClauseAnalysis.Anomalies;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -329,7 +329,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			for (final IConstraint constraint : getContradictoryConstraints()) {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
 			}
-			
+
 			getAnomalyConstraints();
 		}
 	}
@@ -411,37 +411,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 		}
 		return number;
-	}
-
-	// TODO Remove???
-	/**
-	 * Listens to feature model changes. Resets its formula if necessary.
-	 */
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		switch (event.getEventType()) {
-		case ALL_FEATURES_CHANGED_NAME_TYPE: // Required because feature names are used as variable names.
-		case CHILDREN_CHANGED:
-		case CONSTRAINT_ADD:
-		case CONSTRAINT_DELETE:
-		case CONSTRAINT_MODIFY:
-		case FEATURE_ADD:
-		case FEATURE_ADD_ABOVE:
-		case FEATURE_DELETE:
-		case FEATURE_MODIFY: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
-		case FEATURE_NAME_CHANGED: // Required because feature names are used as variable names.
-		case GROUP_TYPE_CHANGED:
-		case HIDDEN_CHANGED: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
-		case MANDATORY_CHANGED:
-		case MODEL_DATA_CHANGED:
-		case MODEL_DATA_OVERRIDDEN:
-		case PARENT_CHANGED:
-		case STRUCTURE_CHANGED:
-			formula.resetFormula();
-			break;
-		default:
-			break;
-		}
 	}
 
 	/**
@@ -741,5 +710,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	public AnalysesCollection getAnalysesCollection() {
 		return analysesCollection;
 	}
+
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {}
 
 }

@@ -21,13 +21,17 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -48,13 +52,19 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration\\s*/?>");
+
 	@Override
 	public XMLConfFormat getInstance() {
-		return this;
+		return new XMLConfFormat();
 	}
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		object.resetValues();
+		final IFeatureModel featureModel = object.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
+
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
@@ -65,7 +75,8 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectableFeature(featureName);
+					selectablefeature = object.getSelectableFeature(renamingsManager == null ? featureName : renamingsManager.getNewName(featureName),
+							object.getFeatureModel() == null);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
@@ -77,16 +88,9 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
 					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
-				} else {
-					createWarning("No manual selection state specified", feature, warnings);
-					continue;
 				}
-
 				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
 					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
-				} else {
-					createWarning("No automatic selection state specified", feature, warnings);
-					continue;
 				}
 
 				final NamedNodeMap attributes = feature.getAttributes();
@@ -122,7 +126,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
 		if (selection == null) {
-			createError("Selection state not specified" + selection, feature, warnings);
 			return Selection.UNDEFINED;
 		} else {
 			switch (selection) {
@@ -133,7 +136,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			case "unselected":
 				return Selection.UNSELECTED;
 			default:
-				createError("Invalid selection state: " + selection, feature, warnings);
 				return Selection.UNDEFINED;
 			}
 		}
@@ -157,17 +159,35 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
+			if ((feature.getManual() == Selection.UNDEFINED) && (feature.getAutomatic() == Selection.UNDEFINED)) {
+				continue;
+			}
 			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
-			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
-			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			if (feature.getManual() != Selection.UNDEFINED) {
+				featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
+			}
+			if (feature.getAutomatic() != Selection.UNDEFINED) {
+				featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			}
 			root.appendChild(featureNode);
+
 		}
 	}
 
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return super.supportsContent(content, CONTENT_REGEX);
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return super.supportsContent(reader, CONTENT_REGEX);
 	}
 
 	@Override

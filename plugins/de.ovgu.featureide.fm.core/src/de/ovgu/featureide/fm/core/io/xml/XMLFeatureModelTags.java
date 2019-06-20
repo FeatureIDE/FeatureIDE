@@ -32,7 +32,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
 public interface XMLFeatureModelTags {
 
 	static final String PROPERTIES = "properties";
+	static final String PROPERTY = "property";
+	static final String GRAPHICS = "graphics";
+	static final String CALCULATIONS = "calculations";
 	static final String FEATURE_MODEL = "featureModel";
+	static final String EXTENDED_FEATURE_MODEL = "extendedFeatureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
@@ -63,10 +67,24 @@ public interface XMLFeatureModelTags {
 	static final String FALSE = "false";
 	static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
 	static final String SHOW_COLLAPSED_CONSTRAINTS = "showCollapsedConstraints";
-	static final String HIDE_LEGEND = "hideLegend";
+	static final String LEGEND = "legend";
+	static final String LEGEND_AUTO_LAYOUT = "autoLayout";
+	static final String LEGEND_HIDDEN = "hidden";
 	static final String SHOW_SHORT_NAMES = "showShortNames";
 	static final String HORIZONTAL_LAYOUT = "horizontalLayout";
 	static final String RULE = "rule";
 	static final String UNKNOWN = "unknown";
 	static final String ATMOST1 = "atmost1";
+	static final String ATTRIBUTE = "attribute";
+	static final String ATTRIBUTE_UNIT = "unit";
+	static final String ATTRIBUTE_TYPE = "type";
+	static final String ATTRIBUTE_VALUE = "value";
+	static final String ATTRIBUTE_RECURSIVE = "recursive";
+	static final String ATTRIBUTE_CONFIGURABLE = "configurable";
+
+	static final String KEY = "key";
+	static final String VALUE = "value";
+	static final String TYPE = "data-type";
+	static final String TYPE_CUSTOM = "custom";
+
 }

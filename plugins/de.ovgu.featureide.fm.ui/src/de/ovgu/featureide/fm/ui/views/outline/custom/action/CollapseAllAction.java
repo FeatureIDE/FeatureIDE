@@ -34,11 +34,6 @@ public class CollapseAllAction extends Action {
 
 	private final TreeViewer viewer;
 
-	/**
-	 * Constructor for CollapseAllAction
-	 *
-	 * @param viewer
-	 */
 	public CollapseAllAction(TreeViewer viewer) {
 		super();
 		this.viewer = viewer;

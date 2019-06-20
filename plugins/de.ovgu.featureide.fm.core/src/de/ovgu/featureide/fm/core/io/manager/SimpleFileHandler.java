@@ -30,13 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import javax.annotation.Nonnull;
+
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager.ObjectCreator;
 
 /**
  * Capable of reading and writing a file in a certain format.
@@ -67,10 +67,40 @@ public class SimpleFileHandler<T> {
 	 * @param path the given path
 	 * @return the file name
 	 */
+	@Nonnull
 	public static String getFileName(Path path) {
 		final String fileName = path.getFileName().toString();
 		final int extensionIndex = fileName.lastIndexOf('.');
 		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
+	}
+
+	/**
+	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
+	 * extension, but ".file.txt" would return "txt".
+	 *
+	 * @param path the given path
+	 * @return the file extension
+	 *
+	 * @see #getFileExtension(String)
+	 */
+	@Nonnull
+	public static String getFileExtension(Path path) {
+		return getFileExtension(path.getFileName().toString());
+	}
+
+	/**
+	 * Retrieves the file extension from a file name.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * but ".file.txt" would return "txt".
+	 *
+	 * @param fileName the given file name
+	 * @return the file extension
+	 *
+	 * @see #getFileExtension(Path)
+	 */
+	@Nonnull
+	public static String getFileExtension(String fileName) {
+		final int extensionIndex = fileName.lastIndexOf('.');
+		return (extensionIndex > 0) ? fileName.substring(extensionIndex + 1) : "";
 	}
 
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
@@ -85,39 +115,24 @@ public class SimpleFileHandler<T> {
 		return fileHandler.getLastProblems();
 	}
 
-	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		return getFileHandler(path, new VirtualFileManager.ObjectCreator<>(object), formatManager).getLastProblems();
+	public static <T> ProblemList load(Path path, T object, FormatManager<T> formatManager) {
+		return load(new SimpleFileHandler<>(path, object, null), formatManager);
 	}
 
-	public static final <T> FileHandler<T> getFileHandler(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		return getFileHandler(path, new VirtualFileManager.ObjectCreator<>(object), formatManager);
-	}
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<T> formatManager) {
+		final String content = fileHandler.getContent();
 
-	public static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator,
-			FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final FileHandler<T> fileHandler = new FileHandler<>(path, null, null);
-		try {
-			final String content = setFormat(path, formatManager, fileHandler);
-			objectCreator.setPath(path, fileHandler.getFormat());
-			fileHandler.setObject(objectCreator.createObject());
-			fileHandler.parse(content);
-		} catch (final Exception e) {
-			fileHandler.getLastProblems().add(new Problem(e));
+		if (content != null) {
+			final String fileName = fileHandler.getPath().getFileName().toString();
+			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
+			if (format == null) {
+				fileHandler.getLastProblems().add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
+			} else {
+				fileHandler.setFormat(format);
+				fileHandler.parse(content);
+			}
 		}
-		return fileHandler;
-	}
-
-	protected static <T> String setFormat(Path path, FormatManager<? extends IPersistentFormat<T>> formatManager, final FileHandler<T> fileHandler)
-			throws IOException, NoSuchExtensionException {
-		final String content = fileHandler.readContent();
-		final String fileName = path.getFileName().toString();
-		final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
-		if (format == null) {
-			throw new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!");
-		} else {
-			fileHandler.setFormat(format);
-		}
-		return content;
+		return fileHandler.getLastProblems();
 	}
 
 	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {

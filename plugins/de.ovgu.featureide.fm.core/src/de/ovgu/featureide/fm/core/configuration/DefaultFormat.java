@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.ovgu.featureide.fm.core.PluginID;
@@ -45,7 +44,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Simple configuration format.<br/> Lists all selected features in the user-defined order (if specified).
+ * Simple configuration format.<br> Lists all selected features in the user-defined order (if specified).
  *
  * @author Sebastian Krieter
  */
@@ -57,7 +56,8 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
 		String line = null;
@@ -84,8 +84,8 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
-					name = renamingsManager.getNewName(name);
-					final IFeature feature = configuration.getFeatureModel().getFeature(name);
+					name = renamingsManager == null ? name : renamingsManager.getNewName(name);
+					final IFeature feature = featureModel != null ? featureModel.getFeature(name) : null;
 					if ((feature != null) && feature.getStructure().hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
@@ -125,37 +125,46 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
 		final IFeatureModel featureModel = configuration.getFeatureModel();
-		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list = featureModel.getFeatureOrderList();
-			final Set<String> featureSet = configuration.getSelectedFeatureNames();
-			for (final String s : list) {
-				if (featureSet.contains(s)) {
-					if (s.contains(" ")) {
-						buffer.append("\"" + s + "\"" + NEWLINE);
-					} else {
-						buffer.append(s + NEWLINE);
-					}
-				}
-			}
+		if ((featureModel != null) && featureModel.isFeatureOrderUserDefined()) {
+			writeFeatureOrder(configuration, buffer, featureModel);
+		} else if (configuration.getRoot() != null) {
+			writeFeatureTree(configuration.getRoot(), buffer, featureModel);
 		} else {
-			final SelectableFeature root = configuration.getRoot();
-			if ((root != null) && (root.getFeature() != null)) {
-				writeSelectedFeatures(root, buffer);
-			}
+			writeFeatureList(configuration, buffer, featureModel);
 		}
 		return buffer.toString();
 	}
 
-	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
-		if (feature.getFeature().getStructure().isConcrete() && (feature.getSelection() == Selection.SELECTED)) {
+	private void writeFeatureOrder(Configuration configuration, final StringBuilder buffer, final IFeatureModel featureModel) {
+		final List<String> list = featureModel.getFeatureOrderList();
+		for (final String name : list) {
+			final SelectableFeature selectableFeature = configuration.getSelectableFeature(name, false);
+			if (selectableFeature != null) {
+				writeSelectedFeature(buffer, selectableFeature, featureModel);
+			}
+		}
+	}
+
+	private void writeFeatureList(Configuration configuration, final StringBuilder buffer, IFeatureModel featureModel) {
+		for (final SelectableFeature feature : configuration.getFeatures()) {
+			writeSelectedFeature(buffer, feature, featureModel);
+		}
+	}
+
+	private void writeFeatureTree(SelectableFeature feature, StringBuilder buffer, IFeatureModel featureModel) {
+		writeSelectedFeature(buffer, feature, featureModel);
+		for (final TreeElement child : feature.getChildren()) {
+			writeFeatureTree((SelectableFeature) child, buffer, featureModel);
+		}
+	}
+
+	private void writeSelectedFeature(final StringBuilder buffer, final SelectableFeature feature, IFeatureModel featureModel) {
+		if (((featureModel == null) || feature.getFeature().getStructure().isConcrete()) && (feature.getSelection() == Selection.SELECTED)) {
 			if (feature.getName().contains(" ")) {
 				buffer.append("\"" + feature.getName() + "\"" + NEWLINE);
 			} else {
 				buffer.append(feature.getName() + NEWLINE);
 			}
-		}
-		for (final TreeElement child : feature.getChildren()) {
-			writeSelectedFeatures((SelectableFeature) child, buffer);
 		}
 	}
 

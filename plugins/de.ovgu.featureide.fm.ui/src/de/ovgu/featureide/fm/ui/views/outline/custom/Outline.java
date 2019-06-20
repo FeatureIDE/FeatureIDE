@@ -459,37 +459,21 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		provider.selectionChanged(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
 		provider.treeCollapsed(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
 		provider.treeExpanded(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-	 */
 	@Override
 	public void propertyChanged(Object source, int propId) {
 		update(curFile);

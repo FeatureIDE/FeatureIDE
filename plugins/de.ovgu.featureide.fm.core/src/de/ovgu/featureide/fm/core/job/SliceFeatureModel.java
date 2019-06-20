@@ -61,14 +61,14 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private final Collection<String> featureNames;
 
 	public SliceFeatureModel(IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
-		formula = FeatureModelManager.getInstance(featuremodel).getSnapshot().getFormula();
+		formula = FeatureModelManager.getInstance(featuremodel).getPersistentFormula();
 		this.featureNames = featureNames;
 		this.considerConstraints = considerConstraints;
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor monitor) throws Exception {
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(formula.getFeatureModel());
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(formula.getFeatureModel());
 		monitor.setRemainingWork(100);
 
 		monitor.checkCancel();
@@ -216,7 +216,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 							}
 						} else {
 							final IFeatureModel featureModel = curFeature.getFeatureModel();
-							final IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
+							final IFeature pseudoAlternative = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (final IFeature child : list) {

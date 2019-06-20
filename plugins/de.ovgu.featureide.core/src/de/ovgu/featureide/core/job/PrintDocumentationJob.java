@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -112,7 +113,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (merger instanceof VariantMerger) {
 			// TODO !!! ignore abstract features (below)
-			final Configuration conf = new Configuration(featureProject.getFeatureModel());
+			final Configuration conf = ConfigurationManager.load(Paths.get(featureProject.getCurrentConfiguration().getLocationURI()));
+			conf.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
 				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
@@ -150,7 +152,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			for (final SelectableFeature feature : conf.getFeatures()) {
 				final Selection selection = feature.getSelection();
 				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
-					: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+					: new Literal(feature.getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
@@ -288,10 +290,6 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		}
 		if (args1 != null) {
 			System.arraycopy(args1, 0, javadocargs, defaultArguments + args0.length, args1.length);
-		}
-
-		for (int j = 0; j < javadocargs.length; j++) {
-			System.out.println(javadocargs[j]);
 		}
 
 		com.sun.tools.javadoc.Main.execute(javadocargs);

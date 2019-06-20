@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.ui.wizards.ChooseFeaturePage;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Wizard for the {@link BuildExtendedModulesHandler}.
+ * Wizard for the BuildExtendedModulesHandler.
  *
  * @author Reimar Schroeter
  */

@@ -22,9 +22,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -34,16 +33,16 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class AtomicParentNode extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public AtomicParentNode(String description, IFeatureModel model) {
+	public AtomicParentNode(String description, FeatureModelFormula model) {
 		super(description, "(expand to calculate)");
 		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = FeatureModelManager.getAnalyzer(model).getAtomicSets();
+		final List<List<IFeature>> atomicSets = model.getAnalyzer().getAtomicSets();
 
 		int i = 0;
 		for (final List<IFeature> list : atomicSets) {

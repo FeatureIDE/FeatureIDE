@@ -339,11 +339,11 @@ public class NodeWriterTests {
 		final NodeWriter w = new NodeWriter(in);
 		String actual = w.nodeToString();
 		String expected = "A & B => B <=> C & A | B | B | atmost2(C) | A";
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 		w.setEnforceBrackets(true);
 		actual = w.nodeToString();
 		expected = "(((A & B) => B) <=> ((C & A) | B | B | (atmost2(C) | A)))";
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 
 	@Test
@@ -353,11 +353,11 @@ public class NodeWriterTests {
 		final NodeWriter w = new NodeWriter(in);
 		String actual = w.nodeToString();
 		String expected = "nowhitespace & white space & with\ttab & with\nnewline & -nowhitespace & -white space & -nowhitespace & -white space";
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 		w.setEnquoteWhitespace(true);
 		actual = w.nodeToString();
 		expected = "nowhitespace & \"white space\" & \"with\ttab\" & \"with\nnewline\" & -nowhitespace & -\"white space\" & -nowhitespace & -\"white space\"";
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 
 	private void testSymbols(String[] symbols, String expected) {
@@ -368,7 +368,7 @@ public class NodeWriterTests {
 		final NodeWriter w = new NodeWriter(in);
 		w.setSymbols(symbols);
 		final String actual = w.nodeToString();
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 
 	private void testNotation(Notation notation, String expected) {
@@ -379,13 +379,13 @@ public class NodeWriterTests {
 		final NodeWriter w = new NodeWriter(in);
 		w.setNotation(notation);
 		final String actual = w.nodeToString();
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 
 	private void testEquals(Node in, String expected) {
 		final NodeWriter w = new NodeWriter(in);
 		final String actual = w.nodeToString();
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 
 	private Node getDefaultIn() {

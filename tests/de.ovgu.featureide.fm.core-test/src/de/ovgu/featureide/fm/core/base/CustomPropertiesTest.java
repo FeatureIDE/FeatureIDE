@@ -26,8 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -36,13 +35,13 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public class CustomPropertiesTest {
 
 	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
-	static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+	static final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 	@Before
 	public void setup() {
 		CustomFeaturesCustomPropertiesTest.setFileSystem();
 
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 
 		final IFeature f1 = factory.createFeature(model, "A");
 		final IFeature f2 = factory.createFeature(model, "B");
@@ -58,11 +57,11 @@ public class CustomPropertiesTest {
 		model.addFeature(f3);
 		model.addFeature(f4);
 
-		model.getFeature("A").getCustomProperties().set("key1", Type.STRING, "value1");
-		model.getFeature("B").getCustomProperties().set("key1", Type.STRING, "value1");
+		model.getFeature("A").getCustomProperties().set("key1", XmlFeatureModelFormat.TYPE_CUSTOM, "value1");
+		model.getFeature("B").getCustomProperties().set("key1", XmlFeatureModelFormat.TYPE_CUSTOM, "value1");
 
-		model.getFeature("C").getCustomProperties().set("key2", Type.INT, 23);
-		model.getFeature("C").getCustomProperties().set("key3", Type.INT, 23);
+		model.getFeature("C").getCustomProperties().set("key2", XmlFeatureModelFormat.TYPE_CUSTOM, "23");
+		model.getFeature("C").getCustomProperties().set("key3", XmlFeatureModelFormat.TYPE_CUSTOM, "23");
 
 		model.getStructure().setRoot(f1.getStructure());
 
@@ -71,36 +70,31 @@ public class CustomPropertiesTest {
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.containsError());
 
-		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1"));
-		Assert.assertTrue(model.getFeature("B").getCustomProperties().has("key1"));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key2"));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key3"));
+		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("B").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key2", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key3", XmlFeatureModelFormat.TYPE_CUSTOM));
 
-		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key2"));
-		Assert.assertFalse(model.getFeature("B").getCustomProperties().has("key3"));
-		Assert.assertFalse(model.getFeature("C").getCustomProperties().has("key1"));
+		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key2", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertFalse(model.getFeature("B").getCustomProperties().has("key3", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertFalse(model.getFeature("C").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
-		Assert.assertTrue(model.getFeature("A").getCustomProperties().getDataType("key1").equals(Type.STRING));
-		Assert.assertTrue(model.getFeature("B").getCustomProperties().getDataType("key1").equals(Type.STRING));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().getDataType("key2").equals(Type.INT));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().getDataType("key3").equals(Type.INT));
+		Assert.assertTrue((model.getFeature("A").getCustomProperties().get("key1", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("value1"));
+		Assert.assertTrue((model.getFeature("B").getCustomProperties().get("key1", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("value1"));
+		Assert.assertTrue((model.getFeature("C").getCustomProperties().get("key2", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("23"));
+		Assert.assertTrue((model.getFeature("C").getCustomProperties().get("key3", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("23"));
 
-		Assert.assertTrue(((String) model.getFeature("A").getCustomProperties().get("key1")).equals("value1"));
-		Assert.assertTrue(((String) model.getFeature("B").getCustomProperties().get("key1")).equals("value1"));
-		Assert.assertTrue(((Integer) model.getFeature("C").getCustomProperties().get("key2")).equals(23));
-		Assert.assertTrue(((Integer) model.getFeature("C").getCustomProperties().get("key3")).equals(23));
-
-		model.getFeature("A").getCustomProperties().remove("key1");
-		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1"));
+		model.getFeature("A").getCustomProperties().remove("key1", XmlFeatureModelFormat.TYPE_CUSTOM);
+		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
 		modelFile.delete();
 		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 
-		final IFeatureModel model2 = factory.createFeatureModel();
+		final IFeatureModel model2 = factory.create();
 		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {
@@ -109,7 +103,7 @@ public class CustomPropertiesTest {
 
 		Assert.assertFalse(problems2.containsError());
 
-		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1"));
+		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
 	}
 

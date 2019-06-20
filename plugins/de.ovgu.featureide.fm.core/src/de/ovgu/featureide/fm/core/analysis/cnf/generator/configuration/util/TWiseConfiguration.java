@@ -24,8 +24,9 @@ import java.util.Arrays;
 
 import org.sat4j.core.VecInt;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
@@ -46,7 +47,7 @@ public class TWiseConfiguration {
 	public static int SOLUTION_COUNT_THRESHOLD = 10;
 
 	protected int[] literals;
-	protected Solution solution;
+	protected LiteralSet solution;
 	protected VecInt solutionLiterals;
 
 	protected int countLiterals, rank = 0;
@@ -144,7 +145,7 @@ public class TWiseConfiguration {
 
 	public TWiseConfiguration(TWiseConfigurationUtil util) {
 		countLiterals = 0;
-		solution = new Solution(new int[util.getCnf().getVariables().size()]);
+		solution = new LiteralSet(new int[util.getCnf().getVariables().size()], Order.INDEX, false);
 		literals = solution.getLiterals();
 		this.util = util;
 		if (util.hasSolver()) {
@@ -240,7 +241,7 @@ public class TWiseConfiguration {
 						final int[] s = solver.findSolution();
 						if (s != null) {
 							literals = s;
-							solution = new Solution(s);
+							solution = new LiteralSet(s, Order.INDEX, false);
 						}
 					} finally {
 						solver.assignmentClear(orgAssignmentSize);
@@ -305,16 +306,16 @@ public class TWiseConfiguration {
 		this.rank = rank;
 	}
 
-	public Solution getSolution() {
+	public LiteralSet getSolution() {
 		return solution;
 	}
 
 	public void updateSolverSolutions() {
 		solverSolutionIndex.clear();
 		final int[] array = solutionLiterals.toArray();
-		final Solution[] solverSolutions = util.getSolverSolutions();
+		final LiteralSet[] solverSolutions = util.getSolverSolutions();
 		solutionLoop: for (int i = 0; i < solverSolutions.length; i++) {
-			final Solution solverSolution = solverSolutions[i];
+			final LiteralSet solverSolution = solverSolutions[i];
 			if (solverSolution == null) {
 				break;
 			}

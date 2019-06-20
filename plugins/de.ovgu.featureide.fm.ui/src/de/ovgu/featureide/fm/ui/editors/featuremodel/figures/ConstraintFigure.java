@@ -59,7 +59,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ConstraintFigure extends ModelElementFigure implements GUIDefaults {
 
-	public final static String VOID_MODEL = StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
+	public final static String VOID_MODEL = StringTable.FEATURE_MODELIS_VOID;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String TAUTOLOGY = CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 	public final static String DEAD_FEATURE = "Constraint makes following features dead:";
@@ -112,7 +112,8 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	/**
 	 * Sets the properties <i>icon, border and tooltips</i> of the {@link ConstraintFigure}.
 	 */
-	public void setConstraintProperties() {
+	@Override
+	public void updateProperties() {
 		init();
 
 		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(graphicalConstraint.getObject());

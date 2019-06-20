@@ -68,7 +68,7 @@ public class FrameworkProjectCreator {
 	 *
 	 * @param name - project name
 	 * @param destination - folder which contains the subproject
-	 * @throws CoreException
+	 * @throws CoreException exception
 	 */
 	public static void createSubprojectFolder(String name, IFolder destination) throws CoreException {
 		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(name);

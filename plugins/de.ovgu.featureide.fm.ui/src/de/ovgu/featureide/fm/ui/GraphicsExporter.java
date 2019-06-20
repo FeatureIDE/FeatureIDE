@@ -30,9 +30,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SVG_EXPORT_FAILED;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.locks.Lock;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.draw2d.IFigure;
@@ -50,10 +53,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
@@ -65,12 +75,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
-	public static boolean exportAs(IFeatureModel featureModel, ScrollingGraphicalViewer diagramEditor) {
+	public static boolean exportAs(IManager<IFeatureModel> featureModelManager, ScrollingGraphicalViewer diagramEditor) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg", "*.tex" };
 		fileDialog.setFilterExtensions(extensions);
 		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
-			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
+			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg", "LaTeX-Document with TikZ *.tex" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		final String filePath = fileDialog.open();
@@ -78,17 +88,26 @@ public class GraphicsExporter {
 			return false;
 		}
 
-		if (filePath.endsWith(".m")) {
-			return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
-		} else if (filePath.endsWith(".xml")) {
-			return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
-		} else if (filePath.endsWith(".velvet")) {
-			return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
-		} else {
-			final File file = new File(filePath);
-			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
-			GraphicsExporter.printExportMessage(file, succ);
-			return succ;
+		final String fileExtension = SimpleFileHandler.getFileExtension(Paths.get(filePath));
+		final Lock fileOperationLock = featureModelManager.getFileOperationLock();
+		fileOperationLock.lock();
+		try {
+			final IFeatureModel featureModel = featureModelManager.editObject();
+			switch (fileExtension) {
+			case GuidslFormat.FILE_EXTENSION:
+				return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
+			case XmlFeatureModelFormat.FILE_EXTENSION:
+				return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
+			case VelvetFeatureModelFormat.FILE_EXTENSION:
+				return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
+			default:
+				final File file = new File(filePath);
+				final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
+				GraphicsExporter.printExportMessage(file, succ);
+				return succ;
+			}
+		} finally {
+			fileOperationLock.unlock();
 		}
 
 	}
@@ -112,7 +131,35 @@ public class GraphicsExporter {
 	public static boolean exportAs(GraphicalViewerImpl viewer, File file) {
 		boolean succ = false;
 
-		if (file.getAbsolutePath().endsWith(".svg")) {
+		if (file.getAbsolutePath().endsWith(".tex")) {
+			// create new folder
+			final StringBuilder myFileName = new StringBuilder();
+			myFileName.append(file.getName().toString());
+			myFileName.delete(myFileName.length() - 4, myFileName.length());
+			Path outputDir;
+			try {
+				outputDir = Paths.get(file.getParent()).resolve(myFileName.toString());
+				FileSystem.mkDir(outputDir);
+			} catch (final IOException e) {
+				FMUIPlugin.getDefault().logError(e);
+				return false;
+			}
+
+			// output Head
+			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzGraphicalFeatureModelFormat.TikZHeadFormat();
+			FileHandler.save(outputDir.resolve("head.tex"), null, formatHead);
+
+			// output body
+			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzGraphicalFeatureModelFormat.TikZBodyFormat(file.getName());
+			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
+
+			// output main
+			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat.TikZMainFormat();
+			FileHandler.save(outputDir.resolve(file.getName()), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
+
+			succ = true;
+
+		} else if (file.getAbsolutePath().endsWith(".svg")) {
 			final ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			final IFigure rootFigure = part.getFigure();
 

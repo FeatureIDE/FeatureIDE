@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -44,7 +44,7 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 	private class Consumer implements Runnable {
 
 		private final IConfigurationGenerator gen;
-		private final Configuration configuration = new Configuration(snapshot.getObject());
+		private final Configuration configuration = new Configuration(snapshot);
 		private boolean run = true;
 
 		public Consumer(IConfigurationGenerator gen) {
@@ -53,7 +53,7 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 
 		@Override
 		public void run() {
-			final LinkedBlockingQueue<Solution> resultQueue = gen.getResultQueue();
+			final LinkedBlockingQueue<LiteralSet> resultQueue = gen.getResultQueue();
 			while (run) {
 				try {
 					generateConfiguration(resultQueue.take());
@@ -62,7 +62,7 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 				}
 			}
 			setConfigurationNumber(gen.getResult().getResult().size());
-			for (final Solution c : resultQueue) {
+			for (final LiteralSet c : resultQueue) {
 				generateConfiguration(c);
 			}
 		}
@@ -71,7 +71,7 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 			run = false;
 		}
 
-		private void generateConfiguration(Solution solution) {
+		private void generateConfiguration(LiteralSet solution) {
 			configuration.resetValues();
 			for (final int selection : solution.getLiterals()) {
 				final String name = cnf.getVariables().getName(selection);
@@ -84,9 +84,9 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 
 	protected final CNF cnf;
 
-	public ACNFConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		super(builder, featureProject);
-		cnf = snapshot.getFormula().getElement(new NoAbstractCNFCreator());
+	public ACNFConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
+		super(builder, formula);
+		cnf = snapshot.getElement(new NoAbstractCNFCreator());
 	}
 
 	@Override

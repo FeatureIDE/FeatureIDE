@@ -22,14 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CALCULATIONS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * Action to specify feature model analysis.<br> A manual call of the feature model analysis.
@@ -37,25 +37,21 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class RunManualCalculationsAction extends Action {
+public class RunManualCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.runmanualcalculations";
 
-	private final IFeatureModel featureModel;
-
-	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(RUN_MANUAL_CALCULATIONS);
-		this.featureModel = featureModel;
-		setId(ID);
+	public RunManualCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(RUN_MANUAL_CALCULATIONS, ID, featureModelManager);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"));
 	}
 
 	@Override
 	public void run() {
-		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		final boolean oldValue = analyzer.getAnalysesCollection().isRunCalculationAutomatically();
-		analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
-		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		analyzer.getAnalysesCollection().setRunCalculationAutomatically(oldValue);
+		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
+		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
+		analyzer.analyzeFeatureModel(new NullMonitor());
+		featureModelManager.fireEvent(new FeatureIDEEvent(featureModelManager.editObject(), EventType.REDRAW_DIAGRAM));
 	}
 
 }

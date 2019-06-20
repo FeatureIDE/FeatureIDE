@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -45,18 +46,18 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final int counter;
-	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
+	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<>();
 
 	public AutoLayoutConstraintOperation(IGraphicalFeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
 		super(featureModel, AUTO_LAYOUT_CONSTRAINTS);
 		this.counter = counter;
-		if (!(oldPos == null) && !oldPos.isEmpty()) {
+		if (oldPos != null) {
 			this.oldPos.addAll(oldPos);
 		}
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -69,7 +70,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 
 			// Get root because the constraints will be auto layouted depending on the root
 			final IGraphicalFeature root =
-				graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
 			minX = root.getLocation().x;
 			maxX = root.getLocation().x + root.getSize().width;
 			// +20 because of the collapsed decorator
@@ -96,7 +97,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			constraintList.get(0).setLocation(oldPos.get(counter).get(0));

@@ -31,18 +31,14 @@ import org.prop4j.NodeWriter;
 import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Representation of the feature model. This class is accessed by FeatureHouse to get information about the feature model.
@@ -52,9 +48,9 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  */
 public class FeatureIDEModelInfo implements FeatureModelInfo {
 
-	private final IFeatureModel featureModel;
+	private final FeatureModelFormula featureModel;
 	private final Configuration currentConfig;
-	private final ConfigurationPropagator propagator;
+	private final IConfigurationPropagator propagator;
 	private List<String> coreFeatureNames;
 	private boolean validSelect = true;
 	private boolean validReject = true;
@@ -67,24 +63,23 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	private final boolean useValidMethod;
 
 	/**
+	 *
+	 * @param featureModel featureModel
 	 * @param useValidMethod Defines whether the valid() or the complete formula is used as requieres clause.
 	 */
-	public FeatureIDEModelInfo(final IFeatureModel featureModel, final boolean useValidMethod) {
+	public FeatureIDEModelInfo(final FeatureModelFormula featureModel, final boolean useValidMethod) {
 		this.featureModel = featureModel;
 		this.useValidMethod = useValidMethod;
 		currentConfig = new Configuration(featureModel);
-		propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator(currentConfig);
+		propagator = currentConfig.getPropagator();
 		validClause = createdValidClause();
 	}
 
 	private String createdValidClause() {
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
-		nc.setCnfType(CNFType.Compact);
-		nc.setIncludeBooleanValues(false);
-		final Node nodes = nc.createNodes().eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = featureModel.getCNFNode().eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = " " + nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 
-		for (final CharSequence feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
+		for (final CharSequence feature : FeatureUtils.extractFeatureNames(featureModel.getFeatureModel().getFeatures())) {
 			formula = formula.replaceAll("([\\s,\\(])" + feature.toString().toLowerCase(Locale.ENGLISH),
 					"$1FM.FeatureModel." + feature.toString().toLowerCase(Locale.ENGLISH));
 		}
@@ -250,7 +245,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		return validSelect && validReject && LongRunningWrapper.runMethod(propagator.canBeValid());
+		return validSelect && validReject && (currentConfig.canBeValid());
 	}
 
 	@Override
@@ -327,8 +322,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 					methodFeature.put(methodName, featureList);
 				}
 
-				if (!featureList.contains(featureModel.getFeature(featureName))) {
-					addToFeatureList(featureModel.getFeature(featureName), featureList);
+				if (!featureList.contains(featureModel.getFeatureModel().getFeature(featureName))) {
+					addToFeatureList(featureModel.getFeatureModel().getFeature(featureName), featureList);
 				}
 			}
 		}

@@ -32,11 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * This class loads all configurations of a given IFeatureModel.
@@ -57,19 +57,19 @@ public class ConfigurationLoader {
 		this.callback = callback;
 	}
 
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, String path) {
 		return loadConfigurations(featureModel, Paths.get(path));
 	}
 
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, Path path) {
 		return loadConfigurations(featureModel, path, null);
 	}
 
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path, String excludeFile) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, String path, String excludeFile) {
 		return loadConfigurations(featureModel, Paths.get(path), excludeFile);
 	}
 
-	public List<Configuration> loadConfigurations(final IFeatureModel featureModel, Path path, final String excludeFile) {
+	public List<Configuration> loadConfigurations(final FeatureModelFormula featureModel, Path path, final String excludeFile) {
 		final List<Configuration> configs = new ArrayList<>();
 		final HashSet<String> configurationNames = new HashSet<>();
 
@@ -88,9 +88,10 @@ public class ConfigurationLoader {
 						final int extensionIndex = fileName.lastIndexOf('.');
 						final String configurationName = (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
 						if (configurationNames.add(configurationName)) {
-							final ProblemList problemList = new ProblemList();
-							final Configuration currentConfiguration = ConfigurationManager.load(file, featureModel.getSourceFile(), problemList);
-							if (!problemList.containsError()) {
+							final FileHandler<Configuration> fileHandler = ConfigurationManager.getFileHandler(file);
+							if (!fileHandler.getLastProblems().containsError()) {
+								final Configuration currentConfiguration = fileHandler.getObject();
+								currentConfiguration.initFeatures(featureModel);
 								configs.add(currentConfiguration);
 								if (callback != null) {
 									callback.onConfigurationLoaded(currentConfiguration, file);

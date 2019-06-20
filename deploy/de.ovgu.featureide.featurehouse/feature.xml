@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurehouse"
       label="FeatureIDE extension for FeatureHouse (optional)"
-      version="3.4.0.qualifier"
+      version="3.5.5.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -197,36 +197,38 @@ Library.
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.jdt.core.manipulation"/>
-      <import plugin="org.eclipse.draw2d"/>
       <import plugin="de.ovgu.featureide.core.mpl"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="de.ovgu.featureide.core.ahead"/>
+      <import plugin="de.ovgu.featureide.core.featurehouse"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.core.featurehouse"
          download-size="0"
          install-size="0"
-         version="3.4.0.qualifier"
+         version="3.5.5.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.mpl"
          download-size="0"
          install-size="0"
-         version="3.4.0.qualifier"
+         version="3.5.5.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.mpl"
          download-size="0"
          install-size="0"
-         version="3.4.0.qualifier"
+         version="3.5.5.qualifier"
          unpack="false"/>
 
    <plugin
-         id="de.ovgu.featureide.core.conversion.ahead_featurehouse"
+         id="de.ovgu.featureide.core.conversion.ahead-featurehouse"
          download-size="0"
          install-size="0"
-         version="3.4.0.qualifier"
+         version="3.5.5.qualifier"
          unpack="false"/>
 
 </feature>

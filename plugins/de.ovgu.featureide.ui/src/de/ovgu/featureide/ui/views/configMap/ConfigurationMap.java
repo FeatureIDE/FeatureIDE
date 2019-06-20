@@ -200,10 +200,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	 * If you want to add filters to the view, do it here. The gui elements will be created automatically.
 	 */
 	private void createFilters() {
-		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new FeatureIsFalseOptionalFilter(true));
-		getFilters().add(new FeatureUnusedFilter(true));
+		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new DeadFeatureFilter(true));
+		getFilters().add(new FeatureUnusedFilter(true));
 
 		final List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(getFilters());
 
@@ -346,7 +346,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			tree.setInput(new Object());
 			updateGUI(true);
 		} else {
-			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModelManager());
 		}
 	}
 
@@ -424,7 +424,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		featuresColumn.setWidth(featureColumnWidth);
 
 		// Callback will handle creating columns
-		configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		configurations = loader.loadConfigurations(featureProject.getFeatureModelManager().getPersistentFormula(), featureProject.getConfigPath());
 		// update header
 		final TreeColumn[] columns = tableTree.getColumns();
 		final List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
@@ -519,6 +519,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
 			this.featureProject = featureProject;
+
 			if (isActive()) {
 				loadConfigurations();
 			} else {
@@ -625,7 +626,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			updateTree();
 			break;
 		default:
@@ -637,5 +638,4 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public List<IConfigurationMapFilter> getFilters() {
 		return filters;
 	}
-
 }

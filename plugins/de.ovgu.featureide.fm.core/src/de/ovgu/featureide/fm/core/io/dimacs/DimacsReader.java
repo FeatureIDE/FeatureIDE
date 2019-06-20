@@ -20,78 +20,50 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
 
 import org.prop4j.And;
-import org.prop4j.ErrorLiteral;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-
-import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
  *
  * @author Timo G&uuml;nther
+ * @author Sebastian Krieter
  */
 public class DimacsReader {
 
-	/** Token leading a (single-line) comment. */
-	private static final String COMMENT = "c";
-	/** Token leading the problem definition. */
-	private static final String PROBLEM = "p";
-	/** Token identifying the problem type as CNF. */
-	private static final String CNF = "cnf";
-
-	/** The source to read from. */
-	private final Readable in;
-	/** The scanner for tokenizing the input. */
-	private Scanner scanner;
-
-	private boolean ignoreMissingVariableNames = true;
+	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSConstants.COMMENT + "\\s*(.*)\\Z");
+	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSConstants.PROBLEM + "\\s+" + DIMACSConstants.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
-	private final Map<Integer, Literal> indexVariables = new LinkedHashMap<>();
+	private final Map<Integer, String> indexVariables = new LinkedHashMap<>();
 	/**
 	 * The amount of variables as declared in the problem definition. May differ from the actual amount of variables found.
 	 */
 	private int variableCount;
 	/** The amount of clauses in the problem. */
 	private int clauseCount;
-	/**
-	 * True iff the last clause has been reached. In this case, the token denoting the end of a clause is optional. However, if it exists, any non-comment data
-	 * past it is illegal.
-	 */
-	private boolean lastClause = false;
 	/** True to read the variable directory for naming variables. */
-	private boolean readingVariableDirectory = false;
-
-	/**
-	 * Constructs a new instance of this class with the given string.
-	 *
-	 * @param s input to read from; not null
-	 */
-	public DimacsReader(String s) {
-		this(new StringReader(s));
-	}
-
-	/**
-	 * Constructs a new instance of this class with the given input.
-	 *
-	 * @param in input to read from; not null
-	 */
-	public DimacsReader(Readable in) {
-		this.in = in;
-	}
+	private boolean readVariableDirectory = false;
+	/** True when currently reading the comment section at the beginning of the file and parsing variable names. */
+	private boolean readingVariables;
 
 	/**
 	 * <p> Sets the reading variable directory flag. If true, the reader will look for a variable directory in the comments. This contains names for the
@@ -99,68 +71,104 @@ public class DimacsReader {
 	 *
 	 * <p> Defaults to false. </p>
 	 *
-	 * @param readingVariableDirectory whether to read the variable directory
+	 * @param readVariableDirectory whether to read the variable directory
 	 */
-	public void setReadingVariableDirectory(boolean readingVariableDirectory) {
-		this.readingVariableDirectory = readingVariableDirectory;
-	}
-
-	/**
-	 * Reads the next non-comment token. Also reads any comments before it.
-	 *
-	 * @return the next token; null if already completely read and empty
-	 * @throws ParseException if there is no token left in the input but the reader is not yet done
-	 */
-	private String readToken() throws ParseException {
-		String token;
-		while (true) {
-			if (!scanner.hasNext()) {
-				if (lastClause) {
-					return null;
-				}
-				throw new ParseException("Unexpected end of input", -1);
-			}
-			token = scanner.next();
-			if (COMMENT.equals(token)) {
-				readComment(scanner.nextLine());
-				continue; // Keep reading tokens...
-			}
-			break; // ... until a non-comment token is found.
-		}
-		return token;
-	}
-
-	public Collection<Literal> getVariables() {
-		return indexVariables.values();
+	public void setReadingVariableDirectory(boolean readVariableDirectory) {
+		this.readVariableDirectory = readVariableDirectory;
 	}
 
 	/**
 	 * Reads the input.
 	 *
+	 * @param in The source to read from.
 	 * @return a CNF; not null
-	 * @throws IllegalStateException if this method has already been called on this instance before (reading multiple times is disallowed since {@link Readable}
-	 *         cannot be reversed)
+	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
-	public synchronized Node read() throws IllegalStateException, ParseException {
-		if (scanner != null) {
-			throw new IllegalStateException("Already read");
-		}
-		try (final Scanner scanner = new Scanner(in)) {
-			this.scanner = scanner;
-			readProblem();
-			final List<Node> clauses = readClauses();
-			if (readToken() != null) {
-				throw new ParseException("Trailing data", -1);
-			}
+	@Nonnull
+	public Node read(Reader in) throws ParseException, IOException {
+		indexVariables.clear();
+		variableCount = -1;
+		clauseCount = -1;
+		readingVariables = readVariableDirectory;
+		try (final BufferedReader reader = new BufferedReader(in)) {
+			final LineIterator lineIterator = new LineIterator(reader);
+			lineIterator.nextLine();
+
+			readComments(lineIterator);
+			readProblem(lineIterator);
+			readComments(lineIterator);
+			readingVariables = false;
+
+			final Node[] clauses = readClauses(lineIterator);
 			final int actualVariableCount = indexVariables.size();
-			if (variableCount < actualVariableCount) {
-				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), -1);
-			} else if (variableCount > actualVariableCount) {
-				Logger.logWarning(String.format("Found %d instead of %d variables", actualVariableCount, variableCount));
+			if (variableCount != actualVariableCount) {
+				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
 			}
-			return new And(clauses.toArray(new Node[clauseCount]));
+			return new And(clauses);
 		}
+	}
+
+	private void readComments(final LineIterator lineIterator) {
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+			final Matcher matcher = commentPattern.matcher(line);
+			if (matcher.matches()) {
+				readComment(matcher.group(1)); // read comments ...
+			} else {
+				break; // ... until a non-comment token is found.
+			}
+		}
+	}
+
+	private static class LineIterator {
+		private final BufferedReader reader;
+		private String line = null;
+		private int lineCount = 0;
+
+		public LineIterator(BufferedReader reader) {
+			this.reader = reader;
+		}
+
+		public String nextLine() {
+			try {
+				do {
+					line = reader.readLine();
+					if (line == null) {
+						return null;
+					}
+					lineCount++;
+				} while (line.trim().isEmpty());
+				return line;
+			} catch (final IOException e) {
+				return null;
+			}
+		}
+
+		public String currentLine() {
+			return line;
+		}
+
+		public void setCurrentLine(String line) {
+			this.line = line;
+		}
+
+		public int getLineCount() {
+			return lineCount;
+		}
+
+	};
+
+	/**
+	 * Reads the input. Calls {@link #read(Reader)}.
+	 *
+	 * @param in The string to read from.
+	 * @return a CNF; not null
+	 * @throws IOException if the reader encounters a problem.
+	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
+	 */
+	@Nonnull
+	public Node read(String in) throws ParseException, IOException {
+		return read(new StringReader(in));
 	}
 
 	/**
@@ -168,31 +176,38 @@ public class DimacsReader {
 	 *
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
-	private void readProblem() throws ParseException {
-		if (!PROBLEM.equals(readToken())) {
-			throw new ParseException("Missing problem definition", -1);
+	private void readProblem(LineIterator lineIterator) throws ParseException {
+		final String line = lineIterator.currentLine();
+		if (line == null) {
+			throw new ParseException("Invalid problem format", lineIterator.getLineCount());
 		}
-
-		if (!CNF.equals(readToken())) {
-			throw new ParseException("Problem type is not CNF", -1);
+		final Matcher matcher = problemPattern.matcher(line);
+		if (!matcher.find()) {
+			throw new ParseException("Invalid problem format", lineIterator.getLineCount());
+		}
+		final String trail = line.substring(matcher.end());
+		if (trail.trim().isEmpty()) {
+			lineIterator.nextLine();
+		} else {
+			lineIterator.setCurrentLine(trail);
 		}
 
 		try {
-			variableCount = Integer.parseInt(readToken());
+			variableCount = Integer.parseInt(matcher.group(1));
 		} catch (final NumberFormatException e) {
-			throw new ParseException("Variable count is not an integer", -1);
+			throw new ParseException("Variable count is not an integer", lineIterator.getLineCount());
 		}
 		if (variableCount <= 0) {
-			throw new ParseException("Variable count is not positive", -1);
+			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
 
 		try {
-			clauseCount = Integer.parseInt(readToken());
+			clauseCount = Integer.parseInt(matcher.group(2));
 		} catch (final NumberFormatException e) {
-			throw new ParseException("Clause count is not an integer", -1);
+			throw new ParseException("Clause count is not an integer", lineIterator.getLineCount());
 		}
 		if (clauseCount <= 0) {
-			throw new ParseException("Clause count is not positive", -1);
+			throw new ParseException("Clause count is not positive", lineIterator.getLineCount());
 		}
 	}
 
@@ -201,76 +216,73 @@ public class DimacsReader {
 	 *
 	 * @return all clauses; not null
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
+	 * @throws IOException
 	 */
-	private List<Node> readClauses() throws ParseException {
-		final List<Node> clauses = new ArrayList<>(clauseCount);
-		for (int i = 0; !lastClause; i++) {
-			if ((i + 1) == clauseCount) {
-				lastClause = true;
+	private Node[] readClauses(LineIterator lineIterator) throws ParseException, IOException {
+		final LinkedList<String> literalQueue = new LinkedList<>();
+		final Node[] clauses = new Node[clauseCount];
+		int readClausesCount = 0;
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+			if (commentPattern.matcher(line).matches()) {
+				continue;
 			}
-			clauses.add(readClause());
+			List<String> literalList = Arrays.asList(line.trim().split("\\s+"));
+			literalQueue.addAll(literalList);
+
+			do {
+				final int clauseEndIndex = literalList.indexOf("0");
+				if (clauseEndIndex < 0) {
+					break;
+				}
+				final int clauseSize = literalQueue.size() - (literalList.size() - clauseEndIndex);
+				if (clauseSize <= 0) {
+					throw new ParseException("Empty clause", lineIterator.getLineCount());
+				}
+
+				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
+				readClausesCount++;
+
+				if (!DIMACSConstants.CLAUSE_END.equals(literalQueue.removeFirst())) {
+					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
+				}
+				literalList = literalQueue;
+			} while (!literalQueue.isEmpty());
+		}
+		if (!literalQueue.isEmpty()) {
+			clauses[readClausesCount] = parseClause(readClausesCount, literalQueue.size(), literalQueue, lineIterator);
+			readClausesCount++;
+		}
+		if (readClausesCount < clauseCount) {
+			throw new ParseException(String.format("Found %d instead of %d clauses", readClausesCount, clauseCount), 1);
 		}
 		return clauses;
 	}
 
-	/**
-	 * Reads a single clause.
-	 *
-	 * @return a clause; not null
-	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
-	 */
-	private Node readClause() throws ParseException {
-		final List<Literal> literals = new LinkedList<>();
-		Literal l = readLiteral();
-		while (l != null) {
-			literals.add(l);
-			l = readLiteral();
+	private Or parseClause(int readClausesCount, int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
+		if (readClausesCount == clauseCount) {
+			throw new ParseException(String.format("Found more than %d clauses", clauseCount), 1);
 		}
-		if (literals.isEmpty()) {
-			throw new ParseException("Empty clause", -1);
+		final Node[] literals = new Node[clauseSize];
+		for (int j = 0; j < literals.length; j++) {
+			final String token = literalQueue.removeFirst();
+			final int index;
+			try {
+				index = Integer.parseInt(token);
+			} catch (final NumberFormatException e) {
+				throw new ParseException("Illegal literal", lineIterator.getLineCount());
+			}
+			if (index == 0) {
+				throw new ParseException("Illegal literal", lineIterator.getLineCount());
+			}
+			final Integer key = Math.abs(index);
+			String variable = indexVariables.get(key);
+			if (variable == null) {
+				variable = String.valueOf(key);
+				indexVariables.put(key, variable);
+			}
+			literals[j] = new Literal(variable, index > 0);
 		}
-		return new Or(literals.toArray(new Node[literals.size()]));
-	}
-
-	/**
-	 * Reads a literal.
-	 *
-	 * @return a literal; null if there are no more literals in the clause
-	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
-	 */
-	private Literal readLiteral() throws ParseException {
-		final String token = readToken();
-		if (token == null) {
-			return null;
-		}
-		final int index;
-		try {
-			index = Integer.parseInt(token);
-		} catch (final NumberFormatException e) {
-			throw new ParseException("Illegal literal", -1);
-		}
-		return createLiteral(index);
-	}
-
-	/**
-	 * Creates a literal from the given index.
-	 *
-	 * @param index index of the literal
-	 * @return a literal; null if the index is 0
-	 */
-	private Literal createLiteral(int index) {
-		if (index == 0) {
-			return null;
-		}
-		final Integer key = Math.abs(index);
-		Literal variable = indexVariables.get(key);
-		if (variable == null) {
-			variable = (ignoreMissingVariableNames) ? new Literal(Integer.toString(key)) : new ErrorLiteral(key);
-			indexVariables.put(key, variable);
-		}
-		final Literal newLiteral = variable.clone();
-		newLiteral.positive = index > 0;
-		return newLiteral;
+		return new Or(literals);
 	}
 
 	/**
@@ -280,59 +292,38 @@ public class DimacsReader {
 	 * @return whether the comment was consumed logically
 	 */
 	private boolean readComment(String comment) {
-		if (readingVariableDirectory && readVariableDirectoryEntry(comment)) {
-			return true;
-		}
-		return false;
+		return readingVariables && readVariableDirectoryEntry(comment);
 	}
 
 	/**
 	 * Reads an entry of the variable directory.
 	 *
-	 * @param entry variable directory entry
+	 * @param line variable directory entry
 	 * @return true if an entry was found
 	 */
-	private boolean readVariableDirectoryEntry(String entry) {
-		try (final Scanner sc = new Scanner(entry)) {
-			if (!sc.hasNextInt()) {
-				return false;
-			}
-			final int index = sc.nextInt();
-			if (!sc.hasNextLine()) {
-				return false;
-			}
-			String variable = sc.nextLine();
-			if ((variable.length() >= 2) && Character.isWhitespace(variable.codePointAt(0))) {
-				variable = variable.substring(1); // remove a single separating whitespace character (but allow variables with whitespace after that)
-			} else {
-				return false;
-			}
-			if (!indexVariables.containsKey(index)) {
-				indexVariables.put(index, new Literal(variable));
-			}
-			return true;
+	private boolean readVariableDirectoryEntry(String comment) {
+		final int firstSeparator = comment.indexOf(' ');
+		if (firstSeparator <= 0) {
+			return false;
 		}
+		final int index;
+		try {
+			index = Integer.parseInt(comment.substring(0, firstSeparator));
+		} catch (final NumberFormatException e) {
+			return false;
+		}
+		if (comment.length() < (firstSeparator + 2)) {
+			return false;
+		}
+		final String variable = comment.substring(firstSeparator + 1);
+		if (!indexVariables.containsKey(index)) {
+			indexVariables.put(index, variable);
+		}
+		return true;
 	}
 
-	/**
-	 * A flag for the behavior of handling variables that are not specified in the comments of the file. If {@code true} a literal that has no corresponding
-	 * variable name in the comment section will create a {@link Literal} with its id as variable name. If {@code false} an {@code ErrorLiteral} will be created
-	 * instead.
-	 *
-	 * @return the current value of the flag
-	 */
-	public boolean isIgnoreMissingVariableNames() {
-		return ignoreMissingVariableNames;
+	public Collection<String> getVariables() {
+		return indexVariables.values();
 	}
 
-	/**
-	 * Sets the flag for the behavior of handling variables that are not specified in the comments of the file. If {@code true} a literal that has no
-	 * corresponding variable name in the comment section will create a {@link Literal} with its id as variable name. If {@code false} an {@code ErrorLiteral}
-	 * will be created instead.
-	 *
-	 * @param ignoreMissingVariableNames the new flag value
-	 */
-	public void setIgnoreMissingVariableNames(boolean ignoreMissingVariableNames) {
-		this.ignoreMissingVariableNames = ignoreMissingVariableNames;
-	}
 }

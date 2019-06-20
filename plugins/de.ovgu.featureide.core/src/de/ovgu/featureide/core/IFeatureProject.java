@@ -38,7 +38,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
 
@@ -73,8 +73,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	QualifiedName contractCompositionID =
 		new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition", IFeatureProject.class.getName() + "#ContractComposition");
 
-	String MARKER_UNUSED = "Unused: ";
-	String MARKER_FALSE_OPTIONAL = "False optional: ";
+	String MARKER_NEVER_SELECTED = "Never-selected: ";
+	String MARKER_ALWAYS_SELECTED = "Always-selected: ";
 
 	void dispose();
 
@@ -125,6 +125,9 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	/**
 	 * Returns the name of the feature this resource belongs to, or <code>null</code> if the resource does not belong to any feature in this project
+	 *
+	 * @param resource resource
+	 * @return name of the feature
 	 */
 	String getFeatureName(IResource resource);
 
@@ -141,7 +144,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	// TODO _Refactor: remove
 	IFeatureModel getFeatureModel();
 
-	IFileManager<IFeatureModel> getFeatureModelManager();
+	IFeatureModelManager getFeatureModelManager();
 
 	IFile getModelFile();
 
@@ -159,6 +162,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	/**
 	 * Sets the ID of the assigned composer
 	 *
+	 * @param composerID id of the composer to set
 	 */
 	void setComposerID(String composerID);
 
@@ -179,28 +183,28 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	void setAdditionalJavaClassPath(String[] paths);
 
 	/**
-	 * @param model
+	 * @param model fst model to set
 	 */
 	void setFSTModel(FSTModel model);
 
 	/**
 	 * sets the contract composition mechanism
 	 *
-	 * @param model
+	 * @param contractComposition contract composition mechanism to set
 	 */
 	void setContractComposition(String contractComposition);
 
 	/**
 	 * sets the meta product generation mechanism.
 	 *
-	 * @param model
+	 * @param metaProductGeneration meta product generation mechanism to set
 	 */
 	void setMetaProductGeneration(String metaProductGeneration);
 
 	/**
 	 * sets the composition mechanism
 	 *
-	 * @param compositionMechanism
+	 * @param compositionMechanism composition mechanism to set
 	 */
 	void setCompositionMechanism(String compositionMechanism);
 
@@ -225,4 +229,5 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	Collection<String> getUnusedConfigurationFeatures();
 
+	void checkForProblems();
 }

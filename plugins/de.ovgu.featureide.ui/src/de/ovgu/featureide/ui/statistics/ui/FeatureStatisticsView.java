@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +44,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -67,7 +65,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IEditorPart currentEditor;
-	private IResource currentInput;
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
 
@@ -87,7 +84,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
-		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
 
 		addButtons();
 	}
@@ -165,8 +161,22 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()) {
-				refresh(false);
+			switch (evt.getEventType()) {
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_OVERWRITTEN:
+			case MODEL_DATA_SAVED:
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case GROUP_TYPE_CHANGED:
+			case MANDATORY_CHANGED:
+				refresh(true);
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -209,15 +219,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						if (currentEditor == null) {
 							contentProvider.defaultContent();
 						} else {
-							final IResource anyFile = ResourceUtil.getResource(currentEditor.getEditorInput());
-							// TODO is refresh really necessary? -> true?
-
-							if (force || (currentInput == null) || !anyFile.getProject().equals(currentInput.getProject())) {
-								contentProvider.calculateContent(anyFile, true);
-								currentInput = anyFile;
-							} else {
-								contentProvider.calculateContent(anyFile, false);
-							}
+							contentProvider.calculateContent(ResourceUtil.getResource(currentEditor.getEditorInput()), force);
 						}
 						return Status.OK_STATUS;
 					}
@@ -253,7 +255,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 
 			if (currentEditor instanceof FeatureModelEditor) {
-				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
+				((FeatureModelEditor) currentEditor).removeEventListener(modelListener);
+				((FeatureModelEditor) currentEditor).getFeatureModelManager().removeListener(modelListener);
 			}
 		}
 		boolean force = true;
@@ -272,7 +275,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 		currentEditor = newEditor;
 		if (newEditor instanceof FeatureModelEditor) {
-			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
+			((FeatureModelEditor) currentEditor).addEventListener(modelListener);
+			((FeatureModelEditor) currentEditor).getFeatureModelManager().addListener(modelListener);
 		}
 		refresh(force);
 	}

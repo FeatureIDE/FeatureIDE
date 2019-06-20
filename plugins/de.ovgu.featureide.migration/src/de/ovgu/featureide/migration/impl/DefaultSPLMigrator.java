@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
@@ -100,7 +101,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		migrateProjects();
 
-		final IFeatureModel featureModel = adjustFeatureModel();
+		final FeatureModelFormula featureModel = adjustFeatureModel();
 
 		createConfigurationFiles(featureModel);
 	}
@@ -270,31 +271,32 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * child features.<br> <br> The result is written to {@code /model.xml}. <br> <br> Can be overwritten by extending classes to accomodate
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
-	protected IFeatureModel adjustFeatureModel() {
-		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
+	protected FeatureModelFormula adjustFeatureModel() {
+		final FeatureModelFormula featureModelOfVariants = generateFeatureModelOfVariants();
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
 		return featureModelOfVariants;
 	}
 
-	private IFeatureModel generateFeatureModelOfVariants() {
+	private FeatureModelFormula generateFeatureModelOfVariants() {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
 		if (featureProject == null) {
 			return null;
 		}
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final FeatureModelFormula featureModelFormula = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = featureModelFormula.getFeatureModel();
 
 		featureModel.reset();
 
-		featureModel.getStructure().setRoot(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
+		featureModel.getStructure().setRoot(FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, "Base").getStructure());
 		featureModel.getStructure().getRoot().changeToAlternative();
 		featureModel.getStructure().getRoot().setAbstract(true);
 
 		for (final IProject project : projects) {
 			featureModel.getStructure().getRoot()
-					.addChild(FMFactoryManager.getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
+					.addChild(FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, project.getName()).getStructure());
 		}
 
-		return featureModel;
+		return featureModelFormula;
 	}
 
 	/**
@@ -303,7 +305,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 *
 	 * @see SPLMigrationDialogSettingsPage#getConfigPath()
 	 */
-	protected void createConfigurationFiles(IFeatureModel featureModel) {
+	protected void createConfigurationFiles(FeatureModelFormula featureModel) {
 		for (final IProject project : projects) {
 			try {
 				SPLMigrationUtils.createConfigFile(featureModel, newProject, configurationData.configPath, project.getName());

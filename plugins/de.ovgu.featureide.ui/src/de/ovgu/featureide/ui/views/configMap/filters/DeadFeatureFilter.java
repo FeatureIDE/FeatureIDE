@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.views.configMap.filters;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -37,9 +37,6 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 	private List<IFeature> deadFeatures;
 	private IFeatureModel featureModelFilterIsInitializedFor;
 
-	/**
-	 * @param name
-	 */
 	public DeadFeatureFilter(boolean isDefault) {
 		super("dead features", isDefault);
 		setImagePath(Image_Minus);
@@ -47,8 +44,8 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) configurationMap.getFeatureProject().getFeatureModelManager().getSnapshot();
-		final IFeatureModel featureModel = snapshot.getObject();
+		final FeatureModelFormula snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = snapshot.getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
 			deadFeatures = snapshot.getAnalyzer().getDeadFeatures();
 			featureModelFilterIsInitializedFor = featureModel;

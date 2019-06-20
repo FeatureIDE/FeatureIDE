@@ -22,9 +22,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -34,9 +33,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class CoreFeaturesParentNode extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public CoreFeaturesParentNode(String description, IFeatureModel model) {
+	public CoreFeaturesParentNode(String description, FeatureModelFormula model) {
 		super(description, null);
 		this.model = model;
 		calculateChidren(false);
@@ -44,7 +43,7 @@ public class CoreFeaturesParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		final List<IFeature> coreFeatures = FeatureModelManager.getAnalyzer(model).getCoreFeatures();
+		final List<IFeature> coreFeatures = model.getAnalyzer().getCoreFeatures();
 		setValue(coreFeatures.size());
 
 		for (final IFeature feature : coreFeatures) {

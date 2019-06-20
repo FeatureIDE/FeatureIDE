@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -34,8 +35,6 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractCollapseOperation extends AbstractGraphicalFeatureModelOperation {
-	/** The features to collapse (true) or expand (false). */
-	private Map<IGraphicalFeature, Boolean> targets;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -48,19 +47,6 @@ public abstract class AbstractCollapseOperation extends AbstractGraphicalFeature
 	}
 
 	/**
-	 * Returns the features to collapse or expand. When this operation is executed, features mapped to true will be collapsed and features mapped to false will
-	 * be expanded.
-	 *
-	 * @return the features to collapse (true) or expand (false)
-	 */
-	protected Map<IGraphicalFeature, Boolean> getTargets() {
-		if (targets == null) {
-			targets = createTargets();
-		}
-		return targets;
-	}
-
-	/**
 	 * Creates the features to collapse or expand.
 	 *
 	 * @return the features to collapse or expand
@@ -69,16 +55,16 @@ public abstract class AbstractCollapseOperation extends AbstractGraphicalFeature
 	protected abstract Map<IGraphicalFeature, Boolean> createTargets();
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		for (final Entry<IGraphicalFeature, Boolean> target : getTargets().entrySet()) {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		for (final Entry<IGraphicalFeature, Boolean> target : createTargets().entrySet()) {
 			target.getKey().setCollapsed(target.getValue());
 		}
 		return null;
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		for (final Entry<IGraphicalFeature, Boolean> target : getTargets().entrySet()) {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		for (final Entry<IGraphicalFeature, Boolean> target : createTargets().entrySet()) {
 			target.getKey().setCollapsed(!target.getValue());
 		}
 		return null;

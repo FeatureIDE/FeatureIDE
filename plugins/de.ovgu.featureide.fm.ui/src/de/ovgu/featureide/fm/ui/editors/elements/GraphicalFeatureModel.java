@@ -27,16 +27,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+
+import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
@@ -46,18 +52,21 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of an {@link IFeatureModel} instance.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Thomas Graave
  *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
-	protected final IFeatureModel correspondingFeatureModel;
+	protected final IFeatureModelManager featureModelManager;
 
 	protected final FeatureModelLayout layout;
 
-	protected Map<IFeature, IGraphicalFeature> features;
-	protected Map<IConstraint, IGraphicalConstraint> constraints;
+	protected Map<IFeature, IGraphicalFeature> features = new HashMap<>();
+	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<>();
 
-	protected boolean hiddenLegend;
+	protected boolean hiddenLegend = false;
+	protected boolean hiddenConstraints = false;
 	protected Legend legend;
 
 	/**
@@ -65,35 +74,39 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	public Explanation<?> currentlyActiveExplanation = null;
 
-	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel;
+	public GraphicalFeatureModel(IFeatureModelManager featureModelManager) {
+		this.featureModelManager = featureModelManager;
 		layout = new FeatureModelLayout();
+		legend = new Legend(this);
 	}
 
 	/**
 	 * Copy constructor
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
-		correspondingFeatureModel = oldModel.correspondingFeatureModel;
-
+		featureModelManager = oldModel.featureModelManager;
 		layout = oldModel.layout;
-		features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
+		hiddenLegend = oldModel.hiddenLegend;
+		legend = oldModel.legend;
+
+		features = new HashMap<>((int) (oldModel.features.size() * 1.5));
 		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
-		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
+
+		constraints = new HashMap<>((int) (oldModel.constraints.size() * 1.5));
 		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());
 		}
 	}
 
 	protected void fireEvent(final EventType action) {
-		correspondingFeatureModel.fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+		featureModelManager.fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
-	public IFeatureModel getFeatureModel() {
-		return correspondingFeatureModel;
+	public IFeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
 	}
 
 	@Override
@@ -111,40 +124,29 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		fireEvent(EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegendHidden()
-	 */
 	@Override
 	public boolean isLegendHidden() {
 		return hiddenLegend;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegendHidden(boolean)
-	 */
 	@Override
 	public void setLegendHidden(boolean hidden) {
 		hiddenLegend = hidden;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegend()
-	 */
 	@Override
 	public Legend getLegend() {
 		return legend;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegend(de.ovgu.featureide.fm.ui.editors.featuremodel.Legend)
-	 */
 	@Override
-	public void setLegend(Legend legend) {
-		this.legend = legend;
+	public void setConstraintsHidden(boolean hideConstraints) {
+		hiddenConstraints = hideConstraints;
+	}
+
+	@Override
+	public boolean getConstraintsHidden() {
+		return hiddenConstraints;
 	}
 
 	@Override
@@ -164,8 +166,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
-		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
+		for (final IFeature f : featureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -173,8 +176,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getAllFeatures() {
-		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
+		for (final IFeature f : featureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -190,10 +194,15 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return graphicalFeature;
 	}
 
+	public IGraphicalFeature removeGraphicalFeature(IFeature feature) {
+		return features.remove(feature);
+	}
+
 	@Override
 	public List<IGraphicalConstraint> getConstraints() {
-		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraintCount());
-		for (final IConstraint c : correspondingFeatureModel.getConstraints()) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(featureModel.getConstraintCount());
+		for (final IConstraint c : featureModel.getConstraints()) {
 			constraintList.add(getGraphicalConstraint(c));
 		}
 		return constraintList;
@@ -201,6 +210,15 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getVisibleConstraints() {
+		final List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
+		if (hiddenConstraints) {
+			return constraints;
+		}
+		return getNonCollapsedConstraints();
+	}
+
+	@Override
+	public List<IGraphicalConstraint> getNonCollapsedConstraints() {
 		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
 		}
@@ -239,21 +257,23 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void init() {
-		final IFeatureStructure root = correspondingFeatureModel.getStructure().getRoot();
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
-			constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
-			for (final IConstraint constraint : correspondingFeatureModel.getConstraints()) {
+			constraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
+			for (final IConstraint constraint : featureModel.getConstraints()) {
 				constraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
 
-			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
-			for (final IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+			features = new HashMap<>((int) (featureModel.getNumberOfFeatures() * 1.5));
+			for (final IFeature feature : featureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
 			constraints = new HashMap<>();
 			features = new HashMap<>();
 		}
+		readValues();
 	}
 
 	@Override
@@ -268,12 +288,23 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	@Override
+	public List<IGraphicalFeature> getVisibleRelations() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IGraphicalFeature f : getFeatures()) {
+			if (!f.isCollapsed() && !f.hasCollapsedParent()) {
+				features.add(f);
+			}
+		}
+		return Collections.unmodifiableList(features);
+	}
+
+	@Override
 	public int getConstraintIndex(Constraint constraint) {
 		final IGraphicalConstraint gConstarint = getGraphicalConstraint(constraint);
 
 		int index = 0;
 		for (int i = 0; i < constraints.size(); i++) {
-			final IGraphicalConstraint gTemp = getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
+			final IGraphicalConstraint gTemp = getGraphicalConstraint(featureModelManager.editObject().getConstraints().get(i));
 			if (gTemp == gConstarint) {
 				return index;
 			}
@@ -293,6 +324,238 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public Explanation<?> getActiveExplanation() {
 		return currentlyActiveExplanation;
+	}
+
+	private static final String LAYOUT_ALGORITHM = "layoutalgorithm";
+	private static final String SHOW_HIDDEN_FEATURES = "showhiddenfeatures";
+	private static final String SHOW_COLLAPSED_CONSTRAINTS = "showcollapsedconstraints";
+	private static final String SHOW_SHORT_NAMES = "showshortnames";
+	private static final String LEGEND_AUTO_LAYOUT = "legendautolayout";
+	private static final String LEGEND_HIDDEN = "legendhidden";
+	private static final String LEGEND_POSITION = "legendposition";
+	private static final String LAYOUT = "layout";
+	private static final String POSITION = "position";
+	private static final String COLLAPSED = "collapsed";
+
+	private static final String VALUE_TRUE = "true";
+	private static final String VALUE_FALSE = "false";
+	private static final String VALUE_VERTICAL = "vertical";
+	private static final String VALUE_HORIZONTAL = "horizontal";
+
+	private static final String TYPE_GRAPHICS = "graphics";
+
+	@Override
+	public void readValues() {
+		final IFeatureModel fm = featureModelManager.editObject();
+
+		getLayout().setLayout(Integer.parseInt(fm.getProperty().get(LAYOUT_ALGORITHM, TYPE_GRAPHICS, "1")));
+
+		switch (fm.getProperty().get(LAYOUT, TYPE_GRAPHICS, VALUE_HORIZONTAL)) {
+		case VALUE_VERTICAL:
+			getLayout().setVerticalLayout(true);
+		case VALUE_HORIZONTAL:
+		default:
+			getLayout().setVerticalLayout(false);
+		}
+
+		final Boolean hiddenFeatures = getBooleanProperty(fm.getProperty(), SHOW_HIDDEN_FEATURES);
+		getLayout().showHiddenFeatures(hiddenFeatures != null ? hiddenFeatures : true);
+
+		final Boolean shortNames = getBooleanProperty(fm.getProperty(), SHOW_SHORT_NAMES);
+		getLayout().setShowShortNames(shortNames != null ? shortNames : false);
+
+		final Boolean colapsedConstraints = getBooleanProperty(fm.getProperty(), SHOW_COLLAPSED_CONSTRAINTS);
+		getLayout().showCollapsedConstraints(colapsedConstraints != null ? colapsedConstraints : true);
+
+		final Boolean legendHidden = getBooleanProperty(fm.getProperty(), LEGEND_HIDDEN);
+		setLegendHidden(legendHidden != null ? legendHidden : false);
+
+		final Boolean legendAutoLayout = getBooleanProperty(fm.getProperty(), LEGEND_AUTO_LAYOUT);
+		getLayout().setLegendAutoLayout(legendAutoLayout != null ? legendAutoLayout : true);
+
+		if (!getLayout().hasLegendAutoLayout()) {
+			final Point legendPos = new Point();
+			final int[] coordinates = convertCoordinatesString(fm.getProperty().get(LEGEND_POSITION, TYPE_GRAPHICS, "0,0"), 2);
+			legendPos.x = coordinates[0];
+			legendPos.y = coordinates[1];
+			getLegend().setPos(legendPos);
+		}
+
+		final boolean manualLayout = !getLayout().hasFeaturesAutoLayout();
+		for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
+			final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
+			if (manualLayout) {
+				final Point location = new Point();
+				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+				location.x = coordinates[0];
+				location.y = coordinates[1];
+				graphicalFeature.setLocation(location);
+			}
+
+			final Boolean isCollapsed = getBooleanProperty(customProperties, COLLAPSED);
+			graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
+		}
+		for (final IGraphicalConstraint constr : getConstraints()) {
+			final IPropertyContainer customProperties = constr.getObject().getCustomProperties();
+			if (manualLayout) {
+				final Point location = new Point();
+				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+				location.x = coordinates[0];
+				location.y = coordinates[1];
+				constr.setLocation(location);
+			}
+		}
+	}
+
+	private int[] convertCoordinatesString(final String coordinatesString, int dimensions) {
+		final String[] coordinates = coordinatesString.split(",");
+		if (coordinates.length != dimensions) {
+			throw new NumberFormatException(coordinatesString);
+		}
+		final int[] c = new int[dimensions];
+		for (int i = 0; i < dimensions; i++) {
+			c[i] = Integer.parseInt(coordinates[i]);
+		}
+		return c;
+	}
+
+	private Boolean getBooleanProperty(IPropertyContainer properties, String name) {
+		final String value;
+		try {
+			value = properties.get(name, TYPE_GRAPHICS);
+		} catch (final IPropertyContainer.NoSuchPropertyException e) {
+			return null;
+		}
+		switch (value) {
+		case VALUE_FALSE:
+			return false;
+		case VALUE_TRUE:
+			return true;
+		default:
+			return null;
+		}
+	}
+
+	@Override
+	public void writeValues() {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			final IFeatureModel fm = featureModelManager.editObject();
+			writeFeatureModelInternal(fm);
+			for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
+				writeFeatureInternal(fm, graphicalFeature);
+			}
+			for (final IGraphicalConstraint graphicalConstraint : getConstraints()) {
+				writeConstraintInternal(graphicalConstraint);
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeFeatureModel() {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeFeatureModelInternal(featureModelManager.editObject());
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeConstraintInternal(graphicalConstraint);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void writeFeature(final IGraphicalFeature graphicalFeature) {
+		final Lock lock = featureModelManager.getFileOperationLock();
+		lock.lock();
+		try {
+			writeFeatureInternal(featureModelManager.editObject(), graphicalFeature);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	private void writeFeatureModelInternal(IFeatureModel fm) {
+		writeLayoutAlgorithm(fm);
+		writeAttributes(fm);
+		writeLegend(fm);
+	}
+
+	private void writeConstraintInternal(final IGraphicalConstraint graphicalConstraint) {
+		writePosition(graphicalConstraint, graphicalConstraint.getObject().getCustomProperties());
+	}
+
+	private void writeFeatureInternal(final IFeatureModel fm, final IGraphicalFeature graphicalFeature) {
+		final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
+		writePosition(graphicalFeature, customProperties);
+		if (graphicalFeature.isCollapsed()) {
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_TRUE);
+		} else if (customProperties.has(COLLAPSED, TYPE_GRAPHICS)) {
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+	}
+
+	private void writePosition(final IGraphicalElement graphicalFeature, final IPropertyContainer customProperties) {
+		if (getLayout().hasFeaturesAutoLayout()) {
+			customProperties.remove(POSITION, TYPE_GRAPHICS);
+		} else {
+			final Point location = graphicalFeature.getLocation();
+			customProperties.set(POSITION, TYPE_GRAPHICS, location.x + "," + location.y);
+		}
+	}
+
+	private void writeAttributes(final IFeatureModel fm) {
+		if (getLayout().showHiddenFeatures()) {
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_TRUE);
+		} else {
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+		if (getLayout().showShortNames()) {
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_TRUE);
+		} else {
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+		if (getLayout().showCollapsedConstraints()) {
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_TRUE);
+		} else {
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+	}
+
+	private void writeLegend(final IFeatureModel fm) {
+		if (isLegendHidden()) {
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_TRUE);
+		} else {
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_FALSE);
+		}
+		if (getLayout().hasLegendAutoLayout()) {
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_TRUE);
+		} else {
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_FALSE);
+			final Point legendPos = getLegend().getPos();
+			fm.getProperty().set(LEGEND_POSITION, TYPE_GRAPHICS, legendPos.x + "," + legendPos.y);
+		}
+	}
+
+	private void writeLayoutAlgorithm(final IFeatureModel fm) {
+		fm.getProperty().set(LAYOUT_ALGORITHM, TYPE_GRAPHICS, Integer.toString(getLayout().getLayoutAlgorithm()));
+		if (getLayout().hasVerticalLayout()) {
+			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, VALUE_VERTICAL);
+		} else {
+			fm.getProperty().set(LAYOUT, TYPE_GRAPHICS, VALUE_HORIZONTAL);
+		}
 	}
 
 }

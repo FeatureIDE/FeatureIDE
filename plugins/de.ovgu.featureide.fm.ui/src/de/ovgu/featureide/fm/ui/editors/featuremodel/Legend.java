@@ -33,19 +33,15 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class Legend implements IGraphicItem {
 
 	private final IGraphicalFeatureModel model;
-	private Point pos;
+	private final Point pos;
 
 	public Legend(IGraphicalFeatureModel model) {
 		this.model = model;
-		pos = model.getLayout().getLegendPos().getCopy();
+		pos = new Point(0, 0);
 	}
 
 	public IGraphicalFeatureModel getModel() {
 		return model;
-	}
-
-	public void update() {
-		model.getFeatureModel().handleModelDataChanged();
 	}
 
 	public Point getPos() {
@@ -53,8 +49,7 @@ public class Legend implements IGraphicItem {
 	}
 
 	public void setPos(Point pos) {
-		this.pos = pos;
-		model.getLayout().setLegendPos(pos.x, pos.y);
+		this.pos.setLocation(pos);
 	}
 
 	@Override

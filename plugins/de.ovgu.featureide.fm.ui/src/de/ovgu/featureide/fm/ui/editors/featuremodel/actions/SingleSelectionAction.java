@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -31,6 +30,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public abstract class SingleSelectionAction extends Action implements IEventListener {
+public abstract class SingleSelectionAction extends AFeatureModelAction implements IEventListener {
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
@@ -58,10 +58,9 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 
 	protected boolean connectionSelected;
 
-	public SingleSelectionAction(String text, Object viewer, String id) {
-		super(text);
+	public SingleSelectionAction(String text, Object viewer, String id, IFeatureModelManager featureModelManager) {
+		super(text, id, featureModelManager);
 		this.viewer = viewer;
-		setId(id);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -146,9 +145,9 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		case GROUP_TYPE_CHANGED:
 		case MANDATORY_CHANGED:
 		case PARENT_CHANGED:
-		case HIDDEN_CHANGED:
-		case COLOR_CHANGED:
-		case COLLAPSED_CHANGED:
+		case FEATURE_HIDDEN_CHANGED:
+		case FEATURE_COLOR_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			updateProperties();
 			break;
 		default:

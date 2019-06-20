@@ -25,8 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -41,8 +41,8 @@ public class CASAConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	private final int t;
 
-	public CASAConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject, int t) {
-		super(builder, featureProject);
+	public CASAConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, int t) {
+		super(builder, formula);
 		this.t = t;
 	}
 

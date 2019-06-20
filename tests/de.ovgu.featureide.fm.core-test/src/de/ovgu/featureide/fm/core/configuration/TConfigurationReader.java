@@ -31,6 +31,7 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -57,6 +58,7 @@ public class TConfigurationReader {
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 
 	private final IFeatureModel FM_test_1 = init("test_5.xml");
+	private final FeatureModelFormula formula = new FeatureModelFormula(FM_test_1);
 
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm = null;
@@ -74,19 +76,19 @@ public class TConfigurationReader {
 	}
 
 	private boolean isValid(Configuration configuration) {
-		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(configuration, true);
+		final IConfigurationPropagator propagator = configuration.getPropagator();
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	private boolean isValidAfterUpdate(Configuration configuration) {
-		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(configuration, true);
+		final IConfigurationPropagator propagator = configuration.getPropagator();
 		LongRunningWrapper.runMethod(propagator.update());
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C#");
 
@@ -95,7 +97,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration2() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
 		c.setManual("Bash   script   ", Selection.UNSELECTED);
@@ -105,7 +107,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration3() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
 		c.setManual("Bash   script   ", Selection.SELECTED);
@@ -115,7 +117,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration4() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \"");
 		assertFalse(isValid(c));
@@ -123,7 +125,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration5() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \"Python Ruby\"");
 		assertTrue(isValid(c));
@@ -131,7 +133,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration6() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
 		assertTrue(isValid(c));
@@ -139,7 +141,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration7() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
 		assertFalse(isValid(c));
@@ -147,7 +149,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration8() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
 		assertFalse(isValid(c));
@@ -155,7 +157,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration9() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
 		assertFalse(isValid(c));
@@ -163,7 +165,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration10() {
-		final Configuration c = new Configuration(FM_test_1);
+		final Configuration c = new Configuration(formula, false);
 		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");
 		assertTrue(isValid(c));

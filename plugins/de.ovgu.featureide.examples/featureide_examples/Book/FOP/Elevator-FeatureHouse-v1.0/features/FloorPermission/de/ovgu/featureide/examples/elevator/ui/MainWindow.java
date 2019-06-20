@@ -22,6 +22,7 @@ package de.ovgu.featureide.examples.elevator.ui;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -45,7 +46,7 @@ public class MainWindow {
 
 	public void initialize(int maxFloors) {
 		FloorChooseDialog permissionDialog =
-			new FloorChooseDialog(maxFloors, new ArrayList<Integer>(),
+			new FloorChooseDialog(maxFloors, Arrays.asList(0),
 					"Choose disabled floors");
 		List<Integer> disabledFloors =
 			permissionDialog.getSelectedFloors();

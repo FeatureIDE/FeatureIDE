@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-
 /**
  * A variable or negated variable.
  *
@@ -111,9 +109,9 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
-		if (var.equals(feature.getName())) {
-			var = replaceWithFeature.getName();
+	protected List<Node> replaceFeature(String feature, String replaceWithFeature, List<Node> list) {
+		if (var.equals(feature)) {
+			var = replaceWithFeature;
 			list.add(this);
 		}
 		return list;
@@ -147,19 +145,19 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+	protected <T extends Collection<String>> T getContainedFeatures(T containedFeatures) {
 		containedFeatures.add(String.valueOf(var));
 		return containedFeatures;
 	}
 
 	@Override
-	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+	protected <T extends Collection<Literal>> T getLiterals(T literals) {
 		literals.add(this);
 		return literals;
 	}
 
 	@Override
-	protected Collection<Object> getVariables(Collection<Object> variables) {
+	protected <T extends Collection<Object>> T getVariables(T variables) {
 		variables.add(var);
 		return variables;
 	}

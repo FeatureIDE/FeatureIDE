@@ -32,7 +32,7 @@ import java.util.concurrent.TimeoutException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
@@ -61,7 +61,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 
 	public SPLCAToolConfigurationGenerator(CNF cnf, int maxSampleSize, int t, String algorithm) {
 		super(cnf, maxSampleSize);
-		featureModel = DefaultFeatureModelFactory.getInstance().createFeatureModel();
+		featureModel = DefaultFeatureModelFactory.getInstance().create();
 		new DIMACSFormat().read(featureModel, new DIMACSFormatCNF().write(cnf));
 		this.algorithm = algorithm;
 		this.t = t;
@@ -108,7 +108,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 					literals[variable - 1] = variable;
 				}
 			}
-			addResult(new Solution(literals));
+			addResult(new LiteralSet(literals, LiteralSet.Order.INDEX));
 		}
 	}
 

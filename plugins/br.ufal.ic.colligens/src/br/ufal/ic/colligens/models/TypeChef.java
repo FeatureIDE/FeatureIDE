@@ -64,7 +64,7 @@ public class TypeChef {
 		final File inputFile = new File(project.getLocation().toOSString() + System.getProperty("file.separator") + "model.xml");
 		final File outputFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "cnf.fm");
 		final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath());
-		try (BufferedWriter print = new BufferedWriter(new FileWriter(outputFile))) {
+		try (final BufferedWriter print = new BufferedWriter(new FileWriter(outputFile))) {
 			final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(fm)));
 			nodeWriter.setSymbols(NodeWriter.javaSymbols);
 			print.write(nodeWriter.nodeToString());
@@ -140,15 +140,15 @@ public class TypeChef {
 	}
 
 	/**
-	 * @return
+	 * @return true if finished
 	 */
 	public boolean isFinish() {
 		return isFinish;
 	}
 
 	/**
-	 * @param resourceList
-	 * @throws TypeChefException
+	 * @param resourceList list of resources
+	 * @throws TypeChefException exception
 	 */
 	public void run(List<IResource> resourceList) throws TypeChefException {
 		isFinish = false;
@@ -232,7 +232,7 @@ public class TypeChef {
 	}
 
 	/**
-	 * @return
+	 * @return list with file proxies
 	 */
 	public List<FileProxy> getFilesLog() {
 		final List<FileProxy> list = new LinkedList<FileProxy>();

@@ -20,11 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.IControlContentAdapter2;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.fm.core.Features;
 
@@ -71,19 +74,20 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final Point selection = editor.getSelection();
 		final String currentText = editor.getText();
 
-		final InsertionResult result = performInsertion(currentText, selection, text);
+		final boolean isFeature = !Arrays.asList(NodeReader.textualSymbols).contains(text);
+		final InsertionResult result = performInsertion(currentText, selection, text, isFeature);
 
 		editor.setText(result.text);
 		editor.setSelection(result.selection);
 	}
 
 	/**
-	 * @param currentText
-	 * @param selection
-	 * @param text
-	 * @return
+	 * @param currentText current text
+	 * @param selection selection point
+	 * @param textToInsert text to insert
+	 * @return return
 	 */
-	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert) {
+	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert, final boolean isFeature) {
 		String before = "", after = "";
 		String text = textToInsert;
 
@@ -123,7 +127,11 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			throw new UnsupportedOperationException();
 		}
 
-		if (!before.isEmpty() && !before.endsWith(" ")) {
+		if (!before.isEmpty() && !before.endsWith(" ") && !isFeature) {
+			before += " ";
+		}
+
+		if (!before.isEmpty() && isFeature && !before.endsWith("(")) {
 			before += " ";
 		}
 
@@ -137,9 +145,9 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	private static int getSubStringStartIndex(final String currentText, final int x) {
-		int substringStartIndex = Math.max(0, x - 1);
+		int substringStartIndex = Math.max(0, x);
 		for (; substringStartIndex > 0; substringStartIndex--) {
-			final char ch = currentText.charAt(substringStartIndex);
+			final char ch = currentText.charAt(substringStartIndex - 1);
 			if ((ch == ' ') || (ch == '(') || (ch == ')')) {
 				break;
 			}

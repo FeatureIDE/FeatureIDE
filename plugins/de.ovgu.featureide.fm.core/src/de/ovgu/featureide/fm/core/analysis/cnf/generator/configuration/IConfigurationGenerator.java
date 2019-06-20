@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public interface IConfigurationGenerator extends IAnalysis<List<Solution>> {
+public interface IConfigurationGenerator extends IAnalysis<List<LiteralSet>> {
 
-	List<Solution> analyze(IMonitor monitor) throws Exception;
+	List<LiteralSet> analyze(IMonitor monitor) throws Exception;
 
-	LinkedBlockingQueue<Solution> getResultQueue();
+	LinkedBlockingQueue<LiteralSet> getResultQueue();
 
 }

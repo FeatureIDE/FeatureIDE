@@ -46,7 +46,7 @@ public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 	int getIndex();
 
 	/**
-	 * @param the index of this page.
+	 * @param index the index of this page.
 	 */
 	void setIndex(int index);
 
@@ -61,18 +61,19 @@ public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 	void initEditor();
 
 	/**
+	 * @param container container
+	 *
 	 * @return This page. You can also call a constructor.
 	 */
 	IFeatureModelEditorPage getPage(Composite container);
 
 	/**
-	 *
 	 * @return The control of this page.
 	 */
 	Control getControl();
 
 	/**
-	 * @param monitor
+	 * @param monitor monitor
 	 */
 	@Override
 	void doSave(IProgressMonitor monitor);
@@ -80,7 +81,7 @@ public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 	/**
 	 * Called if this page is about to change to another page.
 	 *
-	 * @param newPage
+	 * @param newPage new Page
 	 *
 	 * @return {@code true} if the user is allowed to change the page
 	 */
@@ -89,14 +90,14 @@ public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 	/**
 	 * Called if the tab has been changed from this page.
 	 *
-	 * @param newPage
+	 * @param newPage new page
 	 */
 	void pageChangeFrom(int newPage);
 
 	/**
 	 * Called if the tab has been changed to this page.
 	 *
-	 * @param oldPage
+	 * @param oldPage old page
 	 */
 	void pageChangeTo(int oldPage);
 }

@@ -213,6 +213,12 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * Extended for passing selected feature.
 	 *
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
+	 *
+	 * @param workbench workbench
+	 * @param selection selection
+	 * @param feature feature
+	 * @param clss class
+	 * @param pack pack
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection, String feature, String clss, String pack) {
 		this.selection = selection;

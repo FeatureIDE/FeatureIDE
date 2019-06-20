@@ -32,7 +32,6 @@ import org.sat4j.specs.IConstr;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
@@ -568,7 +567,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		if (curModel == null) {
 			return true;
 		}
-		final Solution solution = new Solution(Arrays.copyOf(curModel, curModel.length));
+		final LiteralSet solution = new LiteralSet(Arrays.copyOf(curModel, curModel.length), LiteralSet.Order.INDEX, false);
 		final int partCount = count(solution.getLiterals()) - fixedPartCount;
 		final Configuration config = new Configuration(solution, partCount - getLastCoverage(), partCount);
 

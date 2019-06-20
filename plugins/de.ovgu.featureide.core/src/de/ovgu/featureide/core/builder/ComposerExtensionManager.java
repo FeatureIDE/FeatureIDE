@@ -45,7 +45,7 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 	private static ComposerExtensionManager instance = new ComposerExtensionManager();
 
 	private ComposerExtensionManager() {
-		setExtensionLoaderInternal(new EclipseExtensionLoader<IComposerExtension>(CorePlugin.PLUGIN_ID, IComposerExtensionBase.extensionPointID,
+		setLoader(new EclipseExtensionLoader<IComposerExtension>(CorePlugin.PLUGIN_ID, IComposerExtensionBase.extensionPointID,
 				IComposerExtensionBase.extensionID, IComposerExtension.class) {
 
 			@Override
@@ -73,6 +73,7 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 	/**
 	 * Gets a composer by an ID
 	 *
+	 * @param featureProject FeatureIDE project
 	 * @param composerID The ID of the composer
 	 * @return The composer or null if no composer with the specified ID was found
 	 */

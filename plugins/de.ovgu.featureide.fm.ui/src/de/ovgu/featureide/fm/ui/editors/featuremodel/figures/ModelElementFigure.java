@@ -51,4 +51,7 @@ public abstract class ModelElementFigure extends Figure {
 	public FeatureModelReason getActiveReason() {
 		return activeReason;
 	}
+
+	public abstract void updateProperties();
+
 }

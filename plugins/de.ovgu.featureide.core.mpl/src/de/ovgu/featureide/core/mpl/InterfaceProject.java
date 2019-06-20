@@ -197,7 +197,7 @@ public class InterfaceProject {
 	public Configuration getConfiguration() {
 		if (configuration == null) {
 			final IFile configFile = featureProject.getCurrentConfiguration();
-			configuration = new Configuration(featureModel);
+			configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;

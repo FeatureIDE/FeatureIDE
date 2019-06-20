@@ -22,7 +22,9 @@ package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +34,9 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -45,25 +49,36 @@ public final class Nodes {
 	private Nodes() {}
 
 	public static ClauseList convert(IVariables satInstance, Node node) {
+		return convert(satInstance, node, true);
+	}
+
+	public static ClauseList convert(IVariables satInstance, Node node, boolean keepLiteralOrder) {
 		final ClauseList clauses = new ClauseList();
-		CNFCreator.getClauseFromNode(satInstance, clauses, node);
+		getClauseFromNode(satInstance, clauses, node, keepLiteralOrder);
 		return clauses;
 	}
 
 	public static CNF convert(Node node) {
+		return convert(node, true);
+	}
+
+	public static CNF convert(Node node, boolean keepLiteralOrder) {
+		if (node == null) {
+			return null;
+		}
 		final Set<Object> distinctVariableObjects = getDistinctVariableObjects(node);
 		final ArrayList<String> variableList = new ArrayList<>(distinctVariableObjects.size());
 		for (final Object varObject : distinctVariableObjects) {
-			if (varObject instanceof String) {
-				variableList.add((String) varObject);
+			if (varObject != null) {
+				variableList.add(varObject.toString());
 			}
 		}
 		final Variables mapping = new Variables(variableList);
-		final List<LiteralSet> clauses = convert(mapping, node);
+		final List<LiteralSet> clauses = convert(mapping, node, keepLiteralOrder);
 		return new CNF(mapping, clauses);
 	}
 
-	public static CNF convertSlicingError(IVariables satInstance, Node cnfNode) {
+	public static CNF convertSlicingErrorLiterals(IVariables satInstance, Node cnfNode, boolean keepLiteralOrder) {
 		final HashSet<String> varNames = new HashSet<>();
 		final HashSet<String> errorNames = new HashSet<>();
 		collectVariables(satInstance, cnfNode, varNames, errorNames);
@@ -77,7 +92,7 @@ public final class Nodes {
 		variableList.addAll(errorNames);
 		final Variables mappingWithErrors = new Variables(variableList);
 
-		final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode);
+		final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode, keepLiteralOrder);
 		try {
 			final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
 			final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
@@ -126,7 +141,7 @@ public final class Nodes {
 	}
 
 	public static Set<Object> getDistinctVariableObjects(Node node) {
-		final HashSet<Object> result = new HashSet<>();
+		final LinkedHashSet<Object> result = new LinkedHashSet<>();
 		getDistinctVariableObjects(node, result);
 		return result;
 	}
@@ -138,6 +153,65 @@ public final class Nodes {
 			for (final Node child : node.getChildren()) {
 				getDistinctVariableObjects(child, result);
 			}
+		}
+	}
+
+	static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node, boolean keepLiteralOrder) {
+		final Node cnfNode = Node.buildCNF(node);
+		// final Node cnfNode = node.toCNF();
+		if (cnfNode instanceof And) {
+			for (final Node andChild : cnfNode.getChildren()) {
+				clauses.add(getClause(s, andChild, keepLiteralOrder));
+			}
+		} else {
+			clauses.add(getClause(s, cnfNode, keepLiteralOrder));
+		}
+	}
+
+	private static LiteralSet getClause(IVariables s, Node andChild, boolean keepLiteralOrder) {
+		int absoluteValueCount = 0;
+		boolean valid = true;
+
+		final Literal[] children = (andChild instanceof Or) ? Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class)
+			: new Literal[] { (Literal) andChild };
+
+		for (int j = 0; j < children.length; j++) {
+			final Literal literal = children[j];
+
+			// sort out obvious tautologies
+			if (literal.var.equals(NodeCreator.varTrue)) {
+				if (literal.positive) {
+					valid = false;
+				} else {
+					absoluteValueCount++;
+					children[j] = null;
+				}
+			} else if (literal.var.equals(NodeCreator.varFalse)) {
+				if (literal.positive) {
+					absoluteValueCount++;
+					children[j] = null;
+				} else {
+					valid = false;
+				}
+			}
+		}
+
+		if (valid) {
+			if (children.length == absoluteValueCount) {
+				throw new RuntimeException("Model is void!");
+			}
+			final int[] newChildren = new int[children.length - absoluteValueCount];
+			int k = 0;
+			for (int j = 0; j < children.length; j++) {
+				final Literal literal = children[j];
+				if (literal != null) {
+					final int variable = s.getVariable(literal.var.toString());
+					newChildren[k++] = literal.positive ? variable : -variable;
+				}
+			}
+			return new LiteralSet(newChildren, keepLiteralOrder ? Order.UNORDERED : Order.NATURAL);
+		} else {
+			return null;
 		}
 	}
 

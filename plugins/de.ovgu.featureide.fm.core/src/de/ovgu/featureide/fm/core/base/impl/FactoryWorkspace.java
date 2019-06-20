@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -35,29 +34,23 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  *
  * @author Sebastian Krieter
  */
-public class FactoryWorkspace {
+public final class FactoryWorkspace {
 
-	protected final Map<String, String> map;
-
+	private final Map<String, String> map;
 	private String defaultFactoryID;
 
-	public FactoryWorkspace(FactoryWorkspace oldWorkspace) {
-		defaultFactoryID = oldWorkspace.defaultFactoryID;
+	private FactoryWorkspace(FactoryWorkspace oldWorkspace) {
 		map = new HashMap<>(oldWorkspace.map);
+		defaultFactoryID = oldWorkspace.defaultFactoryID;
 	}
 
-	public FactoryWorkspace() {
-		defaultFactoryID = DefaultFeatureModelFactory.ID;
+	FactoryWorkspace() {
 		map = new HashMap<>();
 	}
 
-	public String getID(IPersistentFormat<IFeatureModel> format) {
-		return getID(format.getId());
-	}
-
-	public String getID(String formatID) {
-		final String factoryID = map.get(formatID);
-		return factoryID == null ? defaultFactoryID : factoryID;
+	public FactoryWorkspace(String defaultFactoryID) {
+		map = new HashMap<>();
+		this.defaultFactoryID = defaultFactoryID;
 	}
 
 	public String getDefaultFactoryID() {
@@ -68,7 +61,16 @@ public class FactoryWorkspace {
 		this.defaultFactoryID = defaultFactoryID;
 	}
 
-	public void assignID(IFeatureModelFormat format, String factoryID) {
+	public String getID(IPersistentFormat<?> format) {
+		return getID(format.getId());
+	}
+
+	public String getID(String formatID) {
+		final String factoryID = map.get(formatID);
+		return factoryID != null ? factoryID : defaultFactoryID;
+	}
+
+	public void assignID(IPersistentFormat<?> format, String factoryID) {
 		assignID(format.getId(), factoryID);
 	}
 
@@ -76,12 +78,20 @@ public class FactoryWorkspace {
 		map.put(formatID, factoryID);
 	}
 
+	public void removeID(IPersistentFormat<?> format) {
+		removeID(format.getId());
+	}
+
+	public void removeID(String formatID) {
+		map.remove(formatID);
+	}
+
 	public Map<String, String> getMap() {
 		return Collections.unmodifiableMap(map);
 	}
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	protected FactoryWorkspace clone() {
 		return new FactoryWorkspace(this);
 	}
 

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.job;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
@@ -43,8 +44,9 @@ public final class LongRunningWrapper {
 		monitor = monitor != null ? monitor : new NullMonitor();
 		try {
 			return method.execute(monitor);
+		} catch (final MethodCancelException e) {
+			return null;
 		} catch (final Exception e) {
-			e.printStackTrace();
 			Logger.logError(e);
 			return null;
 		} finally {
@@ -74,6 +76,18 @@ public final class LongRunningWrapper {
 
 	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor monitor) {
 		return new LongRunningThread<>(name, method, monitor);
+	}
+
+	public static JobToken createToken(JobStartingStrategy strategy) {
+		return JobSynchronizer.createToken(strategy);
+	}
+
+	public static void startJob(JobToken token, final IRunner<?> job) {
+		JobSynchronizer.startJob(token, job);
+	}
+
+	public static void cancelAllJobs(JobToken token) {
+		JobSynchronizer.cancelAllJobs(token);
 	}
 
 }

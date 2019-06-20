@@ -12,7 +12,7 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 	private FileProxy fileProxy;
 
 	/**
-	 * @param fileProxie
+	 * @param fileProxy list of file proxies
 	 */
 	public void setFile(FileProxy fileProxy) {
 		this.fileProxy = fileProxy;

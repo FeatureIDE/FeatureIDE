@@ -23,7 +23,7 @@ package de.ovgu.featureide.core.mpl.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_FEATURE_INTERFACES;
 
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -65,7 +65,7 @@ public class PrintFeatureInterfacesJob implements LongRunningMethod<Boolean> {
 			return false;
 		}
 		final ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();
-		final List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
+		final Collection<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 
 		IFolder folder = FMCorePlugin.createFolder(interfaceProject.getProjectReference(), foldername);
 

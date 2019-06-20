@@ -424,7 +424,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	 * @return
 	 */
 	private Configuration readConfig() {
-		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
+		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 		final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
 		SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 

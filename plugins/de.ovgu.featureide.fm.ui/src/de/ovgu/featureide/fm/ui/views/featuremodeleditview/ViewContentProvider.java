@@ -50,14 +50,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
@@ -191,8 +190,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
 
-	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
-		if ((oldModel.getStructure().getRoot() == null) || (newModel.getStructure().getRoot() == null)) {
+	public void calculateContent(final FeatureModelFormula oldModel, final FeatureModelFormula newModel, IProgressMonitor monitor) {
+		if ((FeatureUtils.getRoot(oldModel.getFeatureModel()) == null) || (FeatureUtils.getRoot(newModel.getFeatureModel()) == null)) {
 			return;
 		}
 
@@ -292,7 +291,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param oldModel
 	 * @param newModel
 	 */
-	private void setHeadAndExamples(IProgressMonitor monitor, IFeatureModel oldModel, IFeatureModel newModel) {
+	private void setHeadAndExamples(IProgressMonitor monitor, FeatureModelFormula oldModel, FeatureModelFormula newModel) {
 		monitor.setTaskName(COMPARE_MODELS);
 		final TreeObject head = calculateHead(oldModel, newModel, comparator);
 		final TreeElement[] children = invisibleRoot.getChildren();
@@ -305,10 +304,10 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	/**
 	 * Calculates the content of the first line Compares the old with the new model
 	 */
-	private TreeObject calculateHead(IFeatureModel oldModel, IFeatureModel newModel, ModelComparator comparator) {
+	private TreeObject calculateHead(FeatureModelFormula oldModel, FeatureModelFormula newModel, ModelComparator comparator) {
 		final long start = System.currentTimeMillis();
 
-		final Comparison comparison = comparator.compare(oldModel, newModel);
+		final Comparison comparison = comparator.compare(oldModel.getFeatureModel(), newModel.getFeatureModel());
 
 		String message;
 		Image image;
@@ -349,16 +348,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated
 	 * @param monitor The monitor of the running job
 	 */
-	private void addStatistics(TreeParent root, final String text, final IFeatureModel model, int position, boolean init, IProgressMonitor monitor) {
+	private void addStatistics(TreeParent root, final String text, final FeatureModelFormula model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.setTaskName("Calculate: \"" + text + "\"");
 		}
 
-		final int features = model.getNumberOfFeatures();
-		final int constraints = model.getConstraintCount();
-		final int concrete = FeatureModelManager.getAnalyzer(model).countConcreteFeatures();
-		final int terminal = FeatureModelManager.getAnalyzer(model).countTerminalFeatures();
-		final int hidden = FeatureModelManager.getAnalyzer(model).countHiddenFeatures();
+		final int features = model.getFeatureModel().getNumberOfFeatures();
+		final int constraints = model.getFeatureModel().getConstraintCount();
+		final int concrete = model.getAnalyzer().countConcreteFeatures();
+		final int terminal = model.getAnalyzer().countTerminalFeatures();
+		final int hidden = model.getAnalyzer().countHiddenFeatures();
 
 		if (init) {
 			// case: init
@@ -368,7 +367,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				@Override
 				public void initChildren() {
 					// TODO catch time put
-					addChild(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
+					addChild(MODEL_VOID + model.getAnalyzer().isValid());
 					addChild(NUMBER_FEATURES + features);
 					addChild(NUMBER_CONCRETE + concrete);
 					addChild(NUMBER_ABSTRACT + (features - concrete));
@@ -389,13 +388,11 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			try {
 				// TODO catch time put
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid());
 				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + FeatureModelManager.getAnalyzer(model).isValid());
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid());
 				}
-			} catch (final ConcurrentModificationException e) {
-
-			}
+			} catch (final ConcurrentModificationException e) {}
 			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
 			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
 			((TreeObject) children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT + (features - concrete));
@@ -449,7 +446,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		}
 	}
 
-	private TreeParent calculateNumberOfVariants(IFeatureModel model, boolean ignoreAbstractFeatures) {
+	private TreeParent calculateNumberOfVariants(FeatureModelFormula model, boolean ignoreAbstractFeatures) {
 
 		final String variants = ignoreAbstractFeatures ? CONFIGURATIONS : PROGRAM_VARIANTS;
 		final TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {
@@ -458,15 +455,13 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			public void initChildren() {}
 		};
 
-		if (!ignoreAbstractFeatures && (FeatureModelManager.getAnalyzer(model).countConcreteFeatures() == 0)) {
+		if (!ignoreAbstractFeatures && (model.getAnalyzer().countConcreteFeatures() == 0)) {
 			// case: there is no concrete feature so there is only one program variant,
 			// without this the calculation least much to long
 			p.addChild("1 " + variants);
 			return p;
 		}
-
-		final ConfigurationPropagator c = FeatureModelManager.getPropagator(model, ignoreAbstractFeatures);
-		final long number = LongRunningWrapper.runMethod(c.number(TIMEOUT_CONFIGURATION));
+		final long number = new Configuration(model, false, !ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
 		String s = "";
 		if (number < 0) {
 			s += MORE_THAN + (-1 - number);
@@ -499,7 +494,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	/**
 	 * Stops the calculation and the running job
 	 *
-	 * @param value
+	 * @param value to set
 	 */
 	public void setCanceled(boolean value) {
 		cancel = value;

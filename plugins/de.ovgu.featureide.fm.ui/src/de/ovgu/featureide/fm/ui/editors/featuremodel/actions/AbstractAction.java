@@ -20,12 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 
 /**
@@ -39,11 +37,8 @@ public class AbstractAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.abstract";
 
-	private final IFeatureModel featureModel;
-
-	public AbstractAction(Object viewer, IFeatureModel featureModel) {
-		super("Abstract", viewer, ID);
-		this.featureModel = featureModel;
+	public AbstractAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Abstract", viewer, ID, featureModelManager);
 	}
 
 	@Override
@@ -53,8 +48,10 @@ public class AbstractAction extends MultipleSelectionAction {
 	}
 
 	private boolean isEveryFeatureAbstract() {
-		for (final IFeature tempFeature : featureArray) {
-			if (!(tempFeature.getStructure().isAbstract())) {
+		final IFeatureModel featureModel = featureModelManager.editObject();
+		for (final String name : featureArray) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (!(feature.getStructure().isAbstract())) {
 				return false;
 			}
 		}
@@ -62,12 +59,7 @@ public class AbstractAction extends MultipleSelectionAction {
 	}
 
 	private void changeAbstractStatus(boolean allAbstract) {
-		final SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(featureModel, allAbstract, getSelectedFeatures());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new SetFeatureToAbstractOperation(featureModelManager, allAbstract, getSelectedFeatures()));
 	}
 
 	@Override

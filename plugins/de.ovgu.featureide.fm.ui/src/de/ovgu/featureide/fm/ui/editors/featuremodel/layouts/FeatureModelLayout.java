@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import org.abego.treelayout.Configuration;
 import org.eclipse.draw2d.geometry.Point;
 
 /**
@@ -29,11 +30,16 @@ import org.eclipse.draw2d.geometry.Point;
  */
 public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
+	private boolean usesAbegoTreeLayout;
+	private Configuration.Location abegoRootposition;
+
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
-	private Point legendPos;
+	private final Point legendPos;
+	private boolean leftRightInverted;
+	private boolean topDownInverted;
 
 	private int selectedLayoutAlgorithm;
 	private boolean showShortNames;
@@ -41,10 +47,11 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public FeatureModelLayout() {
 		autoLayoutLegend = true;
 		showHiddenFeatures = true;
-		showCollapsedConstraints = true;
+		showCollapsedConstraints = false;
 		hasVerticalLayout = true;
 		legendPos = new Point(0, 0);
-		selectedLayoutAlgorithm = 1;
+		selectedLayoutAlgorithm = 4;
+		usesAbegoTreeLayout = false;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
@@ -54,6 +61,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		hasVerticalLayout = featureModelLayout.hasVerticalLayout;
 		legendPos = featureModelLayout.legendPos.getCopy();
 		selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
+		usesAbegoTreeLayout = featureModelLayout.usesAbegoTreeLayout;
 	}
 
 	@Override
@@ -97,23 +105,13 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	}
 
 	@Override
-	public boolean verticalLayout() {
+	public boolean hasVerticalLayout() {
 		return hasVerticalLayout;
 	}
 
 	@Override
-	public void verticalLayout(boolean b) {
+	public void setVerticalLayout(boolean b) {
 		hasVerticalLayout = b;
-	}
-
-	@Override
-	public Point getLegendPos() {
-		return legendPos;
-	}
-
-	@Override
-	public void setLegendPos(int x, int y) {
-		legendPos = new Point(x, y);
 	}
 
 	@Override
@@ -135,4 +133,52 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public FeatureModelLayout clone() {
 		return new FeatureModelLayout(this);
 	}
+
+	/**
+	 * @return the usesAbegoTreeLayout
+	 */
+	public boolean isUsesAbegoTreeLayout() {
+		return usesAbegoTreeLayout;
+	}
+
+	/**
+	 * @param usesAbegoTreeLayout the usesAbegoTreeLayout to set
+	 */
+	public void setUsesAbegoTreeLayout(boolean usesAbegoTreeLayout) {
+		// a default root position:
+		abegoRootposition = Configuration.Location.Bottom;
+		this.usesAbegoTreeLayout = usesAbegoTreeLayout;
+	}
+
+	/**
+	 * @return the abegoRootposition
+	 */
+	public Configuration.Location getAbegoRootposition() {
+		return abegoRootposition;
+	}
+
+	/**
+	 * @param abegoRootposition the abegoRootposition to set
+	 */
+	public void setAbegoRootposition(Configuration.Location abegoRootposition) {
+		usesAbegoTreeLayout = true;
+		this.abegoRootposition = abegoRootposition;
+	}
+
+	public void setLeftRightInverted(boolean isLeftRightInverted) {
+		leftRightInverted = isLeftRightInverted;
+	}
+
+	public boolean getLeftRightInverted() {
+		return leftRightInverted;
+	}
+
+	public void setTopDownInverted(boolean isTopDownInverted) {
+		topDownInverted = isTopDownInverted;
+	}
+
+	public boolean getTopDownInverted() {
+		return topDownInverted;
+	}
+
 }

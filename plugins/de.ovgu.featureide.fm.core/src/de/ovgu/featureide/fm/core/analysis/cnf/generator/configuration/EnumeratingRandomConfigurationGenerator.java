@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -45,7 +45,7 @@ public class EnumeratingRandomConfigurationGenerator extends ARandomConfiguratio
 		monitor.setRemainingWork(maxSampleSize);
 
 		final AllConfigurationGenerator gen = new AllConfigurationGenerator(solver);
-		final List<Solution> allConfigurations = new ArrayList<>(LongRunningWrapper.runMethod(gen));
+		final List<LiteralSet> allConfigurations = new ArrayList<>(LongRunningWrapper.runMethod(gen));
 		if (!allowDuplicates) {
 			Collections.shuffle(allConfigurations, random);
 		}

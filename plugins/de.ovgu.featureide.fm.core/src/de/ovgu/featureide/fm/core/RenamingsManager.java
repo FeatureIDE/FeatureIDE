@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,22 +96,8 @@ public class RenamingsManager implements IEventManager {
 		return (!renamings.isEmpty());
 	}
 
-	public void performRenamings() {
-		final List<IConstraint> constraints = model.getConstraints();
-		for (final Renaming renaming : renamings) {
-			for (final IConstraint c : constraints) {
-				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
-			}
-		}
-		renamings.clear();
-	};
-
-	public void performRenamings(File file) {
-		performRenamings(file.toPath());
-	}
-
-	public void performRenamings(Path path) {
-		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
+	public void notifyAboutRenamings() {
+		final FeatureModelManager instance = FeatureModelManager.getInstance(model.getSourceFile());
 		if (instance == null) {
 			return;
 		}
@@ -188,6 +172,11 @@ public class RenamingsManager implements IEventManager {
 	@Override
 	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	@Override

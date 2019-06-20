@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -43,14 +42,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 	}
 
 	private void testConfigurationValid(Configuration c, final long expectedValue) {
-		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
+		final IConfigurationPropagator propagator = c.getPropagator();
 		LongRunningWrapper.runMethod(propagator.update());
 		assertTrue(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(expectedValue, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 	}
 
 	private void testConfigurationInvalid(Configuration c) {
-		final ConfigurationPropagator propagator = FeatureModelManager.getPropagator(c, true);
+		final IConfigurationPropagator propagator = c.getPropagator();
 		LongRunningWrapper.runMethod(propagator.update());
 		assertFalse(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(0L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
@@ -58,20 +57,20 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection1() {
-		final Configuration c = new Configuration(fm);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("C", Selection.SELECTED);
 		testConfigurationValid(c, 2L);
 	}
 
 	@Test
 	public void testSelection2() {
-		final Configuration c = new Configuration(fm);
+		final Configuration c = new Configuration(formula, false);
 		testConfigurationValid(c, 2L);
 	}
 
 	@Test
 	public void testSelection3() {
-		final Configuration c = new Configuration(fm);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		testConfigurationValid(c, 1L);
@@ -79,14 +78,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection4() {
-		final Configuration c = new Configuration(fm);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("A", Selection.SELECTED);
 		testConfigurationValid(c, 1L);
 	}
 
 	@Test
 	public void testSelection5() {
-		final Configuration c = new Configuration(fm);
+		final Configuration c = new Configuration(formula, false);
 		c.setManual("B", Selection.SELECTED);
 		testConfigurationInvalid(c);
 	}

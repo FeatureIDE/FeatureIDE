@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
 
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
@@ -42,6 +43,7 @@ public class ExportFeatureModelAction extends Action {
 
 	public ExportFeatureModelAction(FeatureDiagramEditor featureModelEditor) {
 		super(EXPORT_AS);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif"));
 		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
 		setId(ID);

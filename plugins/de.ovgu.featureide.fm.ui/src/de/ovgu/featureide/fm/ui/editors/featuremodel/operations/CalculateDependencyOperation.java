@@ -32,20 +32,23 @@ import org.eclipse.swt.widgets.Display;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
 /**
  * Option which uses feature model slicing to calculate dependencies of a sub feature model.
  *
- * @author "Ananieva Sofia"
+ * @author Ananieva Sofia
  */
-public class CalculateDependencyOperation extends AbstractFeatureModelOperation {
+// TODO Move to other package. (This is no operation anymore)
+public class CalculateDependencyOperation implements LongRunningMethod<IFeature> {
+
+	public static final String LABEL = CALCULATE_DEPENDENCY;
 
 	/**
 	 * The selected root of the sub feature model.
@@ -57,8 +60,6 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 */
 	private final IFeatureModel completeFm;
 
-	private static final String LABEL = CALCULATE_DEPENDENCY;
-
 	/**
 	 * Constructor.
 	 *
@@ -66,7 +67,6 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * @param selectedFeature The selected feature which is root of the sub feature model
 	 */
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {
-		super(featureModel, LABEL);
 		subtreeRoot = selectedFeature;
 		completeFm = featureModel;
 	}
@@ -74,7 +74,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	/**
 	 * Collects all features of the sub feature model.
 	 *
-	 * @param featureModel the origin feature model to collect the features from
+	 * @param featureModelManager the origin feature model to collect the features from
 	 * @param root the root of the sub feature model
 	 * @return res A list of all features from the sub feature model
 	 */
@@ -97,7 +97,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * and implicit constraints.
 	 */
 	@Override
-	protected FeatureIDEEvent operation() {
+	public IFeature execute(IMonitor monitor) throws Exception {
 		final ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing
@@ -117,16 +117,8 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 		TrayDialog.setDialogHelpAvailable(false);
 		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
-		// TODO !!! Check if this is correct
-		FeatureModelManager.getAnalyzer(completeFm).analyzeFeatureModel(null);
-		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
+		FeatureModelManager.getInstance(completeFm).getPersistentFormula().getAnalyzer().analyzeFeatureModel(null);
+		return subtreeRoot;
 	}
 
-	/**
-	 * Enables redo/undo operation.
-	 */
-	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
-	}
 }

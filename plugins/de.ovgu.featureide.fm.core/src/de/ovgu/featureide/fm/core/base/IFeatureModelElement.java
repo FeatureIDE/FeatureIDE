@@ -35,4 +35,14 @@ public interface IFeatureModelElement extends IEventManager {
 
 	void setName(String name);
 
+	/**
+	 * Returns the element's custom-defined properties. These properties can be get and set without changes to the code base.
+	 * Custom-Properties consist of a key-value pair and can stored to the file system.
+	 *
+	 * @since 3.0
+	 *
+	 * @return Implementation-independent custom feature properties.
+	 */
+	IPropertyContainer getCustomProperties();
+
 }

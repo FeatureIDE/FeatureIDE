@@ -55,8 +55,9 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -68,7 +69,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewConfigurationFilePage extends WizardPage {
 
-	private final List<IConfigurationFormat> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
+	private final List<IPersistentFormat<Configuration>> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
 
 	private Combo featureComboProject;
 	private Combo formatCombo;
@@ -90,7 +91,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 *
-	 * @param pageName
+	 * @param configFolder folder for the config
 	 */
 	public NewConfigurationFilePage(IFolder configFolder) {
 		super("wizardPage");
@@ -193,7 +194,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		if (configFolder != null) {
 			featureComboProject.setText(configFolder.getProject().getName());
 		}
-		for (final IConfigurationFormat format : formatExtensions) {
+		for (final IPersistentFormat<?> format : formatExtensions) {
 			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
 		}
 		try {
@@ -263,7 +264,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		return fileText.getText();
 	}
 
-	public IConfigurationFormat getFormat() {
+	public IPersistentFormat<Configuration> getFormat() {
 		return formatExtensions.get(formatCombo.getSelectionIndex());
 	}
 

@@ -58,6 +58,11 @@ public abstract class APersistentFormat<T> implements IPersistentFormat<T> {
 	}
 
 	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return supportsRead();
+	}
+
+	@Override
 	public boolean initExtension() {
 		return true;
 	}

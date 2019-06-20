@@ -31,18 +31,18 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 
 public class ConstraintToStringTest {
 
 	private IFeatureModelFactory getFMFactory() {
-		return FMFactoryManager.getDefaultFactory();
+		return DefaultFeatureModelFactory.getInstance();
 	}
 
 	@Test
 	public void testIffQuoteToString() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Equals(new Literal("A"), new Literal("implies")));
 		final String s = c.getNode().toString(NodeWriter.textualSymbols);
 
@@ -52,7 +52,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testStandardToString() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
 		final NodeWriter nodeWriter = new NodeWriter(c.getNode());
 		nodeWriter.setSymbols(NodeWriter.textualSymbols);
@@ -64,7 +64,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testAutoQuoteToString() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
 		Assert.assertEquals("A implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
@@ -72,7 +72,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testAutoQuoteToString2() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("A B"), new Literal("implies")));
 		Assert.assertEquals("\"A B\" implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
@@ -80,7 +80,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testAutoQuoteToString3() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("    A B    "), new Literal("implies")));
 		Assert.assertEquals("\"    A B    \" implies \"implies\"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
@@ -88,7 +88,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testAutoQuoteToString4() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("    A B    "), new Literal(" a b ")));
 		Assert.assertEquals("\"    A B    \" implies \" a b \"", c.getNode().toString(NodeWriter.textualSymbols));
 	}
@@ -96,7 +96,7 @@ public class ConstraintToStringTest {
 	@Test
 	public void testAutoQuoteToString5() {
 		final IFeatureModelFactory factory = getFMFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IConstraint c = factory.createConstraint(fm, new Implies(new Literal("a"), new Literal("b")));
 		Assert.assertEquals("a implies b", c.getNode().toString(NodeWriter.textualSymbols));
 	}
