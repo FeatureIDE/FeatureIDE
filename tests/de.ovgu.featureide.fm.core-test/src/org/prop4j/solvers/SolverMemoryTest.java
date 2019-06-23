@@ -20,19 +20,22 @@
  */
 package org.prop4j.solvers;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.impl.SatProblem;
-import org.prop4j.solvers.impl.javasmt.NewProblemSolverMemory;
+import org.prop4j.solvers.impl.javasmt.MutableSolverMemory;
 import org.prop4j.solvers.impl.javasmt.SolverMemory;
+
+import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Test to check the functionality of {@link SolverMemory}
@@ -42,104 +45,529 @@ import org.prop4j.solvers.impl.javasmt.SolverMemory;
 public class SolverMemoryTest {
 
 	private final SatProblem problem;
+	private final IFeatureModel model;
 
 	public SolverMemoryTest() {
 		final Literal A = new Literal("A");
-
-		final Node cnf = new And(A, new Or(new Literal("B", false), A), new Or(new Literal("C", false), A));
-		problem = new SatProblem(cnf.toRegularCNF());
+		model = Commons.loadTestFeatureModelFromFile("car.xml");
+		problem = new SatProblem(model.getAnalyser().getCnf());
 	}
 
-	public NewProblemSolverMemory<Node, Node> getNewEmptyMemory() {
-		return new NewProblemSolverMemory<>();
+	public MutableSolverMemory<Node, Node> getNewEmptyMemory() {
+		return new MutableSolverMemory<>();
 	}
 
-	public NewProblemSolverMemory<Node, Node> getNewFilledMemory() {
-		return new NewProblemSolverMemory<>(problem, Arrays.asList(problem.getClauses()));
-	}
-
-	@Test
-	public void testVariablesEmpty() {
-		final NewProblemSolverMemory<Node, Node> memory = getNewEmptyMemory();
-		memory.addVariable("A", 1);
-		memory.addVariable("B", 5);
-		memory.addVariable("C", 10);
-		assertTrue(memory.isVariablePresent("A"));
-		assertTrue(memory.isVariablePresent("B"));
-		assertTrue(memory.isVariablePresent("C"));
-		assertEquals(memory.getIndexOfVariable("A"), 1);
-		assertEquals(memory.getIndexOfVariable("B"), 5);
-		assertEquals(memory.getIndexOfVariable("C"), 10);
-		assertEquals(memory.getVariableOfIndex(1), "A");
-		assertEquals(memory.getVariableOfIndex(5), "B");
-		assertEquals(memory.getVariableOfIndex(10), "C");
+	public MutableSolverMemory<Node, Node> getNewFilledMemory(boolean isAnAssumptionAClause) {
+		return new MutableSolverMemory<>(problem, Arrays.asList(problem.getClauses()), isAnAssumptionAClause);
 	}
 
 	@Test
-	public void testVariablesFilled() {
-		final NewProblemSolverMemory<Node, Node> memory = getNewFilledMemory();
-		assertTrue(memory.isVariablePresent("A"));
-		assertTrue(memory.isVariablePresent("B"));
-		assertTrue(memory.isVariablePresent("C"));
+	public void testAddVariable() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
 
-		memory.addVariable("B", 2);
-		memory.addVariable("D", 885);
+		int result = memory.addVariable("Test Test");
+		assertTrue(result == 17);
+		result = memory.addVariable("Test 2");
+		assertTrue(result == 18);
+		result = memory.addVariable("Test 3");
+		assertTrue(result == 19);
 
-		assertEquals(memory.getIndexOfVariable("D"), 885);
-		assertEquals(memory.getVariableOfIndex(885), "D");
+		// Add again all three => should return 0 meaning already present
+		result = memory.addVariable("Test Test");
+		assertTrue(result == 0);
+		result = memory.addVariable("Test 2");
+		assertTrue(result == 0);
+		result = memory.addVariable("Test 3");
+		assertTrue(result == 0);
+
+		// Check that all feature are already registered as variables
+		for (int i = 0; i < problem.getNumberOfVariables(); i++) {
+			final Object var = problem.getVariableOfIndex(i);
+			if (var instanceof String) {
+				result = memory.addVariable((String) var);
+				assertTrue(result == 0);
+			}
+
+		}
 	}
 
 	@Test
-	public void testPushPopClauseEmpty() {
-		final NewProblemSolverMemory<Node, Node> memory = getNewEmptyMemory();
-		final Node testNode = new Or(new Literal("A"), new Literal("B"), new Literal("C"));
-		memory.push(testNode, testNode);
+	public void testGetAssumptionsAsList() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
 
-		assertEquals(testNode, memory.getClauseOfIndex(0));
-		assertEquals(0, memory.getIndexOfClause(testNode));
+		final Literal assumption1 = new Literal("USB", true);
+		final Literal assumption2 = new Literal("CD", false);
+		final Literal assumption3 = new Literal("Europe", true);
+		final Literal assumption4 = new Literal("Manual", false);
 
-		final Node node = memory.pop();
+		assertTrue(memory.getAssumptionsAsList().size() == 0);
+		// Push some assumptions
+		memory.pushAssumption(assumption1, assumption1);
+		assertTrue(memory.getAssumptionsAsList().size() == 1);
+		memory.pushAssumption(assumption2, assumption2);
+		assertTrue(memory.getAssumptionsAsList().size() == 2);
+		memory.pushAssumption(assumption3, assumption3);
+		assertTrue(memory.getAssumptionsAsList().size() == 3);
+		memory.pushAssumption(assumption4, assumption4);
+		assertTrue(memory.getAssumptionsAsList().size() == 4);
 
-		assertEquals(testNode, node);
-
-		memory.push(node, node);
-
-		assertEquals(node, memory.getClauseOfIndex(0));
-		assertEquals(0, memory.getIndexOfClause(testNode));
+		// Get all assumptions
+		final List<Node> assumptions = memory.getAssumptionsAsList();
+		// Check that assuptions nodes are always literals
+		for (final Node assumption : assumptions) {
+			assertTrue(assumption instanceof Literal);
+		}
 	}
 
 	@Test
-	public void testPushPopClauseFilled() {
-		final NewProblemSolverMemory<Node, Node> memory = getNewFilledMemory();
-		final Node testNode = new Or(new Literal("A"), new Literal("B"), new Literal("C"));
-		memory.push(testNode, testNode);
+	public void testGetClauseOfIndex() {
+		MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
 
-		assertEquals(testNode, memory.getClauseOfIndex(3));
-		assertEquals(3, memory.getIndexOfClause(testNode));
+		for (final Node clause : memory.getClausesAsList()) {
+			assertTrue(clause instanceof Or);
+		}
 
-		final Node node = memory.pop();
+		Node clauseOrig = problem.getClauses()[6];
+		Node clauseTemp = memory.getClauseOfIndex(6);
+		assertTrue(clauseOrig == clauseTemp);
 
-		assertEquals(testNode, node);
-		memory.push(node, node);
+		clauseOrig = problem.getClauses()[0];
+		clauseTemp = memory.getClauseOfIndex(0);
+		assertTrue(clauseOrig == clauseTemp);
 
-		assertEquals(node, memory.getClauseOfIndex(3));
-		assertEquals(3, memory.getIndexOfClause(testNode));
+		clauseOrig = problem.getClauses()[problem.getClauseCount() - 1];
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount() - 1);
+		assertTrue(clauseOrig == clauseTemp);
+
+		// Add new clause
+		Or newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(newClause == clauseTemp);
+
+		// Remove clause
+		memory.pop();
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == null);
+
+		// Add new assumption (memory is currently set to recognize assumptions as clauses)
+		Literal newAssumption = new Literal("GearboxTest", true);
+		memory.pushAssumption(newAssumption, newAssumption);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == newAssumption);
+
+		// Remove assumption
+		memory.pop();
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == null);
+
+		// Add both
+		memory.push(newClause, newClause);
+		memory.pushAssumption(newAssumption, newAssumption);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == newClause);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount() + 1);
+		assertTrue(clauseTemp == newAssumption);
+
+		// Now the same but now the assumptions are not recognized as clauses
+		memory = getNewFilledMemory(false);
+
+		for (final Node clause : memory.getClausesAsList()) {
+			assertTrue(clause instanceof Or);
+		}
+
+		clauseOrig = problem.getClauses()[6];
+		clauseTemp = memory.getClauseOfIndex(6);
+		assertTrue(clauseOrig == clauseTemp);
+
+		clauseOrig = problem.getClauses()[0];
+		clauseTemp = memory.getClauseOfIndex(0);
+		assertTrue(clauseOrig == clauseTemp);
+
+		clauseOrig = problem.getClauses()[problem.getClauseCount() - 1];
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount() - 1);
+		assertTrue(clauseOrig == clauseTemp);
+
+		// Add new clause
+		newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(newClause == clauseTemp);
+
+		// Remove clause
+		memory.pop();
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == null);
+
+		// Add new assumption (memory is currently set to not recognize assumptions as clauses)
+		newAssumption = new Literal("GearboxTest", true);
+		memory.pushAssumption(newAssumption, newAssumption);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == null);
+
+		// Remove assumption
+		memory.pop();
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == null);
+
+		// Add both
+		memory.push(newClause, newClause);
+		memory.pushAssumption(newAssumption, newAssumption);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount());
+		assertTrue(clauseTemp == newClause);
+		clauseTemp = memory.getClauseOfIndex(problem.getClauseCount() + 1);
+		assertTrue(clauseTemp == null);
+	}
+
+	@Test
+	public void testGetClausesAsNodeList() {
+		MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		assertTrue(memory.getClausesAsNodeList().size() == problem.getClauseCount());
+
+		// Add new Clause
+		final Node newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		assertTrue(memory.getClausesAsNodeList().contains(newClause));
+		memory.pop();
+		assertTrue(!memory.getClausesAsNodeList().contains(newClause));
+
+		// Add new assumption (memory is currently set to recognize assumptions as clauses)
+		final Literal newAssumption = new Literal("GearboxTest", true);
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.getClausesAsNodeList().contains(newAssumption));
+		memory.pop();
+		assertTrue(!memory.getClausesAsNodeList().contains(newAssumption));
+
+		memory = getNewFilledMemory(false);
+		// Add new assumption (memory is currently set to not recognize assumptions as clauses)
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(!memory.getClausesAsNodeList().contains(newAssumption));
+		memory.pop();
+		assertTrue(!memory.getClausesAsNodeList().contains(newAssumption));
+	}
+
+	@Test
+	public void testGetIndexOfClause() {
+		MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		for (final Node clause : memory.getClausesAsList()) {
+			assertTrue(clause instanceof Or);
+		}
+
+		for (int i = 0; i < memory.getClausesAsList().size(); i++) {
+			assertTrue(memory.getClauseOfIndex(i) != null);
+			assertTrue(memory.getClauseOfIndex(i) instanceof Or);
+		}
+
+		// Add new clause
+		Or newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		int index = memory.getIndexOfClause(newClause);
+		assertTrue(index == problem.getClauseCount());
+
+		// Remove clause
+		memory.pop();
+		index = memory.getIndexOfClause(newClause);
+		assertTrue(index == -1);
+
+		// Add new assumption (memory is currently set to recognize assumptions as clauses)
+		Literal newAssumption = new Literal("GearboxTest", true);
+		memory.pushAssumption(newAssumption, newAssumption);
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == problem.getClauseCount());
+
+		// Remove assumption
+		memory.pop();
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == -1);
+
+		// Add both
+		memory.push(newClause, newClause);
+		memory.pushAssumption(newAssumption, newAssumption);
+		index = memory.getIndexOfClause(newClause);
+		assertTrue(index == problem.getClauseCount());
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == (problem.getClauseCount() + 1));
+
+		// Now the same but now the assumptions are not recognized as clauses
+		memory = getNewFilledMemory(false);
+
+		// Add new clause
+		newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		index = memory.getIndexOfClause(newClause);
+		assertTrue(index == problem.getClauseCount());
+
+		// Remove clause
+		memory.pop();
+		index = memory.getIndexOfClause(newClause);
+		assertTrue(index == -1);
+
+		// Add new assumption (memory is currently set to recognize assumptions as clauses)
+		newAssumption = new Literal("GearboxTest", true);
+		memory.pushAssumption(newAssumption, newAssumption);
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == -1);
+
+		// Remove assumption
+		memory.pop();
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == -1);
+
+		// Add both
+		memory.push(newClause, newClause);
+		memory.pushAssumption(newAssumption, newAssumption);
+		index = memory.getIndexOfClause(newClause);
+		assertTrue(index == problem.getClauseCount());
+		index = memory.getIndexOfClause(newAssumption);
+		assertTrue(index == -1);
+	}
+
+	@Test
+	public void testGetIndexOfVariable() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		for (final IFeature feature : model.getFeatures()) {
+			final String featureName = feature.getName();
+			final int index = memory.getIndexOfVariable(featureName);
+			assertTrue(index != 0);
+		}
+
+		final String testString = "Test Test";
+		final int result = memory.addVariable(testString);
+		assertTrue(result == 17);
+		final int resultTemp = memory.getIndexOfVariable(testString);
+		assertTrue(result == resultTemp);
+	}
+
+	@Test
+	public void testGetSingedIndexOfVariable() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		for (final IFeature feature : model.getFeatures()) {
+			final String featureName = feature.getName();
+			final Literal newLit = new Literal(featureName, (Math.random() * 2) < 1 ? true : false);
+			final int indexOrig = memory.getIndexOfVariable(featureName);
+			final int indexSigned = memory.getSingedIndexOfVariable(newLit);
+			assertTrue(indexOrig == Math.abs(indexSigned));
+			if (newLit.positive) {
+				assertTrue(indexOrig == indexSigned);
+			} else {
+				assertTrue(indexOrig == -indexSigned);
+			}
+		}
+	}
+
+	@Test
+	public void testGetVariableOfIndex() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		final String test = "Test Test";
+		final int result = memory.addVariable(test);
+		assertTrue(result == 17);
+
+		Object var = memory.getVariableOfIndex(result);
+		assertTrue(var == test);
+
+		// Variable index 0 is always null
+		var = memory.getVariableOfIndex(0);
+		assertTrue(var == null);
+	}
+
+	@Test
+	public void testIsNextPopAssumption() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		assertTrue(!memory.isNextPopAssumption());
+
+		// add clause
+		final Node newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		assertTrue(!memory.isNextPopAssumption());
+
+		// Add Assumption
+		final Literal newAssumption = new Literal("GearboxTest");
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.isNextPopAssumption());
+
+		// add another clause
+		final Node newClause2 = new Or(new Literal("AAA"), new Literal("BBB"));
+		memory.push(newClause2, newClause2);
+		assertTrue(!memory.isNextPopAssumption());
 
 		memory.pop();
+		assertTrue(memory.isNextPopAssumption());
+		memory.pop();
+		assertTrue(!memory.isNextPopAssumption());
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.isNextPopAssumption());
+	}
 
-		final Node testNode4 = new Or(new Literal("B"), new Literal("A"), new Literal("C"));
-		final Node testNode5 = new Or(new Literal("C", false), new Literal("A"), new Literal("B"));
+	@Test
+	public void testIsVariablePresent() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
 
-		memory.push(testNode4, testNode4);
-		memory.push(testNode5, testNode5);
+		for (final IFeature feature : model.getFeatures()) {
+			final String featureName = feature.getName();
+			assertTrue(memory.isVariablePresent(featureName));
+		}
+		final String testVar = "Test Test";
+		assertTrue(!memory.isVariablePresent(testVar));
+		memory.addVariable(testVar);
+		assertTrue(memory.isVariablePresent(testVar));
+	}
 
-		assertEquals(testNode4, memory.getClauseOfIndex(3));
-		assertEquals(3, memory.getIndexOfClause(testNode4));
-		assertEquals(testNode5, memory.getClauseOfIndex(4));
-		assertEquals(4, memory.getIndexOfClause(testNode5));
+	@Test
+	public void testPeekNextNode() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
 
-		memory.push(testNode, testNode);
-		assertEquals(testNode, memory.getClauseOfIndex(5));
-		assertEquals(5, memory.getIndexOfClause(testNode));
+		assertTrue(memory.peekNextNode() == null);
+
+		// add clause
+		final Node newClause = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		memory.push(newClause, newClause);
+		assertTrue((memory.peekNextNode() instanceof Or));
+
+		// Add Assumption
+		final Literal newAssumption = new Literal("GearboxTest");
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue((memory.peekNextNode() instanceof Literal));
+
+		// add another clause
+		final Node newClause2 = new Or(new Literal("AAA"), new Literal("BBB"));
+		memory.push(newClause2, newClause2);
+		assertTrue((memory.peekNextNode() instanceof Or));
+
+		memory.pop();
+		assertTrue((memory.peekNextNode() instanceof Literal));
+		memory.pop();
+		assertTrue((memory.peekNextNode() instanceof Or));
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue((memory.peekNextNode() instanceof Literal));
+	}
+
+	@Test
+	public void testPop() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		final Literal newAssumption = new Literal("GearboxTest", true);
+		final Literal newAssumption2 = new Literal("Bluetooth", true);
+		final Node newClause1 = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		final Node newClause2 = new Or(new Literal("AAA"), new Literal("BBB"));
+
+		assertTrue(memory.pop() == null);
+
+		// Check Assumptions
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.pop() == newAssumption);
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.pop() == newAssumption2);
+		assertTrue(memory.pop() == newAssumption);
+
+		// Check clauses
+		memory.push(newClause1, newClause1);
+		assertTrue(memory.pop() == newClause1);
+		memory.push(newClause1, newClause1);
+		memory.push(newClause2, newClause2);
+		assertTrue(memory.pop() == newClause2);
+		assertTrue(memory.pop() == newClause1);
+
+		// Check both
+		memory.push(newClause1, newClause1);
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.push(newClause2, newClause2);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.pop() == newAssumption2);
+		assertTrue(memory.pop() == newClause2);
+		assertTrue(memory.pop() == newAssumption);
+		assertTrue(memory.pop() == newClause1);
+	}
+
+	@Test
+	public void testPopAssumption() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		final Literal newAssumption = new Literal("GearboxTest", true);
+		final Literal newAssumption2 = new Literal("Bluetooth", true);
+		final Node newClause1 = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		final Node newClause2 = new Or(new Literal("AAA"), new Literal("BBB"));
+
+		assertTrue(memory.popAssumption() == null);
+
+		// Check Assumptions
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.popAssumption() == newAssumption);
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.popAssumption() == newAssumption2);
+		assertTrue(memory.popAssumption() == newAssumption);
+
+		// Check clauses
+		memory.push(newClause1, newClause1);
+		assertTrue(memory.popAssumption() == null);
+		memory.pop();
+		memory.push(newClause1, newClause1);
+		memory.push(newClause2, newClause2);
+		assertTrue(memory.popAssumption() == null);
+		memory.pop();
+		assertTrue(memory.popAssumption() == null);
+		memory.pop();
+
+		// Check both
+		memory.push(newClause1, newClause1);
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.push(newClause2, newClause2);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.popAssumption() == newAssumption2);
+		assertTrue(memory.popAssumption() == null);
+		memory.pop();
+		assertTrue(memory.popAssumption() == newAssumption);
+		assertTrue(memory.popAssumption() == null);
+		memory.pop();
+	}
+
+	@Test
+	public void testPopClause() {
+		final MutableSolverMemory<Node, Node> memory = getNewFilledMemory(true);
+
+		final Literal newAssumption = new Literal("GearboxTest", true);
+		final Literal newAssumption2 = new Literal("Bluetooth", true);
+		final Node newClause1 = new Or(new Literal("GearboxTest"), new Literal("Bluetooth"));
+		final Node newClause2 = new Or(new Literal("AAA"), new Literal("BBB"));
+
+		assertTrue(memory.popClause() == null);
+
+		// Check Assumptions
+		memory.pushAssumption(newAssumption, newAssumption);
+		assertTrue(memory.popClause() == null);
+		memory.pop();
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.popClause() == null);
+		memory.pop();
+		assertTrue(memory.popClause() == null);
+		memory.pop();
+
+		// Check clauses
+		memory.push(newClause1, newClause1);
+		assertTrue(memory.popClause() == newClause1);
+		memory.push(newClause1, newClause1);
+		memory.push(newClause2, newClause2);
+		assertTrue(memory.popClause() == newClause2);
+		assertTrue(memory.popClause() == newClause1);
+
+		// Check both
+		memory.push(newClause1, newClause1);
+		memory.pushAssumption(newAssumption, newAssumption);
+		memory.push(newClause2, newClause2);
+		memory.pushAssumption(newAssumption2, newAssumption2);
+		assertTrue(memory.popClause() == null);
+		memory.pop();
+		assertTrue(memory.popClause() == newClause2);
+		assertTrue(memory.popClause() == null);
+		memory.pop();
+		assertTrue(memory.popClause() == newClause1);
 	}
 }

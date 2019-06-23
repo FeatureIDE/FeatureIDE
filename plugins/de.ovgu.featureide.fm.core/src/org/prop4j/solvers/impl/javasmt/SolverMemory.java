@@ -34,7 +34,7 @@ import org.prop4j.solver.Tupel;
 /**
  *
  * Represents the memory for the solver. It is possible to push and pop Nodes with a given representation of the constraints that are used for the specific
- * Solver. Also manges the mapping from nodes to index and index to nodes.
+ * Solver. Also manages the mapping from nodes to index and index to nodes.
  *
  * @author Joshua Sprey
  */
@@ -58,6 +58,18 @@ public class SolverMemory<T> {
 	 * Stack holds the correct order how the Nodes were pushed to the stack.
 	 */
 	private final LinkedList<Tupel<Node, T>> insertionStack = new LinkedList<>();
+
+	/** When true, then the pushed assumptions are included as own clauses for the solver. If false, then assumptions are skipped when retrieving indexes. */
+	public boolean isAssumtionAClause = true;
+
+	/***
+	 * Returns the current problem for the solver.
+	 *
+	 * @return Problem to solve
+	 */
+	public ISolverProblem getProblem() {
+		return problem;
+	}
 
 //	/**
 //	 * Maps Nodes to Formulas.
@@ -93,6 +105,19 @@ public class SolverMemory<T> {
 			return null;
 		}
 		final Tupel<Node, T> t = insertionStack.pop();
+		return t.key;
+	}
+
+	/**
+	 * Returns the node that is pushed next without removing it actually from the memory.
+	 *
+	 * @return Last Node which was pushed to the memory
+	 */
+	public Node peekStack() {
+		if (isStackEmpty()) {
+			return null;
+		}
+		final Tupel<Node, T> t = insertionStack.peek();
 		return t.key;
 	}
 

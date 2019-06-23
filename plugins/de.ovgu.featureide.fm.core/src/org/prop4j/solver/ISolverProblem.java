@@ -85,4 +85,11 @@ public interface ISolverProblem {
 	 */
 	Node[] getClauses();
 
+	/**
+	 * Returns the number of clauses.
+	 *
+	 * @return Clauses as array
+	 */
+	int getClauseCount();
+
 }

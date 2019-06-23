@@ -22,8 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.composite;
 
 import java.util.Arrays;
 
-import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
@@ -38,16 +37,15 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationE
 public class CompositeConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
 
 	/** Factory for LTMS. */
-	// private final ConfigurationExplanationCreatorFactory ltms = new LtmsConfigurationExplanationCreatorFactory();
+	private final ConfigurationExplanationCreatorFactory ltms = new MusConfigurationExplanationCreatorFactory(new LtmsSatSolverFactory());
 	/** Factory for Sat4J MUS. */
 	private final MusConfigurationExplanationCreatorFactory musSat4J = new MusConfigurationExplanationCreatorFactory();
-	/** Factory for JavaSmt MUS */
-	private final MusConfigurationExplanationCreatorFactory musJavaSmt =
-		new MusConfigurationExplanationCreatorFactory(new JavaSmtSatSolverFactory(Solvers.SMTINTERPOL));
+//	/** Factory for JavaSmt MUS */
+//	private final MusConfigurationExplanationCreatorFactory musJavaSmt =
+//		new MusConfigurationExplanationCreatorFactory(new JavaSmtSatSolverFactory(Solvers.SMTINTERPOL));
 
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		return new CompositeAutomaticSelectionExplanationCreator(
-				Arrays.asList(musJavaSmt.getAutomaticSelectionExplanationCreator(), musSat4J.getAutomaticSelectionExplanationCreator()));
+		return new CompositeAutomaticSelectionExplanationCreator(Arrays.asList(ltms.getAutomaticSelectionExplanationCreator()));
 	}
 }

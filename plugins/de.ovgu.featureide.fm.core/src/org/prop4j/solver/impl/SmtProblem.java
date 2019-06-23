@@ -193,4 +193,13 @@ public class SmtProblem implements ISmtProblem {
 	public String toString() {
 		return "SmtProblem[" + root.toString() + "]";
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauseCount()
+	 */
+	@Override
+	public int getClauseCount() {
+		return intToClause.length;
+	}
 }

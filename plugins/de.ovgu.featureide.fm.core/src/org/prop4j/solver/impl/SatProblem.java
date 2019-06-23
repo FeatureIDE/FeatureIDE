@@ -20,6 +20,7 @@
  */
 package org.prop4j.solver.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,9 +39,9 @@ public class SatProblem implements ISatProblem {
 
 	protected Node root;
 	protected HashMap<Object, Integer> varToInt = new HashMap<>();
-	protected Object[] intToVar;
+	protected ArrayList<Object> intToVar;
 	protected HashMap<Node, Integer> clauseToInt = new HashMap<>();
-	protected Node[] intToClause;
+	protected ArrayList<Node> intToClause;
 
 	/**
 	 * Initiates the problem with a root node and a given feature list that represent variables.
@@ -51,7 +52,7 @@ public class SatProblem implements ISatProblem {
 		root = rootNode;
 
 		if (rootNode != null) {
-			intToClause = new Node[rootNode.getChildren().length];
+			intToClause = new ArrayList<>();
 
 			if (!rootNode.isConjunctiveNormalForm()) {
 				rootNode = rootNode.toRegularCNF();
@@ -60,15 +61,16 @@ public class SatProblem implements ISatProblem {
 			// Create mapping from index to clauses starting from 0
 			int indexClauses = 0;
 			for (final Node node : rootNode.getChildren()) {
-				clauseToInt.put(node, indexClauses);
-				intToClause[indexClauses++] = node;
+				clauseToInt.put(node, indexClauses++);
+				intToClause.add(node);
 			}
 		} else {
-			intToClause = new Node[0];
+			intToClause = new ArrayList<>();
 		}
 
 		if (featureList != null) {
-			intToVar = new Object[featureList.size() + 1];
+			intToVar = new ArrayList<>();
+			intToVar.add(null);
 			// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
 			int indexVariables = 0;
 			for (final Object feature : featureList) {
@@ -77,10 +79,11 @@ public class SatProblem implements ISatProblem {
 					throw new RuntimeException();
 				}
 				varToInt.put(name, ++indexVariables);
-				intToVar[indexVariables] = name;
+				intToVar.add(name);
 			}
 		} else {
-			intToVar = new Object[1];
+			intToVar = new ArrayList<>();
+			intToVar.add(null);
 		}
 	}
 
@@ -151,10 +154,10 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node getClauseOfIndex(int index) {
-		if ((index >= intToClause.length)) {
+		if ((index >= intToClause.size())) {
 			return null;
 		}
-		return intToClause[index];
+		return intToClause.get(index);
 	}
 
 	/*
@@ -163,10 +166,10 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		if ((index >= intToVar.length)) {
+		if ((index >= intToVar.size())) {
 			return null;
 		}
-		return intToVar[Math.abs(index)];
+		return intToVar.get(Math.abs(index));
 	}
 
 	/*
@@ -175,7 +178,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.length - 1;
+		return intToVar.size() - 1;
 	}
 
 	/*
@@ -184,7 +187,8 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node[] getClauses() {
-		return intToClause;
+		return intToClause.toArray(new Node[getClauseCount()]);
+
 	}
 
 	/*
@@ -194,5 +198,31 @@ public class SatProblem implements ISatProblem {
 	@Override
 	public String toString() {
 		return "SatProblem[" + root.toString() + "]";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauseCount()
+	 */
+	@Override
+	public int getClauseCount() {
+		return intToClause.size();
+	}
+
+	/**
+	 * Adds a new clause to the problem.
+	 *
+	 * @param clause Clause to add
+	 * @return the index for the new clause
+	 */
+	protected int addClause(Node clause) {
+		if (clause.getChildren().length == 0) {
+			throw new IllegalArgumentException("Empty clause");
+		}
+		final int getNextIndex = getNumberOfVariables() + 1;
+		clauseToInt.put(clause, getNextIndex);
+		intToClause.add(clause);
+		// TODO SOLVER Testen
+		return getNextIndex;
 	}
 }
