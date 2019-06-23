@@ -240,6 +240,10 @@ public class MutableSolverMemory<T, A> {
 		}
 	}
 
+	public ISolverProblem getProblem() {
+		return problem;
+	}
+
 	/**
 	 * Returns the signed index of a given literal.
 	 *

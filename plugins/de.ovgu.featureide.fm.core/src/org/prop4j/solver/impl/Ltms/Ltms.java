@@ -44,7 +44,7 @@ import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
-import org.prop4j.solvers.impl.javasmt.SolverMemory;
+import org.prop4j.solvers.impl.javasmt.MutableSolverMemory;
 
 /**
  * <p> The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations. Uses BCP (boolean constraint propagation)
@@ -58,6 +58,7 @@ import org.prop4j.solvers.impl.javasmt.SolverMemory;
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
+ * @author Joshua Sprey
  */
 public class Ltms implements IMusExtractor, ISatSolver {
 
@@ -69,9 +70,6 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 * The literal whose truth value was derived during the most recent propagation.
 	 */
 	private Literal derivedLiteral;
-
-	/** Information about pushed assumptions and nodes */
-	protected SolverMemory<Node> memory;
 
 	/** Hold information about pushed nodes which can be clauses or assumptions. */
 	protected LinkedList<Node> pushstack = new LinkedList<>();
@@ -95,10 +93,14 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 * contained in this map, its truth value is considered unknown.
 	 */
 	private final Map<Object, Boolean> variableValues = new HashMap<>();
+
 	/**
 	 * The clause that was violated during the most recent contradiction check.
 	 */
 	private Integer violatedClause;
+
+	/** Contains information and mappings for pushed clauses and assumptions */
+	private final MutableSolverMemory<Node, Literal> memory;
 
 	public Ltms(ISatProblem problem, Node rootNode) {
 		// Cache the variable to clauses mapping
@@ -113,7 +115,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 				clauseSet.add(problem.getIndexOfClause(clause));
 			}
 		}
-		memory = new SolverMemory<Node>(problem, Arrays.asList(problem.getClauses()));
+		memory = new MutableSolverMemory<>(problem, Arrays.asList(problem.getClauses()), false);
 	}
 
 	/**
@@ -400,10 +402,10 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public Node pop() {
-		if (memory.isStackEmpty()) {
+		final Node pushedNode = memory.peekNextNode();
+		if (pushedNode == null) {
 			return null;
 		}
-		final Node pushedNode = memory.peekStack();
 		final int index = getIndexOfClause(pushedNode);
 		memory.pop();
 
@@ -416,7 +418,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 				}
 			}
 		} else if (pushedNode instanceof Literal) {
-			// Add assumption
+			// Remove assumption
 			final Literal l = (Literal) pushedNode;
 			variableValues.remove(l.var);
 		}
@@ -443,8 +445,10 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	@Override
 	public List<Node> popAll() {
 		final List<Node> poppedNodes = new ArrayList<>();
-		while (!memory.isStackEmpty()) {
-			poppedNodes.add(pop());
+		Node poppedNode = memory.pop();
+		while (poppedNode != null) {
+			poppedNodes.add(poppedNode);
+			poppedNode = memory.pop();
 		}
 		return poppedNodes;
 	}
@@ -464,10 +468,10 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public int push(Node formula) throws ContradictionException {
-		memory.push(formula, formula);
 		if (formula instanceof Or) {
+			memory.push(formula, formula);
 			// Add clause to memory
-			final int index = memory.getIndexOfNode(formula);
+			final int index = memory.getIndexOfClause(formula);
 			for (final Node child : formula.getChildren()) {
 				final Literal literal = (Literal) child;
 				Set<Integer> clauseSet = variableClauses.get(literal.var);
@@ -479,9 +483,10 @@ public class Ltms implements IMusExtractor, ISatSolver {
 			}
 			return 1;
 		} else if (formula instanceof Literal) {
+			memory.pushAssumption((Literal) formula, (Literal) formula);
 			// Add assumption
 			final Literal l = (Literal) formula;
-			variableValues.put(l.var, true);
+			variableValues.put(l.var, l.positive);
 			return 0;
 		}
 		return 0;
@@ -517,9 +522,8 @@ public class Ltms implements IMusExtractor, ISatSolver {
 		reasons.clear();
 		variableValues.clear();
 		// Apply assupmtions from the memory
-		for (final Node node : memory.getAssumtions()) {
-			final Literal lit = (Literal) node;
-			variableValues.put(lit.var, true);
+		for (final Literal lit : memory.getAssumptionsAsList()) {
+			variableValues.put(lit.var, lit.positive);
 		}
 	}
 
@@ -549,7 +553,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public int getIndexOfClause(Node clause) {
-		return memory.getIndexOfNode(clause);
+		return memory.getIndexOfClause(clause);
 	}
 
 	/*
@@ -558,7 +562,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public Node getClauseOfIndex(int index) {
-		return memory.getNodeOfIndex(index);
+		return memory.getClauseOfIndex(index);
 	}
 
 	/*
@@ -567,6 +571,6 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public List<Node> getClauses() {
-		return memory.getFormulasAsListWithoutAssumptions();
+		return memory.getClausesAsList();
 	}
 }
