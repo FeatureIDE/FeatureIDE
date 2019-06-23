@@ -42,6 +42,10 @@ public class JavaSmtSatSolverFactory extends SatSolverFactory {
 		this.solver = solver;
 	}
 
+	public JavaSmtSatSolverFactory() {
+		solver = Solvers.SMTINTERPOL;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()

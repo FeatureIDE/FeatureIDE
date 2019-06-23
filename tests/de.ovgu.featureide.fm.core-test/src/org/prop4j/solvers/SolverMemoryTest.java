@@ -48,7 +48,6 @@ public class SolverMemoryTest {
 	private final IFeatureModel model;
 
 	public SolverMemoryTest() {
-		final Literal A = new Literal("A");
 		model = Commons.loadTestFeatureModelFromFile("car.xml");
 		problem = new SatProblem(model.getAnalyser().getCnf());
 	}

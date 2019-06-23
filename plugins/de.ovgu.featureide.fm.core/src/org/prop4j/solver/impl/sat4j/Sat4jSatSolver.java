@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -279,6 +280,10 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public int push(Node formula) throws org.prop4j.solver.ContradictionException {
+		formula = formula.toCNF();
+		if (formula instanceof And) {
+			formula = formula.getChildren()[0];
+		}
 		if (formula instanceof Literal) {
 			final Literal literal = (Literal) formula;
 			assignment.push(getProblem().getSignedIndexOfVariable(literal));
@@ -444,6 +449,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public List<Node> getClauses() {
+		if (memory == null) {
+			return null;
+		}
 		return memory.getAllClauses();
 	}
 }

@@ -61,7 +61,7 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 
 	@Test
 	public void testMusContradiction() {
-		final IMusExtractor solver = getInstance(new And("A", new Literal("A", false)));
+		final IMusExtractor solver = getInstance(new And(new Or("A"), new Or(new Literal("A", false))));
 		final Set<Node> expected = new LinkedHashSet<>();
 		expected.add(new Or("A"));
 		expected.add(new Or(new Literal("A", false)));
@@ -71,7 +71,7 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 
 	@Test
 	public void testMusSatisfiable() {
-		final IMusExtractor solver = getInstance(new And("A", new Literal("B", false)));
+		final IMusExtractor solver = getInstance(new And(new Or("A"), new Or(new Literal("B", false))));
 		exception.expect(IllegalStateException.class);
 		solver.getMinimalUnsatisfiableSubset();
 	}

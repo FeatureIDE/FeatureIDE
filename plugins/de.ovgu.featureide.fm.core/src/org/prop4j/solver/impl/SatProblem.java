@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 import org.prop4j.solver.ISatProblem;
 
 /**
@@ -97,6 +98,12 @@ public class SatProblem implements ISatProblem {
 		}
 		if (!cnf.isConjunctiveNormalForm()) {
 			cnf = cnf.toRegularCNF();
+		} else {
+			for (int i = 0; i < cnf.getChildren().length; i++) {
+				if (cnf.getChildren()[i] instanceof Literal) {
+					cnf.getChildren()[i] = new Or(cnf.getChildren()[i]);
+				}
+			}
 		}
 		final HashSet<Object> result = new HashSet<>();
 		for (final Node clause : cnf.getChildren()) {

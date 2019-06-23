@@ -20,14 +20,12 @@
  */
 package org.prop4j.explain.solvers;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.Test;
 import org.prop4j.And;
@@ -48,17 +46,23 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 
 	@Test
 	public void testPush() throws ContradictionException {
-		final ISolver instance = getInstance(new And(new Or("A", new Literal("B", false))));
+		final ISolver instance = getInstance(new And(new Or("A", new Literal("B", false), "C")));
 		final List<Node> expected = new LinkedList<>();
-		expected.add(new Or("A", new Literal("B", false)));
-		assertEquals(expected, instance.getClauses());
+		expected.add(new Or("A", new Literal("B", false), "C"));
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Or("A", "C"));
 		expected.add(new Or("A", "C"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 
@@ -66,58 +70,79 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 	public void testPushEmpty() throws ContradictionException {
 		final ISolver instance = getInstance(null);
 		final List<Node> expected = Collections.emptyList();
-		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.getClauses() == null);
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		assertTrue(instance.getClauses() == null);
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 
 	@Test
 	public void testPushMultiple() throws ContradictionException {
-		final ISolver instance = getInstance(new And(new Or("A", "B")));
+		final ISolver instance = getInstance(new And(new Or("A", "B", "C", "D")));
 		final List<Node> expected = new LinkedList<>();
-		expected.add(new Or("A", "B"));
-		assertEquals(expected, instance.getClauses());
+		expected.add(new Or("A", "B", "C", "D"));
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
-		instance.push(new And(new Or("D", "A"), new Or("B", "D")));
+		instance.push(new Or("D", "A"));
+		instance.push(new Or("B", "D"));
 		expected.add(new Or("D", "A"));
 		expected.add(new Or("B", "D"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Or("C", "D"));
 		expected.add(new Or("C", "D"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Implies("C", "B"));
 		expected.add(new Or(new Literal("C", false), "B"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 
 	@Test
 	public void testPop() throws ContradictionException {
-		final ISolver instance = getInstance(new And(new Or("A", new Literal("B", false))));
+		final ISolver instance = getInstance(new And(new Or("A", new Literal("B", false), "C")));
 		final Deque<Node> expected = new LinkedList<>();
-		expected.add(new Or("A", new Literal("B", false)));
-		assertEquals(expected, instance.getClauses());
+		expected.add(new Or("A", new Literal("B", false), "C"));
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Or("A", "C"));
 		expected.add(new Or("A", "C"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 //
@@ -130,80 +155,112 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 
 	@Test
 	public void testPopMultiple() throws ContradictionException {
-		final ISolver instance = getInstance(new And(new Or("A", "B")));
+		final ISolver instance = getInstance(new And(new Or("A", "B", "C", "D")));
 		final Deque<Node> expected = new LinkedList<>();
-		expected.add(new Or("A", "B"));
-		assertEquals(expected, instance.getClauses());
+		expected.add(new Or("A", "B", "C", "D"));
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
-		instance.push(new And(new Or("D"), new Or("B", "D")));
+		instance.push(new Or("D"));
+		instance.push(new Or("B", "D"));
 		expected.add(new Or("D"));
 		expected.add(new Or("B", "D"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Or("C", "D"));
 		expected.add(new Or("C", "D"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
-		instance.pop();
+		instance.pop(3);
 		expected.removeLast();
 		expected.removeLast();
 		expected.removeLast();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Implies("C", "B"));
 		expected.add(new Or(new Literal("C", false), "B"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
-		exception.expect(NoSuchElementException.class);
 		instance.pop();
 	}
 
 	@Test
 	public void testPopUnit() throws ContradictionException {
-		final ISolver instance = getInstance(new And(new Or("A")));
+		final ISolver instance = getInstance(new And(new Or("A", "B")));
 		final Deque<Node> expected = new LinkedList<>();
-		expected.add(new Or("A"));
-		assertEquals(expected, instance.getClauses());
+		expected.add(new Or("A", "B"));
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Literal("B", true));
 		expected.add(new Or("B"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 
 	@Test
 	public void testPopAssumptions() throws ContradictionException {
-		final ISolver instance = getInstance(new And("A", "B"));
+		final ISolver instance = getInstance(new And(new Or("A"), new Or("B")));
 		final Deque<Node> expected = new LinkedList<>();
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Literal("A", false));
-		assertEquals(expected, instance.getClauses());
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
+		assertTrue(instance.isSatisfiable() == ISatResult.FALSE);
 		instance.pop();
-		assertEquals(expected, instance.getClauses());
+		for (final Node clause : instance.getClauses()) {
+			assertTrue(expected.contains(clause));
+		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 	}
 

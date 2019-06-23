@@ -1,0 +1,5 @@
+TODO SOLVER:
+
+*If pushing to solver I also need to accept the prop4j node Not(), not only Literal and Or
+*When pushing assumptions B, then -B, then B it should assume that B is only true
+*Pushing of new variables should b possible
