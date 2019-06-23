@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite;
 
 import java.util.Arrays;
 
+import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
@@ -38,7 +39,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreproc
 public class CompositePreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
 	/** Factory for LTMS. */
-	// private final PreprocessorExplanationCreatorFactory ltms = new LtmsPreprocessorExplanationCreatorFactory();
+	private final PreprocessorExplanationCreatorFactory ltms = new MusPreprocessorExplanationCreatorFactory(new LtmsSatSolverFactory());
 	/** Factory for Sat4J MUS. */
 	private final PreprocessorExplanationCreatorFactory musSat4j = new MusPreprocessorExplanationCreatorFactory();
 	/** Factory for JavaSMT MUS. */
@@ -47,7 +48,7 @@ public class CompositePreprocessorExplanationCreatorFactory extends Preprocessor
 
 	@Override
 	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
-		return new CompositeInvariantPresenceConditionExplanationCreator(
-				Arrays.asList(musJavaSMT.getInvariantPresenceConditionExplanationCreator(), musSat4j.getInvariantPresenceConditionExplanationCreator()));
+		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.asList(ltms.getInvariantPresenceConditionExplanationCreator(),
+				musSat4j.getInvariantPresenceConditionExplanationCreator(), musJavaSMT.getInvariantPresenceConditionExplanationCreator()));
 	}
 }

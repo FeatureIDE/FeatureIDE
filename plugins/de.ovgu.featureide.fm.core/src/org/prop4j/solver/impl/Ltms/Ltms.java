@@ -71,6 +71,8 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	private Literal derivedLiteral;
 
+	/** Contains information and mappings for pushed clauses and assumptions */
+	private final MutableSolverMemory<Node, Literal> memory;
 	/** Hold information about pushed nodes which can be clauses or assumptions. */
 	protected LinkedList<Node> pushstack = new LinkedList<>();
 	/**
@@ -82,6 +84,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 * The stack to collect unit-open clauses.
 	 */
 	private final Deque<Integer> unitOpenClauses = new LinkedList<>();
+
 	/**
 	 * Variables mapped to the clauses they are contained in. Redundant map for the sake of performance.
 	 */
@@ -98,9 +101,6 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 * The clause that was violated during the most recent contradiction check.
 	 */
 	private Integer violatedClause;
-
-	/** Contains information and mappings for pushed clauses and assumptions */
-	private final MutableSolverMemory<Node, Literal> memory;
 
 	public Ltms(ISatProblem problem, Node rootNode) {
 		// Cache the variable to clauses mapping
@@ -202,6 +202,24 @@ public class Ltms implements IMusExtractor, ISatSolver {
 		return antecedents;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getClauseOfIndex(int)
+	 */
+	@Override
+	public Node getClauseOfIndex(int index) {
+		return memory.getClauseOfIndex(index);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getClauses()
+	 */
+	@Override
+	public List<Node> getClauses() {
+		return memory.getClausesAsList();
+	}
+
 	/**
 	 * Returns an explanation why the premises lead to a contradiction.
 	 *
@@ -245,6 +263,15 @@ public class Ltms implements IMusExtractor, ISatSolver {
 			};
 		}
 		return variableClauses.get(derivedLiteral.var);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getIndexOfClause(org.prop4j.Node)
+	 */
+	@Override
+	public int getIndexOfClause(Node clause) {
+		return memory.getIndexOfClause(clause);
 	}
 
 	@Override
@@ -521,7 +548,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 		derivedLiteral = null;
 		reasons.clear();
 		variableValues.clear();
-		// Apply assupmtions from the memory
+		// Apply assumptions from the memory
 		for (final Literal lit : memory.getAssumptionsAsList()) {
 			variableValues.put(lit.var, lit.positive);
 		}
@@ -545,32 +572,5 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	public boolean setConfiguration(String key, Object value) {
 		// No configuration options available
 		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolver#getIndexOfClause(org.prop4j.Node)
-	 */
-	@Override
-	public int getIndexOfClause(Node clause) {
-		return memory.getIndexOfClause(clause);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolver#getClauseOfIndex(int)
-	 */
-	@Override
-	public Node getClauseOfIndex(int index) {
-		return memory.getClauseOfIndex(index);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolver#getClauses()
-	 */
-	@Override
-	public List<Node> getClauses() {
-		return memory.getClausesAsList();
 	}
 }
