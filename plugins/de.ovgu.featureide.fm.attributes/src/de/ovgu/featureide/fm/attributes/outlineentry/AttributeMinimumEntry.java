@@ -31,6 +31,10 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 
 	}
 
+	public Double getResult() {
+		return result;
+	}
+
 	@Override
 	public String getLabel() {
 		if (attribute instanceof LongFeatureAttribute) {

@@ -116,15 +116,26 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		final Group dialogGroup = new Group(container, SWT.SHADOW_IN);
 		dialogGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		dialogGroup.setText(CONFIGURATION_DIALOGS);
-		final Button constraintViewButton = new Button(dialogGroup, SWT.CHECK);
 
-		constraintViewButton.setText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TEXT);
-		constraintViewButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP);
-		constraintViewButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "default")));
-		constraintViewButton.addSelectionListener(new SelectionAdapter() {
+		final Button constraintViewRememberButton = new Button(dialogGroup, SWT.CHECK);
+		constraintViewRememberButton.setText(StringTable.CONFIGURATION_DIALOGS_REMEMBER_CONSTRAINT_TEXT);
+		constraintViewRememberButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP);
+		constraintViewRememberButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "default")));
+		constraintViewRememberButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewButton.getSelection()));
+				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewRememberButton.getSelection()));
+			}
+		});
+
+		final Button constraintViewDecisionButton = new Button(dialogGroup, SWT.CHECK);
+		constraintViewDecisionButton.setText(StringTable.CONFIGURATION_DIALOGS_DECISION_CONSTRAINT_TEXT);
+		constraintViewDecisionButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP);
+		constraintViewDecisionButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "default")));
+		constraintViewDecisionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, String.valueOf(constraintViewDecisionButton.getSelection()));
 			}
 		});
 
