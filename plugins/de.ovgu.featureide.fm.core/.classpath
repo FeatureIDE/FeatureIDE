@@ -2,30 +2,36 @@
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/java-cup-11a.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/parser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/princess-all.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/princess.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/scala-library-2.11.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/smt-parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar" sourcepath="C:/Users/Joshua/Documents/sat4j.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.pb.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/common-0.3000-229-g055f2fd.jar"/>
-	<classpathentry kind="lib" path="lib/error_prone_annotations-2.2.0.jar"/>
-	<classpathentry kind="lib" path="lib/guava-23.6-jre.jar"/>
 	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
 	<classpathentry kind="lib" path="lib/guava-testlib-23.6-jre.jar"/>
-	<classpathentry kind="lib" path="lib/javasmt-1.0.1-219-g535f988.jar"/>
-	<classpathentry kind="lib" path="lib/jsr305-3.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/smtinterpol-2.1-335-g4c543a5.jar"/>
-	<classpathentry kind="lib" path="lib/spotbugs-annotations-3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/truth-0.39.jar"/>
 	<classpathentry kind="lib" path="lib/truth-java8-extension-0.39.jar"/>
-	<classpathentry kind="lib" path="lib/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/animal-sniffer-annotations-1.17.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/checker-qual-2.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/common-0.3000-323-ge8e29f7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/error_prone_annotations-2.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/failureaccess-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/guava-27.0.1-jre.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/j2objc-annotations-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/java-smt-2.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/jsr305-3.0.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/smtinterpol-2.5-66-g453d36e.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/spotbugs-annotations-3.1.9-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -260,7 +260,7 @@ public class Prop4JToJavaSmtTranslator {
 			case Function.DIVISION:
 				return currentIntegerFormulaManager.divide(leftChild, rightChild);
 			default:
-				throw new RuntimeException("The given function is not supported by JavaSMT: " + function.type);
+				throw new RuntimeException("The given function is not supported by JavaSMT Integer: " + function.type);
 			}
 		} else {
 
@@ -273,8 +273,6 @@ public class Prop4JToJavaSmtTranslator {
 				}
 			case Function.SUBSTRACT:
 				return currentRationalFormulaManager.subtract(childs[0], childs[1]);
-			case Function.MODULO:
-				return currentRationalFormulaManager.modulo(childs[0], childs[1]);
 			case Function.MULTIPLY:
 				return currentRationalFormulaManager.multiply(childs[0], childs[1]);
 			case Function.NEGATE:
@@ -282,7 +280,7 @@ public class Prop4JToJavaSmtTranslator {
 			case Function.DIVISION:
 				return currentRationalFormulaManager.divide(childs[0], childs[1]);
 			default:
-				throw new RuntimeException("The given function is not supported by JavaSMT: " + function.type);
+				throw new RuntimeException("The given function is not supported by JavaSMT Rational Numbers: " + function.type);
 			}
 		}
 
