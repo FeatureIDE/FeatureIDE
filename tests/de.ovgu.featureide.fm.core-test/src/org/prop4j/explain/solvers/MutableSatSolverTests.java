@@ -224,7 +224,7 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		}
 		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
 		instance.push(new Literal("B", true));
-		expected.add(new Or("B"));
+		expected.add(new Literal("B", true));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}

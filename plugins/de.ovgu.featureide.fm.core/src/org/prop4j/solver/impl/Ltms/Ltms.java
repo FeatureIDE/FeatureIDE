@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -217,6 +218,9 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public List<Node> getClauses() {
+		if ((getProblem() == null) || (getProblem().getClauseCount() == 0)) {
+			return null;
+		}
 		return memory.getClausesAsList();
 	}
 
@@ -495,6 +499,13 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public int push(Node formula) throws ContradictionException {
+		formula = formula.toCNF();
+		if (formula instanceof And) {
+			if (formula.getChildren().length > 1) {
+				return 0;
+			}
+			formula = formula.getChildren()[0];
+		}
 		if (formula instanceof Or) {
 			memory.push(formula, formula);
 			// Add clause to memory

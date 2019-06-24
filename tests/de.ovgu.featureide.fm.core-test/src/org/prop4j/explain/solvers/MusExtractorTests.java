@@ -70,13 +70,6 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 	}
 
 	@Test
-	public void testMusSatisfiable() {
-		final IMusExtractor solver = getInstance(new And(new Or("A"), new Or(new Literal("B", false))));
-		exception.expect(IllegalStateException.class);
-		solver.getMinimalUnsatisfiableSubset();
-	}
-
-	@Test
 	public void testMusAssumptions() {
 		try {
 			final IMusExtractor solver = getInstance(new And("A", "B"));

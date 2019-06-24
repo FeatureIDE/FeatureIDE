@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/java-cup-11a.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/parser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/scala-library-2.11.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/animal-sniffer-annotations-1.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/checker-qual-2.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/com.microsoft.z3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/common-0.3000-323-ge8e29f7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/error_prone_annotations-2.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/failureaccess-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/guava-27.0.1-jre.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/j2objc-annotations-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/java-smt-2.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/jsr305-3.0.2-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/smtinterpol-2.5-66-g453d36e.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/spotbugs-annotations-3.1.9-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guava-r09.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar" sourcepath="C:/Users/Joshua/Documents/sat4j.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.pb.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
@@ -16,10 +27,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
-	<classpathentry kind="lib" path="lib/guava-testlib-23.6-jre.jar"/>
-	<classpathentry kind="lib" path="lib/truth-0.39.jar"/>
-	<classpathentry kind="lib" path="lib/truth-java8-extension-0.39.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/checker-qual-2.5.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Joshua/0_GIT/FeatureIDE/plugins/de.ovgu.featureide.fm.core/lib/javaSmt/com.microsoft.z3.jar"/>

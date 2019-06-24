@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -207,6 +208,13 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public int push(Node formula) {
+		formula = formula.toCNF();
+		if (formula instanceof And) {
+			if (formula.getChildren().length > 1) {
+				return 0;
+			}
+			formula = formula.getChildren()[0];
+		}
 		if ((formula instanceof Literal) || (formula instanceof Or)) {
 			final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
 			pushstack.push(formula, formulaJavaSmt);
@@ -307,6 +315,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public List<Node> getClauses() {
+		if ((getProblem() == null) || (getProblem().getClauseCount() == 0)) {
+			return null;
+		}
 		return pushstack.getAllClauses();
 	}
 

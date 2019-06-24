@@ -282,6 +282,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	public int push(Node formula) throws org.prop4j.solver.ContradictionException {
 		formula = formula.toCNF();
 		if (formula instanceof And) {
+			if (formula.getChildren().length > 1) {
+				return 0;
+			}
 			formula = formula.getChildren()[0];
 		}
 		if (formula instanceof Literal) {
@@ -449,7 +452,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public List<Node> getClauses() {
-		if (memory == null) {
+		if ((getProblem() == null) || (getProblem().getClauseCount() == 0)) {
 			return null;
 		}
 		return memory.getAllClauses();
