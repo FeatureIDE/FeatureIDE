@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,16 +28,11 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.IteratorFactory.IteratorID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.MergeIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.CoverAll;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.CoverAll2;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICoverStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICoverStrategy.CombinationStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceConditionManager;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseCombiner;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationUtil;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
@@ -121,7 +116,15 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	});
 
-	public TWiseConfigurationGenerator(CNF cnf, int maxSampleSize, int t, List<List<ClauseList>> nodes) {
+	public TWiseConfigurationGenerator(CNF cnf, int t) {
+		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, Integer.MAX_VALUE);
+	}
+
+	public TWiseConfigurationGenerator(CNF cnf, List<List<ClauseList>> nodes, int t) {
+		this(cnf, nodes, t, Integer.MAX_VALUE);
+	}
+
+	public TWiseConfigurationGenerator(CNF cnf, List<List<ClauseList>> nodes, int t, int maxSampleSize) {
 		super(cnf, maxSampleSize);
 		this.t = t;
 
@@ -132,6 +135,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util.computeMIG();
 		}
 
+		util.setRandom(random);
 		util.setMaxSampleSize(maxSampleSize);
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		combiner = new TWiseCombiner(cnf.getVariables().size());
@@ -156,9 +160,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void buildCombinations() {
-		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
+		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Partition);
 		final List<ICoverStrategy> phaseList = Arrays.asList(//
-				new CoverAll2(util), new CoverAll(util));
+//				new CoverAll(util), //
+				new CoverAll2(util, presenceConditionManager, t), //
+				new CoverAll(util));
 		numberOfCombinations = it.size();
 		try {
 			samplingMonitor.start();
@@ -186,6 +192,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 						combinedCondition.clear();
 						break;
 					default:
+						combinedCondition.clear();
 						break;
 					}
 				}

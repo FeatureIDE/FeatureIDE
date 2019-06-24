@@ -18,21 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
-public class InverseDefaultIterator extends ACombinationIterator {
+public class DefaultIterator extends ACombinationIterator {
 
-	public InverseDefaultIterator(int t, List<PresenceCondition> expressions) {
+	public DefaultIterator(int t, List<PresenceCondition> expressions) {
 		super(t, expressions);
 	}
 
 	@Override
 	protected long nextIndex() {
-		return numCombinations - counter;
+		return counter - 1;
 	}
 
 }

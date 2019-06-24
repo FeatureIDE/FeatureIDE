@@ -18,58 +18,72 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
-public class PartitionIterator extends ACombinationIterator {
+/**
+ *
+ * @author Sebastian Krieter
+ */
+public class LexicographicIterator extends ACombinationIterator {
 
-	protected final int[][] dim;
-	private final int[] pos;
-	private final int radix;
+	private final int[] c;
 
-	public PartitionIterator(int t, List<PresenceCondition> expressions) {
-		this(t, expressions, 2);
+	public LexicographicIterator(int t, List<PresenceCondition> expressions) {
+		super(t, expressions);
+		c = new int[t];
+		for (int i = 0; i < (c.length - 1); i++) {
+			c[i] = i;
+		}
+		c[t - 1] = t - 2;
 	}
 
-	protected PartitionIterator(int t, List<PresenceCondition> expressions, int dimNumber) {
-		super(t, expressions);
-
-		final int numDim = dimNumber * t;
-		radix = (int) Math.ceil(Math.pow(numCombinations, 1.0 / numDim));
-		dim = new int[numDim][radix];
-		pos = new int[numDim];
-
-		for (int i = 0; i < dim.length; i++) {
-			final int[] dimArray = dim[i];
-			for (int j = 0; j < radix; j++) {
-				dimArray[j] = j;
+	@Override
+	protected int[] computeCombination(long index) {
+		int i = t;
+		for (; i > 0; i--) {
+			final int ci = ++c[i - 1];
+			if (ci < ((n - t) + i)) {
+				break;
 			}
 		}
+		if ((i == 0) && (c[i] == ((n - t) + 1))) {
+			return null;
+		}
+
+		for (; i < t; i++) {
+			if (i == 0) {
+				c[i] = 0;
+			} else {
+				c[i] = c[i - 1] + 1;
+			}
+		}
+		return c;
 	}
 
 	@Override
 	protected long nextIndex() {
-		int result;
-		do {
-			result = 0;
-			for (int i = 0; i < pos.length; i++) {
-				result += Math.pow(radix, i) * dim[i][pos[i]];
-			}
-			for (int i = pos.length - 1; i >= 0; i--) {
-				final int p = pos[i];
-				if ((p + 1) < radix) {
-					pos[i] = p + 1;
-					break;
-				} else {
-					pos[i] = 0;
-				}
-			}
-		} while (result >= numCombinations);
-
-		return result;
+		return 0;
 	}
 
+	@Override
+	public long getIndex() {
+		long index = 0;
+		for (int i = 0; i < c.length; i++) {
+			index += binomialCalculator.binomial(c[i], i + 1);
+		}
+		return index;
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		for (int i = 0; i < (c.length - 1); i++) {
+			c[i] = i;
+		}
+		c[t - 1] = t - 2;
+	}
 }

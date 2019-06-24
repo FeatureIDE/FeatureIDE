@@ -28,14 +28,12 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationUtil;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class CoverSingle implements ICoverStrategy {
+class CoverSingle implements ICoverStrategy {
 
 	private final TWiseConfigurationUtil util;
 

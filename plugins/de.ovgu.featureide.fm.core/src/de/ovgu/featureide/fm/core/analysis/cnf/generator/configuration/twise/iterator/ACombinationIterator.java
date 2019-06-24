@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
 import java.util.Iterator;
 import java.util.List;

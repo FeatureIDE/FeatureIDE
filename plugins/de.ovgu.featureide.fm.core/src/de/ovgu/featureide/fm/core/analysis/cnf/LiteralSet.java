@@ -39,7 +39,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	private static final long serialVersionUID = 8948014814795787431L;
 
-	protected int[] literals;
+	protected final int[] literals;
 
 	private int hashCode;
 
@@ -52,7 +52,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	 * @return A newly constructed clause from the given literals (negated).
 	 */
 	public static LiteralSet getBlockingClause(int... literals) {
-		return new LiteralSet(SatUtils.negateSolution(literals));
+		return new LiteralSet(literals).negate();
 	}
 
 	/**
@@ -62,7 +62,23 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	 * @return A newly constructed clause from the given literals.
 	 */
 	public static LiteralSet getClause(int... literals) {
-		return new LiteralSet(SatUtils.negateSolution(literals));
+		return new LiteralSet(literals);
+	}
+
+	/**
+	 * Sets the value at position i of solution1 to 0 if the value of solution2 at position i is different.
+	 *
+	 * @param solution1 First solution.
+	 * @param solution2 Second solution.
+	 */
+	public static void resetConflicts(final int[] solution1, int[] solution2) {
+		for (int i = 0; i < solution1.length; i++) {
+			final int x = solution1[i];
+			final int y = solution2[i];
+			if (x != y) {
+				solution1[i] = 0;
+			}
+		}
 	}
 
 	/**
@@ -327,6 +343,12 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return count;
 	}
 
+	/**
+	 * Returns a copy of the given array with all entries negated.
+	 *
+	 * @param solution the given array
+	 * @return Array with negated entries.
+	 */
 	public LiteralSet negate() {
 		final int[] negLiterals = new int[literals.length];
 		switch (order) {
@@ -398,8 +420,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	 * @param literalSet The initial literal set.
 	 * @param unwantedVariables An array of variables that should be removed.
 	 * @return A new literal set or {@code null}, if the initial set contained a literal and its negation.
-	 *
-	 * @see #cleanLiteralArray(int[], int...)
 	 */
 	@CheckForNull
 	public LiteralSet clean(int... unwantedVariables) {
@@ -471,6 +491,14 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 			newLiterals[i] = newVariables.getVariable(oldVariables.getName(l), l > 0);
 		}
 		return new LiteralSet(newLiterals);
+	}
+
+	public String toBinaryString() {
+		final StringBuilder sb = new StringBuilder(literals.length);
+		for (final int literal : literals) {
+			sb.append(literal == 0 ? '?' : literal < 0 ? '0' : '1');
+		}
+		return sb.toString();
 	}
 
 }

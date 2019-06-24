@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +26,8 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.LexicographicIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceConditionManager;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.LexicographicIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 
 /**

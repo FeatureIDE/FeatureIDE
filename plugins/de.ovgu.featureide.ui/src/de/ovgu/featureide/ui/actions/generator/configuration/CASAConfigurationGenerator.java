@@ -48,7 +48,7 @@ public class CASAConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new SPLCAToolConfigurationGenerator(cnf, numberOfConfigurations, t, "CASA");
+		return new SPLCAToolConfigurationGenerator(cnf, "CASA", t, numberOfConfigurations);
 	}
 
 	@Override

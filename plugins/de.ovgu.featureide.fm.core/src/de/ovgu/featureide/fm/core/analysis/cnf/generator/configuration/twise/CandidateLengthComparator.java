@@ -20,50 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Comparator;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
+ * Compares two candidates for covering consisting of a partial configuration and a literal set. Considers number of literals in the partial configuration and
+ * in the literal set.
  *
  * @author Sebastian Krieter
  */
-public class PresenceCondition extends ClauseList {
-
-	private static final long serialVersionUID = 1L;
-
-	private final TreeSet<Integer> groups = new TreeSet<>();
-
-	public PresenceCondition() {
-		super();
-	}
-
-	public PresenceCondition(ClauseList otherClauseList) {
-		super(otherClauseList);
-	}
-
-	public PresenceCondition(Collection<? extends LiteralSet> c) {
-		super(c);
-	}
-
-	public PresenceCondition(int size) {
-		super(size);
-	}
-
-	public void addGroup(int group) {
-		groups.add(group);
-	}
-
-	public Set<Integer> getGroups() {
-		return groups;
-	}
+class CandidateLengthComparator implements Comparator<Pair<LiteralSet, TWiseConfiguration>> {
 
 	@Override
-	public String toString() {
-		return "PresenceCondition [" + super.toString() + "]";
+	public int compare(Pair<LiteralSet, TWiseConfiguration> o1, Pair<LiteralSet, TWiseConfiguration> o2) {
+		final int diff = o2.getValue().countLiterals - o1.getValue().countLiterals;
+		return diff != 0 ? diff : o2.getKey().size() - o1.getKey().size();
 	}
 
 }

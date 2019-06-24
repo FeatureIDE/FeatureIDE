@@ -47,9 +47,9 @@ public class ModuleConfigurationGenerator extends ACNFConfigurationGenerator {
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		final int featureVariable = cnf.getVariables().getVariable(featureName);
-		final List<List<ClauseList>> expressions = de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator
+		final List<List<ClauseList>> expressions = de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator
 				.convertLiterals(new LiteralSet(featureVariable, -featureVariable));
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, 2, 1, expressions);
+		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator(cnf, expressions, 1, 2);
 	}
 
 }

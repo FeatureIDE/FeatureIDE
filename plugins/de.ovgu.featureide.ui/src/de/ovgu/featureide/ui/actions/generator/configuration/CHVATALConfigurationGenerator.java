@@ -42,7 +42,7 @@ public class CHVATALConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new SPLCAToolConfigurationGenerator(cnf, numberOfConfigurations, t, "Chvatal");
+		return new SPLCAToolConfigurationGenerator(cnf, "Chvatal", t, numberOfConfigurations);
 	}
 
 }

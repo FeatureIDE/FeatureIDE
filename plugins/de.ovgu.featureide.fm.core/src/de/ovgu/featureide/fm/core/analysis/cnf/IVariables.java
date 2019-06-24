@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -43,11 +42,11 @@ public interface IVariables extends Cloneable {
 
 	List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative, boolean markNegative);
 
-	LiteralSet convertToVariables(Collection<String> variableNames);
+	LiteralSet convertToVariables(Iterable<String> variableNames);
 
-	LiteralSet convertToVariables(Collection<String> variableNames, boolean sign);
+	LiteralSet convertToVariables(Iterable<String> variableNames, boolean sign);
 
-	LiteralSet convertToLiterals(Collection<String> variableNames, boolean includePositive, boolean includeNegative);
+	LiteralSet convertToLiterals(Iterable<String> variableNames, boolean includePositive, boolean includeNegative);
 
 	int size();
 
@@ -62,5 +61,7 @@ public interface IVariables extends Cloneable {
 	String[] getNames();
 
 	IVariables clone();
+
+	LiteralSet getLiterals();
 
 }

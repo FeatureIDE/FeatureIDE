@@ -18,24 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
-import java.util.Comparator;
+import java.security.SecureRandom;
+import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
-/**
- * Compares two candidates for covering consisting of a partial configuration and a literal set. Considers number of literals in the partial configuration and
- * in the literal set.
- *
- * @author Sebastian Krieter
- */
-public class CandidateLengthComparator implements Comparator<Pair<LiteralSet, TWiseConfiguration>> {
+public class RandomPartitionIterator extends PartitionIterator {
 
-	@Override
-	public int compare(Pair<LiteralSet, TWiseConfiguration> o1, Pair<LiteralSet, TWiseConfiguration> o2) {
-		final int diff = o2.getValue().countLiterals - o1.getValue().countLiterals;
-		return diff != 0 ? diff : o2.getKey().size() - o1.getKey().size();
+	private static final byte[] seed = new byte[32];
+	{
+		new SecureRandom(new byte[0]).nextBytes(seed);
+	}
+
+	public RandomPartitionIterator(int t, List<PresenceCondition> expressions) {
+		super(t, expressions, 4);
+
+		final SecureRandom rand = new SecureRandom(seed);
+		for (int i = 0; i < dim.length; i++) {
+			final int[] dimArray = dim[i];
+			for (int j = dimArray.length - 1; j >= 0; j--) {
+				final int index = rand.nextInt(j + 1);
+				final int a = dimArray[index];
+				dimArray[index] = dimArray[j];
+				dimArray[j] = a;
+			}
+		}
 	}
 
 }

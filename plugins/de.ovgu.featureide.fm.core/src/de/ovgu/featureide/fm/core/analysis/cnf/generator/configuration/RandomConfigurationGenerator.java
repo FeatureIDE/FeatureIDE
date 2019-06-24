@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -50,11 +49,12 @@ public class RandomConfigurationGenerator extends ARandomConfigurationGenerator 
 			if (solution == null) {
 				break;
 			}
-			addResult(new LiteralSet(solution, Order.INDEX, false));
+			final LiteralSet result = new LiteralSet(solution, Order.INDEX, false);
+			addResult(result);
 			monitor.step();
 			if (!allowDuplicates) {
 				try {
-					solver.addClause(new LiteralSet(SatUtils.negateSolution(solution)));
+					solver.addClause(result.negate());
 				} catch (final RuntimeContradictionException e) {
 					break;
 				}

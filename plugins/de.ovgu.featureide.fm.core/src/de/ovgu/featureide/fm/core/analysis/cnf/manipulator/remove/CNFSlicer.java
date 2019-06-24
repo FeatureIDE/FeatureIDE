@@ -327,12 +327,7 @@ public class CNFSlicer extends AbstractManipulator {
 	}
 
 	protected final boolean isRedundant(ISimpleSatSolver solver, LiteralSet curClause) {
-		final int[] literals = curClause.getLiterals();
-		final int[] literals2 = new int[literals.length];
-		for (int i = 0; i < literals.length; i++) {
-			literals2[i] = -literals[i];
-		}
-		switch (solver.hasSolution(literals2)) {
+		switch (solver.hasSolution(curClause.negate())) {
 		case FALSE:
 			return true;
 		case TIMEOUT:

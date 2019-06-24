@@ -24,15 +24,13 @@ import java.util.Comparator;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.CandidateLengthComparator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public interface ICoverStrategy {
+interface ICoverStrategy {
 
 	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
 

@@ -18,21 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.List;
+import java.util.Comparator;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
-
-public class DefaultIterator extends ACombinationIterator {
-
-	public DefaultIterator(int t, List<PresenceCondition> expressions) {
-		super(t, expressions);
-	}
+class TWiseConfigurationRankComparator implements Comparator<TWiseConfiguration> {
 
 	@Override
-	protected long nextIndex() {
-		return counter - 1;
+	public int compare(TWiseConfiguration arg0, TWiseConfiguration arg1) {
+		final int rankDiff = arg1.rank - arg0.rank;
+		return rankDiff != 0 ? rankDiff : arg0.countLiterals - arg1.countLiterals;
 	}
 
 }

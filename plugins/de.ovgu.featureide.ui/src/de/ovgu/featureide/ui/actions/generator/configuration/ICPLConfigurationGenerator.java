@@ -42,7 +42,7 @@ public class ICPLConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new SPLCAToolConfigurationGenerator(cnf, numberOfConfigurations, t, "ICPL");
+		return new SPLCAToolConfigurationGenerator(cnf, "ICPL", t, numberOfConfigurations);
 	}
 
 }

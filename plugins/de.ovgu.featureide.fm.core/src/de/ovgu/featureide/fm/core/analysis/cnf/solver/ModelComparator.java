@@ -4,7 +4,6 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 
 public abstract class ModelComparator {
@@ -16,7 +15,7 @@ public abstract class ModelComparator {
 	public static boolean compare(CNF satInstance1, final CNF satInstance2) throws TimeoutException {
 		final SimpleSatSolver solver = new SimpleSatSolver(satInstance1);
 		for (final LiteralSet clause : satInstance2.getClauses()) {
-			final SatResult satResult = solver.hasSolution(SatUtils.negateSolution(clause.getLiterals()));
+			final SatResult satResult = solver.hasSolution(clause.negate());
 			switch (satResult) {
 			case FALSE:
 				break;

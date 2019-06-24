@@ -27,7 +27,6 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -80,9 +79,8 @@ public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralS
 			endIndex += clauseGroupSize[i];
 			for (int j = startIndex; j < endIndex; j++) {
 				final LiteralSet clause = clauseList.get(j);
-				final int[] negateClause = SatUtils.negateSolution(clause.getLiterals());
 
-				final SatResult hasSolution = solver.hasSolution(negateClause);
+				final SatResult hasSolution = solver.hasSolution(clause.negate());
 				switch (hasSolution) {
 				case FALSE:
 					resultList.set(i, clause);

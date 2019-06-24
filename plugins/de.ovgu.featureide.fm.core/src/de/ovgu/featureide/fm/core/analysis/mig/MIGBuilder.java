@@ -35,7 +35,6 @@ import org.sat4j.specs.ContradictionException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
@@ -260,12 +259,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
-		final int[] literals = curClause.getLiterals();
-		final int[] literals2 = new int[literals.length];
-		for (int i = 0; i < literals.length; i++) {
-			literals2[i] = -literals[i];
-		}
-		return solver.hasSolution(literals2) == SatResult.FALSE;
+		return solver.hasSolution(curClause.negate()) == SatResult.FALSE;
 	}
 
 	private void initEdges() {
@@ -489,7 +483,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		final int[] firstSolution = solver.findSolution();
 		if (firstSolution != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			SatUtils.updateSolution(firstSolution, solver.findSolution());
+			LiteralSet.resetConflicts(firstSolution, solver.findSolution());
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
@@ -508,7 +502,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatUtils.updateSolution(firstSolution, solver.getSolution());
+						LiteralSet.resetConflicts(firstSolution, solver.getSolution());
 						solver.shuffleOrder(random);
 						break;
 					}

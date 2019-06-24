@@ -273,7 +273,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		monitor.step();
 
 		for (final LiteralSet clause : children) {
-			switch (s.hasSolution(clause.negate().getLiterals())) {
+			switch (s.hasSolution(clause.negate())) {
 			case FALSE:
 				break;
 			case TIMEOUT:

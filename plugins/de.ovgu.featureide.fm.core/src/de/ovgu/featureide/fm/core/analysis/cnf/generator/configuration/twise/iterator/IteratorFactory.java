@@ -18,18 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
-import java.util.Iterator;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
-public interface ICombinationIterator extends Iterator<PresenceCondition[]>, Iterable<PresenceCondition[]> {
+public class IteratorFactory {
 
-	long getIndex();
+	public static enum IteratorID {
+		InverseDefault, Default, Lexicographic, InverseLexicographic, RandomPartition, Partition
+	}
 
-	void reset();
-
-	long size();
-
+	public static ICombinationIterator getIterator(IteratorID id, List<PresenceCondition> expressions, int t) {
+		switch (id) {
+		case Default:
+			return new InverseDefaultIterator(t, expressions);
+		case InverseDefault:
+			return new DefaultIterator(t, expressions);
+		case InverseLexicographic:
+			return new InverseLexicographicIterator(t, expressions);
+		case Lexicographic:
+			return new LexicographicIterator(t, expressions);
+		case Partition:
+			return new PartitionIterator(t, expressions);
+		case RandomPartition:
+			return new RandomPartitionIterator(t, expressions);
+		default:
+			return null;
+		}
+	}
 }

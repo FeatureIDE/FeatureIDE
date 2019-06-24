@@ -26,7 +26,6 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.base.util.RingList;
@@ -64,7 +63,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 
 			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
 
-			SatUtils.updateSolution(model1Copy, model2);
+			LiteralSet.resetConflicts(model1Copy, model2);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
@@ -80,7 +79,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatUtils.updateSolution(model1Copy, solver.getSolution());
+						LiteralSet.resetConflicts(model1Copy, solver.getSolution());
 						solver.shuffleOrder(random);
 						break;
 					}
@@ -124,7 +123,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 								reportTimeout();
 								break;
 							case TRUE:
-								SatUtils.updateSolution(xModel0, solver.getSolution());
+								LiteralSet.resetConflicts(xModel0, solver.getSolution());
 								// updateSolver(c++);
 								solver.shuffleOrder(random);
 								break;
@@ -168,7 +167,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 									break;
 								case TRUE:
 									done[j] = 0;
-									SatUtils.updateSolution(xModel0, solver.getSolution());
+									LiteralSet.resetConflicts(xModel0, solver.getSolution());
 									// updateSolver(c++);
 									solver.shuffleOrder(random);
 									solver.assignmentPop();

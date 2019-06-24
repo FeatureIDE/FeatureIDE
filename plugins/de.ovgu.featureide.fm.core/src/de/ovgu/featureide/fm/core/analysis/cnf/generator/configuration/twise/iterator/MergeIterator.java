@@ -18,14 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.IteratorFactory.IteratorID;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
 
 public class MergeIterator implements ICombinationIterator {
 

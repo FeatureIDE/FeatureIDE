@@ -31,7 +31,6 @@ import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
@@ -404,7 +403,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			core = new byte[solver.getSatInstance().getVariables().maxVariableID()];
 			recArray = new byte[solver.getSatInstance().getVariables().maxVariableID()];
 			final int[] model1Copy = Arrays.copyOf(allYesSolution, allYesSolution.length);
-			SatUtils.updateSolution(model1Copy, allNoSolution);
+			LiteralSet.resetConflicts(model1Copy, allNoSolution);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
@@ -419,7 +418,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatUtils.updateSolution(model1Copy, solver.getSolution());
+						LiteralSet.resetConflicts(model1Copy, solver.getSolution());
 						solver.shuffleOrder(random);
 						break;
 					}

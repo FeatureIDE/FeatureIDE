@@ -158,6 +158,11 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
+	public SatResult hasSolution(LiteralSet assignment) {
+		return null;
+	}
+
+	@Override
 	public int[] getContradictoryAssignment() {
 		return null;
 	}

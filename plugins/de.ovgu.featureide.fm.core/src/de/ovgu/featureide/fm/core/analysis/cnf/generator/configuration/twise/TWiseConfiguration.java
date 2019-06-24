@@ -18,14 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.Arrays;
 
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
@@ -38,7 +37,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfiguration extends LiteralSet {
+class TWiseConfiguration extends LiteralSet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -95,7 +94,7 @@ public class TWiseConfiguration extends LiteralSet {
 					final int[] model2 = solver.findSolution();
 					util.addSolverSolution(model2);
 
-					SatUtils.updateSolution(unkownValues, model2);
+					LiteralSet.resetConflicts(unkownValues, model2);
 					solver.setSelectionStrategy(unkownValues, true);
 
 					final int[] literals = TWiseConfiguration.this.literals;
@@ -132,7 +131,7 @@ public class TWiseConfiguration extends LiteralSet {
 					solver.assignmentPop();
 					final int[] solution2 = solver.getSolution();
 					util.addSolverSolution(solution2);
-					SatUtils.updateSolution(unkownValues, solution2);
+					LiteralSet.resetConflicts(unkownValues, solution2);
 					solver.shuffleOrder(util.getRandom());
 					break;
 				}
@@ -238,13 +237,13 @@ public class TWiseConfiguration extends LiteralSet {
 					try {
 						final int[] s = solver.findSolution();
 						if (s != null) {
-							literals = s;
+							System.arraycopy(s, 0, literals, 0, literals.length);
 						}
 					} finally {
 						solver.assignmentClear(orgAssignmentSize);
 					}
 				} else {
-					literals = util.getSolverSolution(solverSolutionIndex.last()).getLiterals();
+					System.arraycopy(util.getSolverSolution(solverSolutionIndex.last()).getLiterals(), 0, literals, 0, literals.length);
 					solverSolutionIndex.clear();
 				}
 			} else {
@@ -341,6 +340,11 @@ public class TWiseConfiguration extends LiteralSet {
 
 	public VecInt getSolverSolutionIndex() {
 		return solverSolutionIndex;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(literals);
 	}
 
 }

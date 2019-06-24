@@ -162,6 +162,11 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	}
 
 	@Override
+	public SatResult hasSolution(LiteralSet assignment) {
+		return hasSolution(assignment.getLiterals());
+	}
+
+	@Override
 	public void removeClause(IConstr constr) {
 		throw new UnsupportedOperationException();
 	}

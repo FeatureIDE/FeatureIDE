@@ -27,7 +27,6 @@ import org.sat4j.specs.IteratorInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
@@ -97,8 +96,8 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 				model1[Math.abs(solver.assignmentGet(i)) - 1] = 0;
 			}
 
-			SatUtils.updateSolution(model1, model2);
-			solver.setSelectionStrategy(model1, model1.length > (SatUtils.countNegative(model2) + SatUtils.countNegative(model1)));
+			LiteralSet.resetConflicts(model1, model2);
+			solver.setSelectionStrategy(model1, model1.length > (new LiteralSet(model2).countNegative() + new LiteralSet(model1).countNegative()));
 
 			vars = new VecInt(model1.length);
 			split(model1, 0, model1.length);
@@ -139,7 +138,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 					// solver.removeLastClause();
 					break;
 				case TRUE:
-					SatUtils.updateSolution(model, solver.getSolution());
+					LiteralSet.resetConflicts(model, solver.getSolution());
 					solver.shuffleOrder(random);
 
 					final int halfLength = (end - start) / 2;
@@ -171,7 +170,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 			break;
 		case TRUE:
 			solver.assignmentPop();
-			SatUtils.updateSolution(model, solver.getSolution());
+			LiteralSet.resetConflicts(model, solver.getSolution());
 			solver.shuffleOrder(random);
 			break;
 		}
@@ -209,8 +208,8 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 				model1[Math.abs(solver.assignmentGet(i)) - 1] = 0;
 			}
 
-			SatUtils.updateSolution(model1, model2);
-			solver.setSelectionStrategy(model1, model1.length > (SatUtils.countNegative(model2) + SatUtils.countNegative(model1)));
+			LiteralSet.resetConflicts(model1, model2);
+			solver.setSelectionStrategy(model1, model1.length > (new LiteralSet(model2).countNegative() + new LiteralSet(model1).countNegative()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
@@ -227,7 +226,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatUtils.updateSolution(model1, solver.getSolution());
+						LiteralSet.resetConflicts(model1, solver.getSolution());
 						solver.shuffleOrder(random);
 						break;
 					}

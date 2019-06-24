@@ -48,11 +48,11 @@ public class TWiseConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		final LiteralSet literals =
-			cnf.getVariables().convertToLiterals(Functional.toList(FeatureUtils.getConcreteFeatureNames(snapshot.getFeatureModel())), true, true);
+		final Iterable<String> concreteFeatureNames = FeatureUtils.getConcreteFeatureNames(snapshot.getFeatureModel());
+		final LiteralSet literals = cnf.getVariables().convertToLiterals(Functional.toList(concreteFeatureNames), true, true);
 		final List<List<ClauseList>> expressions =
-			de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator.convertLiterals(literals);
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.TWiseConfigurationGenerator(cnf, numberOfConfigurations, t, expressions);
+			de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator.convertLiterals(literals);
+		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator(cnf, expressions, t, numberOfConfigurations);
 	}
 
 }

@@ -113,6 +113,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	 *
 	 * @return A {@link SatResult}.
 	 *
+	 * @see #hasSolution(LiteralSet)
 	 * @see #hasSolution(int...)
 	 * @see #getSolution()
 	 */
@@ -124,10 +125,23 @@ public interface ISimpleSatSolver extends Cloneable {
 	 * @param assignment The temporarily variable assignment for this call.
 	 * @return A {@link SatResult}.
 	 *
+	 * @see #hasSolution(LiteralSet)
 	 * @see #hasSolution()
 	 * @see #getSolution()
 	 */
 	SatResult hasSolution(int... assignment);
+
+	/**
+	 * Checks whether there is a satisfying solution considering the clauses of the solver and the given variable assignment.
+	 *
+	 * @param assignment The temporarily variable assignment for this call.
+	 * @return A {@link SatResult}.
+	 *
+	 * @see #hasSolution()
+	 * @see #hasSolution(int...)
+	 * @see #getSolution()
+	 */
+	SatResult hasSolution(LiteralSet assignment);
 
 	/**
 	 * Returns the last solution found by satisfiability solver. Can only be called after a successful call of {@link #hasSolution()} or

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,13 +29,12 @@ import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class TWiseCombiner {
+class TWiseCombiner {
 
 	/**
 	 * Converts a set of single literals into a grouped expression list.

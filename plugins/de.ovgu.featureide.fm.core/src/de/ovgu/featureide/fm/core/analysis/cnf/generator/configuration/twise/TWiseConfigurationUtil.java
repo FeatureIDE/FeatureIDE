@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
@@ -51,15 +52,13 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfigurationUtil {
+class TWiseConfigurationUtil {
 
-	protected static final int GLOBAL_SOLUTION_LIMIT = 100_000;
-
-	public static long seed = 123456789;
+	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
 
 	protected final LiteralSet[] solverSolutions = new LiteralSet[GLOBAL_SOLUTION_LIMIT];
 	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
-	protected final Random rnd = new Random(seed);
+	protected Random random = new Random(42);
 
 	protected final List<LiteralSet> randomSample;
 
@@ -72,7 +71,7 @@ public class TWiseConfigurationUtil {
 	protected ModalImplicationGraph mig;
 	protected LiteralSet[] strongHull;
 
-	protected int maxSampleSize;
+	protected int maxSampleSize = Integer.MAX_VALUE;
 
 	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver) {
 		this.cnf = cnf;
@@ -81,6 +80,7 @@ public class TWiseConfigurationUtil {
 		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
 		randomGenerator.setAllowDuplicates(false);
 		randomGenerator.setSampleSize(1000);
+		randomGenerator.setRandom(random);
 		randomSample = LongRunningWrapper.runMethod(randomGenerator);
 
 		for (final LiteralSet solution : randomSample) {
@@ -145,7 +145,7 @@ public class TWiseConfigurationUtil {
 	}
 
 	public Random getRandom() {
-		return rnd;
+		return random;
 	}
 
 	protected int solverSolutionEndIndex = -1;
@@ -176,14 +176,14 @@ public class TWiseConfigurationUtil {
 	}
 
 	public boolean isCombinationValid(LiteralSet literals) {
-		return isCombinationValidMIG(literals) && isCombinationValidSAT(literals);
+		return !isCombinationInvalidMIG(literals) && isCombinationValidSAT(literals);
 	}
 
 	public boolean isCombinationValid(ClauseList clauses) {
 		if (hasSolver()) {
 			for (final LiteralSet literalSet : clauses) {
-				if (isCombinationValidMIG(literalSet)) {
-					return true;
+				if (isCombinationInvalidMIG(literalSet)) {
+					return false;
 				}
 			}
 			for (final LiteralSet literalSet : clauses) {
@@ -196,15 +196,15 @@ public class TWiseConfigurationUtil {
 		return true;
 	}
 
-	public boolean isCombinationValidMIG(LiteralSet literals) {
+	public boolean isCombinationInvalidMIG(LiteralSet literals) {
 		if (hasSolver()) {
 			for (final int literal : literals.getLiterals()) {
 				if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literals)) {
-					return false;
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public boolean isCombinationValidSAT(LiteralSet literals) {
@@ -286,19 +286,7 @@ public class TWiseConfigurationUtil {
 	}
 
 	public boolean select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
-		solution.setLiteral(literals.getLiterals());
-		if (hasSolver()) {
-			switch (deduce) {
-			case AC:
-				solution.autoComplete();
-				break;
-			case DP:
-				solution.propagation();
-				break;
-			case NONE:
-				break;
-			}
-		}
+		selectLiterals(solution, deduce, literals);
 
 		if (solution.isComplete()) {
 			solution.clear();
@@ -315,14 +303,30 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
+	private void selectLiterals(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
+		solution.setLiteral(literals.getLiterals());
+		if (hasSolver()) {
+			switch (deduce) {
+			case AC:
+				solution.autoComplete();
+				break;
+			case DP:
+				solution.propagation();
+				break;
+			case NONE:
+				break;
+			}
+		}
+	}
+
 	public boolean isCandidate(final LiteralSet literals, TWiseConfiguration solution) {
-		return solution.hasConflicts(literals);
+		return !solution.hasConflicts(literals);
 	}
 
 	public void addCandidates(final LiteralSet literals, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		for (final TWiseConfiguration candidate : getIncompleteSolutionList()) {
-			if (isCandidate(literals, candidate)) {
-				candidatesList.add(new Pair<>(literals, candidate));
+		for (final TWiseConfiguration configuration : getIncompleteSolutionList()) {
+			if (isCandidate(literals, configuration)) {
+				candidatesList.add(new Pair<>(literals, configuration));
 			}
 		}
 	}
@@ -330,7 +334,7 @@ public class TWiseConfigurationUtil {
 	public void newConfiguration(final LiteralSet literals) {
 		if (completeSolutionList.size() < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(this);
-			select(configuration, Deduce.DP, literals);
+			selectLiterals(configuration, Deduce.DP, literals);
 			configuration.updateSolverSolutions();
 			if (configuration.isComplete()) {
 				configuration.clear();
@@ -363,6 +367,10 @@ public class TWiseConfigurationUtil {
 
 	public void setMaxSampleSize(int maxSampleSize) {
 		this.maxSampleSize = maxSampleSize;
+	}
+
+	public void setRandom(Random random) {
+		this.random = random;
 	}
 
 }

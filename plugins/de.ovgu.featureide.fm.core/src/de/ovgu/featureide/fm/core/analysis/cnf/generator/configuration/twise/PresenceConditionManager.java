@@ -28,15 +28,13 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationUtil;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class PresenceConditionManager {
+class PresenceConditionManager {
 
-	private final List<PresenceCondition> presenceConditionList = new ArrayList<>();
 	private final List<List<PresenceCondition>> dictonary = new ArrayList<>();
 	private final List<List<PresenceCondition>> groupedPresenceConditions = new ArrayList<>();
 
@@ -73,8 +71,6 @@ public class PresenceConditionManager {
 					PresenceCondition mappedPc = presenceConditionSet.get(pc);
 					if (mappedPc == null) {
 						mappedPc = pc;
-						mappedPc.setIndex(presenceConditionList.size());
-						presenceConditionList.add(mappedPc);
 						presenceConditionSet.put(mappedPc, mappedPc);
 
 						for (final LiteralSet literalSet : mappedPc) {
@@ -85,6 +81,12 @@ public class PresenceConditionManager {
 						}
 					}
 					mappedPc.addGroup(groupIndex);
+					Collections.sort(mappedPc, new Comparator<LiteralSet>() {
+						@Override
+						public int compare(LiteralSet o1, LiteralSet o2) {
+							return o1.size() - o2.size();
+						}
+					});
 					newNodeList.add(mappedPc);
 				}
 			}
@@ -109,10 +111,6 @@ public class PresenceConditionManager {
 			};
 			Collections.sort(list, comparator);
 		}
-	}
-
-	public List<PresenceCondition> getPresenceConditionList() {
-		return presenceConditionList;
 	}
 
 	public List<List<PresenceCondition>> getDictonary() {

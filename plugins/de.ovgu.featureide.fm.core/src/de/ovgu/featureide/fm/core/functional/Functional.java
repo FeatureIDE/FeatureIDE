@@ -393,6 +393,10 @@ public abstract class Functional {
 		return map(source, new ToCharSequenceFunction<T>());
 	}
 
+	public static <T> Collection<T> toCollection(Iterable<T> elements) {
+		return (elements instanceof Collection) ? ((Collection<T>) elements) : Functional.toList(elements);
+	}
+
 	/**
 	 * Converts the iterator <i>i</i> of type <b>T</b> into a list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br> <br> It is
 	 * guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b> operation. The resulting list <b>is not modifiable</b>

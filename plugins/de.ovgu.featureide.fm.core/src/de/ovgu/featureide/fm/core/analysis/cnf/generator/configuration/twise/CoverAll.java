@@ -28,14 +28,12 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfiguration;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.TWiseConfigurationUtil;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class CoverAll implements ICoverStrategy {
+class CoverAll implements ICoverStrategy {
 
 	private final TWiseConfigurationUtil util;
 
@@ -56,7 +54,6 @@ public class CoverAll implements ICoverStrategy {
 			util.addCandidates(literals, candidatesList);
 		}
 
-//		Collections.shuffle(candidatesList, random);
 		Collections.sort(candidatesList, candidateLengthComparator);
 
 		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {

@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
+import de.ovgu.featureide.fm.core.functional.Functional;
+
 /**
  * Represents an instance of a satisfiability problem in CNF.<br/> Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()} method to get a
  * {@link BasicSolver solver} for this problem.
@@ -114,32 +117,36 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	@Override
-	public LiteralSet convertToVariables(Collection<String> variableNames) {
-		final int[] literals = new int[variableNames.size()];
+	public LiteralSet convertToVariables(Iterable<String> variableNames) {
+		final Collection<String> variableNameCollection = Functional.toCollection(variableNames);
+		final int[] literals = new int[variableNameCollection.size()];
 		int i = 0;
-		for (final String varName : variableNames) {
+		for (final String varName : variableNameCollection) {
 			literals[i++] = varToInt.get(varName);
 		}
 		return new LiteralSet(literals);
 	}
 
 	@Override
-	public LiteralSet convertToVariables(Collection<String> variableNames, boolean sign) {
-		final int[] literals = new int[variableNames.size()];
+	public LiteralSet convertToVariables(Iterable<String> variableNames, boolean sign) {
+		final Collection<String> variableNameCollection = Functional.toCollection(variableNames);
+		final int[] literals = new int[variableNameCollection.size()];
 		int i = 0;
-		for (final String varName : variableNames) {
+		for (final String varName : variableNameCollection) {
 			literals[i++] = sign ? varToInt.get(varName) : -varToInt.get(varName);
 		}
 		return new LiteralSet(literals);
 	}
 
-	public LiteralSet convertToLiterals(Collection<String> variableNames, boolean includePositive, boolean includeNegative) {
+	@Override
+	public LiteralSet convertToLiterals(Iterable<String> variableNames, boolean includePositive, boolean includeNegative) {
 		if (!includeNegative && !includePositive) {
 			return new LiteralSet();
 		}
-		final int[] literals = new int[(includeNegative && includePositive) ? 2 * variableNames.size() : variableNames.size()];
+		final Collection<String> variableNameCollection = Functional.toCollection(variableNames);
+		final int[] literals = new int[(includeNegative && includePositive) ? 2 * variableNameCollection.size() : variableNameCollection.size()];
 		int i = 0;
-		for (final String varName : variableNames) {
+		for (final String varName : variableNameCollection) {
 			final int var = varToInt.get(varName);
 			if (includeNegative) {
 				literals[i++] = -var;
@@ -244,6 +251,18 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	@Override
 	public String toString() {
 		return "Variables [" + Arrays.toString(intToVar) + "]";
+	}
+
+	@Override
+	public LiteralSet getLiterals() {
+		final int[] literals = new int[intToVar.length << 1];
+		for (int i = 0; i < literals.length; i++) {
+			literals[i] = i - literals.length;
+		}
+		for (int i = 0; i < literals.length; i++) {
+			literals[i + literals.length] = (i + 1);
+		}
+		return new LiteralSet(literals, Order.NATURAL, false);
 	}
 
 }

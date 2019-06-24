@@ -18,16 +18,47 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
+package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
-import java.util.Comparator;
+public class BinomialCalculator {
 
-public class TWiseConfigurationRankComparator implements Comparator<TWiseConfiguration> {
+	private final long[][] binomial;
+	private final long[] factorial;
 
-	@Override
-	public int compare(TWiseConfiguration arg0, TWiseConfiguration arg1) {
-		final int rankDiff = arg1.rank - arg0.rank;
-		return rankDiff != 0 ? rankDiff : arg0.countLiterals - arg1.countLiterals;
+	public BinomialCalculator(int t, int n) {
+		binomial = new long[n + 1][t + 1];
+		factorial = new long[t + 1];
+	}
+
+	public long factorial(int j) {
+		long f = factorial[j];
+		if (f == 0) {
+			f = 1;
+			for (int i = 2; i <= j; i++) {
+				f *= i;
+			}
+			factorial[j] = f;
+		}
+		return f;
+	}
+
+	public long binomial(int n, int k) {
+		if (n < k) {
+			return 0;
+		}
+		long b = binomial[n][k];
+		if (b == 0) {
+			if (k > (n - k)) {
+				k = n - k;
+			}
+
+			b = 1;
+			for (int i = 1, m = n; i <= k; i++, m--) {
+				b = Math.multiplyExact(b, m) / i;
+			}
+			binomial[n][k] = b;
+		}
+		return b;
 	}
 
 }
