@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UfQGoOvjEee9ofvBkamr2g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 6/4/19 1:01 PM
+Save-Time: 6/24/19 3:15 PM
 Testcase-Type: ecl
 Verifications: _AHKDgIa4Eemi6KBWYfLE5Q,_X5rUMOvlEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
 
@@ -49,6 +49,7 @@ with [get-editor "ITickListener.java" | get-text-viewer] {
     set-caret-pos 28 5
     key-type Enter
     type-text "//#if CallB"
+    wait 1000
     key-type "M1+SPACE"
     key-type Down -times 2
     key-type Tab
