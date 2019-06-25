@@ -21,12 +21,9 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
@@ -49,41 +46,18 @@ class CoverAll implements ICoverStrategy {
 			return CombinationStatus.COVERED;
 		}
 
-		candidatesList.clear();
-		for (final LiteralSet literals : nextCondition) {
-			util.addCandidates(literals, candidatesList);
+		util.initCandidatesList(nextCondition, candidatesList);
+
+		if (util.cover(false, candidatesList)) {
+			return CombinationStatus.COVERED;
 		}
 
-		Collections.sort(candidatesList, candidateLengthComparator);
-
-		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
-			if (util.isSelectionPossible(pair.getKey(), pair.getValue(), false)) {
-				util.select(pair.getValue(), Deduce.NONE, pair.getKey());
-				return CombinationStatus.COVERED;
-			}
-		}
-
-		int validCount = nextCondition.size();
-		for (final LiteralSet literals : nextCondition) {
-			if (!util.isCombinationValid(literals)) {
-				validCount--;
-				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
-					if (pair.getKey().equals(literals)) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-		if (validCount == 0) {
+		if (util.removeInvalidClauses(nextCondition, candidatesList)) {
 			return CombinationStatus.INVALID;
 		}
 
-		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
-			if (util.isSelectionPossible(pair.getKey(), pair.getValue(), true)) {
-				util.select(pair.getValue(), Deduce.NONE, pair.getKey());
-				return CombinationStatus.COVERED;
-			}
+		if (util.cover(true, candidatesList)) {
+			return CombinationStatus.COVERED;
 		}
 
 		util.newConfiguration(nextCondition.get(0));

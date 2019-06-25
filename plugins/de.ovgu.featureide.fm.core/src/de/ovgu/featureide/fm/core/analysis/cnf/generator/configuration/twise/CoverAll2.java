@@ -21,14 +21,11 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
@@ -65,25 +62,22 @@ class CoverAll2 implements ICoverStrategy {
 			return CombinationStatus.COVERED;
 		}
 
-		initCandidatesList(nextCondition);
+		util.initCandidatesList(nextCondition, candidatesList);
 
-		if (cover(false)) {
+		if (util.cover(false, candidatesList)) {
 			return CombinationStatus.COVERED;
 		}
 
-		if (isInvalid(nextCondition)) {
+		if (util.removeInvalidClauses(nextCondition, candidatesList)) {
 			return CombinationStatus.INVALID;
 		}
 
-		if (cover(true)) {
+		if (util.cover(true, candidatesList)) {
 			return CombinationStatus.COVERED;
 		}
 
-		if (newConfiguration(nextCondition)) {
-			return CombinationStatus.COVERED;
-		}
-
-		return CombinationStatus.NOT_COVERED;
+		util.newConfiguration(nextCondition.get(0));
+		return CombinationStatus.COVERED;
 	}
 
 	public CombinationStatus coverSubsumingClause(ClauseList nextCondition) {
@@ -91,56 +85,14 @@ class CoverAll2 implements ICoverStrategy {
 			return CombinationStatus.COVERED;
 		}
 
-		initCandidatesList(nextCondition);
+		util.initCandidatesList(nextCondition, candidatesList);
 
-		if (cover(true)) {
+		if (util.cover(true, candidatesList)) {
 			return CombinationStatus.COVERED;
 		}
 
-		if (newConfiguration(nextCondition)) {
-			return CombinationStatus.COVERED;
-		}
-
-		return CombinationStatus.NOT_COVERED;
-	}
-
-	private void initCandidatesList(ClauseList nextCondition) {
-		candidatesList.clear();
-		for (final LiteralSet literals : nextCondition) {
-			util.addCandidates(literals, candidatesList);
-		}
-		Collections.sort(candidatesList, candidateLengthComparator);
-	}
-
-	protected boolean cover(boolean useSolver) {
-		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
-			if (util.isSelectionPossible(pair.getKey(), pair.getValue(), useSolver)) {
-				util.select(pair.getValue(), Deduce.NONE, pair.getKey());
-				return true;
-			}
-		}
-		return false;
-	}
-
-	protected boolean isInvalid(ClauseList nextCondition) {
-		int validCount = nextCondition.size();
-		for (final LiteralSet literals : nextCondition) {
-			if (!util.isCombinationValidSAT(literals)) {
-				validCount--;
-				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
-					if (pair.getKey().equals(literals)) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-		return validCount == 0;
-	}
-
-	protected boolean newConfiguration(ClauseList nextCondition) {
 		util.newConfiguration(nextCondition.get(0));
-		return true;
+		return CombinationStatus.COVERED;
 	}
 
 	protected boolean isSubsumed(ClauseList nextCondition) {
@@ -173,7 +125,7 @@ class CoverAll2 implements ICoverStrategy {
 						for (final LiteralSet otherLiteralSet : combinedCondition) {
 							for (final LiteralSet literalSet : nextCondition) {
 								if ((otherLiteralSet.size() > literalSet.size()) && otherLiteralSet.containsAll(literalSet)) {
-									if (util.isCombinationValidSAT(otherLiteralSet)) {
+									if (util.isCombinationValid(otherLiteralSet)) {
 										return true;
 									}
 								}

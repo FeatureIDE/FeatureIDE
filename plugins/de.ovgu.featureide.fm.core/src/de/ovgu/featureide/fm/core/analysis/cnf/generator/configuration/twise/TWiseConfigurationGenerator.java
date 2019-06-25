@@ -87,8 +87,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		@Override
 		public void run() {
 			if (VERBOSE) {
+				final long uncoveredCount = (numberOfCombinations - coveredCount) - invalidCount;
 				final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
 				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final double uncoverProgress = ((int) Math.floor(((((double) uncoveredCount) / numberOfCombinations)) * 1000)) / 10.0;
 				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
 				final StringBuilder sb = new StringBuilder();
 
@@ -97,15 +99,24 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				sb.append(phaseProgress);
 				sb.append(" (");
 				sb.append(count);
+
 				sb.append(") -- Configurations: ");
 				sb.append(util.getIncompleteSolutionList().size());
 				sb.append(" | ");
 				sb.append(util.getCompleteSolutionList().size());
+
 				sb.append(" -- Covered: ");
 				sb.append(coverProgress);
 				sb.append(" (");
 				sb.append(coveredCount);
 				sb.append(")");
+
+				sb.append(" -- Uncovered: ");
+				sb.append(uncoverProgress);
+				sb.append(" (");
+				sb.append(uncoveredCount);
+				sb.append(")");
+
 				sb.append(" -- Invalid: ");
 				sb.append(invalidProgress);
 				sb.append(" (");
@@ -137,7 +148,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		util.setRandom(random);
 		util.setMaxSampleSize(maxSampleSize);
+		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
+		// TODO Variation Point: Building Combinations
 		combiner = new TWiseCombiner(cnf.getVariables().size());
 
 		solver.useSolutionList(0);
@@ -160,7 +173,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void buildCombinations() {
-		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Partition);
+		// TODO Variation Point: Combination Order
+		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
+
+		// TODO Variation Point: Cover Strategies
 		final List<ICoverStrategy> phaseList = Arrays.asList(//
 //				new CoverAll(util), //
 				new CoverAll2(util, presenceConditionManager, t), //
@@ -168,7 +184,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		numberOfCombinations = it.size();
 		try {
 			samplingMonitor.start();
-			final List<ClauseList> combinationListSingle = new ArrayList<>();
+			final List<ClauseList> combinationListUncovered = new ArrayList<>();
 			ClauseList combinedCondition = new ClauseList();
 			count = coveredCount;
 			ICoverStrategy phase = phaseList.get(phaseCount++);
@@ -180,7 +196,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 					final CombinationStatus covered = phase.cover(combinedCondition);
 					switch (covered) {
 					case NOT_COVERED:
-						combinationListSingle.add(combinedCondition);
+						combinationListUncovered.add(combinedCondition);
 						combinedCondition = new ClauseList();
 						break;
 					case COVERED:
@@ -203,18 +219,18 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			while (phaseCount < phaseList.size()) {
 				phase = phaseList.get(phaseCount++);
 				count = coveredCount + invalidCount;
-				for (int i = coveredIndex + 1; i < combinationListSingle.size(); i++) {
-					final ClauseList combination = combinationListSingle.get(i);
+				for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
+					final ClauseList combination = combinationListUncovered.get(i);
 					final CombinationStatus covered = phase.cover(combination);
 					switch (covered) {
 					case COVERED:
-						Collections.swap(combinationListSingle, i, ++coveredIndex);
+						Collections.swap(combinationListUncovered, i, ++coveredIndex);
 						coveredCount++;
 						break;
 					case NOT_COVERED:
 						break;
 					case INVALID:
-						Collections.swap(combinationListSingle, i, ++coveredIndex);
+						Collections.swap(combinationListUncovered, i, ++coveredIndex);
 						invalidCount++;
 						break;
 					default:

@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -55,6 +57,8 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 class TWiseConfigurationUtil {
 
 	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
+
+	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
 
 	protected final LiteralSet[] solverSolutions = new LiteralSet[GLOBAL_SOLUTION_LIMIT];
 	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
@@ -237,6 +241,22 @@ class TWiseConfigurationUtil {
 		return true;
 	}
 
+	public boolean removeInvalidClauses(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		int validCount = nextCondition.size();
+		for (final LiteralSet literals : nextCondition) {
+			if (!isCombinationValid(literals)) {
+				validCount--;
+				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
+					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
+					if (pair.getKey().equals(literals)) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+		return validCount == 0;
+	}
+
 	public boolean isSelectionPossible(final LiteralSet literals, final TWiseConfiguration configuration, boolean useSolver) {
 		if (hasSolver()) {
 			if (useSolver) {
@@ -329,6 +349,24 @@ class TWiseConfigurationUtil {
 				candidatesList.add(new Pair<>(literals, configuration));
 			}
 		}
+	}
+
+	public void initCandidatesList(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		candidatesList.clear();
+		for (final LiteralSet literals : nextCondition) {
+			addCandidates(literals, candidatesList);
+		}
+		Collections.sort(candidatesList, candidateLengthComparator);
+	}
+
+	protected boolean cover(boolean useSolver, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (isSelectionPossible(pair.getKey(), pair.getValue(), useSolver)) {
+				select(pair.getValue(), Deduce.NONE, pair.getKey());
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void newConfiguration(final LiteralSet literals) {

@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
@@ -51,13 +50,7 @@ class CoverSingle implements ICoverStrategy {
 			return CombinationStatus.COVERED;
 		}
 
-		candidatesList.clear();
-		for (final LiteralSet literals : nextCondition) {
-			util.addCandidates(literals, candidatesList);
-		}
-
-//		Collections.shuffle(candidatesList, random);
-		Collections.sort(candidatesList, candidateLengthComparator);
+		util.initCandidatesList(nextCondition, candidatesList);
 
 		candidatesList2.clear();
 		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {

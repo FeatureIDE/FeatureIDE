@@ -20,19 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.Comparator;
-
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
  *
  * @author Sebastian Krieter
  */
 interface ICoverStrategy {
-
-	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
 
 	static enum CombinationStatus {
 		NOT_COVERED, COVERED, INVALID,
