@@ -16,7 +16,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	IFeatureModelFactory factory;
 
-	protected ExtendedFeatureModel(ExtendedFeatureModel copyFeatureModel, ExtendedFeature newRoot) {
+	public ExtendedFeatureModel(ExtendedFeatureModel copyFeatureModel, ExtendedFeature newRoot) {
 		super(copyFeatureModel, newRoot);
 
 		try {
@@ -26,7 +26,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		}
 	}
 
-	protected ExtendedFeatureModel(String factoryID) {
+	public ExtendedFeatureModel(String factoryID) {
 		super(factoryID);
 
 		try {

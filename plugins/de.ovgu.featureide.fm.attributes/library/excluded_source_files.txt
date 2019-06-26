@@ -2,8 +2,12 @@ de/ovgu/featureide/fm/attributes/AbstractUIPlugin.java
 de/ovgu/featureide/fm/attributes/FMAttributesPlugin.java
 de/ovgu/featureide/fm/attributes/composer/ExtendedFeatureModeling.java
 de/ovgu/featureide/fm/attributes/composer/ExtendedFeatureModelingFMExtension.java
+de/ovgu/featureide/fm/attributes/outlineentry/AttributeComputationBundle.java
+de/ovgu/featureide/fm/attributes/outlineentry/AttributeEntry.java
+de/ovgu/featureide/fm/attributes/outlineentry/AttributeMaximumEntry.java
+de/ovgu/featureide/fm/attributes/outlineentry/AttributeMinimumEntry.java
+de/ovgu/featureide/fm/attributes/outlineentry/CountAttributeComputation.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeContentProvider.java
-de/ovgu/featureide/fm/attributes/view/FeatureAttributeLazyContentProvider.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeView.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeViewSelectionFilter.java
 de/ovgu/featureide/fm/attributes/view/actions/AddFeatureAttributeAction.java

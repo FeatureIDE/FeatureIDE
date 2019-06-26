@@ -32,9 +32,13 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
  * Editing support for the value column of the {@link FeatureAttributeView}.
@@ -76,6 +80,19 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (view.getCurrentEditor() instanceof ConfigurationEditor) {
+			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfiguration();
+			for (SelectableFeature feat : config.getFeatures()) {
+				if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
+					if (feat instanceof ExtendedSelectableFeature) {
+						ExtendedSelectableFeature extSelectable = (ExtendedSelectableFeature) feat;
+						if (extSelectable.getConfigurableAttributes().containsKey(attribute.getName())) {
+							return extSelectable.getConfigurableAttributes().get(attribute.getName()).toString();
+						}
+					}
+				}
+			}
+		}
 		if (attribute.getValue() != null) {
 			return attribute.getValue().toString();
 		}

@@ -6,10 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _UfQGoOvjEee9ofvBkamr2g
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/28/17 5:20 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 6/24/19 3:15 PM
 Testcase-Type: ecl
-Verifications: _cNvKYOvlEee9ofvBkamr2g,_X5rUMOvlEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
+Verifications: _AHKDgIa4Eemi6KBWYfLE5Q,_X5rUMOvlEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
 Content-Type: text/plain
@@ -49,6 +49,7 @@ with [get-editor "ITickListener.java" | get-text-viewer] {
     set-caret-pos 28 5
     key-type Enter
     type-text "//#if CallB"
+    wait 1000
     key-type "M1+SPACE"
     key-type Down -times 2
     key-type Tab

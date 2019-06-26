@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -36,7 +38,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
 	@Override
-	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature) {
+	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature)
+			throws FeatureAttributeParseException, UnknownFeatureAttributeTypeException {
 		final Boolean configurable = Boolean.parseBoolean(attributeData.isConfigurable());
 		final Boolean recursive = Boolean.parseBoolean(attributeData.isRecursive());
 		switch (attributeData.getType()) {
@@ -54,7 +57,7 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				}
 				return createLongAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
-				return null;
+				throw new FeatureAttributeParseException(attributeData);
 			}
 		case FeatureAttribute.DOUBLE:
 			try {
@@ -64,12 +67,12 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				}
 				return createDoubleAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable);
 			} catch (final NumberFormatException nfe) {
-				return null;
+				throw new FeatureAttributeParseException(attributeData);
 			}
 		case FeatureAttribute.STRING:
 			return createStringAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable);
 		default:
-			return null;
+			throw new UnknownFeatureAttributeTypeException(attributeData);
 		}
 	}
 

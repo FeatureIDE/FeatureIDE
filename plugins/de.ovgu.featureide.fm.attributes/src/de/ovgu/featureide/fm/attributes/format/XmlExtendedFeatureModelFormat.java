@@ -34,11 +34,14 @@ import org.w3c.dom.NodeList;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -164,9 +167,9 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 		}
 	}
 
-	protected void parseAttribute(IFeature parent, final Element e) throws UnsupportedModelException {
-		if (e.hasAttributes()) {
-			final NamedNodeMap nodeMapFeatureAttribute = e.getAttributes();
+	protected void parseAttribute(IFeature parent, final Element element) throws UnsupportedModelException {
+		if (element.hasAttributes()) {
+			final NamedNodeMap nodeMapFeatureAttribute = element.getAttributes();
 			String configurable = null;
 			String recursive = null;
 			String name = null;
@@ -191,14 +194,19 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 				} else if (attributeName.equals(ATTRIBUTE_TYPE)) {
 					type = attributeValue;
 				} else {
-					throwError("Unknown feature attribute: " + attributeName, e);
+					throwError("Unknown feature attribute: " + attributeName, element);
 				}
 			}
 			// TODO ATTRIBUTE Error marker for missing name and/or type
 			final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
-			final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
-			if (featureAttribute != null) {
-				((ExtendedFeature) parent).addAttribute(featureAttribute);
+			IFeatureAttribute featureAttribute;
+			try {
+				featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
+				if (featureAttribute != null) {
+					((ExtendedFeature) parent).addAttribute(featureAttribute);
+				}
+			} catch (FeatureAttributeParseException | UnknownFeatureAttributeTypeException e) {
+				Logger.logError(e);
 			}
 		}
 	}

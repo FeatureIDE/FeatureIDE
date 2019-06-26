@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -91,6 +92,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -166,15 +168,18 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				return;
 			}
 			selectedManualFeatures = new ArrayList<>();
-			for (Object obj : ((IStructuredSelection) event.getSelection()).toList()) {
-				if (!(obj instanceof FeatureEditPart)) {
-					selectedManualFeatures = null;
-					treeViewer.refresh();
-					treeViewer.expandToLevel(2);
-					return;
-				} else {
-					FeatureEditPart editPart = (FeatureEditPart) obj;
-					selectedManualFeatures.add(editPart.getModel().getObject());
+			ISelection selection = event.getSelection();
+			if (selection instanceof IStructuredSelection) {
+				for (Object obj : ((IStructuredSelection) selection).toList()) {
+					if (!(obj instanceof FeatureEditPart)) {
+						selectedManualFeatures = null;
+						treeViewer.refresh();
+						treeViewer.expandToLevel(2);
+						return;
+					} else {
+						FeatureEditPart editPart = (FeatureEditPart) obj;
+						selectedManualFeatures.add(editPart.getModel().getObject());
+					}
 				}
 			}
 
@@ -374,7 +379,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				final IStructuredSelection selection = treeViewer.getStructuredSelection();
-				if (!selection.isEmpty()) {
+				if (!selection.isEmpty() && currentEditor instanceof FeatureModelEditor) {
 					if ((selection.size() == 1) && (selection.getFirstElement() instanceof ExtendedFeature)) {
 						final ExtendedFeature feature = (ExtendedFeature) selection.getFirstElement();
 						// Add actions to create new attributes
@@ -495,7 +500,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			editor.diagramEditor.addSelectionChangedListener(selectionListener);
 			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-			setEditorContent(null);
+			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
+			editor.addPageChangedListener(pageListener);
+			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
 			&& !(activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
 			setEditorContent(null);
@@ -528,6 +536,33 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				setFeatureModel(null);
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(FeatureAttributeContentProvider.EMPTY_ROOT);
+				}
+				repackAllColumns();
+				return;
+			}
+		}
+		if (currentEditor instanceof ConfigurationEditor) {
+			if (page instanceof ConfigurationPage) {
+				final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
+				if (editor.getConfiguration().getFeatureModel() instanceof ExtendedFeatureModel) {
+					setFeatureModel(null);
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput(editor.getConfiguration());
+					}
+					treeViewer.expandAll();
+					repackAllColumns();
+				} else {
+					setFeatureModel(null);
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
+					}
+					repackAllColumns();
+					return;
+				}
+			} else {
+				setFeatureModel(null);
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
 				}
 				repackAllColumns();
 				return;
@@ -630,5 +665,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 		currentEditor = null;
 		super.dispose();
+	}
+
+	/**
+	 * Returns current editor of the view
+	 * 
+	 * @return current editor
+	 */
+	public IWorkbenchPart getCurrentEditor() {
+		return currentEditor;
 	}
 }

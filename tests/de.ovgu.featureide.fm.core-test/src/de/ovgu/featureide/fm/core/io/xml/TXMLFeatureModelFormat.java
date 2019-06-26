@@ -55,7 +55,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 
 	public TXMLFeatureModelFormat(IFeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm, s);
-
 	}
 
 	@Test

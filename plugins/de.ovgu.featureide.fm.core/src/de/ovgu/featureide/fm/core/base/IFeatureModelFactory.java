@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.base;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+
 /**
  * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
  *
@@ -40,5 +42,7 @@ public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
 
 	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
+
+	SelectableFeature createSelectableFeature(IFeature feature);
 
 }

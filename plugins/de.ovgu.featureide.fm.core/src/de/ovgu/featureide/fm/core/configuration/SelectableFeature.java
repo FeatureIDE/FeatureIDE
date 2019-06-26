@@ -186,4 +186,6 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 		return new SelectableFeature(this);
 	}
 
+	public void cloneProperties(SelectableFeature feat) {}
+
 }

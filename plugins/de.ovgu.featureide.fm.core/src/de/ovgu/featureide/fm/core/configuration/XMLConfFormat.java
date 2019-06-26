@@ -108,6 +108,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 						}
 					}
 				}
+
 			}
 		} else {
 			warnings.add(new Problem("Root element must be <configuration>", 1, Problem.Severity.ERROR));

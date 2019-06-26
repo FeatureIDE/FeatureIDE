@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -90,6 +91,12 @@ public class CustomFeaturesCustomPropertiesTest {
 		@Override
 		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 			return (Constraint) oldConstraint.clone(featureModel);
+		}
+
+		@Override
+		public SelectableFeature createSelectableFeature(IFeature feature) {
+			// TODO ATTRIBUTE: Useful implementation later
+			return null;
 		}
 
 	}

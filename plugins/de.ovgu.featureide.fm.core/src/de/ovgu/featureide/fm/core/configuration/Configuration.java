@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -63,8 +65,12 @@ public class Configuration implements Cloneable {
 		propagate = false;
 		initFeatures(configuration.featureModel);
 		for (final SelectableFeature f : configuration.selectableFeatures.values()) {
-			setManual(f.getName(), f.getManual());
-			setAutomatic(f.getName(), f.getAutomatic());
+			final SelectableFeature newFeature = getSelectableFeature(f.getName(), featureModel == null);
+			if (newFeature != null) {
+				setManual(newFeature, f.getManual());
+				setAutomatic(newFeature, f.getAutomatic());
+				newFeature.cloneProperties(f);
+			}
 		}
 	}
 
@@ -84,6 +90,7 @@ public class Configuration implements Cloneable {
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
 				newFeature.setAutomatic(oldFeature.getAutomatic());
+				newFeature.cloneProperties(oldFeature);
 			}
 		}
 	}
@@ -130,7 +137,7 @@ public class Configuration implements Cloneable {
 	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature) {
 		SelectableFeature sFeature = selectableFeatures.get(featureModel.getFeatureModel().getRenamingsManager().getOldName(feature.getName()));
 		if (sFeature == null) {
-			sFeature = new SelectableFeature(feature);
+			sFeature = FMFactoryManager.getInstance().getFactory(featureModel.getFeatureModel()).createSelectableFeature(feature);
 			selectableFeatures.put(feature.getName(), sFeature);
 		} else if (sFeature.getFeature() == null) {
 			sFeature.setFeature(feature);
@@ -229,7 +236,8 @@ public class Configuration implements Cloneable {
 	public SelectableFeature getSelectableFeature(String name, boolean create) {
 		SelectableFeature selectableFeature = selectableFeatures.get(name);
 		if (create && (selectableFeature == null)) {
-			selectableFeature = new SelectableFeature(name);
+			selectableFeature =
+				FMFactoryManager.getInstance().getFactory(featureModel.getFeatureModel()).createSelectableFeature(new Feature(getFeatureModel(), name));
 			selectableFeatures.put(name, selectableFeature);
 		}
 		return selectableFeature;

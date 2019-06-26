@@ -167,7 +167,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+			featureProject.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 		} catch (final CoreException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}

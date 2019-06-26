@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
@@ -33,6 +34,9 @@ public class MandatoryFeatureFilter implements IFilter<IFeature> {
 
 	@Override
 	public boolean isValid(IFeature object) {
+		if (FeatureUtils.getRoot(object.getFeatureModel()).getName().equals(object.getName())) {
+			return true;
+		}
 		final IFeatureStructure structure = object.getStructure();
 		final IFeatureStructure parent = structure.getParent();
 		return (parent == null) || (parent.isAnd() && structure.isMandatorySet());

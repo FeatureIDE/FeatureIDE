@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
  *
@@ -73,6 +74,11 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 		return oldConstraint.clone(featureModel);
+	}
+
+	@Override
+	public SelectableFeature createSelectableFeature(IFeature feature) {
+		return new SelectableFeature(feature);
 	}
 
 }

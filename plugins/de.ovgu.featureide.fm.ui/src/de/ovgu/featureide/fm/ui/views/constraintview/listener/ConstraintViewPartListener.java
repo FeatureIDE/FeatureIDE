@@ -42,18 +42,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 	}
 
 	@Override
-	public void partOpened(IWorkbenchPartReference part) {
-		final String partID = part.getId();
-		if (FeatureModelEditor.ID.equals(partID)) {
-			final IWorkbenchPart activePart = part.getPart(false);
-			if (activePart instanceof FeatureModelEditor) {
-				controller.setFeatureModelEditor((FeatureModelEditor) activePart);
-				controller.setConstraintsHidden(true);
-			}
-		} else if (ConstraintViewController.ID.equals(partID)) {
-			controller.setConstraintsHidden(true);
-		}
-	}
+	public void partOpened(IWorkbenchPartReference part) {}
 
 	@Override
 	public void partDeactivated(IWorkbenchPartReference part) {}
@@ -71,10 +60,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference part) {
 		final IWorkbenchPart activePart = part.getPart(false);
-		if (activePart instanceof FeatureModelEditor) {
-			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
-			controller.checkForRefresh();
-		} else {
+		if (!(activePart instanceof FeatureModelEditor)) {
 			controller.getView().addNoFeatureModelItem();
 			controller.getSettingsMenu().setStateOfActions(false);
 		}
