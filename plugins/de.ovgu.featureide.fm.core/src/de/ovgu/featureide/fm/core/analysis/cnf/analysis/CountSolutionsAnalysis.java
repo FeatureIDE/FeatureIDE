@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
@@ -51,7 +52,7 @@ public class CountSolutionsAnalysis extends AbstractAnalysis<Long> {
 			solutionCount++;
 			final int[] solution = solver.getSolution();
 			try {
-				solver.addClause(new LiteralSet(solution).negate());
+				solver.addClause(new LiteralSet(solution, Order.INDEX, false).negate());
 			} catch (final RuntimeContradictionException e) {
 				break;
 			}

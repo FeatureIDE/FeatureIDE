@@ -27,6 +27,7 @@ import org.sat4j.specs.IteratorInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
@@ -97,7 +98,8 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 			}
 
 			LiteralSet.resetConflicts(model1, model2);
-			solver.setSelectionStrategy(model1, model1.length > (new LiteralSet(model2).countNegative() + new LiteralSet(model1).countNegative()));
+			solver.setSelectionStrategy(model1,
+					model1.length > (new LiteralSet(model2, Order.INDEX, false).countNegative() + new LiteralSet(model1, Order.INDEX, false).countNegative()));
 
 			vars = new VecInt(model1.length);
 			split(model1, 0, model1.length);
@@ -209,7 +211,8 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 			}
 
 			LiteralSet.resetConflicts(model1, model2);
-			solver.setSelectionStrategy(model1, model1.length > (new LiteralSet(model2).countNegative() + new LiteralSet(model1).countNegative()));
+			solver.setSelectionStrategy(model1,
+					model1.length > (new LiteralSet(model2, Order.INDEX, false).countNegative() + new LiteralSet(model1, Order.INDEX, false).countNegative()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
