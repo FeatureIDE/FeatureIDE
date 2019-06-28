@@ -7,6 +7,19 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.5 (June 2019)
+* Hotfix containing only stability improvements over v3.5.4
+* Added example called FeatureModelAnalysis to illustrate how to analyze a feature model with the FeatureIDE library
+* Numerous fixes for the framework composer (#779)
+* Non-terminating builds prevented for AspectJ and framework projects (#826)
+* Wrong number of false-optional features fixed in the statistics view (#832)
+* Warning added to indicate that the calculated number of program variants in the statistics view could be incorrect in the presence of indeterminate hidden features (#741)
+* Examples illustrating extended feature models have been improved (#866)
+* Horizontal scrollbars added for the configuration map (#861)
+* Action in feature diagram restored: Show Hidden Dependencies of Submodel (#875)
+* Performance when editing extended feature models improved (#837)
+* Fixed incompatibility with Eclipse 2018-12 and newer versions (#852)
+
 Release 3.5.4 (February 2019)
 * Hotfix containing only stability improvements over v3.5.3
 * Usability and stability of the feature attributes view improved (#847, #853, #856)
