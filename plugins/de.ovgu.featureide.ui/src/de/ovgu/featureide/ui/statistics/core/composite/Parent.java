@@ -49,6 +49,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 
 	protected Object value;
 	protected String description; // description
+	protected String note; // additional note
 	protected Image image;
 
 	private boolean isCalculating;
@@ -90,6 +91,14 @@ public class Parent implements StatisticsIds, GUIDefaults {
 
 	public void setImage(Image image) {
 		this.image = image;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	protected Parent() {}
@@ -151,6 +160,10 @@ public class Parent implements StatisticsIds, GUIDefaults {
 				buffer.append(SEPARATOR);
 			}
 			buffer.append(((value == null) ? "" : value.toString()));
+		}
+		if (note != null) {
+			buffer.append(' ');
+			buffer.append(note);
 		}
 		return buffer.toString();
 	}

@@ -148,7 +148,10 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 			return buffer.toString();
 		}
 
-		writeSelectedFeatures(configuration.getRoot(), buffer);
+		final SelectableFeature root = configuration.getRoot();
+		if ((root != null) && (root.getFeature() != null)) {
+			writeSelectedFeatures(root, buffer);
+		}
 		return buffer.toString();
 	}
 

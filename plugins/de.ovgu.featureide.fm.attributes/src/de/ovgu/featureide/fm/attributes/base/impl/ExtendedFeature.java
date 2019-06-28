@@ -27,7 +27,7 @@ public class ExtendedFeature extends Feature {
 		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
-			attributes.add(attribute);
+			attributes.add(attribute.cloneAtt(this));
 		}
 	}
 
@@ -44,7 +44,6 @@ public class ExtendedFeature extends Feature {
 
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
-
 	}
 
 	public void removeAttribute(IFeatureAttribute attribute) {

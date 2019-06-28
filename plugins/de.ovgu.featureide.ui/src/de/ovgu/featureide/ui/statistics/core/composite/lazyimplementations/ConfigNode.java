@@ -37,7 +37,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 public class ConfigNode extends Parent {
 
-	private final IFeatureModel innerModel;
+	protected final IFeatureModel innerModel;
 
 	public ConfigNode(String description, IFeatureModel innerModel) {
 		super(description, "(double-click to calculate)");
