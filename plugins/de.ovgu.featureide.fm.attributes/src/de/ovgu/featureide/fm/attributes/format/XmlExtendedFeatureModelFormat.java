@@ -32,6 +32,8 @@ import org.w3c.dom.Text;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
@@ -589,9 +591,14 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 					}
 					// TODO ATTRIBUTE Error marker for missing name and/or type
 					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
-					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
-					if (featureAttribute != null) {
-						((ExtendedFeature) parent).addAttribute(featureAttribute);
+					IFeatureAttribute featureAttribute;
+					try {
+						featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
+						if (featureAttribute != null) {
+							((ExtendedFeature) parent).addAttribute(featureAttribute);
+						}
+					} catch (FeatureAttributeParseException | UnknownFeatureAttributeTypeException e1) {
+						e1.printStackTrace();
 					}
 				}
 				continue;

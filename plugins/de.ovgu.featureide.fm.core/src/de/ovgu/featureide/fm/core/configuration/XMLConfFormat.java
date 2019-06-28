@@ -49,8 +49,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
-
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration[\\s>]");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + "configuration" + "[\\s>]");
 
 	@Override
 	public XMLConfFormat getInstance() {
@@ -103,6 +102,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 						}
 					}
 				}
+
 			}
 		} else {
 			warnings.add(new Problem("Root element must be <configuration>", 1, Problem.Severity.ERROR));

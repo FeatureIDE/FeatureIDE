@@ -40,7 +40,10 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -87,13 +90,19 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		 */
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				if (!isRefreshWithDelete()) {
-					checkForRefresh();
-					setRefreshWithDelete(true);
-				} else {
-					checkForRefresh();
+			switch (event.getEventType()) {
+			case ACTIVE_EXPLANATION_CHANGED:
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					if (!isRefreshWithDelete()) {
+						checkForRefresh();
+						setRefreshWithDelete(true);
+					} else {
+						checkForRefresh();
+					}
 				}
+				break;
+			default:
+				break;
 			}
 		}
 	};
@@ -237,7 +246,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	}
 
 	/**
-	 * Show constraints containing the selected feature
+	 * Show constraints containing the selected feature and those which are part of the current explanation
 	 */
 	public void addFeatureConstraints() {
 		if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
@@ -251,6 +260,48 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 						if (matchesConstraint(part, constraint)) {
 							viewer.addItem(constraint.getObject());
 							break;
+						}
+					}
+				}
+			}
+		}
+		addExplanationConstraints();
+	}
+
+	/**
+	 * Add all constraints that are part of the active explanation
+	 */
+	private void addExplanationConstraints() {
+		// if there is no active explanation, don't do anything
+		if (FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getActiveExplanation() == null) {
+			return;
+		}
+
+		final List<IGraphicalConstraint> constraints =
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
+		final Iterable<Reason<?>> reasons = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getActiveExplanation().getReasons();
+
+		for (final Reason<?> r : reasons) {
+			if (r.getSubject() instanceof FeatureModelElementTrace) {
+				if (((FeatureModelElementTrace) r.getSubject()).getElement() != null) {
+					if (((FeatureModelElementTrace) r.getSubject()).getElement() instanceof Constraint) {
+						final Constraint c = (Constraint) ((FeatureModelElementTrace) r.getSubject()).getElement();
+						for (final IGraphicalConstraint constraint : constraints) {
+							if (constraint.getObject() == c) {
+								boolean additem = true;
+								final TreeItem[] treeitems = viewer.getViewer().getTree().getItems();
+								for (int i = 0; i < treeitems.length; i++) {
+									// check for duplicate constraints before adding
+									if (treeitems[i].getData() == c) {
+										additem = false;
+										break;
+									}
+								}
+								if (additem) {
+									viewer.addItem(c);
+								}
+								break;
+							}
 						}
 					}
 				}
@@ -302,7 +353,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private void findConstraints(IFeatureModel currentModel) {
 		for (final IConstraint constraint : currentModel.getConstraints()) {
 			final String lazyConstraint = constraint.getDisplayName().toLowerCase();
-			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
+			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ").replaceAll("\r", " ");
 			searchText = searchText.toLowerCase();
 			// RegEx search with part string: .* at the start and at the end enables part search automatically
 			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
