@@ -10,7 +10,7 @@ pipeline {
         stage ('Initialize') {
             steps {  
                 script {
-                    currentBuild.displayName = #${BUILD_NUMBER} ${GIT_BRANCH} ${CAUSE}
+                    currentBuild.displayName = ${BUILD_NUMBER} ${GIT_BRANCH} ${CAUSE}
                 }
       			sh '''
                		echo "PATH = ${PATH}"
@@ -31,12 +31,12 @@ pipeline {
         	}
         }
 
-
-        stage ('Verify') {
-        	steps {
-                sh 'mvn clean verify'
-        	}
+        wrap([$class: 'Xvfb']) {
+            stage ('Verify') {
+                steps {
+                    sh 'mvn clean verify'
+                }
+            }
         }
-
     }
 }
