@@ -11,10 +11,12 @@ pipeline {
     stages {
         stage ('Initialize') {
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+	    	wrap([$class: 'Xvbf']){
+      			sh '''
+                    		echo "PATH = ${PATH}"
+                    		echo "M2_HOME = ${M2_HOME}"
+                	'''
+			}
             }
         }
 
@@ -33,7 +35,9 @@ pipeline {
 
         stage ('Verify') {
         	steps {
-        		sh 'mvn clean verify'
+			wrap([$class: 'Xvbf']){
+        			sh 'mvn clean verify'
+				}
         	}
         }
 
