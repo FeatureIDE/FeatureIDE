@@ -4,11 +4,15 @@ pipeline {
     
     tools {
         maven 'Maven 3.5.2'
+        default 'org.jenkinsci.plugins.xvfb.XvfbInstallation'
     }
 
     stages {
         stage ('Initialize') {
             steps {  
+                script {
+                    currentBuild.displayName = "The name."
+                }
       			sh '''
                		echo "PATH = ${PATH}"
                		echo "M2_HOME = ${M2_HOME}"
