@@ -10,7 +10,7 @@ pipeline {
         stage ('Initialize') {
             steps {  
                 script {
-                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH}"
+                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${COMMIT_USER}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
