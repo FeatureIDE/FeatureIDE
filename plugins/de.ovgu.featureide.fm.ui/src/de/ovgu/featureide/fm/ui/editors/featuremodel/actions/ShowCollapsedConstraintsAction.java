@@ -53,7 +53,6 @@ public class ShowCollapsedConstraintsAction extends Action {
 	@Override
 	public void run() {
 		final ShowCollapsedConstraintsOperation op = new ShowCollapsedConstraintsOperation(featureModel);
-		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
