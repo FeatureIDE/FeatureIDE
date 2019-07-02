@@ -31,12 +31,13 @@ pipeline {
         	}
         }
 
-        wrap([$class: 'Xvfb']) {
-            stage ('Verify') {
-                steps {
+        stage ('Verify') {
+        	steps {
+                wrap([$class: 'Xvfb']) {
                     sh 'mvn clean verify'
                 }
-            }
+        	}
         }
+
     }
 }
