@@ -10,10 +10,7 @@ pipeline {
 
     stages {
         stage ('Initialize') {
-            steps {
-                script {
-                    currentBuild.displayName = "The name."
-                }    
+            steps {  
       			sh '''
                		echo "PATH = ${PATH}"
                		echo "M2_HOME = ${M2_HOME}"
