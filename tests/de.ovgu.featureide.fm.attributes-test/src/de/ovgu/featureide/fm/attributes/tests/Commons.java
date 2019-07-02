@@ -24,9 +24,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -153,6 +158,62 @@ public class Commons {
 		assertTrue(model instanceof ExtendedFeatureModel);
 		return (ExtendedFeatureModel) model;
 	}
+	
+	public static ExtendedFeatureModel getNewFormatBikeModel() {
+		IFeatureModel model = Commons.loadTestExtendedFeatureModelFromFile("newFormatBike.xml");
+		assertTrue(model instanceof ExtendedFeatureModel);
+		return (ExtendedFeatureModel) model;
+	}
+	
+	public static boolean compareByAttributeValues(ExtendedFeatureModel model1, ExtendedFeatureModel model2) {
+		return compareModelToValueMap(model2, extractValueMap(model1));
+	}
+	
+	public static Map<String, Map<String, Object>> extractValueMap(ExtendedFeatureModel model) {
+		Map<String, Map<String, Object>> valueMap = new HashMap<>();
+		for (IFeature feat : model.getFeatures()) {
+			ExtendedFeature ext = (ExtendedFeature) feat;
+			Map<String, Object> featValueMap = new HashMap<>();
+			for (IFeatureAttribute att : ext.getAttributes()) {
+				featValueMap.put(att.getName(), att.getValue());
+			}
+			valueMap.put(ext.getName(), featValueMap);
+			
+		}
+		
+		return valueMap;
+	}
+	
+	public static boolean compareModelToValueMap(ExtendedFeatureModel model, Map<String, Map<String, Object>> valueMap) {
+		for (IFeature feat : model.getFeatures()) {
+			ExtendedFeature ext = (ExtendedFeature) feat;
+			if (!valueMap.containsKey(ext.getName())) {
+				return false;
+			}
+			for (IFeatureAttribute att : ext.getAttributes()) {
+				if (valueMap.get(ext.getName()).containsKey(att.getName())) {
+					if (att.getValue() == null) {
+						if (valueMap.get(ext.getName()).get(att.getName()) == null) {
+							continue;
+						}
+						return false;
+					}
+					if (valueMap.get(ext.getName()).get(att.getName()) == null) {
+						return false;
+					}
+					if (!valueMap.get(ext.getName()).get(att.getName()).equals(att.getValue())) {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			}
+
+			
+		}
+		return true;
+	}
+	
 
 }
 

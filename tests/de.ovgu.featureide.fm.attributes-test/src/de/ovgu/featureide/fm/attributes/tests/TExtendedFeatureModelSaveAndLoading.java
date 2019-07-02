@@ -24,10 +24,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
@@ -59,6 +61,39 @@ public class TExtendedFeatureModelSaveAndLoading {
 	private static final IFeatureModelFactory factory = new ExtendedFeatureModelFactory();
 	private static final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
 
+	@Before
+	public void prepareWorkbench() {
+		FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
+		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
+	}
+
+	
+	
+	@Test
+	public void test_ReadSaveRead() {
+		ExtendedFeatureModel testModelOldFormat1 = Commons.getSandwitchModel();
+		ExtendedFeatureModel testModelOldFormat2 = Commons.getBaseModel();
+		ExtendedFeatureModel testModelNewFormat = Commons.getNewFormatBikeModel();
+		
+		ExtendedFeatureModel resultModel1 = (ExtendedFeatureModel) writeAndReadModel(testModelOldFormat1);
+		ExtendedFeatureModel resultModel2 = (ExtendedFeatureModel) writeAndReadModel(testModelOldFormat2);
+		ExtendedFeatureModel resultModel3 = (ExtendedFeatureModel) writeAndReadModel(testModelNewFormat);
+		
+		assertEquals(true, Commons.compareByAttributeValues(testModelOldFormat1, resultModel1));
+		assertEquals(true, Commons.compareByAttributeValues(testModelOldFormat2, resultModel2));
+		assertEquals(true, Commons.compareByAttributeValues(testModelNewFormat, resultModel3));
+		
+		assertEquals(false, Commons.compareByAttributeValues(resultModel1, resultModel2));
+		assertEquals(false, Commons.compareByAttributeValues(testModelOldFormat1, resultModel2));
+		
+		ExtendedFeature ext = (ExtendedFeature) resultModel1.getFeature("Bread");
+		ext.addAttribute(new BooleanFeatureAttribute(ext, "New", "", true, false, false));
+		assertEquals(false, Commons.compareByAttributeValues(testModelOldFormat1, resultModel1));
+		
+		
+	}
+	
 	@Test
 	public void test_CreationAndSaving() {
 		FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
