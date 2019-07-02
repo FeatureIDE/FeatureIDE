@@ -1,4 +1,4 @@
-##Just to test Stuff now please!
+##Just to test Stuff
 
 pipeline {
     
