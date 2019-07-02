@@ -10,7 +10,7 @@ pipeline {
         stage ('Initialize') {
             steps {  
                 script {
-                    currentBuild.displayName = "${BUILD_NUMBER} ${GIT_BRANCH}"
+                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${CHANGE_AUTHOR_DISPLAY_NAME}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
@@ -33,7 +33,7 @@ pipeline {
 
         stage ('Verify') {
         	steps {
-                wrap([$class: 'Xvfb']) {
+                wrap([$class: 'Xvfb', additionalOptions: '', assignedLabels: '', autoDisplayName: true, debug: true, displayNameOffset: 0, installationName: 'default', parallelBuild: true, screen: '']) {
                     sh 'mvn clean verify'
                 }
         	}
