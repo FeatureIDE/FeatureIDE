@@ -4,7 +4,7 @@ pipeline {
     
     tools {
         maven 'Maven 3.5.2'
-        default 'org.jenkinsci.plugins.xvfb.XvfbInstallation'
+        org.jenkinsci.plugins.xvfb.XvfbInstallation 'default'
     }
 
     stages {
