@@ -326,6 +326,7 @@ public class SetFeatureColorDialog extends Dialog {
 	protected void okPressed() {
 		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureListBuffer.get(0).getFeatureModel(), featureListBuffer, newColor);
 
+		enableUndoRedo = featureListBuffer.get(0).getFeatureModel().getUndoContext() != null;
 		if (enableUndoRedo) {
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

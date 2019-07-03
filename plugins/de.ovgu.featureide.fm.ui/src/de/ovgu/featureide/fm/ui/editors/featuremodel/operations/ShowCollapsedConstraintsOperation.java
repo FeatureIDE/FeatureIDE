@@ -41,7 +41,7 @@ public class ShowCollapsedConstraintsOperation extends AbstractGraphicalFeatureM
 	@Override
 	public FeatureIDEEvent operation() {
 		graphicalFeatureModel.getLayout().showCollapsedConstraints(!graphicalFeatureModel.getLayout().showCollapsedConstraints());
-		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
+		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_LAYOUT_CHANGED);
 	}
 
 	@Override

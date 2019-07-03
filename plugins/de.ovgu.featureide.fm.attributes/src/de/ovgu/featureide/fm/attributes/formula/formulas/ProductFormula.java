@@ -37,7 +37,7 @@ public class ProductFormula implements AggregateFormula {
 		for (int i = 0; i < factors.size(); i++) {
 			int sign = (potencies.get(i) == 1) ? FormulaStringTable.MULTIPLY : FormulaStringTable.DIVIDE;
 			if (factors.get(i) instanceof AdditionFormula) {
-				result += " " + (char) sign + "(" + factors.get(i).toString() + ")";
+				result += " " + (char) sign + " (" + factors.get(i).toString() + ")";
 			} else {
 				result += " " + (char) sign + " " + factors.get(i).toString();
 			}

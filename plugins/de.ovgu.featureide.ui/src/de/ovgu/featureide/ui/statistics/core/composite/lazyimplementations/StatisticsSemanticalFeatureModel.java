@@ -56,6 +56,6 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 		addChild(new ConfigNode(DESC_CONFIGS, model));
 
-		addChild(new ConfigNode(DESC_VARIANTS, model));
+		addChild(new VariantsNode(DESC_VARIANTS, model));
 	}
 }
