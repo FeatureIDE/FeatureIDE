@@ -10,9 +10,8 @@ pipeline {
         stage ('Initialize') {
             steps {  
                 script {
-                    def causes = currentBuild.getBuildCauses()
-                    shortDescription = causes["shortDescription"]
-                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${short}"
+                    def causes = currentBuild.getBuildCauses('com.cloudbees.jenkins.GitHubPushCause')
+                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
