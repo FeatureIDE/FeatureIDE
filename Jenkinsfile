@@ -42,6 +42,12 @@ pipeline {
                 }
         	}
         }
-
     }
+    post {
+    always {
+        sh 'echo "Das sollte immer zu sehen sein" '
+    }
+    unsuccessful {
+    // One or more steps need to be included within each condition's block.
+  }
 }
