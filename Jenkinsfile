@@ -11,7 +11,8 @@ pipeline {
             steps {  
                 script {
                     def causes = currentBuild.getBuildCauses()
-                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
+                    def short = causes["shortDescription"]
+                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${short}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
