@@ -11,6 +11,9 @@ pipeline {
             steps {  
                 script {
                     def causes = currentBuild.getBuildCauses('com.cloudbees.jenkins.GitHubPushCause').shortDescription
+                    if(!causes) {
+                        causes = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause').shortDescription
+                    }
                     currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
                 }
       			sh '''
