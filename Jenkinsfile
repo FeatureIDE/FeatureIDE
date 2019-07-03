@@ -10,7 +10,8 @@ pipeline {
         stage ('Initialize') {
             steps {  
                 script {
-                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${GIT_AUTHOR}"
+                    def causes = currentBuild.rawBuild.getBuildCauses()
+                    currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
