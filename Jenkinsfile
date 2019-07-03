@@ -11,7 +11,7 @@ pipeline {
             steps {  
                 script {
                     def causes = currentBuild.getBuildCauses()
-                    def short = causes["shortDescription"]
+                    short = causes["shortDescription"]
                     currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${short}"
                 }
       			sh '''
