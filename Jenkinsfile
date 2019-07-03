@@ -48,7 +48,7 @@ pipeline {
             sh '''
                 echo "Das sollte immer zu sehen sein" 
             '''
-            mail bcc: '', body: '${currentBuild.absoluteUrl}', cc: '', from: '', replyTo: '', subject: '${GIT_BRANCH} -build Faild', to: 'c.orsinger@tu-braunschweig.de'
+            emailext body: '${currentBuild.absoluteUrl}', subject: '${GIT_BRANCH} -build Faild', to: 'c.orsinger@tu-braunschweig.de'
         }
         //unsuccessful {
         // One or more steps need to be included within each condition's block.
