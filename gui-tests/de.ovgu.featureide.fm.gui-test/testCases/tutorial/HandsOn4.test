@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hDk9IOvTEee9ofvBkamr2g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 6/4/19 12:42 PM
+Save-Time: 7/7/19 5:07 PM
 Testcase-Type: ecl
 Verifications: _UKIhUOvaEee9ofvBkamr2g,_TfaZAIa1Eemi6KBWYfLE5Q,_7uNdoOvcEee9ofvBkamr2g,_AxTkEOvdEee9ofvBkamr2g,_gxx6IOvhEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
 
@@ -120,8 +120,8 @@ get-view Problems | get-tree
 with [get-editor "Request.java" | get-text-viewer] {
     set-caret-pos 176 29
     select-range 176 30 176 21
-    type-text e
-    key-type "M1+SPACE"
+    type-text edCall
+    wait 1000
     key-type "M1+s"
     hover-text 177 38
 }
