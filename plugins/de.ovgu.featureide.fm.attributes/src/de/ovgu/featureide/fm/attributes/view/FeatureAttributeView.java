@@ -157,8 +157,11 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
+			if (featureModel == null) {
+				return;
+			}
 			if (!synchToFeatureDiagram) {
-				// Prevent the feature attributes view from synching to the feature diagramfor (Object obj : event.getStructuredSelection().toList()) {
+				// Prevent the feature attributes view from synching to the feature diagram for (Object obj : event.getStructuredSelection().toList()) {
 				selection = new ArrayList<>();
 				selectedManualFeatures = null;
 				selectedAutomaticFeatures = null;
