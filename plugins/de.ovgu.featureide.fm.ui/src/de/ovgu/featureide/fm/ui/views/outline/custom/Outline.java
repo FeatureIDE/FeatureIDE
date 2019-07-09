@@ -255,7 +255,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		viewer.setAutoExpandLevel(2);
+		viewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
 		viewer.addSelectionChangedListener(this);
 		viewer.addTreeListener(this);
 
@@ -473,7 +473,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 							if (viewer != null) {
 								if ((viewer.getControl() != null) && !viewer.getControl().isDisposed()) {
 									viewer.getControl().setRedraw(false);
-
 									viewer.setContentProvider(provider.getTreeProvider());
 									viewer.setLabelProvider(provider.getLabelProvider());
 									if (iFile != null) {
@@ -482,10 +481,10 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 										fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 										fillContextMenu();
 									}
-
 									viewer.getControl().setRedraw(true);
 									viewer.getControl().setEnabled(true);
 									viewer.refresh();
+									viewer.expandAll();
 								}
 							}
 							return Status.OK_STATUS;
