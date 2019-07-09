@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -53,7 +54,7 @@ public class AdjustModelToEditorSizeAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		final IFeature root = featureModelManager.editObject().getStructure().getRoot().getFeature();
+		final IFeature root = FeatureUtils.getRoot(featureModelManager.getSnapshot());
 		if (root == null) {
 			return;
 		}

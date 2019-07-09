@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation to move constraints to the new mouse positione when manual layout is activated
+ * Operation to move constraints to the new mouse position when manual layout is activated
  *
  * @author Joshua Sprey
  */
@@ -43,7 +43,7 @@ public class MoveConstraintToLocationOperation extends AbstractGraphicalFeatureM
 
 	public MoveConstraintToLocationOperation(IGraphicalFeatureModel graphicalFeatureModel, Point newPos, IConstraint constraint) {
 		super(graphicalFeatureModel, MOVE_CONSTRAINT);
-		constraintIndex = featureModelManager.editObject().getConstraintIndex(constraint);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 		this.newPos = newPos;
 	}
 

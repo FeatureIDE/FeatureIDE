@@ -20,16 +20,19 @@
  */
 package de.ovgu.featureide.fm.attributes.view.actions;
 
-import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -40,30 +43,49 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class RemoveFeatureAttributeAction extends Action {
 
-	private final ExtendedFeatureModel featureModel;
-	private final HashMap<IFeatureAttribute, ExtendedFeature> map;
+	private final IFeatureModelManager fmManager;
+	private final List<IFeatureAttribute> attributes;
 
-	public RemoveFeatureAttributeAction(ExtendedFeatureModel featureModel, HashMap<IFeatureAttribute, ExtendedFeature> map) {
+	public RemoveFeatureAttributeAction(IFeatureModelManager fmManager, List<IFeatureAttribute> attributes) {
 		super(StringTable.REMOVE_SELECTED_ATTRIBUTE);
-		this.featureModel = featureModel;
-		this.map = map;
+		this.fmManager = fmManager;
+		this.attributes = attributes;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
-		for (final IFeatureAttribute featureAttribute : map.keySet()) {
-			map.get(featureAttribute).removeAttribute(featureAttribute);
+		fmManager.editObject(this::removeAttributes);
+	}
+
+	private void removeAttributes(IFeatureModel featureModel) {
+		for (final IFeatureAttribute attribute : attributes) {
+			// delete all of these recursive elements
+			if (attribute.isRecursive()) {
+				if (attribute.isHeadOfRecursiveAttribute()) {
+					for (final IFeature feature : featureModel.getFeatures()) {
+						ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+						for (IFeatureAttribute localAttribute : extendedFeature.getAttributes()) {
+							if (attribute.getName().equals(localAttribute.getName())) {
+								extendedFeature.removeAttribute(localAttribute);
+							}
+						}
+					}
+				}
+			} else {
+				for (final IFeature feature : featureModel.getFeatures()) {
+					ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+					if (extendedFeature.getAttributes().contains(attribute)) {
+						extendedFeature.removeAttribute(attribute);
+					}
+				}
+			}
 		}
-		featureModel.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, featureModel.getStructure().getRoot().getFeature()));
+		featureModel.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, FeatureUtils.getRoot(featureModel)));
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return map.size() > 0;
+		return attributes.size() > 0;
 	}
 
 }

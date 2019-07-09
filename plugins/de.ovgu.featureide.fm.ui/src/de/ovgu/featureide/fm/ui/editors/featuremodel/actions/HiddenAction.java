@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
@@ -47,19 +45,8 @@ public class HiddenAction extends MultipleSelectionAction {
 		setChecked(isEveryFeatureHidden());
 	}
 
-	private boolean isEveryFeatureHidden() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
-		for (final String name : featureArray) {
-			final IFeature tempFeature = featureModel.getFeature(name);
-			if (!(tempFeature.getStructure().isHidden())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	private void changeHiddenStatus(boolean allHidden) {
-		FeatureModelOperationWrapper.run(new SetFeatureToHiddenOperation(featureModelManager, allHidden, getSelectedFeatures()));
+		FeatureModelOperationWrapper.run(new SetFeatureToHiddenOperation(featureModelManager, getSelectedFeatures()));
 	}
 
 	@Override
@@ -67,6 +54,10 @@ public class HiddenAction extends MultipleSelectionAction {
 		setEnabled(true);
 		// A selection of features is considered hidden if every feature is hidden.
 		setChecked(isEveryFeatureHidden());
+	}
+
+	private boolean isEveryFeatureHidden() {
+		return SetFeatureToHiddenOperation.isEveryFeatureHidden(featureModelManager.getSnapshot(), featureArray);
 	}
 
 }

@@ -10,7 +10,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedConfigurationFactory;
 import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -204,6 +206,15 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 	@Override
 	public boolean supportsContent(LazyReader content) {
 		return super.supportsContent(content, CONTENT_REGEX);
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			ConfigurationFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(ID, ExtendedConfigurationFactory.ID);
+			return true;
+		}
+		return false;
 	}
 
 }

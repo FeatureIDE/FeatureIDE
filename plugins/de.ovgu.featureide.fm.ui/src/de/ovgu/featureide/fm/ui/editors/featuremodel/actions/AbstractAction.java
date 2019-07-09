@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
@@ -43,23 +41,8 @@ public class AbstractAction extends MultipleSelectionAction {
 
 	@Override
 	public void run() {
-		changeAbstractStatus(isEveryFeatureAbstract());
+		FeatureModelOperationWrapper.run(new SetFeatureToAbstractOperation(featureModelManager, getSelectedFeatures()));
 		setChecked(isEveryFeatureAbstract());
-	}
-
-	private boolean isEveryFeatureAbstract() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
-		for (final String name : featureArray) {
-			final IFeature feature = featureModel.getFeature(name);
-			if (!(feature.getStructure().isAbstract())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void changeAbstractStatus(boolean allAbstract) {
-		FeatureModelOperationWrapper.run(new SetFeatureToAbstractOperation(featureModelManager, allAbstract, getSelectedFeatures()));
 	}
 
 	@Override
@@ -67,6 +50,10 @@ public class AbstractAction extends MultipleSelectionAction {
 		setEnabled(true);
 		// A selection of features is considered abstract if every feature is abstract.
 		setChecked(isEveryFeatureAbstract());
+	}
+
+	private boolean isEveryFeatureAbstract() {
+		return SetFeatureToAbstractOperation.isEveryFeatureAbstract(featureModelManager.getSnapshot(), featureArray);
 	}
 
 }

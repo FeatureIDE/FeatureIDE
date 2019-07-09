@@ -37,7 +37,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -58,11 +58,13 @@ public class FeatureNode extends LazyParent implements IToolTip {
 
 	protected final String tooltip;
 
+	private final FeatureModelFormula formula;
 	private final boolean hasConstraints, expand;
 	private final IFeature feat;
 
-	public FeatureNode(final IFeature feat, boolean expand) {
+	public FeatureNode(FeatureModelFormula formula, final IFeature feat, boolean expand) {
 		super(feat.getName());
+		this.formula = formula;
 		this.feat = feat;
 		this.expand = expand;
 		tooltip = buildToolTip();
@@ -98,7 +100,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	 */
 	private String buildToolTip() {
 		final List<String> attribute = new ArrayList<>();
-		final FeatureProperties status = FeatureUtils.getFeatureProperties(feat);
+		final FeatureProperties status = formula.getAnalyzer().getAnalysesCollection().getFeatureProperty(feat);
 
 		if (!status.hasStatus(FeatureStatus.DEAD) && !status.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 			attribute.add("STATUS: " + status);
@@ -179,7 +181,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		if (feat.getStructure().hasChildren()) {
 			for (final IFeatureStructure tempStructure : feat.getStructure().getChildren()) {
 				final IFeature temp = tempStructure.getFeature();
-				childFeat.addChild(new FeatureNode(temp, expand));
+				childFeat.addChild(new FeatureNode(formula, temp, expand));
 			}
 		}
 		return childFeat;

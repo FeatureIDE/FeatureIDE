@@ -66,6 +66,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	FeatureEditPart(IGraphicalFeature feature) {
 		setModel(feature);
+		activate();
 	}
 
 	@Override

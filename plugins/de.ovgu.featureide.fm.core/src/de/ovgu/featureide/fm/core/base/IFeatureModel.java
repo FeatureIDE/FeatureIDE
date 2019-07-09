@@ -342,6 +342,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	IFeature getFeature(CharSequence name);
 
+	IFeatureModelElement getElement(long id);
+
 	/**
 	 * Returns the ordered collection of feature names according to the given feature order. If an order is given, the method returns the corresponding list of
 	 * feature names according to their order. If no order is set, the method returns the names of features according to a pre-order traversation of the root
@@ -730,5 +732,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	void setConstraint(int index, IConstraint constraint);
 
 	List<IEventListener> getListenerList();
+
+	void setEventManager(IEventManager eventManager);
 
 }

@@ -40,7 +40,6 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
@@ -116,7 +115,8 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public void updateProperties() {
 		init();
 
-		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(graphicalConstraint.getObject());
+		final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
+				.getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 

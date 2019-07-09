@@ -27,10 +27,12 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -70,7 +72,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 
 			// Get root because the constraints will be auto layouted depending on the root
 			final IGraphicalFeature root =
-				graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModelManager().editObject().getStructure().getRoot().getFeature());
+				FeatureUIHelper.getGraphicalFeature(FeatureUtils.getRoot(graphicalFeatureModel.getFeatureModelManager().getSnapshot()), graphicalFeatureModel);
 			minX = root.getLocation().x;
 			maxX = root.getLocation().x + root.getSize().width;
 			// +20 because of the collapsed decorator

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.CheckForNull;
@@ -289,7 +288,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * unnecessary or redundant calculations) Hashing might be fast for locating features, but creating a HashSet is costly So LinkedLists are much faster
 	 * because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public Map<IFeatureModelElement, Object> analyzeFeatureModel(IMonitor monitor) {
+	public AnalysesCollection analyzeFeatureModel(IMonitor monitor) {
 		// TODO !!! use monitor
 		if (monitor == null) {
 			monitor = new NullMonitor();
@@ -299,7 +298,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 		updateConstraints(monitor);
 
-		return analysesCollection.elementPropertiesMap;
+		return analysesCollection;
 	}
 
 	public void updateConstraints() {

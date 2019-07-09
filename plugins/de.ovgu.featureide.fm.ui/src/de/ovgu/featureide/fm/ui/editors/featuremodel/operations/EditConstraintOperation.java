@@ -73,7 +73,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 		super(featureModelManager, EDIT_CONSTRAINT);
 		oldWrapper = new ConstraintDescription(constraint.getNode(), constraint.getDescription());
 		newWrapper = new ConstraintDescription(propNode, description);
-		constraintIndex = featureModelManager.editObject().getConstraintIndex(constraint);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 
 	public DeleteConstraintOperation(IConstraint constraint, IFeatureModelManager featureModelManager) {
 		super(featureModelManager, DELETE_CONSTRAINT);
-		constraintIndex = featureModelManager.editObject().getConstraintIndex(constraint);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
 	@Override

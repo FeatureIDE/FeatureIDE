@@ -27,16 +27,13 @@ public class SynchFeatureAttributesToFeatureDiagramAction extends Action {
 		setChecked(view.synchToFeatureDiagram);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
-		view.synchToFeatureDiagram ^= true;
+		view.synchToFeatureDiagram = !view.synchToFeatureDiagram;
 		setChecked(view.synchToFeatureDiagram);
 		view.selectedAutomaticFeatures = null;
 		view.selectedManualFeatures = null;
 		treeView.refresh();
 	}
+
 }

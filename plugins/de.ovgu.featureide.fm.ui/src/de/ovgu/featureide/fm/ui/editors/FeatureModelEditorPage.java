@@ -40,17 +40,15 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
 	protected final IFeatureModelManager fmManager;
-	protected final IGraphicalFeatureModel gfm;
 
 	private int index;
 
 	protected IEditorInput input;
 	protected IEditorSite site;
 
-	public FeatureModelEditorPage(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm) {
+	public FeatureModelEditorPage(IFeatureModelManager fmManager) {
 		super();
 		this.fmManager = fmManager;
-		this.gfm = gfm;
 	}
 
 	public IFeatureModelManager getFeatureModel() {

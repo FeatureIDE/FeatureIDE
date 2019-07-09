@@ -21,8 +21,11 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import javax.annotation.CheckForNull;
+
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -78,18 +81,15 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	@Override
-	public void overwrite() {
-		super.overwrite();
-	}
-
-	@Override
 	public IFeatureModelFormat getFormat() {
 		return (IFeatureModelFormat) super.getFormat();
 	}
 
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		return oldObject.clone();
+		final IFeatureModel clone = oldObject.clone();
+		clone.setEventManager(this);
+		return clone;
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		fileOperationLock.lock();
 		try {
 			if (variableFormula == null) {
-				variableFormula = new FeatureModelFormula(variableObject);
+				variableFormula = new FeatureModelFormula(getSnapshot());
 			}
 			return variableFormula;
 		} finally {
@@ -113,15 +113,16 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		}
 	}
 
-	public FeatureModelFormula getVariableFormulaSnapshot() {
-		IFeatureModel snapshot;
-		fileOperationLock.lock();
-		try {
-			snapshot = copyObject(variableObject);
-		} finally {
-			fileOperationLock.unlock();
+	@Override
+	protected void resetSnapshot() {
+		super.resetSnapshot();
+		if ((variableFormula != null) && (variableObject != null)) {
+			final Node oldNode = variableFormula.getPropositionalNode();
+			final Node newNode = new FeatureModelFormula(variableObject).getPropositionalNode();
+			if (!Objects.equals(oldNode, newNode)) {
+				variableFormula = null;
+			}
 		}
-		return new FeatureModelFormula(snapshot);
 	}
 
 	@Override
@@ -140,7 +141,6 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		fileOperationLock.lock();
 		try {
 			super.setVariableObject(variableObject);
-			variableFormula = null;
 		} finally {
 			fileOperationLock.unlock();
 		}
@@ -150,6 +150,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	protected IFeatureModel createObject() throws Exception {
 		final IFeatureModel featureModel = super.createObject();
 		featureModel.setSourceFile(getPath());
+		featureModel.setEventManager(this);
 		return featureModel;
 	}
 

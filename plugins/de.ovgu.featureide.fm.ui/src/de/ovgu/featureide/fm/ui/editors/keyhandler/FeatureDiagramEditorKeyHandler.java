@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -36,7 +38,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -84,7 +85,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		lastTime = 0;
 
 		resetFeatureList();
-		graphicalFeatureModel.getFeatureModelManager().editObject().addListener(this);
+		graphicalFeatureModel.getFeatureModelManager().addListener(this);
 	}
 
 	@Override
@@ -121,7 +122,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
-			final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().editObject();
+			final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().getSnapshot();
 			// select the new feature
 			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
@@ -154,14 +155,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 	private void resetFeatureList() {
 		featureList.clear();
-		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().editObject();
-		featureList.addAll(Functional.toList(Functional.map(featureModel.getFeatures(), new Functional.IFunction<IFeature, String>() {
-
-			@Override
-			public String invoke(IFeature t) {
-				return t.getName();
-			}
-		})));
+		final Stream<IFeature> features = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeatures().stream();
+		featureList.addAll(features.map(IFeature::getName).collect(Collectors.toList()));
 		curSearchString = "";
 		curIndex = 0;
 	}

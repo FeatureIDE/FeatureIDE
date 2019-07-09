@@ -114,7 +114,7 @@ public class SetFeatureColorAction extends Action {
 
 	private boolean isSelectionValid(IStructuredSelection selection) {
 		if (featureModelManager != null) {
-			final IFeatureModel featureModel = featureModelManager.editObject();
+			final IFeatureModel featureModel = featureModelManager.getSnapshot();
 			for (final Object object : selection.toList()) {
 				if (object instanceof IFeature) {
 					continue;
@@ -154,7 +154,7 @@ public class SetFeatureColorAction extends Action {
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 		if ((featureModelManager != null) && !selection.isEmpty()) {
-			final IFeatureModel featureModel = featureModelManager.editObject();
+			final IFeatureModel featureModel = featureModelManager.getSnapshot();
 			featureList.clear();
 			final Object[] editPartArray = selection.toArray();
 
@@ -186,7 +186,7 @@ public class SetFeatureColorAction extends Action {
 			final List<IFeature> features = new ArrayList<>(featureList);
 
 			if (!features.isEmpty()) {
-				final IFeatureModel featureModel = featureModelManager.editObject();
+				final IFeatureModel featureModel = featureModelManager.getSnapshot();
 				if (featureModel != null) {
 					// only allow coloration if the active profile is not the default profile
 					if (FeatureColorManager.isDefault(featureModel)) {

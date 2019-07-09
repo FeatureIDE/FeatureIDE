@@ -21,13 +21,10 @@ public class CollapseAllButFirstLevel extends Action {
 		this.view = view;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
 		view.collapseAll();
 		view.expandToLevel(2);
 	}
+
 }

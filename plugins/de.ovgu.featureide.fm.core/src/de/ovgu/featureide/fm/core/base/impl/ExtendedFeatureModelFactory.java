@@ -27,7 +27,6 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
  * Factory for {@link IFeatureModel feature models} used in multi product lines.
@@ -77,11 +76,6 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public ExtendedConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 		return (ExtendedConstraint) oldConstraint.clone(featureModel);
-	}
-
-	@Override
-	public SelectableFeature createSelectableFeature(IFeature feature) {
-		return new SelectableFeature(feature);
 	}
 
 }

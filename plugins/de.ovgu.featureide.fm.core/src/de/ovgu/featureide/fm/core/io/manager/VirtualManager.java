@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -55,8 +57,28 @@ public class VirtualManager<T> implements IManager<T> {
 	}
 
 	@Override
-	public T editObject() {
+	public T getVarObject() {
 		return variableObject;
+	}
+
+	@Override
+	public <R> R processObject(Function<T, R> editOperation) {
+		lock.lock();
+		try {
+			return editOperation.apply(variableObject);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void editObject(Consumer<T> editOperation) {
+		lock.lock();
+		try {
+			editOperation.accept(variableObject);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override

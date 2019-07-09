@@ -384,7 +384,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	 * Stops the analyzing job when the editor is closed.
 	 */
 	public void dispose() {
-		graphicalFeatureModel.getFeatureModelManager().editObject().removeListener(editorKeyHandler);
+		graphicalFeatureModel.getFeatureModelManager().removeListener(editorKeyHandler);
 	}
 
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {

@@ -95,7 +95,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						contentProvider.defaultContent();
 					} else {
 						final FeatureModelManager fmManager = featureModelEditor.getFeatureModelManager();
-						contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormulaSnapshot(), monitor);
+						contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormula(), monitor);
 					}
 					return Status.OK_STATUS;
 				}
@@ -320,7 +320,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							contentProvider.defaultManualContent();
 						} else {
 							final FeatureModelManager fmManager = featureModelEditor.getFeatureModelManager();
-							contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormulaSnapshot(), monitor);
+							contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormula(), monitor);
 						}
 						return Status.OK_STATUS;
 					}

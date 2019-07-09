@@ -110,9 +110,10 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 				features.add(tempFeature.getName());
 			}
 			return features;
-		}
-		for (final Object obj : selection.toArray()) {
-			features.add(((FeatureEditPart) obj).getModel().getObject().getName());
+		} else if (part instanceof FeatureEditPart) {
+			for (final Object obj : selection.toArray()) {
+				features.add(((FeatureEditPart) obj).getModel().getObject().getName());
+			}
 		}
 		return features;
 	}
@@ -123,27 +124,34 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	 * @param validSelection
 	 */
 	protected void selectionElementChanged(boolean validSelection) {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final List<String> selectedFeatures = getSelectedFeatures();
+		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection));
+		if (validSelection) {
+			updateProperties();
+		} else {
+			setEnabled(false);
+		}
+	}
+
+	private void addListeners(IFeatureModel featureModel, List<String> newFeatureArray, boolean validSelection) {
 		if (featureArray != null) {
-			for (final String tempFeature : featureArray) {
-				final IFeature feature = featureModel.getFeature(tempFeature);
+			for (final String name : featureArray) {
+				final IFeature feature = featureModel.getFeature(name);
 				if (feature != null) {
 					feature.removeListener(this);
 				}
 			}
 		}
 		if (validSelection) {
-			featureArray = getSelectedFeatures();
-			for (final String tempFeature : featureArray) {
-				final IFeature feature = featureModel.getFeature(tempFeature);
+			featureArray = newFeatureArray;
+			for (final String name : featureArray) {
+				final IFeature feature = featureModel.getFeature(name);
 				if (feature != null) {
 					feature.addListener(this);
 				}
 			}
-			updateProperties();
 		} else {
 			featureArray = null;
-			setEnabled(false);
 		}
 	}
 

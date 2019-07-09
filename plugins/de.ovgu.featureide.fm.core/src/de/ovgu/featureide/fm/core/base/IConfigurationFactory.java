@@ -20,25 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import org.prop4j.Node;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
- * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
+ * Factory to create an instance of {@link SelectableFeature} and {@link Configuration}.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
+public interface IConfigurationFactory extends IFactory<Configuration> {
 
-	public static String extensionPointID = "FMFactory";
-
-	public static String extensionID = "fmFactory";
-
-	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
-
-	IFeature createFeature(IFeatureModel featureModel, String name);
-
-	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
-
-	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
+	SelectableFeature createSelectableFeature(IFeature feature);
 
 }

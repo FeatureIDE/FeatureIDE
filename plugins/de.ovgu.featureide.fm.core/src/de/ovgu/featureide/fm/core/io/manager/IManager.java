@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.util.concurrent.locks.Lock;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -44,7 +46,11 @@ public interface IManager<T> extends IEventManager {
 	 *
 	 * @return The variable object.
 	 */
-	T editObject();
+	T getVarObject();
+
+	void editObject(Consumer<T> editOperation);
+
+	<R> R processObject(Function<T, R> editOperation);
 
 	T getSnapshot();
 

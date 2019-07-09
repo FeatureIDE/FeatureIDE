@@ -40,11 +40,8 @@ public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToHiddenOperation";
 
-	private final boolean allHidden;
-
-	public SetFeatureToHiddenOperation(IFeatureModelManager featureModelManager, boolean allHidden, List<String> featureNames) {
+	public SetFeatureToHiddenOperation(IFeatureModelManager featureModelManager, List<String> featureNames) {
 		super(featureModelManager, HIDE_OPERATION, featureNames);
-		this.allHidden = allHidden;
 	}
 
 	@Override
@@ -54,6 +51,7 @@ public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
 	@Override
 	protected void createSingleOperations(IFeatureModel featureModel) {
+		final boolean allHidden = isEveryFeatureHidden(featureModel, featureNames);
 		for (final String name : featureNames) {
 			final IFeature tempFeature = featureModel.getFeature(name);
 			if (allHidden || !tempFeature.getStructure().isHidden()) {
@@ -62,4 +60,15 @@ public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 			}
 		}
 	}
+
+	public static boolean isEveryFeatureHidden(IFeatureModel featureModel, List<String> featureNames) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (!(tempFeature.getStructure().isHidden())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

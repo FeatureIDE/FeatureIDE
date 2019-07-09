@@ -40,11 +40,8 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToMandatoryOperation";
 
-	private final boolean allMandatory;
-
-	public SetFeatureToMandatoryOperation(IFeatureModelManager featureModelManager, boolean allMandatory, List<String> featureNames) {
+	public SetFeatureToMandatoryOperation(IFeatureModelManager featureModelManager, List<String> featureNames) {
 		super(featureModelManager, MANDATORY_OPERATION, featureNames);
-		this.allMandatory = allMandatory;
 	}
 
 	@Override
@@ -54,6 +51,7 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 
 	@Override
 	protected void createSingleOperations(IFeatureModel featureModel) {
+		final boolean allMandatory = isEveryFeatureMandatory(featureModel, featureNames);
 		for (final String name : featureNames) {
 			final IFeature tempFeature = featureModel.getFeature(name);
 			// Never change mandatory status of root
@@ -72,4 +70,15 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 			}
 		}
 	}
+
+	public static boolean isEveryFeatureMandatory(IFeatureModel featureModel, List<String> featureNames) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (!(tempFeature.getStructure().isMandatory())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

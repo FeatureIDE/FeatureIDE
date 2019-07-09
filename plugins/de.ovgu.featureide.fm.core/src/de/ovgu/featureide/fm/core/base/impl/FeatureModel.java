@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -87,8 +88,9 @@ public class FeatureModel implements IFeatureModel {
 	 * A {@link Map} containing all features.
 	 */
 	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
+	protected final Map<Long, IFeatureModelElement> elements = new ConcurrentHashMap<>();
 
-	protected final IEventManager eventManager = new DefaultEventManager();
+	protected IEventManager eventManager = new DefaultEventManager();
 
 	protected final IFeatureModelProperty property;
 
@@ -149,11 +151,13 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void addConstraint(IConstraint constraint) {
 		constraints.add(constraint);
+		elements.put(constraint.getInternalId(), constraint);
 	}
 
 	@Override
 	public void addConstraint(IConstraint constraint, int index) {
 		constraints.add(index, constraint);
+		elements.put(constraint.getInternalId(), constraint);
 	}
 
 	@Override
@@ -163,6 +167,7 @@ public class FeatureModel implements IFeatureModel {
 			return false;
 		}
 		featureTable.put(name.toString(), feature);
+		elements.put(feature.getInternalId(), feature);
 		return true;
 	}
 
@@ -229,6 +234,7 @@ public class FeatureModel implements IFeatureModel {
 		// delete feature
 		parent.removeChild(feature.getStructure());
 		featureTable.remove(name);
+		elements.remove(feature.getInternalId());
 		featureOrderList.remove(name);
 		return true;
 	}
@@ -236,6 +242,7 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void deleteFeatureFromTable(IFeature feature) {
 		featureTable.remove(feature.getName());
+		elements.remove(feature.getInternalId());
 	}
 
 	@Override
@@ -365,12 +372,13 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void removeConstraint(IConstraint constraint) {
 		constraints.remove(constraint);
+		elements.remove(constraint.getInternalId());
 	}
 
 	@Override
 	public void removeConstraint(int index) {
-		constraints.remove(index);
-
+		final IConstraint constraint = constraints.remove(index);
+		elements.remove(constraint.getInternalId());
 	}
 
 	@Override
@@ -378,7 +386,9 @@ public class FeatureModel implements IFeatureModel {
 		if (constraint == null) {
 			throw new NullPointerException();
 		}
+		elements.remove(constraints.get(index).getInternalId());
 		constraints.set(index, constraint);
+		elements.put(constraint.getInternalId(), constraint);
 	}
 
 	@Override
@@ -389,6 +399,7 @@ public class FeatureModel implements IFeatureModel {
 		renamingsManager.clear();
 		constraints.clear();
 		featureOrderList.clear();
+		elements.clear();
 
 		property.reset();
 		nextElementId = 0;
@@ -418,7 +429,14 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
 		this.featureTable.clear();
+		elements.clear();
 		this.featureTable.putAll(featureTable);
+		for (final IFeature feature : featureTable.values()) {
+			elements.put(feature.getInternalId(), feature);
+		}
+		for (final IConstraint constraint : constraints) {
+			elements.put(constraint.getInternalId(), constraint);
+		}
 	}
 
 	@Override
@@ -517,6 +535,16 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public String getFactoryID() {
 		return factoryID;
+	}
+
+	@Override
+	public void setEventManager(IEventManager eventManager) {
+		this.eventManager = eventManager;
+	}
+
+	@Override
+	public IFeatureModelElement getElement(long id) {
+		return elements.get(id);
 	}
 
 }

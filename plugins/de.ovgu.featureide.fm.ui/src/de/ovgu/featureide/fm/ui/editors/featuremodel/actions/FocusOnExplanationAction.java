@@ -65,7 +65,7 @@ public class FocusOnExplanationAction extends Action {
 	 * Adds a listener that updates the active explanation.
 	 */
 	private void addActiveExplanationListener() {
-		fm.getFeatureModelManager().editObject().addListener(new IEventListener() {
+		fm.getFeatureModelManager().addListener(new IEventListener() {
 
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {

@@ -46,7 +46,7 @@ public class ExpandConstraintOperation extends AbstractGraphicalFeatureModelOper
 
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint constraint) {
 		super(graphicalFeatureModel, FOCUS_ON_CONTAINED_FEATURES);
-		constraintIndex = featureModelManager.editObject().getConstraintIndex(constraint);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
 	public void expandParents(IFeature feature) {

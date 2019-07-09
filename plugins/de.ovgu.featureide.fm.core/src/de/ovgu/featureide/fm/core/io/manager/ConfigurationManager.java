@@ -82,7 +82,7 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		fileOperationLock.lock();
 		try {
 			getObject().initFeatures(formula);
-			editObject().initFeatures(formula);
+			getVarObject().initFeatures(formula);
 		} finally {
 			fileOperationLock.unlock();
 		}
@@ -94,7 +94,7 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 			fileOperationLock.lock();
 			try {
 				getObject().updateFeatures(formula);
-				final Configuration configuration = editObject();
+				final Configuration configuration = getVarObject();
 				configuration.updateFeatures(formula);
 				configuration.update();
 			} finally {

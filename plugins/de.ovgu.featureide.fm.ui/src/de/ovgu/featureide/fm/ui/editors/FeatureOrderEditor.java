@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -87,8 +86,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * @param fmManager file manager for the feature model
 	 */
-	public FeatureOrderEditor(IFeatureModelManager fmManager, IGraphicalFeatureModel gfm) {
-		super(fmManager, gfm);
+	public FeatureOrderEditor(IFeatureModelManager fmManager) {
+		super(fmManager);
 	}
 
 	@Override
@@ -96,24 +95,28 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (isDirty()) {
 			updateOrderEditor();
 
-			if (hasFeatureOrder) {
-				writeToOrderFile(); // save the feature order also in .order if file exists
-			}
-
-			if (getFeatureModel().editObject().getFeatureOrderList().isEmpty()) {
-				defaultFeatureList();
-			}
+			getFeatureModel().editObject(this::saveOrder);
 
 			super.doSave(monitor);
+		}
+	}
+
+	private void saveOrder(final IFeatureModel featureModel) {
+		if (hasFeatureOrder) {
+			writeToOrderFile(featureModel); // save the feature order also in .order if file exists
+		}
+
+		if (featureModel.getFeatureOrderList().isEmpty()) {
+			defaultFeatureList(featureModel);
 		}
 	}
 
 	@Override
 	public void initEditor() {
 		if (hasFeatureOrder) {
-			final IFeatureModel featureModel = getFeatureModel().editObject();
+			final IFeatureModel featureModel = getFeatureModel().getSnapshot();
 			if (featureModel.getFeatureOrderList().isEmpty()) {
-				defaultFeatureList();
+				getFeatureModel().editObject(this::defaultFeatureList);
 			} else {
 				featureOrderTable.removeAll();
 				for (final String str : featureModel.getFeatureOrderList()) {
@@ -131,7 +134,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	public void updateOrderEditor() {
 		if (hasFeatureOrder) {
 			// This flag is true if a concrete feature was added or removed
-			final boolean changed = updateFeatureList();
+			final boolean changed = fmManager.processObject(this::updateFeatureList);
 			updateFeatureOrderList();
 			if (changed) {
 				setDirty();
@@ -283,17 +286,15 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				defaultFeatureList();
+				fmManager.editObject(FeatureOrderEditor.this::defaultFeatureList);
 				updateFeatureOrderList();
 				setDirty();
 			}
 		});
 	}
 
-	private void defaultFeatureList() {
+	private void defaultFeatureList(IFeatureModel featureModel) {
 		featureOrderTable.removeAll();
-
-		final IFeatureModel featureModel = getFeatureModel().editObject();
 		if (featureModel.getStructure().getRoot() != null) {
 			featureModel.setFeatureOrderList(Collections.<String> emptyList());
 			for (final String featureName : featureModel.getFeatureOrderList()) {
@@ -307,11 +308,10 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 *
 	 * @return true if feature order table has changed and was not empty before
 	 */
-	private boolean updateFeatureList() {
+	private boolean updateFeatureList(IFeatureModel featureModel) {
 		boolean changed = false;
-		final IFeatureModel featureModel = getFeatureModel().editObject();
 		if (featureModel.getStructure().getRoot() != null) {
-			final HashSet<String> featureSet = new HashSet<String>(featureModel.getFeatureOrderList());
+			final HashSet<String> featureSet = new HashSet<>(featureModel.getFeatureOrderList());
 
 			int itemcount = featureOrderTable.getList().size();
 			for (int i = 0; i < itemcount; i++) {
@@ -348,19 +348,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 *
 	 */
 	// TODO can be deleted if .order file is no longer used
-	public void writeToOrderFile() {
+	public void writeToOrderFile(IFeatureModel featureModel) {
 		// Cast is necessary, don't remove
 		final IFile inputFile = ((IFile) input.getAdapter(IFile.class));
 		if (inputFile != null) {
 			final IFile orderFile = inputFile.getProject().getFile(".order");
 			if (orderFile.isAccessible()) {
-				final Lock fileOperationLock = getFeatureModel().getFileOperationLock();
-				fileOperationLock.lock();
-				try {
-					FileHandler.save(Paths.get(orderFile.getLocationURI()), getFeatureModel().editObject(), new FeatureOrderFormat());
-				} finally {
-					fileOperationLock.unlock();
-				}
+				FileHandler.save(Paths.get(orderFile.getLocationURI()), featureModel, new FeatureOrderFormat());
 			}
 		}
 	}
@@ -370,16 +364,19 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	public void updateFeatureOrderList() {
 		if (hasFeatureOrder) {
-			final IFeatureModel featureModel = getFeatureModel().editObject();
-			featureModel.setFeatureOrderUserDefined(activate.getSelection());
+			getFeatureModel().editObject(this::updateFeatureOrderList);
+		}
+	}
 
-			if (featureModel.isFeatureOrderUserDefined()) {
-				final LinkedList<String> newFeatureOrderlist = new LinkedList<String>();
-				for (int i = 0; i < featureOrderTable.getList().size(); i++) {
-					newFeatureOrderlist.add(featureOrderTable.getItem(i));
-				}
-				FeatureUtils.setFeatureOrderList(featureModel, newFeatureOrderlist);
+	private void updateFeatureOrderList(final IFeatureModel featureModel) {
+		final boolean selected = activate.getSelection();
+		featureModel.setFeatureOrderUserDefined(selected);
+		if (selected) {
+			final LinkedList<String> newFeatureOrderlist = new LinkedList<String>();
+			for (int i = 0; i < featureOrderTable.getList().size(); i++) {
+				newFeatureOrderlist.add(featureOrderTable.getItem(i));
 			}
+			FeatureUtils.setFeatureOrderList(featureModel, newFeatureOrderlist);
 		}
 	}
 

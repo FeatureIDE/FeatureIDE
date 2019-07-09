@@ -3,6 +3,11 @@ package de.ovgu.featureide.fm.attributes;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedConfigurationFactory;
+import de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -22,6 +27,9 @@ public class FMAttributesPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		ConfigFormatManager.getInstance().addExtension(new XmlExtendedConfFormat());
+		ConfigurationFactoryManager.getInstance().addExtension(new ExtendedConfigurationFactory());
 	}
 
 	public void stop(BundleContext context) throws Exception {

@@ -28,6 +28,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
@@ -81,7 +83,7 @@ public class LegendLayoutAction extends Action {
 		} else {
 			featureModel.getLayout().setLegendAutoLayout(true);
 			setChecked(true);
-			featureModel.getFeatureModelManager().editObject().handleModelDataChanged();
+			featureModel.getFeatureModelManager().fireEvent(new FeatureIDEEvent(this, EventType.MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 
 	}

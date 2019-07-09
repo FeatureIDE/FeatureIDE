@@ -56,7 +56,7 @@ public class FeatureUIHelper {
 	}
 
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
-		return getGraphicalFeature(model.getFeatureModelManager().editObject().getStructure().getRoot(), model);
+		return getGraphicalFeature(model.getFeatureModelManager().getSnapshot().getStructure().getRoot(), model);
 	}
 
 	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {

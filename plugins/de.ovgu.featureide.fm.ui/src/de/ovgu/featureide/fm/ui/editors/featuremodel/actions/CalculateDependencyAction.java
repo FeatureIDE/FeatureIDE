@@ -148,8 +148,9 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 
 		// permit selection to be root of the origin feature model
 		if (res) {
-			final String s = selectedFeatures.getFirst().toString();
-			if (s.equals(FeatureUtils.getRoot(featureModelManager.editObject()).toString())) {
+			final IFeature first = selectedFeatures.getFirst();
+			final String s = first.toString();
+			if (s.equals(FeatureUtils.getRoot(first.getFeatureModel()).toString())) {
 				return false;
 			}
 		}

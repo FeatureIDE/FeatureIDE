@@ -24,8 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_;
 
-import java.util.concurrent.locks.Lock;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
@@ -86,7 +84,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
 					} else {
-						final IFeatureModel featureModel = featureModelManager.editObject();
+						final IFeatureModel featureModel = featureModelManager.getSnapshot();
 						final IProject project =
 							ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(featureModel.getSourceFile().toString())).getProject();
 						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(project);
@@ -94,13 +92,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 							createTooltip(fmComposerExtension.getErrorMessage(), SWT.ICON_ERROR);
 						} else {
 							final Iterable<String> extractFeatureNames;
-							final Lock fileOperationLock = featureModelManager.getFileOperationLock();
-							fileOperationLock.lock();
-							try {
-								extractFeatureNames = FeatureUtils.extractFeatureNames(featureModel.getFeatures());
-							} finally {
-								fileOperationLock.unlock();
-							}
+							extractFeatureNames = FeatureUtils.extractFeatureNames(featureModel.getFeatures());
 							if (Functional.toList(extractFeatureNames).contains(value)) {
 								createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
 							}

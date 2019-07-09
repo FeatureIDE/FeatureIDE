@@ -47,7 +47,7 @@ public class AtomicParentNode extends LazyParent {
 		int i = 0;
 		for (final List<IFeature> list : atomicSets) {
 			if (list.size() > 1) {
-				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
+				addChild(new FeatureListNode(model, "Atomic Set #" + ++i, list, list.size(), false));
 			}
 		}
 		setValue(i);

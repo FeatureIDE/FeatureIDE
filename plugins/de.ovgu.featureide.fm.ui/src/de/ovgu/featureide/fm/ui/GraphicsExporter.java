@@ -35,7 +35,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.locks.Lock;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.draw2d.IFigure;
@@ -89,27 +88,20 @@ public class GraphicsExporter {
 		}
 
 		final String fileExtension = SimpleFileHandler.getFileExtension(Paths.get(filePath));
-		final Lock fileOperationLock = featureModelManager.getFileOperationLock();
-		fileOperationLock.lock();
-		try {
-			final IFeatureModel featureModel = featureModelManager.editObject();
-			switch (fileExtension) {
-			case GuidslFormat.FILE_EXTENSION:
-				return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
-			case XmlFeatureModelFormat.FILE_EXTENSION:
-				return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
-			case VelvetFeatureModelFormat.FILE_EXTENSION:
-				return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
-			default:
-				final File file = new File(filePath);
-				final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
-				GraphicsExporter.printExportMessage(file, succ);
-				return succ;
-			}
-		} finally {
-			fileOperationLock.unlock();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
+		switch (fileExtension) {
+		case GuidslFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
+		case XmlFeatureModelFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
+		case VelvetFeatureModelFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
+		default:
+			final File file = new File(filePath);
+			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
+			GraphicsExporter.printExportMessage(file, succ);
+			return succ;
 		}
-
 	}
 
 	public static boolean exportAs(GraphicalViewerImpl viewer) {

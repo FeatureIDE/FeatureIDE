@@ -49,10 +49,10 @@ public class TWiseConfigurationTester {
 		this.t = t;
 		this.configurations = configurations;
 		if (!this.cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, new AdvancedSatSolver(this.cnf));
+			util = new TWiseConfigurationUtil(cnf, t, new AdvancedSatSolver(this.cnf));
 			util.computeMIG();
 		} else {
-			util = new TWiseConfigurationUtil(cnf, null);
+			util = new TWiseConfigurationUtil(cnf, t, null);
 		}
 		presenceConditionManager = new PresenceConditionManager(util, nodeArray);
 	}
@@ -65,54 +65,24 @@ public class TWiseConfigurationTester {
 	 * Creates statistic values about covered combinations.<br>
 	 * To get a percentage value of covered combinations use:<br
 	 * <pre>{@code
-	 * 	long[] coverage = getCoverage();
-	 * 	double covered = (double) coverage[2] / coverage[0];
+	 * 	TWiseConfigurationStatistic coverage = getCoverage();
+	 * 	double covered = (double) coverage.getNumberOfCoveredConditions() / coverage.getNumberOfValidConditions();
 	 * }</pre>
 	 *
-	 * @return an array containing four values:<br>
+	 * @return a statistic object containing multiple values:<br>
 	 *         <ul>
-	 *         <li>[0] - number of valid combinations
-	 *         <li>[1] - number of invalid combinations
-	 *         <li>[2] - number of covered combinations
-	 *         <li>[3] - number of uncovered combinations
+	 *         <li>number of valid combinations
+	 *         <li>number of invalid combinations
+	 *         <li>number of covered combinations
+	 *         <li>number of uncovered combinations
+	 *         <li>value of each configuration
 	 *         <ul/>
 	 */
-	public long[] getCoverage() {
-		long numberOfValidConditions = 0;
-		long numberOfInvalidConditions = 0;
-		long numberOfCoveredConditions = 0;
-		long numberOfUncoveredConditions = 0;
-
-		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
-		final ClauseList combinedCondition = new ClauseList();
-
-		for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
-			for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
-				final PresenceCondition[] clauseListArray = iterator.next();
-				if (clauseListArray == null) {
-					numberOfInvalidConditions++;
-					break;
-				}
-
-				combinedCondition.clear();
-				combiner.combineConditions(clauseListArray, combinedCondition);
-
-				if (TWiseConfigurationUtil.isCovered(combinedCondition, configurations)) {
-					numberOfValidConditions++;
-					numberOfCoveredConditions++;
-					continue;
-				}
-
-				if (util.isCombinationValid(combinedCondition)) {
-					numberOfValidConditions++;
-					numberOfUncoveredConditions++;
-				} else {
-					numberOfInvalidConditions++;
-				}
-
-			}
-		}
-		return new long[] { numberOfValidConditions, numberOfInvalidConditions, numberOfCoveredConditions, numberOfUncoveredConditions };
+	public TWiseConfigurationStatistic getCoverage() {
+		final TWiseConfigurationStatistic statistic =
+			new TWiseConfigurationStatistic(util, configurations, presenceConditionManager.getGroupedPresenceConditions());
+		statistic.calculate(true);
+		return statistic;
 	}
 
 	public ClauseList hasUncoveredConditions() {

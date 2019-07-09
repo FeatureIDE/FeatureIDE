@@ -21,12 +21,9 @@ public class ExpandTreeViewer extends Action {
 		this.view = view;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
 		view.expandToLevel(TreeViewer.ALL_LEVELS);
 	}
+
 }

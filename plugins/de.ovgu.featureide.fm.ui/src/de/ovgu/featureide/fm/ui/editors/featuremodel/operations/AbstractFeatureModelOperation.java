@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nonnull;
 
@@ -61,14 +60,7 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void execute() {
-		final FeatureIDEEvent event;
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			event = firstOperation(featureModelManager.editObject());
-		} finally {
-			lock.unlock();
-		}
+		final FeatureIDEEvent event = featureModelManager.processObject(this::firstOperation);
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.EXECUTE);
 		}
@@ -76,14 +68,7 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void redo() {
-		final FeatureIDEEvent event;
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			event = operation(featureModelManager.editObject());
-		} finally {
-			lock.unlock();
-		}
+		final FeatureIDEEvent event = featureModelManager.processObject(this::operation);
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.REDO);
 		}
@@ -91,14 +76,7 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void undo() {
-		final FeatureIDEEvent event;
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			event = inverseOperation(featureModelManager.editObject());
-		} finally {
-			lock.unlock();
-		}
+		final FeatureIDEEvent event = featureModelManager.processObject(this::inverseOperation);
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.UNDO);
 		}

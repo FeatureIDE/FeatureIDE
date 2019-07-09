@@ -64,7 +64,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
@@ -82,7 +83,6 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Shell shell;
 
 	private final IFeatureModelManager featureModelManager;
-	private final IFeatureModel featureModel;
 
 	Table alternativefeatureTable;
 	Table featureTable;
@@ -100,7 +100,6 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	public DeleteOperationAlternativeDialog(IFeatureModelManager featureModelManager, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
 		this.featureMap = featureMap;
 		this.featureModelManager = featureModelManager;
-		featureModel = featureModelManager.editObject();
 		this.parent = parent;
 
 		final List<IFeature> toBeDeleted = new LinkedList<IFeature>();
@@ -406,7 +405,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		alternativefeatureTable.remove(rem);
 
 		featureTable.removeAll();
-		featureModel.handleModelDataChanged();
+		featureModelManager.fireEvent(new FeatureIDEEvent(this, EventType.MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 }

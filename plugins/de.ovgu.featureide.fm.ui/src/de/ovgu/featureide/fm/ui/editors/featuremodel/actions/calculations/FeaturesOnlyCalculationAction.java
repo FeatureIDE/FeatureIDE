@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEATURES;
 
-import java.util.concurrent.locks.Lock;
-
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -47,26 +45,20 @@ public class FeaturesOnlyCalculationAction extends AFeatureModelAction {
 	@Override
 	public void run() {
 		final IFeatureModel featureModel;
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
-			final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
-			featureModel = variableFormula.getFeatureModel();
-			if (analyzer.getAnalysesCollection().isCalculateFeatures()) {
-				analyzer.getAnalysesCollection().setCalculateFeatures(false);
-				analyzer.getAnalysesCollection().setCalculateConstraints(false);
-				analyzer.getAnalysesCollection().setCalculateRedundantConstraints(false);
-				analyzer.getAnalysesCollection().setCalculateTautologyConstraints(false);
-				analyzer.getAnalysesCollection().setCalculateDeadConstraints(false);
-				analyzer.getAnalysesCollection().setCalculateFOConstraints(false);
-			} else {
-				analyzer.getAnalysesCollection().setCalculateFeatures(true);
-				analyzer.getAnalysesCollection().setCalculateDeadConstraints(true);
-				analyzer.getAnalysesCollection().setCalculateFOConstraints(true);
-			}
-		} finally {
-			lock.unlock();
+		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
+		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
+		featureModel = variableFormula.getFeatureModel();
+		if (analyzer.getAnalysesCollection().isCalculateFeatures()) {
+			analyzer.getAnalysesCollection().setCalculateFeatures(false);
+			analyzer.getAnalysesCollection().setCalculateConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateRedundantConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateTautologyConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateDeadConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateFOConstraints(false);
+		} else {
+			analyzer.getAnalysesCollection().setCalculateFeatures(true);
+			analyzer.getAnalysesCollection().setCalculateDeadConstraints(true);
+			analyzer.getAnalysesCollection().setCalculateFOConstraints(true);
 		}
 		featureModel.handleModelDataChanged();
 	}

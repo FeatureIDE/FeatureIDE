@@ -98,7 +98,7 @@ public class SetFeatureColorDialog extends Dialog {
 			boolean enableUndoRedo) {
 		super(parentShell);
 		this.featureModelManager = featureModelManager;
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		for (final String name : featurelist) {
 			featureList.add(featureModel.getFeature(name));
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,27 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+
 /**
- * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
+ * Creates a {@link Node} in CNF.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
+public class NodeCreator extends ACreator<Node> {
 
-	public static String extensionPointID = "FMFactory";
-
-	public static String extensionID = "fmFactory";
-
-	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
-
-	IFeature createFeature(IFeatureModel featureModel, String name);
-
-	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
-
-	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
+	@Override
+	protected Node create() {
+		return AdvancedNodeCreator.createNodes(formula.getFeatureModel());
+	}
 
 }

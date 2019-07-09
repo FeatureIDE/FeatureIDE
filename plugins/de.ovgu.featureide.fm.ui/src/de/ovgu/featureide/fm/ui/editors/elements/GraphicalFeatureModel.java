@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Lock;
 
 import org.eclipse.draw2d.geometry.Point;
 
@@ -166,7 +165,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
 		for (final IFeature f : featureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
@@ -176,7 +175,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getAllFeatures() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
 		for (final IFeature f : featureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
@@ -200,7 +199,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getConstraints() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(featureModel.getConstraintCount());
 		for (final IConstraint c : featureModel.getConstraints()) {
 			constraintList.add(getGraphicalConstraint(c));
@@ -257,7 +256,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void init() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			constraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
@@ -304,7 +303,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 		int index = 0;
 		for (int i = 0; i < constraints.size(); i++) {
-			final IGraphicalConstraint gTemp = getGraphicalConstraint(featureModelManager.editObject().getConstraints().get(i));
+			final IGraphicalConstraint gTemp = getGraphicalConstraint(featureModelManager.getSnapshot().getConstraints().get(i));
 			if (gTemp == gConstarint) {
 				return index;
 			}
@@ -346,7 +345,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void readValues() {
-		final IFeatureModel fm = featureModelManager.editObject();
+		final IFeatureModel fm = featureModelManager.getSnapshot();
 
 		getLayout().setLayout(Integer.parseInt(fm.getProperty().get(LAYOUT_ALGORITHM, TYPE_GRAPHICS, "1")));
 
@@ -438,53 +437,32 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void writeValues() {
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			final IFeatureModel fm = featureModelManager.editObject();
-			writeFeatureModelInternal(fm);
-			for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
-				writeFeatureInternal(fm, graphicalFeature);
-			}
-			for (final IGraphicalConstraint graphicalConstraint : getConstraints()) {
-				writeConstraintInternal(graphicalConstraint);
-			}
-		} finally {
-			lock.unlock();
+		featureModelManager.editObject(this::writeElementsInternal);
+	}
+
+	private void writeElementsInternal(final IFeatureModel fm) {
+		writeFeatureModelInternal(fm);
+		for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
+			writeFeatureInternal(fm, graphicalFeature);
+		}
+		for (final IGraphicalConstraint graphicalConstraint : getConstraints()) {
+			writeConstraintInternal(graphicalConstraint);
 		}
 	}
 
 	@Override
 	public void writeFeatureModel() {
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			writeFeatureModelInternal(featureModelManager.editObject());
-		} finally {
-			lock.unlock();
-		}
+		featureModelManager.editObject(this::writeFeatureModelInternal);
 	}
 
 	@Override
 	public void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			writeConstraintInternal(graphicalConstraint);
-		} finally {
-			lock.unlock();
-		}
+		featureModelManager.editObject(fm -> writeConstraintInternal(graphicalConstraint));
 	}
 
 	@Override
 	public void writeFeature(final IGraphicalFeature graphicalFeature) {
-		final Lock lock = featureModelManager.getFileOperationLock();
-		lock.lock();
-		try {
-			writeFeatureInternal(featureModelManager.editObject(), graphicalFeature);
-		} finally {
-			lock.unlock();
-		}
+		featureModelManager.editObject(fm -> writeFeatureInternal(fm, graphicalFeature));
 	}
 
 	private void writeFeatureModelInternal(IFeatureModel fm) {

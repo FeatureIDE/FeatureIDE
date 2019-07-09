@@ -142,7 +142,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		FMPropertyManager.unregisterEditor(this);
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
-			fmManager.editObject().removeListener(diagramEditor);
 			fmManager.removeListener(diagramEditor);
 			fmManager.overwrite();
 		}
@@ -157,7 +156,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
-		fmManager.editObject().getRenamingsManager().notifyAboutRenamings();
+		fmManager.getSnapshot().getRenamingsManager().notifyAboutRenamings();
 		for (final IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
@@ -397,12 +396,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 			pages.clear();
 			addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfm, true));
-			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager, gfm));
+			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
 			createExtensionPages();
 			addPage(textEditor = new FeatureModelTextEditorPage(this));
 
 			fmManager.addListener(diagramEditor);
-			fmManager.editObject().addListener(diagramEditor);
 
 			extensionPages = pages.subList(2, pages.size() - 1);
 
@@ -587,7 +585,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	private boolean saveEditors() {
-		if (fmManager.editObject().getRenamingsManager().isRenamed()) {
+		if (fmManager.getSnapshot().getRenamingsManager().isRenamed()) {
 			final IProject project = getModelFile().getProject();
 			final ArrayList<String> dirtyEditorFileNames = new ArrayList<>();
 			final ArrayList<IEditorPart> dirtyEditors = new ArrayList<>();

@@ -6,14 +6,19 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedConfigurationFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.attributes.computations.impl.EstimatedMaximumComputation;
 import de.ovgu.featureide.fm.attributes.computations.impl.EstimatedMinimumComputation;
+import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
+import de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat;
 import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -26,17 +31,17 @@ public class TExtendedConfiguration {
 
 	@Before
 	public void prepareWorkbench() {
-		FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID,
-				ExtendedFeatureModelFactory.ID);
 		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
+		ConfigFormatManager.getInstance().addExtension(new XmlExtendedConfFormat());
 		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
+		ConfigurationFactoryManager.getInstance().addExtension(new ExtendedConfigurationFactory());
 	}
 
 	@Test
 	public void testExtendedSelectableFeature() {
 		ExtendedFeatureModel model = factory.create();
 		model.createDefaultValues("Test");
-		Configuration congf = new Configuration(new FeatureModelFormula(model));
+		ExtendedConfiguration congf = new ExtendedConfiguration(new FeatureModelFormula(model));
 
 		// Check if selectable features are generated as extended selectable features
 		for (SelectableFeature feat : congf.getFeatures()) {

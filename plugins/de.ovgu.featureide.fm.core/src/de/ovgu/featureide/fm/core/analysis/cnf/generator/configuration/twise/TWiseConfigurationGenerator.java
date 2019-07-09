@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -43,6 +44,52 @@ import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
  * @author Sebastian Krieter
  */
 public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
+
+	private final class SamplingMonitor implements Runnable {
+		@Override
+		public void run() {
+			if (VERBOSE) {
+				final long uncoveredCount = (numberOfCombinations - coveredCount) - invalidCount;
+				final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
+				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final double uncoverProgress = ((int) Math.floor(((((double) uncoveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
+				final StringBuilder sb = new StringBuilder();
+
+				sb.append(phaseCount);
+				sb.append(" - ");
+				sb.append(phaseProgress);
+				sb.append(" (");
+				sb.append(count);
+
+				sb.append(") -- Configurations: ");
+				sb.append(util.getIncompleteSolutionList().size() + util.getCompleteSolutionList().size());
+				sb.append(" (");
+				sb.append(util.getIncompleteSolutionList().size());
+				sb.append(" | ");
+				sb.append(util.getCompleteSolutionList().size());
+
+				sb.append(") -- Covered: ");
+				sb.append(coverProgress);
+				sb.append(" (");
+				sb.append(coveredCount);
+				sb.append(")");
+
+				sb.append(" -- Uncovered: ");
+				sb.append(uncoverProgress);
+				sb.append(" (");
+				sb.append(uncoveredCount);
+				sb.append(")");
+
+				sb.append(" -- Invalid: ");
+				sb.append(invalidProgress);
+				sb.append(" (");
+				sb.append(invalidCount);
+				sb.append(")");
+				System.out.println(sb.toString());
+			}
+		}
+	}
 
 	/**
 	 * Converts a set of single literals into a grouped expression list.
@@ -83,49 +130,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
 
-	protected final MonitorThread samplingMonitor = new MonitorThread(new Runnable() {
-		@Override
-		public void run() {
-			if (VERBOSE) {
-				final long uncoveredCount = (numberOfCombinations - coveredCount) - invalidCount;
-				final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
-				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final double uncoverProgress = ((int) Math.floor(((((double) uncoveredCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final StringBuilder sb = new StringBuilder();
-
-				sb.append(phaseCount);
-				sb.append(" - ");
-				sb.append(phaseProgress);
-				sb.append(" (");
-				sb.append(count);
-
-				sb.append(") -- Configurations: ");
-				sb.append(util.getIncompleteSolutionList().size());
-				sb.append(" | ");
-				sb.append(util.getCompleteSolutionList().size());
-
-				sb.append(" -- Covered: ");
-				sb.append(coverProgress);
-				sb.append(" (");
-				sb.append(coveredCount);
-				sb.append(")");
-
-				sb.append(" -- Uncovered: ");
-				sb.append(uncoverProgress);
-				sb.append(" (");
-				sb.append(uncoveredCount);
-				sb.append(")");
-
-				sb.append(" -- Invalid: ");
-				sb.append(invalidProgress);
-				sb.append(" (");
-				sb.append(invalidCount);
-				sb.append(")");
-				System.out.println(sb.toString());
-			}
-		}
-	});
+	protected MonitorThread samplingMonitor;
 
 	public TWiseConfigurationGenerator(CNF cnf, int t) {
 		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, Integer.MAX_VALUE);
@@ -140,9 +145,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		this.t = t;
 
 		if (cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, null);
+			util = new TWiseConfigurationUtil(cnf, t, null);
 		} else {
-			util = new TWiseConfigurationUtil(cnf, solver);
+			util = new TWiseConfigurationUtil(cnf, t, solver);
 			util.computeMIG();
 		}
 
@@ -159,12 +164,15 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	@Override
 	protected void generate(IMonitor monitor) throws Exception {
-		coveredCount = 0;
-		invalidCount = 0;
 		phaseCount = 0;
-		count = 0;
 
 		buildCombinations();
+
+		for (int i = 0; i < 10; i++) {
+			// TODO Variation Point: Removing low-contributing Configurations
+			trimConfigurations();
+			buildCombinations();
+		}
 
 		for (final TWiseConfiguration configuration : util.getResultList()) {
 			configuration.autoComplete();
@@ -172,22 +180,69 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
+	private void trimConfigurations() {
+		final ArrayList<LiteralSet> completedSolutions = new ArrayList<>();
+		for (final TWiseConfiguration configuration : util.getResultList()) {
+			completedSolutions.add(configuration.getCompleteSolution());
+		}
+
+		final TWiseConfigurationStatistic statistic =
+			new TWiseConfigurationStatistic(util, completedSolutions, presenceConditionManager.getGroupedPresenceConditions());
+		statistic.fastCalc();
+
+		final double[] normConfigValues = statistic.getConfigValues2();
+//			Arrays.sort(normConfigValues);
+//			final double median = normConfigValues[normConfigValues.length / 2];
+//			normConfigValues = statistic.getConfigValues2();
+		double mean = 0;
+		for (final double d : normConfigValues) {
+			mean += d / normConfigValues.length;
+		}
+		final double reference = mean;
+
+//		double[] normConfigValues = statistic.getNormConfigValues();
+//		Arrays.sort(normConfigValues);
+//		final double median = normConfigValues[normConfigValues.length / 3];
+//		normConfigValues = statistic.getNormConfigValues();
+//		final double reference = 0.9;
+
+		int index = 0;
+		index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
+		index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
+	}
+
+	private int removeSolutions(double[] values, final double reference, int index, List<TWiseConfiguration> solutionList) {
+		for (final Iterator<TWiseConfiguration> iterator = solutionList.iterator(); iterator.hasNext();) {
+			iterator.next();
+			if (values[index++] < reference) {
+				iterator.remove();
+			}
+		}
+		return index;
+	}
+
 	private void buildCombinations() {
 		// TODO Variation Point: Combination Order
 		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
 
 		// TODO Variation Point: Cover Strategies
-		final List<ICoverStrategy> phaseList = Arrays.asList(//
+		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
 //				new CoverAll(util), //
-				new CoverAll2(util, presenceConditionManager, t), //
+//				new CoverAll2(util, presenceConditionManager, t), //
 				new CoverAll(util));
 		numberOfCombinations = it.size();
+
+		coveredCount = 0;
+		invalidCount = 0;
+
+		samplingMonitor = new MonitorThread(new SamplingMonitor());
 		try {
 			samplingMonitor.start();
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
 			ClauseList combinedCondition = new ClauseList();
 			count = coveredCount;
-			ICoverStrategy phase = phaseList.get(phaseCount++);
+			phaseCount++;
+			ICoverStrategy phase = phaseList.get(0);
 			while (it.hasNext()) {
 				combiner.combineConditions(it.next(), combinedCondition);
 				if (combinedCondition.isEmpty()) {
@@ -216,8 +271,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			}
 
 			int coveredIndex = -1;
-			while (phaseCount < phaseList.size()) {
-				phase = phaseList.get(phaseCount++);
+			for (int j = 1; j < phaseList.size(); j++) {
+				phaseCount++;
+				phase = phaseList.get(j);
 				count = coveredCount + invalidCount;
 				for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
 					final ClauseList combination = combinationListUncovered.get(i);

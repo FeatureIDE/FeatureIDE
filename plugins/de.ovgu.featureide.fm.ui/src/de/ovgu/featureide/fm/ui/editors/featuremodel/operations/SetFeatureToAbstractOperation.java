@@ -40,11 +40,8 @@ public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToAbstractOperation";
 
-	private final boolean allAbstract;
-
-	public SetFeatureToAbstractOperation(IFeatureModelManager featureModelManager, boolean allAbstract, List<String> featureNames) {
+	public SetFeatureToAbstractOperation(IFeatureModelManager featureModelManager, List<String> featureNames) {
 		super(featureModelManager, ABSTRACT_OPERATION, featureNames);
-		this.allAbstract = allAbstract;
 	}
 
 	@Override
@@ -54,6 +51,7 @@ public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 
 	@Override
 	protected void createSingleOperations(IFeatureModel featureModel) {
+		final boolean allAbstract = isEveryFeatureAbstract(featureModel, featureNames);
 		for (final String name : featureNames) {
 			final IFeature tempFeature = featureModel.getFeature(name);
 			if (allAbstract || !tempFeature.getStructure().isAbstract()) {
@@ -62,4 +60,15 @@ public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 			}
 		}
 	}
+
+	public static boolean isEveryFeatureAbstract(IFeatureModel featureModel, List<String> featureNames) {
+		for (final String name : featureNames) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (!(feature.getStructure().isAbstract())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

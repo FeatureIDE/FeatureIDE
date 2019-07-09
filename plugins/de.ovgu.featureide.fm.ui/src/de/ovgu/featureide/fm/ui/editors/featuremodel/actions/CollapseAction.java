@@ -93,7 +93,16 @@ public class CollapseAction extends MultipleSelectionAction {
 
 	@Override
 	protected void selectionElementChanged(boolean validSelection) {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final List<String> selectedFeatures = getSelectedFeatures();
+		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection));
+		if (validSelection) {
+			updateProperties();
+		} else {
+			setEnabled(false);
+		}
+	}
+
+	private void addListeners(IFeatureModel featureModel, List<String> newFeatureArray, boolean validSelection) {
 		if (featureArray != null) {
 			for (final String name : featureArray) {
 				final IFeature feature = featureModel.getFeature(name);
@@ -103,8 +112,8 @@ public class CollapseAction extends MultipleSelectionAction {
 			}
 		}
 		if (validSelection) {
-			featureArray = getSelectedFeatures();
-			final ArrayList<IGraphicalFeature> tempGraphicalFeatureList = new ArrayList<>();
+			featureArray = newFeatureArray;
+			final ArrayList<IGraphicalFeature> tempGraphicalFeatureList = new ArrayList<>(featureArray.size());
 			for (final String name : featureArray) {
 				final IFeature feature = featureModel.getFeature(name);
 				if (feature != null) {
@@ -113,10 +122,8 @@ public class CollapseAction extends MultipleSelectionAction {
 				}
 			}
 			graphicalFeatureArray = tempGraphicalFeatureList.toArray(new IGraphicalFeature[tempGraphicalFeatureList.size()]);
-			updateProperties();
 		} else {
 			featureArray = null;
-			setEnabled(false);
 		}
 	}
 
@@ -158,7 +165,7 @@ public class CollapseAction extends MultipleSelectionAction {
 	}
 
 	private boolean isThereAtLeastOneFeatureThatHasChildren() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		for (final String name : featureArray) {
 			final IFeature feature = featureModel.getFeature(name);
 			if (feature.getStructure().hasChildren()) {
@@ -205,10 +212,12 @@ public class CollapseAction extends MultipleSelectionAction {
 				}
 			}
 			return features;
-		}
-		for (final Object obj : selection.toArray()) {
-			if (((FeatureEditPart) obj).getModel().getObject().getStructure().hasChildren()) {
-				features.add(((FeatureEditPart) obj).getModel().getObject().getName());
+		} else if (part instanceof FeatureEditPart) {
+			for (final Object obj : selection.toArray()) {
+				final IFeature feature = ((FeatureEditPart) obj).getModel().getObject();
+				if (feature.getStructure().hasChildren()) {
+					features.add(feature.getName());
+				}
 			}
 		}
 		return features;

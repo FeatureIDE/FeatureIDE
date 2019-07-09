@@ -83,6 +83,10 @@ public class FeatureModelFormula {
 		return getElement(new CNFCreator());
 	}
 
+	public Node getPropositionalNode() {
+		return getElement(new NodeCreator());
+	}
+
 	/**
 	 * Get the Node in CNF for the associated feature model.<br> Convenience method, fully equivalent to {@code getElement(new CNFNode())}.
 	 *

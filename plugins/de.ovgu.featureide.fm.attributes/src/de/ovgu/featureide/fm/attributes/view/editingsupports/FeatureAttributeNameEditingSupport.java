@@ -45,29 +45,17 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 		super(view, viewer, enabled);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getCellEditor(java.lang.Object)
-	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		return new TextCellEditor((Composite) getViewer().getControl());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getValue(java.lang.Object)
-	 */
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
 		return attribute.getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#setValue(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void setValue(Object element, Object value) {
 		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();

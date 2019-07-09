@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import java.util.concurrent.locks.Lock;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -78,15 +76,8 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text;
 		final FeatureModelManager manager = featureModelEditor.getFeatureModelManager();
-		final Lock fileOperationLock = manager.getFileOperationLock();
-		fileOperationLock.lock();
-		try {
-			text = featureModelEditor.fmManager.getFormat().getInstance().write(manager.editObject());
-		} finally {
-			fileOperationLock.unlock();
-		}
+		final String text = manager.processObject(manager.getFormat().getInstance()::write);
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);

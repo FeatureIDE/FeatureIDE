@@ -81,17 +81,17 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
 
-			addChild(new FeatureListNode(NUMBER_FEATURES, listOfFeatures));
+			addChild(new FeatureListNode(model, NUMBER_FEATURES, listOfFeatures));
 
-			addChild(new FeatureListNode(NUMBER_CONCRETE, listOfConcreteFeatures));
+			addChild(new FeatureListNode(model, NUMBER_CONCRETE, listOfConcreteFeatures));
 
-			addChild(new FeatureListNode(NUMBER_ABSTRACT, listOfAbstractFeatures));
+			addChild(new FeatureListNode(model, NUMBER_ABSTRACT, listOfAbstractFeatures));
 
-			addChild(new FeatureListNode(NUMBER_COMPOUND, listOfCompoundFeatures));
+			addChild(new FeatureListNode(model, NUMBER_COMPOUND, listOfCompoundFeatures));
 
-			addChild(new FeatureListNode(NUMBER_TERMINAL, listOfPrimitiveFeatures));
+			addChild(new FeatureListNode(model, NUMBER_TERMINAL, listOfPrimitiveFeatures));
 
-			addChild(new FeatureListNode(NUMBER_HIDDEN, FeatureUtils.getHiddenFeatures(model.getFeatureModel())));
+			addChild(new FeatureListNode(model, NUMBER_HIDDEN, FeatureUtils.getHiddenFeatures(model.getFeatureModel())));
 
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
 

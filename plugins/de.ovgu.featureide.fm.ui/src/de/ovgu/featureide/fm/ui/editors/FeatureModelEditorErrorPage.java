@@ -41,7 +41,7 @@ public class FeatureModelEditorErrorPage extends FeatureModelEditorPage {
 	private static final String PAGE_TEXT = "Error";
 
 	public FeatureModelEditorErrorPage() {
-		super(null, null);
+		super(null);
 	}
 
 	@Override

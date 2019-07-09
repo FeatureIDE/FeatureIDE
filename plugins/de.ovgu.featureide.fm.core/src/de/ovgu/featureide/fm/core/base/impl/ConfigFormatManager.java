@@ -57,4 +57,9 @@ public final class ConfigFormatManager extends FormatManager<Configuration> {
 		return new XMLConfFormat();
 	}
 
+	@Override
+	public boolean addExtension(IPersistentFormat<Configuration> extension) {
+		return (extension instanceof IPersistentFormat) ? super.addExtension(extension) : false;
+	}
+
 }

@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
@@ -44,15 +44,15 @@ public class MandatoryAction extends MultipleSelectionAction {
 
 	@Override
 	public void run() {
-		changeMandatoryStatus(isEveryFeatureMandatory());
+		FeatureModelOperationWrapper.run(new SetFeatureToMandatoryOperation(featureModelManager, getSelectedFeatures()));
 		setChecked(isEveryFeatureMandatory());
 	}
 
 	private boolean selectionContainsOptionalFeature() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		for (final String name : featureArray) {
-			final IFeature tempFeature = featureModel.getFeature(name);
-			if (!tempFeature.getStructure().isRoot() && tempFeature.getStructure().getParent().isAnd()) {
+			final IFeatureStructure structure = featureModel.getFeature(name).getStructure();
+			if (!structure.isRoot() && structure.getParent().isAnd()) {
 				return true;
 			}
 		}
@@ -60,18 +60,7 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private boolean isEveryFeatureMandatory() {
-		final IFeatureModel featureModel = featureModelManager.editObject();
-		for (final String name : featureArray) {
-			final IFeature tempFeature = featureModel.getFeature(name);
-			if (!(tempFeature.getStructure().isMandatory())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void changeMandatoryStatus(boolean allMandatory) {
-		FeatureModelOperationWrapper.run(new SetFeatureToMandatoryOperation(featureModelManager, allMandatory, getSelectedFeatures()));
+		return SetFeatureToMandatoryOperation.isEveryFeatureMandatory(featureModelManager.getSnapshot(), featureArray);
 	}
 
 	@Override

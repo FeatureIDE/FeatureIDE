@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
@@ -39,15 +40,17 @@ public final class FeatureListNode extends LazyParent {
 
 	private final Collection<IFeature> list;
 
+	private final FeatureModelFormula formula;
 	private final boolean expand;
 
-	public FeatureListNode(String description, Collection<IFeature> collection) {
-		this(description, collection, collection.size(), true);
+	public FeatureListNode(FeatureModelFormula formula, String description, Collection<IFeature> collection) {
+		this(formula, description, collection, collection.size(), true);
 	}
 
-	public FeatureListNode(String description, Collection<IFeature> collection, Object value, boolean expand) {
+	public FeatureListNode(FeatureModelFormula formula, String description, Collection<IFeature> collection, Object value, boolean expand) {
 		super(description, value);
 
+		this.formula = formula;
 		this.expand = expand;
 
 		final List<IFeature> list = new LinkedList<IFeature>(collection);
@@ -60,7 +63,7 @@ public final class FeatureListNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 		for (final IFeature feat : list) {
-			addChild(new FeatureNode(feat, expand));
+			addChild(new FeatureNode(formula, feat, expand));
 		}
 	}
 }

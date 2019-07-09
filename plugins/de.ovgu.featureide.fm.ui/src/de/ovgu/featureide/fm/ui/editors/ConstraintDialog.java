@@ -471,7 +471,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	public ConstraintDialog(final IFeatureModelManager featureModelManager, final IConstraint constraint) {
 		this.featureModelManager = featureModelManager;
-		featureNamesList = FeatureUtils.getFeatureNamesList(featureModelManager.editObject());
+		featureNamesList = FeatureUtils.getFeatureNamesList(featureModelManager.getSnapshot());
 		final FeatureModelFormula formula = featureModelManager.getVariableFormula();
 		this.constraint = constraint;
 

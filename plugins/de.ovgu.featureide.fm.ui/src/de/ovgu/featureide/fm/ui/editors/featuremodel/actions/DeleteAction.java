@@ -35,7 +35,6 @@ import org.eclipse.ui.actions.ActionFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -89,11 +88,11 @@ public class DeleteAction extends AFeatureModelAction {
 			return false;
 		}
 
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		// check that a possibly new root can be determined unique
 		final IFeature root = featureModel.getStructure().getRoot().getFeature();
 		IFeature newRoot = root;
-		final LinkedList<IFeature> features = new LinkedList<IFeature>(Functional.toList(featureModel.getFeatures()));
+		final LinkedList<IFeature> features = new LinkedList<>(featureModel.getFeatures());
 		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			final Object editPart = iter.next();

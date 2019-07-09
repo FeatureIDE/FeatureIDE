@@ -20,9 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.nio.file.Path;
+
 import de.ovgu.featureide.fm.core.IExtensionLoader;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.base.IConfigurationFactory;
 import de.ovgu.featureide.fm.core.base.IFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
  * Manages all factories for configuration objects.
@@ -52,9 +57,41 @@ public class ConfigurationFactoryManager extends FactoryManager<Configuration> {
 		instance.setLoader(extensionLoader, factorySpaceLoader);
 	}
 
+	/**
+	 * Returns the configuration factory that was used to create the given configuration. (if the factory is not available the default factory is returned).
+	 *
+	 * @param configuration the configuration
+	 *
+	 * @return Returns the configuration factory for the given configuration.
+	 */
 	@Override
-	public IFactory<? extends Configuration> getFactory(Configuration object) {
-		return DefaultConfigurationFactory.getInstance();
+	public IConfigurationFactory getFactory(Configuration configuration) {
+		try {
+			return getFactory(configuration.getFactoryID());
+		} catch (final NoSuchExtensionException e) {
+			Logger.logError(e);
+			return DefaultConfigurationFactory.getInstance();
+		}
+	}
+
+	@Override
+	public IConfigurationFactory getFactory(String id) throws NoSuchExtensionException {
+		return (IConfigurationFactory) super.getFactory(id);
+	}
+
+	@Override
+	public IConfigurationFactory getFactory(Path path, IPersistentFormat<? extends Configuration> format) throws NoSuchExtensionException {
+		return (IConfigurationFactory) super.getFactory(path, format);
+	}
+
+	@Override
+	public IConfigurationFactory getFactory(IPersistentFormat<? extends Configuration> format) throws NoSuchExtensionException {
+		return (IConfigurationFactory) super.getFactory(format);
+	}
+
+	@Override
+	public boolean addExtension(IFactory<Configuration> extension) {
+		return (extension instanceof IConfigurationFactory) ? super.addExtension(extension) : false;
 	}
 
 }

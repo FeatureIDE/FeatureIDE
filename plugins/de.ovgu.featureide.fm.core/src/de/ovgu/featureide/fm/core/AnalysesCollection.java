@@ -519,6 +519,10 @@ public class AnalysesCollection {
 		return featureModelProperties;
 	}
 
+	public Map<IFeatureModelElement, Object> getFeatureModelElementsProperties() {
+		return elementPropertiesMap;
+	}
+
 	public FeatureProperties getFeatureProperty(IFeature feature) {
 		final FeatureProperties featureProperties = featurePropertiesMap.get(feature);
 		return featureProperties != null ? featureProperties : new FeatureProperties(feature);

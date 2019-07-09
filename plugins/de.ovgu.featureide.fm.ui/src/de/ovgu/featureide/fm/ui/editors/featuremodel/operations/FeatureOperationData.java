@@ -42,7 +42,6 @@ public class FeatureOperationData {
 		this.newParent = newParent;
 		this.oldIndex = oldIndex;
 		this.oldParent = oldParent;
-
 	}
 
 	/**

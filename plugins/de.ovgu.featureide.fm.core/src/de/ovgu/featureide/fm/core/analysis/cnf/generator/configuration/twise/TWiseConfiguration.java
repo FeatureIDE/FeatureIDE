@@ -255,7 +255,35 @@ class TWiseConfiguration extends LiteralSet {
 			}
 			countLiterals = numberOfVariableLiterals;
 		}
+	}
 
+	public LiteralSet getCompleteSolution() {
+		if (isComplete()) {
+			return new LiteralSet(this);
+		} else {
+			final int[] s;
+			if (util.hasSolver()) {
+				if (solverSolutionIndex.isEmpty()) {
+					final ISatSolver solver = util.getSolver();
+					final int orgAssignmentSize = setUpSolver(solver);
+					try {
+						s = solver.findSolution();
+					} finally {
+						solver.assignmentClear(orgAssignmentSize);
+					}
+				} else {
+					s = util.getSolverSolution(solverSolutionIndex.last()).getLiterals();
+				}
+			} else {
+				s = Arrays.copyOf(literals, literals.length);
+				for (int i = 0; i < s.length; i++) {
+					if (s[i] == 0) {
+						s[i] = -(i + 1);
+					}
+				}
+			}
+			return (s == null) ? null : new LiteralSet(Arrays.copyOf(s, s.length), Order.INDEX, false);
+		}
 	}
 
 	public void generateRandomSolutions(int count) {

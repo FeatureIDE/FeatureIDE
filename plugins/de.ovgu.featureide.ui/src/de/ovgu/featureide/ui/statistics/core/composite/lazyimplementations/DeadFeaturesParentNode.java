@@ -48,7 +48,7 @@ public class DeadFeaturesParentNode extends LazyParent {
 		setValue(deadFeatures.size());
 
 		for (final IFeature feature : deadFeatures) {
-			addChild(new FeatureNode(feature, true));
+			addChild(new FeatureNode(model, feature, true));
 		}
 	}
 

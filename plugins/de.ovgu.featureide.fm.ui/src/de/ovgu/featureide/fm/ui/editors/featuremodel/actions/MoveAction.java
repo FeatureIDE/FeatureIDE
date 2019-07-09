@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -189,7 +191,7 @@ public class MoveAction extends Action {
 	private void stop() {
 		doMove(true);
 		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout()) {
-			featureModel.getFeatureModelManager().editObject().handleModelDataChanged();
+			featureModel.getFeatureModelManager().fireEvent(new FeatureIDEEvent(this, EventType.MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 
 		init();

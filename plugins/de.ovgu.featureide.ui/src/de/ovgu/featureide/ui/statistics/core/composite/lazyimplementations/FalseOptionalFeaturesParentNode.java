@@ -47,7 +47,7 @@ public class FalseOptionalFeaturesParentNode extends LazyParent {
 		setValue(foFeatures.size());
 
 		for (final IFeature feature : foFeatures) {
-			addChild(new FeatureNode(feature, true));
+			addChild(new FeatureNode(model, feature, true));
 		}
 	}
 

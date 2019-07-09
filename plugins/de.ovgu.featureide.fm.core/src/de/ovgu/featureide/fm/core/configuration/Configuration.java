@@ -36,8 +36,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -137,7 +137,7 @@ public class Configuration implements Cloneable {
 	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature) {
 		SelectableFeature sFeature = selectableFeatures.get(featureModel.getFeatureModel().getRenamingsManager().getOldName(feature.getName()));
 		if (sFeature == null) {
-			sFeature = FMFactoryManager.getInstance().getFactory(featureModel.getFeatureModel()).createSelectableFeature(feature);
+			sFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(feature);
 			selectableFeatures.put(feature.getName(), sFeature);
 		} else if (sFeature.getFeature() == null) {
 			sFeature.setFeature(feature);
@@ -162,7 +162,7 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	private ConfigurationPropagator propagator() {
+	protected ConfigurationPropagator propagator() {
 		if ((propagator == null) && (featureModel != null)) {
 			propagator = new ConfigurationPropagator(featureModel, this);
 		}
@@ -236,8 +236,7 @@ public class Configuration implements Cloneable {
 	public SelectableFeature getSelectableFeature(String name, boolean create) {
 		SelectableFeature selectableFeature = selectableFeatures.get(name);
 		if (create && (selectableFeature == null)) {
-			selectableFeature =
-				FMFactoryManager.getInstance().getFactory(featureModel.getFeatureModel()).createSelectableFeature(new Feature(getFeatureModel(), name));
+			selectableFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(null);
 			selectableFeatures.put(name, selectableFeature);
 		}
 		return selectableFeature;
@@ -419,6 +418,10 @@ public class Configuration implements Cloneable {
 
 	public void setPropagate(boolean propagate) {
 		this.propagate = propagate;
+	}
+
+	public String getFactoryID() {
+		return DefaultConfigurationFactory.ID;
 	}
 
 }

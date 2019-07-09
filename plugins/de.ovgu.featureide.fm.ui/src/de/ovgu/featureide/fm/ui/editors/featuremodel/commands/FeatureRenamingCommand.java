@@ -22,10 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
+import java.net.URI;
+import java.nio.file.Path;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.gef.commands.Command;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -59,22 +64,23 @@ public class FeatureRenamingCommand extends Command {
 		if (newName == null) {
 			return false;
 		}
-		final IFeatureModel featureModel = featureModelManager.editObject();
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(newName)) {
 			return false;
 		}
 
-		if ((featureModel.getSourceFile() == null) || (featureModel.getSourceFile().toUri() == null)
-			|| (ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0] == null)
-			|| (FMComposerManager.getFMComposerExtension(
-					ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0].getProject()) == null)) {
-			return false;
-		} else {
-			return FMComposerManager
-					.getFMComposerExtension(
-							ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0].getProject())
-					.isValidFeatureName(newName);
+		final Path sourcePath = featureModel.getSourceFile();
+		if (sourcePath != null) {
+			final URI sourceUri = sourcePath.toUri();
+			if (sourceUri != null) {
+				final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(sourceUri)[0];
+				if (sourceFile != null) {
+					final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(sourceFile.getProject());
+					return (fmComposerExtension != null) && fmComposerExtension.isValidFeatureName(newName);
+				}
+			}
 		}
+		return false;
 	}
 
 	@Override

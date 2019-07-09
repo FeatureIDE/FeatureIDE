@@ -409,7 +409,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	private boolean requiresAdvancedConfigurationPage() {
-		for (final SelectableFeature feature : configurationManager.editObject().getFeatures()) {
+		for (final SelectableFeature feature : configurationManager.getSnapshot().getFeatures()) {
 			if (feature.getManual() == Selection.UNSELECTED) {
 				return true;
 			}
@@ -474,7 +474,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 						@Override
 						public void run() {
-							final Configuration configuration = configurationManager.editObject();
+							final Configuration configuration = configurationManager.getSnapshot();
 							for (final IConfigurationEditorPage internalPage : allPages) {
 								if (internalPage != currentPage) {
 									internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
@@ -486,7 +486,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			} else {
 				configurationManager.save();
-				final Configuration configuration = configurationManager.editObject();
+				final Configuration configuration = configurationManager.getSnapshot();
 				for (final IConfigurationEditorPage internalPage : allPages) {
 					if (internalPage != currentPage) {
 						internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
@@ -547,7 +547,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public Configuration getConfiguration() {
-		return configurationManager.editObject();
+		return configurationManager.getVarObject();
 	}
 
 	@Override
@@ -592,7 +592,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public IConfigurationPropagator getPropagator() {
-		return configurationManager.editObject().getPropagator();
+		return configurationManager.getVarObject().getPropagator();
 	}
 
 	public ConfigurationManager getConfigurationManager() {

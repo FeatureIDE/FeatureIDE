@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_EXPLANATION;
 
-import java.util.concurrent.locks.Lock;
-
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -75,33 +73,27 @@ public class FocusOnExplanationInViewAction extends AbstractConstraintEditorActi
 	@Override
 	public void run() {
 		final IFeatureModelManager fmManager = featureModelManager;
-		final Lock fileOperationLock = fmManager.getFileOperationLock();
-		fileOperationLock.lock();
-		try {
-			final FeatureModelFormula formula = fmManager.getVariableFormula();
-			final FeatureModelAnalyzer analyser = formula.getAnalyzer();
-			if (constraint == null) {
-				if (!analyser.isValid()) {
-					FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(graphicalFeatureModel, analyser.getVoidFeatureModelExplanation()));
-				}
-			} else if (formula.getFeatureModel() == constraint.getFeatureModel()) {
-				if (analyser.getExplanation(constraint) != null) {
-					FeatureModelOperationWrapper
-							.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(constraint)));
-					// Check if any feature has this constraint as a reason in its explanation
-				} else {
-					for (final IFeature feature : formula.getFeatureModel().getFeatures()) {
-						// Check if Feature has an Explanation
-						final Explanation<?> featureExplanation = analyser.getExplanation(feature);
-						if ((featureExplanation != null) && constraintIsInExplanation(featureExplanation)) {
-							FeatureModelOperationWrapper
-									.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(feature)));
-						}
+		final FeatureModelFormula formula = fmManager.getVariableFormula();
+		final FeatureModelAnalyzer analyser = formula.getAnalyzer();
+		if (constraint == null) {
+			if (!analyser.isValid()) {
+				FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(graphicalFeatureModel, analyser.getVoidFeatureModelExplanation()));
+			}
+		} else if (formula.getFeatureModel() == constraint.getFeatureModel()) {
+			if (analyser.getExplanation(constraint) != null) {
+				FeatureModelOperationWrapper
+						.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(constraint)));
+				// Check if any feature has this constraint as a reason in its explanation
+			} else {
+				for (final IFeature feature : formula.getFeatureModel().getFeatures()) {
+					// Check if Feature has an Explanation
+					final Explanation<?> featureExplanation = analyser.getExplanation(feature);
+					if ((featureExplanation != null) && constraintIsInExplanation(featureExplanation)) {
+						FeatureModelOperationWrapper
+								.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(feature)));
 					}
 				}
 			}
-		} finally {
-			fileOperationLock.unlock();
 		}
 	}
 

@@ -71,7 +71,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
 		if (featureModelManager != null) {
-			final IFeatureModel fModel = featureModelManager.editObject();
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
 			if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
 				elements = new Object[2];
 				elements[0] = fModel.getStructure().getRoot().getFeature();
@@ -91,7 +91,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 		// we have a String as parent of constraints
 		if ((parentElement instanceof String) && CONSTRAINTS.equals(parentElement)) {
-			final IFeatureModel fModel = featureModelManager.editObject();
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
 			final Object[] elements = new Object[fModel.getConstraintCount()];
 			final List<IConstraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
@@ -153,7 +153,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return true;
 		} else if (element instanceof String) {
 			if (CONSTRAINTS.equals(element)) {
-				return featureModelManager.editObject().getConstraintCount() > 0;
+				return featureModelManager.getSnapshot().getConstraintCount() > 0;
 			}
 		}
 

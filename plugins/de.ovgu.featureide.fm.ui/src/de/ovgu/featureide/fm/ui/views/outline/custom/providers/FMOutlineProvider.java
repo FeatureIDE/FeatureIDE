@@ -70,12 +70,11 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 			// Remove Listener and add the listener again to minimize the listeners held by the provider to one. With a feature model check does not help here
 			// as otherwise SyncCollapsedStateAction does not work
-			final IFeatureModel featureModel = featureModelManager.editObject();
-			featureModel.removeListener(this);
-			featureModel.addListener(this);
+			featureModelManager.removeListener(this);
+			featureModelManager.addListener(this);
 			graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 
-			getTreeProvider().inputChanged(viewer, null, featureModel);
+			getTreeProvider().inputChanged(viewer, null, featureModelManager.getSnapshot());
 			setExpandedElements();
 
 			if ((contextMenu == null) || (contextMenu.getFeatureModelManager() != featureModelManager)) {
@@ -120,7 +119,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (!graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(true);
-				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
+				featureModelManager.fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 
@@ -133,7 +132,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getElement()));
 			if (graphicalFeature.isCollapsed()) {
 				graphicalFeature.setCollapsed(false);
-				featureModelManager.editObject().fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
+				featureModelManager.fireEvent(new FeatureIDEEvent((event.getElement()), EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 		}
 	}
@@ -150,7 +149,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			for (final IFeature f : featureModel.getFeatures()) {
 				graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(false);
 			}
-			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+			featureModelManager.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 
@@ -163,7 +162,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 					graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(true);
 				}
 			}
-			featureModelManager.editObject().fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+			featureModelManager.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 		}
 	}
 

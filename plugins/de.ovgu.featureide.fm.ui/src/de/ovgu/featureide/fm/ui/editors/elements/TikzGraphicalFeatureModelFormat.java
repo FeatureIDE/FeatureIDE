@@ -213,7 +213,7 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
-			featureModel = object.getFeatureModelManager().editObject();
+			featureModel = object.getFeatureModelManager().getSnapshot();
 			final StringBuilder str = new StringBuilder();
 			printForest(object, str);
 			return str.toString();

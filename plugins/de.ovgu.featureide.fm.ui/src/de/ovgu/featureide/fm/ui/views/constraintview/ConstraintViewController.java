@@ -213,7 +213,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 				}
 			} else {
 				// when searchText is entered, search through all constraints
-				findConstraints(currentModel.editObject());
+				findConstraints(currentModel.getSnapshot());
 			}
 			// Only update explanations
 		} else {

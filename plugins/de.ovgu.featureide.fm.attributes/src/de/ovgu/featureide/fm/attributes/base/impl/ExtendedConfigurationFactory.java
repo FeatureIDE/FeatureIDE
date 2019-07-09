@@ -18,8 +18,10 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
+import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConfigurationFactory;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -27,16 +29,16 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
- * Factory for the default {@link Configuration} object.
+ * Factory for the {@link ExtendedConfiguration} object.
  *
  * @author Sebastian Krieter
  */
-public class DefaultConfigurationFactory implements IConfigurationFactory {
+public class ExtendedConfigurationFactory implements IConfigurationFactory {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".DefaultConfigurationFactory";
+	public static final String ID = PluginID.PLUGIN_ID + ".ExtendedConfigurationFactory";
 
-	public static DefaultConfigurationFactory getInstance() {
-		return new DefaultConfigurationFactory();
+	public static ExtendedConfigurationFactory getInstance() {
+		return new ExtendedConfigurationFactory();
 	}
 
 	@Override
@@ -51,12 +53,12 @@ public class DefaultConfigurationFactory implements IConfigurationFactory {
 
 	@Override
 	public Configuration create() {
-		return new Configuration();
+		return new ExtendedConfiguration();
 	}
 
 	@Override
 	public SelectableFeature createSelectableFeature(IFeature feature) {
-		return new SelectableFeature(feature);
+		return new ExtendedSelectableFeature(feature);
 	}
 
 }

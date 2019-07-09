@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.CheckForNull;
 
@@ -159,6 +161,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	protected String persistentObjectSource;
 	protected T persistentObject;
 	protected T variableObject;
+	protected T snapshot;
 
 	private IPersistentFormat<T> format;
 	private boolean modifying = false;
@@ -212,6 +215,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 
 	protected void setVariableObject(T variableObject) {
 		this.variableObject = variableObject;
+		resetSnapshot();
 	}
 
 	protected T createObject() throws Exception {
@@ -249,20 +253,50 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	public T getSnapshot() {
 		fileOperationLock.lock();
 		try {
-			return copyObject(variableObject);
+			if (snapshot == null) {
+				snapshot = copyObject(variableObject);
+			}
+			return snapshot;
 		} finally {
 			fileOperationLock.unlock();
 		}
 	}
 
 	@Override
-	public T editObject() {
+	public T getVarObject() {
 		return variableObject;
 	}
 
 	@Override
 	public Lock getFileOperationLock() {
 		return fileOperationLock;
+	}
+
+	@Override
+	public <R> R processObject(Function<T, R> editOperation) {
+		fileOperationLock.lock();
+		try {
+			final R result = editOperation.apply(variableObject);
+			resetSnapshot();
+			return result;
+		} finally {
+			fileOperationLock.unlock();
+		}
+	}
+
+	@Override
+	public void editObject(Consumer<T> editOperation) {
+		fileOperationLock.lock();
+		try {
+			editOperation.accept(variableObject);
+			resetSnapshot();
+		} finally {
+			fileOperationLock.unlock();
+		}
+	}
+
+	protected void resetSnapshot() {
+		snapshot = null;
 	}
 
 	public void setModifying(boolean modifying) {
@@ -391,7 +425,8 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */
 	protected boolean hasChanged(T newObject) {
-		return !Objects.equals(format.getInstance().write(newObject), persistentObjectSource);
+		final String write = format.getInstance().write(newObject);
+		return !Objects.equals(write, persistentObjectSource);
 	}
 
 	/**

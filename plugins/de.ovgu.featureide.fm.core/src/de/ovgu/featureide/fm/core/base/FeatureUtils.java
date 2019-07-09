@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.base;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,20 +37,11 @@ import javax.annotation.Nonnull;
 
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
-import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.IFeatureModelLayout;
-import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.RenamingsManager;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
@@ -177,18 +167,6 @@ public final class FeatureUtils {
 		return featureModel.addFeature(feature);
 	}
 
-	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
-		// constraint.addListener(listener);
-	}
-
-	public static final void addListener(IFeature feature, PropertyChangeListener listener) {
-		// feature.addListener(listener);
-	}
-
-	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-		// featureModel.addListener(listener);
-	}
-
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
 		requireNonNull(featureModel);
 		requireNonNull(node);
@@ -201,10 +179,6 @@ public final class FeatureUtils {
 		requireNonNull(node);
 
 		featureModel.addConstraint(new Constraint(featureModel, node), index);
-	}
-
-	public static final void addTargetConnection(IFeature feature, FeatureConnection connection) {
-		// feature.getStructure().addTargetConnection(connection);
 	}
 
 	public static final void changeToAlternative(IFeature feature) {
@@ -365,17 +339,6 @@ public final class FeatureUtils {
 		return Functional.map(features, GET_OLD_FEATURE_NAME);
 	}
 
-	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
-		// constraint.fireEvent(event);
-	}
-
-	public static final void fire(IFeature feature, PropertyChangeEvent event) {
-		requireNonNull(feature);
-		requireNonNull(event);
-
-		// feature.fireEvent(event);
-	}
-
 	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
@@ -405,16 +368,6 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 
 		return feature.getStructure().getChildrenCount();
-	}
-
-	public static final ColorList getColorList(IFeature feature) {
-		// return feature.getGraphicRepresenation().getColorList();
-		return null;
-	}
-
-	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
-		// return featureModel.getGraphicRepresenation().getColorschemeTable();
-		return null;
 	}
 
 	public static final List<String> getComments(IFeatureModel featureModel) {
@@ -488,12 +441,6 @@ public final class FeatureUtils {
 		return constraint.getContainedFeatures();
 	}
 
-	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
-		requireNonNull(constraint);
-
-		return getConstraintProperties(constraint).getDeadFeatures();
-	}
-
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		requireNonNull(constraint);
 		requireNonNull(fmDeadFeatures);
@@ -518,31 +465,10 @@ public final class FeatureUtils {
 		return deadFeaturesAfter;
 	}
 
-	@Deprecated
-	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
-		requireNonNull(constraint);
-		requireNonNull(fmDeadFeatures);
-
-		return Collections.emptyList();
-	}
-
 	public static final String getDescription(IFeature feature) {
 		requireNonNull(feature);
 
 		return feature.getProperty().getDescription();
-	}
-
-	@Deprecated
-	public static final String getDisplayName(IFeature feature) {
-		requireNonNull(feature);
-
-		return feature.getProperty().getDisplayName();
-	}
-
-	public static final Collection<IFeature> getFalseOptional(IConstraint constraint) {
-		requireNonNull(constraint);
-
-		return getConstraintProperties(constraint).getFalseOptionalFeatures();
 	}
 
 	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
@@ -624,30 +550,10 @@ public final class FeatureUtils {
 		return feature.getStructure().getFirstChild().getFeature();
 	}
 
-	public static final GraphicItem getItemType(IConstraint constraint) {
-		// return constraint.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
-	public static final GraphicItem getItemType(IFeature feature) {
-		// return feature.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
-	public static final GraphicItem getItemType(IFeatureModel featureModel) {
-		// return featureModel.getGraphicRepresenation().getItemType();
-		return null;
-	}
-
 	public static final IFeature getLastChild(IFeature feature) {
 		requireNonNull(feature);
 
 		return feature.getStructure().getLastChild().getFeature();
-	}
-
-	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
-		// return featureModel.getLayout();
-		return null;
 	}
 
 	public static final String getName(IFeature feature) {
@@ -789,34 +695,10 @@ public final class FeatureUtils {
 		return null;
 	}
 
-	public static final Iterable<FeatureConnection> getSourceConnections(IFeature feature) {
-		// return feature.getStructure().getSourceConnections();
-		return null;
-	}
-
-	public static final Iterable<FeatureConnection> getTargetConnections(IFeature feature) {
-		// return feature.getStructure().getTargetConnections();
-		return null;
-	}
-
-	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
-		// featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
-	}
-
 	public static final void handleModelDataChanged(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
 		featureModel.handleModelDataChanged();
-	}
-
-	// public static final void handleModelDataLoaded(IFeatureModel featureModel) {
-	// requireNonNull(featureModel);
-	//
-	// featureModel.handleModelDataLoaded();
-	// }
-
-	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
-		// featureModel.getGraphicRepresenation().handleModelLayoutChanged();
 	}
 
 	public static final boolean hasAbstract(IFeatureModel featureModel) {
@@ -847,18 +729,6 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 
 		return featureModel.getStructure().hasConcrete();
-	}
-
-	public static final boolean hasDeadConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasDeadConstraints();
-	}
-
-	public static final boolean hasFalseOptionalFeatures(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasFalseOptionalFeatures();
 	}
 
 	public static final int hashCode(IConstraint constraint) {
@@ -897,12 +767,6 @@ public final class FeatureUtils {
 		return feature.getStructure().hasHiddenParent();
 	}
 
-	public static final boolean hasIndetHidden(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasIndeterminateHiddenFeatures();
-	}
-
 	public static final boolean hasInlineRule(IFeature feature) {
 		requireNonNull(feature);
 
@@ -925,30 +789,6 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 
 		return featureModel.getStructure().hasOrGroup();
-	}
-
-	public static final boolean hasRedundantConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasRedundantConstraints();
-	}
-
-	public static final boolean hasTautologyConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasTautologyConstraints();
-	}
-
-	public static final boolean hasUnsatisfiableConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasUnsatisfiableConstraints();
-	}
-
-	public static final boolean hasVoidModelConst(IFeatureModel featureModel) {
-		requireNonNull(featureModel);
-
-		return getFeatureModelProperties(featureModel).hasVoidModelConstraints();
 	}
 
 	public static final boolean isAbstract(IFeature feature) {
@@ -1097,14 +937,6 @@ public final class FeatureUtils {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	public static final void redrawDiagram(IFeatureModel featureModel) {
-		// featureModel.getGraphicRepresenation().redrawDiagram();
-	}
-
-	public static final void refreshContextMenu(IFeatureModel featureModel) {
-		// featureModel.getGraphicRepresenation().refreshContextMenu();
-	}
-
 	public static final void removeChild(IFeature feature, IFeature child) {
 		requireNonNull(feature);
 		requireNonNull(child);
@@ -1133,18 +965,6 @@ public final class FeatureUtils {
 		return feature.getStructure().removeLastChild().getFeature();
 	}
 
-	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
-		// constraint.removeListener(listener);
-	}
-
-	public static final void removeListener(IFeature feature, PropertyChangeListener listener) {
-		// feature.removeListener(listener);
-	}
-
-	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-		// featureModel.removeListener(listener);
-	}
-
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
 		requireNonNull(featureModel);
 		requireNonNull(node);
@@ -1158,11 +978,6 @@ public final class FeatureUtils {
 			}
 		}
 		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
-	}
-
-	public static final boolean removeTargetConnection(IFeature feature, FeatureConnection connection) {
-		// return feature.getStructure().removeTargetConnection(connection);
-		return false;
 	}
 
 	public static final void replaceChild(IFeature feature, IFeature oldChild, IFeature newChild) {
@@ -1188,7 +1003,7 @@ public final class FeatureUtils {
 	}
 
 	public static final void requireNonNull(Object object) {
-		// TODO check unnecessary null checks, may cuase defect itself
+		// TODO check unnecessary null checks, may cause defect itself
 		// or move to constructors
 		// java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
 	}
@@ -1210,14 +1025,6 @@ public final class FeatureUtils {
 
 		feature.getStructure().setAlternative();
 	}
-
-	// public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-	// featureModel.getUndoContext(undoContext);
-	// }
-	//
-	// public static final Object getUndoContext(IFeatureModel featureModel) {
-	// return featureModel.getUndoContext();
-	// }
 
 	public static final void setAnd(IFeature feature) {
 		requireNonNull(feature);
@@ -1243,21 +1050,6 @@ public final class FeatureUtils {
 		feature.getStructure().setChildren(Functional.toList(Functional.map(children, FEATURE_TO_STRUCTURE)));
 	}
 
-	// public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-	// return featureModel.isFeatureOrderInXML();
-	// }
-	//
-	// public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-	// featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
-	// }
-
-	@Deprecated
-	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
-		requireNonNull(constraint);
-		requireNonNull(attri);
-		// ...
-	}
-
 	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
 		requireNonNull(featureModel);
 		requireNonNull(constraints);
@@ -1273,13 +1065,6 @@ public final class FeatureUtils {
 
 	public static final void setContainedFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
-	}
-
-	public static final void setDeadFeatures(IConstraint constraint, Collection<IFeature> deadFeatures) {
-		requireNonNull(constraint);
-		requireNonNull(deadFeatures);
-
-		getConstraintProperties(constraint).setDeadFeatures(deadFeatures);
 	}
 
 	public static final void setDescription(IFeature feature, CharSequence description) {
@@ -1306,15 +1091,6 @@ public final class FeatureUtils {
 			}
 		}
 		return found;
-	}
-
-	@Deprecated
-	public static final boolean setFalseOptionalFeatures(IConstraint constraint, IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
-		requireNonNull(constraint);
-		requireNonNull(fmFalseOptionals);
-
-		getConstraintProperties(constraint).setFalseOptionalFeatures(fmFalseOptionals);
-		return true;
 	}
 
 	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<String> featureOrderList) {
@@ -1466,18 +1242,6 @@ public final class FeatureUtils {
 			}
 		}
 		return stringBuilder.toString();
-	}
-
-	public static ConstraintProperties getConstraintProperties(IConstraint constraint) {
-		return FeatureModelManager.getAnalyzer(constraint.getFeatureModel()).getConstraintProperties(constraint);
-	}
-
-	public static FeatureProperties getFeatureProperties(IFeature feature) {
-		return FeatureModelManager.getAnalyzer(feature.getFeatureModel()).getFeatureProperties(feature);
-	}
-
-	public static FeatureModelProperties getFeatureModelProperties(IFeatureModel featureModel) {
-		return FeatureModelManager.getAnalyzer(featureModel).getFeatureModelProperties();
 	}
 
 }

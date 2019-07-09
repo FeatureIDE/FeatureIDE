@@ -52,7 +52,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
 		if (featureModel == null) {
-			throw new RuntimeException();
+			throw new NullPointerException("Feature model must not be null!");
 		}
 		id = featureModel.getNextElementId();
 		this.featureModel = featureModel;

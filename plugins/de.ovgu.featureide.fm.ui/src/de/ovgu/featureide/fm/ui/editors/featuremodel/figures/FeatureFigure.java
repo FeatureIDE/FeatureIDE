@@ -140,9 +140,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		final FeatureModelAnalyzer analyzer = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer();
 		final IFeature feature = this.feature.getObject();
-		final FeatureProperties featureProperties = analyzer.getAnalysesCollection().getFeatureProperty(feature);
+		final FeatureProperties featureProperties =
+			this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection().getFeatureProperty(feature);
 
 		// First draw custom color
 		final FeatureColor color = FeatureColorManager.getColor(feature);
