@@ -46,7 +46,7 @@ pipeline {
     }
     post {
         always {
-            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n ${currentBuild.changeSets}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
+            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n ${currentBuild.changeSets.getAt(0)}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
             script {
                 currentBuild.description = ""
             }
