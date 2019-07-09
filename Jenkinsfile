@@ -46,7 +46,7 @@ pipeline {
     }
     post {
         always {
-            script {
+            
             def commits = ""
             for(int i = 0; i < currentBuild.changeSets.size(); i++) {
                 for(int j = 0; j < currentBuild.changeSets.getItems().length; j++) {
@@ -54,7 +54,7 @@ pipeline {
                 }
             }
             emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \nAffected commits: ${commits}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
-            
+            script {
                 currentBuild.description = ""
             }
         }
