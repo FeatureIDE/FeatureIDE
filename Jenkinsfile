@@ -47,13 +47,7 @@ pipeline {
     post {
         always {
             script {
-            def commits = ""
-            for(int i = 0; i < currentBuild.changeSets.size(); i++) {
-                for(int j = 0; j < currentBuild.changeSets.getItems().length; j++) {
-                    commits += " '${currentBuild.changeSets.getAt(0).getItems()[0].getMsg()}' \t From:'${currentBuild.changeSets.getAt(i).getItems()[j].getAuthor()}' \n"
-                }
-            }
-            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \nAffected commits: ${commits}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
+                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \nAffected commits: ${currentBuild.changeSets.getAt(0).getItems()[0].getMsg()} \t From:${currentBuild.changeSets.getAt(0).getItems()[0].getAuthor()}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
             
                 currentBuild.description = ""
             }
