@@ -28,6 +28,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IEditorPart;
 
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
@@ -44,7 +45,7 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		return true;
 	}
 

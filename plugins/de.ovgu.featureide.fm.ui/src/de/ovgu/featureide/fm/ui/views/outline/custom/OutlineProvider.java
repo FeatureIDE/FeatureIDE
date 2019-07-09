@@ -29,6 +29,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IEditorPart;
 
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
@@ -90,12 +91,13 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 
 	/**
-	 * Checks whether the provider supports the file that is opened in the editor.
+	 * Checks whether the provider supports the file that is opened in the editor. Additionally, we must check that the given editor supports the provider.
 	 *
+	 * @param part editor part to check
 	 * @param file file to check
 	 * @return true if the file is supported, false otherwise
 	 */
-	public abstract boolean isSupported(IFile file);
+	public abstract boolean isSupported(IEditorPart part, IFile file);
 
 	/**
 	 * @return the label provider name

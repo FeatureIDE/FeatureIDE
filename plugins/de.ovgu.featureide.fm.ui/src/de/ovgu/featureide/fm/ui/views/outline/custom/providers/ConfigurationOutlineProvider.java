@@ -41,6 +41,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.TextEditorPage;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
@@ -131,9 +132,15 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#isSupported(org.eclipse.core.resources.IFile)
 	 */
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		try {
-			return ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null;
+			final boolean isConfig = ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null;
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				final boolean isNotSourceEditor = !(editor.getSelectedPage() instanceof TextEditorPage);
+				return isConfig && isNotSourceEditor;
+			}
+			return isConfig;
 		} catch (final ClassCastException e) {
 			return false;
 		}

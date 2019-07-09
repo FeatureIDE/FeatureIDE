@@ -24,6 +24,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
@@ -51,9 +52,16 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		if (file != null) {
-			return file.getFileExtension().equalsIgnoreCase("xml") && (FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null);
+			final boolean isFeatureModel =
+				file.getFileExtension().equalsIgnoreCase("xml") && (FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null);
+			if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				final boolean isNotSourceEditor = !(editor.getSelectedPage() instanceof FeatureModelTextEditorPage);
+				return isFeatureModel && isNotSourceEditor;
+			}
+			return isFeatureModel;
 		}
 		return false;
 	}

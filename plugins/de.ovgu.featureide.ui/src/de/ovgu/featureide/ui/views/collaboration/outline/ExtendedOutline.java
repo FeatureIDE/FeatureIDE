@@ -107,7 +107,7 @@ public class ExtendedOutline extends OutlineProvider {
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		return supportedTypes.contains(file.getFileExtension());
 	}
 
