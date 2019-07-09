@@ -45,9 +45,6 @@ pipeline {
     }
     post {
         always {
-            sh '''
-                echo "Das sollte immer zu sehen sein" 
-            '''
             emailext body: '${currentBuild.absoluteUrl}', subject: '${GIT_BRANCH} -build Faild', to: 'c.orsinger@tu-braunschweig.de'
         }
         //unsuccessful {
