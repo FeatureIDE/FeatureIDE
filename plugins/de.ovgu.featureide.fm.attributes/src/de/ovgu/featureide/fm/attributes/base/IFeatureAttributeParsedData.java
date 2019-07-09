@@ -63,4 +63,11 @@ public interface IFeatureAttributeParsedData {
 	 * @return true, if the parsed attribute was flagged as configurable.
 	 */
 	public String isConfigurable();
+
+	/**
+	 * 
+	 * @return true, if the only specified parameters are name and value
+	 *         In this case the attribute is considered recursed
+	 */
+	public boolean isRecursed();
 }

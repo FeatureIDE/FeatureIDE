@@ -102,4 +102,13 @@ public class FeatureAttributeParsedData implements IFeatureAttributeParsedData {
 		return configurable;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData#isRecursed()
+	 */
+	@Override
+	public boolean isRecursed() {
+		return configurable == null && recursive == null && unit == null && type == null;
+	}
+
 }

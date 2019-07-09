@@ -23,7 +23,10 @@ package de.ovgu.featureide.fm.attributes.format;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
@@ -39,10 +42,12 @@ import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeT
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
@@ -67,12 +72,15 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 
 	protected final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
 
+	private Map<String, Map<String, String>> recursiveLookup = new HashMap<>();
+
 	public XmlExtendedFeatureModelFormat() {
 		super();
 	}
 
 	protected XmlExtendedFeatureModelFormat(XmlExtendedFeatureModelFormat oldFormat) {
 		super(oldFormat);
+		factory = oldFormat.factory;
 	}
 
 	@Override
@@ -89,13 +97,67 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			parseFeatureModelProperties(getElement(e, PROPERTIES, true));
 		}
 
+		handleRecursiveAttributes();
+
 		if (object.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
+		}
+		// handle recursive attributes
+		List<IFeatureAttribute> recursiveAttributes = getRecursiveAttributes();
+		for (IFeatureAttribute att : recursiveAttributes) {
+			recurseAttributesWithLookup(att.getFeature(), att);
 		}
 
 		warnings.addAll(localProblems);
 	}
 
+	protected void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
+		if (feature instanceof ExtendedFeature) {
+			if ((((ExtendedFeature) feature).getAttributes() != null) && !((ExtendedFeature) feature).getAttributes().isEmpty()) {
+				// Write FeatureAttributes into the XML
+				for (final IFeatureAttribute featureAttribute : ((ExtendedFeature) feature).getAttributes()) {
+					final Element attributeNode;
+					if (featureAttribute.isRecursive() && !featureAttribute.isHeadOfRecursiveAttribute()) {
+						createRecursedAttribute(doc, fnode, featureAttribute);
+					} else {
+						attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
+						attributeNode.setAttribute(XMLFeatureModelTags.NAME, featureAttribute.getName());
+						attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType());
+						if (featureAttribute.getValue() != null) {
+							attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
+						}
+						attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_UNIT, featureAttribute.getUnit());
+						if (featureAttribute.isRecursive()) {
+							attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_RECURSIVE, XMLFeatureModelTags.TRUE);
+						}
+						if (featureAttribute.isConfigurable()) {
+							attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_CONFIGURABLE, XMLFeatureModelTags.TRUE);
+						}
+						fnode.appendChild(attributeNode);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Adds a feature attribute that is recursive but not the holder of the original recursive attribute to the xml-document
+	 * 
+	 * @param doc XML-document that is supposed to be edited
+	 * @param fnode parent node
+	 * @param att recursed feature attribute that is supposed to be added
+	 */
+	private void createRecursedAttribute(Document doc, Element fnode, IFeatureAttribute att) {
+		final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
+		if (att.getValue() == null) {
+			return;
+		}
+		attributeNode.setAttribute(XMLFeatureModelTags.NAME, att.getName());
+		attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, att.getValue().toString());
+		fnode.appendChild(attributeNode);
+	}
+
+	@Override
 	protected void writeDocument(Document doc) {
 		final Element root = doc.createElement(EXTENDED_FEATURE_MODEL);
 		doc.appendChild(root);
@@ -107,31 +169,7 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 		writeFeatureOrder(doc, root);
 	}
 
-	protected void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
-		if (!(feature instanceof ExtendedFeature)) {
-			return;
-		}
-		if ((((ExtendedFeature) feature).getAttributes() != null) && !((ExtendedFeature) feature).getAttributes().isEmpty()) {
-			// Write FeatureAttributes into the XML
-			for (final IFeatureAttribute featureAttribute : ((ExtendedFeature) feature).getAttributes()) {
-				final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
-				attributeNode.setAttribute(XMLFeatureModelTags.NAME, featureAttribute.getName());
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType());
-				if (featureAttribute.getValue() != null) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
-				}
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_UNIT, featureAttribute.getUnit());
-				if (featureAttribute.isRecursive()) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_RECURSIVE, XMLFeatureModelTags.TRUE);
-				}
-				if (featureAttribute.isConfigurable()) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_CONFIGURABLE, XMLFeatureModelTags.TRUE);
-				}
-				fnode.appendChild(attributeNode);
-			}
-		}
-	}
-
+	@Override
 	protected void writeFeatureProperties(Document doc, Element node, IFeature feat, final Element fnod) {
 		addDescription(doc, feat.getProperty().getDescription(), fnod);
 		addProperties(doc, feat.getCustomProperties(), fnod);
@@ -199,15 +237,107 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			}
 			// TODO ATTRIBUTE Error marker for missing name and/or type
 			final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
-			IFeatureAttribute featureAttribute;
-			try {
-				featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
-				if (featureAttribute != null) {
-					((ExtendedFeature) parent).addAttribute(featureAttribute);
+			if (parsedAttribute.isRecursed()) {
+				addLookUpEntry(parent.getName(), name, value);
+			} else {
+				IFeatureAttribute featureAttribute;
+				try {
+					featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
+					if (featureAttribute != null) {
+						((ExtendedFeature) parent).addAttribute(featureAttribute);
+					}
+				} catch (FeatureAttributeParseException | UnknownFeatureAttributeTypeException e) {
+					Logger.logError(e);
 				}
-			} catch (FeatureAttributeParseException | UnknownFeatureAttributeTypeException e) {
-				Logger.logError(e);
 			}
+		}
+	}
+
+	private void addLookUpEntry(String featureName, String attributeName, String value) {
+		if (!recursiveLookup.containsKey(attributeName)) {
+			recursiveLookup.put(attributeName, new HashMap<String, String>());
+		}
+		if (!recursiveLookup.get(attributeName).containsKey(featureName)) {
+			recursiveLookup.get(attributeName).put(featureName, value);
+		}
+	}
+
+	private void handleRecursiveAttributes() {
+		// TODO Auto-generated method stub
+	}
+
+	private List<IFeatureAttribute> getRecursiveAttributes() {
+		List<IFeatureAttribute> recursiveAttributes = new ArrayList<>();
+		for (IFeature feat : object.getFeatures()) {
+			ExtendedFeature ext = (ExtendedFeature) feat;
+			for (IFeatureAttribute att : ext.getAttributes()) {
+				if (att.isRecursive()) {
+					recursiveAttributes.add(att);
+				}
+			}
+		}
+		return recursiveAttributes;
+	}
+
+	private void recurseAttributesWithLookup(IFeature feature, IFeatureAttribute attribute) {
+		IFeatureAttribute newAttribute = null;
+		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
+			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
+			recurseAttributesWithLookup(feat, attribute);
+			newAttribute = attribute.cloneRecursive(feat);
+			String value = getValueFromLookup(feat.getName(), newAttribute.getName());
+			addValueAccordingToType(newAttribute, value);
+			if (!feat.isContainingAttribute(newAttribute)) {
+				feat.addAttribute(newAttribute);
+			}
+		}
+	}
+
+	private String getValueFromLookup(String featName, String attributeName) {
+		if (recursiveLookup.containsKey(attributeName)) {
+			if (recursiveLookup.get(attributeName).containsKey(featName)) {
+				return recursiveLookup.get(attributeName).get(featName);
+			}
+		}
+		return null;
+	}
+
+	private void addValueAccordingToType(IFeatureAttribute attribute, String value) {
+		if (value == null) {
+			return;
+		}
+		switch (attribute.getType()) {
+		case FeatureAttribute.BOOLEAN:
+			Boolean valueBoolean = null;
+			if (value != null) {
+				valueBoolean = Boolean.parseBoolean(value);
+			}
+			attribute.setValue(valueBoolean);
+			break;
+		case FeatureAttribute.LONG:
+			Long valueLong = null;
+			if (value != null) {
+				valueLong = Long.parseLong(value);
+			}
+			attribute.setValue(valueLong);
+			break;
+		case FeatureAttribute.DOUBLE:
+			Double valueDouble = null;
+			if (value != null) {
+				valueDouble = Double.parseDouble(value);
+			}
+			attribute.setValue(valueDouble);
+			break;
+		case FeatureAttribute.STRING:
+			String valueString = null;
+			if (value != null) {
+				valueString = value;
+			}
+			attribute.setValue(valueString);
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -239,7 +369,7 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 	@Override
 	public boolean initExtension() {
 		if (super.initExtension()) {
-			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(ID, ExtendedFeatureModelFactory.ID);
 			return true;
 		}
 		return false;

@@ -156,7 +156,8 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
 	protected static void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
+		final Object userData = node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		throw new UnsupportedModelException(message, userData == null ? 0 : Integer.parseInt(userData.toString()));
 	}
 
 	protected void addToProblemsList(String message, org.w3c.dom.Node node) {

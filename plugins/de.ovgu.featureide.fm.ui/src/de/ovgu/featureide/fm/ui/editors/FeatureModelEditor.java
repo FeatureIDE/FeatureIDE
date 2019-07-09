@@ -560,7 +560,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	private int getDiagramEditorIndex() {
-		return diagramEditor.getIndex();
+		return diagramEditor != null ? diagramEditor.getIndex() : 0;
 	}
 
 	/**

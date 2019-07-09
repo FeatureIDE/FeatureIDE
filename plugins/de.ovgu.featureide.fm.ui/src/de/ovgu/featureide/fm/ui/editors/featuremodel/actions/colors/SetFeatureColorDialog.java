@@ -325,7 +325,6 @@ public class SetFeatureColorDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureModelManager, Functional.mapToStringList(featureListBuffer), newColor);
-
 		if (enableUndoRedo) {
 			FeatureModelOperationWrapper.run(op);
 		} else {
