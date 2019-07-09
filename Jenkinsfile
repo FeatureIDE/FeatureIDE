@@ -46,9 +46,9 @@ pipeline {
     }
     post {
         always {
-            
-            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \nAffected commits: ${currentBuild.changeSets.getAt(0).getItems()[0].getMsg()} \t ${currentBuild.changeSets.getAt(0).getItems()[0].getAuthor()}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
             script {
+            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \nAffected commits: ${currentBuild.changeSets.getAt(0).getItems()[0].getMsg()} \t From:${currentBuild.changeSets.getAt(0).getItems()[0].getAuthor()}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
+            
                 currentBuild.description = ""
             }
         }
