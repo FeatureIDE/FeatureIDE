@@ -15,6 +15,7 @@ pipeline {
                         causes = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause').shortDescription
                     }
                     currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
+                    currentBuild.description = "${GIT_BRANCH}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
@@ -45,7 +46,10 @@ pipeline {
     }
     post {
         always {
-            emailext body: '${currentBuild.absoluteUrl}', subject: '${GIT_BRANCH} -build Faild', to: 'c.orsinger@tu-braunschweig.de'
+            emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n ${currentBuild.changeSets}", subject: "Unsuccessful Job '${currentBuild.description}'", to: 'c.orsinger@tu-braunschweig.de'
+            script {
+                currentBuild.description = ""
+            }
         }
         //unsuccessful {
         // One or more steps need to be included within each condition's block.
