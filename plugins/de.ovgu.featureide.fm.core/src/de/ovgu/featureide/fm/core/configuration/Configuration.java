@@ -59,6 +59,8 @@ public class Configuration implements Cloneable {
 	private final SelectableFeature root;
 	private final ConfigurationPropagator propagator;
 	private boolean propagate = true;
+	// Used to identify the configuration as default configuration or extended configuration.
+	public String rootIdentifier = "configuration";
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -417,6 +419,14 @@ public class Configuration implements Cloneable {
 
 	public boolean isIgnoreAbstractFeatures() {
 		return ignoreAbstractFeatures;
+	}
+
+	public String getRootIdentifier() {
+		return rootIdentifier;
+	}
+
+	public void setRootIdentifier(String identifier) {
+		rootIdentifier = identifier;
 	}
 
 }
