@@ -15,7 +15,7 @@ pipeline {
                         causes = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause').shortDescription
                     }
                     currentBuild.displayName = "#${BUILD_NUMBER} ${GIT_BRANCH} ${causes}"
-                    params.gitBranch = "${GIT_BRANCH}"
+                    //params.gitBranch = "${GIT_BRANCH}"
                 }
       			sh '''
                		echo "PATH = ${PATH}"
