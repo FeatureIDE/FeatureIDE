@@ -5,29 +5,26 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesLibrary;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
 import de.ovgu.featureide.fm.attributes.outlineentry.AttributeMaximumEntry;
 import de.ovgu.featureide.fm.attributes.outlineentry.AttributeMinimumEntry;
 import de.ovgu.featureide.fm.attributes.outlineentry.CountAttributeComputation;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 
 public class TExtendedOutline {
 
 	@Before
 	public void prepareWorkbench() {
-		FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID,
-				ExtendedFeatureModelFactory.ID);
-		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
-		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
+		LibraryManager.registerLibrary(new FMCoreLibrary());
+		LibraryManager.registerLibrary(new FMAttributesLibrary());
 	}
 
 	@Test

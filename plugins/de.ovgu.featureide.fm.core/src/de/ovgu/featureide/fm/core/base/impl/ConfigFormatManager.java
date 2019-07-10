@@ -20,12 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
-import de.ovgu.featureide.fm.core.configuration.EquationFormat;
-import de.ovgu.featureide.fm.core.configuration.ExpressionFormat;
-import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -37,20 +32,10 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public final class ConfigFormatManager extends FormatManager<Configuration> {
 
-	@Override
-	protected Class<?>[] getDefaultClasses() {
-		return new Class<?>[] { XMLConfFormat.class, DefaultFormat.class, FeatureIDEFormat.class, EquationFormat.class, ExpressionFormat.class };
-	}
-
 	private static ConfigFormatManager instance = new ConfigFormatManager();
 
 	public static ConfigFormatManager getInstance() {
-		instance.setLoader(null);
 		return instance;
-	}
-
-	public static void initialize(IExtensionLoader<IPersistentFormat<Configuration>> extensionLoader) {
-		instance.setLoader(extensionLoader);
 	}
 
 	public static IConfigurationFormat getDefaultFormat() {

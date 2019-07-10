@@ -21,6 +21,7 @@ de/ovgu/featureide/fm/core/color/ColorPalette.java
 de/ovgu/featureide/fm/core/color/FeatureColorManager.java
 de/ovgu/featureide/fm/core/configuration/FeatureOrderReader.java
 de/ovgu/featureide/fm/core/editing/evaluation/Evaluation.java
+de/ovgu/featureide/fm/core/init/FMCoreEclipseLibrary.java
 de/ovgu/featureide/fm/core/io/AbstractFeatureModelReader.java
 de/ovgu/featureide/fm/core/io/AbstractFeatureModelWriter.java
 de/ovgu/featureide/fm/core/io/AbstractObjectWriter.java

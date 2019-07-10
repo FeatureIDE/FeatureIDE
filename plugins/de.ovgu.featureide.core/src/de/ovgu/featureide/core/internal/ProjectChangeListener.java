@@ -40,7 +40,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
  * deleted or imported.
  *
  * @author Markus Leich
- * @author Thomas Th�m
+ * @author Thomas Thüm
  */
 public class ProjectChangeListener implements IResourceChangeListener {
 

@@ -30,15 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public final class GraphicalFeatureModelFormatManager extends FormatManager<IGraphicalFeatureModel> {
 
-	@Override
-	protected Class<?>[] getDefaultClasses() {
-		return new Class<?>[] { GraphicalFeatureModelFormat.class };
-	}
-
 	private static GraphicalFeatureModelFormatManager instance = new GraphicalFeatureModelFormatManager();
-	static {
-		instance.setLoader(null);
-	}
 
 	public static GraphicalFeatureModelFormatManager getInstance() {
 		return instance;

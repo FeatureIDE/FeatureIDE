@@ -29,21 +29,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.BundleContext;
 
-import de.ovgu.featureide.fm.core.base.IFactory;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.EclipseFactoryWorkspaceProvider;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
+import de.ovgu.featureide.fm.core.init.FMCoreEclipseLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
@@ -66,24 +53,12 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-
-		FileSystem.INSTANCE = new EclipseFileSystem();
-		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
-		Logger.logger = new EclipseLogger();
-
-		FMFactoryManager.initialize(new EclipseExtensionLoader<IFactory<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
-				IFeatureModelFactory.extensionID, IFeatureModelFactory.class), new EclipseFactoryWorkspaceProvider());
-		ConfigurationFactoryManager.initialize(null, null);
-		FMFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<IFeatureModel>>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
-				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.initialize(new EclipseExtensionLoader<IPersistentFormat<Configuration>>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
-				IConfigurationFormat.extensionID, IConfigurationFormat.class));
+		LibraryManager.registerLibrary(new FMCoreEclipseLibrary());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		FMFactoryManager.getInstance().save();
-		ConfigurationFactoryManager.getInstance().save();
+		LibraryManager.deregisterLibraries();
 		plugin = null;
 		super.stop(context);
 	}

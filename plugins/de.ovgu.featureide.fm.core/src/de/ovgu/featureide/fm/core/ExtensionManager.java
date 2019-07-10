@@ -29,7 +29,6 @@ import java.util.List;
  *
  * @author Sebastian Krieter
  */
-// TODO Check synchronization for get and add extension methods
 public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {
@@ -43,22 +42,11 @@ public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExt
 
 	private final List<T> extensions = new ArrayList<>();
 
-	private IExtensionLoader<T> extensionLoader;
-
-	private boolean initialized = false;
-
-	@SuppressWarnings("unchecked")
-	protected final boolean setLoader(IExtensionLoader<T> extensionLoader) {
-		if (!initialized) {
-			initialized = true;
-			this.extensionLoader = extensionLoader != null ? extensionLoader : new CoreExtensionLoader<T>((Class<? extends T>[]) getDefaultClasses());
-			getExtensions();
-			return true;
-		}
-		return false;
+	public synchronized final void addExtensions(IExtensionLoader<T> extensionLoader) {
+		extensionLoader.loadProviders(this);
 	}
 
-	protected boolean addExtension(T extension) {
+	public synchronized boolean addExtension(T extension) {
 		if (extension != null) {
 			for (final T t : extensions) {
 				if (t.getId().equals(extension.getId())) {
@@ -74,14 +62,6 @@ public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExt
 	}
 
 	public synchronized List<T> getExtensions() {
-		if (extensionLoader != null) {
-			synchronized (extensions) {
-				if (extensionLoader != null) {
-					extensionLoader.loadProviders(this);
-					extensionLoader = null;
-				}
-			}
-		}
 		return Collections.unmodifiableList(extensions);
 	}
 
@@ -96,7 +76,4 @@ public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExt
 		throw new NoSuchExtensionException("No extension found for ID " + id);
 	}
 
-	protected Class<?>[] getDefaultClasses() {
-		return null;
-	}
 }

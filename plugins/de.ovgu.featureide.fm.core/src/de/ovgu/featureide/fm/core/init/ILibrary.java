@@ -18,31 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.init;
 
 /**
- * Handles extensions via native Java.
+ * The interface for the library classes in all plug-ins.
  *
  * @author Sebastian Krieter
  */
-public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
+public interface ILibrary {
 
-	private final Class<? extends T>[] extensionArray;
+	void install();
 
-	@SafeVarargs
-	public CoreExtensionLoader(Class<? extends T>... extensions) {
-		this.extensionArray = extensions;
-	}
-
-	@Override
-	public void loadProviders(ExtensionManager<T> extensionManager) {
-		for (final Class<? extends T> extensionClass : extensionArray) {
-			try {
-				extensionManager.addExtension(extensionClass.newInstance());
-			} catch (final Throwable e) {
-				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
-			}
-		}
-	}
+	void uninstall();
 
 }

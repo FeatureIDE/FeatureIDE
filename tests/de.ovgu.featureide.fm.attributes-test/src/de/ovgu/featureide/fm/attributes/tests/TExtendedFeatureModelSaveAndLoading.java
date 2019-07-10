@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesLibrary;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
@@ -37,8 +38,8 @@ import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 
 /**
@@ -55,8 +56,8 @@ public class TExtendedFeatureModelSaveAndLoading {
 
 	@Before
 	public void prepareWorkbench() {
-		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
-		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
+		LibraryManager.registerLibrary(new FMCoreLibrary());
+		LibraryManager.registerLibrary(new FMAttributesLibrary());
 	}
 
 	@Test
@@ -84,8 +85,8 @@ public class TExtendedFeatureModelSaveAndLoading {
 
 	@Test
 	public void test_CreationAndSaving() {
-		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
-		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
+		LibraryManager.registerLibrary(new FMCoreLibrary());
+		LibraryManager.registerLibrary(new FMAttributesLibrary());
 
 		// At first create an empty extended feature model
 		IFeatureModel model = factory.create();

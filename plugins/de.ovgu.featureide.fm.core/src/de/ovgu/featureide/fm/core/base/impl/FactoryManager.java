@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 import de.ovgu.featureide.fm.core.ExtensionManager;
-import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFactory;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -40,19 +39,15 @@ public abstract class FactoryManager<T> extends ExtensionManager<IFactory<T>> {
 
 	private IFactoryWorkspaceLoader fwIOHandler = null;
 
-	protected final boolean setLoader(IExtensionLoader<IFactory<T>> extensionLoader, IFactoryWorkspaceLoader factorySpaceLoader) {
-		if (super.setLoader(extensionLoader)) {
-			fwIOHandler = factorySpaceLoader != null ? factorySpaceLoader : new CoreFactoryWorkspaceLoader();
-			if (!load()) {
-				try {
-					getDefaultFactoryWorkspace().setDefaultFactoryID(getFactory(getDefaultID()).getId());
-				} catch (final de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException e) {
-					Logger.logError(e);
-				}
+	public final void setWorkspaceLoader(IFactoryWorkspaceLoader factorySpaceLoader) {
+		fwIOHandler = factorySpaceLoader != null ? factorySpaceLoader : new CoreFactoryWorkspaceLoader();
+		if (!load()) {
+			try {
+				getDefaultFactoryWorkspace().setDefaultFactoryID(getFactory(getDefaultID()).getId());
+			} catch (final de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException e) {
+				Logger.logError(e);
 			}
-			return true;
 		}
-		return false;
 	}
 
 	protected final HashMap<Path, FactoryWorkspace> projectMap = new HashMap<>();

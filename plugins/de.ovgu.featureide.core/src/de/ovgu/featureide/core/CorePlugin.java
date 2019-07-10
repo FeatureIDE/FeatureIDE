@@ -51,7 +51,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -71,7 +70,6 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
-import de.ovgu.featureide.core.internal.ProjectChangeListener;
 import de.ovgu.featureide.core.job.PrintDocumentationJob;
 import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
@@ -101,6 +99,7 @@ import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -147,11 +146,6 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private IRunner<Void> job = null;
 
-	/**
-	 * add ResourceChangeListener to workspace to track project move/rename events at the moment project refactoring and
-	 */
-	private IResourceChangeListener listener;
-
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
@@ -161,6 +155,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		LibraryManager.registerLibrary(new CoreEclipseLibrary());
 
 		featureProjectMap = new HashMap<>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
@@ -181,9 +177,6 @@ public class CorePlugin extends AbstractCorePlugin {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
-		listener = new ProjectChangeListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
-
 	}
 
 	/**
@@ -210,9 +203,8 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
+		LibraryManager.deregisterLibrary(new CoreEclipseLibrary());
 
-		listener = null;
 		for (final IFeatureProject data : featureProjectMap.values()) {
 			data.dispose();
 		}

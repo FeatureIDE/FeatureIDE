@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -35,6 +37,10 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  * @author Thomas Thuem
  */
 public class Commons {
+
+	static {
+		LibraryManager.registerLibrary(new FMCoreLibrary());
+	}
 
 	public static File getRemoteOrLocalFolder(String path) {
 		final File folder = new File("src/" + path);

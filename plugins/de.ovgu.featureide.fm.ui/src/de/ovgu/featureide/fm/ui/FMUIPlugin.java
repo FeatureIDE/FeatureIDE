@@ -25,8 +25,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
-import de.ovgu.featureide.fm.ui.editors.EclipseExternalChangeListener;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -49,13 +49,12 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		final EclipseExternalChangeListener eclipseExternalChangeListener = new EclipseExternalChangeListener();
-		ExternalChangeListener.listener = eclipseExternalChangeListener;
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(eclipseExternalChangeListener);
+		LibraryManager.registerLibrary(new FMUIEclipseLibrary());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		LibraryManager.deregisterLibrary(new FMUIEclipseLibrary());
 		plugin = null;
 		super.stop(context);
 		final ExternalChangeListener listener = ExternalChangeListener.listener;

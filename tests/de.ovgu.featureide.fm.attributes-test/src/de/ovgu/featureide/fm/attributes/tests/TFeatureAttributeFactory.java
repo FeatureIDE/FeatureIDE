@@ -4,15 +4,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesLibrary;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
-import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 
 public class TFeatureAttributeFactory {
 
@@ -24,8 +23,8 @@ public class TFeatureAttributeFactory {
 	 */
 	@Test
 	public void test_AttributeInit() {
-		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
-		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
+		LibraryManager.registerLibrary(new FMCoreLibrary());
+		LibraryManager.registerLibrary(new FMAttributesLibrary());
 		ExtendedFeatureModel model = Commons.getBaseModel();
 		ExtendedFeature root = (ExtendedFeature)model.getFeature("Root");
 

@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.nio.file.Path;
 
-import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFactory;
@@ -50,20 +49,10 @@ public final class FMFactoryManager extends FactoryManager<IFeatureModel> {
 		return DefaultFeatureModelFactory.ID;
 	}
 
-	@Override
-	protected Class<?>[] getDefaultClasses() {
-		return new Class<?>[] { DefaultFeatureModelFactory.class, ExtendedFeatureModelFactory.class };
-	}
-
 	private static FMFactoryManager instance = new FMFactoryManager();
 
 	public static FMFactoryManager getInstance() {
-		instance.setLoader(null, null);
 		return instance;
-	}
-
-	public static void initialize(IExtensionLoader<IFactory<IFeatureModel>> extensionLoader, IFactoryWorkspaceLoader factorySpaceLoader) {
-		instance.setLoader(extensionLoader, factorySpaceLoader);
 	}
 
 	/**
