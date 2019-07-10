@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part odify
+ * it under the terms of the GNU Lesser General Public License as published ither version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it wi
+FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or moll be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.results;
 
 import java.util.HashMap;
@@ -17,8 +37,7 @@ import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
 /**
- * CPD is optimized for speed and badly documented, which sadly results in badly
- * formatted results.
+ * CPD is optimized for speed and badly documented, which sadly results in badly formatted results.
  * 
  * This class handles the conversion of CPDs results into a better format.
  * 
@@ -31,14 +50,12 @@ import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 public class CPDResultConverter {
 
 	/**
-	 * Creates an Instance of {@link CloneAnalysisResults} and fills it with
-	 * information gained from the matches found by CPD.
+	 * Creates an Instance of {@link CloneAnalysisResults} and fills it with information gained from the matches found by CPD.
 	 * 
 	 * @param matchesFound matches found by CPD
 	 * @return instance of {@link CloneAnalysisResults}
 	 */
-	public static CloneAnalysisResults<VariantAwareClone> convertMatchesToReadableResults(
-			Iterator<Match> matchesFound) {
+	public static CloneAnalysisResults<VariantAwareClone> convertMatchesToReadableResults(Iterator<Match> matchesFound) {
 		Set<VariantAwareClone> clones = new HashSet<VariantAwareClone>();
 		while (matchesFound.hasNext()) {
 			final VariantAwareClone clone = convertMatchToClone(matchesFound.next());
@@ -55,17 +72,14 @@ public class CPDResultConverter {
 		return results;
 	}
 
-	private static IClonePercentageData calculateClonedAmountPercentage(
-			CloneAnalysisResults<VariantAwareClone> results) {
+	private static IClonePercentageData calculateClonedAmountPercentage(CloneAnalysisResults<VariantAwareClone> results) {
 		ClonePercentageData clonePercentageData = new ClonePercentageData();
 		final Set<FeatureRootLocation> relevantFeatures = results.getRelevantFeatures();
 		final Map<FeatureRootLocation, Map<IFile, short[]>> featureClonedLinesPerFile = new HashMap<FeatureRootLocation, Map<IFile, short[]>>();
 
 		for (FeatureRootLocation feature : relevantFeatures) {
-			clonePercentageData.setFeatureTotalLineCount(feature,
-					CloneAnalysisUtils.getMemberLineSum(feature.getLocation()));
-			clonePercentageData.setFeatureTotalCloneLength(feature,
-					CloneAnalysisUtils.getClonedLineCount(feature, results.getClones()));
+			clonePercentageData.setFeatureTotalLineCount(feature, CloneAnalysisUtils.getMemberLineSum(feature.getLocation()));
+			clonePercentageData.setFeatureTotalCloneLength(feature, CloneAnalysisUtils.getClonedLineCount(feature, results.getClones()));
 			featureClonedLinesPerFile.put(feature, CloneAnalysisUtils.getEmptyMemberLinesMap(feature));
 		}
 		CloneAnalysisUtils.calculateClonedLines(featureClonedLinesPerFile, relevantFeatures, results);
@@ -90,12 +104,10 @@ public class CPDResultConverter {
 	}
 
 	/**
-	 * Checks the clones occurences. If occurences exist in different projects
-	 * or, in the case of FeatureProjects, in different feature folders, the
-	 * clone is intervariant.
+	 * Checks the clones occurences. If occurences exist in different projects or, in the case of FeatureProjects, in different feature folders, the clone is
+	 * intervariant.
 	 * 
-	 * @param occurences
-	 *            the complete Set of the clones occurences.
+	 * @param occurences the complete Set of the clones occurences.
 	 * @return true if the clone is intervariant, false else.
 	 */
 	public static boolean checkForIntervariance(Set<CloneOccurence> occurences) {
@@ -103,8 +115,7 @@ public class CPDResultConverter {
 	}
 
 	/**
-	 * Creates a {@link Clone} object and fills it with information taken from
-	 * the given {@link Match}.
+	 * Creates a {@link Clone} object and fills it with information taken from the given {@link Match}.
 	 * 
 	 * @see Clone clone
 	 * @see Match
@@ -131,8 +142,7 @@ public class CPDResultConverter {
 
 		final int fileCount = countFiles(occurences);
 
-		final VariantAwareClone variantAwareClone = new VariantAwareClone(occurences, cloneLineCount, tokenCount,
-				fileCount, match.getSourceCodeSlice());
+		final VariantAwareClone variantAwareClone = new VariantAwareClone(occurences, cloneLineCount, tokenCount, fileCount, match.getSourceCodeSlice());
 
 		for (CloneOccurence occurence : variantAwareClone.getOccurences())
 			occurence.setClone(variantAwareClone);

@@ -1,3 +1,20 @@
+/* FeatureIDE - A Framework for Feature-Oriented any
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distrY; without even the implied warranty of
+ * MERCHANTABILITY or FITNE License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.views;
 
 import org.eclipse.core.resources.IProject;
@@ -15,6 +32,7 @@ import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
 import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
 public class CloneAnalysisLabelProvider extends LabelProvider implements ITableLabelProvider {
+
 	final String LINE_BREAK = System.getProperty("line.separator");
 
 	public String getColumnText(Object obj, int index) {

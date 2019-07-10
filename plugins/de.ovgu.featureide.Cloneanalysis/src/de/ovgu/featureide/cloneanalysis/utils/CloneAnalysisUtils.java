@@ -1,10 +1,29 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.utils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +49,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
 public class CloneAnalysisUtils {
+
 	public static IFile getFileFromPath(IPath iPath) {
 		return getWorkspaceRoot().getFileForLocation(iPath);
 	}
@@ -42,17 +62,14 @@ public class CloneAnalysisUtils {
 		Set<FeatureRootLocation> result = new HashSet<FeatureRootLocation>();
 		for (VariantAwareClone clone : results.getClones()) {
 			if (clone.getRelevantFeatures() != null && !clone.getRelevantFeatures().isEmpty()) {
-				final IProject project = CloneAnalysisUtils.getFileFromPath(clone.getDistinctFiles().get(0))
-						.getProject();
+				final IProject project = CloneAnalysisUtils.getFileFromPath(clone.getDistinctFiles().get(0)).getProject();
 				final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-				if (featureProject != null)
-					result.addAll(getIFeaturesFromFeatureFolder(featureProject.getSourceFolder()));
+				if (featureProject != null) result.addAll(getIFeaturesFromFeatureFolder(featureProject.getSourceFolder()));
 			}
 
 			final Set<IProject> relevantProjects = clone.getRelevantProjects();
-			if (relevantProjects != null && !relevantProjects.isEmpty())
-				for (final IProject project : relevantProjects)
-					result.add(new FeatureRootLocation(project.getLocation()));
+			if (relevantProjects != null && !relevantProjects.isEmpty()) for (final IProject project : relevantProjects)
+				result.add(new FeatureRootLocation(project.getLocation()));
 		}
 		return result;
 	}
@@ -72,8 +89,7 @@ public class CloneAnalysisUtils {
 
 			if (member instanceof IContainer) {
 				final IFolder subFolder = sourceFolder.getFolder(currentPath);
-				if (subFolder.exists())
-					iFeatures.add(new FeatureRootLocation(subFolder.getLocation()));
+				if (subFolder.exists()) iFeatures.add(new FeatureRootLocation(subFolder.getLocation()));
 			}
 			assert false : "Only expected Containers in FeatureProjects source folder";
 		}
@@ -115,8 +131,7 @@ public class CloneAnalysisUtils {
 
 	private static long getMemberLineSum(IPath path, long c) {
 		IContainer countRoot = getWorkspaceRoot().getContainerForLocation(path);
-		if (countRoot == null)
-			return c;
+		if (countRoot == null) return c;
 		IResource[] members = null;
 		try {
 			members = countRoot.members();
@@ -129,12 +144,10 @@ public class CloneAnalysisUtils {
 			final IPath currentPath = new Path(member.getName());
 
 			if (member instanceof IFile) {
-				if (member.exists() && member.getName().endsWith(".java"))
-					c += countFileLines(member.getLocation());
+				if (member.exists() && member.getName().endsWith(".java")) c += countFileLines(member.getLocation());
 			} else if (member instanceof IContainer) {
 				final IFolder subFolder = countRoot.getFolder(currentPath);
-				if (subFolder.exists())
-					c += getMemberLineSum(subFolder.getLocation());
+				if (subFolder.exists()) c += getMemberLineSum(subFolder.getLocation());
 			}
 		}
 		return c;
@@ -157,8 +170,7 @@ public class CloneAnalysisUtils {
 
 	private static Map<IFile, short[]> getEmptyMemberLinesMap(Map<IFile, short[]> map, IPath path) {
 		IContainer countRoot = getWorkspaceRoot().getContainerForLocation(path);
-		if (map == null)
-			return null;
+		if (map == null) return null;
 		IResource[] members = null;
 		try {
 			members = countRoot.members();
@@ -171,19 +183,17 @@ public class CloneAnalysisUtils {
 			final IPath currentPath = new Path(member.getName());
 
 			if (member instanceof IFile) {
-				if (member.exists() && member.getName().endsWith(".java"))
-					map.put((IFile) member, new short[(int) countFileLines(member.getLocation())]);
+				if (member.exists() && member.getName().endsWith(".java")) map.put((IFile) member, new short[(int) countFileLines(member.getLocation())]);
 			} else if (member instanceof IContainer) {
 				final IFolder subFolder = countRoot.getFolder(currentPath);
-				if (subFolder.exists())
-					map.putAll(getEmptyMemberLinesMap(new HashMap<IFile, short[]>(), member.getLocation()));
+				if (subFolder.exists()) map.putAll(getEmptyMemberLinesMap(new HashMap<IFile, short[]>(), member.getLocation()));
 			}
 		}
 		return map;
 	}
 
-	public static void calculateClonedLines(Map<FeatureRootLocation, Map<IFile, short[]>> featureClonedLinesPerFile,
-			Set<FeatureRootLocation> relevantFeatures, CloneAnalysisResults<VariantAwareClone> results) {
+	public static void calculateClonedLines(Map<FeatureRootLocation, Map<IFile, short[]>> featureClonedLinesPerFile, Set<FeatureRootLocation> relevantFeatures,
+			CloneAnalysisResults<VariantAwareClone> results) {
 		for (VariantAwareClone clone : results.getClones()) {
 			for (CloneOccurence occurence : clone.getOccurences()) {
 				final IFile file = getFileFromPath(occurence.getFile());
@@ -191,7 +201,7 @@ public class CloneAnalysisUtils {
 					short[] lines = featureClonedLinesPerFile.get(feature).get(file);
 					if (lines != null) {
 						for (int i = occurence.getStartIndex(); i < (clone.getLineCount() + occurence.getStartIndex())
-								&& i < countFileLines(occurence.getFile()); i++) {
+							&& i < countFileLines(occurence.getFile()); i++) {
 							lines[i] = ++(lines[i]);
 						}
 						featureClonedLinesPerFile.get(feature).remove(file);
@@ -204,8 +214,7 @@ public class CloneAnalysisUtils {
 
 	public static String getRelevantFeatureOrProjectName(CloneOccurence occurence) {
 		if (occurence.getClone().getRelevantProjects() != null)
-			return occurence.getFile().makeRelativeTo(ResourcesPlugin.getWorkspace().getRoot().getLocation())
-					.toString();
+			return occurence.getFile().makeRelativeTo(ResourcesPlugin.getWorkspace().getRoot().getLocation()).toString();
 
 		// for(IProject project : occurence.getClone().getRelevantProjects())
 		// {
