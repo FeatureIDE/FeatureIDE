@@ -1,8 +1,8 @@
 package de.ovgu.featureide.cloneanalysis.results;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -11,8 +11,6 @@ import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.views.CloneVariantType;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-//import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 public class VariantAwareClone extends Clone {

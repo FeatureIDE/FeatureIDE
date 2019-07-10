@@ -13,7 +13,7 @@
                				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 					</reference>
 				</visibleWhen>
             <command

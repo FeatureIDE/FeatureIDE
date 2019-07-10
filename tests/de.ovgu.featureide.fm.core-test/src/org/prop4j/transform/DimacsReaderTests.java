@@ -35,8 +35,6 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.io.dimacs.DimacsReader;
 
-import de.ovgu.featureide.fm.core.io.dimacs.DimacsReader;
-
 /**
  * Tests for {@link DimacsReader}.
  *
