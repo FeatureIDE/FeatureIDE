@@ -4,11 +4,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar" sourcepath="C:/Users/skrieter/Downloads/sat4j-core-v20130525/org.sat4j.core-src.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.pb.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
 	<classpathentry kind="lib" path="lib/splar.jar"/>
 	<classpathentry kind="lib" path="lib/SPLCAT.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/org.sat4j.pb.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
