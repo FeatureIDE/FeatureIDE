@@ -57,10 +57,10 @@ public class FMCoreEclipseLibrary implements ILibrary {
 
 		FMFactoryManager.getInstance().addExtensions(new EclipseExtensionLoader<IFactory<IFeatureModel>>(PluginID.PLUGIN_ID,
 				IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFactoryManager.getInstance().setWorkspaceLoader(new EclipseFactoryWorkspaceProvider());
+		FMFactoryManager.getInstance().setWorkspaceLoader(new EclipseFactoryWorkspaceProvider("featureModel"));
 
 		ConfigurationFactoryManager.getInstance().addExtension(DefaultConfigurationFactory.getInstance());
-		ConfigurationFactoryManager.getInstance().setWorkspaceLoader(new EclipseFactoryWorkspaceProvider());
+		ConfigurationFactoryManager.getInstance().setWorkspaceLoader(new EclipseFactoryWorkspaceProvider("configuration"));
 
 		FMFormatManager.getInstance().addExtensions(new EclipseExtensionLoader<IPersistentFormat<IFeatureModel>>(PluginID.PLUGIN_ID,
 				IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));

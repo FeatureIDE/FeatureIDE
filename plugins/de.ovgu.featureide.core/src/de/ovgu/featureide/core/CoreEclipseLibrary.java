@@ -30,7 +30,6 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.core.internal.ProjectChangeListener;
 import de.ovgu.featureide.fm.core.EclipseExtensionLoader;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.init.ILibrary;
 
 /**
@@ -53,7 +52,7 @@ public class CoreEclipseLibrary implements ILibrary {
 					try {
 						return new ComposerExtensionProxy(configurationElement);
 					} catch (final Exception e) {
-						Logger.logError(e);
+						CorePlugin.getDefault().logError(e);
 					}
 				}
 				return null;

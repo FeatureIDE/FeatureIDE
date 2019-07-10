@@ -50,6 +50,10 @@ public final class EclipseFactoryWorkspaceProvider implements IFactoryWorkspaceL
 	private static final String FM_CORE_NODE = "de.ovgu.featureide.fm.core";
 	private String subNode;
 
+	public EclipseFactoryWorkspaceProvider(String subNode) {
+		this.subNode = subNode;
+	}
+
 	public static String getFmCoreNode() {
 		return FM_CORE_NODE;
 	}
