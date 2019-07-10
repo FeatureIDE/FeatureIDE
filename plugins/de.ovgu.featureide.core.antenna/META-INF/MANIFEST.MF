@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/antenna.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: antenna.preprocessor,
  antenna.preprocessor.v3,

@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core.ahead,
  de.ovgu.featureide.core.featurehouse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.core.conversion.ahead_featurehouse,

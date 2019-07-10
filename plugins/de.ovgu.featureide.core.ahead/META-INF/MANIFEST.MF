@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Bundle-ClassPath: lib/jak2java.jar,
  lib/mixin.jar,

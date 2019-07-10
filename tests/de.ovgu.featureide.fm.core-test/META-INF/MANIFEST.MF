@@ -4,7 +4,7 @@ Bundle-Name: Feature Model Core Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.fm.core-test;singleton:=true
 Bundle-Version: 3.6.0.qualifier
 Fragment-Host: de.ovgu.featureide.fm.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
 Bundle-ClassPath: .,

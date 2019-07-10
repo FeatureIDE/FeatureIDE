@@ -5,7 +5,6 @@ Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
 Bundle-Version: 3.6.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
-Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/annotations.jar,
  lib/antlr-3.4.jar,
@@ -16,7 +15,7 @@ Bundle-ClassPath: .,
  lib/splar.jar,
  lib/SPLCAT.jar,
  lib/commons-math-2.2.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.swt.graphics
@@ -75,6 +74,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.filter,
  de.ovgu.featureide.fm.core.filter.base,
  de.ovgu.featureide.fm.core.functional,
+ de.ovgu.featureide.fm.core.init,
  de.ovgu.featureide.fm.core.io,
  de.ovgu.featureide.fm.core.io.cnf,
  de.ovgu.featureide.fm.core.io.dimacs,
@@ -144,3 +144,4 @@ Export-Package: Jakarta.DRAttributes,
  org.stringtemplate.v4.debug,
  org.stringtemplate.v4.gui,
  org.stringtemplate.v4.misc
+Bundle-ActivationPolicy: lazy

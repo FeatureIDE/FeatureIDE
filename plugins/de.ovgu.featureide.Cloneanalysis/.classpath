@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="lib/pmd-fortran-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-go-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-javascript-5.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-jsp-5.2.2.jar" />
+	<classpathentry kind="lib" path="lib/pmd-jsp-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-php-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-plsql-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-ruby-5.2.2.jar"/>
@@ -29,6 +29,6 @@
 	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/openjfx-78-backport-1.8.0-ea-b96.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
