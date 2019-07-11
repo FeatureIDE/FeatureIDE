@@ -63,17 +63,17 @@ public class BFeatureModelAnalyzer {
 		analyze(2);
 	}
 
-	@Test(timeout = 100) // 0.007 @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.007 @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel10() {
 		analyze(10);
 	}
 
-	@Test(timeout = 100) // 0.006s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.006s @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel20() {
 		analyze(20);
 	}
 
-	@Test(timeout = 250) // 0.020s @ i5(3,3GHz)
+	@Test(timeout = 2500) // 0.020s @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel21() {
 		analyze(21);
 	}
@@ -125,27 +125,27 @@ public class BFeatureModelAnalyzer {
 		BUpdateConstraints(2);
 	}
 
-	@Test(timeout = 100) // 0.004s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.004s @ i5(3,3GHz)
 	public final void BUpdateConstraints10() {
 		BUpdateConstraints(10);
 	}
 
-	@Test(timeout = 100) // 0.005s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.005s @ i5(3,3GHz)
 	public final void BUpdateConstraints20() {
 		BUpdateConstraints(20);
 	}
 
-	@Test(timeout = 100) // 0.004s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.004s @ i5(3,3GHz)
 	public final void BUpdateConstraints21() {
 		BUpdateConstraints(21);
 	}
 
-	@Test(timeout = 100) // 0.011s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.011s @ i5(3,3GHz)
 	public final void BUpdateConstraints50() {
 		BUpdateConstraints(50);
 	}
 
-	@Test(timeout = 250) // 0.051s @ i5(3,3GHz)
+	@Test(timeout = 2500) // 0.051s @ i5(3,3GHz)
 	public final void BUpdateConstraints100() {
 		BUpdateConstraints(100);
 	}
@@ -187,32 +187,32 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(2);
 	}
 
-	@Test(timeout = 100) // 0.005s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.005s @ i5(3,3GHz)
 	public final void BUpdateFeatures10() {
 		BUpdateFeatures(10);
 	}
 
-	@Test(timeout = 100) // 0.005s @ i5(3,3GHz)
+	@Test(timeout = 1000) // 0.005s @ i5(3,3GHz)
 	public final void BUpdateFeatures20() {
 		BUpdateFeatures(20);
 	}
 
-	@Test(timeout = 200) // 0.020s @ i5(3,3GHz)
+	@Test(timeout = 2000) // 0.020s @ i5(3,3GHz)
 	public final void BUpdateFeatures21() {
 		BUpdateFeatures(21);
 	}
 
-	@Test(timeout = 250) // 0.012s @ i5(3,3GHz)
+	@Test(timeout = 2500) // 0.012s @ i5(3,3GHz)
 	public final void BUpdateFeatures50() {
 		BUpdateFeatures(50);
 	}
 
-	@Test(timeout = 200) // 0.027s @ i5(3,3GHz)
+	@Test(timeout = 2000) // 0.027s @ i5(3,3GHz)
 	public final void BUpdateFeatures100() {
 		BUpdateFeatures(100);
 	}
 
-	@Test(timeout = 500) // 0.092s @ i5(3,3GHz)
+	@Test(timeout = 5000) // 0.092s @ i5(3,3GHz)
 	public final void BUpdateFeatures200() {
 		BUpdateFeatures(200);
 	}
