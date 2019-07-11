@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class ClauseAnalysis extends AClauseAnalysis<List<ClauseAnalysis.Anomalies>> {
+public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>> {
 
 	public static class Anomalies {
 
@@ -81,15 +81,16 @@ public class ClauseAnalysis extends AClauseAnalysis<List<ClauseAnalysis.Anomalie
 		}
 	}
 
-	public ClauseAnalysis(CNF satInstance) {
+	public CauseAnalysis(CNF satInstance) {
 		super(satInstance);
 	}
 
-	public ClauseAnalysis(ISatSolver solver) {
+	public CauseAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
 	private Anomalies anomalies;
+	protected boolean[] relevantConstraint;
 
 	public Anomalies getAnomalies() {
 		return anomalies;
@@ -97,6 +98,14 @@ public class ClauseAnalysis extends AClauseAnalysis<List<ClauseAnalysis.Anomalie
 
 	public void setAnomalies(Anomalies anomalies) {
 		this.anomalies = anomalies;
+	}
+
+	public boolean[] getRelevantConstraint() {
+		return relevantConstraint;
+	}
+
+	public void setRelevantConstraint(boolean[] relevantConstraint) {
+		this.relevantConstraint = relevantConstraint;
 	}
 
 	@Override
@@ -142,21 +151,22 @@ public class ClauseAnalysis extends AClauseAnalysis<List<ClauseAnalysis.Anomalie
 			final int startIndex = endIndex;
 			endIndex += clauseGroupSize[i];
 			solver.addClauses(clauseList.subList(startIndex, endIndex));
-
-			if (remainingVariables.getLiterals().length > 0) {
-				final LiteralSet deadVariables = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, remainingVariables));
-				if (deadVariables.getLiterals().length != 0) {
-					getAnomalies(resultList, i).setDeadVariables(deadVariables);
-					remainingVariables = remainingVariables.removeAll(deadVariables);
+			if (relevantConstraint[i]) {
+				if (remainingVariables.getLiterals().length > 0) {
+					final LiteralSet deadVariables = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, remainingVariables));
+					if (deadVariables.getLiterals().length != 0) {
+						getAnomalies(resultList, i).setDeadVariables(deadVariables);
+						remainingVariables = remainingVariables.removeAll(deadVariables);
+					}
 				}
-			}
 
-			if (!remainingClauses.isEmpty()) {
-				final List<LiteralSet> newClauseList =
-					Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
-				if (!newClauseList.isEmpty()) {
-					getAnomalies(resultList, i).setRedundantClauses(newClauseList);
-					remainingClauses.removeAll(newClauseList);
+				if (!remainingClauses.isEmpty()) {
+					final List<LiteralSet> newClauseList =
+						Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
+					if (!newClauseList.isEmpty()) {
+						getAnomalies(resultList, i).setRedundantClauses(newClauseList);
+						remainingClauses.removeAll(newClauseList);
+					}
 				}
 			}
 

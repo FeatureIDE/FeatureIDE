@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ClauseAnalysis.Anomalies;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis.Anomalies;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
-import de.ovgu.featureide.fm.core.filter.MandatoryFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -176,7 +176,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public List<IFeature> getFalseOptionalFeatures() {
-		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new InverseFilter<>(new MandatoryFeatureFilter()));
+		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new OptionalFeatureFilter());
 		final List<LiteralSet> result = getFalseOptionalFeatures(optionalFeatures);
 
 		final List<IFeature> resultList = new ArrayList<>();
@@ -231,13 +231,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return resultList;
 	}
 
-	public List<IConstraint> getAnomalyConstraints() {
+	public List<IConstraint> getAnomalyConstraints(boolean[] relevantConstraint) {
+		analysesCollection.constraintAnomaliesAnalysis.setRelevantConstraint(relevantConstraint);
 		final List<Anomalies> result = analysesCollection.constraintAnomaliesAnalysis.getResult();
 		if (result == null) {
 			return Collections.emptyList();
 		}
 
-		final CNF cnf = formula.getCNF();
+		final IVariables variables = formula.getCNF().getVariables();
 
 		final List<IConstraint> resultList = new ArrayList<>();
 		for (int i = 0; i < analysesCollection.constraintAnomaliesAnalysis.getClauseGroupSize().length; i++) {
@@ -247,7 +248,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 					final ArrayList<IFeature> falseOptionalFeatures = new ArrayList<>();
 					for (final LiteralSet literalSet : anomalies.getRedundantClauses()) {
 						if (literalSet != null) {
-							falseOptionalFeatures.add(featureModel.getFeature(cnf.getVariables().getName(literalSet.getLiterals()[1])));
+							falseOptionalFeatures.add(featureModel.getFeature(variables.getName(literalSet.getLiterals()[1])));
 						}
 					}
 					final IConstraint constraint = constraints.get(i);
@@ -256,8 +257,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 				}
 				if (anomalies.getDeadVariables() != null) {
 					final IConstraint constraint = constraints.get(i);
-					getConstraintProperties(constraint).setDeadFeatures(Functional.mapToList(
-							cnf.getVariables().convertToString(anomalies.getDeadVariables(), false, true, false), new StringToFeature(featureModel)));
+					getConstraintProperties(constraint).setDeadFeatures(Functional
+							.mapToList(variables.convertToString(anomalies.getDeadVariables(), false, true, false), new StringToFeature(featureModel)));
 					resultList.add(constraint);
 				}
 			}
@@ -311,8 +312,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 				monitor = new NullMonitor();
 			}
 			// set default values for constraint properties
-			for (final IConstraint constraint : featureModel.getConstraints()) {
-				getConstraintProperties(constraint).resetStatus();
+			for (final IConstraint constraint : constraints) {
+				final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
+				constraintProperties.resetStatus();
+				constraintProperties.setStatus(ConstraintStatus.NECESSARY);
+				constraintProperties.setStatus(ConstraintStatus.SATISFIABLE);
 			}
 
 			// get constraint anomalies
@@ -329,7 +333,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
 			}
 
-			getAnomalyConstraints();
+			int i = 0;
+			final boolean[] relevantConstraint = new boolean[constraints.size()];
+			for (final IConstraint constraint : constraints) {
+				final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
+				if (constraintProperties.hasStatus(ConstraintStatus.NECESSARY) && constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
+					relevantConstraint[i] = true;
+				}
+				i++;
+			}
+
+			getAnomalyConstraints(relevantConstraint);
 		}
 	}
 

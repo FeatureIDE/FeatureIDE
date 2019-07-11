@@ -27,8 +27,11 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -73,25 +76,42 @@ public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralS
 		}
 		monitor.step();
 
-		int endIndex = 0;
-		groupLoop: for (int i = 0; i < clauseGroupSize.length; i++) {
-			final int startIndex = endIndex;
-			endIndex += clauseGroupSize[i];
-			for (int j = startIndex; j < endIndex; j++) {
-				final LiteralSet clause = clauseList.get(j);
+		final int[] firstSolution = solver.findSolution();
+		if (firstSolution != null) {
 
-				final SatResult hasSolution = solver.hasSolution(clause.negate());
-				switch (hasSolution) {
-				case FALSE:
-					resultList.set(i, clause);
-					continue groupLoop;
-				case TIMEOUT:
-					reportTimeout();
-					break;
-				case TRUE:
-					break;
-				default:
-					throw new AssertionError(hasSolution);
+			final RingList<LiteralSet> solutionList = new RingList<>(ISatSolver.MAX_SOLUTION_BUFFER);
+			solver.setSelectionStrategy(SelectionStrategy.RANDOM);
+			solutionList.add(new LiteralSet(firstSolution, Order.INDEX, false));
+
+			int endIndex = 0;
+			groupLoop: for (int i = 0; i < clauseGroupSize.length; i++) {
+				final int startIndex = endIndex;
+				endIndex += clauseGroupSize[i];
+				clauseLoop: for (int j = startIndex; j < endIndex; j++) {
+					final LiteralSet clause = clauseList.get(j);
+					final LiteralSet complement = clause.negate();
+
+					for (final LiteralSet solution : solutionList) {
+						if (solution.containsAll(complement)) {
+							continue clauseLoop;
+						}
+					}
+
+					final SatResult hasSolution = solver.hasSolution(complement);
+					switch (hasSolution) {
+					case FALSE:
+						resultList.set(i, clause);
+						continue groupLoop;
+					case TIMEOUT:
+						reportTimeout();
+						break;
+					case TRUE:
+						solutionList.add(new LiteralSet(solver.getSolution(), Order.INDEX, false));
+						solver.shuffleOrder(random);
+						break;
+					default:
+						throw new AssertionError(hasSolution);
+					}
 				}
 			}
 		}
