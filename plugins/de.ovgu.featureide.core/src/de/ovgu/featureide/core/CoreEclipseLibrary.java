@@ -65,8 +65,10 @@ public class CoreEclipseLibrary implements ILibrary {
 
 	@Override
 	public void uninstall() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
-		listener = null;
+		if (listener != null) {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
+			listener = null;
+		}
 	}
 
 }

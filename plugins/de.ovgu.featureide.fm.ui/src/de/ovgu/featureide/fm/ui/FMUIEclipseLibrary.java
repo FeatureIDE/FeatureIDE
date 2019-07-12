@@ -48,8 +48,10 @@ public class FMUIEclipseLibrary implements ILibrary {
 
 	@Override
 	public void uninstall() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(eclipseExternalChangeListener);
-		eclipseExternalChangeListener = null;
+		if (eclipseExternalChangeListener != null) {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(eclipseExternalChangeListener);
+			eclipseExternalChangeListener = null;
+		}
 	}
 
 }
