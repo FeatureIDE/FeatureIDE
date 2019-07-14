@@ -63,7 +63,7 @@ public class NodeReader {
 	private static final Pattern parenthesisPattern = Pattern.compile("\\(([^()]*)\\)");
 	private static final Pattern quotePattern = Pattern.compile("\\\"(.*?)\\\"");
 
-	private Collection<String> featureNames;
+	private final HashSet<String> featureNames = new HashSet<>();;
 
 	private String[] symbols = textualSymbols;
 
@@ -102,7 +102,10 @@ public class NodeReader {
 	}
 
 	public void setFeatureNames(Collection<String> featureNames) {
-		this.featureNames = new HashSet<>(featureNames);
+		this.featureNames.clear();
+		if (featureNames != null) {
+			this.featureNames.addAll(featureNames);
+		}
 	}
 
 	/**
@@ -112,24 +115,7 @@ public class NodeReader {
 	 * @return A node representing the constraint.
 	 */
 	public Node stringToNode(String constraint) {
-		return stringToNode(constraint, null);
-	}
-
-	/**
-	 * Parses a constraint and create a corresponding {@link Node} tree.
-	 *
-	 * @deprecated Use {@link #stringToNode(String)} and {@link #setFeatureNames(Collection)} instead.
-	 * @param constraint The constraint to be parsed.
-	 * @param featureNames The valid feature names.
-	 * @return A node representing the constraint.
-	 */
-	@Deprecated
-	public Node stringToNode(String constraint, Collection<String> featureNames) {
-		if (featureNames != null) {
-			setFeatureNames(featureNames);
-		}
 		errorMessage = null;
-
 		try {
 			final Node parseNode = parseNode(constraint);
 			return parseNode;
@@ -140,13 +126,26 @@ public class NodeReader {
 	}
 
 	/**
+	 * Parses a constraint and create a corresponding {@link Node} tree.
+	 *
+	 * @param constraint The constraint to be parsed.
+	 * @param featureNames The valid feature names.
+	 * @return A node representing the constraint.
+	 */
+	public Node stringToNode(String constraint, Collection<String> featureNames) {
+		setFeatureNames(featureNames);
+		return stringToNode(constraint);
+	}
+
+	/**
 	 * returns true if constraint is well formed
 	 *
 	 * @param constraint
 	 * @return
 	 */
 	public boolean isWellFormed(String constraint) {
-		return stringToNode(constraint, null) != null;
+		setFeatureNames(null);
+		return stringToNode(constraint) != null;
 	}
 
 	/**
@@ -157,7 +156,8 @@ public class NodeReader {
 	 * @return true if constraint is well formed
 	 */
 	public boolean isWellFormed(String constraint, final Collection<String> featureNames) {
-		return stringToNode(constraint, featureNames) != null;
+		setFeatureNames(featureNames);
+		return stringToNode(constraint) != null;
 	}
 
 	/**

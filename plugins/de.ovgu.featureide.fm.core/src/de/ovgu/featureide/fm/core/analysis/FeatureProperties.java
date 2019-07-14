@@ -49,12 +49,12 @@ public class FeatureProperties {
 	/**
 	 * Explanation for dead features.
 	 */
-	private Explanation deadExplanation;
+	private Explanation<?> deadExplanation;
 
 	/**
 	 * Explanation for false-optional features.
 	 */
-	private Explanation falseOptionalExplanation;
+	private Explanation<?> falseOptionalExplanation;
 
 	public FeatureProperties(IFeature feature) {
 		this.feature = feature;
@@ -95,19 +95,19 @@ public class FeatureProperties {
 		this.featureStatus.add(featureStatus);
 	}
 
-	public Explanation getFalseOptionalExplanation() {
+	public Explanation<?> getFalseOptionalExplanation() {
 		return falseOptionalExplanation;
 	}
 
-	public void setFalseOptionalExplanation(Explanation falseOptionalExplanation) {
+	public void setFalseOptionalExplanation(Explanation<?> falseOptionalExplanation) {
 		this.falseOptionalExplanation = falseOptionalExplanation;
 	}
 
-	public Explanation getDeadExplanation() {
+	public Explanation<?> getDeadExplanation() {
 		return deadExplanation;
 	}
 
-	public void setDeadExplanation(Explanation deadExplanation) {
+	public void setDeadExplanation(Explanation<?> deadExplanation) {
 		this.deadExplanation = deadExplanation;
 	}
 

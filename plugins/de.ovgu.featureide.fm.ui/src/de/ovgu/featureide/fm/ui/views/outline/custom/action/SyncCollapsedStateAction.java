@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -32,12 +31,9 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class SyncCollapsedStateAction extends Action {
 
-	private final TreeViewer viewer;
-
-	public SyncCollapsedStateAction(TreeViewer viewer) {
+	public SyncCollapsedStateAction() {
 		super("", AS_CHECK_BOX);
 		setChecked(FMUIPlugin.getDefault().getPreferenceStore().getBoolean("outlineSyncCollapsedState"));
-		this.viewer = viewer;
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif"));
 	}
 

@@ -112,7 +112,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
-		syncCollapsedStateAction = new SyncCollapsedStateAction(viewer);
+		syncCollapsedStateAction = new SyncCollapsedStateAction();
 		syncCollapsedStateAction.setEnabled(true);
 		manager.add(syncCollapsedStateAction);
 	}

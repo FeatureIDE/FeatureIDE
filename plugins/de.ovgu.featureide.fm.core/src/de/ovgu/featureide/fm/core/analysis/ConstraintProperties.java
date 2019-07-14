@@ -52,7 +52,7 @@ public class ConstraintProperties {
 	/**
 	 * Explanation for redundant constraints.
 	 */
-	private Explanation redundantExplanation;
+	private Explanation<?> redundantExplanation;
 
 	private final IConstraint constraint;
 
@@ -93,11 +93,11 @@ public class ConstraintProperties {
 		return constraint;
 	}
 
-	public Explanation getRedundantExplanation() {
+	public Explanation<?> getRedundantExplanation() {
 		return redundantExplanation;
 	}
 
-	public void setRedundantExplanation(Explanation redundantExplanation) {
+	public void setRedundantExplanation(Explanation<?> redundantExplanation) {
 		this.redundantExplanation = redundantExplanation;
 	}
 

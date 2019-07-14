@@ -98,22 +98,12 @@ public class CloneAnalysisUtils {
 
 	public static long countFileLines(IPath path) {
 		long lineCount = 0;
-		try {
-			// LineNumberReader lnr = new LineNumberReader(new
-			// FileReader(path.toFile()));
-			// lnr.skip(Long.MAX_VALUE);
-			// lineCount = lnr.getLineNumber() + 1; //Add 1 because line index
-			// starts at 0
-			// lnr.close();
-
-			final BufferedReader br = new BufferedReader(new FileReader(path.toFile()));
-			String line;
-			while ((line = br.readLine()) != null) {
+		try (final BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				if (!line.trim().isEmpty()) {
 					lineCount++;
 				}
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

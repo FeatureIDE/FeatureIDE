@@ -37,8 +37,8 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 //import org.eclipse.jface.text.IMarkSelection;
 import org.eclipse.swt.widgets.Composite;
@@ -80,11 +80,10 @@ public class CloneAnalysisView extends ViewPart {
 
 	private Action action1;
 	private Action action2;
-	private Action doubleClickAction;
 
 	private HashSet<Action> filterActions;
 
-	class NameSorter extends ViewerSorter {}
+	class NameSorter extends ViewerComparator {}
 
 	/**
 	 * The constructor.
@@ -96,14 +95,12 @@ public class CloneAnalysisView extends ViewPart {
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
-	@SuppressWarnings("deprecation")
 	public void createPartControl(Composite parent) {
-
 		cloneTree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		cloneViewer = new TreeViewer(cloneTree);
 		cloneViewer.setContentProvider(new CloneAnalysisContentProvider(this));
 		cloneViewer.setLabelProvider(new CloneAnalysisLabelProvider());
-		cloneViewer.setSorter(new NameSorter());
+		cloneViewer.setComparator(new NameSorter());
 		cloneViewer.setInput(getViewSite());
 		cloneViewer.setComparator(new SizeComparator());
 

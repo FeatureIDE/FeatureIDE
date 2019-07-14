@@ -17,8 +17,6 @@
  */
 package de.ovgu.featureide.cloneanalysis.views;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -27,9 +25,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.results.Clone;
-import de.ovgu.featureide.cloneanalysis.results.FeatureRootLocation;
 import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
-import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
 public class CloneAnalysisLabelProvider extends LabelProvider implements ITableLabelProvider {
 
