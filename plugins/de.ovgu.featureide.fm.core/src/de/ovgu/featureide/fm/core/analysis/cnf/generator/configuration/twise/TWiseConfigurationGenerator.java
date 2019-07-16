@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
 	private final class SamplingMonitor implements Runnable {
+
 		@Override
 		public void run() {
 			if (VERBOSE) {
@@ -130,6 +131,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
 
+	private ArrayList<LiteralSet> curResult = null;
+	private ArrayList<LiteralSet> bestResult = null;
+
 	protected MonitorThread samplingMonitor;
 
 	public TWiseConfigurationGenerator(CNF cnf, int t) {
@@ -168,43 +172,27 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		buildCombinations();
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 4; i++) {
 			// TODO Variation Point: Removing low-contributing Configurations
 			trimConfigurations();
 			buildCombinations();
 		}
 
-		for (final TWiseConfiguration configuration : util.getResultList()) {
-			configuration.autoComplete();
+		for (final LiteralSet configuration : bestResult) {
 			addResult(configuration);
 		}
 	}
 
 	private void trimConfigurations() {
-		final ArrayList<LiteralSet> completedSolutions = new ArrayList<>();
-		for (final TWiseConfiguration configuration : util.getResultList()) {
-			completedSolutions.add(configuration.getCompleteSolution());
-		}
-
-		final TWiseConfigurationStatistic statistic =
-			new TWiseConfigurationStatistic(util, completedSolutions, presenceConditionManager.getGroupedPresenceConditions());
+		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
 		statistic.fastCalc();
 
 		final double[] normConfigValues = statistic.getConfigValues2();
-//			Arrays.sort(normConfigValues);
-//			final double median = normConfigValues[normConfigValues.length / 2];
-//			normConfigValues = statistic.getConfigValues2();
 		double mean = 0;
 		for (final double d : normConfigValues) {
 			mean += d / normConfigValues.length;
 		}
 		final double reference = mean;
-
-//		double[] normConfigValues = statistic.getNormConfigValues();
-//		Arrays.sort(normConfigValues);
-//		final double median = normConfigValues[normConfigValues.length / 3];
-//		normConfigValues = statistic.getNormConfigValues();
-//		final double reference = 0.9;
 
 		int index = 0;
 		index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
@@ -227,8 +215,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
-//				new CoverAll(util), //
-//				new CoverAll2(util, presenceConditionManager, t), //
 				new CoverAll(util));
 		numberOfCombinations = it.size();
 
@@ -297,6 +283,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			}
 		} finally {
 			samplingMonitor.finish();
+		}
+
+		curResult = new ArrayList<>();
+		for (final TWiseConfiguration configuration : util.getResultList()) {
+			curResult.add(configuration.getCompleteSolution());
+		}
+		if ((bestResult == null) || (bestResult.size() > curResult.size())) {
+			bestResult = curResult;
 		}
 	}
 
