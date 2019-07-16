@@ -859,7 +859,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		comboIndex = new short[combinations2.length << 2];
 
 		solver = solver.clone();
-		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
 		// allyes
 		handleNewConfig(allYesSolution, featuresUsedOrg);
@@ -928,6 +928,8 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 			if (handleNewConfig(solver.findSolution(), featuresUsedOrg)) {
 				break;
+			} else {
+				solver.shuffleOrder(random);
 			}
 			solver.assignmentClear(numberOfFixedFeatures);
 		}
