@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -51,7 +52,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected boolean constraintSelected;
 
-	protected long featureName;
+	protected IFeature featureObject;
 
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
@@ -67,7 +68,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		featureName = correspondingFeature.getInternalId();
+		featureObject = correspondingFeature;
 		sourceConnection = new FeatureConnection(this);
 	}
 
@@ -76,14 +77,15 @@ public class GraphicalFeature implements IGraphicalFeature {
 		constraintSelected = graphicalFeature.constraintSelected;
 		location = graphicalFeature.location;
 		dimension = graphicalFeature.dimension;
-		featureName = graphicalFeature.featureName;
+		featureObject = graphicalFeature.featureObject;
 		graphicalFeatureModel = graphicalFeature.graphicalFeatureModel;
 		sourceConnection = graphicalFeature.sourceConnection;
 	}
 
 	@Override
 	public IFeature getObject() {
-		return (IFeature) graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(featureName);
+		final IFeatureModelElement element = graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(featureObject.getInternalId());
+		return element instanceof IFeature ? (IFeature) element : featureObject;
 	}
 
 	@Override
@@ -191,7 +193,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		return (int) (prime * featureName);
+		return (int) (prime * featureObject.getInternalId());
 	}
 
 	@Override
@@ -203,7 +205,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 			return false;
 		}
 		final GraphicalFeature other = (GraphicalFeature) obj;
-		return featureName == other.featureName;
+		return featureObject.getInternalId() == other.featureObject.getInternalId();
 	}
 
 	@Override

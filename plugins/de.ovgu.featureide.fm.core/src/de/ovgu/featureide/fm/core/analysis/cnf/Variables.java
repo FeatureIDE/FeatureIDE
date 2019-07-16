@@ -255,12 +255,13 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 
 	@Override
 	public LiteralSet getLiterals() {
-		final int[] literals = new int[intToVar.length << 1];
-		for (int i = 0; i < literals.length; i++) {
-			literals[i] = i - literals.length;
+		final int length = intToVar.length - 1;
+		final int[] literals = new int[length << 1];
+		for (int i = 0; i < length; i++) {
+			literals[i] = i - length;
 		}
-		for (int i = 0; i < literals.length; i++) {
-			literals[i + literals.length] = (i + 1);
+		for (int i = length; i < literals.length; i++) {
+			literals[i] = (i - length) + 1;
 		}
 		return new LiteralSet(literals, Order.NATURAL, false);
 	}

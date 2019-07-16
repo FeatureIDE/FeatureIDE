@@ -38,8 +38,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
@@ -66,81 +66,34 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		super(treeProvider, labelProvider);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
-		// TODO Auto-generated method stub
+	public void selectionChanged(SelectionChangedEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
-	public void treeCollapsed(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
+	public void treeCollapsed(TreeExpansionEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
-	public void treeExpanded(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
+	public void treeExpanded(TreeExpansionEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#initContextMenuActions(org.eclipse.jface.action.IMenuManager)
-	 */
 	@Override
-	protected void initContextMenuActions(IMenuManager manager) {
-		// TODO Auto-generated method stub
+	protected void initContextMenuActions(IMenuManager manager) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#initToolbarActions(org.eclipse.jface.action.IToolBarManager)
-	 */
 	@Override
-	protected void initToolbarActions(IToolBarManager manager) {
-		// TODO Auto-generated method stub
+	protected void initToolbarActions(IToolBarManager manager) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#getFilters()
-	 */
 	@Override
 	protected List<IOutlineFilter> getFilters() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#isSupported(org.eclipse.core.resources.IFile)
-	 */
 	@Override
 	public boolean isSupported(IFile file) {
-		try {
-			return ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null;
-		} catch (final ClassCastException e) {
-			return false;
-		}
+		return ConfigFormatManager.getInstance().hasFormat(Paths.get(file.getLocationURI()));
 	}
 
 	private void initListeners() {
 		dblClickListener = new IDoubleClickListener() {
+
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IOutlineEntry)) {
@@ -152,10 +105,6 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#handleUpdate(org.eclipse.jface.viewers.TreeViewer, org.eclipse.core.resources.IFile)
-	 */
 	@Override
 	public void handleUpdate(TreeViewer viewer, IFile iFile) {
 		this.viewer = viewer;

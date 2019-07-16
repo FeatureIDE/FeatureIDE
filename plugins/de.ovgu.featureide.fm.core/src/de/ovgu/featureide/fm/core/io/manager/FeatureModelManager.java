@@ -48,12 +48,11 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	@CheckForNull
 	public static FeatureModelManager getInstance(Path path) {
-		return getInstance(path, true);
+		return getOrCreateInstance(path, FeatureModelManager.class, null);
 	}
 
-	@CheckForNull
-	public static final FeatureModelManager getInstance(Path identifier, boolean createInstance) {
-		return getInstance(identifier, createInstance, FeatureModelManager.class);
+	public static boolean isFileSupported(Path filePath) {
+		return FMFormatManager.getInstance().hasFormat(filePath);
 	}
 
 	public static IFeatureModelManager getInstance(IFeatureModel featureModel) {
@@ -77,7 +76,15 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	protected FeatureModelManager(Path identifier) {
 		super(identifier, FMFormatManager.getInstance(), FMFactoryManager.getInstance());
-		variableObject.setSourceFile(identifier);
+	}
+
+	@Override
+	protected boolean init(IPersistentFormat<IFeatureModel> desiredFormat) {
+		if (super.init(desiredFormat)) {
+			variableObject.setSourceFile(getPath());
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -116,10 +123,14 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	@Override
 	protected void resetSnapshot() {
 		super.resetSnapshot();
-		if ((variableFormula != null) && (variableObject != null)) {
-			final Node oldNode = variableFormula.getPropositionalNode();
-			final Node newNode = new FeatureModelFormula(variableObject).getPropositionalNode();
-			if (!Objects.equals(oldNode, newNode)) {
+		if (variableFormula != null) {
+			if (variableObject != null) {
+				final Node oldNode = variableFormula.getPropositionalNode();
+				final Node newNode = new FeatureModelFormula(variableObject).getPropositionalNode();
+				if (!Objects.equals(oldNode, newNode)) {
+					variableFormula = null;
+				}
+			} else {
 				variableFormula = null;
 			}
 		}

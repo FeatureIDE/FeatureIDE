@@ -224,6 +224,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public Collection<IConstraint> getRelevantConstraints() {
+		setRelevantConstraints();
 		return partOfConstraints;
 	}
 

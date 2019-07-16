@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -90,14 +89,12 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	 * @param identifier The {@link FileIdentifier identifier} for the file.
 	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
-	 *
-	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@SuppressWarnings("unchecked")
 	@CheckForNull
 	public static final <T, R extends IFileManager<T>> R removeInstance(Path identifier, Class<R> fileManagerClass) {
 		synchronized (pathMap) {
-			if (getInstance(identifier, false, fileManagerClass) != null) {
+			if (getInstance(identifier, fileManagerClass) != null) {
 				return (R) pathMap.remove(identifier);
 			} else {
 				return null;
@@ -106,38 +103,50 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	/**
-	 * Returns an instance of a {@link IFileManager} for a certain file. If no previous instance is available, this method creates a new one using
-	 * a constructor with only a {@link Path} parameter.
+	 * Returns an instance of a {@link IFileManager} for a certain file. If no previous instance is available, this method creates a new one using a constructor
+	 * with only a {@link Path} parameter.
 	 *
 	 * @param path The Path to the corresponding file.
-	 * @param createInstance Whether a new instance should be created, if none is available.
 	 * @param fileManagerClass Provides a corresponding content object for the file manager.
+	 * @param format the desired format, if a new instance is created.
 	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance is available and no new instance could be created.
-	 *
-	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
+	@SuppressWarnings("unchecked")
 	@CheckForNull
-	protected static <T, R extends IFileManager<T>> R getInstance(Path path, boolean createInstance, Class<R> fileManagerClass) {
+	protected static <T, R extends IFileManager<T>> R getOrCreateInstance(Path path, Class<R> fileManagerClass, IPersistentFormat<T> format) {
 		synchronized (pathMap) {
 			final IFileManager<?> instance = pathMap.get(path);
 			if (fileManagerClass.isInstance(instance)) {
 				return (R) fileManagerClass.cast(instance);
 			} else {
-				if (createInstance && (path != null) && Files.exists(path)) {
+				if (path != null) {
 					try {
 						final Constructor<R> constructor = fileManagerClass.getDeclaredConstructor(Path.class);
 						constructor.setAccessible(true);
-						final R newInstance = constructor.newInstance(path);
+						final AFileManager<T> newInstance = (AFileManager<T>) constructor.newInstance(path);
+						if (!newInstance.init(format)) {
+							return null;
+						}
 						if (instance != null) {
 							Logger.logWarning("Replaced file manager " + instance + " with " + newInstance + ".");
 						}
 						pathMap.put(path, newInstance);
-						return newInstance;
+						return (R) newInstance;
 					} catch (final Exception e) {
 						Logger.logError(e);
 					}
 				}
+			}
+			return null;
+		}
+	}
+
+	protected static <T, R extends IFileManager<T>> R getInstance(Path path, Class<R> fileManagerClass) {
+		synchronized (pathMap) {
+			final IFileManager<?> instance = pathMap.get(path);
+			if (fileManagerClass.isInstance(instance)) {
+				return (R) fileManagerClass.cast(instance);
 			}
 			return null;
 		}
@@ -170,11 +179,18 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 		this.path = path;
 		formats = formatManager.getFormatListForExtension(getAbsolutePath());
 		this.factoryManager = factoryManager;
+	}
 
-		if (FileSystem.exists(path)) {
+	protected boolean init(IPersistentFormat<T> desiredFormat) {
+		if ((desiredFormat != null) || FileSystem.exists(path)) {
 			try {
 				final String content = new String(FileSystem.read(path), SimpleFileHandler.DEFAULT_CHARSET);
-				detectFormat(content);
+				if (desiredFormat != null) {
+					format = desiredFormat;
+					setVariableObject(createObject());
+				} else {
+					detectFormat(content);
+				}
 				final ProblemList problems = format.getInstance().read(variableObject, content);
 				final T newPersistentObject = createObject();
 				format.getInstance().read(newPersistentObject, content);
@@ -183,25 +199,18 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 				}
 				persistentObjectSource = content;
 				this.persistentObject = newPersistentObject;
+				return true;
 			} catch (final Exception e) {
 				handleException(e);
 			}
-		} else {
-			// TODO use cases?
-			try {
-				format = formats.get(0);
-				setVariableObject(createObject());
-				setPersistentObject(createObject());
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
 		}
+		return false;
 	}
 
 	private void detectFormat(final CharSequence content) throws Exception {
 		for (final IPersistentFormat<T> possibleFormat : formats) {
 			if (possibleFormat.supportsContent(content)) {
-				if (format != possibleFormat) {
+				if ((format == null) || !format.getId().equals(possibleFormat.getId())) {
 					format = possibleFormat;
 					setVariableObject(createObject());
 				}

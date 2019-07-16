@@ -41,8 +41,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -70,7 +70,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	@Override
 	public boolean isSupported(IFile file) {
 		if (file != null) {
-			return "xml".equalsIgnoreCase(file.getFileExtension()) && (FeatureModelManager.getInstance(EclipseFileSystem.getPath(file)) != null);
+			return "xml".equalsIgnoreCase(file.getFileExtension()) && (FMFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file)));
 		}
 		return false;
 	}

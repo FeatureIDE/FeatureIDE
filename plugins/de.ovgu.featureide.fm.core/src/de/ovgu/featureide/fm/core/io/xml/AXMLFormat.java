@@ -66,6 +66,9 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 
 	public static final String FILE_EXTENSION = "xml";
 
+	private static final Pattern completeTagPattern = Pattern.compile("<(\\w+)[^\\/]*>.*<\\/\\1.*>");
+	private static final Pattern incompleteTagPattern = Pattern.compile("(<\\w+[^\\/>]*>)|(<\\/\\w+[^>]*>)");
+
 	protected T object;
 
 	/**
@@ -88,41 +91,48 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 
 	protected String prettyPrint(String text) {
 		final StringBuilder result = new StringBuilder();
-		String line;
 		int indentLevel = 0;
-		final BufferedReader reader = new BufferedReader(new StringReader(text));
-		try {
-			line = reader.readLine();
-			while (line != null) {
-				if (line.startsWith("</")) {
-					indentLevel--;
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
+		try (final BufferedReader reader = new BufferedReader(new StringReader(text))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				final String trimmedLine = line.trim();
+				if (!trimmedLine.isEmpty()) {
+					if (completeTagPattern.matcher(trimmedLine).matches()) {
+						appendLine(result, indentLevel, trimmedLine);
+					} else {
+						final Matcher matcher = incompleteTagPattern.matcher(trimmedLine);
+						int start = 0;
+						while (matcher.find()) {
+							appendLine(result, indentLevel, trimmedLine.substring(start, matcher.start()));
+							final String openTag = matcher.group(1);
+							final String closeTag = matcher.group(2);
+							if (openTag != null) {
+								appendLine(result, indentLevel, openTag);
+								indentLevel++;
+							} else if (closeTag != null) {
+								indentLevel--;
+								appendLine(result, indentLevel, closeTag);
+							}
+							start = matcher.end();
+						}
+						appendLine(result, indentLevel, trimmedLine.substring(start, trimmedLine.length()));
 					}
 				}
-
-				else if (line.startsWith("<")) {
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
-					}
-					if (!line.contains("</")) {
-						indentLevel++;
-					}
-				} else {
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
-					}
-				}
-				result.append(line + "\n");
-				if (line.contains("/>")) {
-					indentLevel--;
-				}
-				line = reader.readLine();
 			}
 		} catch (final IOException e) {
 			Logger.logError(e);
 		}
 		return result.toString();
+	}
+
+	private void appendLine(final StringBuilder result, int indentLevel, String line) {
+		final String trimmedLine = line.trim();
+		if (!trimmedLine.isEmpty()) {
+			for (int i = 0; i < indentLevel; i++) {
+				result.append("\t");
+			}
+			result.append(trimmedLine);
+			result.append("\n");
+		}
 	}
 
 	protected List<Element> getElement(final Element element, final String nodeName, boolean allowEmpty) throws UnsupportedModelException {

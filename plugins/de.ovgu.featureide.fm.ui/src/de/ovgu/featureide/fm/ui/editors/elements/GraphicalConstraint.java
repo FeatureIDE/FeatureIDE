@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalConstraint implements IGraphicalConstraint {
 
-	protected final long constraintId;
+	protected final IConstraint constraintObject;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 	protected boolean featureSelected = false;
 	public boolean isImplicit = false;
@@ -52,21 +52,21 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
 		featureSelected = constraint.featureSelected;
-		constraintId = constraint.constraintId;
+		constraintObject = constraint.constraintObject;
 		graphicalFeatureModel = constraint.graphicalFeatureModel;
 		location = constraint.location;
 		dimension = constraint.dimension;
 	}
 
 	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
-		constraintId = correspondingConstraint.getInternalId();
+		constraintObject = correspondingConstraint;
 		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
 	public IConstraint getObject() {
-		IFeatureModelElement element = graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(constraintId);
-		return (IConstraint) element;
+		final IFeatureModelElement element = graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(constraintObject.getInternalId());
+		return element instanceof IConstraint ? (IConstraint) element : constraintObject;
 	}
 
 	@Override

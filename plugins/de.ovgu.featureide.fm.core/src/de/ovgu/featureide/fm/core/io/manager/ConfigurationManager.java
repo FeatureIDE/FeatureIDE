@@ -40,12 +40,11 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
-		return getInstance(path, true);
+		return getOrCreateInstance(path, ConfigurationManager.class, null);
 	}
 
-	@CheckForNull
-	public static final ConfigurationManager getInstance(Path identifier, boolean createInstance) {
-		return getInstance(identifier, createInstance, ConfigurationManager.class);
+	public static boolean isFileSupported(Path filePath) {
+		return ConfigFormatManager.getInstance().hasFormat(filePath);
 	}
 
 	public static final Configuration load(Path path) {

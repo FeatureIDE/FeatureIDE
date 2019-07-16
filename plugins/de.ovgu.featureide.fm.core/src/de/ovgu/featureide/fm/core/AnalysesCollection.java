@@ -204,7 +204,8 @@ public class AnalysesCollection {
 			} catch (
 					InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 					| SecurityException e) {
-				throw new AssertionError();
+				Logger.logError(e);
+				throw new RuntimeException(e);
 			}
 		}
 

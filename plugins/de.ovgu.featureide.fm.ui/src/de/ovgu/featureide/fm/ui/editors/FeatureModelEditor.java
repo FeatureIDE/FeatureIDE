@@ -165,6 +165,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
 			fmManager.externalSave(new Runnable() {
+
 				@Override
 				public void run() {
 					textEditor.doSave(monitor);
@@ -645,13 +646,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public boolean checkModel(String source) {
 		final Path fileName = fmManager.getPath().getFileName();
 		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName.toString());
-		try {
-			final ProblemList warnings = format.read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source);
-			return !warnings.containsError();
-		} catch (final NoSuchExtensionException e) {
-			Logger.logError(e);
-			return false;
+		if (format != null) {
+			try {
+				final ProblemList warnings = format.read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source);
+				return !warnings.containsError();
+			} catch (final NoSuchExtensionException e) {
+				Logger.logError(e);
+			}
 		}
+		return false;
 	}
 
 	public void addEventListener(IEventListener listener) {
