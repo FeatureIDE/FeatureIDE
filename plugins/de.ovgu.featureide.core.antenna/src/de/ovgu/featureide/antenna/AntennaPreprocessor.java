@@ -555,15 +555,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			featureList.deleteCharAt(length - 1);
 		}
 
-		featureModel = AdvancedNodeCreator.createNodes(configuration.getFeatureModel());
-
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
 			final Preprocessor preprocessor = new Preprocessor(new AntennaLogger(), new AntennaLineFilter());
 			preprocessor.addDefines(featureList.toString());
 			// preprocess for all files in source folder
-			preprocessSourceFiles(folder, preprocessor, congurationName);
+			preprocessSourceFiles(folder, preprocessor, congurationName, AdvancedNodeCreator.createNodes(featureModel));
 		} catch (CoreException | IOException | PPException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
@@ -572,12 +570,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	/**
 	 * Customized build for buildConfiguration().
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName)
+	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName, Node featureModelNode)
 			throws CoreException, FileNotFoundException, IOException {
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively
-				preprocessSourceFiles((IFolder) res, preprocessor, null);
+				preprocessSourceFiles((IFolder) res, preprocessor, null, featureModelNode);
 			} else if (res instanceof IFile) {
 				if (res.getName().equals(congurationName + "." + getConfigurationExtension())) {
 					continue;
@@ -586,7 +584,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				if (featureModel != null) {// TODO check why the FM is null when generating products
+				if (featureModelNode != null) {// TODO check why the FM is null when generating products
 					processLinesOfFile(lines, (IFile) res);
 				}
 				boolean changed = false;
