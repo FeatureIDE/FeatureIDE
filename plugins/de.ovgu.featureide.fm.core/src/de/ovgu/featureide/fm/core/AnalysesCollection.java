@@ -417,6 +417,7 @@ public class AnalysesCollection {
 	void reset(FeatureModelFormula formula) {
 		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
 			analysisWrapper.reset();
+			analysisWrapper.setFormula(formula);
 		}
 		deadFeatureExplanations.clear();
 		falseOptionalFeatureExplanations.clear();

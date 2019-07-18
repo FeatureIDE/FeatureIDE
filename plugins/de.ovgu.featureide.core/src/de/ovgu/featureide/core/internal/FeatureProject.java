@@ -61,7 +61,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -148,7 +147,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
 			switch (evt.getEventType()) {
-			case FEATURE_NAME_CHANGED:
+			case FEATURE_NAME_PERSISTENTLY_CHANGED:
 				final String oldName = (String) evt.getOldValue();
 				final String newName = (String) evt.getNewValue();
 				renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
@@ -576,22 +575,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				try {
 					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 					configurationUpdate = true;
-					final FeatureModelFormula featureModel = featureModelManager.getPersistentFormula();
-					configFolder.accept(new IResourceVisitor() {
-
-						@Override
-						public boolean visit(IResource resource) throws CoreException {
-							if ((resource instanceof IFile) && resource.isAccessible()) {
-								final FileHandler<Configuration> fileHandler =
-									ConfigurationIO.getInstance().getFileHandler(EclipseFileSystem.getPath(resource));
-								fileHandler.getObject().initFeatures(featureModel);
-								if (!fileHandler.getLastProblems().containsError()) {
-									fileHandler.write();
-								}
-							}
-							return true;
-						}
-					}, IResource.DEPTH_ONE, IResource.NONE);
+					configFolder.accept(resource -> adaptConfigurations(resource, featureModelManager));
 					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				} catch (final CoreException e) {
 					LOGGER.logError(e);
@@ -600,6 +584,17 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				}
 			}
 		}
+	}
+
+	private boolean adaptConfigurations(IResource resource, IFeatureModelManager featureModelManager) {
+		if ((resource instanceof IFile) && resource.isAccessible()) {
+			final ConfigurationManager instance = ConfigurationManager.getInstance(EclipseFileSystem.getPath(resource));
+			if (instance != null) {
+				instance.getVarObject().updateFeatures(featureModelManager.getVariableFormula());
+				instance.save();
+			}
+		}
+		return true;
 	}
 
 	@Override

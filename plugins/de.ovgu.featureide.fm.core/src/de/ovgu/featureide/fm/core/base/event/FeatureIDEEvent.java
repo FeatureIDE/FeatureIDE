@@ -89,6 +89,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
+		 * A feature's name was changed and persistently saved.
+		 */
+		FEATURE_NAME_PERSISTENTLY_CHANGED,
+		/**
 		 * All features changed their name representation.
 		 */
 		ALL_FEATURES_CHANGED_NAME_TYPE,

@@ -156,7 +156,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
-		fmManager.getSnapshot().getRenamingsManager().notifyAboutRenamings();
+		fmManager.processObject(this::handleRenamings, true);
 		for (final IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
@@ -179,6 +179,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		setPageModified(false);
 		// TODO reset?
 		textEditor.resetTextEditor();
+	}
+
+	private Void handleRenamings(IFeatureModel featureModel) {
+		featureModel.getRenamingsManager().notifyAboutRenamings();
+		return null;
 	}
 
 	@Override

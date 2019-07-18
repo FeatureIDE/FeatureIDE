@@ -283,10 +283,17 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 
 	@Override
 	public <R> R processObject(Function<T, R> editOperation) {
+		return processObject(editOperation, true);
+	}
+
+	@Override
+	public <R> R processObject(Function<T, R> editOperation, boolean edit) {
 		fileOperationLock.lock();
 		try {
 			final R result = editOperation.apply(variableObject);
-			resetSnapshot();
+			if (edit) {
+				resetSnapshot();
+			}
 			return result;
 		} finally {
 			fileOperationLock.unlock();

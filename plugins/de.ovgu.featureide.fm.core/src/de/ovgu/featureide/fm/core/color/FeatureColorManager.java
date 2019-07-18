@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Manages colors assigned to features.
@@ -212,7 +213,7 @@ public class FeatureColorManager implements IEventListener {
 		final Map<String, ColorScheme> newEntry = new HashMap<>();
 		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
 		colorSchemes.put(project, newEntry);
-		featureModel.getRenamingsManager().addListener(INSTANCE);
+		FeatureModelManager.getInstance(featureModel).addListener(INSTANCE);
 
 		final IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {

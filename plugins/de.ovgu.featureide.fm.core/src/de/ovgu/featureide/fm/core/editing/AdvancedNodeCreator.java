@@ -79,12 +79,12 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	private ModelType modelType = ModelType.All;
 
 	/**
-	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.<br> Default values is {@code true} (values will
-	 * be included).
+	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.<br> Default values is {@code true} (values will be
+	 * included).
 	 */
 	private boolean includeBooleanValues = true;
 
-	private boolean useOldNames = true;
+	private boolean useOldNames = false;
 
 	private boolean optionalRoot = false;
 

@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Handles feature renamings.
@@ -46,7 +47,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class RenamingsManager implements IEventManager {
+public class RenamingsManager implements IEventManager, Cloneable {
 
 	/**
 	 * a list containing all renamings since the last save
@@ -56,12 +57,13 @@ public class RenamingsManager implements IEventManager {
 
 	private final DefaultEventManager eventManager = new DefaultEventManager();
 
-	/*
-	 * ***************************************************************** Renaming #
-	 *****************************************************************/
-
 	public RenamingsManager(IFeatureModel model) {
 		this.model = model;
+	}
+
+	protected RenamingsManager(RenamingsManager renamingsManager) {
+		model = renamingsManager.model;
+		renamings.addAll(renamingsManager.renamings);
 	}
 
 	public boolean renameFeature(final String oldName, final String newName) {
@@ -88,7 +90,6 @@ public class RenamingsManager implements IEventManager {
 				break;
 			}
 		}
-		fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_NAME_CHANGED, oldName, newName));
 		return true;
 	}
 
@@ -97,18 +98,9 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public void notifyAboutRenamings() {
-		final FeatureModelManager instance = FeatureModelManager.getInstance(model.getSourceFile());
-		if (instance == null) {
-			return;
-		}
-		final IFeatureModel projectModel = instance.getObject();
+		final IFeatureModelManager instance = FeatureModelManager.getInstance(model);
 		for (final Renaming renaming : renamings) {
-			// TODO check weather all these events are necessary
-			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
-			projectModel.fireEvent(event);
-			model.fireEvent(event);
-			// call to FMComposerExtension
-			instance.fireEvent(event);
+			instance.fireEvent(new FeatureIDEEvent(model, EventType.FEATURE_NAME_PERSISTENTLY_CHANGED, renaming.oldName, renaming.newName));
 		}
 		renamings.clear();
 	}
@@ -188,4 +180,10 @@ public class RenamingsManager implements IEventManager {
 	public void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
 	}
+
+	@Override
+	public RenamingsManager clone() {
+		return new RenamingsManager(this);
+	}
+
 }

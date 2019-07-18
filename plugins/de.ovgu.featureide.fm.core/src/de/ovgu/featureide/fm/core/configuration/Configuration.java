@@ -119,11 +119,11 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	public boolean updateFeatures(FeatureModelFormula featureModel) {
-		if ((featureModel != null) && (this.featureModel != featureModel)) {
-			final IFeature featureRoot = FeatureUtils.getRoot(featureModel.getFeatureModel());
+	public boolean updateFeatures(FeatureModelFormula featureModelFormula) {
+		if ((featureModelFormula != null) && (featureModel != featureModelFormula)) {
+			final IFeature featureRoot = FeatureUtils.getRoot(featureModelFormula.getFeatureModel());
 			if (featureRoot != null) {
-				this.featureModel = featureModel;
+				featureModel = featureModelFormula;
 				propagator = null;
 				root = initFeatures(null, featureRoot);
 				selectableFeatures.clear();
@@ -135,10 +135,18 @@ public class Configuration implements Cloneable {
 	}
 
 	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature) {
-		SelectableFeature sFeature = selectableFeatures.get(featureModel.getFeatureModel().getRenamingsManager().getOldName(feature.getName()));
+		final String curName = feature.getName();
+		final String oldName = featureModel.getFeatureModel().getRenamingsManager().getOldName(curName);
+		SelectableFeature sFeature = selectableFeatures.get(oldName);
 		if (sFeature == null) {
 			sFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(feature);
-			selectableFeatures.put(feature.getName(), sFeature);
+			selectableFeatures.put(curName, sFeature);
+		} else if (!curName.equals(oldName)) {
+			selectableFeatures.remove(oldName);
+			sFeature = sFeature.clone();
+			sFeature.setFeature(feature);
+			sFeature.setName(null);
+			selectableFeatures.put(curName, sFeature);
 		} else if (sFeature.getFeature() == null) {
 			sFeature.setFeature(feature);
 			sFeature.setName(null);
@@ -237,6 +245,7 @@ public class Configuration implements Cloneable {
 		SelectableFeature selectableFeature = selectableFeatures.get(name);
 		if (create && (selectableFeature == null)) {
 			selectableFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(null);
+			selectableFeature.setName(name);
 			selectableFeatures.put(name, selectableFeature);
 		}
 		return selectableFeature;

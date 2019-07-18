@@ -56,7 +56,6 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  * @author Marcus Pinnecke
- *
  */
 public class FeatureModel implements IFeatureModel {
 
@@ -94,7 +93,7 @@ public class FeatureModel implements IFeatureModel {
 
 	protected final IFeatureModelProperty property;
 
-	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
+	protected final RenamingsManager renamingsManager;
 
 	protected final IFeatureModelStructure structure;
 
@@ -109,6 +108,8 @@ public class FeatureModel implements IFeatureModel {
 
 		property = createProperty();
 		structure = createStructure();
+
+		renamingsManager = new RenamingsManager(this);
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -119,6 +120,8 @@ public class FeatureModel implements IFeatureModel {
 
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
+
+		renamingsManager = oldFeatureModel.renamingsManager.clone();
 
 		sourceFile = oldFeatureModel.sourceFile;
 

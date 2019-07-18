@@ -73,9 +73,9 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		return oldObject.clone();
 	}
 
-	private FeatureModelManager featureModelManager;
+	private IFeatureModelManager featureModelManager;
 
-	public void linkFeatureModel(FeatureModelManager featureModelManager) {
+	public void linkFeatureModel(IFeatureModelManager featureModelManager) {
 		this.featureModelManager = featureModelManager;
 		final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
 		fileOperationLock.lock();
@@ -85,6 +85,10 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		} finally {
 			fileOperationLock.unlock();
 		}
+	}
+
+	public IFeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
 	}
 
 	public void update() {
