@@ -63,7 +63,7 @@ public class NodeReader {
 	private static final Pattern parenthesisPattern = Pattern.compile("\\(([^()]*)\\)");
 	private static final Pattern quotePattern = Pattern.compile("\\\"(.*?)\\\"");
 
-	private final HashSet<String> featureNames = new HashSet<>();;
+	private HashSet<String> featureNames;
 
 	private String[] symbols = textualSymbols;
 
@@ -102,10 +102,7 @@ public class NodeReader {
 	}
 
 	public void setFeatureNames(Collection<String> featureNames) {
-		this.featureNames.clear();
-		if (featureNames != null) {
-			this.featureNames.addAll(featureNames);
-		}
+		this.featureNames = (featureNames == null) ? null : new HashSet<>(featureNames);
 	}
 
 	/**
