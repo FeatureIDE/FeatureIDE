@@ -73,7 +73,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 				final Object var = NodeCreator.getVariable(featureSelection.getFeature());
 				final boolean value;
-				if (featureSelection == getSubject()) {
+				if (featureSelection.getName().equals(getSubject().getName())) {
 					switch (featureSelection.getAutomatic()) {
 					case SELECTED:
 						value = false;
@@ -88,7 +88,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					}
 					oracle.addAssumption(var, value); // Assumptions do not show up in the explanation.
 				} else {
-					switch (featureSelection.getManual()) {
+					switch (featureSelection.getSelection()) {
 					case SELECTED:
 						value = true;
 						break;
