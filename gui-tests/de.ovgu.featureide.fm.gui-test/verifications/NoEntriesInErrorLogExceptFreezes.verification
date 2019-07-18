@@ -4,8 +4,8 @@ Element-Name: NoEntriesInErrorLogExceptFreezes
 Element-Type: verification
 Element-Version: 2.0
 Id: _qiKvwOvZEee9ofvBkamr2g
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/28/17 3:17 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/18/19 12:51 PM
 Verification-Type: org.eclipse.rcptt.verifications.log
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -21,6 +21,7 @@ Entry-Name: .errorlog.verification
 INCLUDE CONTEXTS: true
 ALLOWED:
 7 0 org.eclipse.ui.monitoring Message:.*
+4 0 org.eclipse.ui Message:Unhandled event loop exception
 DENIED:
 7 0 .* Message:.*
 
