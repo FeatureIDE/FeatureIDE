@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="Build FIDE" default="get_build" basedir=".">
+
+	<property name="fm.core.path" value="../../de.ovgu.featureide.fm.core" />
+	<property name="lib.jar.dir" value="jar/lib" />
+	<property name="lib.external.dir" value="library/jar/lib" />
+	<property name="target.name" value="clean_build" />
+
+	<target name="get_build">
+		<mkdir dir="${lib.jar.dir}" />
+		<subant target="">
+			<fileset dir="${fm.core.path}/library" includes="build.xml" />
+			<target name="${target.name}" />
+		</subant>
+		<copy file="${fm.core.path}/library/jar/de.ovgu.featureide.lib.fm.core.jar" todir="${lib.jar.dir}" />
+		<copy todir="${lib.jar.dir}">
+			<fileset dir="${fm.core.path}/${lib.external.dir}" />
+		</copy>
+	</target>
+
+</project>
