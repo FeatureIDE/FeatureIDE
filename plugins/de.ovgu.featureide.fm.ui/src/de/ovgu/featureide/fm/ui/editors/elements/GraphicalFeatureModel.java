@@ -382,26 +382,32 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 		final boolean manualLayout = !getLayout().hasFeaturesAutoLayout();
 		for (final IGraphicalFeature graphicalFeature : getAllFeatures()) {
-			final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
-			if (manualLayout) {
-				final Point location = new Point();
-				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
-				location.x = coordinates[0];
-				location.y = coordinates[1];
-				graphicalFeature.setLocation(location);
-			}
+			final IFeature feature = graphicalFeature.getObject();
+			if (feature != null) {
+				final IPropertyContainer customProperties = feature.getCustomProperties();
+				if (manualLayout) {
+					final Point location = new Point();
+					final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+					location.x = coordinates[0];
+					location.y = coordinates[1];
+					graphicalFeature.setLocation(location);
+				}
 
-			final Boolean isCollapsed = getBooleanProperty(customProperties, COLLAPSED);
-			graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
+				final Boolean isCollapsed = getBooleanProperty(customProperties, COLLAPSED);
+				graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
+			}
 		}
 		for (final IGraphicalConstraint constr : getConstraints()) {
-			final IPropertyContainer customProperties = constr.getObject().getCustomProperties();
-			if (manualLayout) {
-				final Point location = new Point();
-				final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
-				location.x = coordinates[0];
-				location.y = coordinates[1];
-				constr.setLocation(location);
+			final IConstraint constraint = constr.getObject();
+			if (constraint != null) {
+				final IPropertyContainer customProperties = constraint.getCustomProperties();
+				if (manualLayout) {
+					final Point location = new Point();
+					final int[] coordinates = convertCoordinatesString(customProperties.get(POSITION, TYPE_GRAPHICS, "0,0"), 2);
+					location.x = coordinates[0];
+					location.y = coordinates[1];
+					constr.setLocation(location);
+				}
 			}
 		}
 	}
