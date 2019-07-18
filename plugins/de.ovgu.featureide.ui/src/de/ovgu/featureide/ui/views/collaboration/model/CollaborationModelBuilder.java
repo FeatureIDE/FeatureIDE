@@ -321,12 +321,23 @@ public class CollaborationModelBuilder {
 		}
 
 		if (scanner.hasNext()) {
+			boolean featuresSelected = false;
 			list = new HashSet<String>();
-			while (scanner.hasNext()) {
-				list.add(scanner.next());
+			while (scanner.hasNextLine()) {
+				final String cur = scanner.nextLine().trim();
+				if (cur.contains("manual=\"selected") || cur.contains("automatic=\"selected")) {
+					if (cur.contains("name=\"")) {
+						list.add(cur.substring(cur.indexOf("name=\"") + 6, cur.length() - 3));
+						featuresSelected = true;
+					}
+				}
 			}
 			scanner.close();
-			return list;
+			if (featuresSelected) {
+				return list;
+			} else {
+				return Collections.emptySet();
+			}
 		} else {
 			scanner.close();
 			return Collections.emptySet();
