@@ -58,6 +58,7 @@ public abstract class ConfigurationExplanationWriter<E extends ConfigurationExpl
 			break;
 		case UNDEFINED:
 			selectionString = "neither selected nor unselected";
+			break;
 		default:
 			throw new IllegalStateException("Unknown feature selection state");
 		}

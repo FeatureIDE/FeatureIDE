@@ -41,7 +41,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,6 +107,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -339,7 +339,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
 		}
 
-		final FeatureModelManager instance = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
+		final FeatureModelManager instance = FeatureModelManager.getInstance(EclipseFileSystem.getPath(modelFile.getModelFile()));
 		if (instance != null) {
 			featureModelManager = instance;
 			instance.read();
@@ -459,9 +459,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final IFile orderFile = project.getFile(".order");
 		final IFeatureModel featureModel = featureModelManager.getObject();
 		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
-			SimpleFileHandler.load(Paths.get(orderFile.getLocationURI()), featureModel, new FeatureOrderFormat());
+			SimpleFileHandler.load(EclipseFileSystem.getPath(orderFile), featureModel, new FeatureOrderFormat());
 			// write feature order to model
-			final java.nio.file.Path path = Paths.get(modelFile.getModelFile().getLocationURI());
+			final java.nio.file.Path path = EclipseFileSystem.getPath(modelFile.getModelFile());
 			FeatureModelManager.save(featureModel, path, FMFormatManager.getInstance().getFormatByContent(path));
 		}
 
@@ -478,9 +478,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * If the project contains only an old model in guidsl format it will be converted into a .xml
 	 */
 	private void guidslToXML() {
-		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
-			FeatureModelIO.getInstance().convert(Paths.get(project.getFile("model.m").getLocationURI()),
-					Paths.get(project.getFile("model.xml").getLocationURI()), new XmlFeatureModelFormat());
+		final IFile guidslFile = project.getFile("model.m");
+		final IFile xmlFile = project.getFile("model.xml");
+		if (guidslFile.exists() && !xmlFile.exists()) {
+			FeatureModelIO.getInstance().convert(EclipseFileSystem.getPath(guidslFile), EclipseFileSystem.getPath(xmlFile), new XmlFeatureModelFormat());
 		}
 		// TODO GUIDSL Annotations, should be handled in guidsl format #write
 		// if (!guidslReader.getAnnLine().isEmpty()) {
@@ -577,11 +578,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configurationUpdate = true;
 					final FeatureModelFormula featureModel = featureModelManager.getPersistentFormula();
 					configFolder.accept(new IResourceVisitor() {
+
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							if ((resource instanceof IFile) && resource.isAccessible()) {
 								final FileHandler<Configuration> fileHandler =
-									ConfigurationIO.getInstance().getFileHandler(Paths.get(resource.getLocationURI()));
+									ConfigurationIO.getInstance().getFileHandler(EclipseFileSystem.getPath(resource));
 								fileHandler.getObject().initFeatures(featureModel);
 								if (!fileHandler.getLastProblems().containsError()) {
 									fileHandler.write();
@@ -1064,7 +1066,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		try {
 			for (final IResource res : configFolder.members()) {
-				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()))) {
+				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(res))) {
 					configs.add((IFile) res);
 				}
 			}
@@ -1104,7 +1106,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				// check validity
 				for (final IFile file : files) {
 					subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-					final ProblemList lastProblems = SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
+					final ProblemList lastProblems = SimpleFileHandler.load(EclipseFileSystem.getPath(file), config, ConfigFormatManager.getInstance());
 					if (!config.isValid()) {
 						String name = file.getName();
 						final int extIndex = name.lastIndexOf('.');
@@ -1184,7 +1186,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		int row = 0;
 		for (final IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
-			final Configuration configuration = ConfigurationManager.load(Paths.get(file.getLocationURI()));
+			final Configuration configuration = ConfigurationManager.load(EclipseFileSystem.getPath(file));
 			configuration.initFeatures(featureModel);
 
 			int column = 0;

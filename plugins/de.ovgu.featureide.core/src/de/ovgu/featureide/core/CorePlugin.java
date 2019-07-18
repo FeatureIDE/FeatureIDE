@@ -33,7 +33,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,6 +99,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -557,7 +557,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	private static FeatureModelManager createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
-		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
+		final Path modelPath = EclipseFileSystem.getPath(project.getFile("model.xml"));
 
 		if (!Files.exists(modelPath)) {
 			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
@@ -580,7 +580,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		final XMLConfFormat configFormat = new XMLConfFormat();
 		final IFile file = project.getFolder(configPath).getFile(configName + configFormat.getSuffix());
 		final Configuration config = new Configuration(featureModel.getPersistentFormula());
-		SimpleFileHandler.save(Paths.get(file.getLocationURI()), config, configFormat);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(file), config, configFormat);
 		return config;
 	}
 

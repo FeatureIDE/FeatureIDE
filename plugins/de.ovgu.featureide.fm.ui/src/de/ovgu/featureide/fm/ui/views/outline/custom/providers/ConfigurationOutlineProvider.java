@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -40,6 +39,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
@@ -88,7 +88,7 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 
 	@Override
 	public boolean isSupported(IFile file) {
-		return ConfigFormatManager.getInstance().hasFormat(Paths.get(file.getLocationURI()));
+		return ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file));
 	}
 
 	private void initListeners() {

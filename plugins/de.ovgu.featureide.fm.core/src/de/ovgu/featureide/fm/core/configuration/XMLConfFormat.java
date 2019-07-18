@@ -160,9 +160,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
-			if ((feature.getManual() == Selection.UNDEFINED) && (feature.getAutomatic() == Selection.UNDEFINED)) {
-				continue;
-			}
 			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
 			if (feature.getManual() != Selection.UNDEFINED) {

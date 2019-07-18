@@ -33,7 +33,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -113,6 +112,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
@@ -372,6 +372,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
 		resolveButton.setEnabled(false);
 		resolveButton.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				computeTree(true, true);
@@ -554,6 +555,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		tree.addMouseTrackListener(new MouseTrackListener() {
+
 			@Override
 			public void mouseEnter(MouseEvent e) {}
 
@@ -1002,7 +1004,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		if (useRecommendation) {
 			final ConfigurationMatrix configurationMatrix = new ConfigurationMatrix(configurationEditor.getConfiguration().getFeatureModelFormula(),
-					Paths.get(configurationEditor.getFile().getParent().getLocationURI()));
+					EclipseFileSystem.getPath(configurationEditor.getFile().getParent()));
 			configurationMatrix.readConfigurations(configurationEditor.getFile().getName());
 			configurationMatrix.calcRec(configurationEditor.getConfiguration());
 			final double[] rec = configurationMatrix.getRec();
@@ -1234,12 +1236,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final LongRunningMethod<Void> update = propagator.resolve();
 			final IRunner<Void> updateJob = LongRunningWrapper.getRunner(update);
 			updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
+
 				@Override
 				public void jobFinished(IJob<Void> finishedJob) {
 					if (finishedJob.getStatus() == JobStatus.OK) {
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						currentDisplay.syncExec(new Runnable() {
+
 							@Override
 							public void run() {
 								for (final TreeItem item : itemMap.values()) {

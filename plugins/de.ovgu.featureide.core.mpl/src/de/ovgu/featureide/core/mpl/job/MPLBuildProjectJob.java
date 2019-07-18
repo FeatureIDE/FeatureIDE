@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_MPL_PROJ
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_MAPPING_FILE_SPECIFIED_;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
@@ -49,6 +48,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -183,7 +183,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				return false;
 			}
 			final IFile configFile = externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
-			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigFormatManager.getInstance());
+			SimpleFileHandler.load(EclipseFileSystem.getPath(configFile), mappedProjects, ConfigFormatManager.getInstance());
 		} catch (final Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;

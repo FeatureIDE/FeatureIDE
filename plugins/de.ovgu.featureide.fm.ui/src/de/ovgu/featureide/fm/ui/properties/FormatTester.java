@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.properties;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -40,7 +39,7 @@ public class FormatTester extends PropertyTester {
 
 	protected boolean checkFormat(final FormatManager<?> formatManager, final IFile res, Object expectedValue) {
 		if ((res != null) && (formatManager != null)) {
-			final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(Paths.get(res.getLocationURI()));
+			final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(EclipseFileSystem.getPath(res));
 			return (expectedValue == null) ? formatByContent != null : expectedValue.equals(formatByContent.getId());
 		}
 		return false;

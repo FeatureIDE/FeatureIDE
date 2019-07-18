@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_COR
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +64,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -218,24 +218,22 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			}
 		}
-		final Path modelPath = Paths.get(res.getLocationURI());
-		final Path path = Paths.get(file.getLocationURI());
+		final Path modelPath = EclipseFileSystem.getPath(res);
+		final Path path = EclipseFileSystem.getPath(file);
 
-		configurationManager = ConfigurationManager.getInstance(path);
 		featureModelManager = FeatureModelManager.getInstance(modelPath);
 		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
 		if (invalidFeatureModel) {
 			return;
 		}
+		configurationManager = ConfigurationManager.getInstance(path);
+		configurationManager.linkFeatureModel(featureModelManager);
 
 		// TODO mapping model
 		// if (mappingModel) {
 		// featureModelManager = FeatureModelManager.getInstance(absolutePath, format);
 		// featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		// }
-
-		configurationManager.read();
-		configurationManager.linkFeatureModel(featureModelManager);
 
 		final ProblemList lastProblems = configurationManager.getLastProblems();
 		createModelFileMarkers(lastProblems);
@@ -300,7 +298,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 		dialog.setFilterExtensions(suffixes.toArray(new String[0]));
 		dialog.setFilterNames(names.toArray(new String[0]));
-		dialog.setFilterPath(file.getProject().getLocation().toOSString());
+		final IProject project = file.getProject();
+		if (project != null) {
+			dialog.setFilterPath(project.getLocation().toOSString());
+		}
 		return dialog.open();
 	}
 

@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURAT
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -54,6 +53,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
@@ -143,7 +143,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		}
 
 		final IFile file = container.getFile(new Path(fileName));
-		SimpleFileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(file), new Configuration(featureModel), format);
 
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);

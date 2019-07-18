@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
@@ -108,7 +108,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI()));
+			featureModel = FeatureModelManager.load(EclipseFileSystem.getPath(projectReference.getFile("model.xml")));
 		} else {
 			featureModel = null;
 		}
@@ -198,7 +198,7 @@ public class InterfaceProject {
 		if (configuration == null) {
 			final IFile configFile = featureProject.getCurrentConfiguration();
 			configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+			SimpleFileHandler.load(EclipseFileSystem.getPath(configFile), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;
 	}

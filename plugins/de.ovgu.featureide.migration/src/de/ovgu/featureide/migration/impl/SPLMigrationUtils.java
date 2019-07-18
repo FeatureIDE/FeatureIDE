@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -47,6 +46,7 @@ import org.eclipse.core.runtime.Path;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -175,7 +175,7 @@ public class SPLMigrationUtils {
 			throws CoreException, UnsupportedEncodingException {
 		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
 		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
-		SimpleFileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel, false, true), defaultFormat);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(configFile), new Configuration(featureModel, false, true), defaultFormat);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class SPLMigrationUtils {
 	public static void writeFeatureModelToDefaultFile(IProject featureProject, FeatureModelFormula featureModel) {
 		final IFeatureModelFormat format = new XmlFeatureModelFormat();
 		final ProblemList problems =
-			SimpleFileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()), featureModel.getFeatureModel(), format);
+			SimpleFileHandler.save(EclipseFileSystem.getPath(featureProject.getFile("model.xml")), featureModel.getFeatureModel(), format);
 		if (problems.containsError()) {
 			final ProblemList errors = problems.getErrors();
 			SPLMigrationPlugin.getDefault().logError(errors.toString(), new Exception());

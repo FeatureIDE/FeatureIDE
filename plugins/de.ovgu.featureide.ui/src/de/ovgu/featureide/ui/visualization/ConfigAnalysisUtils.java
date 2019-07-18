@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.visualization;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +43,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
@@ -61,7 +61,7 @@ public class ConfigAnalysisUtils {
 		for (final IResource res : configsFolder.members()) {
 			if ((res instanceof IFile) && res.isAccessible()) {
 				final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-				final ProblemList problems = SimpleFileHandler.load(Paths.get(res.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+				final ProblemList problems = SimpleFileHandler.load(EclipseFileSystem.getPath(res), configuration, ConfigFormatManager.getInstance());
 				if (!problems.containsError()) {
 					configs.add(configuration);
 				}

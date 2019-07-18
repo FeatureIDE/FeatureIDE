@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.handlers;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -30,6 +29,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -48,7 +48,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(final IFile file) {
-		final FeatureModelManager manager = FeatureModelManager.getInstance(Paths.get(file.getProject().getLocationURI()));
+		final FeatureModelManager manager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file.getProject()));
 		final IFeatureModel featureModel = manager.getObject();
 		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
@@ -62,7 +62,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 
 					@Override
 					public void jobFinished(IJob<IFeatureModel> finishedJob) {
-						final Path modelFile = Paths.get(file.getLocationURI());
+						final Path modelFile = EclipseFileSystem.getPath(file);
 						final Path filePath = modelFile.getFileName();
 						final Path root = modelFile.getRoot();
 						if ((filePath != null) && (root != null)) {

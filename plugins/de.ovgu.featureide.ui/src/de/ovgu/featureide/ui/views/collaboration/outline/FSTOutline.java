@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +61,7 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
@@ -107,7 +107,7 @@ public class FSTOutline extends OutlineProvider {
 		this.file = file;
 
 		if (file != null) {
-			featureModelManager = FeatureModelManager.getInstance(Paths.get(file.getLocationURI()));
+			featureModelManager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file));
 		}
 	}
 

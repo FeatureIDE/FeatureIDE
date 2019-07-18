@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -63,6 +62,7 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
@@ -364,7 +364,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
 			final IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			SimpleFileHandler.save(EclipseFileSystem.getPath(configurationFile), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
@@ -476,7 +476,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
-		final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(Paths.get(config.getLocationURI()));
+		final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(EclipseFileSystem.getPath(config));
 		if (fileHandler.getLastProblems().containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;

@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENT
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,6 +60,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -113,11 +113,11 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (merger instanceof VariantMerger) {
 			// TODO !!! ignore abstract features (below)
-			final Configuration conf = ConfigurationManager.load(Paths.get(featureProject.getCurrentConfiguration().getLocationURI()));
+			final Configuration conf = ConfigurationManager.load(EclipseFileSystem.getPath(featureProject.getCurrentConfiguration()));
 			conf.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
+				SimpleFileHandler.load(EclipseFileSystem.getPath(file), conf, ConfigFormatManager.getInstance());
 			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
@@ -246,7 +246,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			final IFolder folder = FMCorePlugin.createFolder(project, path);
 			final IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
 			try {
-				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
+				FileSystem.write(EclipseFileSystem.getPath(file), javaClass.toString().getBytes(Charset.forName("UTF-8")));
 			} catch (final IOException e) {
 				CorePlugin.getDefault().logError(e);
 			}

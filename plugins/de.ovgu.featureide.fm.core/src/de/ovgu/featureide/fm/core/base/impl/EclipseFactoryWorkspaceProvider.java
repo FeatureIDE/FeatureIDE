@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
@@ -34,6 +33,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FactoryWorkspaceFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -69,7 +69,7 @@ public final class EclipseFactoryWorkspaceProvider implements IFactoryWorkspaceL
 		final IFile[] findFilesForLocationURI = root.findFilesForLocationURI(path.toUri());
 		final IResource res = ((findFilesForLocationURI.length > 0) && (findFilesForLocationURI[0].getProject() != null))
 			? findFilesForLocationURI[0].getProject() : ResourcesPlugin.getWorkspace().getRoot();
-		return Paths.get(res.getLocationURI()).toAbsolutePath();
+		return EclipseFileSystem.getPath(res).toAbsolutePath();
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public final class EclipseFactoryWorkspaceProvider implements IFactoryWorkspaceL
 			for (final Entry<Path, FactoryWorkspace> entry : manager.projectMap.entrySet()) {
 				final IFile file =
 					root.getProject(entry.getKey().getFileName().toString()).getFile(getSubNode() + FACTORY_WORKSPACE_FILENAME + format.getSuffix());
-				SimpleFileHandler.save(Paths.get(file.getLocationURI()), entry.getValue(), format);
+				SimpleFileHandler.save(EclipseFileSystem.getPath(file), entry.getValue(), format);
 			}
 		}
 	}
@@ -114,9 +114,9 @@ public final class EclipseFactoryWorkspaceProvider implements IFactoryWorkspaceL
 		for (final IProject project : root.getProjects()) {
 			if (project.isAccessible()) {
 				final IFile file = project.getFile(getSubNode() + FACTORY_WORKSPACE_FILENAME + format.getSuffix());
-				final Path path = Paths.get(project.getLocationURI());
+				final Path path = EclipseFileSystem.getPath(project);
 				final FactoryWorkspace factoryWorkspace = manager.addFactoryWorkspace(path);
-				if (SimpleFileHandler.load(Paths.get(file.getLocationURI()), factoryWorkspace, format.getInstance()).containsError()) {
+				if (SimpleFileHandler.load(EclipseFileSystem.getPath(file), factoryWorkspace, format.getInstance()).containsError()) {
 					manager.removeFactoryWorkspace(path);
 				}
 			}

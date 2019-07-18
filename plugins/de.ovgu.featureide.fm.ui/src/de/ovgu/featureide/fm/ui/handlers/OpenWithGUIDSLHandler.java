@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
@@ -41,6 +40,7 @@ import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -64,7 +64,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 
-			final IFeatureModel fm = FeatureModelManager.load(Paths.get(modelfile.getLocationURI()));
+			final IFeatureModel fm = FeatureModelManager.load(EclipseFileSystem.getPath(modelfile));
 
 			// Parse XML to GUIDSL and save file as model.m
 			final String loc = modelfile.getLocation().toOSString();

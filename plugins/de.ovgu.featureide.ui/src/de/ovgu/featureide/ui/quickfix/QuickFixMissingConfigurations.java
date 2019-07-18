@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.quickfix;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_MISSING_CONFIGURATIONS_;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -40,6 +39,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -98,7 +98,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 			configurationNr = 0;
 			for (final Configuration c : confs) {
 				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-				writer.write(Paths.get(configurationFile.getLocationURI()), c);
+				writer.write(EclipseFileSystem.getPath(configurationFile), c);
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (final CoreException e) {

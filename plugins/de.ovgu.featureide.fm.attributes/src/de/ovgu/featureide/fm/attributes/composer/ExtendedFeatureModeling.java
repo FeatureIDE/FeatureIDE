@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.composer;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -37,6 +35,7 @@ import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -97,7 +96,7 @@ public class ExtendedFeatureModeling extends ComposerExtensionClass {
 			}
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
 			final IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
-			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			SimpleFileHandler.save(EclipseFileSystem.getPath(configurationFile), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);

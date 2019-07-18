@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -92,7 +92,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 				confs.add(configuration);
 			} else {
 				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-				writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
+				writer.write(EclipseFileSystem.getPath(configurationFile), configuration);
 			}
 		}
 

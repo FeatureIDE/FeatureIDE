@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -49,6 +48,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
@@ -247,7 +247,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
 		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(currentConfiguration.getLocationURI()));
+			final ConfigurationManager instance = ConfigurationManager.getInstance(EclipseFileSystem.getPath(currentConfiguration));
 			selectedFeatures = (instance != null) ? new ArrayList<>(instance.getObject().getSelectedFeatureNames()) : Collections.<String> emptyList();
 		}
 	}

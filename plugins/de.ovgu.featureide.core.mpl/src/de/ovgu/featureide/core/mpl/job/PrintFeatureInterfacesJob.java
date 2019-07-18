@@ -22,7 +22,6 @@ package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_FEATURE_INTERFACES;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFolder;
@@ -38,6 +37,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -93,11 +93,11 @@ public class PrintFeatureInterfacesJob implements LongRunningMethod<Boolean> {
 
 				folder = FMCorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 
-				FileSystem.write(Paths.get(folder.getFile(role.getSignature().getName() + ".java").getLocationURI()), role.toShortString());
+				FileSystem.write(EclipseFileSystem.getPath(folder.getFile(role.getSignature().getName() + ".java")), role.toShortString());
 			}
 			workMonitor.worked();
 		}
-		FileSystem.write(Paths.get(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt").getLocationURI()),
+		FileSystem.write(EclipseFileSystem.getPath(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt")),
 				projectSignatures.getStatisticsString());
 		MPLPlugin.getDefault().logInfo(BUILT_FEATURE_INTERFACES);
 

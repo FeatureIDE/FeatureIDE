@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +32,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.computations.ConfigurationOutlineStandardBundle;
@@ -57,7 +57,7 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 			} else if (newInput instanceof IFile) {
 				final IFile iFile = (IFile) newInput;
 				if (iFile.exists()) {
-					final Path filePath = Paths.get(iFile.getLocationURI());
+					final Path filePath = EclipseFileSystem.getPath(iFile);
 					if (ConfigurationManager.isFileSupported(filePath)) {
 						config = ConfigurationManager.getInstance(filePath).getObject();
 					}

@@ -29,7 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERR
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -53,6 +52,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import jampack.Jampack;
@@ -169,7 +169,7 @@ public class ComposerWrapper {
 		featureFolders.clear();
 
 		if (configFile != null) {
-			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(Paths.get(configFile.getLocationURI()));
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(EclipseFileSystem.getPath(configFile));
 			if (!fileHandler.getLastProblems().containsError()) {
 				final Configuration configuration = fileHandler.getObject();
 				configuration.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());

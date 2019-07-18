@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
 
@@ -35,7 +35,7 @@ public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
 			|| ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
 			final IResource resource = delta.getResource();
 			if (resource instanceof IFile) {
-				final IFileManager<?> instance = AFileManager.getInstance(Paths.get(resource.getLocationURI()));
+				final IFileManager<?> instance = AFileManager.getInstance(EclipseFileSystem.getPath(resource));
 				if (instance != null) {
 					instance.read();
 				}

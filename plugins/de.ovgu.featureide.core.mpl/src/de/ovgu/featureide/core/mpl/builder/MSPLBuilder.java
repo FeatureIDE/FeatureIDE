@@ -22,7 +22,6 @@ package de.ovgu.featureide.core.mpl.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_GOT;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +39,7 @@ import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -117,7 +117,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				final Configuration config = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 
 				final IFile configFile = featureProject.getCurrentConfiguration();
-				SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());
+				SimpleFileHandler.load(EclipseFileSystem.getPath(configFile), config, ConfigFormatManager.getInstance());
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();

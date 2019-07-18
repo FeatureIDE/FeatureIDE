@@ -30,7 +30,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -40,6 +39,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -176,7 +176,7 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 		sb.append(sum2);
 		sb.append('\n');
 		try {
-			FileSystem.write(Paths.get(folder.getFile("statistics.csv").getLocationURI()), sb.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("statistics.csv")), sb.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -209,7 +209,7 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 		sb2.append("\\% \\\\\n");
 
 		try {
-			FileSystem.write(Paths.get(folder.getFile("latexTab.txt").getLocationURI()), sb2.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("latexTab.txt")), sb2.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -222,7 +222,7 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 //		}
 		sb3.setCharAt(sb3.length() - 1, '\n');
 		try {
-			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("numComments.txt")), sb3.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}

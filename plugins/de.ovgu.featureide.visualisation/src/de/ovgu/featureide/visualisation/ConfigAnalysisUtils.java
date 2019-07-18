@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.visualisation;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 
 /**
@@ -53,8 +53,7 @@ public class ConfigAnalysisUtils {
 	 * @return boolean[][]
 	 * @throws CoreException
 	 */
-	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList)
-			throws CoreException {
+	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
 		Collection<IFile> configs = new ArrayList<IFile>();
 		// check that they are config files
 		IFolder configsFolder = featureProject.getConfigFolder();
@@ -69,7 +68,7 @@ public class ConfigAnalysisUtils {
 		boolean[][] matrix = new boolean[configs.size()][featureList.size()];
 		int iconf = 0;
 		for (IFile config : configs) {
-			Configuration configuration = ConfigurationManager.load(Paths.get(config.getLocationURI()));
+			Configuration configuration = ConfigurationManager.load(EclipseFileSystem.getPath(config));
 			configuration.initFeatures(new FeatureModelFormula(featureProject.getFeatureModel()));
 			Set<String> configFeatures = configuration.getSelectedFeatureNames();
 			int ifeat = 0;

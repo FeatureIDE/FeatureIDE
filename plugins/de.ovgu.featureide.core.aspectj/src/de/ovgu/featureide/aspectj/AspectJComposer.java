@@ -29,7 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_B
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -67,6 +66,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -132,7 +132,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 
 		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		SimpleFileHandler.load(EclipseFileSystem.getPath(config), configuration, ConfigFormatManager.getInstance());
 
 		final LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
@@ -259,7 +259,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				featureModel.getStructure().setRoot(root.getStructure());
 				featureModel.getStructure().getRoot().setAbstract(false);
 				final ProblemList problems =
-					SimpleFileHandler.save(Paths.get(project.getProject().getFile("model.xml").getLocationURI()), featureModel, new XmlFeatureModelFormat());
+					SimpleFileHandler.save(EclipseFileSystem.getPath(project.getProject().getFile("model.xml")), featureModel, new XmlFeatureModelFormat());
 				if (problems.containsError()) {
 					CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL + "\n" + problems.getErrors().toString(), new Exception());
 				}

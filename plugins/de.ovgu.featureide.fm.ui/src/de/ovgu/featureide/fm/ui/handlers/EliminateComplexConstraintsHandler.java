@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -61,7 +62,7 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(Paths.get(file.getLocationURI()));
+		final FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(EclipseFileSystem.getPath(file));
 		final IFeatureModel featureModel = fileHandler.getObject();
 
 		IConverterStrategy strategy = new NNFConverter();

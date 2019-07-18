@@ -51,7 +51,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CL
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,6 +121,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
@@ -224,6 +224,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private final JobToken updateGuiToken = LongRunningWrapper.createToken(JobStartingStrategy.WAIT_ONE);
 
 	private final LongRunningMethod<Void> updateGUIMethod = new LongRunningMethod<Void>() {
+
 		@Override
 		public Void execute(IMonitor monitor) throws Exception {
 			disableToolbarFilterItems();
@@ -246,6 +247,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				return null;
 			}
 			final UIJob uiJob = new UIJob(UPDATE_COLLABORATION_VIEW) {
+
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					viewer.setContents(model);
@@ -507,7 +509,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				// }
 				// });
 
-				if (ConfigFormatManager.getInstance().hasFormat(Paths.get(inputFile.getLocationURI()))) {
+				if (ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(inputFile))) {
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile = null;
 					if ((builder.configuration != null) && builder.configuration.equals(inputFile)

@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * {@link AbstractFeatureModelReader} are needed
  *
  * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br> {@link IFile} can be converted via
- *             {@code Paths.getPath(ifile.getLocationURI())}.
+ *             {@code EclipseFileSystem.getPath(ifile)}.
  *
  * @author Sönke Holthusen
  * @author Marcus Pinnecke (Feature Interface)

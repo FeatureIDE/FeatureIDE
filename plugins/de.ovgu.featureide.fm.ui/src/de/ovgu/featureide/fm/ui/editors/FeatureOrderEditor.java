@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_ORDER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.USER_DEFINED_FEATURE_ORDER;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +46,7 @@ import org.eclipse.swt.widgets.Label;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -354,7 +354,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (inputFile != null) {
 			final IFile orderFile = inputFile.getProject().getFile(".order");
 			if (orderFile.isAccessible()) {
-				FileHandler.save(Paths.get(orderFile.getLocationURI()), featureModel, new FeatureOrderFormat());
+				FileHandler.save(EclipseFileSystem.getPath(orderFile), featureModel, new FeatureOrderFormat());
 			}
 		}
 	}

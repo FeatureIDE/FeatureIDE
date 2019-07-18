@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.images;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -122,7 +122,7 @@ public class ImagesComposer extends ComposerExtensionClass {
 	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
 		final List<String> selectedFeatures = new ArrayList<String>();
 		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		SimpleFileHandler.load(EclipseFileSystem.getPath(config), configuration, ConfigFormatManager.getInstance());
 		for (final IFeature f : configuration.getSelectedFeatures()) {
 			if (!f.getStructure().isAbstract()) {
 				selectedFeatures.add(f.getName());

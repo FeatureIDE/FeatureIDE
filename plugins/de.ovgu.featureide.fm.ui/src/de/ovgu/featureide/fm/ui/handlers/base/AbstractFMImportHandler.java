@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -101,7 +102,7 @@ public abstract class AbstractFMImportHandler extends AFileHandler {
 				}
 				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
 			} else {
-				SimpleFileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
+				SimpleFileHandler.save(EclipseFileSystem.getPath(outputFile), fm, new XmlFeatureModelFormat());
 				try {
 					openFileInEditor(outputFile);
 				} catch (final PartInitException e) {

@@ -118,7 +118,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 		synchronized (pathMap) {
 			final IFileManager<?> instance = pathMap.get(path);
 			if (fileManagerClass.isInstance(instance)) {
-				return (R) fileManagerClass.cast(instance);
+				return fileManagerClass.cast(instance);
 			} else {
 				if (path != null) {
 					try {
@@ -146,7 +146,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 		synchronized (pathMap) {
 			final IFileManager<?> instance = pathMap.get(path);
 			if (fileManagerClass.isInstance(instance)) {
-				return (R) fileManagerClass.cast(instance);
+				return fileManagerClass.cast(instance);
 			}
 			return null;
 		}

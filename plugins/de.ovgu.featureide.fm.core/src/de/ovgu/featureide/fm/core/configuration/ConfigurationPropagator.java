@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
@@ -533,10 +534,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 		}
 		try {
-			return new AdvancedSatSolver(satInstance);
+			if (satInstance != null) {
+				return new AdvancedSatSolver(satInstance);
+			}
 		} catch (final RuntimeContradictionException e) {
-			return null;
+			Logger.logError(e);
 		}
+		return null;
 	}
 
 	@Override

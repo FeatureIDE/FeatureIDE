@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -52,6 +51,7 @@ import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -139,7 +139,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 
 	@Override
 	public void performFullBuild(IFile config) {
-		final Path configPath = Paths.get(config.getLocationURI());
+		final Path configPath = EclipseFileSystem.getPath(config);
 		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
 
 		SimpleFileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());

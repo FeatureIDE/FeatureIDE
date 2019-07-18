@@ -21,12 +21,12 @@
 package de.ovgu.featureide.ui.handlers;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.MIGAdjListFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -49,7 +49,7 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	@Override
 	protected void endAction() {
 		for (final IFeatureProject project : projectList) {
-			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
+			final Path path = EclipseFileSystem.getPath(project.getProject().getFile("model.fg"));
 			final IRunner<ModalImplicationGraph> runner = LongRunningWrapper.getRunner(new LongRunningMethod<ModalImplicationGraph>() {
 
 				@Override

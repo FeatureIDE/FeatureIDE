@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.runtime;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
@@ -59,7 +59,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 
 			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
 
-			final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
+			final Path configPath = EclipseFileSystem.getPath(featureProject.getCurrentConfiguration());
 			SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 			String args = userDefinedArgs;

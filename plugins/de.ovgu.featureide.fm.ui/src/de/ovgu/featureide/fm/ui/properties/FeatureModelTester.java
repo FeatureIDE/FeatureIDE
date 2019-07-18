@@ -20,11 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.properties;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -34,7 +33,7 @@ public class FeatureModelTester extends PropertyTester {
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		final IFile res = SelectionWrapper.checkClass(receiver, IFile.class);
 		if (res != null) {
-			return FeatureModelManager.load(Paths.get(res.getLocationURI())) != null;
+			return FeatureModelManager.load(EclipseFileSystem.getPath(res)) != null;
 		}
 		return false;
 	}

@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -90,6 +89,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -654,7 +654,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			final IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
 			try {
-				FileSystem.write(Paths.get(cnfFile.getLocationURI()), input);
+				FileSystem.write(EclipseFileSystem.getPath(cnfFile), input);
 				cnfFile.setDerived(true, null);
 			} catch (final IOException e) {
 				LOGGER.logError(e);

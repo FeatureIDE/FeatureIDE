@@ -28,6 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -43,7 +44,7 @@ public abstract class AbstractExportHandler<T> extends AFileHandler {
 			return;
 		}
 
-		final Path path = Paths.get(inputFile.getLocationURI());
+		final Path path = EclipseFileSystem.getPath(inputFile);
 		final IPersistentFormat<T> format = getInputFormat(path);
 
 		final FileHandler<T> handler = new FileHandler<>(getObject(path, format));

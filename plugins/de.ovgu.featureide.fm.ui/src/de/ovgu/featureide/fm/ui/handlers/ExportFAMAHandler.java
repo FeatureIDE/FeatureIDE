@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.fama.FAMAFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -53,7 +54,7 @@ public class ExportFAMAHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel fm = FeatureModelManager.load(Paths.get(file.getLocationURI()));
+		final IFeatureModel fm = FeatureModelManager.load(EclipseFileSystem.getPath(file));
 
 		IConverterStrategy strategy = new NNFConverter();
 		final ComplexConstraintConverter converter = new ComplexConstraintConverter();

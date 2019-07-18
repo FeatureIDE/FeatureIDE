@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,6 +72,7 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -425,7 +425,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	 */
 	private Configuration readConfig() {
 		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
+		final Path configPath = EclipseFileSystem.getPath(featureProject.getCurrentConfiguration());
 		SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 		return featureProjectConfig;
