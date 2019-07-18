@@ -74,6 +74,7 @@ import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.ConfigurationEditorErrorPage;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -195,13 +196,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				// case: there was no path saved for this project
 				path = openFileDialog();
 				if (path == null) {
-					return;
-				}
-
-				modelFile = new File(path);
-
-				if (!setModelFile(path)) {
-					return;
+					setContainsError(true);
+				} else {
+					modelFile = new File(path);
+					setContainsError(setModelFile(path));
 				}
 			} else {
 				// case: use the saved path
@@ -211,37 +209,38 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					if (path == null) {
 						return;
 					}
-
 					modelFile = new File(path);
-
-					setModelFile(path);
+					setContainsError(!setModelFile(path));
 				}
 			}
 		}
-		final Path modelPath = EclipseFileSystem.getPath(res);
-		final Path path = EclipseFileSystem.getPath(file);
 
-		featureModelManager = FeatureModelManager.getInstance(modelPath);
-		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
-		if (invalidFeatureModel) {
-			return;
+		if (!containsError()) {
+			final Path modelPath = modelFile.toPath();
+			featureModelManager = FeatureModelManager.getInstance(modelPath);
+			invalidFeatureModel = featureModelManager.getLastProblems().containsError();
+			if (invalidFeatureModel) {
+				return;
+			}
 		}
+
+		final Path path = EclipseFileSystem.getPath(file);
 		configurationManager = ConfigurationManager.getInstance(path);
-		configurationManager.linkFeatureModel(featureModelManager);
+		if (configurationManager != null) {
+			configurationManager.linkFeatureModel(featureModelManager);
 
-		// TODO mapping model
-		// if (mappingModel) {
-		// featureModelManager = FeatureModelManager.getInstance(absolutePath, format);
-		// featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
-		// }
+			final ProblemList lastProblems = configurationManager.getLastProblems();
+			createModelFileMarkers(lastProblems);
+			setContainsError(lastProblems.containsError());
 
-		final ProblemList lastProblems = configurationManager.getLastProblems();
-		createModelFileMarkers(lastProblems);
-		setContainsError(lastProblems.containsError());
-
-		featureModelManager.addListener(this);
-		configurationManager.addListener(this);
-		firePropertyChange(IEditorPart.PROP_DIRTY);
+			if (!containsError()) {
+				featureModelManager.addListener(this);
+			}
+			configurationManager.addListener(this);
+			firePropertyChange(IEditorPart.PROP_DIRTY);
+		} else {
+			setContainsError(true);
+		}
 
 		if (!containsError()) {
 //			loadPropagator();
@@ -251,16 +250,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 		}
 	}
-
-//	private IFeatureGraph loadFeatureGraph(Path filePath) {
-//		final IFeatureGraph featureGraph = new MatrixFeatureGraph();
-//		final FeatureGraphFormat format = new FeatureGraphFormat();
-//		if (!FileSystem.exists(filePath) || SimpleFileHandler.load(filePath, featureGraph, format).containsError()) {
-//			return null;
-//		} else {
-//			return featureGraph;
-//		}
-//	}
 
 	/**
 	 * Sets and saved the model file with the given path
@@ -285,24 +274,26 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * @see FileDialog#open()
 	 */
 	private String openFileDialog() {
-		final FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
-		dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
-		dialog.setFileName("model.xml");
-		final ArrayList<String> suffixes = new ArrayList<>();
-		final ArrayList<String> names = new ArrayList<>();
-		for (final IPersistentFormat<IFeatureModel> extension : FMFormatManager.getInstance().getExtensions()) {
-			if (extension.supportsRead()) {
-				suffixes.add("*." + extension.getSuffix());
-				names.add(extension.getName() + " *." + extension.getSuffix());
-			}
-		}
-		dialog.setFilterExtensions(suffixes.toArray(new String[0]));
-		dialog.setFilterNames(names.toArray(new String[0]));
 		final IProject project = file.getProject();
-		if (project != null) {
+		if ((project != null) && (project.getLocation() != null)) {
+			final FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
+			dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
+			dialog.setFileName("model.xml");
+			final ArrayList<String> suffixes = new ArrayList<>();
+			final ArrayList<String> names = new ArrayList<>();
+			for (final IPersistentFormat<IFeatureModel> extension : FMFormatManager.getInstance().getExtensions()) {
+				if (extension.supportsRead()) {
+					suffixes.add("*." + extension.getSuffix());
+					names.add(extension.getName() + " *." + extension.getSuffix());
+				}
+			}
+			dialog.setFilterExtensions(suffixes.toArray(new String[0]));
+			dialog.setFilterNames(names.toArray(new String[0]));
 			dialog.setFilterPath(project.getLocation().toOSString());
+			return dialog.open();
+		} else {
+			return null;
 		}
-		return dialog.open();
 	}
 
 	/**
@@ -377,11 +368,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			internalPages = new ArrayList<>(3);
 			internalPages.add(initPage(new ConfigurationPage()));
 			internalPages.add(initPage(new AdvancedConfigurationPage()));
+			textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
+			internalPages.add(textEditorPage);
 		} else {
 			internalPages = new ArrayList<>(1);
+			if (configurationManager != null) {
+				textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
+				internalPages.add(textEditorPage);
+			} else {
+				internalPages.add((ConfigurationEditorErrorPage) initPage(new ConfigurationEditorErrorPage()));
+			}
 		}
-		textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
-		internalPages.add(textEditorPage);
 		allPages.addAll(internalPages);
 
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
@@ -399,7 +396,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		allPages.addAll(extensionPages);
 
 		if ((modelFile == null) || containsError()) {
-			setActivePage(textEditorPage.getIndex());
+			setActivePage(0);
 		} else if (requiresAdvancedConfigurationPage()) {
 			setActivePage(internalPages.get(1).getIndex());
 		}
@@ -596,6 +593,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		return configurationManager.getVarObject().getPropagator();
 	}
 
+	@Override
 	public ConfigurationManager getConfigurationManager() {
 		return configurationManager;
 	}

@@ -26,10 +26,13 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 
 public interface IConfigurationEditor {
 
 	Configuration getConfiguration();
+
+	ConfigurationManager getConfigurationManager();
 
 	IFile getFile();
 

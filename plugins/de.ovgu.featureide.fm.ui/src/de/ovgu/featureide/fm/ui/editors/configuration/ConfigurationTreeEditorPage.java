@@ -89,6 +89,7 @@ import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -113,7 +114,9 @@ import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -1190,26 +1193,27 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * @return a new explanation for the given automatic selection; null if none could be generated
 	 */
 	protected Explanation<?> createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
-		final Configuration config = configurationEditor.getConfiguration();
-		if (config == null) {
+		final ConfigurationManager configManager = configurationEditor.getConfigurationManager();
+		if (configManager == null) {
 			return null;
 		}
-		final IFeatureModel fm = config.getFeatureModel();
-		if (fm == null) {
+		final IFeatureModelManager featureModelManager = configManager.getFeatureModelManager();
+		if (featureModelManager == null) {
 			return null;
 		}
-		final FeatureProperties featureProperties = FeatureModelManager.getAnalyzer(fm).getFeatureProperties(automaticSelection.getFeature());
+		final FeatureModelFormula fm = featureModelManager.getPersistentFormula();
+		final FeatureProperties featureProperties = fm.getAnalyzer().getFeatureProperties(automaticSelection.getFeature());
 		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
-			deadFeatureExplanationCreator.setFeatureModel(fm);
+			deadFeatureExplanationCreator.setFeatureModel(fm.getFeatureModel());
 			deadFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 			return deadFeatureExplanationCreator.getExplanation();
 		}
 		if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-			falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
+			falseOptionalFeatureExplanationCreator.setFeatureModel(fm.getFeatureModel());
 			falseOptionalFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 			return falseOptionalFeatureExplanationCreator.getExplanation();
 		}
-		automaticSelectionExplanationCreator.setConfiguration(config);
+		automaticSelectionExplanationCreator.setConfiguration(configManager.getSnapshot());
 		automaticSelectionExplanationCreator.setSubject(automaticSelection);
 		return automaticSelectionExplanationCreator.getExplanation();
 	}
