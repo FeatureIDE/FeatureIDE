@@ -154,9 +154,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 
+		handleRenamings(fmManager.getVarObject());
+
 		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
-		fmManager.processObject(this::handleRenamings, true);
 		for (final IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
