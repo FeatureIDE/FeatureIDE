@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,6 +104,10 @@ public class RenamingsManager implements IEventManager, Cloneable {
 			instance.fireEvent(new FeatureIDEEvent(model, EventType.FEATURE_NAME_PERSISTENTLY_CHANGED, renaming.oldName, renaming.newName));
 		}
 		renamings.clear();
+	}
+
+	public List<Renaming> getRenamings() {
+		return new ArrayList<>(renamings);
 	}
 
 	private void renameVariables(Node node, String oldName, String newName) {

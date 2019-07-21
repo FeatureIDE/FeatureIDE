@@ -154,8 +154,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 
-		handleRenamings(fmManager.getVarObject());
-
 		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
 		for (final IFeatureModelEditorPage page : extensionPages) {
@@ -180,11 +178,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		setPageModified(false);
 		// TODO reset?
 		textEditor.resetTextEditor();
-	}
-
-	private Void handleRenamings(IFeatureModel featureModel) {
-		featureModel.getRenamingsManager().notifyAboutRenamings();
-		return null;
 	}
 
 	@Override
@@ -406,8 +399,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
 			createExtensionPages();
 			addPage(textEditor = new FeatureModelTextEditorPage(this));
-
-			fmManager.addListener(diagramEditor);
 
 			extensionPages = pages.subList(2, pages.size() - 1);
 

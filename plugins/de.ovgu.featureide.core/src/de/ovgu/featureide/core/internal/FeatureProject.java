@@ -41,6 +41,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,6 +91,8 @@ import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
+import de.ovgu.featureide.fm.core.Renaming;
+import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -108,14 +111,17 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -147,13 +153,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
 			switch (evt.getEventType()) {
-			case FEATURE_NAME_PERSISTENTLY_CHANGED:
-				final String oldName = (String) evt.getOldValue();
-				final String newName = (String) evt.getNewValue();
-				renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
-				break;
 			case MODEL_DATA_SAVED:
 				try {
+					renameFeature((IFeatureModel) evt.getSource());
 					checkFeatureCoverage();
 					checkConfigurations(getAllConfigurations());
 					createAndDeleteFeatureFolders();
@@ -419,6 +421,27 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	@Override
 	public void dispose() {
 		removeModelListener();
+		try {
+			final java.nio.file.Path configPath = EclipseFileSystem.getPath(configFolder);
+			if (configPath != null) {
+				Files.walk(configPath).forEach(this::disposeFileManager);
+			}
+			final java.nio.file.Path fmPath = EclipseFileSystem.getPath(modelFile.getModelFile());
+			if (fmPath != null) {
+				disposeFileManager(fmPath);
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void disposeFileManager(java.nio.file.Path path) {
+		if (Files.isRegularFile(path) && Files.isWritable(path)) {
+			final IFileManager<?> instance = AFileManager.getInstance(path);
+			if (instance != null) {
+				instance.dispose();
+			}
+		}
 	}
 
 	/**
@@ -545,25 +568,37 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	private void renameFeature(final IFeatureModel model, String oldName, String newName) {
+	private void renameFeature(final IFeatureModel model) {
+		final RenamingsManager renamingsManager = model.getRenamingsManager();
+		final List<Renaming> renamings = renamingsManager.getRenamings();
+		renamingsManager.clear();
+		if (renamings.isEmpty()) {
+			return;
+		}
 		final IComposerExtensionClass composer = getComposer();
-		boolean renamePerformed = false;
+		boolean renamePerformed = true;
 		final IJobManager manager = Job.getJobManager();
 		try {
 			manager.beginRule(ModelScheduleRule.RULE, null);
-			renamePerformed = FMComposerManager.getFMComposerExtension(getProject()).performRenaming(oldName, newName, project);
+			for (final Renaming renaming : renamings) {
+				if (!FMComposerManager.getFMComposerExtension(getProject()).performRenaming(renaming.oldName, renaming.newName, project)) {
+					renamePerformed = false;
+				}
+			}
 		} finally {
 			manager.endRule(ModelScheduleRule.RULE);
 		}
 		if (!renamePerformed && composer.hasFeatureFolder()) {
 			try {
 				sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
-				final IFolder folder = sourceFolder.getFolder(oldName);
-				if (folder.isAccessible()) {
-					final IPath newPath = sourceFolder.getFolder(newName).getFullPath();
-					folder.move(newPath, true, null);
-					folder.refreshLocal(IResource.DEPTH_ZERO, null);
-					LOGGER.fireFeatureFolderChanged(folder);
+				for (final Renaming renaming : renamings) {
+					final IFolder folder = sourceFolder.getFolder(renaming.oldName);
+					if (folder.isAccessible()) {
+						final IPath newPath = sourceFolder.getFolder(renaming.newName).getFullPath();
+						folder.move(newPath, true, null);
+						folder.refreshLocal(IResource.DEPTH_ZERO, null);
+						LOGGER.fireFeatureFolderChanged(folder);
+					}
 				}
 			} catch (final CoreException e) {
 				LOGGER.logError(e);
@@ -575,7 +610,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				try {
 					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 					configurationUpdate = true;
-					configFolder.accept(resource -> adaptConfigurations(resource, featureModelManager));
+					configFolder.accept(resource -> adaptConfigurations(resource, featureModelManager.getPersistentFormula(), renamings));
 					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				} catch (final CoreException e) {
 					LOGGER.logError(e);
@@ -586,12 +621,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	private boolean adaptConfigurations(IResource resource, IFeatureModelManager featureModelManager) {
+	private boolean adaptConfigurations(IResource resource, FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
 		if ((resource instanceof IFile) && resource.isAccessible()) {
-			final ConfigurationManager instance = ConfigurationManager.getInstance(EclipseFileSystem.getPath(resource));
+			final java.nio.file.Path path = EclipseFileSystem.getPath(resource);
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(path);
+			final IPersistentFormat<Configuration> format = fileHandler.getFormat();
+			final Configuration object = fileHandler.getObject();
+			object.updateFeatures(featureModelFormula, renamings);
+			try {
+				Files.write(path, format.write(object).getBytes());
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+			final ConfigurationManager instance = ConfigurationManager.getInstance(path);
 			if (instance != null) {
-				instance.getVarObject().updateFeatures(featureModelManager.getVariableFormula());
-				instance.save();
+				instance.read();
 			}
 		}
 		return true;

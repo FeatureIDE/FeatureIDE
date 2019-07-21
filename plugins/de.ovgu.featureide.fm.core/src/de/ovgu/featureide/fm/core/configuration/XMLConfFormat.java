@@ -61,7 +61,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		object.resetValues();
+		object.reset();
 		final IFeatureModel featureModel = object.getFeatureModel();
 		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 

@@ -77,6 +77,7 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		object.reset();
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));

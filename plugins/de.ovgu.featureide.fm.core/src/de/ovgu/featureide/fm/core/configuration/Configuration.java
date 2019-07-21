@@ -31,6 +31,7 @@ import java.util.Set;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.Renaming;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -120,23 +121,39 @@ public class Configuration implements Cloneable {
 	}
 
 	public boolean updateFeatures(FeatureModelFormula featureModelFormula) {
+		return updateFeatures(featureModelFormula, null);
+	}
+
+	public boolean updateFeatures(FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
 		if ((featureModelFormula != null) && (featureModel != featureModelFormula)) {
-			final IFeature featureRoot = FeatureUtils.getRoot(featureModelFormula.getFeatureModel());
-			if (featureRoot != null) {
-				featureModel = featureModelFormula;
-				propagator = null;
-				root = initFeatures(null, featureRoot);
-				selectableFeatures.clear();
-				readdFeatures(root);
-			}
+			initFeatures(featureModelFormula, renamings);
 			return true;
 		}
 		return false;
 	}
 
-	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature) {
+	private void initFeatures(FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
+		final IFeature featureRoot = FeatureUtils.getRoot(featureModelFormula.getFeatureModel());
+		if (featureRoot != null) {
+			featureModel = featureModelFormula;
+			propagator = null;
+			root = initFeatures(null, featureRoot, renamings);
+			selectableFeatures.clear();
+			readdFeatures(root);
+		}
+	}
+
+	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature, List<Renaming> renamings) {
 		final String curName = feature.getName();
-		final String oldName = featureModel.getFeatureModel().getRenamingsManager().getOldName(curName);
+		String oldName = curName;
+		if (renamings != null) {
+			for (final Renaming renaming : renamings) {
+				if (renaming.newName.equals(curName)) {
+					oldName = renaming.oldName;
+					break;
+				}
+			}
+		}
 		SelectableFeature sFeature = selectableFeatures.get(oldName);
 		if (sFeature == null) {
 			sFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(feature);
@@ -154,7 +171,7 @@ public class Configuration implements Cloneable {
 
 		sFeature.removeChildren();
 		for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-			initFeatures(sFeature, child.getFeature());
+			initFeatures(sFeature, child.getFeature(), renamings);
 		}
 
 		if (parent != null) {
@@ -352,6 +369,13 @@ public class Configuration implements Cloneable {
 		for (final SelectableFeature feature : selectableFeatures.values()) {
 			feature.setManual(Selection.UNDEFINED);
 			feature.setAutomatic(Selection.UNDEFINED);
+		}
+	}
+
+	public void reset() {
+		selectableFeatures.clear();
+		if (featureModel != null) {
+			initFeatures(featureModel, null);
 		}
 	}
 
