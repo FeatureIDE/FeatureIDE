@@ -56,6 +56,7 @@ pipeline {
 
         stage ('Verify') {
         	steps {
+                //starts Xvfb plugin
                 wrap([$class: 'Xvfb', additionalOptions: '', assignedLabels: '', autoDisplayName: true, debug: true, displayNameOffset: 0, installationName: 'default', parallelBuild: true, screen: '']) {
                     sh 'mvn clean verify'
                 }
