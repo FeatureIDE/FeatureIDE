@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -129,11 +130,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 		}
 
 		if (varName == null) {
-			String varName = externalFeatureProject.getCurrentConfiguration().getName();
-			final int splitIndex = varName.lastIndexOf('.');
-			if (splitIndex > -1) {
-				varName = varName.substring(0, splitIndex);
-			}
+			final String varName = FileHandler.getFileName(externalFeatureProject.getCurrentConfiguration());
 			rootBuildFolder = buildF.getFolder(varName);
 			internTempBuildFolder = buildF.getFolder(EMPTY___ + varName);
 		} else {
@@ -265,13 +262,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			}
 		} else {
 			// Build project
-			String configName = externalFeatureProject.getCurrentConfiguration().getName();
-			final int splitIndex = configName.lastIndexOf('.');
-			if (splitIndex > -1) {
-				configName = configName.substring(0, splitIndex);
-			}
-
-			composerExtension.buildConfiguration(buildFolder, configuration, configName);
+			composerExtension.buildConfiguration(buildFolder, configuration, FileHandler.getFileName(externalFeatureProject.getCurrentConfiguration()));
 		}
 
 		try {

@@ -53,7 +53,6 @@ import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -62,8 +61,6 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -113,51 +110,44 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (merger instanceof VariantMerger) {
 			// TODO !!! ignore abstract features (below)
-			final Configuration conf = ConfigurationManager.load(EclipseFileSystem.getPath(featureProject.getCurrentConfiguration()));
-			conf.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
-			try {
-				final IFile file = featureProject.getCurrentConfiguration();
-				SimpleFileHandler.load(EclipseFileSystem.getPath(file), conf, ConfigFormatManager.getInstance());
-			} catch (final Exception e) {
-				CorePlugin.getDefault().logError(e);
-				return false;
-			}
-			final Collection<String> featureNames = conf.getSelectedFeatureNames();
-
-			final int[] tempFeatureList = new int[featureNames.size()];
-			int count = 0;
-			for (final String featureName : featureNames) {
-				final int id = projectSignatures.getFeatureID(featureName);
-				if (id >= 0) {
-					tempFeatureList[count++] = id;
-				}
-			}
-			final int[] validFeatureIDs = new int[count];
-
-			// sort feature list
-			int c = 0;
-			for (int j = 0; j < count; j++) {
-				final int curId = tempFeatureList[j];
-				for (int k = 0; k < featureIDs.length; k++) {
-					if (curId == featureIDs[k]) {
-						validFeatureIDs[c++] = curId;
-						break;
+			final Configuration conf = featureProject.loadCurrentConfiguration();
+			if (conf != null) {
+				final Collection<String> featureNames = conf.getSelectedFeatureNames();
+				final int[] tempFeatureList = new int[featureNames.size()];
+				int count = 0;
+				for (final String featureName : featureNames) {
+					final int id = projectSignatures.getFeatureID(featureName);
+					if (id >= 0) {
+						tempFeatureList[count++] = id;
 					}
 				}
-			}
+				final int[] validFeatureIDs = new int[count];
 
-			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
-			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
-			int i = 1;
-			for (final SelectableFeature feature : conf.getFeatures()) {
-				final Selection selection = feature.getSelection();
-				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
-					: new Literal(feature.getName(), feature.getSelection() == Selection.SELECTED);
-			}
-			signatureFilters.add(new ConstraintFilter(nodes));
-			commentFilters.add(new ConstraintFilter(nodes));
+				// sort feature list
+				int c = 0;
+				for (int j = 0; j < count; j++) {
+					final int curId = tempFeatureList[j];
+					for (int k = 0; k < featureIDs.length; k++) {
+						if (curId == featureIDs[k]) {
+							validFeatureIDs[c++] = curId;
+							break;
+						}
+					}
+				}
 
-			merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
+				final Node[] nodes = new Node[conf.getFeatures().size() + 1];
+				nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
+				int i = 1;
+				for (final SelectableFeature feature : conf.getFeatures()) {
+					final Selection selection = feature.getSelection();
+					nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
+						: new Literal(feature.getName(), feature.getSelection() == Selection.SELECTED);
+				}
+				signatureFilters.add(new ConstraintFilter(nodes));
+				commentFilters.add(new ConstraintFilter(nodes));
+
+				merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
+			}
 		} else if (merger instanceof ContextMerger) {
 			final Node[] nodes = new Node[2];
 			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.runtime;
 
-import java.nio.file.Path;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -32,12 +30,9 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
 
@@ -55,12 +50,11 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 		if ((featureProject != null) && featureProject.getComposerID().equals(COMPOSER_ID)
 			&& RuntimeParameters.RUN_CONFIGURATION.equals(featureProject.getCompositionMechanism())) {
 
-			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-
+			final Configuration featureProjectConfig = featureProject.loadCurrentConfiguration();
+			if (featureProjectConfig == null) {
+				return;
+			}
 			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
-
-			final Path configPath = EclipseFileSystem.getPath(featureProject.getCurrentConfiguration());
-			SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 			String args = userDefinedArgs;
 			for (final SelectableFeature f : featureProjectConfig.getFeatures()) {

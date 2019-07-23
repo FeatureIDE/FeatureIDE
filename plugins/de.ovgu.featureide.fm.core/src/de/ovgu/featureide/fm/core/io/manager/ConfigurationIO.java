@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
+import java.nio.file.Path;
+
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -49,6 +51,15 @@ public class ConfigurationIO extends AbstractIO<Configuration> {
 	@Override
 	protected FactoryManager<Configuration> getFactoryManager() {
 		return ConfigurationFactoryManager.getInstance();
+	}
+
+	public Configuration load(Path path, IFeatureModelManager fmManager) {
+		final FileHandler<Configuration> fileHandler = getFileHandler(path);
+		final Configuration configuration = (fileHandler == null) ? null : fileHandler.getObject();
+		if (configuration != null) {
+			configuration.initFeatures(fmManager.getPersistentFormula());
+		}
+		return configuration;
 	}
 
 }

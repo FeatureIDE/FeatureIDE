@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.editors.annotation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.HashSet;
 
 import org.eclipse.core.resources.IContainer;
@@ -45,6 +46,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -221,12 +223,9 @@ public class EditorTracker {
 					} else {
 						if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
 							// case: a composed file
-							final IFile configuration = featureProject.getCurrentConfiguration();
+							final Path configuration = featureProject.getCurrentConfiguration();
 							if (configuration != null) {
-								final String config = configuration.getName().split("[.]")[0];
-								if (config != null) {
-									return file.getName() + "<" + config + ">";
-								}
+								return file.getName() + "<" + FileHandler.getFileName(configuration) + ">";
 							}
 						} else {
 							final String configuration = getConfiguration(file.getParent());

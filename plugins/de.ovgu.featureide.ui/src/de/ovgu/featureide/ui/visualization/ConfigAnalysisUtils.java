@@ -35,7 +35,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
@@ -44,8 +43,6 @@ import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Configurations Analysis utils
@@ -60,9 +57,8 @@ public class ConfigAnalysisUtils {
 		final IFolder configsFolder = featureProject.getConfigFolder();
 		for (final IResource res : configsFolder.members()) {
 			if ((res instanceof IFile) && res.isAccessible()) {
-				final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-				final ProblemList problems = SimpleFileHandler.load(EclipseFileSystem.getPath(res), configuration, ConfigFormatManager.getInstance());
-				if (!problems.containsError()) {
+				final Configuration configuration = featureProject.loadConfiguration(EclipseFileSystem.getPath(res));
+				if (configuration != null) {
 					configs.add(configuration);
 				}
 			}

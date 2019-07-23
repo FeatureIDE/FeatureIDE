@@ -23,6 +23,7 @@ package de.ovgu.featureide.core;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THEOREM_PROVING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIABILITY_AWARE_TESTING;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
@@ -84,9 +86,13 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 *
 	 * @return The current configuration file or <code>null</code> if there is none.
 	 */
-	IFile getCurrentConfiguration();
+	Path getCurrentConfiguration();
 
-	void setCurrentConfiguration(IFile file);
+	Configuration loadCurrentConfiguration();
+
+	Configuration loadConfiguration(Path configurationPath);
+
+	void setCurrentConfiguration(Path file);
 
 	String getBuildPath();
 
@@ -148,9 +154,9 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	IFile getModelFile();
 
-	IFile getInternalConfigurationFile();
+	Path getInternalConfigurationFile();
 
-	IFile getInternalConfigurationFile(IFile configurationFile);
+	Path getInternalConfigurationFile(Path configurationFile);
 
 	/**
 	 * Returns the ID of the assigned composer
@@ -223,11 +229,12 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	void setPaths(String feature, String src, String configuration);
 
-	List<IFile> getAllConfigurations();
+	List<Path> getAllConfigurations();
 
 	Collection<String> getFalseOptionalConfigurationFeatures();
 
 	Collection<String> getUnusedConfigurationFeatures();
 
 	void checkForProblems();
+
 }

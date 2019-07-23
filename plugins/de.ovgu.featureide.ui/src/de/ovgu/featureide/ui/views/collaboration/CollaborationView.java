@@ -51,6 +51,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CL
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -525,7 +526,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						return;
 					}
 					CollaborationModelBuilder.editorFile = inputFile;
-					builder.configuration = featureProject.getCurrentConfiguration();
+					builder.configuration = (IFile) EclipseFileSystem.getResource(featureProject.getCurrentConfiguration());
 				}
 			}
 		}
@@ -856,7 +857,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void updateGuiAfterBuild(final IFeatureProject project, final IFile configurationFile) {
 		if ((featureProject != null) && featureProject.equals(project)) {
 			if (configurationFile == null) {
-				configurations.add(project.getCurrentConfiguration());
+				final Path currentConfiguration = project.getCurrentConfiguration();
+				if (currentConfiguration != null) {
+					configurations.add((IFile) EclipseFileSystem.getResource(currentConfiguration));
+				} else {
+					return;
+				}
 			} else {
 				configurations.add(configurationFile);
 			}

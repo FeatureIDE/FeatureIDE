@@ -22,10 +22,10 @@ package de.ovgu.featureide.core.mpl.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_GOT;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -37,10 +37,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -100,6 +98,12 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				return null;
 			}
 
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
+			final Configuration config = featureProject.loadConfiguration(currentConfiguration);
+			if (config == null) {
+				return null;
+			}
+
 			Boolean building;
 			synchronized (buildMap) {
 				building = buildMap.get(project.getName());
@@ -114,23 +118,10 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			}
 
 			try {
-				final Configuration config = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-
-				final IFile configFile = featureProject.getCurrentConfiguration();
-				SimpleFileHandler.load(EclipseFileSystem.getPath(configFile), config, ConfigFormatManager.getInstance());
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();
 				final LongRunningMethod<?> job = new MPLBuildProjectJob(featureProject, featureProject, buildFolder, config, null);
-
-				final String tempConfigName = featureProject.getCurrentConfiguration().getName();
-				final String configName;
-				final int splitIndex = tempConfigName.lastIndexOf('.');
-				if (splitIndex > -1) {
-					configName = tempConfigName.substring(0, splitIndex);
-				} else {
-					configName = tempConfigName;
-				}
 
 				final JobSequence buildSequence = new JobSequence();
 				buildSequence.setIgnorePreviousJobFail(false);
@@ -140,6 +131,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 
 					@Override
 					public void jobFinished(IJob finishedJob) {
+						final String configName = FileHandler.getFileName(currentConfiguration);
 						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 						synchronized (buildMap) {
 							buildMap.put(project.getName(), false);

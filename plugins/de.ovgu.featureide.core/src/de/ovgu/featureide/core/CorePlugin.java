@@ -312,7 +312,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public void fireBuildUpdated(IFeatureProject featureProject) {
 		for (final ICurrentBuildListener listener : currentBuildListeners) {
-			listener.updateGuiAfterBuild(featureProject, featureProject.getCurrentConfiguration());
+			listener.updateGuiAfterBuild(featureProject, (IFile) EclipseFileSystem.getResource(featureProject.getCurrentConfiguration()));
 		}
 	}
 

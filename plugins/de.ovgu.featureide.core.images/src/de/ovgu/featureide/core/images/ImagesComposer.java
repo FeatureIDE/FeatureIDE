@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.images;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -28,15 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Images composer through images overlapping. Images in the different feature folders need to have the same relative path to be combined.
@@ -50,7 +47,7 @@ public class ImagesComposer extends ComposerExtensionClass {
 	 * This is call when the project builds using the currently selected configuration by the user
 	 */
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		// Get the selected features and order them
 		final List<String> selectedFeatures = getSelectedNonAbstractFeatures(config);
 		final List<String> orderedFeatures = orderSelectedFeatures(selectedFeatures);
@@ -119,13 +116,14 @@ public class ImagesComposer extends ComposerExtensionClass {
 	 * @param config
 	 * @return features
 	 */
-	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
-		final List<String> selectedFeatures = new ArrayList<String>();
-		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		SimpleFileHandler.load(EclipseFileSystem.getPath(config), configuration, ConfigFormatManager.getInstance());
-		for (final IFeature f : configuration.getSelectedFeatures()) {
-			if (!f.getStructure().isAbstract()) {
-				selectedFeatures.add(f.getName());
+	protected List<String> getSelectedNonAbstractFeatures(Path config) {
+		final List<String> selectedFeatures = new ArrayList<>();
+		final Configuration configuration = featureProject.loadCurrentConfiguration();
+		if (configuration != null) {
+			for (final IFeature f : configuration.getSelectedFeatures()) {
+				if (!f.getStructure().isAbstract()) {
+					selectedFeatures.add(f.getName());
+				}
 			}
 		}
 		return selectedFeatures;

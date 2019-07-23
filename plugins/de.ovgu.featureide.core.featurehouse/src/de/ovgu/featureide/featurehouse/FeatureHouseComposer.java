@@ -93,6 +93,7 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -370,7 +371,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		assert (featureProject != null) : "Invalid project given";
 
 		final Path temporaryConfigrationFile = createTemporaryConfigrationFile(config);
@@ -669,8 +670,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			newArgs[i] = CmdLineInterpreter.INPUT_OPTION_LIFTING + language;
 			composer.run(newArgs);
 
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			final IFolder verificationClasses =
-				featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFolder("verificationClasses");
+				featureProject.getBuildFolder().getFolder(FileHandler.getFileName(currentConfiguration)).getFolder("verificationClasses");
 			verificationClasses.create(true, true, null);
 			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_ONE, null);
 			for (final IResource res : featureProject.getBuildFolder().members()) {
@@ -999,7 +1001,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return;
 		}
 		final String configPath;
-		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+		final Path currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
 			final Path temporaryConfigrationFile = createTemporaryConfigrationFile(currentConfiguration);
 			if (temporaryConfigrationFile == null) {
@@ -1044,7 +1046,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
-		final IFile configurationFile = folder.getFile(congurationName + '.' + getConfigurationExtension());
+		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationExtension());
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
@@ -1133,7 +1135,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setProperty(USE_FUJI, useFuji);
 
 		if (useFuji) {
-			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			if (currentConfiguration != null) {
 				performFullBuild(currentConfiguration);
 			}

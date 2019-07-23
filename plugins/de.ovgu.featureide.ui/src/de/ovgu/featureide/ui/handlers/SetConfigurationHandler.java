@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -43,7 +44,7 @@ public class SetConfigurationHandler extends AFileHandler {
 		if (project == null) {
 			UIPlugin.getDefault().logWarning(CANT_SET_CONFIGURATION_AS_CURRENT_CONFIGURATION_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT);
 		} else {
-			project.setCurrentConfiguration(file);
+			project.setCurrentConfiguration(EclipseFileSystem.getPath(file));
 		}
 	}
 

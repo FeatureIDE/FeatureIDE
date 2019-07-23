@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -129,7 +130,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		if (!prepareFullBuild(config)) {
 			return;
 		}
@@ -560,7 +561,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		setProperty(CREATE_SIGNATURE, signature);
 
 		if (signature) {
-			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			if (currentConfiguration != null) {
 				performFullBuild(currentConfiguration);
 			}

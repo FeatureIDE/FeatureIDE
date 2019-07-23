@@ -46,14 +46,16 @@ import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
 public class EclipseFileSystem implements IFileSystem {
 
 	public static IPath getIPath(Path path) {
-		return org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
+		return path == null ? null : org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
 	}
 
 	public static IResource getResource(Path path) {
 		final IPath iPath = getIPath(path);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
-		return res;
+		if (iPath != null) {
+			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			return Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		}
+		return null;
 	}
 
 	public static final Path getPath(IResource res) {

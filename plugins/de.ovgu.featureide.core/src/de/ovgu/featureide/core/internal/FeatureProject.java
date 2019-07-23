@@ -42,6 +42,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,7 +70,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -195,7 +195,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * a folder containing all configuration files
 	 */
-	private final IFolder configFolder;
+	private final Path configFolder;
 
 	/**
 	 * a folder for source files
@@ -224,7 +224,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private boolean buildRelevantChanges = false;
 
-	private IFile currentConfiguration = null;
+	private Path currentConfiguration = null;
 
 	private final JobToken syncModulesToken = LongRunningWrapper.createToken(JobStartingStrategy.WAIT_ONE);
 	private final JobToken checkConfigurationToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
@@ -266,7 +266,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		@Override
 		public Boolean execute(IMonitor workMonitor) throws Exception {
-			final IFolder folder = configFolder;
+			final IFolder folder = (IFolder) EclipseFileSystem.getResource(configFolder);
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setRemainingWork(7);
 			next(CALCULATE_CORE_AND_DEAD_FEATURES, workMonitor);
@@ -376,8 +376,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		libFolder = FMCorePlugin.getFolder(project, "lib");
 		buildFolder = FMCorePlugin.getFolder(project, projectBuildPath);
-		configFolder = FMCorePlugin.getFolder(project, getProjectConfigurationPath());
 		sourceFolder = FMCorePlugin.getFolder(project, getProjectSourcePath());
+		configFolder = EclipseFileSystem.getPath(FMCorePlugin.getFolder(project, getProjectConfigurationPath()));
 
 		fstModel = null;
 		// loading model data and listen to changes in the model file
@@ -403,8 +403,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// adds the compiler to the feature project if it is an older project
 		if (composer != null) {
 			if (sourceFolder != null) {
-				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder.getProjectRelativePath().toOSString(),
-						buildFolder.getProjectRelativePath().toOSString());
+				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(),
+						EclipseFileSystem.getResource(configFolder).getProjectRelativePath().toOSString(), buildFolder.getProjectRelativePath().toOSString());
 			}
 		}
 
@@ -422,11 +422,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public void dispose() {
 		removeModelListener();
 		try {
-			final java.nio.file.Path configPath = EclipseFileSystem.getPath(configFolder);
-			if (configPath != null) {
-				Files.walk(configPath).forEach(this::disposeFileManager);
+			if (configFolder != null) {
+				Files.walk(configFolder).forEach(this::disposeFileManager);
 			}
-			final java.nio.file.Path fmPath = EclipseFileSystem.getPath(modelFile.getModelFile());
+			final Path fmPath = EclipseFileSystem.getPath(modelFile.getModelFile());
 			if (fmPath != null) {
 				disposeFileManager(fmPath);
 			}
@@ -435,7 +434,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	private void disposeFileManager(java.nio.file.Path path) {
+	private void disposeFileManager(Path path) {
 		if (Files.isRegularFile(path) && Files.isWritable(path)) {
 			final IFileManager<?> instance = AFileManager.getInstance(path);
 			if (instance != null) {
@@ -483,7 +482,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
 			SimpleFileHandler.load(EclipseFileSystem.getPath(orderFile), featureModel, new FeatureOrderFormat());
 			// write feature order to model
-			final java.nio.file.Path path = EclipseFileSystem.getPath(modelFile.getModelFile());
+			final Path path = EclipseFileSystem.getPath(modelFile.getModelFile());
 			FeatureModelManager.save(featureModel, path, FMFormatManager.getInstance().getFormatByContent(path));
 		}
 
@@ -606,24 +605,20 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		}
 		if (configFolder != null) {
-			if (configFolder.isAccessible()) {
-				try {
-					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
-					configurationUpdate = true;
-					configFolder.accept(resource -> adaptConfigurations(resource, featureModelManager.getPersistentFormula(), renamings));
-					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
-				} catch (final CoreException e) {
-					LOGGER.logError(e);
-				} finally {
-					configurationUpdate = false;
-				}
+			try {
+				configurationUpdate = true;
+				Files.walk(configFolder).forEach(path -> adaptConfigurations(path, featureModelManager.getPersistentFormula(), renamings));
+				EclipseFileSystem.getResource(configFolder).refreshLocal(IResource.DEPTH_ONE, null);
+			} catch (final CoreException | IOException e) {
+				LOGGER.logError(e);
+			} finally {
+				configurationUpdate = false;
 			}
 		}
 	}
 
-	private boolean adaptConfigurations(IResource resource, FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
-		if ((resource instanceof IFile) && resource.isAccessible()) {
-			final java.nio.file.Path path = EclipseFileSystem.getPath(resource);
+	private void adaptConfigurations(Path path, FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
+		if (Files.isRegularFile(path) && Files.isWritable(path)) {
 			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(path);
 			final IPersistentFormat<Configuration> format = fileHandler.getFormat();
 			final Configuration object = fileHandler.getObject();
@@ -638,7 +633,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				instance.read();
 			}
 		}
-		return true;
 	}
 
 	@Override
@@ -647,54 +641,93 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	@Override
-	public IFile getCurrentConfiguration() {
-		if ((currentConfiguration != null) && currentConfiguration.exists()) {
-			return currentConfiguration;
-		}
-
-		if (getConfigFolder() == null) {
-			return null;
-		}
-
-		String configuration = null;
-		try {
+	public Path getCurrentConfiguration() {
+		if ((currentConfiguration == null) || !Files.exists(currentConfiguration)) {
 			if (project.exists() && project.isOpen()) {
-				configuration = project.getPersistentProperty(configConfigID);
+				if ((configFolder != null) && Files.exists(configFolder)) {
+					final String configuration;
+					try {
+						configuration = project.getPersistentProperty(configConfigID);
+					} catch (final CoreException e) {
+						LOGGER.logError(e);
+						return null;
+					}
+					if (configuration != null) {
+						final Path file = configFolder.resolve(configuration);
+						if (Files.exists(file)) {
+							currentConfiguration = file;
+						} else {
+							LOGGER.logWarning("Specified current configuration file " + file + " for project " + project.getName() + " does not exist.");
+						}
+
+						final List<Path> configs = getAllConfigurations();
+						if (!configs.isEmpty()) {
+							setCurrentConfiguration(configs.get(0));
+						} else {
+							LOGGER.logWarning("Failed to get a current configuration. No configuration files found for project " + project.getName() + ".");
+							return null;
+						}
+					} else {
+						LOGGER.logWarning("Failed to get a current configuration. No configuration folder found for project " + project.getName() + ".");
+						return null;
+					}
+				} else {
+					LOGGER.logWarning("Failed to get a current configuration. No configuration folder found for project " + project.getName() + ".");
+					return null;
+				}
+			} else {
+				LOGGER.logWarning("Failed to get the current configuration. Project " + project.getName() + " is not available.");
+				return null;
 			}
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
 		}
-
-		if (configuration != null) {
-			final IFile file = configFolder.getFile(configuration);
-			if (file.exists()) {
-				return file;
-			}
-		}
-
-		// no valid configuration found
-		if (!getConfigFolder().exists()) {
-			return null;
-		}
-
-		final List<IFile> configs = getAllConfigurations();
-		if (configs.isEmpty()) {
-			return null;
-		}
-
-		// select the first configuration
-		final IFile config = configs.get(0);
-		setCurrentConfiguration(config);
-		return config;
+		return currentConfiguration;
 	}
 
 	@Override
-	public void setCurrentConfiguration(IFile file) {
+	public Configuration loadCurrentConfiguration() {
+		final Path configurationPath = getCurrentConfiguration();
+		if (configurationPath != null) {
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(configurationPath);
+			if (!fileHandler.getLastProblems().containsError()) {
+				final Configuration configuration = fileHandler.getObject();
+				if (configuration != null) {
+					configuration.initFeatures(featureModelManager.getPersistentFormula());
+					return configuration;
+				} else {
+					LOGGER.logWarning("Failed to parse current configuration " + configurationPath + ".");
+				}
+			} else {
+				LOGGER.logWarning("Failed to read current configuration " + configurationPath + ".");
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Configuration loadConfiguration(Path configurationPath) {
+		if (configurationPath != null) {
+			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(configurationPath);
+			if (!fileHandler.getLastProblems().containsError()) {
+				final Configuration configuration = fileHandler.getObject();
+				if (configuration != null) {
+					configuration.initFeatures(featureModelManager.getPersistentFormula());
+					return configuration;
+				} else {
+					LOGGER.logWarning("Failed to parse current configuration " + configurationPath + ".");
+				}
+			} else {
+				LOGGER.logWarning("Failed to read current configuration " + configurationPath + ".");
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void setCurrentConfiguration(Path file) {
 		final boolean performBuild = currentConfiguration != null;
 		currentConfiguration = file;
 
-		final int offset = getConfigFolder().getProjectRelativePath().toString().length();
-		final String configPath = file.getProjectRelativePath().toString().substring(offset);
+		final String configPath = configFolder.relativize(file).toString();
 		try {
 			project.setPersistentProperty(configConfigID, configPath);
 			LOGGER.fireCurrentConfigurationChanged(this);
@@ -747,7 +780,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	@Override
 	public IFolder getConfigFolder() {
-		return configFolder;
+		return (IFolder) EclipseFileSystem.getResource(configFolder);
 	}
 
 	@Override
@@ -766,7 +799,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	@Override
 	public String getConfigPath() {
-		return configFolder.getRawLocation().toOSString();
+		return configFolder.toAbsolutePath().normalize().toString();
 	}
 
 	@Override
@@ -964,8 +997,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 
 		try {
-			final List<IFile> configs = getAllConfigurations();
-			final IResourceDelta configurationDelta = event.getDelta().findMember(configFolder.getFullPath());
+			final List<Path> configs = getAllConfigurations();
+			final IResourceDelta configurationDelta = event.getDelta().findMember(EclipseFileSystem.getIPath(configFolder));
 			if (configurationDelta != null) {
 				for (final IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
 					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
@@ -973,18 +1006,18 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					checkFeatureCoverage();
 				}
 			}
-			final List<IFile> changedConfigs = new ArrayList<IFile>();
-			final IFile currentConfig = getCurrentConfiguration();
-			for (final IFile config : configs) {
-				final IResourceDelta delta = event.getDelta().findMember(config.getFullPath());
+			final List<Path> changedConfigs = new ArrayList<>();
+			for (final Path config : configs) {
+				final IResourceDelta delta = event.getDelta().findMember(EclipseFileSystem.getIPath(config));
 				if (delta != null) {
 					checkFeatureCoverage();
 					break;
 				}
 			}
 
-			for (final IFile config : configs) {
-				final IResourceDelta delta = event.getDelta().findMember(config.getFullPath());
+			final Path currentConfig = getCurrentConfiguration();
+			for (final Path config : configs) {
+				final IResourceDelta delta = event.getDelta().findMember(EclipseFileSystem.getIPath(config));
 				if ((delta != null) && ((delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
 					changedConfigs.add(config);
 					if (config.equals(currentConfig)) {
@@ -1000,7 +1033,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
 				if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
 					// ignore changes in unselected feature folders
-					final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig.getLocation().toFile().toPath());
+					final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig);
 					final Configuration currentConfiguration = fileHandler.getObject();
 					currentConfiguration.initFeatures(featureModelManager.getPersistentFormula());
 
@@ -1098,28 +1131,32 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	@Override
-	public List<IFile> getAllConfigurations() {
-		final List<IFile> configs = new ArrayList<IFile>();
-		if (!configFolder.isAccessible()) {
+	public List<Path> getAllConfigurations() {
+		final List<Path> configs = new ArrayList<>();
+		if (!Files.isReadable(configFolder)) {
 			return configs;
 		}
 		try {
-			for (final IResource res : configFolder.members()) {
-				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(res))) {
-					configs.add((IFile) res);
-				}
-			}
-		} catch (final CoreException e) {
+			Files.walk(configFolder).forEach(path -> addConfiguration(path, configs));
+		} catch (final IOException e) {
 			LOGGER.logError(e);
 		}
 		return configs;
+	}
+
+	private void addConfiguration(Path path, List<Path> configs) {
+		if (Files.isRegularFile(path) && Files.isWritable(path) && ConfigurationManager.isFileSupported(path)) {
+			final ConfigurationManager instance = ConfigurationManager.getInstance(path);
+			instance.linkFeatureModel(featureModelManager);
+			configs.add(path);
+		}
 	}
 
 	private boolean checkModelChange(IResourceDelta delta) {
 		return (delta != null) && ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
 	}
 
-	private void checkConfigurations(final List<IFile> files) {
+	private void checkConfigurations(final List<Path> files) {
 		if ((files == null) || files.isEmpty()) {
 			return;
 		}
@@ -1135,30 +1172,29 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				IMonitor subTask = workMonitor.subTask(1);
 				subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
 				subTask.setRemainingWork(files.size());
-				for (final IFile file : files) {
-					deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+				for (final Path file : files) {
+					deleteConfigurationMarkers(EclipseFileSystem.getResource(file), IResource.DEPTH_ZERO);
 					subTask.step();
 				}
 				subTask.done();
 				subTask = workMonitor.subTask(1);
 				subTask.setRemainingWork(files.size());
 				// check validity
-				for (final IFile file : files) {
-					subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-					final ProblemList lastProblems = SimpleFileHandler.load(EclipseFileSystem.getPath(file), config, ConfigFormatManager.getInstance());
+				for (final Path file : files) {
+					subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getFileName().toString());
+					final ProblemList lastProblems = SimpleFileHandler.load(file, config, ConfigFormatManager.getInstance());
 					if (!config.isValid()) {
-						String name = file.getName();
+						String name = file.getFileName().toString();
 						final int extIndex = name.lastIndexOf('.');
 						if (extIndex > 0) {
 							name = name.substring(0, extIndex);
 						}
 						final String message = CONFIGURATION_ + name + IS_INVALID;
-						createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
-
+						createConfigurationMarker(EclipseFileSystem.getResource(file), message, 0, IMarker.SEVERITY_ERROR);
 					}
 					// create warnings (e.g., for features that are not available anymore)
 					for (final Problem warning : lastProblems) {
-						createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
+						createConfigurationMarker(EclipseFileSystem.getResource(file), warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
 					}
 					subTask.step();
 				}
@@ -1217,15 +1253,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private boolean[][] getSelectionMatrix(final Collection<String> concreteFeatures) {
-		final List<IFile> configurations = getAllConfigurations();
+		final List<Path> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final FeatureModelFormula featureModel = featureModelManager.getPersistentFormula();
 
 		int row = 0;
-		for (final IFile file : configurations) {
+		for (final Path file : configurations) {
 			final boolean[] currentRow = selections[row++];
-			final Configuration configuration = ConfigurationManager.load(EclipseFileSystem.getPath(file));
+			final Configuration configuration = ConfigurationManager.load(file);
 			configuration.initFeatures(featureModel);
 
 			int column = 0;
@@ -1520,23 +1556,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	@Override
-	public IFile getInternalConfigurationFile() {
+	public Path getInternalConfigurationFile() {
 		return getInternalConfigurationFile(currentConfiguration);
 	}
 
 	@Override
-	public IFile getInternalConfigurationFile(IFile configurationFile) {
-		String fileName = configurationFile.getName();
+	public Path getInternalConfigurationFile(Path configurationFile) {
+		final String fileName = "." + FileHandler.getFileName(configurationFile) + "." + FeatureIDEFormat.EXTENSION;
+		final Path internalFile = configurationFile.getParent().resolve(fileName);
 
-		final String extension = configurationFile.getFileExtension();
-		if (extension != null) {
-			fileName = "." + fileName.substring(0, fileName.length() - (extension.length())) + FeatureIDEFormat.EXTENSION;
-		} else {
-			fileName = "." + fileName + "." + FeatureIDEFormat.EXTENSION;
-		}
-		final IFile internalFile = configurationFile.getParent().getFile(Path.fromOSString(fileName));
-
-		return (internalFile.isAccessible()) ? internalFile : null;
+		return (Files.isReadable(internalFile)) ? internalFile : null;
 	}
 
 	@Override

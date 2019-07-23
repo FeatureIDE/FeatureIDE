@@ -76,12 +76,14 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	private IFeatureModelManager featureModelManager;
 
 	public void linkFeatureModel(IFeatureModelManager featureModelManager) {
-		this.featureModelManager = featureModelManager;
-		final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
 		fileOperationLock.lock();
 		try {
-			getObject().initFeatures(formula);
-			getVarObject().initFeatures(formula);
+			if ((featureModelManager == null) || (this.featureModelManager != featureModelManager)) {
+				this.featureModelManager = featureModelManager;
+				final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
+				getObject().initFeatures(formula);
+				getVarObject().initFeatures(formula);
+			}
 		} finally {
 			fileOperationLock.unlock();
 		}

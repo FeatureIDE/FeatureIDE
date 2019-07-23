@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,7 +107,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		PreprocessorExplanationCreatorFactory.getDefault().getInvariantPresenceConditionExplanationCreator();
 
 	/**
-	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
+	 * Feature model node generated in {@link #performFullBuild(Path)} and used for expression checking.
 	 */
 	protected IFeatureModel featureModel;
 
@@ -172,28 +172,21 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Initializes class fields. Should called at start of {@link #performFullBuild(IFile)}.
+	 * Initializes class fields. Should called at start of {@link #performFullBuild(Path)}.
 	 *
 	 * @param config Path to the activated configuration file.
 	 * @return Return <code>false</code> if configuration file does not exists or its feature list is empty.
 	 */
-	public boolean prepareFullBuild(IFile config) {
+	public boolean prepareFullBuild(Path config) {
 		usedFeatures.clear();
 		assert (featureProject != null) : "Invalid project given";
 		final FeatureModelFormula persistentFormula = featureProject.getFeatureModelManager().getPersistentFormula();
 		if (config != null) {
-			final String configPath = config.getRawLocation().toOSString();
-
-			if (configPath == null) {
-				return false;
-			}
-
 			// Fix for #625: Antenna has currently no implementation for .xml config files.
-			final Configuration configuration = ConfigurationManager.load(Paths.get(config.getRawLocationURI()));
+			final Configuration configuration = ConfigurationManager.load(config);
 			configuration.initFeatures(persistentFormula);
 			// // read activated features from configuration
 			activatedFeatures = new ArrayList<>(configuration.getSelectedFeatureNames());
-
 		}
 		// get all concrete and abstract features and generate pattern
 		final StringBuilder concreteFeatures = new StringBuilder();

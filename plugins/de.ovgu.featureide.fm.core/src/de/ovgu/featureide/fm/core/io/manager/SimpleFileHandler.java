@@ -75,8 +75,20 @@ public class SimpleFileHandler<T> {
 	}
 
 	/**
-	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
-	 * extension, but ".file.txt" would return "txt".
+	 * Retrieves the file name of a {@link Path} without its extension.
+	 *
+	 * @param fileName the file name with a (possible) extension
+	 * @return the file name
+	 */
+	@Nonnull
+	public static String getFileName(String fileName) {
+		final int extensionIndex = fileName.lastIndexOf('.');
+		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
+	}
+
+	/**
+	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * but ".file.txt" would return "txt".
 	 *
 	 * @param path the given path
 	 * @return the file extension

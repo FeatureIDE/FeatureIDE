@@ -49,10 +49,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Framework composer updating .classpath file of eclipse
@@ -138,11 +135,11 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
-		final Path configPath = EclipseFileSystem.getPath(config);
-		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-
-		SimpleFileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());
+	public void performFullBuild(Path configPath) {
+		final Configuration configuration = featureProject.loadConfiguration(configPath);
+		if (configuration == null) {
+			return;
+		}
 
 		selectedFeatures = new LinkedList<>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
@@ -150,7 +147,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 				selectedFeatures.add(feature.getName());
 			}
 		}
-		final IProject project = config.getProject();
+		final IProject project = featureProject.getProject();
 		try {
 			project.deleteMarkers("de.ovgu.featureide.core.featureModuleMarker", true, IResource.DEPTH_ZERO);
 		} catch (final CoreException e) {

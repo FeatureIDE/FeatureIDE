@@ -68,12 +68,9 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  *
@@ -377,7 +374,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	 * Every time the project is built, the config will be read and written into runtime.properties.
 	 */
 	@Override
-	public void performFullBuild(final IFile config) {
+	public void performFullBuild(final Path config) {
 		if (featureProject == null) {
 			return;
 		}
@@ -386,7 +383,10 @@ public class RuntimeParameters extends ComposerExtensionClass {
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 			buildFSTModel();
 
-			final Configuration configuration = readConfig();
+			final Configuration configuration = featureProject.loadConfiguration(config);
+			if (configuration == null) {
+				return;
+			}
 
 			String configString = "";
 			for (final SelectableFeature f : configuration.getFeatures()) {
@@ -417,19 +417,6 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	@Override
 	public void postCompile(final IResourceDelta delta, final IFile buildFile) {}
-
-	/**
-	 * Reads and returns current feature config.
-	 *
-	 * @return
-	 */
-	private Configuration readConfig() {
-		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		final Path configPath = EclipseFileSystem.getPath(featureProject.getCurrentConfiguration());
-		SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
-
-		return featureProjectConfig;
-	}
 
 	/**
 	 * Sets the parent-child-relations within the FSTModel by adding children to parent directives. To determine these relations the parent-child-relations of
@@ -514,7 +501,10 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			}
 		});
 
-		final Configuration configuration = readConfig();
+		final Configuration configuration = featureProject.loadCurrentConfiguration();
+		if (configuration == null) {
+			return;
+		}
 
 		// check whether the feature corresponding with the
 		// FeatureLocation-object is in the current config

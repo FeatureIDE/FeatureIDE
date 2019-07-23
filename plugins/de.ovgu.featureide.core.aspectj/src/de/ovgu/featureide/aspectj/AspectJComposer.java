@@ -63,7 +63,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
@@ -112,7 +111,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(java.nio.file.Path config) {
 		if (config == null) {
 			return;
 		}
@@ -131,11 +130,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModelManager().getPersistentFormula());
-		SimpleFileHandler.load(EclipseFileSystem.getPath(config), configuration, ConfigFormatManager.getInstance());
+		final Configuration configuration = featureProject.loadConfiguration(config);
+		if (configuration == null) {
+			return;
+		}
 
-		final LinkedList<String> selectedFeatures = new LinkedList<String>();
-		unSelectedFeatures = new LinkedList<String>();
+		final LinkedList<String> selectedFeatures = new LinkedList<>();
+		unSelectedFeatures = new LinkedList<>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
@@ -145,7 +146,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			}
 		}
 
-		final IProject project = config.getProject();
+		final IProject project = featureProject.getProject();
 		setBuildpaths(project);
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
