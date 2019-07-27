@@ -476,10 +476,10 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	@Override
 	public List<Node> popAll() {
 		final List<Node> poppedNodes = new ArrayList<>();
-		Node poppedNode = memory.pop();
+		Node poppedNode = pop();
 		while (poppedNode != null) {
 			poppedNodes.add(poppedNode);
-			poppedNode = memory.pop();
+			poppedNode = pop();
 		}
 		return poppedNodes;
 	}
