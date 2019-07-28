@@ -337,8 +337,28 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		for (final IConstraint constraint : constraints) {
 			constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			constraint.setContainedFeatures();
-			constraint.setFalseOptionalFeatures(Collections.<IFeature> emptyList());
-			constraint.setDeadFeatures(Collections.<IFeature> emptyList());
+			if (calculateFeatures) {
+				// Set the false optional feature constraint attributes
+				final List<IFeature> constraintFOFeatureList = new ArrayList<>();
+				for (final IFeature feature : falseOptionalFeatures) {
+					if (constraint.getContainedFeatures().contains(feature)) {
+						constraintFOFeatureList.add(feature);
+					}
+				}
+				constraint.setFalseOptionalFeatures(constraintFOFeatureList);
+
+				// Set the dead feature constraint attributes
+				final List<IFeature> constraintDeadFeatureList = new ArrayList<>();
+				for (final IFeature feature : constraintDeadFeatureList) {
+					if (constraint.getContainedFeatures().contains(feature)) {
+						constraintDeadFeatureList.add(feature);
+					}
+				}
+				constraint.setDeadFeatures(constraintDeadFeatureList);
+			} else {
+				constraint.setFalseOptionalFeatures(Collections.<IFeature> emptyList());
+				constraint.setDeadFeatures(Collections.<IFeature> emptyList());
+			}
 		}
 
 		if (!calculateFeatures) {

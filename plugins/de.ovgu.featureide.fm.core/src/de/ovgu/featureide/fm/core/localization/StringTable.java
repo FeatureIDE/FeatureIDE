@@ -1111,4 +1111,13 @@ public class StringTable {
 	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
+	public static final String CONFIGURATION_FEATUREMODEL_ANALYSIS_SETTINGS = "Feature Model Analysis";
+	public static final String CONFIGURATION_FEATUREMODEL_ANALYSIS_SETTINGS_TOOLTIP =
+		"Set the solver which should be used by FeatureIDE to peform the feature model analysis. (Default: Sat4J)";
+	public static final String CONFIGURATION_FEATUREMODEL_DEFECT_EXPLANATION_SETTINGS = "Explaining Feature Model Defects";
+	public static final String CONFIGURATION_FEATUREMODEL_DEFECT_EXPLANATION_SETTINGS_TOOLTIP =
+		"Set the solver which should be used by FeatureIDE to explain feature model defects. (Default: Ltms)";
+	public static final String CONFIGURATION_OTHER_ANALYSIS_SETTINGS = "Other Analyses";
+	public static final String CONFIGURATION_OTHER_ANALYSIS_SETTINGS_TOOLTIP =
+		"Set the solver which should be used by FeatureIDE to peform other analyses. (Default: Sat4J)";
 }

@@ -205,10 +205,17 @@
 	<extension
 			point="org.eclipse.ui.preferencePages">
 		<page
-				class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
-				id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
-				name="FeatureIDE">
+        category="FeatureIDE"
+        class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
+        id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+        name="FeatureIDE">
 		</page>
+  <page
+        category="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+        class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferenceSolverPage"
+        id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage.Solvers"
+        name="Solver Settings">
+  </page>
 	</extension>
 	<extension
 			point="org.eclipse.ui.menus">
