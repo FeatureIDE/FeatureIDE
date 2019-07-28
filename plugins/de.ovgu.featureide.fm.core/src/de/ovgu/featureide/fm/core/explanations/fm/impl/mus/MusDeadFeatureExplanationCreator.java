@@ -64,6 +64,8 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		} catch (final ContradictionException ex) {
 			oracle.popAll();
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
+		} finally {
+			oracle.popAll();
 		}
 		return explanation;
 	}

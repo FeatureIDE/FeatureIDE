@@ -237,11 +237,17 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		if (oldNode instanceof Literal) {
 			assignment.pop();
 		} else if (oldNode instanceof Or) {
-			final IConstr constraint = memory.popFormula();
-			if (constraint != null) {
-				try {
-					solver.removeConstr(constraint);
-				} catch (final NoSuchElementException e) {}
+			final Node[] children = oldNode.getChildren();
+			// Or with only one literal, just add the literal as assumption
+			if ((children.length == 1) && (children[0] instanceof Literal)) {
+				assignment.pop();
+			} else {
+				final IConstr constraint = memory.popFormula();
+				if (constraint != null) {
+					try {
+						solver.removeConstr(constraint);
+					} catch (final NoSuchElementException e) {}
+				}
 			}
 		}
 		return oldNode;
@@ -280,6 +286,12 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public int push(Node formula) throws org.prop4j.solver.ContradictionException {
+		if (formula instanceof Literal) {
+			final Literal literal = (Literal) formula;
+			assignment.push(getProblem().getSignedIndexOfVariable(literal));
+			pushstack.push(formula);
+			return 0;
+		}
 		formula = formula.toCNF();
 		if (formula instanceof And) {
 			if (formula.getChildren().length > 1) {
@@ -287,14 +299,16 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 			}
 			formula = formula.getChildren()[0];
 		}
-		if (formula instanceof Literal) {
-			final Literal literal = (Literal) formula;
-			assignment.push(getProblem().getSignedIndexOfVariable(literal));
-			pushstack.push(formula);
-			return 0;
-		} else if (formula instanceof Or) {
+		if (formula instanceof Or) {
 			try {
 				final Node[] children = formula.getChildren();
+				// Or with only one literal, just add the literal as assumption
+				if ((children.length == 1) && (children[0] instanceof Literal)) {
+					final Literal literal = (Literal) children[0];
+					assignment.push(getProblem().getSignedIndexOfVariable(literal));
+					pushstack.push(formula);
+					return 0;
+				}
 				final int[] clause = new int[children.length];
 				for (int i = 0; i < children.length; i++) {
 					final Literal literal = (Literal) children[i];
