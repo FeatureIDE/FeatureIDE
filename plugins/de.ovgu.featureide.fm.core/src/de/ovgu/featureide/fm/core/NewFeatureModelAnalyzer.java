@@ -45,7 +45,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.prop4j.analysesOld.FeatureModelAnalysis;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -171,7 +171,7 @@ public class NewFeatureModelAnalyzer implements IEventListener {
 	/*
 	 * A common factory for creating solvers for sat problems.
 	 */
-	private final SatSolverFactory solverFactory;
+	private final AbstractSolverFactory solverFactory;
 
 	/**
 	 * Returns the value calculated during the last call of updateFeatureModel().
@@ -185,7 +185,7 @@ public class NewFeatureModelAnalyzer implements IEventListener {
 	public NewFeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
 
-		solverFactory = SatSolverFactory.getDefault();
+		solverFactory = AbstractSolverFactory.getDefault();
 		fm.addListener(this);
 		clearExplanations();
 	}

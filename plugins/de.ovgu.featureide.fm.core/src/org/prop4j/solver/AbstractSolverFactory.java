@@ -27,7 +27,7 @@ import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
  *
  * @author Joshua Sprey
  */
-public abstract class SatSolverFactory {
+public abstract class AbstractSolverFactory {
 
 	/**
 	 * Return a solver with a mus extractor interface
@@ -49,7 +49,7 @@ public abstract class SatSolverFactory {
 	 *
 	 * @return
 	 */
-	public static SatSolverFactory getDefault() {
+	public static AbstractSolverFactory getDefault() {
 		return new Sat4JSatSolverFactory();
 	}
 }

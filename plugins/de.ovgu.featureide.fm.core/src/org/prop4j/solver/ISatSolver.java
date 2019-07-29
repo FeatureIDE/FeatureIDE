@@ -21,7 +21,7 @@
 package org.prop4j.solver;
 
 /**
- * Interface to identify the current solver as an sat solver.
+ * Interface to identify the current solver as an sat solver. Contains some properties that can be used to configure a SAT solver
  *
  * @author Joshua Sprey
  */

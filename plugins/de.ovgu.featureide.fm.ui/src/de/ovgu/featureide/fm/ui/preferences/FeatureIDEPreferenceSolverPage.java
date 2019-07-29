@@ -149,7 +149,7 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 	}
 
 	private String[][] getSolverNamesAndValues() {
-		// TODO PROJECT Create extension point for solvers
+		// TODO SOLVER Create extension point for solvers
 		final String[][] solverNamesAndValues = new String[3][2];
 		solverNamesAndValues[0][0] = "LTMS (BCP)";
 		solverNamesAndValues[0][0] = "LTMS";

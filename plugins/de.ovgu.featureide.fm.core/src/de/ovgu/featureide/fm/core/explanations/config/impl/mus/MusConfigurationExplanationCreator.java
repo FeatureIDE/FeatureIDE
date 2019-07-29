@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.impl.SatProblem;
 
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
@@ -39,16 +39,16 @@ public abstract class MusConfigurationExplanationCreator<S, E extends Configurat
 		extends AbstractConfigurationExplanationCreator<S, E, IMusExtractor> {
 
 	/** The solver factory used to create the oracle. */
-	private final SatSolverFactory solverFactory;
+	private final AbstractSolverFactory solverFactory;
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	protected MusConfigurationExplanationCreator(SatSolverFactory solverFactory) {
+	protected MusConfigurationExplanationCreator(AbstractSolverFactory solverFactory) {
 		if (solverFactory == null) {
-			solverFactory = SatSolverFactory.getDefault();
+			solverFactory = AbstractSolverFactory.getDefault();
 		}
 		this.solverFactory = solverFactory;
 	}
@@ -58,7 +58,7 @@ public abstract class MusConfigurationExplanationCreator<S, E extends Configurat
 	 *
 	 * @return the solver factory
 	 */
-	public SatSolverFactory getSatSolverFactory() {
+	public AbstractSolverFactory getSatSolverFactory() {
 		return solverFactory;
 	}
 

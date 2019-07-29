@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 import org.prop4j.Literal;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -51,7 +51,7 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusFalseOptionalFeatureExplanationCreator(SatSolverFactory solverFactory) {
+	public MusFalseOptionalFeatureExplanationCreator(AbstractSolverFactory solverFactory) {
 		super(solverFactory);
 	}
 

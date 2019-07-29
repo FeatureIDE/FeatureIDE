@@ -21,7 +21,7 @@
 package org.prop4j.solver;
 
 /**
- * TODO ATTRIBUTES Implement the node extension to return the right return value types.
+ * TODO SOLVER Implement the node extension to return the right return value types.
  *
  * @author Joshua Sprey
  */

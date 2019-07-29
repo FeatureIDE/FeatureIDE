@@ -28,7 +28,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
@@ -62,7 +62,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusInvariantPresenceConditionExplanationCreator(SatSolverFactory solverFactory) {
+	public MusInvariantPresenceConditionExplanationCreator(AbstractSolverFactory solverFactory) {
 		super(solverFactory);
 	}
 

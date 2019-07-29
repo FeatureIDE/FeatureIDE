@@ -26,14 +26,14 @@ import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 /**
  * Concrete factory for Sat4J sat solver
  *
  * @author Joshua Sprey
  */
-public class Sat4JSatSolverFactory extends SatSolverFactory {
+public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 
 	/*
 	 * (non-Javadoc)

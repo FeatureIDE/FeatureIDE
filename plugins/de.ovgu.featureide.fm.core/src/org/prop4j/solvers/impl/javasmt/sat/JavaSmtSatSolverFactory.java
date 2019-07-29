@@ -25,7 +25,7 @@ import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
  *
  * @author Joshua Sprey
  */
-public class JavaSmtSatSolverFactory extends SatSolverFactory {
+public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 
 	private final Solvers solver;
 

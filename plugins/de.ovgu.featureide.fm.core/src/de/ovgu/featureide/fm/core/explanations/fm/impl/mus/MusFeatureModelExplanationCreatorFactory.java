@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 
 	/** The solver factory used to create the oracle. */
-	private final SatSolverFactory solverFactory;
+	private final AbstractSolverFactory solverFactory;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -51,9 +51,9 @@ public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplan
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusFeatureModelExplanationCreatorFactory(SatSolverFactory solverFactory) {
+	public MusFeatureModelExplanationCreatorFactory(AbstractSolverFactory solverFactory) {
 		if (solverFactory == null) {
-			solverFactory = SatSolverFactory.getDefault();
+			solverFactory = AbstractSolverFactory.getDefault();
 		}
 		this.solverFactory = solverFactory;
 	}

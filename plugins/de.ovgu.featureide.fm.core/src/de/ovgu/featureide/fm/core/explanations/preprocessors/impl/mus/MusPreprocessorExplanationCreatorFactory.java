@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus;
 
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
 public class MusPreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
 	/** The solver factory used to create the oracle. */
-	private final SatSolverFactory solverFactory;
+	private final AbstractSolverFactory solverFactory;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -48,9 +48,9 @@ public class MusPreprocessorExplanationCreatorFactory extends PreprocessorExplan
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusPreprocessorExplanationCreatorFactory(SatSolverFactory solverFactory) {
+	public MusPreprocessorExplanationCreatorFactory(AbstractSolverFactory solverFactory) {
 		if (solverFactory == null) {
-			solverFactory = SatSolverFactory.getDefault();
+			solverFactory = AbstractSolverFactory.getDefault();
 		}
 		this.solverFactory = solverFactory;
 	}

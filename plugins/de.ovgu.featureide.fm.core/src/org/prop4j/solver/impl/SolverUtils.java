@@ -55,7 +55,7 @@ public class SolverUtils {
 	}
 
 	/**
-	 * Converts a int array to an Object array
+	 * Converts an int array to an Object array
 	 *
 	 * @param model
 	 * @return
@@ -143,7 +143,7 @@ public class SolverUtils {
 
 	/**
 	 * TODO SOLVER
-	 * 
+	 *
 	 * @param problem
 	 * @param values
 	 * @return

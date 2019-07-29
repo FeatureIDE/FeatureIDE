@@ -24,7 +24,7 @@ import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -56,7 +56,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusRedundantConstraintExplanationCreator(SatSolverFactory solverFactory) {
+	public MusRedundantConstraintExplanationCreator(AbstractSolverFactory solverFactory) {
 		super(solverFactory);
 	}
 

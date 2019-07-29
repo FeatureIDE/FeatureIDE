@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCr
 public class MusConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
 
 	/** The solver factory used to create the oracle. */
-	private final SatSolverFactory solverFactory;
+	private final AbstractSolverFactory solverFactory;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -48,9 +48,9 @@ public class MusConfigurationExplanationCreatorFactory extends ConfigurationExpl
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusConfigurationExplanationCreatorFactory(SatSolverFactory solverFactory) {
+	public MusConfigurationExplanationCreatorFactory(AbstractSolverFactory solverFactory) {
 		if (solverFactory == null) {
-			solverFactory = SatSolverFactory.getDefault();
+			solverFactory = AbstractSolverFactory.getDefault();
 		}
 		this.solverFactory = solverFactory;
 	}

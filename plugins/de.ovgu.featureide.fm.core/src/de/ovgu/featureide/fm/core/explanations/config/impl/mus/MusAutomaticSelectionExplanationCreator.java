@@ -26,7 +26,7 @@ import java.util.List;
 import org.prop4j.Literal;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -60,7 +60,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	 *
 	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusAutomaticSelectionExplanationCreator(SatSolverFactory solverFactory) {
+	public MusAutomaticSelectionExplanationCreator(AbstractSolverFactory solverFactory) {
 		super(solverFactory);
 	}
 

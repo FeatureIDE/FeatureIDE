@@ -41,7 +41,6 @@ public class Tupel<A, B> {
 	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "" + key + ", " + value;
 	}
 }
