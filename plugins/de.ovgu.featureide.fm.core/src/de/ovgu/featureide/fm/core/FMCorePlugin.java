@@ -34,6 +34,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.osgi.framework.BundleContext;
+import org.prop4j.solver.AbstractSolverFactory;
+import org.prop4j.solver.impl.SolverManager;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -86,6 +88,8 @@ public class FMCorePlugin extends AbstractCorePlugin {
 				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
 		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
 				IConfigurationFormat.extensionID, IConfigurationFormat.class));
+		SolverManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, AbstractSolverFactory.extensionPointID,
+				AbstractSolverFactory.extensionID, AbstractSolverFactory.class));
 
 //		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
 //		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));

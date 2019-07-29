@@ -171,7 +171,7 @@ public class EvauatedFeatureModelAnaysis {
 			}
 		}
 
-		evaluateClearFalseOptional(name, possibleFOFeatures);
+		// evaluateClearFalseOptional(name, possibleFOFeatures);
 		// evaluateOptiFalseOptional(name, possibleFOFeatures);
 		// evaluateSat4jFalseOptional(name, possibleFOFeatures);
 

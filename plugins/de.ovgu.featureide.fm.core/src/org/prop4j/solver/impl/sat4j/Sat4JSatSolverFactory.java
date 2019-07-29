@@ -20,13 +20,13 @@
  */
 package org.prop4j.solver.impl.sat4j;
 
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.AbstractSolverFactory;
 
 /**
  * Concrete factory for Sat4J sat solver
@@ -35,10 +35,15 @@ import org.prop4j.solver.AbstractSolverFactory;
  */
 public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
-	 */
+	public static final String ID = "org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory";
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	public Sat4JSatSolverFactory() {}
+
 	@Override
 	public IMusExtractor getMusExtractor(ISatProblem problem) {
 		try {
@@ -48,10 +53,6 @@ public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getSolver()
-	 */
 	@Override
 	public ISatSolver getSolver(ISatProblem problem) {
 		try {
@@ -61,13 +62,33 @@ public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getOptimizationSolver()
-	 */
 	@Override
 	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
 		throw new UnsupportedOperationException("Sat4J does not support optimizing.");
 	}
 
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "Sat4J";
+	}
+
+	@Override
+	public String getDisplayDescription() {
+		return "Default SAT solver used by Feature IDE.";
+	}
+
+	@Override
+	public boolean isSupportingOptimizations() {
+		return false;
+	}
+
+	@Override
+	public AbstractSolverFactory getNewFactory() {
+		return new Sat4JSatSolverFactory();
+	}
 }

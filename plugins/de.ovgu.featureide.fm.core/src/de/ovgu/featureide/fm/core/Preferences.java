@@ -41,6 +41,10 @@ public abstract class Preferences {
 		defaultCompletion = castToInt(pref, COMPLETION_ONE_CLICK);
 	}
 
+	public static IEclipsePreferences getPreferenceStorage() {
+		return preferences;
+	}
+
 	/**
 	 * @return the defaultCompletion
 	 */

@@ -22,6 +22,7 @@ package org.prop4j.analyses;
 
 import java.util.HashMap;
 
+import org.prop4j.analyses.impl.GeneralSolverAnalysisFactory;
 import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.solver.ISolverProblem;
@@ -53,7 +54,7 @@ public abstract class AbstractSolverAnalysisFactory {
 	 * @return Default factory.
 	 */
 	public static AbstractSolverAnalysisFactory getDefault() {
-		return new Sat4JSolverAnalysisFactory();
+		return new GeneralSolverAnalysisFactory();
 	}
 
 	/**

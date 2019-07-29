@@ -595,6 +595,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
 		this.monitor = monitor == null ? new NullMonitor() : monitor;
 //		final org.prop4j.analysesOld.FeatureModelAnalysis analysis = new org.prop4j.analysesOld.FeatureModelAnalysis(fm);
+
 		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm, AbstractSolverAnalysisFactory.getDefault());
 		analysis.setCalculateFeatures(calculateFeatures);
 		analysis.setCalculateConstraints(calculateConstraints);

@@ -22,12 +22,33 @@ package org.prop4j.solver;
 
 import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 
+import de.ovgu.featureide.fm.core.IExtension;
+
 /**
  * Factory used to create solvers.
  *
  * @author Joshua Sprey
  */
-public abstract class AbstractSolverFactory {
+public abstract class AbstractSolverFactory implements IExtension {
+
+	public static String extensionPointID = "SolverFactory";
+
+	public static String extensionID = "solverFactory";
+
+	/**
+	 * The name that should be displayed when handling the solver settings.
+	 */
+	public abstract String getDisplayName();
+
+	/**
+	 * The information that should be displayed when handling the solver settings.
+	 */
+	public abstract String getDisplayDescription();
+
+	/**
+	 * Does the factory support an optimization solver
+	 */
+	public abstract boolean isSupportingOptimizations();
 
 	/**
 	 * Return a solver with a mus extractor interface
@@ -52,4 +73,11 @@ public abstract class AbstractSolverFactory {
 	public static AbstractSolverFactory getDefault() {
 		return new Sat4JSatSolverFactory();
 	}
+
+	/**
+	 * Returns a new instance of the solver factory.
+	 * 
+	 * @return
+	 */
+	public abstract AbstractSolverFactory getNewFactory();
 }

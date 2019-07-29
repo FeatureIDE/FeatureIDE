@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.preferences;
 
+import java.util.List;
+
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -31,10 +34,21 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.prop4j.solver.AbstractSolverFactory;
+import org.prop4j.solver.impl.SolverManager;
+import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IWorkbenchPreferencePage {
+
+	private final List<AbstractSolverFactory> registeredFactories = SolverManager.getInstance().getExtensions();
+
+	private ComboFieldEditor fASolver;
+	private ComboFieldEditor fDSolver;
+	private ComboFieldEditor oASolver;
 
 	public FeatureIDEPreferenceSolverPage() {}
 
@@ -47,80 +61,20 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 	}
 
 	@Override
-	public void init(IWorkbench workbench) {}
+	public void init(IWorkbench workbench) {
+		setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, SolverManager.PREFERENCE_STORE_PATH));
+		getPreferenceStore().setDefault(SolverManager.FEATURE_MODEL_ANALYSIS_SOLVER, Sat4JSatSolverFactory.ID);
+		getPreferenceStore().setDefault(SolverManager.FEATURE_MODEL_DEFECT_SOLVER, LtmsSatSolverFactory.ID);
+		getPreferenceStore().setDefault(SolverManager.OTHER_ANALYSES_SOLVER, Sat4JSatSolverFactory.ID);
+	}
 
 	@Override
 	protected Control createContents(Composite parent) {
 		final Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
-
 		createFeatureAnalysisSolverSettings(container);
 		createFeatureDefectExplanationSolverSettings(container);
 		createOtherAnalysesSolverSettings(container);
-
-//		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
-//		completionGroup.setText(CONFIGURATION_COLORING);
-//		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
-//		completionGroup.setToolTipText(THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_);
-//		final Button noneButton = new Button(completionGroup, SWT.RADIO);
-//		final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
-//		final Button contradictionButton = new Button(completionGroup, SWT.RADIO);
-//
-//		noneButton.setData(Preferences.COMPLETION_NONE);
-//		openClauseButton.setData(Preferences.COMPLETION_OPEN_CLAUSES);
-//		contradictionButton.setData(Preferences.COMPLETION_ONE_CLICK);
-//
-//		noneButton.setText("None");
-//		openClauseButton.setText("Check open clauses (Faster results)");
-//		contradictionButton.setText("Check contradiction (Better results)");
-//
-//		noneButton.setToolTipText("Diseable the functionality (Yields best performance for large feature models).");
-//		openClauseButton.setToolTipText(LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_);
-//		contradictionButton.setToolTipText(TRIES_TO_FIND_FEATURES_WHICH_LEAD_TO_A_VALID_CONFIGURATION_BY_SOLVING_A_SATISFIABILITY_PROBLEM_);
-//
-//		switch (Preferences.getDefaultCompletion()) {
-//		case Preferences.COMPLETION_NONE:
-//			noneButton.setSelection(true);
-//			break;
-//		case Preferences.COMPLETION_OPEN_CLAUSES:
-//			openClauseButton.setSelection(true);
-//			break;
-//		case Preferences.COMPLETION_ONE_CLICK:
-//			contradictionButton.setSelection(true);
-//			break;
-//		}
-//
-//		noneButton.addSelectionListener(completionSelectionListener);
-//		openClauseButton.addSelectionListener(completionSelectionListener);
-//		contradictionButton.addSelectionListener(completionSelectionListener);
-//
-//		// dialog Configuration
-//		final Group dialogGroup = new Group(container, SWT.SHADOW_IN);
-//		dialogGroup.setLayout(new RowLayout(SWT.VERTICAL));
-//		dialogGroup.setText(CONFIGURATION_DIALOGS);
-//
-//		final Button constraintViewRememberButton = new Button(dialogGroup, SWT.CHECK);
-//		constraintViewRememberButton.setText(StringTable.CONFIGURATION_DIALOGS_REMEMBER_CONSTRAINT_TEXT);
-//		constraintViewRememberButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP);
-//		constraintViewRememberButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "default")));
-//		constraintViewRememberButton.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent event) {
-//				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewRememberButton.getSelection()));
-//			}
-//		});
-//
-//		final Button constraintViewDecisionButton = new Button(dialogGroup, SWT.CHECK);
-//		constraintViewDecisionButton.setText(StringTable.CONFIGURATION_DIALOGS_DECISION_CONSTRAINT_TEXT);
-//		constraintViewDecisionButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP);
-//		constraintViewDecisionButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "default")));
-//		constraintViewDecisionButton.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent event) {
-//				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, String.valueOf(constraintViewDecisionButton.getSelection()));
-//			}
-//		});
-
 		return container;
 	}
 
@@ -129,7 +83,10 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		featureModelAnalysisGroup.setText(StringTable.CONFIGURATION_FEATUREMODEL_ANALYSIS_SETTINGS);
 		featureModelAnalysisGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		featureModelAnalysisGroup.setToolTipText(StringTable.CONFIGURATION_FEATUREMODEL_ANALYSIS_SETTINGS_TOOLTIP);
-		final ComboFieldEditor solver = new ComboFieldEditor("featureAnalysisSolver", "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		fASolver = new ComboFieldEditor(SolverManager.FEATURE_MODEL_ANALYSIS_SOLVER, "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		fASolver.setPage(this);
+		fASolver.setPreferenceStore(getPreferenceStore());
+		fASolver.load();
 	}
 
 	private void createFeatureDefectExplanationSolverSettings(Composite parent) {
@@ -137,7 +94,10 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		featureModelAnalysisGroup.setText(StringTable.CONFIGURATION_FEATUREMODEL_DEFECT_EXPLANATION_SETTINGS);
 		featureModelAnalysisGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		featureModelAnalysisGroup.setToolTipText(StringTable.CONFIGURATION_FEATUREMODEL_DEFECT_EXPLANATION_SETTINGS_TOOLTIP);
-		final ComboFieldEditor solver = new ComboFieldEditor("featureAnalysisSolver", "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		fDSolver = new ComboFieldEditor(SolverManager.FEATURE_MODEL_DEFECT_SOLVER, "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		fDSolver.setPage(this);
+		fDSolver.setPreferenceStore(getPreferenceStore());
+		fDSolver.load();
 	}
 
 	private void createOtherAnalysesSolverSettings(Composite parent) {
@@ -145,18 +105,35 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		featureModelAnalysisGroup.setText(StringTable.CONFIGURATION_OTHER_ANALYSIS_SETTINGS);
 		featureModelAnalysisGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		featureModelAnalysisGroup.setToolTipText(StringTable.CONFIGURATION_OTHER_ANALYSIS_SETTINGS_TOOLTIP);
-		final ComboFieldEditor solver = new ComboFieldEditor("featureAnalysisSolver", "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		oASolver = new ComboFieldEditor(SolverManager.OTHER_ANALYSES_SOLVER, "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
+		oASolver.setPage(this);
+		oASolver.setPreferenceStore(getPreferenceStore());
+		oASolver.load();
+
 	}
 
 	private String[][] getSolverNamesAndValues() {
-		// TODO SOLVER Create extension point for solvers
-		final String[][] solverNamesAndValues = new String[3][2];
-		solverNamesAndValues[0][0] = "LTMS (BCP)";
-		solverNamesAndValues[0][0] = "LTMS";
-		solverNamesAndValues[1][0] = "Sat4J (Native SAT)";
-		solverNamesAndValues[1][0] = "SAT4J";
-		solverNamesAndValues[2][0] = "SMTInterpol (Native SMT)";
-		solverNamesAndValues[2][0] = "SMTINTERPOL";
+		final String[][] solverNamesAndValues = new String[registeredFactories.size()][2];
+		for (int i = 0; i < registeredFactories.size(); i++) {
+			solverNamesAndValues[i][0] = registeredFactories.get(i).getDisplayName();
+			solverNamesAndValues[i][1] = registeredFactories.get(i).getId();
+		}
 		return solverNamesAndValues;
+	}
+
+	@Override
+	protected void performDefaults() {
+		fASolver.loadDefault();
+		fDSolver.loadDefault();
+		oASolver.loadDefault();
+		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk() {
+		fASolver.store();
+		fDSolver.store();
+		oASolver.store();
+		return super.performOk();
 	}
 }

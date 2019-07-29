@@ -5,6 +5,7 @@
    <extension-point id="FMFactory" name="fmFactory" schema="schema/fmFactory.exsd"/>
    <extension-point id="FMFormat" name="fmFormat" schema="schema/fmFormat.exsd"/>
    <extension-point id="ConfigFormat" name="configFormat" schema="schema/ConfigFormat.exsd"/>
+   <extension-point id="SolverFactory" name="solverFactory" schema="schema/SolverFactory.exsd"/>
    <extension
       id="de.ovgu.featureide.fm.core.featureModelMarker"
       name="Feature Model Marker"
@@ -99,5 +100,32 @@
             id="de.ovgu.featureide.fm.core.format.config.ExpressionFormat"
             name="ExpressionFormat">
       </configFormat>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.SolverFactory">
+      <solverFactory
+            class="org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory"
+            factoryClass="org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory"
+            factoryDescription="The logic truth maintenence system is a boolean constraint propagator. It is fast but does not "
+            id="org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory"
+            name="LTMS"
+            supportsOptimization="false">
+      </solverFactory>
+      <solverFactory
+            class="org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory"
+            factoryClass="org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory"
+            factoryDescription="Default SAT solver used by Feature IDE."
+            id="org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory"
+            name="Sat4J"
+            supportsOptimization="false">
+      </solverFactory>
+      <solverFactory
+            class="org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory"
+            factoryClass="org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory"
+            factoryDescription="JavaSMT is an interface for multiple SMT solver. JavaSMT can also be used to solve SAT problems."
+            id="org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory"
+            name="JavaSMT"
+            supportsOptimization="true">
+      </solverFactory>
    </extension>
 </plugin>

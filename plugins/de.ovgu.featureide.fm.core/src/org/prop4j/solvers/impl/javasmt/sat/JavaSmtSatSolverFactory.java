@@ -20,12 +20,12 @@
  */
 package org.prop4j.solvers.impl.javasmt.sat;
 
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
@@ -37,6 +37,12 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 
 	private final Solvers solver;
+	public static final String ID = "org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory";
+
+	@Override
+	public String getId() {
+		return ID;
+	}
 
 	public JavaSmtSatSolverFactory(Solvers solver) {
 		this.solver = solver;
@@ -64,13 +70,34 @@ public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 		return new JavaSmtSatSolver(problem, solver, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getOptimizationSolver()
-	 */
 	@Override
 	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
 		return new JavaSmtSolver(problem, solver, null);
+	}
+
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "JavaSMT";
+	}
+
+	@Override
+	public String getDisplayDescription() {
+		return "JavaSMT is an interface for multiple SMT solver. JavaSMT can also be used to solve SAT problems.";
+	}
+
+	@Override
+	public boolean isSupportingOptimizations() {
+		return true;
+	}
+
+	@Override
+	public AbstractSolverFactory getNewFactory() {
+		return new JavaSmtSatSolverFactory();
 	}
 
 }

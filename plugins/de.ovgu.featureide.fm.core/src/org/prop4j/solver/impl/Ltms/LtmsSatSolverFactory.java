@@ -20,12 +20,12 @@
  */
 package org.prop4j.solver.impl.Ltms;
 
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.AbstractSolverFactory;
 
 /**
  * Concrete factory for Sat4J sat solver
@@ -34,31 +34,53 @@ import org.prop4j.solver.AbstractSolverFactory;
  */
 public class LtmsSatSolverFactory extends AbstractSolverFactory {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
-	 */
+	public static final String ID = "org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory";
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	public LtmsSatSolverFactory() {}
+
 	@Override
 	public IMusExtractor getMusExtractor(ISatProblem problem) {
 		return new Ltms(problem, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getSolver()
-	 */
 	@Override
 	public ISatSolver getSolver(ISatProblem problem) {
 		return new Ltms(problem, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getOptimizationSolver()
-	 */
 	@Override
 	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
 		throw new UnsupportedOperationException("Ltms does not support optimizing attributes.");
+	}
+
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "LTMS";
+	}
+
+	@Override
+	public String getDisplayDescription() {
+		return "The logic truth maintenence system is a boolean constraint propagator. It is fast but does not always provide a solution.";
+	}
+
+	@Override
+	public boolean isSupportingOptimizations() {
+		return false;
+	}
+
+	@Override
+	public AbstractSolverFactory getNewFactory() {
+		return new LtmsSatSolverFactory();
 	}
 
 }

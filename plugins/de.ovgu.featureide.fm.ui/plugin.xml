@@ -205,7 +205,6 @@
 	<extension
 			point="org.eclipse.ui.preferencePages">
 		<page
-        category="FeatureIDE"
         class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
         id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
         name="FeatureIDE">
