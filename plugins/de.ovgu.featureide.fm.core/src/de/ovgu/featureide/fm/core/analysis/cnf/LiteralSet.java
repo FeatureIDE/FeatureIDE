@@ -192,7 +192,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		}
 	}
 
-	// TODO exploit that both sets are sorted
 	public boolean containsAll(LiteralSet otherLiteralSet) {
 		for (final int otherLiteral : otherLiteralSet.getLiterals()) {
 			if (indexOfLiteral(otherLiteral) < 0) {
@@ -479,8 +478,15 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	@Override
 	public int compareTo(LiteralSet o) {
-		// TODO implement more efficient comparison
-		return Arrays.toString(literals).compareTo(Arrays.toString(o.literals));
+		final int lengthDiff = literals.length - o.literals.length;
+		final int length = lengthDiff < 0 ? literals.length : o.literals.length;
+		for (int i = 0; i < length; i++) {
+			final int diff = literals[i] - o.literals[i];
+			if (diff != 0) {
+				return diff;
+			}
+		}
+		return lengthDiff;
 	}
 
 	public LiteralSet reorder(IVariables oldVariables, IVariables newVariables) {
