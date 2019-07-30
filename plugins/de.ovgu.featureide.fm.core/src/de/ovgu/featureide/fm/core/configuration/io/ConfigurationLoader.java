@@ -91,7 +91,7 @@ public class ConfigurationLoader {
 							final FileHandler<Configuration> fileHandler = ConfigurationManager.getFileHandler(file);
 							if (!fileHandler.getLastProblems().containsError()) {
 								final Configuration currentConfiguration = fileHandler.getObject();
-								currentConfiguration.initFeatures(featureModel);
+								currentConfiguration.updateFeatures(featureModel);
 								configs.add(currentConfiguration);
 								if (callback != null) {
 									callback.onConfigurationLoaded(currentConfiguration, file);

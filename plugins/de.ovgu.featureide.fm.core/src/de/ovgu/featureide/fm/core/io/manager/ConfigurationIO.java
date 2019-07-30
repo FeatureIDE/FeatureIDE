@@ -57,7 +57,7 @@ public class ConfigurationIO extends AbstractIO<Configuration> {
 		final FileHandler<Configuration> fileHandler = getFileHandler(path);
 		final Configuration configuration = (fileHandler == null) ? null : fileHandler.getObject();
 		if (configuration != null) {
-			configuration.initFeatures(fmManager.getPersistentFormula());
+			configuration.updateFeatures(fmManager.getPersistentFormula());
 		}
 		return configuration;
 	}

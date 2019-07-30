@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -283,7 +284,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		RemoveBaseMarkerFromSourceFolderFiles();
 		final Job job = new Job(jobName) {
 
-			private IRunner<Void> configurationBuilderJob;
+			private IRunner<List<LiteralSet>> configurationBuilderJob;
 
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
@@ -355,7 +356,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					System.err.println(configurationBuilderJob.getStatus());
 
 					if (!sorter.isSorted()) {
-						final IMonitor workMonitor = new ProgressMonitor(getTaskName(), monitor);
+						final IMonitor<?> workMonitor = new ProgressMonitor<>(getTaskName(), monitor);
 						configurationNumber = Math.min(configurationNumber, sorter.sortConfigurations(workMonitor));
 					}
 					finish();

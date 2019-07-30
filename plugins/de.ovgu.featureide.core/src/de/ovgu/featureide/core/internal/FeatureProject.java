@@ -695,7 +695,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!fileHandler.getLastProblems().containsError()) {
 				final Configuration configuration = fileHandler.getObject();
 				if (configuration != null) {
-					configuration.initFeatures(featureModelManager.getPersistentFormula());
+					configuration.updateFeatures(featureModelManager.getPersistentFormula());
 					return configuration;
 				} else {
 					LOGGER.logWarning("Failed to parse current configuration " + configurationPath + ".");
@@ -714,7 +714,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (!fileHandler.getLastProblems().containsError()) {
 				final Configuration configuration = fileHandler.getObject();
 				if (configuration != null) {
-					configuration.initFeatures(featureModelManager.getPersistentFormula());
+					configuration.updateFeatures(featureModelManager.getPersistentFormula());
 					return configuration;
 				} else {
 					LOGGER.logWarning("Failed to parse current configuration " + configurationPath + ".");
@@ -1039,7 +1039,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					// ignore changes in unselected feature folders
 					final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig);
 					final Configuration currentConfiguration = fileHandler.getObject();
-					currentConfiguration.initFeatures(featureModelManager.getPersistentFormula());
+					currentConfiguration.updateFeatures(featureModelManager.getPersistentFormula());
 
 					final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
 					for (final IResource res : sourceFolder.members()) {
@@ -1172,7 +1172,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				workMonitor.setRemainingWork(2);
 				final FeatureModelFormula f = featureModelManager.getPersistentFormula();
 
-				final Configuration config = new Configuration(f, false, false);
+				final Configuration config = new Configuration(f);
 				IMonitor<?> subTask = workMonitor.subTask(1);
 				subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
 				subTask.setRemainingWork(files.size());
@@ -1267,7 +1267,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		for (final Path file : configurations) {
 			final boolean[] currentRow = selections[row++];
 			final Configuration configuration = ConfigurationManager.load(file);
-			configuration.initFeatures(featureModel);
+			configuration.updateFeatures(featureModel);
 
 			int column = 0;
 			for (final String feature : concreteFeatures) {

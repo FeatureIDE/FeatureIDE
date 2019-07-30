@@ -57,20 +57,20 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection1() {
-		final Configuration c = new Configuration(formula, false);
+		final Configuration c = new Configuration(formula);
 		c.setManual("C", Selection.SELECTED);
 		testConfigurationValid(c, 2L);
 	}
 
 	@Test
 	public void testSelection2() {
-		final Configuration c = new Configuration(formula, false);
+		final Configuration c = new Configuration(formula);
 		testConfigurationValid(c, 2L);
 	}
 
 	@Test
 	public void testSelection3() {
-		final Configuration c = new Configuration(formula, false);
+		final Configuration c = new Configuration(formula);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		testConfigurationValid(c, 1L);
@@ -78,14 +78,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection4() {
-		final Configuration c = new Configuration(formula, false);
+		final Configuration c = new Configuration(formula);
 		c.setManual("A", Selection.SELECTED);
 		testConfigurationValid(c, 1L);
 	}
 
 	@Test
 	public void testSelection5() {
-		final Configuration c = new Configuration(formula, false);
+		final Configuration c = new Configuration(formula);
 		c.setManual("B", Selection.SELECTED);
 		testConfigurationInvalid(c);
 	}

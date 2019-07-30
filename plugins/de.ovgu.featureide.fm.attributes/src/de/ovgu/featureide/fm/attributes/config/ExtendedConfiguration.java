@@ -50,22 +50,13 @@ public class ExtendedConfiguration extends Configuration {
 	}
 
 	public ExtendedConfiguration() {
-		super(null, true, true);
+		super();
 	}
 
 	public ExtendedConfiguration(FeatureModelFormula featureModel) {
-		super(featureModel, true, true);
+		super(featureModel);
 	}
 
-	public ExtendedConfiguration(FeatureModelFormula featureModel, boolean propagate) {
-		super(featureModel, propagate, true);
-	}
-
-	public ExtendedConfiguration(FeatureModelFormula featureModel, boolean propagate, boolean includeAbstractFeatures) {
-		super(featureModel, propagate, includeAbstractFeatures);
-	}
-
-	@Override
 	public ExtendedSelectableFeature getRoot() {
 		return (ExtendedSelectableFeature) root;
 	}

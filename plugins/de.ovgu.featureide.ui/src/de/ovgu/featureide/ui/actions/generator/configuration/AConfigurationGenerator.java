@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -32,7 +35,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
+public abstract class AConfigurationGenerator implements LongRunningMethod<List<LiteralSet>> {
 
 	protected final FeatureModelFormula snapshot;
 

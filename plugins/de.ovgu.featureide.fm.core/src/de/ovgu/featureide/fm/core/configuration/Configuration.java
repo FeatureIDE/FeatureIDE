@@ -47,8 +47,6 @@ public class Configuration implements Cloneable {
 
 	protected FeatureModelFormula featureModel;
 	protected SelectableFeature root;
-	protected boolean includeAbstractFeatures;
-	protected boolean propagate;
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -56,10 +54,7 @@ public class Configuration implements Cloneable {
 	 * @param configuration The configuration to clone
 	 */
 	protected Configuration(Configuration configuration) {
-		includeAbstractFeatures = configuration.includeAbstractFeatures;
-
-		propagate = false;
-		initFeatures(configuration.featureModel);
+		updateFeatures(configuration.featureModel);
 		for (final SelectableFeature f : configuration.selectableFeatures.values()) {
 			final SelectableFeature newFeature = getSelectableFeature(f.getName(), featureModel == null);
 			if (newFeature != null) {
@@ -77,10 +72,7 @@ public class Configuration implements Cloneable {
 	 * @param featureModel the underlying feature model. The model can be different from the model of the old configuration.
 	 */
 	public Configuration(Configuration configuration, FeatureModelFormula featureModel) {
-		includeAbstractFeatures = configuration.includeAbstractFeatures;
-
-		propagate = false;
-		initFeatures(featureModel);
+		updateFeatures(featureModel);
 		for (final SelectableFeature oldFeature : configuration.selectableFeatures.values()) {
 			final SelectableFeature newFeature = selectableFeatures.get(oldFeature.getName());
 			if (newFeature != null) {
@@ -91,28 +83,10 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	public Configuration() {
-		this(null, true, true);
-	}
+	public Configuration() {}
 
 	public Configuration(FeatureModelFormula featureModel) {
-		this(featureModel, true, true);
-	}
-
-	public Configuration(FeatureModelFormula featureModel, boolean propagate) {
-		this(featureModel, propagate, true);
-	}
-
-	public Configuration(FeatureModelFormula featureModel, boolean propagate, boolean includeAbstractFeatures) {
-		this.includeAbstractFeatures = includeAbstractFeatures;
-		this.propagate = propagate;
-		initFeatures(featureModel);
-	}
-
-	public void initFeatures(FeatureModelFormula featureModel) {
-		if (updateFeatures(featureModel) && propagate) {
-//			update();
-		}
+		updateFeatures(featureModel);
 	}
 
 	public boolean updateFeatures(FeatureModelFormula featureModelFormula) {
@@ -279,10 +253,6 @@ public class Configuration implements Cloneable {
 		return result;
 	}
 
-	public boolean isPropagate() {
-		return propagate;
-	}
-
 	/**
 	 * Turns all automatic into manual values
 	 *
@@ -349,18 +319,6 @@ public class Configuration implements Cloneable {
 			}
 		}
 		return new Configuration(this);
-	}
-
-	public void setConsiderAbstractFeatures(boolean considerAbstractFeatures) {
-		includeAbstractFeatures = considerAbstractFeatures;
-	}
-
-	public boolean isIgnoreAbstractFeatures() {
-		return includeAbstractFeatures;
-	}
-
-	public void setPropagate(boolean propagate) {
-		this.propagate = propagate;
 	}
 
 	public String getFactoryID() {

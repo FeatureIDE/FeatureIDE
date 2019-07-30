@@ -62,7 +62,7 @@ public class ConfigNode extends Parent {
 					return "1";
 				}
 
-				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(innerModel, new Configuration(innerModel, false));
+				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(innerModel, new Configuration(innerModel));
 				analyzer.setIncludeAbstractFeatures(!removeAbstract);
 				final long number = analyzer.number(timeout);
 

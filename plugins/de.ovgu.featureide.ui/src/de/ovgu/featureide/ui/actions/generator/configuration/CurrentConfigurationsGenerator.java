@@ -20,12 +20,15 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
@@ -49,12 +52,12 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
+	public List<LiteralSet> execute(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		buildCurrentConfigurations(builder.featureProject, monitor);
 		return null;
 	}
 
-	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
+	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor<?> monitor) {
 		try {
 			for (final IResource configuration : featureProject.getConfigFolder().members()) {
 				if (confs >= builder.configurationNumber) {
@@ -82,9 +85,9 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @param configuration The configuration file
 	 * @param monitor
 	 */
-	private void build(IResource configuration, IMonitor monitor) {
+	private void build(IResource configuration, IMonitor<?> monitor) {
 		final Configuration config = ConfigurationManager.load(EclipseFileSystem.getPath(configuration));
-		config.initFeatures(snapshot);
+		config.updateFeatures(snapshot);
 		builder.addConfiguration(new BuilderConfiguration(config, configuration.getName().split("[.]")[0]));
 	}
 

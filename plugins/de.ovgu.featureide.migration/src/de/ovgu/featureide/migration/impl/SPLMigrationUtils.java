@@ -175,7 +175,7 @@ public class SPLMigrationUtils {
 			throws CoreException, UnsupportedEncodingException {
 		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
 		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
-		SimpleFileHandler.save(EclipseFileSystem.getPath(configFile), new Configuration(featureModel, false, true), defaultFormat);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(configFile), new Configuration(featureModel), defaultFormat);
 	}
 
 	/**

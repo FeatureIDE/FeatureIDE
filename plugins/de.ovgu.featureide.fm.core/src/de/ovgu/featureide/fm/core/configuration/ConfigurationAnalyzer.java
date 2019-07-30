@@ -43,7 +43,8 @@ public class ConfigurationAnalyzer {
 	}
 
 	public ConfigurationAnalyzer(FeatureModelFormula formula, Configuration configuration) {
-		propagator = new ConfigurationPropagator(formula, configuration, true);
+		propagator = new ConfigurationPropagator(formula, configuration);
+		propagator.setIncludeAbstractFeatures(true);
 	}
 
 	public boolean isIncludeAbstractFeatures() {

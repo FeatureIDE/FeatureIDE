@@ -66,7 +66,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Boolean execute(IMonitor monitor) {
+		public Boolean execute(IMonitor<Boolean> monitor) {
 			if (formula == null) {
 				return false;
 			}
@@ -129,7 +129,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Boolean execute(IMonitor workMonitor) throws Exception {
+		public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 			if (formula == null) {
 				return false;
 			}
@@ -164,7 +164,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Long execute(IMonitor monitor) throws Exception {
+		public Long execute(IMonitor<Long> monitor) throws Exception {
 			if (formula == null) {
 				return 0L;
 			}
@@ -270,7 +270,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public List<List<String>> execute(IMonitor monitor) throws Exception {
+		public List<List<String>> execute(IMonitor<List<List<String>>> monitor) throws Exception {
 			if (formula == null) {
 				return null;
 			}
@@ -306,7 +306,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public List<List<String>> execute(IMonitor workMonitor) throws Exception {
+		public List<List<String>> execute(IMonitor<List<List<String>>> workMonitor) throws Exception {
 			if (formula == null) {
 				return null;
 			}
@@ -327,7 +327,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			oneWiseConfigurationGenerator.setFeatures(featureArray);
 
 			final List<List<String>> solutionList = new ArrayList<>();
-			final List<LiteralSet> solutions = LongRunningWrapper.runMethod(oneWiseConfigurationGenerator, workMonitor);
+			final List<LiteralSet> solutions = LongRunningWrapper.runMethod(oneWiseConfigurationGenerator, workMonitor.subTask(1));
 			if (solutions == null) {
 				return solutionList;
 			}
@@ -459,13 +459,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	protected final FeatureModelFormula formula;
 	protected final Configuration configuration;
 
-	protected boolean includeAbstractFeatures;
+	protected boolean includeAbstractFeatures = true;
 
-	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration, boolean includeAbstractFeatures) {
-		this.formula = formula;
-		this.configuration = configuration;
-		this.includeAbstractFeatures = includeAbstractFeatures;
-	}
+//	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration, boolean includeAbstractFeatures) {
+//		this.formula = formula;
+//		this.configuration = configuration;
+//		this.includeAbstractFeatures = includeAbstractFeatures;
+//	}
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
@@ -479,18 +479,20 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
-		this(formula, configuration, configuration.includeAbstractFeatures);
+		this.formula = formula;
+		this.configuration = configuration;
+//		this(formula, configuration, configuration.includeAbstractFeatures);
 	}
 
-	/**
-	 * @deprecated Use {@link #ConfigurationPropagator(FeatureModelFormula, Configuration)} instead and receive a {@link FeatureModelFormula} instance from a
-	 *             {@link FeatureProjectData}.
-	 * @param configuration
-	 */
-	@Deprecated
-	public ConfigurationPropagator(Configuration configuration, boolean includeAbstractFeatures) {
-		this(new FeatureModelFormula(configuration.getFeatureModel()), configuration, includeAbstractFeatures);
-	}
+//	/**
+//	 * @deprecated Use {@link #ConfigurationPropagator(FeatureModelFormula, Configuration)} instead and receive a {@link FeatureModelFormula} instance from a
+//	 *             {@link FeatureProjectData}.
+//	 * @param configuration
+//	 */
+//	@Deprecated
+//	public ConfigurationPropagator(Configuration configuration, boolean includeAbstractFeatures) {
+//		this(new FeatureModelFormula(configuration.getFeatureModel()), configuration, includeAbstractFeatures);
+//	}
 
 	@Override
 	public boolean isIncludeAbstractFeatures() {

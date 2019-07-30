@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -95,13 +96,13 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
+	public List<LiteralSet> execute(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final IConfigurationGenerator gen = getGenerator(cnf, (int) builder.configurationNumber);
 		final Consumer consumer = new Consumer(gen);
 		final Thread thread = new Thread(consumer);
 		thread.start();
 		try {
-			LongRunningWrapper.runMethod(gen, monitor);
+			LongRunningWrapper.runMethod(gen, monitor.subTask(1));
 		} catch (final Exception e) {
 			handleException(e);
 			throw e;

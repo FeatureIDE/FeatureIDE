@@ -48,13 +48,13 @@ public class AbstractConfigurationSorter {
 		concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
 	}
 
-	public int sortConfigurations(final IMonitor monitor) {
+	public int sortConfigurations(final IMonitor<?> monitor) {
 		final int numberOfConfigurations = sort(monitor);
 		sorted = true;
 		return numberOfConfigurations;
 	}
 
-	protected int sort(final IMonitor monitor) {
+	protected int sort(final IMonitor<?> monitor) {
 		return configurations.size();
 	}
 

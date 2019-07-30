@@ -462,7 +462,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(model, new Configuration(model, false, !ignoreAbstractFeatures));
+		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(model, new Configuration(model));
 		analyzer.setIncludeAbstractFeatures(!ignoreAbstractFeatures);
 		final long number = analyzer.number(TIMEOUT_CONFIGURATION);
 		String s = "";

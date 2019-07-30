@@ -96,7 +96,7 @@ class StoppableExecuter<T> extends Executer<T> {
 	}
 
 	@Override
-	public T execute(IMonitor monitor) throws Exception {
+	public T execute(IMonitor<T> monitor) throws Exception {
 		synchronized (this) {
 			// in case job was started and canceled at the same time
 			this.monitor = monitor;

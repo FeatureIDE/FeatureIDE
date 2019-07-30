@@ -172,7 +172,7 @@ public class ComposerWrapper {
 			final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(EclipseFileSystem.getPath(configFile));
 			if (!fileHandler.getLastProblems().containsError()) {
 				final Configuration configuration = fileHandler.getObject();
-				configuration.initFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
+				configuration.updateFeatures(featureProject.getFeatureModelManager().getPersistentFormula());
 				final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
 				for (final IFeature feature : selectedFeatures) {
 					if (feature.getStructure().isConcrete()) {

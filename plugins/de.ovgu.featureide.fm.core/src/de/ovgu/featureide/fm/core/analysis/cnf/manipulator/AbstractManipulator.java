@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds atomic sets.
+ * Manipulates a given CNF.
  *
  * @author Sebastian Krieter
  */
@@ -38,7 +38,7 @@ public abstract class AbstractManipulator implements LongRunningMethod<CNF> {
 	}
 
 	@Override
-	public final CNF execute(IMonitor monitor) throws Exception {
+	public final CNF execute(IMonitor<CNF> monitor) throws Exception {
 		if (orgCNF == null) {
 			return null;
 		}
@@ -50,6 +50,6 @@ public abstract class AbstractManipulator implements LongRunningMethod<CNF> {
 		}
 	}
 
-	protected abstract CNF manipulate(IMonitor monitor) throws Exception;
+	protected abstract CNF manipulate(IMonitor<CNF> monitor) throws Exception;
 
 }

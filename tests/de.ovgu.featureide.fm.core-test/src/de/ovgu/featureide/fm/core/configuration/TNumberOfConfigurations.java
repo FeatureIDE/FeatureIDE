@@ -42,7 +42,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 
 	private long number(final IFeatureModel fm, boolean removeAbstract) {
 		final FeatureModelFormula featureModel = new FeatureModelFormula(fm);
-		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(featureModel, new Configuration(featureModel, true));
+		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(featureModel, new Configuration(featureModel));
 		analyzer.setIncludeAbstractFeatures(!removeAbstract);
 		return analyzer.number();
 	}

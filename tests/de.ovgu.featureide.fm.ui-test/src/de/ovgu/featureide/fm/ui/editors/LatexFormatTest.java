@@ -55,7 +55,7 @@ public class LatexFormatTest {
 	@Test
 	public void testLatexExporter() {
 		final FeatureModelManager modelExample = Commons.loadTestFeatureModelFromFile(TEST_XML_MODEL_FILE_NAME);
-		final Configuration configExample = new Configuration(modelExample.getPersistentFormula(), false);
+		final Configuration configExample = new Configuration(modelExample.getPersistentFormula());
 		final IPersistentFormat<Configuration> formatHead = new LatexFormat.LaTeXHead();
 		final IPersistentFormat<Configuration> formatMain = new LatexFormat.LaTeXMain();
 		final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(TEST_TEX_MAIN_FILE_NAME);

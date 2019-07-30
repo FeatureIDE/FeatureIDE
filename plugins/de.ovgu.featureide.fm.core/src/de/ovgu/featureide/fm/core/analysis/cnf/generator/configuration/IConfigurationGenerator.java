@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public interface IConfigurationGenerator extends IAnalysis<List<LiteralSet>> {
 
-	List<LiteralSet> analyze(IMonitor monitor) throws Exception;
+	List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception;
 
 	LinkedBlockingQueue<LiteralSet> getResultQueue();
 

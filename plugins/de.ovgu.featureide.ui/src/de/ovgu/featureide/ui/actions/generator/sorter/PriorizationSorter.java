@@ -59,7 +59,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private int configurationCounter = 1;
 
 	@Override
-	protected int sort(final IMonitor monitor) {
+	protected int sort(final IMonitor<?> monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
@@ -84,7 +84,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return new BuilderConfiguration(configuration, i);
 	}
 
-	protected List<List<String>> sortConfigs(List<List<String>> configs, IMonitor monitor) {
+	protected List<List<String>> sortConfigs(List<List<String>> configs, IMonitor<?> monitor) {
 		// bring the first product with maximum number of optional feature.\
 		System.err.println("START sort");
 		allconfigs.addAll(configs);
@@ -105,7 +105,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return allconfigs.size() + configurations.size();
 	}
 
-	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor monitor) {
+	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor<?> monitor) {
 		configsDistancesResult = new HashMap<String, Double>();
 		String mapKey;
 		for (int i = 0; i < allConfig.size(); i++) {

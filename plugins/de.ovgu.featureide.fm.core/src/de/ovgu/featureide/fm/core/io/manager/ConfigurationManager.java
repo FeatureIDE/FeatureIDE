@@ -82,8 +82,8 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 			if ((featureModelManager == null) || (this.featureModelManager != featureModelManager)) {
 				this.featureModelManager = featureModelManager;
 				final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
-				getObject().initFeatures(formula);
-				getVarObject().initFeatures(formula);
+				getObject().updateFeatures(formula);
+				getVarObject().updateFeatures(formula);
 			}
 		} finally {
 			fileOperationLock.unlock();
@@ -114,9 +114,9 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	@Override
 	protected Configuration createObject() throws Exception {
 		final Configuration configuration = super.createObject();
-		configuration.setPropagate(true);
+//		configuration.setPropagate(true);
 		if (featureModelManager != null) {
-			configuration.initFeatures(featureModelManager.getPersistentFormula());
+			configuration.updateFeatures(featureModelManager.getPersistentFormula());
 		}
 		return configuration;
 	}

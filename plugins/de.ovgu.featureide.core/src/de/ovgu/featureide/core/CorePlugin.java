@@ -664,11 +664,11 @@ public class CorePlugin extends AbstractCorePlugin {
 	private class AddingProjectsMethod implements LongRunningMethod<Void> {
 
 		@Override
-		public Void execute(IMonitor monitor) throws Exception {
+		public Void execute(IMonitor<Void> monitor) throws Exception {
 			monitor.setRemainingWork(projectsToAdd.size());
 			while (!projectsToAdd.isEmpty()) {
 				final IProject project = projectsToAdd.poll();
-				final IMonitor subTask = monitor.subTask(1);
+				final IMonitor<?> subTask = monitor.subTask(1);
 				subTask.setTaskName(project.getName());
 				addProject(project);
 				subTask.step();
