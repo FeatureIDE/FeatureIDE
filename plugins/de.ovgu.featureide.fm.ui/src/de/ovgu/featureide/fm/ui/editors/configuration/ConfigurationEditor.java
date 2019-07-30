@@ -105,7 +105,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private ConfigurationManager configurationManager;
 	private FeatureModelManager featureModelManager;
 
-	private EXPAND_ALGORITHM currentExpandAlgorithm = EXPAND_ALGORITHM.DEFUALT;
+	private ExpandAlgorithm currentExpandAlgorithm = ExpandAlgorithm.ALL_SELECTED;
 
 	private int currentPageIndex = -1;
 
@@ -149,12 +149,12 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-	public EXPAND_ALGORITHM getExpandAlgorithm() {
+	public ExpandAlgorithm getExpandAlgorithm() {
 		return currentExpandAlgorithm;
 	}
 
 	@Override
-	public void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm) {
+	public void setExpandAlgorithm(ExpandAlgorithm expandAlgorithm) {
 		currentExpandAlgorithm = expandAlgorithm;
 	}
 

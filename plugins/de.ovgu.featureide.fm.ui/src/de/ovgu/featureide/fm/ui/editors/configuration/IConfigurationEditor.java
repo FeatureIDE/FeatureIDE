@@ -41,12 +41,12 @@ public interface IConfigurationEditor {
 
 	boolean isReadFeatureModelError();
 
-	enum EXPAND_ALGORITHM {
-		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	enum ExpandAlgorithm {
+		NONE, CURRENTLY_SELECTED, ALL_SELECTED, OPEN_CLAUSES, ALL_SELECTED_OPEN_CLAUSE
 	}
 
-	EXPAND_ALGORITHM getExpandAlgorithm();
+	ExpandAlgorithm getExpandAlgorithm();
 
-	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
+	void setExpandAlgorithm(ExpandAlgorithm expandAlgorithm);
 
 }

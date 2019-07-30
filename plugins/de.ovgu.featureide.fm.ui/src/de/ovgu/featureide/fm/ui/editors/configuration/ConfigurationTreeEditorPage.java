@@ -121,7 +121,7 @@ import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.RunnerSequence;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
+import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.ExpandAlgorithm;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
 import de.ovgu.featureide.fm.ui.utils.SearchField;
 import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
@@ -133,8 +133,8 @@ import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage, ISearchable<TreeItem> {
 
-	private static final String EXPAND_DIRECT_CHILDREN_TOOL_TIP = "Expands The Direct Children Of The Selected Feature";
-	private static final String EXPAND_DIRECT_CHILDREN = "Expand Direct Children";
+	private static final String EXPAND_CURRENT_SELECTION_TOOL_TIP = "Expands/Collapses Only The Currently Selected Item";
+	private static final String EXPAND_CURRENT_SELECTION = "Expand Current Selection";
 
 	private static final String SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP = "Shows Next Open Clause And Expands All Selections";
 	private static final String SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS = "Show Next Open Clause And Expand All Selections";
@@ -431,11 +431,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
-		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, EXPAND_ALGORITHM.DEFUALT).setSelection(true);
-		createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT);
-		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, EXPAND_ALGORITHM.OPEN_CLAUSE);
-		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT_CLAUSE);
-		createMenu(EXPAND_DIRECT_CHILDREN, EXPAND_DIRECT_CHILDREN_TOOL_TIP, EXPAND_ALGORITHM.CHILDREN);
+		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, ExpandAlgorithm.NONE);
+		final MenuItem defaultItem = createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, ExpandAlgorithm.ALL_SELECTED);
+		createMenu(EXPAND_CURRENT_SELECTION, EXPAND_CURRENT_SELECTION_TOOL_TIP, ExpandAlgorithm.CURRENTLY_SELECTED);
+		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, ExpandAlgorithm.OPEN_CLAUSES);
+		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP,
+				ExpandAlgorithm.ALL_SELECTED_OPEN_CLAUSE);
+
+		menu.setDefaultItem(defaultItem);
+		defaultItem.setSelection(true);
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
@@ -544,7 +548,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 	}
 
-	private MenuItem createMenu(String text, final String toolTipText, final EXPAND_ALGORITHM algorithm) {
+	private MenuItem createMenu(String text, final String toolTipText, final ExpandAlgorithm algorithm) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.RADIO);
 		menuItem.setText(text);
 		menuItem.addDisposeListener(new DisposeListener() {
@@ -578,15 +582,20 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (configurationEditor.getExpandAlgorithm() != algorithm) {
 					configurationEditor.setExpandAlgorithm(algorithm);
-					curGroup = 0;
+					if (useGroups) {
+						curGroup = 0;
+					}
 					autoExpand();
-				} else {
-					configurationEditor.setExpandAlgorithm(EXPAND_ALGORITHM.DEFUALT);
 				}
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+				if (useGroups) {
+					curGroup = 0;
+				}
+				configurationEditor.setExpandAlgorithm(ExpandAlgorithm.ALL_SELECTED);
+			}
 		});
 		return menuItem;
 	}
@@ -687,15 +696,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 			if (configurationManager != null) {
 				configurationManager.editObject(config -> config.setManual(feature, manualSelection));
-				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+				if (configurationEditor.getExpandAlgorithm() == ExpandAlgorithm.CURRENTLY_SELECTED) {
 					switch (manualSelection) {
 					case SELECTED:
-						expandSingleChildren(item);
+						expandRec(item);
 						break;
 					case UNSELECTED:
-						item.setExpanded(false);
-						break;
 					case UNDEFINED:
+						item.setExpanded(false);
 						break;
 					default:
 						throw new AssertionError(manualSelection);
@@ -743,16 +751,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	private void expandSingleChildren(TreeItem item) {
-		final SelectableFeature feature = (SelectableFeature) item.getData();
-		if (feature.getSelection() != Selection.UNSELECTED) {
-			item.setExpanded(true);
-			if (feature.getChildren().length == 1) {
-				expandSingleChildren(item.getItem(0));
-			}
-		}
-	}
-
 	private Void autoExpand(Display display) {
 		display.syncExec(() -> autoExpand());
 		return null;
@@ -768,7 +766,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 */
 	private void expandToOpenClause() {
 		switch (configurationEditor.getExpandAlgorithm()) {
-		case PARENT_CLAUSE:
+		case ALL_SELECTED_OPEN_CLAUSE:
 			levelExpand();
 			groupExpand(false);
 			break;
@@ -778,23 +776,20 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	/**
-	 * Applies the selected expand algorithm.
-	 */
 	private void autoExpand() {
-		final EXPAND_ALGORITHM expandAlgorithm = configurationEditor.getExpandAlgorithm();
+		final ExpandAlgorithm expandAlgorithm = configurationEditor.getExpandAlgorithm();
 		switch (expandAlgorithm) {
-		case DEFUALT:
+		case NONE:
 			break;
-		case CHILDREN:
+		case CURRENTLY_SELECTED:
 			break;
-		case OPEN_CLAUSE:
+		case OPEN_CLAUSES:
 			groupExpand(true);
 			break;
-		case PARENT:
+		case ALL_SELECTED:
 			levelExpand();
 			break;
-		case PARENT_CLAUSE:
+		case ALL_SELECTED_OPEN_CLAUSE:
 			levelExpand();
 			groupExpand(false);
 			break;
@@ -867,22 +862,23 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (!tree.isDisposed()) {
 			final TreeItem root = tree.getItem(0);
 			if (root != null) {
-				root.setExpanded(true);
 				expandRec(root);
 			}
 		}
 	}
 
 	private void expandRec(TreeItem root) {
-		final TreeItem[] items = root.getItems();
-		for (final TreeItem treeItem : items) {
-			final Object data = treeItem.getData();
-			if (data instanceof SelectableFeature) {
-				final SelectableFeature feature = (SelectableFeature) data;
-				if ((feature.getSelection() == Selection.UNDEFINED) || (feature.getSelection() == Selection.UNSELECTED)) {
-					treeItem.setExpanded(false);
-				} else {
-					treeItem.setExpanded(true);
+		if (root.isDisposed()) {
+			return;
+		}
+		final Object data = root.getData();
+		if (data instanceof SelectableFeature) {
+			final SelectableFeature feature = (SelectableFeature) data;
+			if ((feature.getSelection() == Selection.UNDEFINED) || (feature.getSelection() == Selection.UNSELECTED)) {
+				root.setExpanded(false);
+			} else {
+				root.setExpanded(true);
+				for (final TreeItem treeItem : root.getItems()) {
 					expandRec(treeItem);
 				}
 			}

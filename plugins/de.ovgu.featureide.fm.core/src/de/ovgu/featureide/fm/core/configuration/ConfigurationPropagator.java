@@ -189,10 +189,15 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			final boolean[] results = new boolean[clausesWithoutHidden.getVariables().maxVariableID() + 1];
 			final List<LiteralSet> openClauses = new ArrayList<>();
 
+			final ArrayList<SelectableFeature> previouslyRecommendedFeatures = new ArrayList<>();
 			for (final SelectableFeature selectableFeature : configuration.getFeatures()) {
-				selectableFeature.setRecommended(Selection.UNDEFINED);
-				selectableFeature.clearOpenClauses();
+				if (selectableFeature.getRecommended() != Selection.UNDEFINED) {
+					previouslyRecommendedFeatures.add(selectableFeature);
+					selectableFeature.setRecommended(Selection.UNDEFINED);
+					selectableFeature.clearOpenClauses();
+				}
 			}
+			workMonitor.invoke(previouslyRecommendedFeatures);
 
 			final List<LiteralSet> clauses = clausesWithoutHidden.getClauses();
 			workMonitor.setRemainingWork(clauses.size());
