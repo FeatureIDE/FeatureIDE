@@ -897,25 +897,25 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		for (final TreeItem item : items) {
 			final Object data = item.getData();
 			if (data instanceof SelectableFeature) {
+				boolean checked = false;
+				boolean grayed = false;
+				Color fgColor = null;
+				Font font = treeItemStandardFont;
 				final SelectableFeature feature = (SelectableFeature) data;
 				final Selection automatic = feature.getAutomatic();
 				final Selection recommended = feature.getRecommended();
-				item.setBackground(null);
 				switch (automatic) {
 				case SELECTED:
-					item.setGrayed(true);
-					item.setForeground(null);
-					item.setChecked(true);
+					checked = true;
+					grayed = true;
 					break;
 				case UNSELECTED:
-					item.setGrayed(true);
-					item.setForeground(gray);
-					item.setChecked(false);
+					checked = false;
+					grayed = true;
+					fgColor = gray;
 					break;
 				case UNDEFINED:
-					item.setGrayed(false);
-					item.setForeground(null);
-					item.setChecked(feature.getManual() == Selection.SELECTED);
+					checked = feature.getManual() == Selection.SELECTED;
 					break;
 				}
 
@@ -923,16 +923,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (automatic == Selection.UNDEFINED) {
 					switch (recommended) {
 					case SELECTED:
-						item.setFont(treeItemSpecialFont);
-						item.setForeground(green);
+						font = treeItemSpecialFont;
+						fgColor = green;
 						break;
 					case UNSELECTED:
-						item.setFont(treeItemSpecialFont);
-						item.setForeground(blue);
+						font = treeItemSpecialFont;
+						fgColor = blue;
 						break;
 					case UNDEFINED:
-						item.setFont(treeItemStandardFont);
-						item.setForeground(null);
 						break;
 					}
 					if (recommended == Selection.UNDEFINED) {
@@ -955,6 +953,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					sb.append(feature.getName());
 				}
 				item.setText(sb.toString());
+				item.setChecked(checked);
+				item.setGrayed(grayed);
+				item.setFont(font);
+				item.setBackground(null);
+				item.setForeground(fgColor);
 			}
 		}
 	}
