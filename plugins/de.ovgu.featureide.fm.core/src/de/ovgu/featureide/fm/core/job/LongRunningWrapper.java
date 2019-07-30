@@ -40,8 +40,8 @@ public final class LongRunningWrapper {
 		return runMethod(method, null);
 	}
 
-	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
-		monitor = monitor != null ? monitor : new NullMonitor();
+	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor<T> monitor) {
+		monitor = monitor != null ? monitor : new NullMonitor<T>();
 		try {
 			return method.execute(monitor);
 		} catch (final MethodCancelException e) {
@@ -70,11 +70,11 @@ public final class LongRunningWrapper {
 		return getThread(method, name, null);
 	}
 
-	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, IMonitor monitor) {
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, IMonitor<T> monitor) {
 		return getThread(method, "", monitor);
 	}
 
-	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor monitor) {
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor<T> monitor) {
 		return new LongRunningThread<>(name, method, monitor);
 	}
 

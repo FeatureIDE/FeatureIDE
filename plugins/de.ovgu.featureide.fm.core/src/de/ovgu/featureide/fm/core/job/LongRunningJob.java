@@ -43,7 +43,7 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 	}
 
 	@Override
-	protected T work(IMonitor monitor) throws Exception {
+	protected T work(IMonitor<T> monitor) throws Exception {
 		executer = cancelingTimeout < 0 ? new Executer<>(method) : new StoppableExecuter<>(method, cancelingTimeout);
 		methodResult = executer.execute(monitor);
 		return methodResult;

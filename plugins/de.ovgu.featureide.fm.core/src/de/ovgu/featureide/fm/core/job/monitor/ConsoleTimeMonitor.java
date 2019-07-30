@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public class ConsoleTimeMonitor extends ConsoleMonitor {
+public class ConsoleTimeMonitor<T> extends ConsoleMonitor<T> {
 
 	protected long time = System.nanoTime();
 

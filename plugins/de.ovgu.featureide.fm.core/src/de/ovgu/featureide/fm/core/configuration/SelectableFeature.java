@@ -159,10 +159,10 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 
 	@Nonnull
 	public Set<Integer> getOpenClauseIndexes() {
-		if (openClauses != null) {
-			return openClauses.keySet();
+		if (openClauses == null) {
+			return Collections.emptySet();
 		}
-		return Collections.emptySet();
+		return openClauses.keySet();
 	}
 
 	public IVariables getVariables() {

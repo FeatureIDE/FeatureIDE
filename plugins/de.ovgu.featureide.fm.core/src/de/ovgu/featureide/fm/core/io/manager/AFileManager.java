@@ -311,7 +311,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 		}
 	}
 
-	protected void resetSnapshot() {
+	public void resetSnapshot() {
 		snapshot = null;
 	}
 

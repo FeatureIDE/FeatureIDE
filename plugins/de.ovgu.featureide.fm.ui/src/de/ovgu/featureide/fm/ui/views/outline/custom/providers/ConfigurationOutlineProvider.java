@@ -38,8 +38,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
@@ -54,7 +54,6 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  */
 public class ConfigurationOutlineProvider extends OutlineProvider {
 
-	Configuration config;
 	TreeViewer viewer;
 	IDoubleClickListener dblClickListener;
 
@@ -117,9 +116,10 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor instanceof ConfigurationEditor) {
 			final ConfigurationEditor confEditor = (ConfigurationEditor) activeEditor;
-			config = confEditor.getConfiguration();
-
-			getTreeProvider().inputChanged(viewer, null, config);
+			final ConfigurationManager configurationManager = confEditor.getConfigurationManager();
+			if (configurationManager != null) {
+				getTreeProvider().inputChanged(viewer, null, configurationManager.getSnapshot());
+			}
 		}
 
 	}

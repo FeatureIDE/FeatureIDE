@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import java.util.function.Consumer;
+
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -99,6 +100,6 @@ public interface IJob<T> {
 
 	void setPriority(int priority);
 
-	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
+	void setIntermediateFunction(Consumer<T> intermediateFunction);
 
 }

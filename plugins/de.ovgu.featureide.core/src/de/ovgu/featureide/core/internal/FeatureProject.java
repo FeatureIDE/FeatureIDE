@@ -106,6 +106,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -265,8 +266,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final LongRunningMethod<Boolean> configurationChecker = new LongRunningMethod<Boolean>() {
 
 		@Override
-		public Boolean execute(IMonitor workMonitor) throws Exception {
+		public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 			final IFolder folder = (IFolder) EclipseFileSystem.getResource(configFolder);
+			if (folder == null) {
+				return false;
+			}
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setRemainingWork(7);
 			next(CALCULATE_CORE_AND_DEAD_FEATURES, workMonitor);
@@ -404,7 +408,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (composer != null) {
 			if (sourceFolder != null) {
 				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(),
-						EclipseFileSystem.getResource(configFolder).getProjectRelativePath().toOSString(), buildFolder.getProjectRelativePath().toOSString());
+						EclipseFileSystem.getPath(project).relativize(configFolder).toString(), buildFolder.getProjectRelativePath().toOSString());
 			}
 		}
 
@@ -1183,7 +1187,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				for (final Path file : files) {
 					subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getFileName().toString());
 					final ProblemList lastProblems = SimpleFileHandler.load(file, config, ConfigFormatManager.getInstance());
-					if (!config.isValid()) {
+					final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(f, config);
+					if (!analyzer.isValid()) {
 						String name = file.getFileName().toString();
 						final int extIndex = name.lastIndexOf('.');
 						if (extIndex > 0) {

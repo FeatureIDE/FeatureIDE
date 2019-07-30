@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -61,13 +62,15 @@ public class ConfigNode extends Parent {
 					return "1";
 				}
 
-				final long number = new Configuration(innerModel, false, !removeAbstract).number(timeout);
+				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(innerModel, new Configuration(innerModel, false));
+				analyzer.setIncludeAbstractFeatures(!removeAbstract);
+				final long number = analyzer.number(timeout);
 
 				return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 			}
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				setValue(calculateConfigs());
 				return true;
 			}

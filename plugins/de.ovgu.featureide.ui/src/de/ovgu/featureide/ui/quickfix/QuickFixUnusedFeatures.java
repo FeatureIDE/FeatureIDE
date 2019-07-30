@@ -33,11 +33,10 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
@@ -60,9 +59,9 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					final IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					final IMonitor<?> monitor2 = new ProgressMonitor<>("Cover unused features", monitor);
 					monitor2.setRemainingWork(2);
-					final IMonitor subTask = monitor2.subTask(1);
+					final IMonitor<?> subTask = monitor2.subTask(1);
 					subTask.setTaskName("Collect unused features");
 					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
 					subTask.step();
@@ -76,13 +75,13 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 		job.schedule();
 	}
 
-	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor<List<List<String>>> monitor, boolean collect) {
 		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<>();
 		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
-		final ConfigurationPropagator propagator = (ConfigurationPropagator) new Configuration(featureModel).getPropagator();
-		final List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, true), monitor);
+		final Configuration c = new Configuration(featureModel);
+		final List<List<String>> solutions = new ConfigurationAnalyzer(featureModel, c).coverFeatures(unusedFeatures, true);
 		for (final List<String> solution : solutions) {
 			final Configuration configuration = new Configuration(featureModel);
 			for (final String feature : solution) {
@@ -108,7 +107,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, FeatureModelFormula fm) {
 		featureModel = fm;
-		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
+		return createConfigurations(falseOptionalFeatures, new NullMonitor<>(), true);
 	}
 
 }

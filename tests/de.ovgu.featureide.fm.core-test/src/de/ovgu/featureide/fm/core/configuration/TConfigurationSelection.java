@@ -42,14 +42,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 	}
 
 	private void testConfigurationValid(Configuration c, final long expectedValue) {
-		final IConfigurationPropagator propagator = c.getPropagator();
+		final IConfigurationPropagator propagator = getConfigurationPropagator(formula, c);
 		LongRunningWrapper.runMethod(propagator.update());
 		assertTrue(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(expectedValue, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
 	}
 
 	private void testConfigurationInvalid(Configuration c) {
-		final IConfigurationPropagator propagator = c.getPropagator();
+		final ConfigurationPropagator propagator = getConfigurationPropagator(formula, c);
 		LongRunningWrapper.runMethod(propagator.update());
 		assertFalse(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(0L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());

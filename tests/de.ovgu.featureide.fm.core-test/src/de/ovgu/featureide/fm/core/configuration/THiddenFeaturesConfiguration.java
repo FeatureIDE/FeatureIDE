@@ -29,7 +29,6 @@ import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Tests about handling of hidden features during configuration
@@ -46,20 +45,22 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	@Test
 	public void testMandatoryHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(new FeatureModelFormula(fm));
-		final IConfigurationPropagator propagator = c.getPropagator();
-		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
-		LongRunningWrapper.runMethod(propagator.update());
+		final FeatureModelFormula formula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(formula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(formula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("B"))), c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testOptionalHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(new FeatureModelFormula(fm));
-		final IConfigurationPropagator propagator = c.getPropagator();
-		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
-		LongRunningWrapper.runMethod(propagator.update());
+		final FeatureModelFormula formula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(formula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(formula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());
 	}
 
@@ -67,28 +68,30 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	public void testAlternativeHidden() {
 		final IFeatureModel fm = loadXML(
 				"<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
-		final Configuration c = new Configuration(new FeatureModelFormula(fm));
-		final IConfigurationPropagator propagator = c.getPropagator();
-		assertEquals(2L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
+		final FeatureModelFormula fmFormula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(fmFormula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(fmFormula, c);
+		assertEquals(2L, analyzer.number(1000));
 
 		// set={S,B}
 		c.setManual("A", Selection.UNSELECTED);
-		LongRunningWrapper.runMethod(propagator.update());
+		analyzer.update();
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("B"))), c.getSelectedFeatures());
 
 		// set={S,A}
 		c.setManual("A", Selection.SELECTED);
-		LongRunningWrapper.runMethod(propagator.update());
+		analyzer.update();
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("A"))), c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(new FeatureModelFormula(fm));
-		final IConfigurationPropagator propagator = c.getPropagator();
-		assertEquals(1L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());
-		LongRunningWrapper.runMethod(propagator.update());
+		final FeatureModelFormula fmFormula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(fmFormula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(fmFormula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
 		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());
 	}
 }

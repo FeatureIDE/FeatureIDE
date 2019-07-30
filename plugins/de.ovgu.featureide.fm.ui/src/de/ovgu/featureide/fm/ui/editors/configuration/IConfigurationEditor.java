@@ -20,29 +20,26 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import java.io.File;
-
-import org.eclipse.core.resources.IFile;
-
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public interface IConfigurationEditor {
 
-	Configuration getConfiguration();
-
 	ConfigurationManager getConfigurationManager();
 
-	IFile getFile();
-
-	File getModelFile();
+	FeatureModelManager getFeatureModelManager();
 
 	boolean isAutoSelectFeatures();
 
 	void setAutoSelectFeatures(boolean autoSelectFeatures);
 
 	boolean hasValidFeatureModel();
+
+	boolean isIOError();
+
+	boolean isReadConfigurationError();
+
+	boolean isReadFeatureModelError();
 
 	enum EXPAND_ALGORITHM {
 		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
@@ -51,7 +48,5 @@ public interface IConfigurationEditor {
 	EXPAND_ALGORITHM getExpandAlgorithm();
 
 	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
-
-	IConfigurationPropagator getPropagator();
 
 }

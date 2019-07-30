@@ -29,13 +29,14 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
  *
  * @author Sebastian Krieter
  */
+@FunctionalInterface
 public interface LongRunningMethod<T> {
 
-	T execute(IMonitor monitor) throws Exception;
+	T execute(IMonitor<T> monitor) throws Exception;
 
 	class Util {
 
-		public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
+		public static <T> T runMethod(LongRunningMethod<T> method, IMonitor<T> monitor) {
 			try {
 				return method.execute(monitor);
 			} catch (final MethodCancelException e) {
@@ -46,7 +47,7 @@ public interface LongRunningMethod<T> {
 			}
 		}
 
-		public static <T> T runMethodInThread(LongRunningMethod<T> method, IMonitor monitor) {
+		public static <T> T runMethodInThread(LongRunningMethod<T> method, IMonitor<T> monitor) {
 			final IRunner<T> thread = LongRunningWrapper.getThread(method, monitor);
 			monitor.checkCancel();
 			thread.schedule();

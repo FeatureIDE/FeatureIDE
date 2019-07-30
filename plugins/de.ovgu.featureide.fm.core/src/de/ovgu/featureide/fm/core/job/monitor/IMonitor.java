@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job.monitor;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import java.util.function.Consumer;
+
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -28,7 +29,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public interface IMonitor {
+public interface IMonitor<T> {
 
 	public static class MethodCancelException extends RuntimeException {
 
@@ -64,7 +65,7 @@ public interface IMonitor {
 	 *
 	 * @param t the parameter for the intermediate function
 	 */
-	void step(Object t) throws MethodCancelException;
+	void step(T t) throws MethodCancelException;
 
 	/**
 	 * Increases the monitor's progress, invokes the intermediate function, and checks for cancel.
@@ -72,9 +73,9 @@ public interface IMonitor {
 	 * @param t the parameter for the intermediate function
 	 * @param work the amount of work done
 	 */
-	void step(int work, Object t) throws MethodCancelException;
+	void step(int work, T t) throws MethodCancelException;
 
-	IMonitor subTask(int size);
+	<R> IMonitor<R> subTask(int size);
 
 	void setTaskName(String name);
 
@@ -104,9 +105,9 @@ public interface IMonitor {
 	 *
 	 * @param t the parameter for the intermediate function
 	 */
-	void invoke(Object t);
+	void invoke(T t);
 
-	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
+	void setIntermediateFunction(Consumer<T> intermediateFunction);
 
 	void cancel();
 

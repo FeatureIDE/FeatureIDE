@@ -529,10 +529,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (currentEditor instanceof ConfigurationEditor) {
 			if (page instanceof ConfigurationPage) {
 				final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
-				if (editor.getConfiguration().getFeatureModel() instanceof ExtendedFeatureModel) {
+				if (editor.getFeatureModelManager().getSnapshot() instanceof ExtendedFeatureModel) {
 					clear();
 					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(editor.getConfiguration());
+						treeViewer.setInput(editor.getConfigurationManager().getSnapshot());
 					}
 					treeViewer.expandAll();
 					repackAllColumns();

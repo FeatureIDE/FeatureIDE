@@ -50,10 +50,12 @@ public class EclipseFileSystem implements IFileSystem {
 	}
 
 	public static IResource getResource(Path path) {
-		final IPath iPath = getIPath(path);
-		if (iPath != null) {
-			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			return Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		if ((path != null) && Files.exists(path)) {
+			final IPath iPath = getIPath(path);
+			if (iPath != null) {
+				final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+				return Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+			}
 		}
 		return null;
 	}

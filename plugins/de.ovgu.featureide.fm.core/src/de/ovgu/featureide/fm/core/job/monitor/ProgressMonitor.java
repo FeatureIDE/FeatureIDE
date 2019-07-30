@@ -30,12 +30,12 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public class ProgressMonitor extends ATaskMonitor {
+public class ProgressMonitor<T> extends ATaskMonitor<T> {
 
 	private final SubMonitor monitor;
 	private final IProgressMonitor orgMonitor;
 
-	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
+	private ProgressMonitor(SubMonitor monitor, AMonitor<?> parent) {
 		super(parent);
 		orgMonitor = monitor;
 		this.monitor = SubMonitor.convert(monitor, 1);
@@ -78,8 +78,8 @@ public class ProgressMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public synchronized IMonitor subTask(int size) {
-		return new ProgressMonitor(monitor.newChild(size), this);
+	public synchronized <R> IMonitor<R> subTask(int size) {
+		return new ProgressMonitor<>(monitor.newChild(size), this);
 	}
 
 	@Override

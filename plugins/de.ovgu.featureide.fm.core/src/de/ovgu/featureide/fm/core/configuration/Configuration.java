@@ -28,8 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.sat4j.specs.TimeoutException;
-
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.Renaming;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -39,8 +37,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -116,7 +112,7 @@ public class Configuration implements Cloneable {
 
 	public void initFeatures(FeatureModelFormula featureModel) {
 		if (updateFeatures(featureModel) && propagate) {
-			update();
+//			update();
 		}
 	}
 
@@ -187,17 +183,6 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	protected ConfigurationPropagator propagator() {
-		if ((propagator == null) && (featureModel != null)) {
-			propagator = new ConfigurationPropagator(featureModel, this);
-		}
-		return propagator;
-	}
-
-	public IConfigurationPropagator getPropagator() {
-		return propagator();
-	}
-
 	void resetAutomaticValues() {
 		for (final SelectableFeature feature : selectableFeatures.values()) {
 			feature.setAutomatic(Selection.UNDEFINED);
@@ -214,10 +199,6 @@ public class Configuration implements Cloneable {
 			throw new FeatureNotFoundException();
 		}
 		setAutomatic(feature, selection);
-	}
-
-	public boolean canBeValid() {
-		return LongRunningWrapper.runMethod(propagator().canBeValid());
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -282,10 +263,6 @@ public class Configuration implements Cloneable {
 		return getFeatures(Selection.SELECTED);
 	}
 
-	public List<List<String>> getSolutions(int max) throws TimeoutException {
-		return LongRunningWrapper.runMethod(propagator().getSolutions(max));
-	}
-
 	public List<IFeature> getUnSelectedFeatures() {
 		return getFeatures(Selection.UNSELECTED);
 	}
@@ -309,22 +286,6 @@ public class Configuration implements Cloneable {
 	}
 
 	/**
-	 * Checks that all manual and automatic selections are valid.<br> Abstract features will <b>not</b> be ignored.
-	 *
-	 * @return {@code true} if the current selection is a valid configuration
-	 */
-	public boolean isValid() {
-		return LongRunningWrapper.runMethod(propagator().isValid());
-	}
-
-	/**
-	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
-	 */
-	public boolean isValidNoHidden() {
-		return LongRunningWrapper.runMethod(propagator().isValidNoHidden());
-	}
-
-	/**
 	 * Turns all automatic into manual values
 	 *
 	 * @param discardDeselected if {@code true} all automatic deselected features get undefined instead of manual deselected
@@ -339,30 +300,6 @@ public class Configuration implements Cloneable {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Convenience method, fully equivalent to {@link #number(long, boolean) number(250, false)}.
-	 *
-	 * @return number of possible solutions
-	 *
-	 * @see #number(boolean)
-	 * @see #number(long, boolean)
-	 */
-	public long number() {
-		return number(250);
-	}
-
-	/**
-	 * Counts the number of possible solutions.
-	 *
-	 * @param timeout Timeout in milliseconds.
-	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occured) that
-	 *         indicates that there are more solutions than the absolute value
-	 */
-	public long number(int timeout) {
-		return LongRunningWrapper.runMethod(propagator().number(timeout));
 	}
 
 	public void resetValues() {
@@ -403,20 +340,6 @@ public class Configuration implements Cloneable {
 		return builder.toString();
 	}
 
-	public void update() {
-		LongRunningWrapper.runMethod(propagator().update(false, null));
-	}
-
-	public void update(boolean redundantManual, List<SelectableFeature> featureOrder) {
-		if (propagate) {
-			LongRunningWrapper.runMethod(propagator().update(redundantManual, featureOrder));
-		}
-	}
-
-	public void resolve() {
-		LongRunningWrapper.runMethod(propagator().resolve());
-	}
-
 	@Override
 	public Configuration clone() {
 		if (!this.getClass().equals(Configuration.class)) {
@@ -428,17 +351,6 @@ public class Configuration implements Cloneable {
 			}
 		}
 		return new Configuration(this);
-	}
-
-	/**
-	 * Creates solutions to cover the given features.
-	 *
-	 * @param features The features that should be covered.
-	 * @param selection true is the features should be selected, false otherwise.
-	 */
-	public List<List<String>> coverFeatures(Collection<String> features, IMonitor monitor, boolean selection) throws TimeoutException {
-		return LongRunningWrapper.runMethod(propagator().coverFeatures(features, selection), monitor);
-
 	}
 
 	public void setConsiderAbstractFeatures(boolean considerAbstractFeatures) {

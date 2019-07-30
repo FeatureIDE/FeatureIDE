@@ -60,9 +60,9 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				if (project != null) {
-					final IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					final IMonitor<?> monitor2 = new ProgressMonitor<>("Cover unused features", monitor);
 					monitor2.setRemainingWork(2);
-					final IMonitor subTask = monitor2.subTask(1);
+					final IMonitor<?> subTask = monitor2.subTask(1);
 					subTask.setTaskName("Collect unused features");
 					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
 					subTask.step();
@@ -76,12 +76,12 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		job.schedule();
 	}
 
-	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
+	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor<List<List<String>>> monitor, boolean collect) {
 		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<>();
 		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
-		final ConfigurationPropagator propagator = (ConfigurationPropagator) new Configuration(featureModel).getPropagator();
+		final ConfigurationPropagator propagator = new ConfigurationPropagator(featureModel, new Configuration(featureModel));
 		final List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, false), monitor);
 		for (final List<String> solution : solutions) {
 			final Configuration configuration = new Configuration(featureModel);
@@ -101,7 +101,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, FeatureModelFormula fm) {
 		featureModel = fm;
-		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
+		return createConfigurations(falseOptionalFeatures, new NullMonitor<>(), true);
 	}
 
 }

@@ -54,10 +54,6 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 
 	private static final String TRUE_STRING = "true";
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getCellEditor(java.lang.Object)
-	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
@@ -73,15 +69,11 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getValue(java.lang.Object)
-	 */
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
 		if (view.getCurrentEditor() instanceof ConfigurationEditor) {
-			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfiguration();
+			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getSnapshot();
 			for (SelectableFeature feat : config.getFeatures()) {
 				if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
 					if (feat instanceof ExtendedSelectableFeature) {
@@ -99,10 +91,6 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		return "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#setValue(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void setValue(Object element, Object value) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
@@ -151,12 +139,9 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		getViewer().update(element, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
-	 */
 	@Override
 	protected boolean canEdit(Object element) {
 		return enabled && (element instanceof IFeatureAttribute);
 	}
+
 }

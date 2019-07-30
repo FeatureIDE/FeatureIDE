@@ -53,6 +53,7 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
@@ -461,7 +462,9 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number = new Configuration(model, false, !ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
+		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(model, new Configuration(model, false, !ignoreAbstractFeatures));
+		analyzer.setIncludeAbstractFeatures(!ignoreAbstractFeatures);
+		final long number = analyzer.number(TIMEOUT_CONFIGURATION);
 		String s = "";
 		if (number < 0) {
 			s += MORE_THAN + (-1 - number);

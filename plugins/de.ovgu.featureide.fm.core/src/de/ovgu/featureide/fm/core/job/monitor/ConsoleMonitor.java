@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public class ConsoleMonitor extends ATaskMonitor {
+public class ConsoleMonitor<T> extends ATaskMonitor<T> {
 
 	protected boolean output = true;
 
@@ -43,7 +43,7 @@ public class ConsoleMonitor extends ATaskMonitor {
 		this.output = output;
 	}
 
-	private ConsoleMonitor(boolean output, boolean canceled, AMonitor parent) {
+	private ConsoleMonitor(boolean output, boolean canceled, AMonitor<?> parent) {
 		super(parent);
 		this.output = output;
 		this.canceled = canceled;
@@ -98,9 +98,9 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public synchronized IMonitor subTask(int size) {
+	public synchronized <R> IMonitor<R> subTask(int size) {
 		worked(size);
-		return new ConsoleMonitor(output, canceled, this);
+		return new ConsoleMonitor<>(output, canceled, this);
 	}
 
 }

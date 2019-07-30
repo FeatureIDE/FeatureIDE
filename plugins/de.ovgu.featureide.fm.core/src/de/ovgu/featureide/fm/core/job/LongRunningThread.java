@@ -22,9 +22,9 @@ package de.ovgu.featureide.fm.core.job;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -40,7 +40,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	protected final List<JobFinishListener<T>> listenerList = new LinkedList<>();
 
 	private final LongRunningMethod<T> method;
-	private final IMonitor monitor;
+	private final IMonitor<T> monitor;
 	private Executer<T> executer;
 
 	private int cancelingTimeout = -1;
@@ -49,10 +49,10 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	private boolean stoppable;
 
-	public LongRunningThread(String name, LongRunningMethod<T> method, IMonitor monitor) {
+	public LongRunningThread(String name, LongRunningMethod<T> method, IMonitor<T> monitor) {
 		super(name);
 		this.method = method;
-		this.monitor = monitor != null ? monitor : new NullMonitor();
+		this.monitor = monitor != null ? monitor : new NullMonitor<T>();
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	}
 
 	@Override
-	public void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
+	public void setIntermediateFunction(Consumer<T> intermediateFunction) {
 		monitor.setIntermediateFunction(intermediateFunction);
 	}
 

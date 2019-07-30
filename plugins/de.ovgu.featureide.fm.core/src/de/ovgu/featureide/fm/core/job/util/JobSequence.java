@@ -99,7 +99,7 @@ public final class JobSequence implements LongRunningMethod<Boolean> {
 	}
 
 	@Override
-	public Boolean execute(IMonitor monitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> monitor) throws Exception {
 		monitor.setRemainingWork(jobs.size());
 		while (true) {
 			monitor.checkCancel();

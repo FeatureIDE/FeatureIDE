@@ -76,12 +76,12 @@ public class TConfigurationReader {
 	}
 
 	private boolean isValid(Configuration configuration) {
-		final IConfigurationPropagator propagator = configuration.getPropagator();
+		final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, configuration);
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	private boolean isValidAfterUpdate(Configuration configuration) {
-		final IConfigurationPropagator propagator = configuration.getPropagator();
+		final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, configuration);
 		LongRunningWrapper.runMethod(propagator.update());
 		return LongRunningWrapper.runMethod(propagator.isValid());
 	}

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADVANCED_CONFIGURATION;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.eclipse.jface.action.Action;
@@ -142,18 +143,20 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		final MenuManager contextMenu = new MenuManager(null);
 		contextMenu.setRemoveAllWhenShown(true);
 		contextMenu.addMenuListener(new IMenuListener() {
+
 			@Override
 			public void menuAboutToShow(IMenuManager mgr) {
 				contextMenu.add(new Action("Export As...", IMAGE_EXPORT_AS) {
+
 					@Override
 					public void run() {
-						ConfigurationExporter.exportAs(configurationEditor.getConfiguration());
+						ConfigurationExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
 					}
 				});
 			}
 		});
 		final Menu createContextMenu = contextMenu.createContextMenu(tree);
-		
+
 		tree.addMouseListener(new MouseListener() {
 
 			@Override
@@ -215,26 +218,15 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	}
 
 	@Override
-	protected void refreshItem(TreeItem item) {
-		final Object data = item.getData();
-		if (data instanceof SelectableFeature) {
-			final SelectableFeature feature = (SelectableFeature) data;
-			item.setBackground(null);
-			item.setForeground(null);
-			item.setFont(treeItemStandardFont);
-			item.setImage(getImage(feature, null));
-			item.setText(feature.getName());
-			if (feature.getAutomatic() == Selection.UNSELECTED) {
-				item.setForeground(gray);
+	protected void refreshItem(Collection<TreeItem> items) {
+		super.refreshItem(items);
+		for (final TreeItem item : items) {
+			final Object data = item.getData();
+			if (data instanceof SelectableFeature) {
+				final SelectableFeature feature = (SelectableFeature) data;
+				item.setImage(getImage(feature, null));
 			}
 		}
-	}
-
-	@Override
-	protected void lockItem(TreeItem item) {
-		item.setImage(getImage((SelectableFeature) item.getData(), Selection.SELECTED));
-		item.setFont(treeItemStandardFont);
-		item.setForeground(gray);
 	}
 
 	@Override

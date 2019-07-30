@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
@@ -50,7 +50,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 
 	private final FeatureModelFormula featureModel;
 	private final Configuration currentConfig;
-	private final IConfigurationPropagator propagator;
+	private final ConfigurationAnalyzer propagator;
 	private List<String> coreFeatureNames;
 	private boolean validSelect = true;
 	private boolean validReject = true;
@@ -71,7 +71,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		this.featureModel = featureModel;
 		this.useValidMethod = useValidMethod;
 		currentConfig = new Configuration(featureModel);
-		propagator = currentConfig.getPropagator();
+		propagator = new ConfigurationAnalyzer(featureModel, currentConfig);
 		validClause = createdValidClause();
 	}
 
@@ -245,7 +245,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		return validSelect && validReject && (currentConfig.canBeValid());
+		return validSelect && validReject && (propagator.canBeValid());
 	}
 
 	@Override

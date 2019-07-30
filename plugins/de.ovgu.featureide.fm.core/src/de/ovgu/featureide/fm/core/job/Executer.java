@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 class Executer<T> {
 
 	protected final LongRunningMethod<T> method;
-	protected IMonitor monitor;
+	protected IMonitor<T> monitor;
 
 	public Executer(LongRunningMethod<T> method) {
 		this.method = method;
@@ -39,7 +39,7 @@ class Executer<T> {
 		monitor.cancel();
 	}
 
-	public T execute(IMonitor monitor) throws Exception {
+	public T execute(IMonitor<T> monitor) throws Exception {
 		this.monitor = monitor;
 		return method.execute(monitor);
 	}

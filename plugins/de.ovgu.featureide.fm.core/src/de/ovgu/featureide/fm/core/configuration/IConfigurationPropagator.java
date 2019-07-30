@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
@@ -59,11 +59,11 @@ public interface IConfigurationPropagator {
 	 */
 	LongRunningMethod<Long> number(int timeout);
 
-	LongRunningMethod<Boolean> update(boolean redundantManual, List<SelectableFeature> featureOrder);
+	LongRunningMethod<Collection<SelectableFeature>> update(boolean redundantManual, List<SelectableFeature> featureOrder);
 
-	LongRunningMethod<Boolean> update(boolean redundantManual);
+	LongRunningMethod<Collection<SelectableFeature>> update(boolean redundantManual);
 
-	LongRunningMethod<Boolean> update();
+	LongRunningMethod<Collection<SelectableFeature>> update();
 
 	LongRunningMethod<Boolean> completeRandomly();
 
@@ -71,18 +71,21 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Boolean> completeMax();
 
-	LongRunningMethod<Void> resolve();
+	LongRunningMethod<Collection<SelectableFeature>> resolve();
+
+	LongRunningMethod<List<List<String>>> coverFeatures(Collection<String> features, boolean selection);
 
 	/**
 	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
-	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}).
-	 * Features that are undefined are considered deselected.
+	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}). Features that are undefined are considered deselected.
 	 *
 	 * @param featureList If not {@code null} only the features within the list will be marked.
 	 * @return A list of unsatisfied clauses.
-	 * @deprecated Use {@link #findUnsatisfiedClauses(List, boolean)} instead.
 	 */
-	@Deprecated
-	LongRunningMethod<List<LiteralSet>> findOpenClauses(List<SelectableFeature> featureList);
+	LongRunningMethod<Collection<SelectableFeature>> findOpenClauses();
+
+	boolean isIncludeAbstractFeatures();
+
+	void setIncludeAbstractFeatures(boolean includeAbstractFeatures);
 
 }

@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.quickfix;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGURATIONS_FOR;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,9 +34,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Creates configurations for missing configurations.
@@ -67,18 +67,23 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
 		monitor.beginTask(CREATE_CONFIGURATIONS_FOR, unusedFeatures.size());
-		final List<Configuration> confs = new LinkedList<Configuration>();
-		while (!unusedFeatures.isEmpty()) {
+		final List<Configuration> confs = new LinkedList<>();
+		int lastSize = -1;
+		while (!unusedFeatures.isEmpty() && (lastSize != unusedFeatures.size())) {
+			lastSize = unusedFeatures.size();
 			monitor.subTask(createShortMessage(unusedFeatures));
 			if (monitor.isCanceled()) {
 				break;
 			}
 			final Configuration configuration = new Configuration(featureModel);
-			final IConfigurationPropagator c = configuration.getPropagator();
-			for (final String feature : unusedFeatures) {
+			final ConfigurationAnalyzer c = new ConfigurationAnalyzer(featureModel, configuration);
+
+			for (final Iterator<String> iterator = unusedFeatures.iterator(); iterator.hasNext();) {
+				final String feature = iterator.next();
 				if (configuration.getSelectableFeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);
-					LongRunningWrapper.runMethod(c.update());
+					c.update();
+					iterator.remove();
 				}
 				monitor.worked(1);
 			}
@@ -86,7 +91,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 			if (monitor.isCanceled()) {
 				break;
 			}
-			LongRunningWrapper.runMethod(c.completeMin());
+			c.completeMin();
 
 			confs.add(configuration);
 		}

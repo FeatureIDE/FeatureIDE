@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public final class NullMonitor extends AMonitor {
+public final class NullMonitor<T> extends AMonitor<T> {
 
 	private boolean cancel = false;
 
@@ -47,8 +47,8 @@ public final class NullMonitor extends AMonitor {
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		return this;
+	public <R> IMonitor<R> subTask(int size) {
+		return new NullMonitor<>();
 	}
 
 	@Override

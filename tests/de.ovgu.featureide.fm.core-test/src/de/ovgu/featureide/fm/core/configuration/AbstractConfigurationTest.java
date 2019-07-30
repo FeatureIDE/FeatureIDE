@@ -58,6 +58,14 @@ public abstract class AbstractConfigurationTest {
 
 	abstract IFeatureModel loadModel();
 
+	public ConfigurationAnalyzer getConfigurationAnalyzer(FeatureModelFormula formula, Configuration configuration) {
+		return new ConfigurationAnalyzer(formula, configuration);
+	}
+
+	public ConfigurationPropagator getConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
+		return new ConfigurationPropagator(formula, configuration);
+	}
+
 	protected static IFeatureModel loadGUIDSL(String grammar) {
 		return load(new GuidslFormat(), grammar);
 	}

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -30,7 +32,6 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
@@ -77,7 +78,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		}
 	}
 
-	private IConsumer<Object> intermediateFunction;
+	private Consumer<T> intermediateFunction;
 
 	protected T methodResult = null;
 
@@ -115,7 +116,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		status = JobStatus.RUNNING;
 
 		// run job and catch possible runtime exceptions
-		final ProgressMonitor workMonitor = new ProgressMonitor(getName(), monitor);
+		final ProgressMonitor<T> workMonitor = new ProgressMonitor<>(getName(), monitor);
 		workMonitor.setIntermediateFunction(intermediateFunction);
 		try {
 			methodResult = work(workMonitor);
@@ -136,7 +137,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	}
 
 	@Override
-	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
+	public final void setIntermediateFunction(Consumer<T> intermediateFunction) {
 		this.intermediateFunction = intermediateFunction;
 	}
 
@@ -154,6 +155,6 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)
 	 */
-	protected abstract T work(IMonitor workMonitor) throws Exception;
+	protected abstract T work(IMonitor<T> workMonitor) throws Exception;
 
 }

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,10 +88,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 	}
 
-	public class Resolve implements LongRunningMethod<Void> {
+	public class Resolve implements LongRunningMethod<Collection<SelectableFeature>> {
 
 		@Override
-		public Void execute(IMonitor workMonitor) throws Exception {
+		public Collection<SelectableFeature> execute(IMonitor<Collection<SelectableFeature>> workMonitor) throws Exception {
 			if (formula == null) {
 				return null;
 			}
@@ -177,16 +178,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	}
 
-	public class FindOpenClauses implements LongRunningMethod<List<LiteralSet>> {
-
-		private final List<SelectableFeature> featureList;
-
-		public FindOpenClauses(List<SelectableFeature> featureList) {
-			this.featureList = featureList;
-		}
+	public class FindOpenClauses implements LongRunningMethod<Collection<SelectableFeature>> {
 
 		@Override
-		public List<LiteralSet> execute(IMonitor workMonitor) {
+		public Collection<SelectableFeature> execute(IMonitor<Collection<SelectableFeature>> workMonitor) {
 			if (formula == null) {
 				return Collections.emptyList();
 			}
@@ -194,16 +189,17 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			final boolean[] results = new boolean[clausesWithoutHidden.getVariables().maxVariableID() + 1];
 			final List<LiteralSet> openClauses = new ArrayList<>();
 
-			for (final SelectableFeature selectableFeature : featureList) {
+			for (final SelectableFeature selectableFeature : configuration.getFeatures()) {
 				selectableFeature.setRecommended(Selection.UNDEFINED);
 				selectableFeature.clearOpenClauses();
 			}
 
 			final List<LiteralSet> clauses = clausesWithoutHidden.getClauses();
 			workMonitor.setRemainingWork(clauses.size());
+			final Collection<SelectableFeature> result = new ArrayList<>();
 
 			loop: for (final LiteralSet clause : clauses) {
-				workMonitor.step();
+				workMonitor.worked();
 				final int[] orLiterals = clause.getLiterals();
 				for (int j = 0; j < orLiterals.length; j++) {
 					final int literal = orLiterals[j];
@@ -226,6 +222,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					}
 				}
 
+				final ArrayList<SelectableFeature> updateFeatures = new ArrayList<>();
 				boolean newLiterals = false;
 				for (int j = 0; j < orLiterals.length; j++) {
 					final int literal = orLiterals[j];
@@ -235,6 +232,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 						final SelectableFeature feature = configuration.getSelectableFeature(clausesWithoutHidden.getVariables().getName(literal));
 						final Selection selection = feature.getSelection();
+						updateFeatures.add(feature);
 						switch (selection) {
 						case SELECTED:
 							feature.setRecommended(Selection.UNSELECTED);
@@ -250,15 +248,16 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 						default:
 							throw new AssertionError(selection);
 						}
-						workMonitor.invoke(feature);
 					}
 				}
 
 				if (newLiterals) {
+					workMonitor.invoke(updateFeatures);
+					result.addAll(updateFeatures);
 					openClauses.add(clause);
 				}
 			}
-			return openClauses;
+			return result;
 		}
 	}
 
@@ -341,7 +340,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	}
 
-	public class UpdateMethod implements LongRunningMethod<Boolean> {
+	public class UpdateMethod implements LongRunningMethod<Collection<SelectableFeature>> {
 
 		protected final boolean redundantManual;
 		protected final List<SelectableFeature> featureOrder;
@@ -356,9 +355,9 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Boolean execute(IMonitor workMonitor) {
+		public Collection<SelectableFeature> execute(IMonitor<Collection<SelectableFeature>> workMonitor) {
 			if (formula == null) {
-				return false;
+				return Collections.emptyList();
 			}
 			configuration.resetAutomaticValues();
 
@@ -392,27 +391,34 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			// if there is a contradiction within the configuration
 			if (impliedFeatures == null) {
-				return false;
+				return Collections.emptyList();
 			}
+
+			final Collection<SelectableFeature> result = new HashSet<>(rootNode.getVariables().size());
 
 			for (final int i : impliedFeatures.getLiterals()) {
 				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
 				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-				workMonitor.invoke(feature);
+				result.add(feature);
 				manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
 			}
+			workMonitor.invoke(result);
+
 			// only for update of configuration editor
+			final ArrayList<SelectableFeature> updateFeatures = new ArrayList<>();
 			for (final SelectableFeature feature : configuration.getFeatures()) {
 				if (!manualLiteralSet
 						.contains(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED))) {
-					workMonitor.invoke(feature);
+					updateFeatures.add(feature);
+					result.add(feature);
 				}
 			}
+			workMonitor.invoke(updateFeatures);
 
 			if (redundantManual) {
 				final AdvancedSatSolver solver = getSolver(true);
 				if (solver == null) {
-					return false;
+					return result;
 				}
 				for (final int feature : intLiterals) {
 					solver.assignmentPush(feature);
@@ -427,14 +433,16 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					switch (satResult) {
 					case FALSE:
 						configuration.setAutomatic(feature, oLiteral > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-						workMonitor.invoke(feature);
+						result.add(feature);
+						workMonitor.invoke(Arrays.asList(feature));
 						intLiterals[i] = intLiterals[--literalCount];
 						solver.assignmentDelete(i--);
 						break;
 					case TIMEOUT:
 					case TRUE:
 						solver.assignmentSet(i, oLiteral);
-						workMonitor.invoke(feature);
+						result.add(feature);
+						workMonitor.invoke(Arrays.asList(feature));
 						break;
 					default:
 						throw new AssertionError(satResult);
@@ -442,7 +450,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					workMonitor.worked();
 				}
 			}
-			return true;
+			return result;
 		}
 
 	}
@@ -480,24 +488,16 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 * @param configuration
 	 */
 	@Deprecated
-	public ConfigurationPropagator(Configuration configuration) {
-		this(configuration, true);
-	}
-
-	/**
-	 * @deprecated Use {@link #ConfigurationPropagator(FeatureModelFormula, Configuration)} instead and receive a {@link FeatureModelFormula} instance from a
-	 *             {@link FeatureProjectData}.
-	 * @param configuration
-	 */
-	@Deprecated
 	public ConfigurationPropagator(Configuration configuration, boolean includeAbstractFeatures) {
 		this(new FeatureModelFormula(configuration.getFeatureModel()), configuration, includeAbstractFeatures);
 	}
 
+	@Override
 	public boolean isIncludeAbstractFeatures() {
 		return includeAbstractFeatures;
 	}
 
+	@Override
 	public void setIncludeAbstractFeatures(boolean includeAbstractFeatures) {
 		this.includeAbstractFeatures = includeAbstractFeatures;
 	}
@@ -560,13 +560,14 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 * @param selection true is the features should be selected, false otherwise.
 	 * @throws Exception
 	 */
+	@Override
 	public CoverFeatures coverFeatures(final Collection<String> features, final boolean selection) {
 		return new CoverFeatures(features, selection);
 	}
 
 	@Override
-	public FindOpenClauses findOpenClauses(List<SelectableFeature> featureList) {
-		return new FindOpenClauses(featureList);
+	public FindOpenClauses findOpenClauses() {
+		return new FindOpenClauses();
 	}
 
 	@Override
