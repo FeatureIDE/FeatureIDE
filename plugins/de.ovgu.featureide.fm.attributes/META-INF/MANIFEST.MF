@@ -25,3 +25,4 @@ Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.view,
  de.ovgu.featureide.fm.attributes.view.actions,
  de.ovgu.featureide.fm.attributes.view.editingsupports
+Bundle-ActivationPolicy: lazy
