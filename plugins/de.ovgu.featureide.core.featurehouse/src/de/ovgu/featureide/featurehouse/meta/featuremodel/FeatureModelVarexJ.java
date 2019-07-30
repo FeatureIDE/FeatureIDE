@@ -72,8 +72,8 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	public String getFeatureFields() {
 		final StringBuilder fields = new StringBuilder();
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		final List<IFeature> coreList = analyzer.getCoreFeatures();
-		final List<IFeature> deadList = analyzer.getDeadFeatures();
+		final List<IFeature> coreList = analyzer.getCoreFeatures(null);
+		final List<IFeature> deadList = analyzer.getDeadFeatures(null);
 		for (final IFeature feature : features) {
 			final boolean isCoreFeature = coreList.contains(feature);
 			final boolean isDeadFeature = deadList.contains(feature);

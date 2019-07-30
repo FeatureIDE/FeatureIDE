@@ -42,7 +42,7 @@ public class AtomicParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = model.getAnalyzer().getAtomicSets();
+		final List<List<IFeature>> atomicSets = model.getAnalyzer().getAtomicSets(null);
 
 		int i = 0;
 		for (final List<IFeature> list : atomicSets) {

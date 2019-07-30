@@ -433,6 +433,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				setActiveExplanation();
@@ -460,7 +461,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			return;
 		}
 		final FeatureModelAnalyzer analyser = getFeatureModel().getVariableFormula().getAnalyzer();
-		setActiveExplanation(analyser.isValid() ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
+		setActiveExplanation(analyser.isValid(null) ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
 	}
 
 	/**
@@ -511,8 +512,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			return;
 		}
 		final IRunner<Boolean> analyzeJob = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
+
 			@Override
-			public Boolean execute(IMonitor monitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> monitor) throws Exception {
 				final FeatureModelAnalyzer localAnalyzer = variableFormula.getAnalyzer();
 				localAnalyzer.reset();
 				refreshGraphics(null);
@@ -754,6 +756,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
+
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
@@ -768,7 +771,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			viewer.deregisterEditParts();
+			graphicalFeatureModel.init();
 			viewer.setContents(graphicalFeatureModel);
+			viewer.setLayout();
 			setDirty();
 			analyzeFeatureModel();
 			break;

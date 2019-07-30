@@ -368,7 +368,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				@Override
 				public void initChildren() {
 					// TODO catch time put
-					addChild(MODEL_VOID + model.getAnalyzer().isValid());
+					addChild(MODEL_VOID + model.getAnalyzer().isValid(null));
 					addChild(NUMBER_FEATURES + features);
 					addChild(NUMBER_CONCRETE + concrete);
 					addChild(NUMBER_ABSTRACT + (features - concrete));
@@ -389,9 +389,9 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			try {
 				// TODO catch time put
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid());
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid(null));
 				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid());
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid(null));
 				}
 			} catch (final ConcurrentModificationException e) {}
 			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);

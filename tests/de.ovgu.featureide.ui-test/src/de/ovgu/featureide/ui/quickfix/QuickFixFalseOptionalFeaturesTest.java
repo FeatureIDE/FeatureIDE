@@ -94,8 +94,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
 		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm.getFeatureModel());
-		final Collection<IFeature> core = fm.getAnalyzer().getCoreFeatures();
-		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+		final Collection<IFeature> core = fm.getAnalyzer().getCoreFeatures(null);
+		final Collection<String> falseOptionalFeatures = new LinkedList<>();
 
 		for (final IFeature feature : concrete) {
 			if (!core.contains(feature)) {

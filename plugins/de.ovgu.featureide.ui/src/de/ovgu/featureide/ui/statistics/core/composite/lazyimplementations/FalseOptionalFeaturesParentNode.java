@@ -43,7 +43,7 @@ public class FalseOptionalFeaturesParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		final List<IFeature> foFeatures = model.getAnalyzer().getFalseOptionalFeatures();
+		final List<IFeature> foFeatures = model.getAnalyzer().getFalseOptionalFeatures(null);
 		setValue(foFeatures.size());
 
 		for (final IFeature feature : foFeatures) {

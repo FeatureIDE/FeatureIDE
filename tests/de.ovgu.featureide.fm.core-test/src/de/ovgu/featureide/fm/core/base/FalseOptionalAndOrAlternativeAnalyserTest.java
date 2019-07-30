@@ -36,6 +36,6 @@ public class FalseOptionalAndOrAlternativeAnalyserTest {
 	@Test
 	public void checkFalseOptionals() {
 		final IFeatureModel model = Commons.loadTestFeatureModelFromFile("false_optional_test.xml");
-		Assert.assertEquals(3, FeatureModelManager.getAnalyzer(model).getFalseOptionalFeatures().size());
+		Assert.assertEquals(3, FeatureModelManager.getAnalyzer(model).getFalseOptionalFeatures(null).size());
 	}
 }

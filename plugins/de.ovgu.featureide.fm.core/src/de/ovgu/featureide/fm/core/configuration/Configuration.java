@@ -47,7 +47,6 @@ public class Configuration implements Cloneable {
 
 	protected FeatureModelFormula featureModel;
 	protected SelectableFeature root;
-	protected ConfigurationPropagator propagator;
 	protected boolean includeAbstractFeatures;
 	protected boolean propagate;
 
@@ -132,7 +131,6 @@ public class Configuration implements Cloneable {
 		final IFeature featureRoot = FeatureUtils.getRoot(featureModelFormula.getFeatureModel());
 		if (featureRoot != null) {
 			featureModel = featureModelFormula;
-			propagator = null;
 			root = initFeatures(null, featureRoot, renamings);
 			selectableFeatures.clear();
 			readdFeatures(root);

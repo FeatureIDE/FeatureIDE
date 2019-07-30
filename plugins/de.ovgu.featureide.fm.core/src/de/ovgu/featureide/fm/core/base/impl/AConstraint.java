@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -46,7 +47,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final IPropertyContainer propertyContainer;
 
-	protected final Collection<IFeature> containedFeatureList = new ArrayList<>();
+	protected final List<IFeature> containedFeatureList = new ArrayList<>();
 
 	protected Node propNode;
 	boolean featureSelected;
@@ -55,7 +56,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
-		propNode = oldConstraint.propNode.clone();
+		setNode(oldConstraint.propNode.clone());
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
 		description = oldConstraint.description;
@@ -64,7 +65,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
-		this.propNode = propNode;
+		setNode(propNode);
 		featureSelected = false;
 		isImplicit = false;
 		description = "";
@@ -83,11 +84,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
 		synchronized (containedFeatureList) {
-			if (containedFeatureList.isEmpty()) {
-				for (final String featureName : propNode.getContainedFeatures()) {
-					containedFeatureList.add(featureModel.getFeature(featureName));
-				}
-			}
 			return new ArrayList<>(containedFeatureList);
 		}
 	}
@@ -117,6 +113,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		propNode = node;
 		synchronized (containedFeatureList) {
 			containedFeatureList.clear();
+			if (propNode != null) {
+				for (final String featureName : propNode.getContainedFeatures()) {
+					containedFeatureList.add(featureModel.getFeature(featureName));
+				}
+			}
 		}
 	}
 

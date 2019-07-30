@@ -149,7 +149,7 @@ public class AnalysesCollection {
 		protected FeatureModelFormula formula;
 
 		private Object syncObject = new Object();
-		private IMonitor monitor = new NullMonitor();
+		private IMonitor<R> monitor = new NullMonitor<>();
 		private boolean enabled = true;
 
 		private AnalysisResult<R> analysisResult;
@@ -161,24 +161,27 @@ public class AnalysesCollection {
 		}
 
 		public R getResult() {
+			return getResult(null);
+		}
+
+		public R getResult(IMonitor<R> monitor) {
 			if (!enabled) {
 				return null;
 			}
 
 			AnalysisResult<R> curAnalysisResult;
-			IMonitor curMonitor;
 			Object curSyncObject;
 			synchronized (this) {
 				curAnalysisResult = this.analysisResult;
-				curMonitor = this.monitor;
 				curSyncObject = this.syncObject;
 			}
 
 			synchronized (curSyncObject) {
+				this.monitor = monitor != null ? monitor : new NullMonitor<>();
 				if (curAnalysisResult == null) {
 					final AbstractAnalysis<R> analysisInstance = createNewAnalysis();
 					try {
-						LongRunningWrapper.runMethod(analysisInstance, curMonitor);
+						LongRunningWrapper.runMethod(analysisInstance, this.monitor);
 						curAnalysisResult = analysisInstance.getResult();
 					} catch (final Exception e) {
 						Logger.logError(e);
@@ -187,9 +190,10 @@ public class AnalysesCollection {
 					synchronized (this) {
 						if (curSyncObject == this.syncObject) {
 							this.analysisResult = curAnalysisResult;
-							this.monitor = new NullMonitor();
 						}
 					}
+				} else {
+					this.monitor.done();
 				}
 				return curAnalysisResult.getResult();
 			}
@@ -231,7 +235,7 @@ public class AnalysesCollection {
 			synchronized (this) {
 				analysisResult = null;
 				monitor.cancel();
-				monitor = new NullMonitor();
+				monitor = new NullMonitor<>();
 				syncObject = new Object();
 			}
 		}

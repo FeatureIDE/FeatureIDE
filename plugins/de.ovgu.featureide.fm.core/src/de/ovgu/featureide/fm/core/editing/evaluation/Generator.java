@@ -99,7 +99,7 @@ public abstract class Generator {
 	}
 
 	public static void generateConstraints(IFeatureModel fm, Random random, int numberOfConstraints) {
-		final boolean valid = FeatureModelManager.getAnalyzer(fm).isValid();
+		final boolean valid = FeatureModelManager.getAnalyzer(fm).isValid(null);
 		if (!valid) {
 			Logger.logInfo("Feature model not valid!");
 		}
@@ -126,7 +126,7 @@ public abstract class Generator {
 				}
 			}
 			fm.addConstraint(new Constraint(fm, node));
-			if (!valid || FeatureModelManager.getAnalyzer(fm).isValid()) {
+			if (!valid || FeatureModelManager.getAnalyzer(fm).isValid(null)) {
 				i++;
 				System.out.println("E\t" + i + "\t" + node);
 			} else {
@@ -310,7 +310,7 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel arbitraryEdits(IFeatureModel originalFM, long id, int numberOfEdits) {
-		final boolean valid = FeatureModelManager.getAnalyzer(originalFM).isValid();
+		final boolean valid = FeatureModelManager.getAnalyzer(originalFM).isValid(null);
 		IFeatureModel fm = originalFM.clone(null);
 		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
 		final Random random = new Random(id);
@@ -406,7 +406,7 @@ public abstract class Generator {
 				}
 			}
 
-			if (valid && !FeatureModelManager.getAnalyzer(fm).isValid()) {
+			if (valid && !FeatureModelManager.getAnalyzer(fm).isValid(null)) {
 				System.out.println("Void feature model by arbitrary edit	" + r);
 				fm = backup;
 				i--;

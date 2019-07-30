@@ -44,7 +44,7 @@ public class DeadFeaturesParentNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 		// TODO Performance: Dead and core features should be calculated together.
-		final List<IFeature> deadFeatures = model.getAnalyzer().getDeadFeatures();
+		final List<IFeature> deadFeatures = model.getAnalyzer().getDeadFeatures(null);
 		setValue(deadFeatures.size());
 
 		for (final IFeature feature : deadFeatures) {

@@ -65,7 +65,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 	}
 
 	@Override
-	public final T execute(IMonitor monitor) throws Exception {
+	public final T execute(IMonitor<T> monitor) throws Exception {
 		if (solver == null) {
 			return null;
 		}
@@ -86,7 +86,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		}
 	}
 
-	protected abstract T analyze(IMonitor monitor) throws Exception;
+	protected abstract T analyze(IMonitor<T> monitor) throws Exception;
 
 	protected final void reportTimeout() throws RuntimeTimeoutException {
 		timeoutOccured = true;

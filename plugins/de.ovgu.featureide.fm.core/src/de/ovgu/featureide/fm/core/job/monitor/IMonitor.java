@@ -48,6 +48,8 @@ public interface IMonitor<T> {
 	 */
 	void setRemainingWork(int work);
 
+	int getRemainingWork();
+
 	/**
 	 * Increases the monitor's progress, invokes the intermediate function (with {@code null}), and checks for cancel.
 	 */

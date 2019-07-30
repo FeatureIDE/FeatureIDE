@@ -78,6 +78,11 @@ public class ProgressMonitor<T> extends ATaskMonitor<T> {
 	}
 
 	@Override
+	public synchronized int getRemainingWork() {
+		return 0;
+	}
+
+	@Override
 	public synchronized <R> IMonitor<R> subTask(int size) {
 		return new ProgressMonitor<>(monitor.newChild(size), this);
 	}

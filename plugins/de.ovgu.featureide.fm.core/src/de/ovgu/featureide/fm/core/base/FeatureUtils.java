@@ -449,7 +449,7 @@ public final class FeatureUtils {
 		final Node propNode = constraint.getNode();
 		if (propNode != null) {
 			fm.removeConstraint(constraint);
-			deadFeaturesBefore = FeatureModelManager.getAnalyzer(fm).getDeadFeatures();
+			deadFeaturesBefore = FeatureModelManager.getAnalyzer(fm).getDeadFeatures(null);
 			fm.addConstraint(new Constraint(fm, propNode));
 			fm.handleModelDataChanged();
 		}
@@ -1083,8 +1083,8 @@ public final class FeatureUtils {
 		final IFeatureModel featureModel = constraint.getFeatureModel();
 		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
 		clonedModel.removeConstraint(constraint);
-		final Collection<IFeature> foFeatures = FeatureModelManager.getAnalyzer(clonedModel).getFalseOptionalFeatures();
-		for (final IFeature feature : FeatureModelManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
+		final Collection<IFeature> foFeatures = FeatureModelManager.getAnalyzer(clonedModel).getFalseOptionalFeatures(null);
+		for (final IFeature feature : FeatureModelManager.getAnalyzer(featureModel).getFalseOptionalFeatures(null)) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;

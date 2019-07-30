@@ -81,6 +81,7 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -459,14 +460,16 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 
 			} else {
-				final IFeatureModel featureModel = featureProject.getFeatureModel();
+				final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+				final IFeatureModel featureModel = formula.getFeatureModel();
+				final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
 				final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 				for (final FSTClass c : fstModel.getClasses()) {
 					for (final FSTRole r : c.getRoles()) {
 						final IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (final FSTMethod m : r.getClassFragment().getMethods()) {
-							final List<IFeature> currentFeatureList = new LinkedList<IFeature>();
-							final List<IFeature> originalList = new LinkedList<IFeature>();
+							final List<IFeature> currentFeatureList = new LinkedList<>();
+							final List<IFeature> originalList = new LinkedList<>();
 
 							currentFeatureList.add(factory.createFeature(featureModel, r.getFeature().getName()));
 
@@ -486,7 +489,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									}
 
 									if (checkForIllegitimateMethodRefinement(m, mm)) {
-										final List<IFeature> finalMethodList = new LinkedList<IFeature>();
+										final List<IFeature> finalMethodList = new LinkedList<>();
 										finalMethodList.add(featureRole2);
 										if (FeatureModelManager.getAnalyzer(featureModel).checkIfFeatureCombinationPossible(featureRole1, finalMethodList)) {
 											setContractErrorMarker(m, "keyword \"\\final_method\" found but possibly later refinement.");
@@ -494,11 +497,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									}
 
 									if (checkForIllegitimateContract(m, mm)) {
-										final List<IFeature> finalContractList = new LinkedList<IFeature>();
+										final List<IFeature> finalContractList = new LinkedList<>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT)
-											&& FeatureModelManager.getAnalyzer(featureModel).checkIfFeatureCombinationPossible(
-													factory.createFeature(featureModel, r.getFeature().getName()), finalContractList)) {
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && analyzer.checkIfFeatureCombinationPossible(
+												factory.createFeature(featureModel, r.getFeature().getName()), finalContractList)) {
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 										}
 									}
@@ -506,7 +508,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									if (checkForIllegitimaterefinement(m, mm)) {
 										final LinkedList<IFeature> treeDependencyList = new LinkedList<IFeature>();
 										treeDependencyList.add(featureRole2);
-										if (FeatureModelManager.getAnalyzer(featureModel).checkIfFeatureCombinationPossible(featureRole1, treeDependencyList)) {
+										if (analyzer.checkIfFeatureCombinationPossible(featureRole1, treeDependencyList)) {
 											setContractErrorMarker(m, "Contract with composition keyword " + mm.getCompKey()
 												+ " possibily illegitimately redefined with keyword " + m.getCompKey() + ".");
 										}
@@ -514,8 +516,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 								}
 							}
-							if (m.getContract().contains(ORIGINAL) && !(!originalList.isEmpty()
-								? FeatureModelManager.getAnalyzer(featureModel).checkImplies(currentFeatureList, originalList) : false)) {
+							if (m.getContract().contains(ORIGINAL)
+								&& !(!originalList.isEmpty() ? analyzer.checkImplies(currentFeatureList, originalList) : false)) {
 								setContractErrorMarker(m, "keyword \"\\original\" found but no mandatory previous introduction.");
 							}
 						}
@@ -610,7 +612,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		final LinkedList<String> deadFeatures = new LinkedList<String>();
-		for (final IFeature deadFeature : FeatureModelManager.getAnalyzer(featureModel).getDeadFeatures()) {
+		for (final IFeature deadFeature : FeatureModelManager.getAnalyzer(featureModel).getDeadFeatures(null)) {
 			deadFeatures.add(deadFeature.getName());
 		}
 
@@ -719,7 +721,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);

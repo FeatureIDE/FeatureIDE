@@ -551,7 +551,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		if (!warnings.containsError()) {
-			if (!fmManager.getVariableFormula().getAnalyzer().isValid()) {
+			if (!fmManager.getVariableFormula().getAnalyzer().isValid(null)) {
 				markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		}

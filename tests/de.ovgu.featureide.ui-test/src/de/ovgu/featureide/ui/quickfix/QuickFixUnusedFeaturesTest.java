@@ -92,7 +92,7 @@ public class QuickFixUnusedFeaturesTest {
 
 	@Test
 	public void createConfigurationsTest() {
-		final Collection<IFeature> common = fm.getAnalyzer().getCommonFeatures();
+		final Collection<IFeature> common = fm.getAnalyzer().getCommonFeatures(null);
 		final Collection<String> unusedFeatures = new LinkedList<>();
 
 		for (final IFeature feature : common) {

@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanati
  * @author Rahel Arens
  */
 public class FocusOnExplanationInViewAction extends AbstractConstraintEditorAction {
+
 	public static final String ID = "de.ovgu.featureide.focusonexplanationinview";
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
@@ -76,7 +77,7 @@ public class FocusOnExplanationInViewAction extends AbstractConstraintEditorActi
 		final FeatureModelFormula formula = fmManager.getVariableFormula();
 		final FeatureModelAnalyzer analyser = formula.getAnalyzer();
 		if (constraint == null) {
-			if (!analyser.isValid()) {
+			if (!analyser.isValid(null)) {
 				FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(graphicalFeatureModel, analyser.getVoidFeatureModelExplanation()));
 			}
 		} else if (formula.getFeatureModel() == constraint.getFeatureModel()) {

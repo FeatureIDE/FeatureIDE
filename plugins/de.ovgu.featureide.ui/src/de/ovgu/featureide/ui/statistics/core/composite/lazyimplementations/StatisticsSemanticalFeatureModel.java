@@ -42,7 +42,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	@Override
 	protected void initChildren() {
 		// Cached validity for speed
-		final boolean isValid = model.getAnalyzer().isValid();
+		final boolean isValid = model.getAnalyzer().isValid(null);
 
 		addChild(new Parent(MODEL_VOID, isValid));
 

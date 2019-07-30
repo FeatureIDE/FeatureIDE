@@ -98,6 +98,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	private FeatureModelEditor featureModelEditor;
 
 	private final IEventListener eventListener = new IEventListener() {
+
 		/**
 		 * Reacts on observer of the current feature model
 		 */
@@ -121,6 +122,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	};
 
 	private final IPageChangedListener pageChangeListener = new IPageChangedListener() {
+
 		@Override
 		public void pageChanged(PageChangedEvent event) {
 			if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
@@ -154,6 +156,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 * reacts when searchBox noticed input and modifies the Constraint table according to the input
 	 */
 	private final ModifyListener searchListener = new ModifyListener() {
+
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
@@ -179,7 +182,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			}
 			if (fmManager != null) {
 				this.fmManager = fmManager;
-				fmManager.getVariableFormula().getAnalyzer().analyzeFeatureModel(null);
+//				fmManager.getVariableFormula().getAnalyzer().analyzeFeatureModel(null);
 				this.fmManager.addListener(eventListener);
 			}
 		}
@@ -208,7 +211,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 					addVisibleConstraints();
 				}
 				// Selection has explanation or Model is void
-				if ((explanationList != null) || !currentModel.getVariableFormula().getAnalyzer().isValid()) {
+				if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
 					changeIntoDecoratedConstraints();
 				}
 			} else {
@@ -400,7 +403,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final FeatureModelEditor fmEditor = featureModelEditor;
 			if (fmEditor != null) {
 				final FeatureModelAnalyzer analyser = fmEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
-				if (!analyser.isValid()) {
+				if (analyser.getAnalysesCollection().getFeatureModelProperties().hasVoidModelConstraints()) {
 					explanation = (Explanation<?>) analyser.getVoidFeatureModelExplanation();
 				} else if (fmEditor.diagramEditor.getActiveExplanation() != null) {
 					explanation = (Explanation<?>) fmEditor.diagramEditor.getActiveExplanation();

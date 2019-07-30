@@ -97,14 +97,14 @@ public class CalculateDependencyOperation implements LongRunningMethod<IFeature>
 	 * and implicit constraints.
 	 */
 	@Override
-	public IFeature execute(IMonitor monitor) throws Exception {
+	public IFeature execute(IMonitor<IFeature> monitor) throws Exception {
 		final ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing
 		final IFeatureModel slicedModel = LongRunningWrapper.runMethod(new SliceFeatureModel(completeFm, subtreeFeatures, true));
 
 		// only replace root with selected feature if feature is core-feature
-		final List<IFeature> coreFeatures = FeatureModelManager.getAnalyzer(completeFm).getCoreFeatures();
+		final List<IFeature> coreFeatures = FeatureModelManager.getAnalyzer(completeFm).getCoreFeatures(null);
 		if (coreFeatures.contains(subtreeRoot)) {
 			isCoreFeature = true;
 		}

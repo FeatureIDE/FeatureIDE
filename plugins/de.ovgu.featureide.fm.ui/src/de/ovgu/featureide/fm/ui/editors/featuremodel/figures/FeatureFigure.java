@@ -264,7 +264,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			toolTip.append(INDETERMINATE_HIDDEN);
 		}
 
-		if (!analyser.isValid()) {
+		if (!analyser.isValid(null)) {
 			toolTip.setLength(0);
 			toolTip.trimToSize();
 			toolTip.append(VOID);

@@ -43,7 +43,7 @@ public class CoreFeaturesParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		final List<IFeature> coreFeatures = model.getAnalyzer().getCoreFeatures();
+		final List<IFeature> coreFeatures = model.getAnalyzer().getCoreFeatures(null);
 		setValue(coreFeatures.size());
 
 		for (final IFeature feature : coreFeatures) {

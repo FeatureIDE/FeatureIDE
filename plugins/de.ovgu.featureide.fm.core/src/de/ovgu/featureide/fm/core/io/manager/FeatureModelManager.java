@@ -21,11 +21,8 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import javax.annotation.CheckForNull;
-
-import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -121,18 +118,10 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	@Override
-	protected void resetSnapshot() {
+	public void resetSnapshot() {
 		super.resetSnapshot();
 		if (variableFormula != null) {
-			if (variableObject != null) {
-				final Node oldNode = variableFormula.getPropositionalNode();
-				final Node newNode = new FeatureModelFormula(variableObject).getPropositionalNode();
-				if (!Objects.equals(oldNode, newNode)) {
-					variableFormula = null;
-				}
-			} else {
-				variableFormula = null;
-			}
+			variableFormula = null;
 		}
 	}
 

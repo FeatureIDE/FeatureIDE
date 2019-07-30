@@ -233,7 +233,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final LongRunningMethod<Boolean> syncModulesJob = new LongRunningMethod<Boolean>() {
 
 		@Override
-		public Boolean execute(IMonitor workMonitor) throws Exception {
+		public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 			try {
 				final IFolder folder = sourceFolder;
 				featureModelManager.read();
@@ -299,7 +299,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return true;
 		}
 
-		private void next(String subTaskName, IMonitor workMonitor) {
+		private void next(String subTaskName, IMonitor<?> workMonitor) {
 			workMonitor.step();
 			workMonitor.setTaskName(subTaskName);
 		}
@@ -426,7 +426,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public void dispose() {
 		removeModelListener();
 		try {
-			if (configFolder != null) {
+			if ((configFolder != null) && Files.exists(configFolder)) {
 				Files.walk(configFolder).forEach(this::disposeFileManager);
 			}
 			final Path fmPath = EclipseFileSystem.getPath(modelFile.getModelFile());
@@ -747,7 +747,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
+				public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 					buildRelevantChanges = true;
 					try {
 						project.build(IncrementalProjectBuilder.FULL_BUILD, null);
@@ -1112,7 +1112,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				checkBuildFolder(folder);
 				return true;
 			}
@@ -1168,12 +1168,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				workMonitor.setRemainingWork(2);
 				final FeatureModelFormula f = featureModelManager.getPersistentFormula();
 
 				final Configuration config = new Configuration(f, false, false);
-				IMonitor subTask = workMonitor.subTask(1);
+				IMonitor<?> subTask = workMonitor.subTask(1);
 				subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
 				subTask.setRemainingWork(files.size());
 				for (final Path file : files) {
@@ -1286,8 +1286,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final IFeatureModel featureModel = persistentFormula.getFeatureModel();
 		final List<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 		final FeatureModelAnalyzer analyzer = persistentFormula.getAnalyzer();
-		final List<IFeature> coreList = analyzer.getCoreFeatures();
-		final List<IFeature> deadList = analyzer.getDeadFeatures();
+		final List<IFeature> coreList = analyzer.getCoreFeatures(null);
+		final List<IFeature> deadList = analyzer.getDeadFeatures(null);
 		for (final IFeature feature : coreList) {
 			concreteFeatures.remove(feature.getName());
 		}
@@ -1590,15 +1590,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			modelFile.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		if (!featureModelManager.getLastProblems().containsError()) {
-			if (!featureModelManager.getPersistentFormula().getAnalyzer().isValid()) {
+			if (!featureModelManager.getPersistentFormula().getAnalyzer().isValid(null)) {
 				modelFile.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		}
 		try {
 			createAndDeleteFeatureFolders();
 		} catch (final CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.logError(e);
 		}
 	}
 

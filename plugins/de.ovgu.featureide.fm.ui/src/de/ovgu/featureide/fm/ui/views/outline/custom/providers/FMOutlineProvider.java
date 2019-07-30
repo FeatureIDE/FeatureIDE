@@ -128,9 +128,9 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			if (!f.isCollapsed()) {
 				expandedElements.add(f);
 			}
-			expandedElements.add("Constraints");
-			viewer.setExpandedElements(expandedElements.toArray());
 		}
+		expandedElements.add("Constraints");
+		viewer.setExpandedElements(expandedElements.toArray());
 	}
 
 	@Override

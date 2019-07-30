@@ -191,7 +191,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected int curGroup = 0;
 	protected int curSearchIndex = 0;
 	protected int maxGroup = 0;
-	protected boolean useGroups = true;
+	protected boolean useGroups = false;
 	protected boolean useRecommendation = false;
 
 	protected Tree tree;
@@ -373,7 +373,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				computeTree(UpdateStrategy.RESOLVE);
-				resolveButton.setEnabled(false);
+				setResolveButton(false);
 				setDirty();
 			}
 
@@ -607,7 +607,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			sb.append(CONFLICTING_COMMA_);
 			sb.append("0");
 			sb.append(POSSIBLE_CONFIGURATIONS);
-			display.asyncExec(() -> resolveButton.setEnabled(true));
+			display.asyncExec(() -> setResolveButton(true));
 		} else {
 			final long number = conflicting ? 0 : LongRunningWrapper.runMethod(propagator.number(250));
 			sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
@@ -618,7 +618,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				sb.append(number);
 			}
 			sb.append(POSSIBLE_CONFIGURATIONS);
-			display.asyncExec(() -> resolveButton.setEnabled(false));
+			display.asyncExec(() -> setResolveButton(false));
 		}
 		final String message = sb.toString();
 		final Color color = valid ? blue : red;
@@ -627,8 +627,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	private void setInfoLabel(String message, Color color) {
-		infoLabel.setText(message);
-		infoLabel.setForeground(color);
+		if (!infoLabel.isDisposed()) {
+			infoLabel.setText(message);
+			infoLabel.setForeground(color);
+		}
+	}
+
+	private void setResolveButton(boolean enable) {
+		if (!resolveButton.isDisposed()) {
+			resolveButton.setEnabled(enable);
+		}
 	}
 
 	@Override
@@ -653,7 +661,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			return false;
 		} else {
 			final FeatureModelAnalyzer analyzer = configurationEditor.getFeatureModelManager().getPersistentFormula().getAnalyzer();
-			if (!analyzer.isValid()) {
+			if (!analyzer.isValid(null)) {
 				displayError(
 						THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 				return false;
@@ -856,10 +864,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	private void levelExpand() {
-		final TreeItem root = tree.getItem(0);
-		if (root != null) {
-			root.setExpanded(true);
-			expandRec(root);
+		if (!tree.isDisposed()) {
+			final TreeItem root = tree.getItem(0);
+			if (root != null) {
+				root.setExpanded(true);
+				expandRec(root);
+			}
 		}
 	}
 
@@ -1231,6 +1241,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	public Void build(SelectableFeature rootFeature, final Display currentDisplay) {
 		final LinkedList<TreeItem> parentElements = new LinkedList<>();
 		currentDisplay.syncExec(() -> createRootItem(rootFeature, parentElements));
+		if (parentElements.isEmpty()) {
+			return null;
+		}
 
 		final LinkedList<List<TreeElement>> newElements = new LinkedList<>();
 		newElements.offer(Arrays.asList(rootFeature.getChildren()));
@@ -1247,36 +1260,45 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					newElements.offer(Arrays.asList(feature.getChildren()));
 				}
 			}
-			currentDisplay.syncExec(() -> createFeatureItems(nonHidden, parent, parentElements));
-			if (!nonHidden.isEmpty() && parentElements.isEmpty()) {
-				return null;
+			if (!nonHidden.isEmpty()) {
+				final LinkedList<TreeItem> newParentElements = new LinkedList<>();
+				currentDisplay.syncExec(() -> createFeatureItems(nonHidden, parent, newParentElements));
+				if (newParentElements.isEmpty()) {
+					return null;
+				} else {
+					parentElements.addAll(newParentElements);
+				}
 			}
 		}
 		return null;
 	}
 
 	private void createRootItem(SelectableFeature rootFeature, LinkedList<TreeItem> parentElements) {
-		tree.removeAll();
-		final TreeItem root = new TreeItem(tree, 0);
-		root.setData(rootFeature);
-		parentElements.add(root);
-		itemMap.put(rootFeature, root);
-		refreshItem(Arrays.asList(root));
+		if (!tree.isDisposed()) {
+			tree.removeAll();
+			final TreeItem root = new TreeItem(tree, 0);
+			root.setData(rootFeature);
+			parentElements.add(root);
+			itemMap.put(rootFeature, root);
+			refreshItem(Arrays.asList(root));
+		}
 	}
 
 	private void createFeatureItems(List<SelectableFeature> features, TreeItem parent, LinkedList<TreeItem> parentElements) {
-		final List<TreeItem> items = new ArrayList<>();
-		for (final SelectableFeature currentFeature : features) {
-			// This try for the case that the parent item is already disposed.
-			try {
-				final TreeItem childNode = new TreeItem(parent, 0);
-				childNode.setData(currentFeature);
-				items.add(childNode);
-				parentElements.add(childNode);
-				itemMap.put(currentFeature, childNode);
-			} catch (final Exception e) {}
+		if (!parent.isDisposed()) {
+			final List<TreeItem> items = new ArrayList<>();
+			for (final SelectableFeature currentFeature : features) {
+				// This try for the case that the parent item is already disposed.
+				try {
+					final TreeItem childNode = new TreeItem(parent, 0);
+					childNode.setData(currentFeature);
+					items.add(childNode);
+					parentElements.add(childNode);
+					itemMap.put(currentFeature, childNode);
+				} catch (final Exception e) {}
+			}
+			refreshItem(items);
 		}
-		refreshItem(items);
 	}
 
 }

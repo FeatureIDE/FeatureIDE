@@ -49,7 +49,7 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 		final IFeatureModel featureModel = snapshot.getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
 			final FeatureModelAnalyzer analyser = snapshot.getAnalyzer();
-			coreFeatures = analyser.getCoreFeatures();
+			coreFeatures = analyser.getCoreFeatures(null);
 			featureModelFilterIsInitializedFor = featureModel;
 		}
 	}

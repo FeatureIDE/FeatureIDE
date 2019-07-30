@@ -47,7 +47,7 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 		final FeatureModelFormula snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
 		final IFeatureModel featureModel = snapshot.getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			deadFeatures = snapshot.getAnalyzer().getDeadFeatures();
+			deadFeatures = snapshot.getAnalyzer().getDeadFeatures(null);
 			featureModelFilterIsInitializedFor = featureModel;
 		}
 	}

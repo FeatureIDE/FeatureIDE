@@ -109,7 +109,7 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 	}
 
 	@Override
-	public List<Anomalies> analyze(IMonitor monitor) throws Exception {
+	public List<Anomalies> analyze(IMonitor<List<Anomalies>> monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
 		}

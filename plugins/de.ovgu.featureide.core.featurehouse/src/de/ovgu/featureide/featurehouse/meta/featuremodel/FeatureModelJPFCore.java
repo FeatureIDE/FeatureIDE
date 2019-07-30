@@ -86,8 +86,8 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 
 		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		coreFeatures = analyzer.getCoreFeatures();
-		deadFeatures = analyzer.getDeadFeatures();
+		coreFeatures = analyzer.getCoreFeatures(null);
+		deadFeatures = analyzer.getDeadFeatures(null);
 		fields.append(NEWLINE + "\t/**" + NEWLINE + "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE
 			+ "\t * All other features have unknown selection states." + NEWLINE + "\t */" + NEWLINE + "\tstatic {" + NEWLINE);
 		for (final IFeature f : features) {

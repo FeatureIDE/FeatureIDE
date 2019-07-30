@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.decorators;
 
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -34,6 +35,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -58,7 +60,7 @@ public class ActiveConfigurationDecorator implements ILightweightLabelDecorator,
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
 		final IFeatureProject pd = CorePlugin.getFeatureProject((IResource) element);
-		if ((pd != null) && ((IResource) element).equals(pd.getCurrentConfiguration())) {
+		if ((pd != null) && Objects.equals(EclipseFileSystem.getPath((IResource) element), pd.getCurrentConfiguration())) {
 			decoration.addOverlay(icon, IDecoration.TOP_LEFT);
 		}
 	}

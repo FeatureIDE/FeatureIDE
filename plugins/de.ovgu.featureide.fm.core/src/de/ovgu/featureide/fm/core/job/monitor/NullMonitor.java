@@ -65,4 +65,9 @@ public final class NullMonitor<T> extends AMonitor<T> {
 		return "";
 	}
 
+	@Override
+	public int getRemainingWork() {
+		return 0;
+	}
+
 }

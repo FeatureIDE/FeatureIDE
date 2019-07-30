@@ -55,7 +55,9 @@ public class ConsoleMonitor<T> extends ATaskMonitor<T> {
 	}
 
 	@Override
-	public void done() {}
+	public void done() {
+		worked(getRemainingWork());
+	}
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
@@ -67,6 +69,11 @@ public class ConsoleMonitor<T> extends ATaskMonitor<T> {
 	@Override
 	public synchronized final void setRemainingWork(int work) {
 		this.work = work;
+	}
+
+	@Override
+	public synchronized int getRemainingWork() {
+		return work;
 	}
 
 	@Override

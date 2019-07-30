@@ -48,7 +48,7 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 		final FeatureModelFormula featureModel = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
 		if (featureModel.getFeatureModel() != featureModelFilterIsInitializedFor) {
 			final FeatureModelAnalyzer analyser = featureModel.getAnalyzer();
-			foFeatures = analyser.getFalseOptionalFeatures();
+			foFeatures = analyser.getFalseOptionalFeatures(null);
 			featureModelFilterIsInitializedFor = featureModel.getFeatureModel();
 		}
 	}

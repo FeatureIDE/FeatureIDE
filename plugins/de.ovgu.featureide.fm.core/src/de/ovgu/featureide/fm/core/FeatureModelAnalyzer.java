@@ -101,21 +101,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 		analysesCollection.reset(formula);
 	}
 
-	public boolean isValid() {
-		final Boolean result = analysesCollection.validAnalysis.getResult();
+	public boolean isValid(IMonitor<Boolean> monitor) {
+		final Boolean result = analysesCollection.validAnalysis.getResult(monitor);
 		return result == null ? false : result;
 	}
 
-	public List<IFeature> getCoreFeatures() {
-		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult();
+	public List<IFeature> getCoreFeatures(IMonitor<LiteralSet> monitor) {
+		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
 		return Functional.mapToList(formula.getCNF().getVariables().convertToString(result, true, false, false), new StringToFeature(featureModel));
 	}
 
-	public List<IFeature> getDeadFeatures() {
-		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult();
+	public List<IFeature> getDeadFeatures(IMonitor<LiteralSet> monitor) {
+		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -128,8 +128,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 *
 	 * @return a list of features that is common to all variants
 	 */
-	public List<IFeature> getCommonFeatures() {
-		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult();
+	public List<IFeature> getCommonFeatures(IMonitor<LiteralSet> monitor) {
+		final LiteralSet result = analysesCollection.coreDeadAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -139,8 +139,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 				new Functional.IdentityFunction<IFeature>());
 	}
 
-	public List<List<IFeature>> getAtomicSets() {
-		final List<LiteralSet> result = analysesCollection.atomicSetAnalysis.getResult();
+	public List<List<IFeature>> getAtomicSets(IMonitor<List<LiteralSet>> monitor) {
+		final List<LiteralSet> result = analysesCollection.atomicSetAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -167,17 +167,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 *
 	 * @param changedAttributes
 	 */
-	public List<IFeature> getIndeterminedHiddenFeatures() {
-		final LiteralSet result = analysesCollection.determinedAnalysis.getResult();
+	public List<IFeature> getIndeterminedHiddenFeatures(IMonitor<LiteralSet> monitor) {
+		final LiteralSet result = analysesCollection.determinedAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
 		return Functional.mapToList(formula.getCNF().getVariables().convertToString(result, true, false, false), new StringToFeature(featureModel));
 	}
 
-	public List<IFeature> getFalseOptionalFeatures() {
+	public List<IFeature> getFalseOptionalFeatures(IMonitor<List<LiteralSet>> monitor) {
 		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new OptionalFeatureFilter());
-		final List<LiteralSet> result = getFalseOptionalFeatures(optionalFeatures);
+		final List<LiteralSet> result = getFalseOptionalFeatures(optionalFeatures, monitor);
 
 		final List<IFeature> resultList = new ArrayList<>();
 		int i = 0;
@@ -190,34 +190,35 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return resultList;
 	}
 
-	private List<LiteralSet> getFalseOptionalFeatures(final List<IFeature> optionalFeatures) {
+	private List<LiteralSet> getFalseOptionalFeatures(final List<IFeature> optionalFeatures, IMonitor<List<LiteralSet>> monitor) {
 		analysesCollection.foAnalysis.setOptionalFeatures(optionalFeatures);
-		final List<LiteralSet> result = analysesCollection.foAnalysis.getResult();
+		final List<LiteralSet> result = analysesCollection.foAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
 		return result;
 	}
 
-	public List<IConstraint> getContradictoryConstraints() {
-		return getConstraintAnalysisResults(getVoidConstraints(), analysesCollection.constraintContradictionAnalysis);
+	public List<IConstraint> getContradictoryConstraints(IMonitor<List<LiteralSet>> monitor) {
+		return getConstraintAnalysisResults(getVoidConstraints(monitor.subTask(1)), analysesCollection.constraintContradictionAnalysis, monitor);
 	}
 
-	public List<IConstraint> getVoidConstraints() {
-		return getConstraintAnalysisResults(constraints, analysesCollection.constraintVoidAnalysis);
+	public List<IConstraint> getVoidConstraints(IMonitor<List<LiteralSet>> monitor) {
+		return getConstraintAnalysisResults(constraints, analysesCollection.constraintVoidAnalysis, monitor);
 	}
 
-	public List<IConstraint> getTautologyConstraints() {
-		return getConstraintAnalysisResults(getRedundantConstraints(), analysesCollection.constraintTautologyAnalysis);
+	public List<IConstraint> getTautologyConstraints(IMonitor<List<LiteralSet>> monitor) {
+		return getConstraintAnalysisResults(getRedundantConstraints(monitor.subTask(1)), analysesCollection.constraintTautologyAnalysis, monitor);
 	}
 
-	public List<IConstraint> getRedundantConstraints() {
-		return getConstraintAnalysisResults(constraints, analysesCollection.constraintRedundancyAnalysis);
+	public List<IConstraint> getRedundantConstraints(IMonitor<List<LiteralSet>> monitor) {
+		return getConstraintAnalysisResults(constraints, analysesCollection.constraintRedundancyAnalysis, monitor);
 	}
 
-	private List<IConstraint> getConstraintAnalysisResults(List<IConstraint> constraints, ConstraintAnalysisWrapper<?> analysisWrapper) {
+	private List<IConstraint> getConstraintAnalysisResults(List<IConstraint> constraints, ConstraintAnalysisWrapper<?> analysisWrapper,
+			IMonitor<List<LiteralSet>> monitor) {
 		analysisWrapper.setConstraints(constraints);
-		final List<LiteralSet> result = analysisWrapper.getResult();
+		final List<LiteralSet> result = analysisWrapper.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -231,9 +232,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return resultList;
 	}
 
-	public List<IConstraint> getAnomalyConstraints(boolean[] relevantConstraint) {
+	public List<IConstraint> getAnomalyConstraints(boolean[] relevantConstraint, IMonitor<List<Anomalies>> monitor) {
 		analysesCollection.constraintAnomaliesAnalysis.setRelevantConstraint(relevantConstraint);
-		final List<Anomalies> result = analysesCollection.constraintAnomaliesAnalysis.getResult();
+		final List<Anomalies> result = analysesCollection.constraintAnomaliesAnalysis.getResult(monitor);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -289,11 +290,19 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * unnecessary or redundant calculations) Hashing might be fast for locating features, but creating a HashSet is costly So LinkedLists are much faster
 	 * because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public AnalysesCollection analyzeFeatureModel(IMonitor monitor) {
-		// TODO !!! use monitor
+	public AnalysesCollection analyzeFeatureModel(IMonitor<Boolean> monitor) {
 		if (monitor == null) {
-			monitor = new NullMonitor();
+			monitor = new NullMonitor<>();
 		}
+
+		int work = 0;
+		if (analysesCollection.isCalculateFeatures()) {
+			work += 4;
+		}
+		if (analysesCollection.isCalculateConstraints()) {
+			work += 20;
+		}
+		monitor.setRemainingWork(work);
 
 		updateFeatures(monitor);
 
@@ -306,11 +315,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 		updateConstraints(null);
 	}
 
-	public void updateConstraints(IMonitor monitor) {
+	protected void updateConstraints(IMonitor<Boolean> monitor) {
 		if (analysesCollection.isCalculateConstraints()) {
 			if (monitor == null) {
-				monitor = new NullMonitor();
+				monitor = new NullMonitor<>();
 			}
+			monitor.checkCancel();
 			// set default values for constraint properties
 			for (final IConstraint constraint : constraints) {
 				final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
@@ -318,21 +328,27 @@ public class FeatureModelAnalyzer implements IEventListener {
 				constraintProperties.setStatus(ConstraintStatus.NECESSARY);
 				constraintProperties.setStatus(ConstraintStatus.SATISFIABLE);
 			}
+			monitor.worked();
 
+			monitor.checkCancel();
 			// get constraint anomalies
-			for (final IConstraint constraint : getRedundantConstraints()) {
+			for (final IConstraint constraint : getRedundantConstraints(monitor.subTask(2))) {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.REDUNDANT);
 			}
-			for (final IConstraint constraint : getTautologyConstraints()) {
+			monitor.checkCancel();
+			for (final IConstraint constraint : getTautologyConstraints(monitor.subTask(2))) {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.TAUTOLOGY);
 			}
-			for (final IConstraint constraint : getVoidConstraints()) {
+			monitor.checkCancel();
+			for (final IConstraint constraint : getVoidConstraints(monitor.subTask(2))) {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.VOID_MODEL);
 			}
-			for (final IConstraint constraint : getContradictoryConstraints()) {
+			monitor.checkCancel();
+			for (final IConstraint constraint : getContradictoryConstraints(monitor.subTask(2))) {
 				getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
 			}
 
+			monitor.checkCancel();
 			int i = 0;
 			final boolean[] relevantConstraint = new boolean[constraints.size()];
 			for (final IConstraint constraint : constraints) {
@@ -342,8 +358,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 				}
 				i++;
 			}
+			monitor.worked();
 
-			getAnomalyConstraints(relevantConstraint);
+			monitor.checkCancel();
+			getAnomalyConstraints(relevantConstraint, monitor.subTask(10));
 		}
 	}
 
@@ -351,11 +369,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 		updateFeatures(null);
 	}
 
-	public void updateFeatures(IMonitor monitor) {
+	protected void updateFeatures(IMonitor<Boolean> monitor) {
 		if (analysesCollection.isCalculateFeatures()) {
 			if (monitor == null) {
-				monitor = new NullMonitor();
+				monitor = new NullMonitor<>();
 			}
+			monitor.checkCancel();
 			// set default values for feature properties
 			for (final IFeature feature : featureModel.getFeatures()) {
 				final FeatureProperties featureProperties = getFeatureProperties(feature);
@@ -378,15 +397,19 @@ public class FeatureModelAnalyzer implements IEventListener {
 					}
 				}
 			}
+			monitor.worked();
 
+			monitor.checkCancel();
 			// get feature anomalies
-			for (final IFeature feature : getDeadFeatures()) {
+			for (final IFeature feature : getDeadFeatures(monitor.subTask(1))) {
 				getFeatureProperties(feature).setStatus(FeatureStatus.DEAD);
 			}
-			for (final IFeature feature : getFalseOptionalFeatures()) {
+			monitor.checkCancel();
+			for (final IFeature feature : getFalseOptionalFeatures(monitor.subTask(1))) {
 				getFeatureProperties(feature).setStatus(FeatureStatus.FALSE_OPTIONAL);
 			}
-			for (final IFeature feature : getIndeterminedHiddenFeatures()) {
+			monitor.checkCancel();
+			for (final IFeature feature : getIndeterminedHiddenFeatures(monitor.subTask(1))) {
 				getFeatureProperties(feature).setStatus(FeatureStatus.INDETERMINATE_HIDDEN);
 			}
 		}
