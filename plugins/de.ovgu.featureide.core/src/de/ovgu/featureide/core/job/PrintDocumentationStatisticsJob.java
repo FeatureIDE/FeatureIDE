@@ -59,7 +59,7 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			CorePlugin.getDefault().logWarning(project.getName() + " is no FeatureIDE Project!");

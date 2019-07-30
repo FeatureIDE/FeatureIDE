@@ -825,7 +825,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		if (maxNumber <= 0) {
 			return;
 		}

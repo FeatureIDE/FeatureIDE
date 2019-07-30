@@ -64,10 +64,10 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 	}
 
 	public CNF createNodes() {
-		return createNodes(new NullMonitor());
+		return createNodes(new NullMonitor<>());
 	}
 
-	public CNF createNodes(IMonitor monitor) {
+	public CNF createNodes(IMonitor<CNF> monitor) {
 		if (featureModel == null) {
 			return new CNF(new Variables(Collections.<String> emptyList()));
 		}
@@ -110,7 +110,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 	}
 
 	@Override
-	public CNF execute(IMonitor monitor) throws Exception {
+	public CNF execute(IMonitor<CNF> monitor) throws Exception {
 		return createNodes(monitor);
 	}
 

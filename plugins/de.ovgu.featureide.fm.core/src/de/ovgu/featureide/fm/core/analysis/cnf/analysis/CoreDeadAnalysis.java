@@ -60,7 +60,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 	}
 
 	@Override
-	public LiteralSet analyze(IMonitor monitor) throws Exception {
+	public LiteralSet analyze(IMonitor<LiteralSet> monitor) throws Exception {
 		return analyze1(monitor);
 	}
 
@@ -73,7 +73,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 		}
 	}
 
-	public LiteralSet analyze2(IMonitor monitor) throws Exception {
+	public LiteralSet analyze2(IMonitor<LiteralSet> monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findSolution();
@@ -186,7 +186,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 		}
 	}
 
-	public LiteralSet analyze1(IMonitor monitor) throws Exception {
+	public LiteralSet analyze1(IMonitor<LiteralSet> monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findSolution();
@@ -221,7 +221,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 					switch (solver.hasSolution()) {
 					case FALSE:
 						solver.assignmentReplaceLast(varX);
-						monitor.invoke(varX);
+						monitor.invoke(new LiteralSet(varX));
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();

@@ -57,7 +57,7 @@ public abstract class LazyParent extends Parent {
 		}
 
 		@Override
-		public Boolean execute(IMonitor monitor) throws Exception {
+		public Boolean execute(IMonitor<Boolean> monitor) throws Exception {
 			try {
 				initChildren();
 			} finally {

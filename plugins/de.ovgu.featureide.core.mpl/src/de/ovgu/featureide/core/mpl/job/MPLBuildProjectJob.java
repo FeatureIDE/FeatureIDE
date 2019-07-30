@@ -81,7 +81,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 	IFolder rootBuildFolder = null;
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		try {
 			if (externalFeatureProject.getProject().hasNature(MSPLNature.NATURE_ID)) {
 				if (!buildMPLProject()) {

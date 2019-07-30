@@ -197,10 +197,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public Node createNodes() {
-		return createNodes(new NullMonitor());
+		return createNodes(new NullMonitor<>());
 	}
 
-	public Node createNodes(IMonitor monitor) {
+	public Node createNodes(IMonitor<Node> monitor) {
 		if (featureModel == null) {
 			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
 			switch (cnfType) {
@@ -217,7 +217,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new And(createFormula(monitor.subTask(1)));
 	}
 
-	private Node[] createFormula(IMonitor monitor) {
+	private Node[] createFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Creating Formula");
 		monitor.setRemainingWork(2);
 		final Node[] andChildren1;
@@ -374,7 +374,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	@Override
-	public Node execute(IMonitor monitor) throws Exception {
+	public Node execute(IMonitor<Node> monitor) throws Exception {
 		return createNodes(monitor);
 	}
 

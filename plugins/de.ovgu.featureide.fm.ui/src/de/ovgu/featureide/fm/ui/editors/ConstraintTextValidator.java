@@ -72,6 +72,7 @@ public final class ConstraintTextValidator {
 		token = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 		final IRunner<InitialAnalysis.InitialResult> runner = LongRunningWrapper.getRunner(new InitialAnalysis(featureModel, constraint));
 		runner.addJobFinishedListener(new JobFinishListener<InitialAnalysis.InitialResult>() {
+
 			@Override
 			public void jobFinished(IJob<InitialAnalysis.InitialResult> finishedJob) {
 				final ValidationMessage m = new ValidationMessage("");
@@ -113,6 +114,7 @@ public final class ConstraintTextValidator {
 	private static class InitialAnalysis implements LongRunningMethod<InitialAnalysis.InitialResult> {
 
 		private static class InitialResult {
+
 			CNF satInstance;
 			AdvancedSatSolver solver;
 
@@ -130,7 +132,8 @@ public final class ConstraintTextValidator {
 		}
 
 		@Override
-		public InitialResult execute(IMonitor monitor) throws Exception {
+		public InitialResult execute(IMonitor<InitialResult> monitor) throws Exception {
+			monitor.setRemainingWork(3);
 			final InitialResult initialResult = new InitialResult();
 			CNF cnf = featureModel.getElement(new CNFCreator());
 			if (constraint != null) {
@@ -150,13 +153,13 @@ public final class ConstraintTextValidator {
 			initialResult.satInstance = cnf;
 
 			initialResult.solver = new AdvancedSatSolver(initialResult.satInstance);
-			monitor.checkCancel();
-			initialResult.valid = null != LongRunningWrapper.runMethod(new HasSolutionAnalysis(initialResult.solver), monitor);
+			monitor.step();
+			initialResult.valid = null != LongRunningWrapper.runMethod(new HasSolutionAnalysis(initialResult.solver), monitor.subTask(1));
 
 			if (initialResult.valid) {
 
 				monitor.checkCancel();
-				initialResult.deadCore = LongRunningWrapper.runMethod(new CoreDeadAnalysis(initialResult.solver), monitor);
+				initialResult.deadCore = LongRunningWrapper.runMethod(new CoreDeadAnalysis(initialResult.solver), monitor.subTask(1));
 
 				monitor.checkCancel();
 				initialResult.possibleFOFeatures = new ClauseList();
@@ -194,7 +197,7 @@ public final class ConstraintTextValidator {
 		}
 
 		@Override
-		public Void execute(IMonitor monitor) throws Exception {
+		public Void execute(IMonitor<Void> monitor) throws Exception {
 			onUpdate.invoke(new ValidationMessage(
 					"Checking constraint...\nThis may take a while. Although it is not recommended, you can save the unchecked constraint.",
 					DialogState.SAVE_CHANGES_DONT_MIND));
@@ -307,7 +310,7 @@ public final class ConstraintTextValidator {
 			monitor.checkCancel();
 			final CoreDeadAnalysis method = new CoreDeadAnalysis(solver);
 			method.setAssumptions(initialResult.deadCore);
-			final LiteralSet newDeadCore = LongRunningWrapper.runMethod(method, monitor);
+			final LiteralSet newDeadCore = LongRunningWrapper.runMethod(method, monitor.subTask(1));
 			if (method.isTimeoutOccured()) {
 				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_ENABLED));

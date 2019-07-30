@@ -67,7 +67,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	}
 
 	@Override
-	public IFeatureModel execute(IMonitor monitor) throws Exception {
+	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
 		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(formula.getFeatureModel());
 		monitor.setRemainingWork(100);
 
@@ -81,14 +81,14 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		return m;
 	}
 
-	private CNF sliceFormula(IMonitor monitor) {
+	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
 		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(formula.getFeatureModel()));
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
 
-	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor monitor) {
+	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Tree");
 		monitor.setRemainingWork(2);
 		final IFeatureModel m = orgFeatureModel.clone();
@@ -263,7 +263,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		}
 	}
 
-	private void merge(IFeatureModelFactory factory, CNF cnf, IFeatureModel m, IMonitor monitor) {
+	private void merge(IFeatureModelFactory factory, CNF cnf, IFeatureModel m, IMonitor<?> monitor) {
 		final List<LiteralSet> children = cnf.getClauses();
 
 		monitor.setTaskName("Adding Constraints");

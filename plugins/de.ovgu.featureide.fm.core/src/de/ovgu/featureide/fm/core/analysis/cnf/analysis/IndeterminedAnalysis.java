@@ -58,7 +58,7 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 	}
 
 	@Override
-	public LiteralSet analyze(IMonitor monitor) throws Exception {
+	public LiteralSet analyze(IMonitor<LiteralSet> monitor) throws Exception {
 		monitor.setRemainingWork(2 * variables.getLiterals().length);
 
 		final VecInt potentialResultList = new VecInt();

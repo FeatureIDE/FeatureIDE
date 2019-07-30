@@ -48,7 +48,7 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 			final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
+				public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 					try {
 						featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 					} catch (final CoreException e) {

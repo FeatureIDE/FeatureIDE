@@ -20,7 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -48,6 +51,6 @@ public class NullConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {}
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {}
 
 }

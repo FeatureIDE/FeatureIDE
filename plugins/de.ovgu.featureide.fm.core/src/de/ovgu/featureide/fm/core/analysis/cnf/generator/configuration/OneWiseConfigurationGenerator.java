@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.List;
+
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -76,7 +78,7 @@ public class OneWiseConfigurationGenerator extends AConfigurationGenerator imple
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
 		if (coverMode == 1) {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);

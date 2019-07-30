@@ -44,7 +44,7 @@ public class CountSolutionsAnalysis extends AbstractAnalysis<Long> {
 	}
 
 	@Override
-	public Long analyze(IMonitor monitor) throws Exception {
+	public Long analyze(IMonitor<Long> monitor) throws Exception {
 		solver.setGlobalTimeout(true);
 		long solutionCount = 0;
 		SatResult hasSolution = solver.hasSolution();

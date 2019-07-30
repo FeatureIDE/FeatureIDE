@@ -43,7 +43,7 @@ public class UniformRandomConfigurationGenerator extends ARandomConfigurationGen
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
 		gen.setAllowDuplicates(false);
 		gen.setRandom(random);

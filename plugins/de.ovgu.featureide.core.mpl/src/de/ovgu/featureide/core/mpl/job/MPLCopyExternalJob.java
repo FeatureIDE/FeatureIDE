@@ -47,7 +47,7 @@ public class MPLCopyExternalJob implements LongRunningMethod<Boolean> {
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		final IPath destPath = destFolder.getFullPath();
 
 		try {

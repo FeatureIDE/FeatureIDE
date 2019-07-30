@@ -119,7 +119,6 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			break;
 		case CONSTRAINT_MODIFY:
 		case ATTRIBUTE_CHANGED:
-		case CONSTRAINT_SELECTED:
 			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
 			break;

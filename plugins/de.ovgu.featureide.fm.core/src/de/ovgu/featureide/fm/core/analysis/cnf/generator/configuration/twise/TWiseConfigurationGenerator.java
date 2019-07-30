@@ -167,7 +167,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		phaseCount = 0;
 
 		buildCombinations();

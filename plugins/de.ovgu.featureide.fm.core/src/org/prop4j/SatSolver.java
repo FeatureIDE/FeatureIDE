@@ -733,7 +733,7 @@ public class SatSolver {
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
-	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor monitor) throws TimeoutException {
+	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor<?> monitor) throws TimeoutException {
 		final VecInt vector = new VecInt();
 		final List<String> coveredFeatures = new LinkedList<>();
 		for (final String feature : features) {

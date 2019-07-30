@@ -53,7 +53,7 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 			final IRunner<ModalImplicationGraph> runner = LongRunningWrapper.getRunner(new LongRunningMethod<ModalImplicationGraph>() {
 
 				@Override
-				public ModalImplicationGraph execute(IMonitor monitor) throws Exception {
+				public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 					return project.getFeatureModelManager().getPersistentFormula().getElement(new ModalImplicationGraphCreator());
 				}
 			});

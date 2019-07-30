@@ -170,7 +170,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			case FEATURE_ADD:
 			case FEATURE_ADD_ABOVE:
 			case FEATURE_DELETE:
-			case FEATURE_MODIFY:
 			case GROUP_TYPE_CHANGED:
 			case MANDATORY_CHANGED:
 				refresh();

@@ -150,7 +150,7 @@ public class MPLRenameExternalJob implements LongRunningMethod<Boolean> {
 	private final JavaProject javaProject;
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		try {
 			formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
 			formerSourcePath = setJavaBuildPath(javaProject, srcPath, formerSourcePathIndex);

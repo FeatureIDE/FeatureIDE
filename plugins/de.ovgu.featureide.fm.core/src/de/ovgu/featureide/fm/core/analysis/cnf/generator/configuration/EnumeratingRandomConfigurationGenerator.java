@@ -41,7 +41,7 @@ public class EnumeratingRandomConfigurationGenerator extends ARandomConfiguratio
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		monitor.setRemainingWork(maxSampleSize);
 
 		final AllConfigurationGenerator gen = new AllConfigurationGenerator(solver);

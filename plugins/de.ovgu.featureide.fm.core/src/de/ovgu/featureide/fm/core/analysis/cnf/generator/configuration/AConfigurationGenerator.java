@@ -64,7 +64,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Lite
 	}
 
 	@Override
-	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
+	public List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		resultList.clear();
 		resultQueue.clear();
 
@@ -73,7 +73,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<Lite
 		return resultList;
 	}
 
-	protected abstract void generate(IMonitor monitor) throws Exception;
+	protected abstract void generate(IMonitor<List<LiteralSet>> monitor) throws Exception;
 
 	protected void addResult(LiteralSet result) {
 		resultList.add(result);

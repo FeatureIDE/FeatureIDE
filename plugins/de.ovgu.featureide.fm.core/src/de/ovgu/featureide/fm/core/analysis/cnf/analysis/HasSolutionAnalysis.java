@@ -41,7 +41,7 @@ public class HasSolutionAnalysis extends AbstractAnalysis<Boolean> {
 	}
 
 	@Override
-	public Boolean analyze(IMonitor monitor) throws Exception {
+	public Boolean analyze(IMonitor<Boolean> monitor) throws Exception {
 		final SatResult hasSolution = solver.hasSolution();
 		switch (hasSolution) {
 		case FALSE:

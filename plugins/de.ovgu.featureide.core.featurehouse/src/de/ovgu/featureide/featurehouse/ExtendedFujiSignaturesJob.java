@@ -93,7 +93,7 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 	}
 
 	@Override
-	public ProjectSignatures execute(IMonitor monitor) throws Exception {
+	public ProjectSignatures execute(IMonitor<ProjectSignatures> monitor) throws Exception {
 		throw new UnsupportedOperationException("Fuji is currently not supported.");
 	}
 

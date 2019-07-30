@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEdgeTypes {
 
 	private static class TempVertex {
+
 		private final ArrayList<Integer> posStrongEdges = new ArrayList<>();
 		private final ArrayList<Integer> negStrongEdges = new ArrayList<>();
 		private final ArrayList<Integer> relevantClausesIndex = new ArrayList<>();
@@ -60,6 +61,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	 * For sorting clauses by length. Starting with the longest.
 	 */
 	private static final Comparator<LiteralSet> lengthComparator = new Comparator<LiteralSet>() {
+
 		@Override
 		public int compare(LiteralSet o1, LiteralSet o2) {
 			return o1.getLiterals().length - o2.getLiterals().length;
@@ -90,7 +92,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	@Override
-	public ModalImplicationGraph execute(IMonitor monitor) throws Exception {
+	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 		monitor.setRemainingWork(5 + (detectStrong ? 3 : 0));
 		if (!init()) {
 			return null;

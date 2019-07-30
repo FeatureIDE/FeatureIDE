@@ -99,6 +99,7 @@ public class CNFSlicer extends AbstractManipulator {
 	ModalImplicationGraph dirtyGraph;
 
 	MonitorThread monitorThread = new MonitorThread(new Runnable() {
+
 		@Override
 		public void run() {
 			final StringBuilder sb = new StringBuilder();
@@ -115,7 +116,7 @@ public class CNFSlicer extends AbstractManipulator {
 	});
 
 	@Override
-	protected CNF manipulate(IMonitor monitor) throws TimeoutException {
+	protected CNF manipulate(IMonitor<CNF> monitor) throws TimeoutException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
 

@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<LiteralSet> {
 
 	public static class IntermediateResult {
+
 		private final int var;
 		private final Selection selection;
 
@@ -51,7 +52,7 @@ public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<Li
 		}
 	}
 
-	protected IMonitor monitor;
+	protected IMonitor<LiteralSet> monitor;
 	protected int[] fixedVariables;
 	protected int[] variableOrder;
 	protected int newCount;
@@ -67,7 +68,7 @@ public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<Li
 	}
 
 	@Override
-	protected LiteralSet analyze(IMonitor monitor) throws Exception {
+	protected LiteralSet analyze(IMonitor<LiteralSet> monitor) throws Exception {
 		this.monitor = monitor;
 		return null;
 	}
@@ -92,7 +93,7 @@ public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<Li
 			final int y = model2[i];
 			if ((x != 0) && (x != y)) {
 				model1[i] = 0;
-				monitor.step(new IntermediateResult(Math.abs(x), Selection.UNDEFINED));
+				monitor.step();
 			}
 		}
 	}

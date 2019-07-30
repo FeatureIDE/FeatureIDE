@@ -79,7 +79,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	}
 
 	@Override
-	public IFeatureModel execute(IMonitor monitor) throws Exception {
+	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
 		digest = MessageDigest.getInstance("SHA-256");
 		obfuscatedFeatureModel = factory.create();
 		obfuscateStructure(orgFeatureModel.getStructure().getRoot(), null);

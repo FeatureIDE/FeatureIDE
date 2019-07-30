@@ -68,7 +68,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		CoveringArray ca = null;
 		final boolean casa = algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
 		try {

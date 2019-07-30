@@ -58,7 +58,7 @@ public class PrintFeatureInterfacesJob implements LongRunningMethod<Boolean> {
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(project);
 		if (interfaceProject == null) {
 			MPLPlugin.getDefault().logWarning(project.getName() + " is no Interface Project!");

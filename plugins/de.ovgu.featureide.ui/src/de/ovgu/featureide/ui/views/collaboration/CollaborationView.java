@@ -227,7 +227,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private final LongRunningMethod<Void> updateGUIMethod = new LongRunningMethod<Void>() {
 
 		@Override
-		public Void execute(IMonitor monitor) throws Exception {
+		public Void execute(IMonitor<Void> monitor) throws Exception {
 			disableToolbarFilterItems();
 			if (configurations.isEmpty()) {
 				refreshButton.setEnabled(true);
@@ -831,7 +831,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 					@Override
-					public Boolean execute(IMonitor workMonitor) throws Exception {
+					public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 						if (!refreshButton.isEnabled()) {
 							return true;
 						}

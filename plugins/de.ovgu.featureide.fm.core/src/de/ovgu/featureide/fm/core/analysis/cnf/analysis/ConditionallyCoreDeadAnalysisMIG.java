@@ -30,7 +30,6 @@ import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
-import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -53,7 +52,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 	}
 
 	@Override
-	public LiteralSet analyze(IMonitor monitor) throws Exception {
+	public LiteralSet analyze(IMonitor<LiteralSet> monitor) throws Exception {
 		super.analyze(monitor);
 		monitor.setRemainingWork(solver.getSatInstance().getVariables().size() + 2);
 
@@ -64,7 +63,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 		for (final int fixedVar : fixedVariables) {
 			final int var = Math.abs(fixedVar);
 			knownValues[var - 1] = fixedVar;
-			monitor.step(new IntermediateResult(var, Selection.UNDEFINED));
+			monitor.step();
 		}
 
 		// get core / dead variables
@@ -72,7 +71,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 			if (vertex.isCore()) {
 				final int var = vertex.getVar();
 				knownValues[var - 1] = var;
-				monitor.step(new IntermediateResult(Math.abs(var), var < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+				monitor.step(new LiteralSet(var));
 			}
 		}
 
@@ -91,7 +90,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 			final int computedVar = computedValues.get(i);
 			final int var = Math.abs(computedVar);
 			knownValues[var - 1] = computedVar;
-			monitor.step(new IntermediateResult(var, computedVar < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+			monitor.step(new LiteralSet(computedVar));
 		}
 
 		if (variableOrder != null) {
@@ -142,7 +141,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 		return new LiteralSet(solver.getAssignmentArray(0, solver.getAssignmentSize()));
 	}
 
-	private void sat(int[] unkownValues, VecInt valuesToCalulate, IMonitor monitor, Traverser traverser) {
+	private void sat(int[] unkownValues, VecInt valuesToCalulate, IMonitor<LiteralSet> monitor, Traverser traverser) {
 		final CollectingVisitor visitor = new CollectingVisitor();
 		traverser.setVisitor(visitor);
 
@@ -156,20 +155,20 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 				case FALSE:
 					solver.assignmentReplaceLast(varX);
 					unkownValues[i] = 0;
-					monitor.step(new IntermediateResult(Math.abs(varX), varX < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+					monitor.step(new LiteralSet(varX));
 					traverser.traverseStrong(varX);
 					final VecInt newFoundValues = visitor.getResult()[0];
 					for (int j = 0; j < newFoundValues.size(); j++) {
 						final int var = newFoundValues.get(j);
 						solver.assignmentPush(var);
 						unkownValues[Math.abs(var) - 1] = 0;
-						monitor.step(new IntermediateResult(Math.abs(var), var < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+						monitor.step(new LiteralSet(var));
 					}
 					break;
 				case TIMEOUT:
 					solver.assignmentPop();
 					unkownValues[Math.abs(varX) - 1] = 0;
-					monitor.step(new IntermediateResult(Math.abs(varX), Selection.UNDEFINED));
+					monitor.step();
 					break;
 				case TRUE:
 					solver.assignmentPop();

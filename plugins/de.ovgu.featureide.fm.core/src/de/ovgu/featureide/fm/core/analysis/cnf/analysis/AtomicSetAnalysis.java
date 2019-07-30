@@ -47,7 +47,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 	}
 
 	@Override
-	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
+	public List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final List<LiteralSet> result = new ArrayList<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);

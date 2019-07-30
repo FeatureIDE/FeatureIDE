@@ -76,7 +76,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 	private final IProject project;
 
 	private final ADocumentationCommentMerger merger;
-	private IMonitor workMonitor;
+	private IMonitor<Boolean> workMonitor;
 
 	public PrintDocumentationJob(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
 		this.foldername = foldername;
@@ -87,7 +87,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		this.workMonitor = workMonitor;
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {

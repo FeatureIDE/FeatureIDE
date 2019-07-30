@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
@@ -39,7 +41,7 @@ public class RandomConfigurationGenerator extends ARandomConfigurationGenerator 
 	}
 
 	@Override
-	protected void generate(IMonitor monitor) throws Exception {
+	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		monitor.setRemainingWork(maxSampleSize);
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 

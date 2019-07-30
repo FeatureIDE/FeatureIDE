@@ -59,7 +59,7 @@ public class RedundancyAnalysis2 extends AClauseAnalysis<List<LiteralSet>> {
 	}
 
 	@Override
-	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
+	public List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
 		}

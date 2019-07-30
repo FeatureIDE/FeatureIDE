@@ -280,7 +280,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (solver == null) {
 				return resultList;
 			}
-			final List<LiteralSet> result = new AllConfigurationGenerator(solver, max).analyze(monitor);
+			final List<LiteralSet> result = new AllConfigurationGenerator(solver, max).analyze(monitor.subTask(1));
 			for (final LiteralSet is : result) {
 				resultList.add(solver.getSatInstance().getVariables().convertToString(is));
 			}

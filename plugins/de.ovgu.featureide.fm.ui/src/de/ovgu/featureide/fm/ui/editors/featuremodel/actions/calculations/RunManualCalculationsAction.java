@@ -50,7 +50,7 @@ public class RunManualCalculationsAction extends AFeatureModelAction {
 	public void run() {
 		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
 		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
-		analyzer.analyzeFeatureModel(new NullMonitor());
+		analyzer.analyzeFeatureModel(new NullMonitor<>());
 		featureModelManager.fireEvent(new FeatureIDEEvent(featureModelManager.getSnapshot(), EventType.REDRAW_DIAGRAM));
 	}
 
