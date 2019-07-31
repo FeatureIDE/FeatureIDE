@@ -460,17 +460,41 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	}
 
+	public class ResetAutomaticMethod implements LongRunningMethod<Collection<SelectableFeature>> {
+
+		@Override
+		public Collection<SelectableFeature> execute(IMonitor<Collection<SelectableFeature>> workMonitor) {
+			if (formula == null) {
+				return Collections.emptyList();
+			}
+			workMonitor.setRemainingWork(2);
+
+			final List<SelectableFeature> result = configuration.getAutomaticFeatures();
+			configuration.resetAutomaticValues();
+
+			final CNF rootNode = formula.getCNF();
+
+			workMonitor.checkCancel();
+			final LiteralSet impliedFeatures = LongRunningWrapper.runMethod(new CoreDeadAnalysis(rootNode), workMonitor.subTask(1));
+			if (impliedFeatures == null) {
+				return Collections.emptyList();
+			}
+
+			for (final int i : impliedFeatures.getLiterals()) {
+				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
+				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+			}
+			workMonitor.step(result);
+			return result;
+		}
+
+	}
+
 	// TODO fix monitor values
 	protected final FeatureModelFormula formula;
 	protected final Configuration configuration;
 
 	protected boolean includeAbstractFeatures = true;
-
-//	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration, boolean includeAbstractFeatures) {
-//		this.formula = formula;
-//		this.configuration = configuration;
-//		this.includeAbstractFeatures = includeAbstractFeatures;
-//	}
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
@@ -486,18 +510,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
 		this.formula = formula;
 		this.configuration = configuration;
-//		this(formula, configuration, configuration.includeAbstractFeatures);
 	}
-
-//	/**
-//	 * @deprecated Use {@link #ConfigurationPropagator(FeatureModelFormula, Configuration)} instead and receive a {@link FeatureModelFormula} instance from a
-//	 *             {@link FeatureProjectData}.
-//	 * @param configuration
-//	 */
-//	@Deprecated
-//	public ConfigurationPropagator(Configuration configuration, boolean includeAbstractFeatures) {
-//		this(new FeatureModelFormula(configuration.getFeatureModel()), configuration, includeAbstractFeatures);
-//	}
 
 	@Override
 	public boolean isIncludeAbstractFeatures() {
@@ -620,6 +633,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	@Override
 	public UpdateMethod update() {
 		return update(false, null);
+	}
+
+	@Override
+	public ResetAutomaticMethod resetAutomatic() {
+		return new ResetAutomaticMethod();
 	}
 
 	protected ConfigurationPropagator clone(Configuration configuration) {

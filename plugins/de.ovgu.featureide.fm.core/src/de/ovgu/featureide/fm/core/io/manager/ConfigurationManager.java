@@ -28,7 +28,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
@@ -102,9 +101,6 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 				getObject().updateFeatures(formula);
 				final Configuration configuration = getVarObject();
 				configuration.updateFeatures(formula);
-				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(formula, configuration);
-				analyzer.setIncludeAbstractFeatures(true);
-				analyzer.update();
 			} finally {
 				fileOperationLock.unlock();
 			}
@@ -114,7 +110,6 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	@Override
 	protected Configuration createObject() throws Exception {
 		final Configuration configuration = super.createObject();
-//		configuration.setPropagate(true);
 		if (featureModelManager != null) {
 			configuration.updateFeatures(featureModelManager.getPersistentFormula());
 		}

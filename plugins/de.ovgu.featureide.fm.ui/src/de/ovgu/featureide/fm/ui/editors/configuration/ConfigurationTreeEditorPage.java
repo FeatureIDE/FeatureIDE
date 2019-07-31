@@ -268,13 +268,31 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	protected final void refreshPage() {
-		// if (configurationEditor.isAutoSelectFeatures()) {
-		// autoSelectButton.setEnabled(true);
-		// }
-		// autoSelectButton.setSelection(configurationEditor.isAutoSelectFeatures());
 		itemMap.clear();
-		if (errorMessage()) {
-			computeTree(UpdateStrategy.BUILD);
+
+		if (configurationEditor.hasValidFeatureModel()) {
+
+			final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+			if (configurationManager != null) {
+				final FeatureModelFormula persistentFormula = configurationEditor.getFeatureModelManager().getPersistentFormula();
+				final FeatureModelAnalyzer fmAnalyzer = persistentFormula.getAnalyzer();
+				if (fmAnalyzer.isValid(null)) {
+					computeTree(UpdateStrategy.BUILD);
+				} else {
+					displayError(
+							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
+
+				}
+			} else {
+
+				if (configurationEditor.isReadFeatureModelError()) {
+					displayError(THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_);
+				} else {
+					displayError(AN_UNKNOWN_ERROR_OCCURRED_);
+				}
+			}
+		} else {
+			displayError(THE_GIVEN_FEATURE_MODEL + " is invalid.");
 		}
 	}
 
@@ -751,12 +769,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	private Void autoExpand(Display display) {
+	private Void expandAll(Display display) {
+		display.syncExec(() -> expandItems(itemMap.values(), true));
+		return null;
+	}
+
+	private Void expandAuto(Display display) {
 		display.syncExec(() -> autoExpand());
 		return null;
 	}
 
-	private Void levelExpand(Display display) {
+	private Void expandLevel(Display display) {
 		display.syncExec(() -> levelExpand());
 		return null;
 	}
@@ -1053,6 +1076,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final FeatureModelManager featureModelManager = configurationEditor.getFeatureModelManager();
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if ((featureModelManager == null) || (configurationManager == null) || (currentDisplay == null)) {
+			displayError(AN_UNKNOWN_ERROR_OCCURRED_);
 			return;
 		}
 
@@ -1064,6 +1088,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private void update(UpdateStrategy updateStrategy, final Display currentDisplay, ConfigurationManager configurationManager,
 			final FeatureModelManager featureModelManager, final Configuration configuration) {
 		final ConfigurationPropagator propagator = new ConfigurationPropagator(featureModelManager.getPersistentFormula(), configuration);
+
+		final Boolean canBeValid = LongRunningWrapper.runMethod(propagator.canBeValid());
+		final boolean conflicting;
+		if (canBeValid == null) {
+			return;
+		} else {
+			conflicting = !canBeValid;
+		}
+
 		final RunnerSequence sequence = new RunnerSequence();
 		sequence.setIgnorePreviousJobFail(false);
 		IRunner<Collection<SelectableFeature>> updateJob = null;
@@ -1075,12 +1108,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			sequence.addJob(LongRunningWrapper.getRunner(monitor -> build(configuration.getRoot(), currentDisplay)));
 		case UPDATE:
 			if (configurationEditor.isAutoSelectFeatures()) {
-				final TreeItem topItem = tree.getTopItem();
-				if (topItem != null) {
-					final List<SelectableFeature> featureOrder = Arrays.asList((SelectableFeature) (topItem.getData()));
-					updateJob = LongRunningWrapper.getRunner(propagator.update(true, featureOrder));
+				if (conflicting) {
+					updateJob = LongRunningWrapper.getRunner(propagator.resetAutomatic());
 				} else {
-					updateJob = LongRunningWrapper.getRunner(propagator.update(true));
+					final TreeItem topItem = tree.getTopItem();
+					if (topItem != null) {
+						final List<SelectableFeature> featureOrder = Arrays.asList((SelectableFeature) (topItem.getData()));
+						updateJob = LongRunningWrapper.getRunner(propagator.update(true, featureOrder));
+					} else {
+						updateJob = LongRunningWrapper.getRunner(propagator.update(true));
+					}
 				}
 				updateFeatures.clear();
 				updateFeatures.addAll(configuration.getFeatures());
@@ -1102,14 +1139,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (useGroups) {
 			curGroup = 0;
 		}
-		switch (updateStrategy) {
-		case BUILD:
-			sequence.addJob(LongRunningWrapper.getRunner(monitor -> levelExpand(currentDisplay)));
-			break;
-		case RESOLVE:
-		case UPDATE:
-			sequence.addJob(LongRunningWrapper.getRunner(monitor -> autoExpand(currentDisplay)));
-			break;
+		if (conflicting) {
+			sequence.addJob(LongRunningWrapper.getRunner(monitor -> expandAll(currentDisplay)));
+		} else {
+			switch (updateStrategy) {
+			case BUILD:
+				sequence.addJob(LongRunningWrapper.getRunner(monitor -> expandLevel(currentDisplay)));
+				break;
+			case RESOLVE:
+			case UPDATE:
+				sequence.addJob(LongRunningWrapper.getRunner(monitor -> expandAuto(currentDisplay)));
+				break;
+			}
 		}
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> resetSnapshot(configurationManager)));
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> updateInfoLabel(currentDisplay, propagator)));

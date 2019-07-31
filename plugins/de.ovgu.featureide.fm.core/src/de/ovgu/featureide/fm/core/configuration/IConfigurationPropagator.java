@@ -65,6 +65,8 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Collection<SelectableFeature>> update();
 
+	LongRunningMethod<Collection<SelectableFeature>> resetAutomatic();
+
 	LongRunningMethod<Boolean> completeRandomly();
 
 	LongRunningMethod<Boolean> completeMin();

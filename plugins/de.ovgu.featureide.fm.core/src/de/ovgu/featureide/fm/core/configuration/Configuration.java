@@ -199,6 +199,16 @@ public class Configuration implements Cloneable {
 		return featureList;
 	}
 
+	public List<SelectableFeature> getAutomaticFeatures() {
+		final List<SelectableFeature> featureList = new ArrayList<>();
+		for (final SelectableFeature selectableFeature : selectableFeatures.values()) {
+			if ((selectableFeature.getAutomatic() != Selection.UNDEFINED) && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
+				featureList.add(selectableFeature);
+			}
+		}
+		return featureList;
+	}
+
 	public SelectableFeature getRoot() {
 		return root;
 	}

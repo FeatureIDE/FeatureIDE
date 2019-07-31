@@ -156,11 +156,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			switch (evt.getEventType()) {
 			case MODEL_DATA_SAVED:
 				try {
-					renameFeature((IFeatureModel) evt.getSource());
-					checkFeatureCoverage();
-					checkConfigurations(getAllConfigurations());
-					createAndDeleteFeatureFolders();
-					composerExtension.postModelChanged();
+					final Object source = evt.getSource();
+					if (source instanceof IFeatureModel) {
+						renameFeature((IFeatureModel) source);
+						checkFeatureCoverage();
+						checkConfigurations(getAllConfigurations());
+						createAndDeleteFeatureFolders();
+						composerExtension.postModelChanged();
+					}
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
@@ -1001,61 +1004,67 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 
 		try {
-			final List<Path> configs = getAllConfigurations();
-			final IResourceDelta configurationDelta = event.getDelta().findMember(EclipseFileSystem.getIPath(configFolder));
-			if (configurationDelta != null) {
-				for (final IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
-					CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
-					// if configuration was removed update warnings
-					checkFeatureCoverage();
-				}
-			}
-			final List<Path> changedConfigs = new ArrayList<>();
-			for (final Path config : configs) {
-				final IResourceDelta delta = event.getDelta().findMember(EclipseFileSystem.getIPath(config));
-				if (delta != null) {
-					checkFeatureCoverage();
-					break;
-				}
-			}
-
-			final Path currentConfig = getCurrentConfiguration();
-			for (final Path config : configs) {
-				final IResourceDelta delta = event.getDelta().findMember(EclipseFileSystem.getIPath(config));
-				if ((delta != null) && ((delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
-					changedConfigs.add(config);
-					if (config.equals(currentConfig)) {
-						buildRelevantChanges = true;
+			final IResource configIFolder = EclipseFileSystem.getResource(configFolder);
+			if (configIFolder != null) {
+				final List<Path> configs = getAllConfigurations();
+				final IPath configIPath = configIFolder.getFullPath();
+				final IResourceDelta configurationDelta = event.getDelta().findMember(configIPath);
+				if (configurationDelta != null) {
+					for (final IResourceDelta delta : configurationDelta.getAffectedChildren(IResourceDelta.REMOVED)) {
+						CorePlugin.getDefault().logInfo(delta.toString() + " was removed.");
+						// if configuration was removed update warnings
+						checkFeatureCoverage();
 					}
 				}
-			}
-			if (!configurationUpdate && !changedConfigs.isEmpty()) {
-				LOGGER.fireConfigurationChanged(this);
-				checkConfigurations(changedConfigs);
-			}
+				final List<Path> changedConfigs = new ArrayList<>();
+				for (final Path config : configs) {
+					final IPath iPath = EclipseFileSystem.getResource(config).getFullPath();
+					final IResourceDelta delta = event.getDelta().findMember(iPath);
+					if (delta != null) {
+						checkFeatureCoverage();
+						break;
+					}
+				}
 
-			if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
-				if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
-					// ignore changes in unselected feature folders
-					final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig);
-					final Configuration currentConfiguration = fileHandler.getObject();
-					currentConfiguration.updateFeatures(featureModelManager.getPersistentFormula());
-
-					final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
-					for (final IResource res : sourceFolder.members()) {
-						if (res instanceof IFolder) {
-							if (selectedFeatures.contains(res.getName())) {
-								checkSourceFolder((IFolder) res, event);
-							}
+				final Path currentConfig = getCurrentConfiguration();
+				for (final Path config : configs) {
+					final IPath iPath = EclipseFileSystem.getResource(config).getFullPath();
+					final IResourceDelta delta = event.getDelta().findMember(iPath);
+					if ((delta != null) && ((delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
+						changedConfigs.add(config);
+						if (config.equals(currentConfig)) {
+							buildRelevantChanges = true;
 						}
 					}
-				} else {
-					checkSourceFolder(sourceFolder, event);
 				}
-			}
+				if (!configurationUpdate && !changedConfigs.isEmpty()) {
+					LOGGER.fireConfigurationChanged(this);
+					checkConfigurations(changedConfigs);
+				}
 
-			if ((composerExtension != null) && (buildFolder != null) && buildFolder.isAccessible()) {
-				checkBuildFolder(buildFolder, event);
+				if (!buildRelevantChanges && (sourceFolder != null) && sourceFolder.isAccessible()) {
+					if ((currentConfig != null) && (composerExtension != null) && composerExtension.hasFeatureFolder()) {
+						// ignore changes in unselected feature folders
+						final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(currentConfig);
+						final Configuration currentConfiguration = fileHandler.getObject();
+						currentConfiguration.updateFeatures(featureModelManager.getPersistentFormula());
+
+						final Set<String> selectedFeatures = currentConfiguration.getSelectedFeatureNames();
+						for (final IResource res : sourceFolder.members()) {
+							if (res instanceof IFolder) {
+								if (selectedFeatures.contains(res.getName())) {
+									checkSourceFolder((IFolder) res, event);
+								}
+							}
+						}
+					} else {
+						checkSourceFolder(sourceFolder, event);
+					}
+				}
+
+				if ((composerExtension != null) && (buildFolder != null) && buildFolder.isAccessible()) {
+					checkBuildFolder(buildFolder, event);
+				}
 			}
 
 		} catch (final CoreException e) {
