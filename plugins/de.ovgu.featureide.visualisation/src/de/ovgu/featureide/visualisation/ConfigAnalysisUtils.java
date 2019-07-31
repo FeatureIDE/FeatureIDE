@@ -69,7 +69,7 @@ public class ConfigAnalysisUtils {
 		int iconf = 0;
 		for (IFile config : configs) {
 			Configuration configuration = ConfigurationManager.load(EclipseFileSystem.getPath(config));
-			configuration.initFeatures(new FeatureModelFormula(featureProject.getFeatureModel()));
+			configuration.updateFeatures(new FeatureModelFormula(featureProject.getFeatureModel()));
 			Set<String> configFeatures = configuration.getSelectedFeatureNames();
 			int ifeat = 0;
 			for (String f : featureList) {
@@ -93,7 +93,7 @@ public class ConfigAnalysisUtils {
 		List<String> featureList1 = featureProject.getFeatureModel().getFeatureOrderList();
 		List<String> featureList = new ArrayList<String>();
 		featureList.addAll(featureList1);
-		List<IFeature> coreFeatures = featureProject.getFeatureModelManager().getPersistentFormula().getAnalyzer().getCoreFeatures();
+		List<IFeature> coreFeatures = featureProject.getFeatureModelManager().getPersistentFormula().getAnalyzer().getCoreFeatures(null);
 		Collection<IFeature> hiddenFeatures = FeatureUtils.getHiddenFeatures(featureProject.getFeatureModel());
 		for (IFeature coref : coreFeatures) {
 			featureList.remove(coref.getName());

@@ -7,10 +7,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR_A
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,7 +149,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 
 		if (!isPluginInstalled(PLUGIN_CDT_ID)) {
 			generateWarning(PLUGIN_WARNING);
@@ -188,10 +188,6 @@ public class CPPComposer extends PPComposerExtensionClass {
 		annotationChecking();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
-	 */
 	@Override
 	public void postModelChanged() {
 		prepareFullBuild(null);
@@ -431,9 +427,6 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 		final TypeChef typeChef = new TypeChef();
 		try {
-			for (final Iterator<IResource> iterator = prjController.getList().iterator(); iterator.hasNext();) {
-				final IResource type = iterator.next();
-			}
 			typeChef.run(prjController.getList());
 
 			final Display display = Display.getDefault();
