@@ -11,10 +11,10 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- org.eclipse.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
  org.eclipse.core.expressions,
+ org.eclipse.core.resources,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
