@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 
 /**
  * Checks whether a feature is optional.
@@ -32,14 +31,11 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  */
 public class OptionalFeatureFilter implements IFilter<IFeature> {
 
+	private final IFilter<IFeature> optionalFeatureFilter = new InverseFilter<>(new MandatoryFeatureFilter());
+
 	@Override
 	public boolean isValid(IFeature object) {
-		if (FeatureUtils.getRoot(object.getFeatureModel()).getName().equals(object.getName())) {
-			return false;
-		}
-		final IFeatureStructure structure = object.getStructure();
-		final IFeatureStructure parent = structure.getParent();
-		return (parent != null) && (!parent.isAnd() || !structure.isMandatorySet());
+		return optionalFeatureFilter.isValid(object);
 	}
 
 }

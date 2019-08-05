@@ -39,7 +39,7 @@ public class MandatoryFeatureFilter implements IFilter<IFeature> {
 		}
 		final IFeatureStructure structure = object.getStructure();
 		final IFeatureStructure parent = structure.getParent();
-		return (parent == null) || (parent.isAnd() && structure.isMandatorySet());
+		return (parent == null) || (parent.isAnd() && structure.isMandatorySet()) || (!parent.isAnd() && (parent.getChildrenCount() == 1));
 	}
 
 }

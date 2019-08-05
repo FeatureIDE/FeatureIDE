@@ -196,6 +196,7 @@ public class AnalysesCollection {
 						}
 					}
 				} else {
+					result = curAnalysisResult.getResult();
 					this.monitor.done();
 				}
 				return result;
@@ -268,17 +269,11 @@ public class AnalysesCollection {
 		protected void configureAnalysis(CNF cnf, CauseAnalysis analysis) {
 			final Anomalies initialAnomalies = new Anomalies();
 			final LiteralSet coreDeadResult = coreDeadAnalysis.getResult();
-			if (coreDeadResult == null) {
-				return;
-			}
 			initialAnomalies.setDeadVariables(coreDeadResult);
 
 			foAnalysis.setOptionalFeatures(Functional.filterToList(formula.getFeatureModel().getFeatures(), new OptionalFeatureFilter()));
 			final List<LiteralSet> foResult = foAnalysis.getResult();
-			if (foResult == null) {
-				return;
-			}
-			initialAnomalies.setRedundantClauses(Functional.removeNull(foResult));
+			initialAnomalies.setRedundantClauses(foResult == null ? null : Functional.removeNull(foResult));
 
 			analysis.setAnomalies(initialAnomalies);
 			analysis.setClauseList(constraintClauses);
