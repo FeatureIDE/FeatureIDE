@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.base.event;
 
 /**
  * Event for executing a specific operation.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FeatureModelOperationEvent extends FeatureIDEEvent {

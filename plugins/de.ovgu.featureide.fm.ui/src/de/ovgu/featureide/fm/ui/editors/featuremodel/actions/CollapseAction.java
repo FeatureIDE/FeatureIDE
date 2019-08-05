@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -94,7 +95,7 @@ public class CollapseAction extends MultipleSelectionAction {
 	@Override
 	protected void selectionElementChanged(boolean validSelection) {
 		final List<String> selectedFeatures = getSelectedFeatures();
-		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection));
+		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection), FeatureModelManager.CHANGE_NOTHING);
 		if (validSelection) {
 			updateProperties();
 		} else {

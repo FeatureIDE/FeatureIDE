@@ -37,15 +37,20 @@ public final class LongRunningWrapper {
 	private LongRunningWrapper() {}
 
 	public static <T> T runMethod(LongRunningMethod<T> method) {
-		return runMethod(method, null);
+		try {
+			return runMethod(method, new NullMonitor<T>());
+		} catch (final MethodCancelException e) {
+			assert false;
+		} catch (final Exception e) {
+			Logger.logError(e);
+		}
+		return null;
 	}
 
-	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor<T> monitor) {
+	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor<T> monitor) throws MethodCancelException {
 		monitor = monitor != null ? monitor : new NullMonitor<T>();
 		try {
 			return method.execute(monitor);
-		} catch (final MethodCancelException e) {
-			return null;
 		} catch (final Exception e) {
 			Logger.logError(e);
 			return null;
@@ -80,6 +85,10 @@ public final class LongRunningWrapper {
 
 	public static JobToken createToken(JobStartingStrategy strategy) {
 		return JobSynchronizer.createToken(strategy);
+	}
+
+	public static void removeToken(JobToken token) {
+		JobSynchronizer.removeToken(token);
 	}
 
 	public static void startJob(JobToken token, final IRunner<?> job) {

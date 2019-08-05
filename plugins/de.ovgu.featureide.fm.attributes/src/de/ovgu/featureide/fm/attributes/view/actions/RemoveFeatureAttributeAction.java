@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
@@ -54,7 +55,7 @@ public class RemoveFeatureAttributeAction extends Action {
 
 	@Override
 	public void run() {
-		fmManager.editObject(this::removeAttributes);
+		fmManager.editObject(this::removeAttributes, FeatureModelManager.CHANGE_ATTRIBUTES);
 	}
 
 	private void removeAttributes(IFeatureModel featureModel) {

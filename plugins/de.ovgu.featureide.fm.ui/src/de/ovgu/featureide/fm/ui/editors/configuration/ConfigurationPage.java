@@ -97,7 +97,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	public void pageChangeTo(int index) {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			configurationManager.editObject(this::resetAbstractDeselected);
+			configurationManager.editObject(this::resetAbstractDeselected, ConfigurationManager.CHANGE_ALL);
 		}
 		super.pageChangeTo(index);
 	}

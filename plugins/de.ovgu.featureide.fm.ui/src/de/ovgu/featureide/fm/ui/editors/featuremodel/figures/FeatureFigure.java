@@ -47,9 +47,11 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -245,7 +247,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 	private String createTooltip(Object... objects) {
 		final StringBuilder toolTip = new StringBuilder();
-		final FeatureModelAnalyzer analyser = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer();
 		final IFeatureStructure structure = feature.getObject().getStructure();
 		toolTip.append(structure.isConcrete() ? CONCRETE : ABSTRACT);
 
@@ -255,16 +256,17 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		toolTip.append(structure.isRoot() ? ROOT : FEATURE);
 
-		final FeatureProperties featureProperties = analyser.getAnalysesCollection().getFeatureProperty(feature.getObject());
-		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+		final FeatureModelFormula variableFormula = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
+		final FeatureModelProperties properties = variableFormula.getAnalyzer().getAnalysesCollection().getFeatureModelProperties();
+		if (properties.hasStatus(FeatureStatus.DEAD)) {
 			toolTip.append(DEAD);
-		} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+		} else if (properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 			toolTip.append(FALSE_OPTIONAL);
-		} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+		} else if (properties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 			toolTip.append(INDETERMINATE_HIDDEN);
 		}
 
-		if (!analyser.isValid(null)) {
+		if (properties.hasStatus(FeatureModelStatus.VOID)) {
 			toolTip.setLength(0);
 			toolTip.trimToSize();
 			toolTip.append(VOID);

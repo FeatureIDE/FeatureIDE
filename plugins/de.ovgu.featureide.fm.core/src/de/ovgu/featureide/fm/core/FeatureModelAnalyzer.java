@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.AnalysesCollection.StringToFeature;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -181,10 +182,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 		final List<IFeature> resultList = new ArrayList<>();
 		int i = 0;
-		for (final IFeature iFeature : optionalFeatures) {
-			if (result.get(i++) != null) {
-				resultList.add(iFeature);
+		for (final LiteralSet iFeature : result) {
+			if (iFeature != null) {
+				resultList.add(optionalFeatures.get(i));
 			}
+			i++;
 		}
 
 		return resultList;
@@ -232,10 +234,25 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return resultList;
 	}
 
+	public List<IConstraint> getAnomalyConstraints(IMonitor<List<Anomalies>> monitor) {
+		monitor.checkCancel();
+		int i = 0;
+		final boolean[] relevantConstraint = new boolean[constraints.size()];
+		for (final IConstraint constraint : constraints) {
+			final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
+			if (constraintProperties.hasStatus(ConstraintStatus.NECESSARY) && constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
+				relevantConstraint[i] = true;
+			}
+			i++;
+		}
+		monitor.checkCancel();
+		return getAnomalyConstraints(relevantConstraint, monitor);
+	}
+
 	public List<IConstraint> getAnomalyConstraints(boolean[] relevantConstraint, IMonitor<List<Anomalies>> monitor) {
 		analysesCollection.constraintAnomaliesAnalysis.setRelevantConstraint(relevantConstraint);
 		final List<Anomalies> result = analysesCollection.constraintAnomaliesAnalysis.getResult(monitor);
-		if (result == null) {
+		if ((result == null) || result.isEmpty()) {
 			return Collections.emptyList();
 		}
 
@@ -295,18 +312,27 @@ public class FeatureModelAnalyzer implements IEventListener {
 			monitor = new NullMonitor<>();
 		}
 
-		int work = 0;
-		if (analysesCollection.isCalculateFeatures()) {
-			work += 4;
-		}
-		if (analysesCollection.isCalculateConstraints()) {
-			work += 20;
-		}
-		monitor.setRemainingWork(work);
+		try {
+			int work = 1;
+			if (analysesCollection.isCalculateFeatures() || analysesCollection.isCalculateConstraints()) {
+				work += 1;
+			}
+			if (analysesCollection.isCalculateFeatures()) {
+				work += 4;
+			}
+			if (analysesCollection.isCalculateConstraints()) {
+				work += 19;
+			}
+			monitor.setRemainingWork(work);
 
-		updateFeatures(monitor);
+			updateFeatureModel(monitor);
 
-		updateConstraints(monitor);
+			updateFeatures(monitor);
+
+			updateConstraints(monitor);
+		} finally {
+			monitor.done();
+		}
 
 		return analysesCollection;
 	}
@@ -331,42 +357,57 @@ public class FeatureModelAnalyzer implements IEventListener {
 			monitor.worked();
 
 			monitor.checkCancel();
-			// get constraint anomalies
-			for (final IConstraint constraint : getRedundantConstraints(monitor.subTask(2))) {
-				getConstraintProperties(constraint).setStatus(ConstraintStatus.REDUNDANT);
-			}
-			monitor.checkCancel();
-			for (final IConstraint constraint : getTautologyConstraints(monitor.subTask(2))) {
-				getConstraintProperties(constraint).setStatus(ConstraintStatus.TAUTOLOGY);
-			}
-			monitor.checkCancel();
-			for (final IConstraint constraint : getVoidConstraints(monitor.subTask(2))) {
-				getConstraintProperties(constraint).setStatus(ConstraintStatus.VOID_MODEL);
-			}
-			monitor.checkCancel();
-			for (final IConstraint constraint : getContradictoryConstraints(monitor.subTask(2))) {
-				getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
-			}
-
-			monitor.checkCancel();
-			int i = 0;
-			final boolean[] relevantConstraint = new boolean[constraints.size()];
-			for (final IConstraint constraint : constraints) {
-				final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
-				if (constraintProperties.hasStatus(ConstraintStatus.NECESSARY) && constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
-					relevantConstraint[i] = true;
+			final FeatureModelProperties properties = getFeatureModelProperties();
+			if (properties.hasStatus(FeatureModelStatus.VOID)) {
+				final List<IConstraint> voidConstraints = getVoidConstraints(monitor.subTask(2));
+				for (final IConstraint constraint : voidConstraints) {
+					getConstraintProperties(constraint).setStatus(ConstraintStatus.VOID);
 				}
-				i++;
-			}
-			monitor.worked();
+				monitor.checkCancel();
+				final List<IConstraint> contradictoryConstraints = getContradictoryConstraints(monitor.subTask(2));
+				for (final IConstraint constraint : contradictoryConstraints) {
+					getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
+				}
+				monitor.worked(15);
+			} else {
+				// get constraint anomalies
+				final List<IConstraint> redundantConstraints = getRedundantConstraints(monitor.subTask(2));
+				for (final IConstraint constraint : redundantConstraints) {
+					getConstraintProperties(constraint).setStatus(ConstraintStatus.REDUNDANT);
+				}
+				monitor.checkCancel();
+				final List<IConstraint> tautologyConstraints = getTautologyConstraints(monitor.subTask(2));
+				for (final IConstraint constraint : tautologyConstraints) {
+					getConstraintProperties(constraint).setStatus(ConstraintStatus.TAUTOLOGY);
+				}
 
-			monitor.checkCancel();
-			getAnomalyConstraints(relevantConstraint, monitor.subTask(10));
+				if (!redundantConstraints.isEmpty() || !tautologyConstraints.isEmpty()) {
+					properties.setStatus(FeatureModelStatus.ANOMALIES);
+				}
+
+				monitor.checkCancel();
+				getAnomalyConstraints(monitor.subTask(10));
+			}
 		}
 	}
 
 	public void updateFeatures() {
 		updateFeatures(null);
+	}
+
+	protected void updateFeatureModel(IMonitor<Boolean> monitor) {
+		if (analysesCollection.isCalculateFeatures() || analysesCollection.isCalculateConstraints()) {
+			if (monitor == null) {
+				monitor = new NullMonitor<>();
+			}
+			monitor.checkCancel();
+			final FeatureModelProperties properties = getFeatureModelProperties();
+			if (isValid(monitor.subTask(1))) {
+				properties.setStatus(FeatureModelStatus.VALID);
+			} else {
+				properties.setStatus(FeatureModelStatus.VOID);
+			}
+		}
 	}
 
 	protected void updateFeatures(IMonitor<Boolean> monitor) {
@@ -400,17 +441,32 @@ public class FeatureModelAnalyzer implements IEventListener {
 			monitor.worked();
 
 			monitor.checkCancel();
-			// get feature anomalies
-			for (final IFeature feature : getDeadFeatures(monitor.subTask(1))) {
-				getFeatureProperties(feature).setStatus(FeatureStatus.DEAD);
-			}
-			monitor.checkCancel();
-			for (final IFeature feature : getFalseOptionalFeatures(monitor.subTask(1))) {
-				getFeatureProperties(feature).setStatus(FeatureStatus.FALSE_OPTIONAL);
-			}
-			monitor.checkCancel();
-			for (final IFeature feature : getIndeterminedHiddenFeatures(monitor.subTask(1))) {
-				getFeatureProperties(feature).setStatus(FeatureStatus.INDETERMINATE_HIDDEN);
+			final FeatureModelProperties properties = getFeatureModelProperties();
+			if (properties.hasStatus(FeatureModelStatus.VOID)) {
+				for (final IFeature feature : featureModel.getFeatures()) {
+					final FeatureProperties featureProperties = getFeatureProperties(feature);
+					featureProperties.setStatus(FeatureStatus.DEAD);
+				}
+				monitor.worked(3);
+			} else {
+				// get feature anomalies
+				final List<IFeature> deadFeatures = getDeadFeatures(monitor.subTask(1));
+				for (final IFeature feature : deadFeatures) {
+					getFeatureProperties(feature).setStatus(FeatureStatus.DEAD);
+				}
+				monitor.checkCancel();
+				final List<IFeature> falseOptionalFeatures = getFalseOptionalFeatures(monitor.subTask(1));
+				for (final IFeature feature : falseOptionalFeatures) {
+					getFeatureProperties(feature).setStatus(FeatureStatus.FALSE_OPTIONAL);
+				}
+				monitor.checkCancel();
+				final List<IFeature> indeterminedHiddenFeatures = getIndeterminedHiddenFeatures(monitor.subTask(1));
+				for (final IFeature feature : indeterminedHiddenFeatures) {
+					getFeatureProperties(feature).setStatus(FeatureStatus.INDETERMINATE_HIDDEN);
+				}
+				if (!deadFeatures.isEmpty() || !falseOptionalFeatures.isEmpty() || !indeterminedHiddenFeatures.isEmpty()) {
+					properties.setStatus(FeatureModelStatus.ANOMALIES);
+				}
 			}
 		}
 	}

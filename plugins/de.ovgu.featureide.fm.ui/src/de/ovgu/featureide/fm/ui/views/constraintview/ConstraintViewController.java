@@ -41,6 +41,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -403,7 +404,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final FeatureModelEditor fmEditor = featureModelEditor;
 			if (fmEditor != null) {
 				final FeatureModelAnalyzer analyser = fmEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
-				if (analyser.getAnalysesCollection().getFeatureModelProperties().hasVoidModelConstraints()) {
+				if (analyser.getAnalysesCollection().getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
 					explanation = (Explanation<?>) analyser.getVoidFeatureModelExplanation();
 				} else if (fmEditor.diagramEditor.getActiveExplanation() != null) {
 					explanation = (Explanation<?>) fmEditor.diagramEditor.getActiveExplanation();

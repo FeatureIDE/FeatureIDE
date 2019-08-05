@@ -38,6 +38,12 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class ConfigurationManager extends AFileManager<Configuration> {
 
+	public static final int CHANGE_ALL = 0;
+	public static final int CHANGE_FEATURES = 1;
+	public static final int CHANGE_MANUAL = 2;
+	public static final int CHANGE_AUTOMATIC = 3;
+	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
+
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
 		return getOrCreateInstance(path, ConfigurationManager.class, null);

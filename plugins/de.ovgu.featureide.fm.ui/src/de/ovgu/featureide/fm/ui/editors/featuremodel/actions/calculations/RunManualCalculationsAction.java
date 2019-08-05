@@ -51,7 +51,7 @@ public class RunManualCalculationsAction extends AFeatureModelAction {
 		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
 		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
 		analyzer.analyzeFeatureModel(new NullMonitor<>());
-		featureModelManager.fireEvent(new FeatureIDEEvent(featureModelManager.getSnapshot(), EventType.REDRAW_DIAGRAM));
+		featureModelManager.fireEvent(new FeatureIDEEvent(variableFormula.getFeatureModel(), EventType.REDRAW_DIAGRAM));
 	}
 
 }

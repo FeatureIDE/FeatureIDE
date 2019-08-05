@@ -94,7 +94,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	protected final void refresh() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if ((configurationManager != null) && !configurationEditor.isIOError()) {
-			configurationManager.processObject(config -> updateSource(configurationManager, config), false);
+			configurationManager.processObject(config -> updateSource(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
 		}
 	}
 
@@ -116,7 +116,8 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	public void updateConfiguration() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			final boolean changed = configurationManager.processObject(config -> updateConfiguration(configurationManager, config), false);
+			final boolean changed =
+				configurationManager.processObject(config -> updateConfiguration(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
 			if (changed) {
 				configurationManager.resetSnapshot();
 			}
@@ -160,7 +161,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
 			final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
-			final ProblemList problems = configurationManager.processObject(config -> parseSource(config, confFormat));
+			final ProblemList problems = configurationManager.processObject(config -> parseSource(config, confFormat), ConfigurationManager.CHANGE_ALL);
 			configurationEditor.createModelFileMarkers(problems);
 			configurationEditor.setReadConfigurationError(problems.containsError());
 			return problems;

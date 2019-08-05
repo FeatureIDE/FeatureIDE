@@ -126,6 +126,10 @@ public final class JobSynchronizer {
 		return token;
 	}
 
+	static void removeToken(JobToken token) {
+		jobMap.remove(token);
+	}
+
 	static void startJob(JobToken token, final IRunner<?> job) {
 		if (job == null) {
 			return;

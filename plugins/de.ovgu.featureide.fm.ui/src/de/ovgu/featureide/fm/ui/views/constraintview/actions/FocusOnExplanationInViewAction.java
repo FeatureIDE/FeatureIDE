@@ -124,11 +124,11 @@ public class FocusOnExplanationInViewAction extends AbstractConstraintEditorActi
 		if (constraint == null) {
 			return false;
 		}
-		final ConstraintProperties constraintProperties2 =
+		final ConstraintProperties constraintProperties =
 			featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
-		return constraintProperties2.hasStatus(ConstraintStatus.REDUNDANT) || constraintProperties2.hasStatus(ConstraintStatus.UNSATISFIABLE)
-			|| constraintProperties2.hasStatus(ConstraintStatus.VOID_MODEL) || constraintProperties2.hasStatus(ConstraintStatus.IMPLICIT)
-			|| constraintProperties2.hasStatus(ConstraintStatus.TAUTOLOGY);
+		return constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)
+			|| constraintProperties.hasStatus(ConstraintStatus.VOID) || constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)
+			|| constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY);
 	}
 
 }

@@ -63,11 +63,16 @@ public class VirtualManager<T> implements IManager<T> {
 
 	@Override
 	public <R> R processObject(Function<T, R> editOperation) {
-		return processObject(editOperation, true);
+		return processObject(editOperation, 0);
 	}
 
 	@Override
-	public <R> R processObject(Function<T, R> editOperation, boolean edit) {
+	public void editObject(Consumer<T> editOperation) {
+		editObject(editOperation, 0);
+	}
+
+	@Override
+	public <R> R processObject(Function<T, R> editOperation, int changeIndicator) {
 		lock.lock();
 		try {
 			return editOperation.apply(variableObject);
@@ -77,7 +82,7 @@ public class VirtualManager<T> implements IManager<T> {
 	}
 
 	@Override
-	public void editObject(Consumer<T> editOperation) {
+	public void editObject(Consumer<T> editOperation, int changeIndicator) {
 		lock.lock();
 		try {
 			editOperation.accept(variableObject);

@@ -122,20 +122,24 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
 			label.setIcon(null);
-		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID_MODEL)) {
-			label.setIcon(null);
+		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {
+			label.setIcon(FM_ERROR);
 			add(label);
 			toolTipContent.add(new Label(VOID_MODEL));
 		} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
-			label.setIcon(null);
+			label.setIcon(FM_ERROR);
 			toolTipContent.add(new Label(UNSATISFIABLE));
 		}
 
 		if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
-			label.setIcon(null);
+			label.setIcon(FM_WARNING);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
+		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
+			label.setIcon(FM_WARNING);
+			add(label);
+			toolTipContent.add(new Label(REDUNDANCE));
+		} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
 			label.setIcon(FM_INFO);
 			add(label);
 			toolTipContent.add(new Label(REDUNDANCE));

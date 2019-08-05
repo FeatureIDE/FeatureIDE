@@ -77,7 +77,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 */
 	private void updateTextEditor() {
 		final FeatureModelManager manager = featureModelEditor.getFeatureModelManager();
-		final String text = manager.processObject(manager.getFormat().getInstance()::write);
+		final String text = manager.processObject(manager.getFormat().getInstance()::write, FeatureModelManager.CHANGE_NOTHING);
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);

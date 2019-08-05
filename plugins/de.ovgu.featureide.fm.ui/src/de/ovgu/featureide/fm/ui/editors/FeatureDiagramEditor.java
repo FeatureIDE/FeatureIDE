@@ -233,7 +233,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private int index;
 
-	private final JobToken analysisToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
+	private final JobToken analysisToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT);
 
 	FeatureDiagramEditorKeyHandler editorKeyHandler;
 
@@ -813,8 +813,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			viewer.reload();
 			refreshGraphics(null);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().getSnapshot().getStructure().getRoot().getFeature());
-			analyzeFeatureModel();
+			viewer.refreshChildAll(((IFeatureModel) event.getSource()).getStructure().getRoot().getFeature());
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
@@ -1276,10 +1275,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public void dispose() {
 		LongRunningWrapper.cancelAllJobs(analysisToken);
+		LongRunningWrapper.removeToken(analysisToken);
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
 		graphicalFeatureModel.getFeatureModelManager().removeListener(editorKeyHandler);
-//		gfmManager.dispose();
 		super.dispose();
 	}
 

@@ -61,7 +61,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureMo
 		}
 		new CollapseAllOperation(graphicalFeatureModel, true).operation(featureModel);
 		checkChildren(featureModel.getStructure().getRoot().getFeature());
-		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
+		return new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureMo
 			for (final String name : affectedFeatureList) {
 				graphicalFeatureModel.getGraphicalFeature(featureModel.getFeature(name)).setCollapsed(!collapse);
 			}
-			return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
+			return new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 		}
 	}
 
@@ -95,13 +95,13 @@ public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureMo
 			for (final IFeature node : layer) {
 				final IGraphicalFeature gf = graphicalFeatureModel.getGraphicalFeature(node);
 				editor.getViewer().internRefresh(true);
-				editor.propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+				editor.propertyChange(new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 				if (editor.getViewer().isNodeOutOfSight(gf)) {
 					gf.setCollapsed(true);
 					break;
 				} else {
 					gf.setCollapsed(false);
-					editor.propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
+					editor.propertyChange(new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED));
 					final boolean leftestChildIsOutOfSight = editor.getViewer().isNodeOutOfSight(leftestChild);
 					final int lastChildIndex = gf.getAllGraphicalChildren().size() - 1;
 					final boolean rightestChildIsOutOfSight;

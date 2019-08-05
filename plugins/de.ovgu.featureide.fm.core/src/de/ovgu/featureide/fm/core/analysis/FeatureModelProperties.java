@@ -35,6 +35,12 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class FeatureModelProperties {
 
+	public enum FeatureModelStatus {
+		VALID, ANOMALIES, VOID
+	}
+
+	private FeatureModelStatus featureModelStatus = FeatureModelStatus.VALID;
+
 	private final Collection<FeatureProperties> featureProperties;
 	private final Collection<ConstraintProperties> constraintProperties;
 
@@ -46,7 +52,15 @@ public class FeatureModelProperties {
 	private final HashMap<FeatureStatus, Boolean> cachedFeatureStatus = new HashMap<>();
 	private final HashMap<ConstraintStatus, Boolean> cachedConstraintStatus = new HashMap<>();
 
-	public boolean hasProperty(FeatureStatus status) {
+	public void setStatus(FeatureModelStatus featureModelStatus) {
+		this.featureModelStatus = featureModelStatus;
+	}
+
+	public boolean hasStatus(FeatureModelStatus status) {
+		return featureModelStatus == status;
+	}
+
+	public boolean hasStatus(FeatureStatus status) {
 		Boolean chachedResult = cachedFeatureStatus.get(status);
 		if (chachedResult == null) {
 			chachedResult = false;
@@ -61,7 +75,7 @@ public class FeatureModelProperties {
 		return chachedResult;
 	}
 
-	public boolean hasProperty(ConstraintStatus status) {
+	public boolean hasStatus(ConstraintStatus status) {
 		Boolean chachedResult = cachedConstraintStatus.get(status);
 		if (chachedResult == null) {
 			chachedResult = false;
@@ -186,7 +200,7 @@ public class FeatureModelProperties {
 	public boolean hasVoidModelConstraints() {
 		if (hasVoidModelConstraints == null) {
 			for (final ConstraintProperties c : constraintProperties) {
-				if (c.hasStatus(ConstraintStatus.VOID_MODEL) || c.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
+				if (c.hasStatus(ConstraintStatus.VOID) || c.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
 					hasVoidModelConstraints = Boolean.TRUE;
 					break;
 				}

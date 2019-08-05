@@ -26,6 +26,7 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -79,6 +80,11 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

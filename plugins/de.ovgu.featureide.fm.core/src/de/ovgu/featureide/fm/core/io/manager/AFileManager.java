@@ -283,17 +283,20 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 
 	@Override
 	public <R> R processObject(Function<T, R> editOperation) {
-		return processObject(editOperation, true);
+		return processObject(editOperation, 0);
 	}
 
 	@Override
-	public <R> R processObject(Function<T, R> editOperation, boolean edit) {
+	public void editObject(Consumer<T> editOperation) {
+		editObject(editOperation, 0);
+	}
+
+	@Override
+	public <R> R processObject(Function<T, R> editOperation, int changeIndicator) {
 		fileOperationLock.lock();
 		try {
 			final R result = editOperation.apply(variableObject);
-			if (edit) {
-				resetSnapshot();
-			}
+			resetSnapshot(changeIndicator);
 			return result;
 		} finally {
 			fileOperationLock.unlock();
@@ -301,17 +304,21 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	@Override
-	public void editObject(Consumer<T> editOperation) {
+	public void editObject(Consumer<T> editOperation, int changeIndicator) {
 		fileOperationLock.lock();
 		try {
 			editOperation.accept(variableObject);
-			resetSnapshot();
+			resetSnapshot(changeIndicator);
 		} finally {
 			fileOperationLock.unlock();
 		}
 	}
 
 	public void resetSnapshot() {
+		resetSnapshot(0);
+	}
+
+	protected void resetSnapshot(int changeIndicator) {
 		snapshot = null;
 	}
 

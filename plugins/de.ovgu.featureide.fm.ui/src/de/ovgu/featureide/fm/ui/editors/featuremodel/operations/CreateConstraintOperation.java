@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -71,6 +72,11 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintCount);
 		featureModel.removeConstraint(constraintCount);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

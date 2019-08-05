@@ -55,7 +55,7 @@ public class AddFeatureAttributeAction extends Action {
 
 	@Override
 	public void run() {
-		fmManager.editObject(this::addAttribute);
+		fmManager.editObject(this::addAttribute, FeatureModelManager.CHANGE_ATTRIBUTES);
 	}
 
 	private void addAttribute(IFeatureModel featureModel) {

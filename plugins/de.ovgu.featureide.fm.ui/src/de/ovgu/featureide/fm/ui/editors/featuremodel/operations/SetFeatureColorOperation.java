@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -72,6 +73,11 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 		}
 		FeatureColorManager.notifyColorChange(featureList);
 		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_GRAPHICS;
 	}
 
 }

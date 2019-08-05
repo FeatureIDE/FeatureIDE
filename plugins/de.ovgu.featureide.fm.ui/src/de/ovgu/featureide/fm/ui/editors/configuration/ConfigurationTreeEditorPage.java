@@ -713,7 +713,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 			final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 			if (configurationManager != null) {
-				configurationManager.editObject(config -> config.setManual(feature, manualSelection));
+				configurationManager.editObject(config -> config.setManual(feature, manualSelection), ConfigurationManager.CHANGE_MANUAL);
 				if (configurationEditor.getExpandAlgorithm() == ExpandAlgorithm.CURRENTLY_SELECTED) {
 					switch (manualSelection) {
 					case SELECTED:
@@ -1082,7 +1082,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		setInfoLabel(CALCULATING____, null);
 
-		configurationManager.editObject(config -> update(updateStrategy, currentDisplay, configurationManager, featureModelManager, config));
+		configurationManager.editObject(config -> update(updateStrategy, currentDisplay, configurationManager, featureModelManager, config),
+				ConfigurationManager.CHANGE_AUTOMATIC);
 	}
 
 	private void update(UpdateStrategy updateStrategy, final Display currentDisplay, ConfigurationManager configurationManager,
@@ -1102,7 +1103,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		IRunner<Collection<SelectableFeature>> updateJob = null;
 		switch (updateStrategy) {
 		case RESOLVE:
-			updateJob = LongRunningWrapper.getRunner(propagator.resolve());
+			sequence.addJob(LongRunningWrapper.getRunner(propagator.resolve()));
+			updateJob = LongRunningWrapper.getRunner(propagator.update(true));
+			updateFeatures.clear();
+			updateFeatures.addAll(configuration.getFeatures());
 			break;
 		case BUILD:
 			sequence.addJob(LongRunningWrapper.getRunner(monitor -> build(configuration.getRoot(), currentDisplay)));

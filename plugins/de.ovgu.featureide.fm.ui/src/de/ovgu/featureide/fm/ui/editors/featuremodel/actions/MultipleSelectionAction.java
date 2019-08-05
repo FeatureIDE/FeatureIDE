@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -50,6 +51,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
 public abstract class MultipleSelectionAction extends AFeatureModelAction implements IEventListener {
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -125,7 +127,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	 */
 	protected void selectionElementChanged(boolean validSelection) {
 		final List<String> selectedFeatures = getSelectedFeatures();
-		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection));
+		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection), FeatureModelManager.CHANGE_NOTHING);
 		if (validSelection) {
 			updateProperties();
 		} else {

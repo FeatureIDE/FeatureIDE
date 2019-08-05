@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -33,6 +34,11 @@ public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFea
 	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
 		super(graphicalFeatureModel.getFeatureModelManager(), label);
 		this.graphicalFeatureModel = graphicalFeatureModel;
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_GRAPHICS;
 	}
 
 }

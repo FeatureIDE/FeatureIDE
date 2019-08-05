@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
@@ -443,7 +444,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void writeValues() {
-		featureModelManager.editObject(this::writeElementsInternal);
+		featureModelManager.editObject(this::writeElementsInternal, FeatureModelManager.CHANGE_GRAPHICS);
 	}
 
 	private void writeElementsInternal(final IFeatureModel fm) {
@@ -458,17 +459,17 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void writeFeatureModel() {
-		featureModelManager.editObject(this::writeFeatureModelInternal);
+		featureModelManager.editObject(this::writeFeatureModelInternal, FeatureModelManager.CHANGE_GRAPHICS);
 	}
 
 	@Override
 	public void writeConstraint(final IGraphicalConstraint graphicalConstraint) {
-		featureModelManager.editObject(fm -> writeConstraintInternal(graphicalConstraint));
+		featureModelManager.editObject(fm -> writeConstraintInternal(graphicalConstraint), FeatureModelManager.CHANGE_GRAPHICS);
 	}
 
 	@Override
 	public void writeFeature(final IGraphicalFeature graphicalFeature) {
-		featureModelManager.editObject(fm -> writeFeatureInternal(fm, graphicalFeature));
+		featureModelManager.editObject(fm -> writeFeatureInternal(fm, graphicalFeature), FeatureModelManager.CHANGE_GRAPHICS);
 	}
 
 	private void writeFeatureModelInternal(IFeatureModel fm) {

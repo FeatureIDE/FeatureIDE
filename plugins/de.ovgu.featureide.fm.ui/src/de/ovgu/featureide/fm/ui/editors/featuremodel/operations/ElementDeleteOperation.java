@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -271,6 +272,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 						: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_),
 				MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

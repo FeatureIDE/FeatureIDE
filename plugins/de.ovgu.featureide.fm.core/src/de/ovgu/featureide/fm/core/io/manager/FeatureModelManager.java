@@ -40,6 +40,13 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> implements IFeatureModelManager {
 
+	public static final int CHANGE_ALL = 0;
+	public static final int CHANGE_DEPENDENCIES = 1;
+	public static final int CHANGE_ATTRIBUTES = 2;
+	public static final int CHANGE_ORDER = 3;
+	public static final int CHANGE_GRAPHICS = 4;
+	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
+
 	private FeatureModelFormula persistentFormula = null;
 	private FeatureModelFormula variableFormula = null;
 
@@ -118,10 +125,12 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	@Override
-	public void resetSnapshot() {
-		super.resetSnapshot();
+	protected void resetSnapshot(int changeIndicator) {
+		super.resetSnapshot(changeIndicator);
 		if (variableFormula != null) {
-			variableFormula = null;
+			if (changeIndicator <= CHANGE_DEPENDENCIES) {
+				variableFormula = null;
+			}
 		}
 	}
 

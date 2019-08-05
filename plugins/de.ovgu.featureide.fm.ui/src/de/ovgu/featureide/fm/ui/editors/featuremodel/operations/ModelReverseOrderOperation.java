@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -60,6 +61,11 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		return operation(featureModel);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ORDER;
 	}
 
 }

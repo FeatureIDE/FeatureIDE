@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -58,6 +59,11 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 		featureModel.removeConstraint(newIndex);
 		featureModel.addConstraint(constraint, oldIndex);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, newIndex, oldIndex);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_GRAPHICS;
 	}
 
 }

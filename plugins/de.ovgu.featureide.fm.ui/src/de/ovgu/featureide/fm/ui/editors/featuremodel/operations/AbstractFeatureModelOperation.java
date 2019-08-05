@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent.ExecutionType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -60,7 +61,7 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void execute() {
-		final FeatureIDEEvent event = featureModelManager.processObject(this::firstOperation);
+		final FeatureIDEEvent event = featureModelManager.processObject(this::firstOperation, getChangeIndicator());
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.EXECUTE);
 		}
@@ -68,7 +69,7 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void redo() {
-		final FeatureIDEEvent event = featureModelManager.processObject(this::operation);
+		final FeatureIDEEvent event = featureModelManager.processObject(this::operation, getChangeIndicator());
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.REDO);
 		}
@@ -76,11 +77,15 @@ public abstract class AbstractFeatureModelOperation {
 	}
 
 	public final void undo() {
-		final FeatureIDEEvent event = featureModelManager.processObject(this::inverseOperation);
+		final FeatureIDEEvent event = featureModelManager.processObject(this::inverseOperation, getChangeIndicator());
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.UNDO);
 		}
 		fireEvent(event);
+	}
+
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ALL;
 	}
 
 	protected final void fireEvent(@Nonnull FeatureIDEEvent event) {

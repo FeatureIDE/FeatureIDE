@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
@@ -55,6 +56,11 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		featureModelManager.readFromSource(oldText);
 		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ALL;
 	}
 
 }

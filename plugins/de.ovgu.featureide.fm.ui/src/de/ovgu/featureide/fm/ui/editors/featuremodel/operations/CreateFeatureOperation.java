@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -62,6 +63,11 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 		final IFeature newFeature = featureModel.getFeature(newFeatureName);
 		featureModel.deleteFeature(newFeature);
 		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

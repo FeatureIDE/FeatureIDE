@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -43,12 +44,11 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private final int constraintIndex;
 
 	/**
-	 * This wrapper is used to wrap both fields (node and description) of a constraint
-	 * It is needed because the FeatureIDEEvent constructor expects only one set of objects
-	 * (oldState and newState)
-	 * This way it is possible to cache the state of two different fields.
+	 * This wrapper is used to wrap both fields (node and description) of a constraint It is needed because the FeatureIDEEvent constructor expects only one set
+	 * of objects (oldState and newState) This way it is possible to cache the state of two different fields.
 	 */
 	public static class ConstraintDescription {
+
 		private final Node node;
 		private final String description;
 
@@ -90,6 +90,11 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 		constraint.setNode(newWrapper.getNode());
 		constraint.setDescription(newWrapper.getDescription());
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

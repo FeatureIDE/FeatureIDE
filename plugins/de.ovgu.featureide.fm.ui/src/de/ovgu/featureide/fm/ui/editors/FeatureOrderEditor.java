@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -95,7 +96,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (isDirty()) {
 			updateOrderEditor();
 
-			getFeatureModel().editObject(this::saveOrder);
+			getFeatureModel().editObject(this::saveOrder, FeatureModelManager.CHANGE_ORDER);
 
 			super.doSave(monitor);
 		}
@@ -116,7 +117,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (hasFeatureOrder) {
 			final IFeatureModel featureModel = getFeatureModel().getSnapshot();
 			if (featureModel.getFeatureOrderList().isEmpty()) {
-				getFeatureModel().editObject(this::defaultFeatureList);
+				getFeatureModel().editObject(this::defaultFeatureList, FeatureModelManager.CHANGE_ORDER);
 			} else {
 				featureOrderTable.removeAll();
 				for (final String str : featureModel.getFeatureOrderList()) {
@@ -134,7 +135,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	public void updateOrderEditor() {
 		if (hasFeatureOrder) {
 			// This flag is true if a concrete feature was added or removed
-			final boolean changed = fmManager.processObject(this::updateFeatureList);
+			final boolean changed = fmManager.processObject(this::updateFeatureList, FeatureModelManager.CHANGE_ORDER);
 			updateFeatureOrderList();
 			if (changed) {
 				setDirty();
@@ -286,7 +287,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				fmManager.editObject(FeatureOrderEditor.this::defaultFeatureList);
+				fmManager.editObject(FeatureOrderEditor.this::defaultFeatureList, FeatureModelManager.CHANGE_ORDER);
 				updateFeatureOrderList();
 				setDirty();
 			}
@@ -364,7 +365,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	public void updateFeatureOrderList() {
 		if (hasFeatureOrder) {
-			getFeatureModel().editObject(this::updateFeatureOrderList);
+			getFeatureModel().editObject(this::updateFeatureOrderList, FeatureModelManager.CHANGE_ORDER);
 		}
 	}
 

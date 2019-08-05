@@ -36,13 +36,13 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 public class ConstraintProperties {
 
 	public enum ConstraintStatus {
-		NECESSARY, REDUNDANT, IMPLICIT, TAUTOLOGY, SATISFIABLE, VOID_MODEL, UNSATISFIABLE
+		NECESSARY, REDUNDANT, IMPLICIT, TAUTOLOGY, SATISFIABLE, VOID, UNSATISFIABLE
 	}
 
 	private static final EnumSet<ConstraintStatus> constraintRedundancyStatus =
 		EnumSet.of(ConstraintStatus.NECESSARY, ConstraintStatus.REDUNDANT, ConstraintStatus.IMPLICIT, ConstraintStatus.TAUTOLOGY);
 	private static final EnumSet<ConstraintStatus> constraintSatisfiabilityStatus =
-		EnumSet.of(ConstraintStatus.SATISFIABLE, ConstraintStatus.VOID_MODEL, ConstraintStatus.UNSATISFIABLE);
+		EnumSet.of(ConstraintStatus.SATISFIABLE, ConstraintStatus.VOID, ConstraintStatus.UNSATISFIABLE);
 
 	private final EnumSet<ConstraintStatus> constraintStatus = EnumSet.noneOf(ConstraintStatus.class);
 

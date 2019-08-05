@@ -72,6 +72,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
@@ -178,15 +179,17 @@ public class AnalysesCollection {
 
 			synchronized (curSyncObject) {
 				this.monitor = monitor != null ? monitor : new NullMonitor<>();
+				R result = null;
 				if (curAnalysisResult == null) {
 					final AbstractAnalysis<R> analysisInstance = createNewAnalysis();
 					try {
-						LongRunningWrapper.runMethod(analysisInstance, this.monitor);
-						curAnalysisResult = analysisInstance.getResult();
+						result = LongRunningWrapper.runMethod(analysisInstance, this.monitor);
+						curAnalysisResult = result == null ? null : analysisInstance.getResult();
+					} catch (final MethodCancelException e) {
+
 					} catch (final Exception e) {
 						Logger.logError(e);
 					}
-
 					synchronized (this) {
 						if (curSyncObject == this.syncObject) {
 							this.analysisResult = curAnalysisResult;
@@ -195,7 +198,7 @@ public class AnalysesCollection {
 				} else {
 					this.monitor.done();
 				}
-				return curAnalysisResult.getResult();
+				return result;
 			}
 		}
 
@@ -264,10 +267,18 @@ public class AnalysesCollection {
 		@Override
 		protected void configureAnalysis(CNF cnf, CauseAnalysis analysis) {
 			final Anomalies initialAnomalies = new Anomalies();
-			initialAnomalies.setDeadVariables(coreDeadAnalysis.getResult());
+			final LiteralSet coreDeadResult = coreDeadAnalysis.getResult();
+			if (coreDeadResult == null) {
+				return;
+			}
+			initialAnomalies.setDeadVariables(coreDeadResult);
 
 			foAnalysis.setOptionalFeatures(Functional.filterToList(formula.getFeatureModel().getFeatures(), new OptionalFeatureFilter()));
-			initialAnomalies.setRedundantClauses(Functional.removeNull(foAnalysis.getResult()));
+			final List<LiteralSet> foResult = foAnalysis.getResult();
+			if (foResult == null) {
+				return;
+			}
+			initialAnomalies.setRedundantClauses(Functional.removeNull(foResult));
 
 			analysis.setAnomalies(initialAnomalies);
 			analysis.setClauseList(constraintClauses);

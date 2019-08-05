@@ -50,9 +50,11 @@ public interface IManager<T> extends IEventManager {
 
 	void editObject(Consumer<T> editOperation);
 
+	void editObject(Consumer<T> editOperation, int changeIndicator);
+
 	<R> R processObject(Function<T, R> editOperation);
 
-	<R> R processObject(Function<T, R> editOperation, boolean edit);
+	<R> R processObject(Function<T, R> editOperation, int changeIndicator);
 
 	T getSnapshot();
 

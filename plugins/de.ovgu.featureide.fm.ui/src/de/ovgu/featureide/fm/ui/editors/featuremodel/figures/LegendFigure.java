@@ -36,6 +36,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -221,7 +222,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 		indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
 
-		void_model = analysisResults.getFeatureModelProperties().hasVoidModelConstraints();
+		void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
 		if (void_model) {
 			dead = false;
 		}
