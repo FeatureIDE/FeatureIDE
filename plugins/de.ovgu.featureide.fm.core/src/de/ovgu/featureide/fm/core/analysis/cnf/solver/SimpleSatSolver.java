@@ -49,16 +49,29 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	protected final IInternalVariables internalMapping;
 	protected final Solver<?> solver;
 
-	public SimpleSatSolver(CNF satInstance) throws RuntimeContradictionException {
-		this.satInstance = satInstance;
-		internalMapping = satInstance.getInternalVariables();
-		solver = newSolver();
+	protected final boolean contradiction;
+
+	public SimpleSatSolver(CNF satInstance) {
+		this(satInstance, satInstance.getInternalVariables());
 	}
 
 	protected SimpleSatSolver(SimpleSatSolver oldSolver) {
-		satInstance = oldSolver.satInstance;
-		internalMapping = oldSolver.internalMapping;
-		solver = newSolver();
+		this(oldSolver.satInstance, oldSolver.internalMapping);
+	}
+
+	protected SimpleSatSolver(CNF satInstance, IInternalVariables variables) throws RuntimeContradictionException {
+		this.satInstance = satInstance;
+		internalMapping = variables;
+
+		Solver<?> newSolver = null;
+		boolean contradictionException = false;
+		try {
+			newSolver = newSolver();
+		} catch (final RuntimeContradictionException e) {
+			contradictionException = true;
+		}
+		solver = newSolver;
+		contradiction = contradictionException;
 	}
 
 	@Override
@@ -122,16 +135,19 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	@Override
 	public int[] getSolution() {
-		return internalMapping.convertToOriginal(solver.model());
+		return contradiction ? null : internalMapping.convertToOriginal(solver.model());
 	}
 
 	@Override
 	public int[] getInternalSolution() {
-		return solver.model();
+		return contradiction ? null : solver.model();
 	}
 
 	@Override
 	public SatResult hasSolution() {
+		if (contradiction) {
+			return SatResult.FALSE;
+		}
 		try {
 			if (solver.isSatisfiable(false)) {
 				return SatResult.TRUE;
@@ -146,6 +162,9 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	@Override
 	public SatResult hasSolution(int... assignment) {
+		if (contradiction) {
+			return SatResult.FALSE;
+		}
 		final int[] unitClauses = new int[assignment.length];
 		System.arraycopy(internalMapping.convertToInternal(assignment), 0, unitClauses, 0, unitClauses.length);
 
@@ -183,7 +202,9 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	@Override
 	public void reset() {
-		solver.reset();
+		if (!contradiction) {
+			solver.reset();
+		}
 	}
 
 	private boolean checkClauseValidity(final int[] literals) {
@@ -246,7 +267,9 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	@Override
 	public void setTimeout(int timeout) {
-		solver.setTimeout(timeout);
+		if (!contradiction) {
+			solver.setTimeout(timeout);
+		}
 	}
 
 	@Override

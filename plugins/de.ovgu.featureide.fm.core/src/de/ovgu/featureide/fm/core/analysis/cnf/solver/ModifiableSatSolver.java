@@ -36,11 +36,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
  */
 public class ModifiableSatSolver extends AdvancedSatSolver {
 
-	public ModifiableSatSolver(AdvancedSatSolver oldSolver) throws RuntimeContradictionException {
+	public ModifiableSatSolver(AdvancedSatSolver oldSolver) {
 		super(oldSolver);
 	}
 
-	public ModifiableSatSolver(CNF satInstance) throws RuntimeContradictionException {
+	public ModifiableSatSolver(CNF satInstance) {
 		super(satInstance);
 	}
 
@@ -69,6 +69,9 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 
 	@Override
 	public void removeClause(IConstr constr) {
+		if (contradiction) {
+			return;
+		}
 		if (constr != null) {
 			try {
 				solver.removeConstr(constr);
@@ -80,6 +83,9 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 
 	@Override
 	public void removeLastClauses(int numberOfClauses) {
+		if (contradiction) {
+			return;
+		}
 		try {
 			for (int i = 0; i < numberOfClauses; i++) {
 				final IConstr removeLast = constrList.remove(constrList.size() - 1);

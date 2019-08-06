@@ -53,7 +53,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	protected boolean globalTimeout = false;
 
-	public AdvancedSatSolver(CNF satInstance) throws RuntimeContradictionException {
+	public AdvancedSatSolver(CNF satInstance) {
 		super(satInstance);
 		strategy = SelectionStrategy.ORG;
 
@@ -167,6 +167,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public SatResult hasSolution() {
+		if (contradiction) {
+			return SatResult.FALSE;
+		}
 		try {
 			if (solver.isSatisfiable(assignment, globalTimeout)) {
 				addSolution();
@@ -185,6 +188,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	 */
 	@Override
 	public SatResult hasSolution(int... assignment) {
+		if (contradiction) {
+			return SatResult.FALSE;
+		}
 		final int[] unitClauses = new int[assignment.length];
 		System.arraycopy(internalMapping.convertToInternal(assignment), 0, unitClauses, 0, unitClauses.length);
 
@@ -211,6 +217,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public int[] getContradictoryAssignment() {
+		if (contradiction) {
+			return new int[0];
+		}
 		final IVecInt unsatExplanation = solver.unsatExplanation();
 		return internalMapping.convertToOriginal(Arrays.copyOf(unsatExplanation.toArray(), unsatExplanation.size()));
 	}
@@ -245,6 +254,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
+		if (contradiction) {
+			return;
+		}
 		if (this.strategy != strategy) {
 			this.strategy = strategy;
 			switch (strategy) {
@@ -272,6 +284,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void setSelectionStrategy(int[] model, boolean min) {
+		if (contradiction) {
+			return;
+		}
 		strategy = SelectionStrategy.FIXED;
 		solver.setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model, min), order));
 		solver.getOrder().init();
@@ -279,6 +294,9 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void setSelectionStrategy(List<LiteralSet> sample) {
+		if (contradiction) {
+			return;
+		}
 		strategy = SelectionStrategy.UNIFORM_RANDOM;
 		solver.setOrder(new VarOrderHeap3(sample));
 		solver.getOrder().init();
