@@ -138,7 +138,10 @@ public final class JobSynchronizer {
 	}
 
 	static void cancelAllJobs(JobToken token) {
-		jobMap.get(token).cancelAll();
+		final JobEntry jobEntry = jobMap.get(token);
+		if (jobEntry != null) {
+			jobEntry.cancelAll();
+		}
 	}
 
 }

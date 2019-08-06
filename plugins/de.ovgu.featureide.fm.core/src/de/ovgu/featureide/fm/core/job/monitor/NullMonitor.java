@@ -41,7 +41,7 @@ public final class NullMonitor<T> extends AMonitor<T> {
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
-		if (cancel || Thread.currentThread().isInterrupted()) {
+		if (cancel || Thread.interrupted()) {
 			throw new MethodCancelException();
 		}
 	}
