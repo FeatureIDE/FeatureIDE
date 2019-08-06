@@ -119,6 +119,7 @@ import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.RunnerSequence;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.ExpandAlgorithm;
@@ -1009,6 +1010,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		currentDisplay.asyncExec(() -> refreshItem(itmes));
 	}
 
+	private Void resetUpdateFeatures(IMonitor<Void> monitor) {
+		updateFeatures.clear();
+		return null;
+	}
+
 	/**
 	 * Returns an explanation for the given feature selection. Generates it first if necessary.
 	 *
@@ -1131,6 +1137,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (updateJob != null) {
 			updateJob.setIntermediateFunction(t -> updateFeatures(currentDisplay, t));
 			sequence.addJob(updateJob);
+			sequence.addJob(LongRunningWrapper.getRunner(this::resetUpdateFeatures));
 		}
 
 		final IRunner<Collection<SelectableFeature>> coloringJob = LongRunningWrapper.getRunner(propagator.findOpenClauses());
