@@ -25,8 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import de.ovgu.featureide.fm.core.functional.Functional;
+import java.util.stream.Collectors;
 
 /**
  * Tree element.
@@ -68,14 +67,6 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	}
 
-	private static final class Converter<M, E> implements Functional.IFunction<ModelTree<M, E>, E> {
-
-		@Override
-		public E invoke(ModelTree<M, E> tree) {
-			return tree.object;
-		}
-	}
-
 	protected final M treeModel;
 
 	protected final List<ModelTree<M, E>> children = new ArrayList<>();
@@ -98,7 +89,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public Iterable<E> getChildrenObjects() {
-		return Functional.map(children, new Converter<M, E>());
+		return children.stream().map(ModelTree::getObject).collect(Collectors.toList());
 	}
 
 	public ModelTree<M, E> getParent() {

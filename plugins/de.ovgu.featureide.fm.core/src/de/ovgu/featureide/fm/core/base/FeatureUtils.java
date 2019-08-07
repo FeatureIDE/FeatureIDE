@@ -225,10 +225,10 @@ public final class FeatureUtils {
 		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
 	}
 
-	public static Iterable<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
+	public static List<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
 		requireNonNull(list);
 
-		return Functional.map(list, FEATURE_TO_STRUCTURE);
+		return Functional.toList(Functional.map(list, FEATURE_TO_STRUCTURE));
 	}
 
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 
@@ -62,7 +63,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
 import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -134,10 +134,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 		if (result == null) {
 			return Collections.emptyList();
 		}
-		final Set<IFeature> uncommonFeatures =
-			Functional.toSet(Functional.map(formula.getCNF().getVariables().convertToString(result, true, true, false), new StringToFeature(featureModel)));
-		return Functional.mapToList(featureModel.getFeatures(), new InverseFilter<>(new FeatureSetFilter(uncommonFeatures)),
-				new Functional.IdentityFunction<IFeature>());
+		final List<String> variables = formula.getCNF().getVariables().convertToString(result, true, true, false);
+		final Set<IFeature> uncommonFeatures = variables.stream().map(featureModel::getFeature).collect(Collectors.toSet());
+		return featureModel.getFeatures().stream().filter(new FeatureSetFilter(uncommonFeatures).negate()).collect(Collectors.toList());
 	}
 
 	public List<List<IFeature>> getAtomicSets(IMonitor<List<LiteralSet>> monitor) {

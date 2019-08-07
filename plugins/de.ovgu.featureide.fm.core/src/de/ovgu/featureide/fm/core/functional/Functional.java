@@ -25,12 +25,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.filter.base.AndFilter;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
@@ -409,11 +410,7 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> List<T> toList(final Iterable<T> source) {
-		final ArrayList<T> retval = new ArrayList<>();
-		for (final T t : source) {
-			retval.add(t);
-		}
-		return retval;
+		return collect(source, new ArrayList<>());
 	}
 
 	/**
@@ -428,11 +425,12 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> Set<T> toSet(final Iterable<T> source) {
-		final HashSet<T> retval = new HashSet<>();
-		for (final T t : source) {
-			retval.add(t);
-		}
-		return retval;
+		return collect(source, new HashSet<>());
+	}
+
+	private static <T, C extends Collection<T>> C collect(final Iterable<T> source, C collection) {
+		source.forEach(collection::add);
+		return collection;
 	}
 
 	public static <T, R> List<R> mapToList(final Iterable<T> source, IFilter<T> filter, IFunction<T, R> mapFunction) {
@@ -477,64 +475,6 @@ public abstract class Functional {
 	 */
 	public static <T> Set<String> mapToStringSet(final Iterable<T> source) {
 		return toSet(map(source, new ToStringFunction<T>()));
-	}
-
-	/**
-	 * Converts the iterator <i>source</i> of type <b>T</b> into a collection of <b>CharSequence</b> using a binary function invoking {@link Object#toString()}
-	 * on each element in <b>source</b> and finally {@link #toList(Iterable)} on the result. <br> <br> It is guaranteed not to remove any element from the
-	 * iterator. <br> <br> This is a <b>blocking</b> operation.
-	 *
-	 * @param source Source of elements
-	 * @param <T>
-	 * @return A collection of CharSequence that were yielded by <b>source</b>
-	 *
-	 * @see Functional.ToCharSequenceFunction
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
-		return toList(map(source, new ToCharSequenceFunction<T>()));
-	}
-
-	/**
-	 * Converts the enumeration <i>enumeration</i> of type <b>T</b> into an Iterable of <b>T</b>. The enumeration is read into a intermediate collection which
-	 * is then used to create the result value. <br> It is guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b>
-	 * operation.
-	 *
-	 * @param enumeration Enumeration of elements
-	 * @param <T>
-	 * @return An iterable of <b>T</b> that were yielded by <b>enumeration</b>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
-		final Collection<T> collection = new ArrayList<>();
-		while (enumeration.hasMoreElements()) {
-			collection.add(enumeration.nextElement());
-		}
-		return collection;
-	}
-
-	/**
-	 * Converts the collection <i>collection</i> of type <b>T</b> into an Iterable of <b>T</b>. <br/> It is guaranteed not to remove any element from the
-	 * iterator. <br/> <br/> <b>Note</b>: This is a <b>non-blocking</b> operation
-	 *
-	 * @param Collection source
-	 * @return An iterable of <b>T</b> that were yielded by <b>collection</b>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Iterable<T> toIterator(final Collection<T> collection) {
-		return new Iterable<T>() {
-
-			@Override
-			public Iterator<T> iterator() {
-				return collection.iterator();
-			}
-		};
 	}
 
 	/**
@@ -641,25 +581,6 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Returns an type-safe empty iterable of type <b>T</b> as convenience counterpart to {@link Collections#emptyIterator()} or
-	 * {@link Collections#emptyList()}. <br> <br> The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time. <br> <br>
-	 * <b>Example</b> The following example shows how to create an empty iterable of type <code>IFeature</code>. <code> Iterable&lt;IFeature&gt; it =
-	 * Functional.getEmptyIterable(IFeature.class)); </code>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 *
-	 * @param <T> the infered type of the iterable, must be compatible to <code>className</code>
-	 * @param className the class name of the type <b>T</b>
-	 *
-	 * @return Returns an empty type-safe iterable of type <b>T</b>
-	 */
-	public static <T> Iterable<T> getEmptyIterable(Class<? extends T> className) {
-		final Collection<T> collection = new ArrayList<>(0);
-		return collection;
-	}
-
-	/**
 	 * Checks whenever <code>iterable</code> is empty or not by calling <code>iterable.iterator().hasNext()</code>
 	 *
 	 * @author Marcus Pinnecke
@@ -705,13 +626,11 @@ public abstract class Functional {
 	}
 
 	public static <T> List<T> removeNull(List<T> oldList) {
-		final List<T> newList = new ArrayList<>();
-		for (final T t : oldList) {
-			if (t != null) {
-				newList.add(t);
-			}
+		if (oldList == null) {
+			return null;
+		} else {
+			return oldList.stream().filter(Objects::nonNull).collect(Collectors.toList());
 		}
-		return newList;
 	}
 
 }

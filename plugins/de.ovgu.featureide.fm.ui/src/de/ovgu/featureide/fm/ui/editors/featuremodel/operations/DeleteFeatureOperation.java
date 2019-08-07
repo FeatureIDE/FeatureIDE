@@ -128,7 +128,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 
 			final IFeature feature = FMFactoryManager.getInstance().getFactory(featureModel).copyFeature(featureModel, oldFeature);
-			feature.getStructure().setChildren(Functional.toList(FeatureUtils.convertToFeatureStructureList(oldChildren)));
+			feature.getStructure().setChildren(FeatureUtils.convertToFeatureStructureList(oldChildren));
 			if (oldParent != null) {
 				oldParent.getStructure().addChildAtPosition(oldIndex, feature.getStructure());
 			} else {
