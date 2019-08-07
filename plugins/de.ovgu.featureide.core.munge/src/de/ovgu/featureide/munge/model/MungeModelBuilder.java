@@ -165,7 +165,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			sigIt.addFilter(new IFilter<AbstractSignature>() {
 
 				@Override
-				public boolean isValid(AbstractSignature object) {
+				public boolean test(AbstractSignature object) {
 					String sigName = object.getFullName();
 					if (sigName.startsWith(".")) {
 						sigName = sigName.substring(1);

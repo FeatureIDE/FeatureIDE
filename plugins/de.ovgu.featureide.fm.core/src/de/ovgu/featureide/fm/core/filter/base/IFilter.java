@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.filter.base;
 
+import java.util.function.Predicate;
+
 /**
  * Performs a test on an object based on its properties and returns whether the object passes or fails the test.
  *
@@ -27,8 +29,6 @@ package de.ovgu.featureide.fm.core.filter.base;
  *
  * @see Filter
  */
-public interface IFilter<T> {
-
-	boolean isValid(T object);
+public interface IFilter<T> extends Predicate<T> {
 
 }

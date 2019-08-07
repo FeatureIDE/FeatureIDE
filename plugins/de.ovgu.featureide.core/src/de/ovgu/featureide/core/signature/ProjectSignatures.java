@@ -92,7 +92,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private boolean isValid(AbstractSignature sig) {
 			for (final IFilter curFilter : filter) {
-				if (!curFilter.isValid(sig)) {
+				if (!curFilter.test(sig)) {
 					return false;
 				}
 			}

@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 public class MethodFilter implements IFilter<AbstractSignature> {
 
 	@Override
-	public boolean isValid(AbstractSignature signature) {
+	public boolean test(AbstractSignature signature) {
 		return signature instanceof AbstractMethodSignature;
 	}
 

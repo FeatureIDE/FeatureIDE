@@ -54,7 +54,7 @@ public class HashSetFilter<T> extends HashSet<T> implements IFilter<T> {
 	}
 
 	@Override
-	public boolean isValid(T object) {
+	public boolean test(T object) {
 		return contains(object);
 	}
 

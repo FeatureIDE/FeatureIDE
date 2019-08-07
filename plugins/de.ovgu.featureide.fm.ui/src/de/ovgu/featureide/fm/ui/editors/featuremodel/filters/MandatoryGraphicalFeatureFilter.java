@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 public class MandatoryGraphicalFeatureFilter implements IFilter<IGraphicalFeature> {
 
 	@Override
-	public boolean isValid(IGraphicalFeature object) {
+	public boolean test(IGraphicalFeature object) {
 		final IFeatureStructure parent = object.getObject().getStructure().getParent();
 		if ((parent != null) && parent.isAnd() && object.getObject().getStructure().isMandatory()) {
 			return true;

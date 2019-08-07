@@ -45,7 +45,7 @@ public abstract class Filter {
 	public static <U, T extends U, V extends Iterable<T>> V remove(V source, IFilter<U> predicate) {
 		if ((source != null) && (predicate != null)) {
 			for (final Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
-				if (predicate.isValid(iterator.next())) {
+				if (predicate.test(iterator.next())) {
 					iterator.remove();
 				}
 			}
@@ -62,7 +62,7 @@ public abstract class Filter {
 	public static <U, T extends U, V extends Iterable<T>> V retain(V source, IFilter<U> predicate) {
 		if ((source != null) && (predicate != null)) {
 			for (final Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
-				if (!predicate.isValid(iterator.next())) {
+				if (!predicate.test(iterator.next())) {
 					iterator.remove();
 				}
 			}
@@ -75,7 +75,7 @@ public abstract class Filter {
 		if ((collection != null) && (filterList != null)) {
 			for (final IFilter filter : filterList) {
 				for (final Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-					if (!filter.isValid(iterator.next())) {
+					if (!filter.test(iterator.next())) {
 						iterator.remove();
 					}
 				}

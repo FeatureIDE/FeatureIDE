@@ -34,8 +34,8 @@ public class OptionalFeatureFilter implements IFilter<IFeature> {
 	private final IFilter<IFeature> optionalFeatureFilter = new InverseFilter<>(new MandatoryFeatureFilter());
 
 	@Override
-	public boolean isValid(IFeature object) {
-		return optionalFeatureFilter.isValid(object);
+	public boolean test(IFeature object) {
+		return optionalFeatureFilter.test(object);
 	}
 
 }

@@ -36,8 +36,8 @@ public class InverseFilter<T> implements IFilter<T> {
 	}
 
 	@Override
-	public boolean isValid(T object) {
-		return !originalFilter.isValid(object);
+	public boolean test(T object) {
+		return !originalFilter.test(object);
 	}
 
 }

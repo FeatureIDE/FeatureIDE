@@ -36,7 +36,7 @@ public class ContextMerger extends ADocumentationCommentMerger {
 	private static final class BlockTagFilter implements IFilter<BlockTag> {
 
 		@Override
-		public boolean isValid(BlockTag blockTag) {
+		public boolean test(BlockTag blockTag) {
 			return blockTag.isFeatureIndependent() || (blockTag.getPriority() >= 0);
 		}
 	}

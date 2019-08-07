@@ -302,7 +302,7 @@ public abstract class Functional {
 		public boolean hasNext() {
 			while (collectionIterator.hasNext()) {
 				next = collectionIterator.next();
-				if (filter.isValid(next)) {
+				if (filter.test(next)) {
 					return true;
 				}
 			}

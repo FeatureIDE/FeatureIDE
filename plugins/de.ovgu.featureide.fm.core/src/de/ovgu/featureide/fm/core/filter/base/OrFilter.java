@@ -47,9 +47,9 @@ public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 	}
 
 	@Override
-	public boolean isValid(T object) {
+	public boolean test(T object) {
 		for (final IFilter<T> filter : this) {
-			if (filter.isValid(object)) {
+			if (filter.test(object)) {
 				return true;
 			}
 		}

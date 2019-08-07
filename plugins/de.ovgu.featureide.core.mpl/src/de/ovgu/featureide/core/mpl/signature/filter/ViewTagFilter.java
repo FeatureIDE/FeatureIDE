@@ -32,7 +32,7 @@ public class ViewTagFilter implements IFilter<AbstractSignature> {
 	}
 
 	@Override
-	public boolean isValid(AbstractSignature signature) {
+	public boolean test(AbstractSignature signature) {
 		// return signature.hasViewTag(viewTag);
 		return true;
 	}

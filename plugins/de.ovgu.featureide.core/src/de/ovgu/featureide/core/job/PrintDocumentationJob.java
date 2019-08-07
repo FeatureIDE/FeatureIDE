@@ -170,7 +170,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 				commentFilters.add(new IFilter<BlockTag>() {
 
 					@Override
-					public boolean isValid(BlockTag object) {
+					public boolean test(BlockTag object) {
 						for (final String featureName : object.getConstraint().getContainedFeatures()) {
 							if (featureName.equals(featureName)) {
 								return true;

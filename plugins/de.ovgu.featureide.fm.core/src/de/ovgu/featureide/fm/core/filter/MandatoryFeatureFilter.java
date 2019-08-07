@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 public class MandatoryFeatureFilter implements IFilter<IFeature> {
 
 	@Override
-	public boolean isValid(IFeature object) {
+	public boolean test(IFeature object) {
 		if (FeatureUtils.getRoot(object.getFeatureModel()).getName().equals(object.getName())) {
 			return true;
 		}

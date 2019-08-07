@@ -32,7 +32,7 @@ public class FeatureFilter implements IFilter<AbstractSignature> {
 	}
 
 	@Override
-	public boolean isValid(AbstractSignature signature) {
+	public boolean test(AbstractSignature signature) {
 		return signature.hasFeature(featureList);
 	}
 

@@ -42,8 +42,13 @@ public class FeatureSetFilter implements IFilter<IFeature> {
 	}
 
 	@Override
-	public boolean isValid(IFeature object) {
+	public boolean test(IFeature object) {
 		return features.contains(object);
 	}
+
+//	@Override
+//	public boolean test(IFeature t) {
+//		return isValid(t);
+//	}
 
 }

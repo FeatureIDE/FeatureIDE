@@ -48,7 +48,7 @@ public class ConstraintFilter implements IFilter<IConstrainedObject> {
 	}
 
 	@Override
-	public boolean isValid(IConstrainedObject object) {
+	public boolean test(IConstrainedObject object) {
 		Node constraint = object.getConstraint();
 
 		if (constraint == null) {

@@ -75,7 +75,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 	}
 
 	@Override
-	public boolean isValid(AbstractSignature signature) {
+	public boolean test(AbstractSignature signature) {
 		final AFeatureData[] ids = signature.getFeatureData();
 		final Node[] negativeLiterals = new Node[ids.length];
 		for (int i = 0; i < ids.length; ++i) {

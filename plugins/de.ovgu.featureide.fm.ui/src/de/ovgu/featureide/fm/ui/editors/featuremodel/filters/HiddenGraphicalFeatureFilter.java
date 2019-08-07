@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 public class HiddenGraphicalFeatureFilter implements IFilter<IGraphicalFeature> {
 
 	@Override
-	public boolean isValid(IGraphicalFeature object) {
+	public boolean test(IGraphicalFeature object) {
 		return object.getObject().getStructure().hasHiddenParent();
 	}
 
