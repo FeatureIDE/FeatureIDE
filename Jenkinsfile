@@ -57,9 +57,9 @@ pipeline {
         	steps {
                 //starts Xvfb plugin
                 wrap([$class: 'Xvfb', additionalOptions: '', assignedLabels: '', autoDisplayName: true, debug: true, displayNameOffset: 0, installationName: 'default', parallelBuild: true, screen: '']) {
-                    sh 'mvn clean verify jacoco:report'
+                    sh 'mvn clean verify'
                 }
-                //jacoco exclusionPattern: '**/*Test*.class **/T*.class **/*Test.class **/*Tests.class', sourcePattern: '**/src/de/ovgu'
+                jacoco exclusionPattern: '**/*Test*.class **/T*.class **/*Test.class **/*Tests.class', sourcePattern: '**/src/de/ovgu'
         	}
         }
     }
