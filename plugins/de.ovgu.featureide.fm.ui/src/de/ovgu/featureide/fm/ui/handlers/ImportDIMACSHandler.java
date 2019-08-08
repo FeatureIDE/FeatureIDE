@@ -35,7 +35,9 @@ public class ImportDIMACSHandler extends AbstractFMImportHandler {
 
 	@Override
 	protected IFeatureModelFormat setModelReader() {
-		return new DIMACSFormat();
+		final DIMACSFormat dimacsFormat = new DIMACSFormat();
+		dimacsFormat.setFlattenCNF(true);
+		return dimacsFormat;
 	}
 
 	@Override

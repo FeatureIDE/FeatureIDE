@@ -62,6 +62,7 @@ public class DimacsReader {
 	private int clauseCount;
 	/** True to read the variable directory for naming variables. */
 	private boolean readVariableDirectory = false;
+	private boolean flattenCNF = false;
 	/** True when currently reading the comment section at the beginning of the file and parsing variable names. */
 	private boolean readingVariables;
 
@@ -75,6 +76,18 @@ public class DimacsReader {
 	 */
 	public void setReadingVariableDirectory(boolean readVariableDirectory) {
 		this.readVariableDirectory = readVariableDirectory;
+	}
+
+	/**
+	 * <p> Sets the flatten CNF flag. If true, the reader will try to compact the resulting CNF nodes by replacing node with just one child with their
+	 * child.</p>
+	 *
+	 * <p> Defaults to false. </p>
+	 *
+	 * @param flattenCNF whether to flatten the resulting CNF node
+	 */
+	public void setFlattenCNF(boolean flattenCNF) {
+		this.flattenCNF = flattenCNF;
 	}
 
 	/**
@@ -105,7 +118,11 @@ public class DimacsReader {
 			if (variableCount != actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
 			}
-			return new And(clauses);
+			Node node = new And(clauses);
+			if (flattenCNF) {
+				node = node.flatten();
+			}
+			return node;
 		}
 	}
 
@@ -121,6 +138,7 @@ public class DimacsReader {
 	}
 
 	private static class LineIterator {
+
 		private final BufferedReader reader;
 		private String line = null;
 		private int lineCount = 0;

@@ -51,6 +51,8 @@ public class DIMACSFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
+	private boolean flattenCNF = false;
+
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
@@ -59,13 +61,14 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		// Transform the input into a propositional node.
 		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
+		r.setFlattenCNF(flattenCNF);
 		try (StringReader reader = new StringReader(source.toString())) {
-			final Node read = r.read(reader);
+			final Node node = r.read(reader);
 			final Collection<String> variables = r.getVariables();
 
 			// Add the propositional node to the feature model.
 			featureModel.reset();
-			addNodeToFeatureModel(featureModel, read, variables);
+			addNodeToFeatureModel(featureModel, node, variables);
 		} catch (final ParseException e) {
 			problemList.add(new Problem(e, e.getErrorOffset()));
 		} catch (final IOException e) {
@@ -102,6 +105,10 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		for (final Node clause : clauses) {
 			FeatureUtils.addConstraint(featureModel, factory.createConstraint(featureModel, clause));
 		}
+	}
+
+	public void setFlattenCNF(boolean flattenCNF) {
+		this.flattenCNF = flattenCNF;
 	}
 
 	@Override
