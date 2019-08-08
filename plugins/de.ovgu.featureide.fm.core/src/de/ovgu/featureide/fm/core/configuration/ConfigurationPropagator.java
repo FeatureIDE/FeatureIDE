@@ -209,21 +209,23 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				for (int j = 0; j < orLiterals.length; j++) {
 					final int literal = orLiterals[j];
 					final SelectableFeature feature = configuration.getSelectableFeature(clausesWithoutHidden.getVariables().getName(literal));
-					final Selection selection = feature.getSelection();
-					switch (selection) {
-					case SELECTED:
-						if (literal > 0) {
-							continue loop;
+					if (feature != null) {
+						final Selection selection = feature.getSelection();
+						switch (selection) {
+						case SELECTED:
+							if (literal > 0) {
+								continue loop;
+							}
+							break;
+						case UNDEFINED:
+						case UNSELECTED:
+							if (literal < 0) {
+								continue loop;
+							}
+							break;
+						default:
+							throw new AssertionError(selection);
 						}
-						break;
-					case UNDEFINED:
-					case UNSELECTED:
-						if (literal < 0) {
-							continue loop;
-						}
-						break;
-					default:
-						throw new AssertionError(selection);
 					}
 				}
 
@@ -236,22 +238,24 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 						newLiterals = true;
 
 						final SelectableFeature feature = configuration.getSelectableFeature(clausesWithoutHidden.getVariables().getName(literal));
-						final Selection selection = feature.getSelection();
-						updateFeatures.add(feature);
-						switch (selection) {
-						case SELECTED:
-							feature.setRecommended(Selection.UNSELECTED);
-							feature.addOpenClause(openClauses.size(), clause);
-							feature.setVariables(clausesWithoutHidden.getVariables());
-							break;
-						case UNDEFINED:
-						case UNSELECTED:
-							feature.setRecommended(Selection.SELECTED);
-							feature.addOpenClause(openClauses.size(), clause);
-							feature.setVariables(clausesWithoutHidden.getVariables());
-							break;
-						default:
-							throw new AssertionError(selection);
+						if (feature != null) {
+							final Selection selection = feature.getSelection();
+							updateFeatures.add(feature);
+							switch (selection) {
+							case SELECTED:
+								feature.setRecommended(Selection.UNSELECTED);
+								feature.addOpenClause(openClauses.size(), clause);
+								feature.setVariables(clausesWithoutHidden.getVariables());
+								break;
+							case UNDEFINED:
+							case UNSELECTED:
+								feature.setRecommended(Selection.SELECTED);
+								feature.addOpenClause(openClauses.size(), clause);
+								feature.setVariables(clausesWithoutHidden.getVariables());
+								break;
+							default:
+								throw new AssertionError(selection);
+							}
 						}
 					}
 				}
@@ -403,9 +407,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			for (final int i : impliedFeatures.getLiterals()) {
 				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
-				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-				result.add(feature);
-				manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
+				if (feature != null) {
+					configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+					result.add(feature);
+					manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
+				}
 			}
 			workMonitor.invoke(result);
 
@@ -433,24 +439,26 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				for (int i = 0; i < solver.getAssignmentSize(); i++) {
 					final int oLiteral = intLiterals[i];
 					final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(oLiteral));
-					solver.assignmentSet(i, -oLiteral);
-					final SatResult satResult = solver.hasSolution();
-					switch (satResult) {
-					case FALSE:
-						configuration.setAutomatic(feature, oLiteral > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-						result.add(feature);
-						workMonitor.invoke(Arrays.asList(feature));
-						intLiterals[i] = intLiterals[--literalCount];
-						solver.assignmentDelete(i--);
-						break;
-					case TIMEOUT:
-					case TRUE:
-						solver.assignmentSet(i, oLiteral);
-						result.add(feature);
-						workMonitor.invoke(Arrays.asList(feature));
-						break;
-					default:
-						throw new AssertionError(satResult);
+					if (feature != null) {
+						solver.assignmentSet(i, -oLiteral);
+						final SatResult satResult = solver.hasSolution();
+						switch (satResult) {
+						case FALSE:
+							configuration.setAutomatic(feature, oLiteral > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+							result.add(feature);
+							workMonitor.invoke(Arrays.asList(feature));
+							intLiterals[i] = intLiterals[--literalCount];
+							solver.assignmentDelete(i--);
+							break;
+						case TIMEOUT:
+						case TRUE:
+							solver.assignmentSet(i, oLiteral);
+							result.add(feature);
+							workMonitor.invoke(Arrays.asList(feature));
+							break;
+						default:
+							throw new AssertionError(satResult);
+						}
 					}
 					workMonitor.worked();
 				}
@@ -482,7 +490,9 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			for (final int i : impliedFeatures.getLiterals()) {
 				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
-				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+				if (feature != null) {
+					configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+				}
 			}
 			workMonitor.step(result);
 			return result;

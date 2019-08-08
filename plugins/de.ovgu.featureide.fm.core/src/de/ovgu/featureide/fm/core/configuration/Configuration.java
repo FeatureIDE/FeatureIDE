@@ -155,7 +155,7 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	void resetAutomaticValues() {
+	public void resetAutomaticValues() {
 		for (final SelectableFeature feature : selectableFeatures.values()) {
 			feature.setAutomatic(Selection.UNDEFINED);
 		}

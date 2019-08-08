@@ -196,6 +196,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			setReadConfigurationError(lastProblems.containsError());
 
 			if (!isReadFeatureModelError()) {
+				configurationManager.update();
 				featureModelManager.addListener(this);
 			}
 			configurationManager.addListener(this);
@@ -480,35 +481,27 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					currentPage.doSave(monitor);
 				} else {
 					textEditorPage.updateConfiguration();
-					final Configuration configuration = configurationManager.getSnapshot();
-					configurationManager.externalSave(new Runnable() {
-
-						@Override
-						public void run() {
-							for (final IConfigurationEditorPage internalPage : allPages) {
-								if (internalPage != currentPage) {
-									internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
-								}
-							}
-							currentPage.doSave(monitor);
-						}
-					});
+					configurationManager.externalSave(() -> notifyPages(monitor, currentPage));
 				}
 			} else {
 				configurationManager.save();
-				final Configuration configuration = configurationManager.getSnapshot();
-				for (final IConfigurationEditorPage internalPage : allPages) {
-					if (internalPage != currentPage) {
-						internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
-					}
-				}
-				currentPage.doSave(monitor);
+				notifyPages(monitor, currentPage);
 			}
 		} else {
 			for (final IConfigurationEditorPage internalPage : allPages) {
 				internalPage.doSave(monitor);
 			}
 		}
+	}
+
+	private void notifyPages(final IProgressMonitor monitor, final IConfigurationEditorPage currentPage) {
+		final Configuration configuration = configurationManager.getSnapshot();
+		for (final IConfigurationEditorPage internalPage : allPages) {
+			if (internalPage != currentPage) {
+				internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
+			}
+		}
+		currentPage.doSave(monitor);
 	}
 
 	@Override

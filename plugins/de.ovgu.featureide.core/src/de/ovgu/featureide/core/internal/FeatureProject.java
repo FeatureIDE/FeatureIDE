@@ -101,10 +101,10 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -1197,6 +1197,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getFileName().toString());
 					final ProblemList lastProblems = SimpleFileHandler.load(file, config, ConfigFormatManager.getInstance());
 					final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(f, config);
+					analyzer.update();
 					if (!analyzer.isValid()) {
 						String name = file.getFileName().toString();
 						final int extIndex = name.lastIndexOf('.');

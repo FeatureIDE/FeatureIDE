@@ -915,69 +915,71 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void refreshItem(Collection<TreeItem> items) {
 		for (final TreeItem item : items) {
-			final Object data = item.getData();
-			if (data instanceof SelectableFeature) {
-				boolean checked = false;
-				boolean grayed = false;
-				Color fgColor = null;
-				Font font = treeItemStandardFont;
-				final SelectableFeature feature = (SelectableFeature) data;
-				final Selection automatic = feature.getAutomatic();
-				final Selection recommended = feature.getRecommended();
-				switch (automatic) {
-				case SELECTED:
-					checked = true;
-					grayed = true;
-					break;
-				case UNSELECTED:
-					checked = false;
-					grayed = true;
-					fgColor = gray;
-					break;
-				case UNDEFINED:
-					checked = feature.getManual() == Selection.SELECTED;
-					break;
-				}
-
-				final StringBuilder sb = new StringBuilder();
-				if (automatic == Selection.UNDEFINED) {
-					switch (recommended) {
+			if (!item.isDisposed()) {
+				final Object data = item.getData();
+				if (data instanceof SelectableFeature) {
+					boolean checked = false;
+					boolean grayed = false;
+					Color fgColor = null;
+					Font font = treeItemStandardFont;
+					final SelectableFeature feature = (SelectableFeature) data;
+					final Selection automatic = feature.getAutomatic();
+					final Selection recommended = feature.getRecommended();
+					switch (automatic) {
 					case SELECTED:
-						font = treeItemSpecialFont;
-						fgColor = green;
+						checked = true;
+						grayed = true;
 						break;
 					case UNSELECTED:
-						font = treeItemSpecialFont;
-						fgColor = blue;
+						checked = false;
+						grayed = true;
+						fgColor = gray;
 						break;
 					case UNDEFINED:
+						checked = feature.getManual() == Selection.SELECTED;
 						break;
 					}
-					if (recommended == Selection.UNDEFINED) {
-						sb.append(feature.getName());
+
+					final StringBuilder sb = new StringBuilder();
+					if (automatic == Selection.UNDEFINED) {
+						switch (recommended) {
+						case SELECTED:
+							font = treeItemSpecialFont;
+							fgColor = green;
+							break;
+						case UNSELECTED:
+							font = treeItemSpecialFont;
+							fgColor = blue;
+							break;
+						case UNDEFINED:
+							break;
+						}
+						if (recommended == Selection.UNDEFINED) {
+							sb.append(feature.getName());
+						} else {
+							final int recommendationValue = feature.getRecommendationValue();
+							if (useRecommendation && (recommendationValue >= 0)) {
+								sb.append(recommendationValue);
+								sb.append(" ");
+							}
+							sb.append(feature.getName());
+							final Set<Integer> openClauseIndexes = feature.getOpenClauseIndexes();
+							if (useGroups && !openClauseIndexes.isEmpty()) {
+								sb.append(" (unsatisfied group ");
+								sb.append(openClauseIndexes.iterator().next());
+								sb.append(")");
+							}
+						}
 					} else {
-						final int recommendationValue = feature.getRecommendationValue();
-						if (useRecommendation && (recommendationValue >= 0)) {
-							sb.append(recommendationValue);
-							sb.append(" ");
-						}
 						sb.append(feature.getName());
-						final Set<Integer> openClauseIndexes = feature.getOpenClauseIndexes();
-						if (useGroups && !openClauseIndexes.isEmpty()) {
-							sb.append(" (unsatisfied group ");
-							sb.append(openClauseIndexes.iterator().next());
-							sb.append(")");
-						}
 					}
-				} else {
-					sb.append(feature.getName());
+					item.setText(sb.toString());
+					item.setChecked(checked);
+					item.setGrayed(grayed);
+					item.setFont(font);
+					item.setBackground(null);
+					item.setForeground(fgColor);
 				}
-				item.setText(sb.toString());
-				item.setChecked(checked);
-				item.setGrayed(grayed);
-				item.setFont(font);
-				item.setBackground(null);
-				item.setForeground(fgColor);
 			}
 		}
 	}
