@@ -57,9 +57,6 @@ public class TikzFormatTest {
 		final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzGraphicalFeatureModelFormat.TikZHeadFormat();
 		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat.TikZMainFormat();
 		final IPersistentFormat<IGraphicalFeatureModel> formatbody = new TikzGraphicalFeatureModelFormat.TikZBodyFormat(TEST_TEX_MAIN_FILE_NAME);
-		String head = new String();
-		String main = new String();
-		String body = new String();
 		String testHead = new String();
 		String testBody = new String();
 		String testMain = new String();
@@ -93,9 +90,9 @@ public class TikzFormatTest {
 		}
 
 		// execute Tikz-Exporter
-		head = formatHead.write(gFM).replace(System.lineSeparator(), "\n");
-		main = formatMain.write(gFM).replace(System.lineSeparator(), "\n");
-		body = formatbody.write(gFM).replace(System.lineSeparator(), "\n");
+		final String head = formatHead.write(gFM).replace(System.lineSeparator(), "\n");
+		final String main = formatMain.write(gFM).replace(System.lineSeparator(), "\n");
+		final String body = formatbody.write(gFM).replace(System.lineSeparator(), "\n");
 
 		// test the Tikz-Exporter
 		assertEquals(testHead, head);

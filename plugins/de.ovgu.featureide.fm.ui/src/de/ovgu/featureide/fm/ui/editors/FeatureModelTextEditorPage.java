@@ -22,15 +22,24 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
+import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
@@ -106,9 +115,21 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	@Override
 	public void doSave(IProgressMonitor progressMonitor) {
-		super.doSave(progressMonitor);
-		if (featureModelEditor.checkModel(getCurrentContent())) {
+		try {
+			internalSave(progressMonitor);
+		} catch (final Exception e) {}
+	}
+
+	public void internalSave(IProgressMonitor progressMonitor) {
+		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
+		if (problems.containsError()) {
+			createMarkers(problems);
+			throw new RuntimeException();
+		} else {
+			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
+			super.doSave(progressMonitor);
 			executeSaveOperation();
+			featureModelEditor.setPageModified(false);
 		}
 	}
 
@@ -127,8 +148,51 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	@Override
 	public boolean allowPageChange(int newPage) {
-		final String newText = getCurrentContent();
-		return (newPage == getIndex()) || featureModelEditor.checkModel(newText);
+		if (newPage == getIndex()) {
+			return true;
+		}
+		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
+		final boolean containsError = problems.containsError();
+		if (containsError) {
+			createMarkers(problems);
+		} else {
+			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
+		}
+		return !containsError;
+	}
+
+	private void createMarkers(ProblemList problems) {
+		final IDocumentProvider documentProvider = getDocumentProvider();
+		final IEditorInput editorInput = getEditorInput();
+		final IDocument document = documentProvider.getDocument(editorInput);
+		final IAnnotationModel annotationModel = documentProvider.getAnnotationModel(editorInput);
+		deleteMarkers(annotationModel);
+		for (final Problem problem : problems) {
+			final Annotation annotation = new Annotation(false);
+			annotation.setText(problem.getMessage());
+			switch (problem.getSeverity()) {
+			case ERROR:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.error");
+				break;
+			case INFO:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.info");
+				break;
+			case WARNING:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.warning");
+				break;
+			}
+			int lineOffset = 0;
+			try {
+				lineOffset = document.getLineOffset(problem.getLine());
+			} catch (final BadLocationException e) {}
+			annotationModel.addAnnotation(annotation, new Position(lineOffset));
+		}
+	}
+
+	private void deleteMarkers(final IAnnotationModel annotationModel) {
+		for (final Iterator<Annotation> iterator = annotationModel.getAnnotationIterator(); iterator.hasNext();) {
+			annotationModel.removeAnnotation(iterator.next());
+		}
 	}
 
 	@Override

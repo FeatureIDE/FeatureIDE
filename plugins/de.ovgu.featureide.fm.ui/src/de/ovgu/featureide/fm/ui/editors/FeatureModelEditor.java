@@ -163,21 +163,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		gfm.writeValues();
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
-			fmManager.externalSave(new Runnable() {
-
-				@Override
-				public void run() {
-					textEditor.doSave(monitor);
-				}
-			});
+			fmManager.externalSave(() -> textEditor.internalSave(monitor));
 		} else {
 			fmManager.save();
 			textEditor.resetTextEditor();
+			setPageModified(false);
 		}
-
-		setPageModified(false);
-		// TODO reset?
-		textEditor.resetTextEditor();
 	}
 
 	@Override
@@ -404,7 +395,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 			currentPageIndex = 0;
 			// if there are errors in the model file, go to source page
-			if (!checkModel(textEditor.getCurrentContent())) {
+			final ProblemList problems = checkModel(textEditor.getCurrentContent());
+			if (problems.containsError()) {
+				createModelFileMarkers(problems);
 				setActivePage(textEditor.getIndex());
 			} else {
 				diagramEditor.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
@@ -640,18 +633,19 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 	}
 
-	public boolean checkModel(String source) {
+	public ProblemList checkModel(String source) {
+		final ProblemList problemList = new ProblemList();
 		final Path fileName = fmManager.getPath().getFileName();
 		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName.toString());
 		if (format != null) {
 			try {
-				final ProblemList warnings = format.read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source);
-				return !warnings.containsError();
+				problemList.addAll(format.getInstance().read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source));
 			} catch (final NoSuchExtensionException e) {
+				problemList.add(new Problem(e));
 				Logger.logError(e);
 			}
 		}
-		return false;
+		return problemList;
 	}
 
 	public void addEventListener(IEventListener listener) {

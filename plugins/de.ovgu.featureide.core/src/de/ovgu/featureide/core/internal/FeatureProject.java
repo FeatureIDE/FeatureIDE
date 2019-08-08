@@ -631,7 +631,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			final Configuration object = fileHandler.getObject();
 			object.updateFeatures(featureModelFormula, renamings);
 			try {
-				Files.write(path, format.write(object).getBytes());
+				Files.write(path, format.getInstance().write(object).getBytes());
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}

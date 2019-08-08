@@ -96,7 +96,7 @@ public abstract class AbstractIO<T> {
 		final IPersistentFormat<T> format = getFormatManager().getFormatByContent(source, fileName.toString());
 		try {
 			final T object = getFactoryManager().getFactory(fileName, format).create();
-			format.read(object, source);
+			format.getInstance().read(object, source);
 			return object;
 		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);

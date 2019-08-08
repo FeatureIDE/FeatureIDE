@@ -59,9 +59,6 @@ public class LatexFormatTest {
 		final IPersistentFormat<Configuration> formatHead = new LatexFormat.LaTeXHead();
 		final IPersistentFormat<Configuration> formatMain = new LatexFormat.LaTeXMain();
 		final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(TEST_TEX_MAIN_FILE_NAME);
-		String head = new String();
-		String main = new String();
-		String body = new String();
 		String testHead = new String();
 		String testBody = new String();
 		String testMain = new String();
@@ -89,9 +86,9 @@ public class LatexFormatTest {
 		FileHandler.load(Paths.get(Commons.getRemoteOrLocalFolder(TEST_XML_FILE_NAME).toURI()), configExample, ConfigFormatManager.getInstance());
 
 		// execute LaTeXExporter
-		head = formatHead.write(configExample).replace(System.lineSeparator(), "\n");
-		main = formatMain.write(configExample).replace(System.lineSeparator(), "\n");
-		body = formatBody.write(configExample).replace(System.lineSeparator(), "\n");
+		final String head = formatHead.write(configExample).replace(System.lineSeparator(), "\n");
+		final String main = formatMain.write(configExample).replace(System.lineSeparator(), "\n");
+		final String body = formatBody.write(configExample).replace(System.lineSeparator(), "\n");
 
 		// test the Tikz-Exporter
 		assertEquals(testHead, head);

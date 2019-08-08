@@ -476,7 +476,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 				final String source = format.getInstance().write(variableObject);
 				FileSystem.write(path, source.getBytes(SimpleFileHandler.DEFAULT_CHARSET));
 				final T tempObject = createObject();
-				format.read(tempObject, source);
+				format.getInstance().read(tempObject, source);
 				setPersistentObject(tempObject);
 			} catch (final Exception e) {
 				handleException(e);

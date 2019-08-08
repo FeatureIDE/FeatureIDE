@@ -495,13 +495,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	private void notifyPages(final IProgressMonitor monitor, final IConfigurationEditorPage currentPage) {
+		currentPage.doSave(monitor);
 		final Configuration configuration = configurationManager.getSnapshot();
 		for (final IConfigurationEditorPage internalPage : allPages) {
 			if (internalPage != currentPage) {
 				internalPage.propertyChange(new FeatureIDEEvent(configuration, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
 			}
 		}
-		currentPage.doSave(monitor);
 	}
 
 	@Override
