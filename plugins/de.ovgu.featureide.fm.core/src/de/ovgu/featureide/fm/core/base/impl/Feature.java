@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 /**
  * Implementation of {@link AFeature} used as default implementation inside FeatureIDE. <br> <br> This class implements the functionality required by
  * {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}. <br> <br> This class is intended to be the default implementation for
- * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link ExtendedFeature} and inside
+ * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link MultiFeature} and inside
  * {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}. <br> <br> An instance of a <code>Feature</code> is intended to be instantiated by a
  * {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
  * FeatureIDE's default <code>IFeature</code> ( <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the

@@ -54,10 +54,10 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
@@ -108,8 +108,8 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel object) {
-		if (object instanceof ExtendedFeatureModel) {
-			extFeatureModel = (ExtendedFeatureModel) object;
+		if (object instanceof MultiFeatureModel) {
+			extFeatureModel = (MultiFeatureModel) object;
 		}
 		final IFeatureStructure root = object.getStructure().getRoot();
 		sb.delete(0, sb.length());
@@ -126,7 +126,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 
 			for (final IConstraint constraint : object.getConstraints()) {
-				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
+				if (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERN) {
 					sb.append("\tconstraint ");
 					sb.append(constraint.getNode().toString(SYMBOLS));
 					sb.append(";");
@@ -227,8 +227,8 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
 		problemList = new ProblemList();
-		factory = ExtendedFeatureModelFactory.getInstance();
-		extFeatureModel = (ExtendedFeatureModel) object;
+		factory = MultiFeatureModelFactory.getInstance();
+		extFeatureModel = (MultiFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile();
 		}
@@ -263,7 +263,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 
 	private final boolean velvetImport = false;
 
-	private ExtendedFeatureModel extFeatureModel;
+	private MultiFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 
 	private static WeightedTerm createTerm(final int weight, final boolean rightSide, final boolean minus, final Reference reference) {
@@ -313,16 +313,16 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
-	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
+	private MultiFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
 			final boolean isHidden) {
-		final ExtendedFeature newFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, featureName);
+		final MultiFeature newFeature = (MultiFeature) factory.createFeature(extFeatureModel, featureName);
 		newFeature.getStructure().setMandatory(isMandatory);
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
 
 		final IFeature orgFeature = extFeatureModel.getFeature(featureName);
-		if ((orgFeature != null) && (orgFeature instanceof ExtendedFeature)) {
-			return (ExtendedFeature) orgFeature;
+		if ((orgFeature != null) && (orgFeature instanceof MultiFeature)) {
+			return (MultiFeature) orgFeature;
 		} else {
 			extFeatureModel.addFeature(newFeature);
 			parent.getStructure().addChild(newFeature.getStructure());
@@ -471,7 +471,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 			case VelvetParser.ID:
 				extFeatureModelName = checkTree(curNode).getText();
 
-				final ExtendedFeature rootFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
+				final MultiFeature rootFeature = (MultiFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
 				rootFeature.getStructure().setAbstract(true);
 				rootFeature.getStructure().setMandatory(true);
 
@@ -697,7 +697,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 			problemList.add(new Problem(featureName + " is not a valid feature name", root.getLine(), de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
 		}
 
-		final ExtendedFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
+		final MultiFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
 		if (moreDefinitions) {
 			parentStack.push(newFeature);
 			parseDefinitions(childNode);
@@ -794,7 +794,7 @@ public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean initExtension() {
 		if (super.initExtension()) {
-			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, MultiFeatureModelFactory.ID);
 			return true;
 		}
 		return false;

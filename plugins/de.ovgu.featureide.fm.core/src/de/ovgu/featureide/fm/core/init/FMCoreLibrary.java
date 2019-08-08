@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.CoreFactoryWorkspaceLoader;
 import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
@@ -61,7 +61,7 @@ public class FMCoreLibrary implements ILibrary {
 		Logger.logger = new JavaLogger();
 
 		FMFactoryManager.getInstance().addExtension(DefaultFeatureModelFactory.getInstance());
-		FMFactoryManager.getInstance().addExtension(ExtendedFeatureModelFactory.getInstance());
+		FMFactoryManager.getInstance().addExtension(MultiFeatureModelFactory.getInstance());
 		FMFactoryManager.getInstance().setWorkspaceLoader(new CoreFactoryWorkspaceLoader());
 
 		FMFormatManager.getInstance().addExtension(new XmlFeatureModelFormat());

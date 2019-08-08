@@ -20,39 +20,32 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
 /**
  *
  * @author Sebastian Krieter
+ *
  */
-public class ExtendedConstraint extends Constraint {
+public class MultiFeatureProperty extends FeatureProperty {
 
-	private int type = ExtendedFeature.TYPE_INTERN;
-
-	public ExtendedConstraint(IFeatureModel featureModel, Node propNode) {
-		super(featureModel, propNode);
+	public MultiFeatureProperty(IFeature correspondingFeature) {
+		super(correspondingFeature);
 	}
 
-	public ExtendedConstraint(ExtendedConstraint extendedConstraint, IFeatureModel newFeatureModel) {
-		super(extendedConstraint, newFeatureModel);
-		type = extendedConstraint.type;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
+	protected MultiFeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
+		super(oldProperty, correspondingFeature);
 	}
 
 	@Override
-	public IConstraint clone(IFeatureModel newFeatureModel) {
-		return new ExtendedConstraint(this, newFeatureModel);
+	public String getDisplayName() {
+		return super.getDisplayName();
+	}
+
+	@Override
+	public IFeatureProperty clone(IFeature newFeature) {
+		return new MultiFeatureProperty(this, newFeature);
 	}
 
 }

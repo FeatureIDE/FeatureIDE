@@ -72,11 +72,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
@@ -139,8 +139,8 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel object) {
-		if (object instanceof ExtendedFeatureModel) {
-			extFeatureModel = (ExtendedFeatureModel) object;
+		if (object instanceof MultiFeatureModel) {
+			extFeatureModel = (MultiFeatureModel) object;
 			isInterface = isInterface || extFeatureModel.isInterface();
 		}
 		final IFeatureStructure root = object.getStructure().getRoot();
@@ -154,18 +154,18 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		sb.append(root.getFeature().getName());
 		if (extFeatureModel != null) {
 			usedVariables.clear();
-			final LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels = new LinkedList<>();
-			final LinkedList<ExtendedFeatureModel.UsedModel> instanceModels = new LinkedList<>();
-			final LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels = new LinkedList<>();
+			final LinkedList<MultiFeatureModel.UsedModel> inheritedModels = new LinkedList<>();
+			final LinkedList<MultiFeatureModel.UsedModel> instanceModels = new LinkedList<>();
+			final LinkedList<MultiFeatureModel.UsedModel> interfaceModels = new LinkedList<>();
 			for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 				switch (usedModel.getType()) {
-				case ExtendedFeature.TYPE_INHERITED:
+				case MultiFeature.TYPE_INHERITED:
 					inheritedModels.add(usedModel);
 					break;
-				case ExtendedFeature.TYPE_INSTANCE:
+				case MultiFeature.TYPE_INSTANCE:
 					instanceModels.add(usedModel);
 					break;
-				case ExtendedFeature.TYPE_INTERFACE:
+				case MultiFeature.TYPE_INTERFACE:
 					interfaceModels.add(usedModel);
 					break;
 				}
@@ -212,7 +212,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 
 			for (final IConstraint constraint : object.getConstraints()) {
-				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
+				if (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERN) {
 					sb.append("\tconstraint ");
 					sb.append(constraint.getNode().toString(SYMBOLS));
 					sb.append(";");
@@ -300,10 +300,10 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	// TODO fix write for inherited feature models
 	private void writeNewDefined(IFeatureStructure child2, int depth) {
 		final IFeature feature = child2.getFeature();
-		if (feature instanceof ExtendedFeature) {
-			final ExtendedFeature extFeature = (ExtendedFeature) feature;
+		if (feature instanceof MultiFeature) {
+			final MultiFeature extFeature = (MultiFeature) feature;
 
-			if ((extFeature.getType() == ExtendedFeature.TYPE_INSTANCE) || (extFeature.getType() == ExtendedFeature.TYPE_INTERFACE)) {
+			if ((extFeature.getType() == MultiFeature.TYPE_INSTANCE) || (extFeature.getType() == MultiFeature.TYPE_INTERFACE)) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
 					writeTab(depth);
 					sb.append(USE);
@@ -311,7 +311,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 					sb.append(";");
 					sb.append(NEWLINE);
 				}
-			} else if (extFeature.getType() == ExtendedFeature.TYPE_INTERN) {
+			} else if (extFeature.getType() == MultiFeature.TYPE_INTERN) {
 				writeFeature(child2, 1);
 			}
 		}
@@ -329,8 +329,8 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		factory = ExtendedFeatureModelFactory.getInstance();
-		extFeatureModel = (ExtendedFeatureModel) object;
+		factory = MultiFeatureModelFactory.getInstance();
+		extFeatureModel = (MultiFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile().toFile();
 		}
@@ -368,7 +368,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	private final boolean velvetImport = false;
 
 	private ModelMarkerHandler<IResource> modelMarkerHandler;
-	private ExtendedFeatureModel extFeatureModel;
+	private MultiFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch = false;
 
@@ -412,15 +412,15 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		return true;
 	}
 
-	private void copyChildnodes(final ExtendedFeatureModel targetModel, final IFeatureStructure targetParentNode, final IFeatureStructure sourceParentNode,
+	private void copyChildnodes(final MultiFeatureModel targetModel, final IFeatureStructure targetParentNode, final IFeatureStructure sourceParentNode,
 			final String parentModelName, final String targetParentName, final int type) {
 		for (final IFeatureStructure sourceChildStructure : sourceParentNode.getChildren()) {
-			final ExtendedFeature feature;
+			final MultiFeature feature;
 			if (velvetImport) {
-				feature = (ExtendedFeature) factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
+				feature = (MultiFeature) factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
 			} else {
 				final String shortName = sourceChildStructure.getFeature().getName().replace(sourceParentNode.getFeature().getName() + ".", "");
-				feature = (ExtendedFeature) factory.createFeature(targetModel, targetParentName + "." + shortName);
+				feature = (MultiFeature) factory.createFeature(targetModel, targetParentName + "." + shortName);
 			}
 			final IFeatureStructure targetChildStructure = feature.getStructure();
 			targetChildStructure.setMandatory(sourceChildStructure.isMandatory());
@@ -520,16 +520,16 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
-	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
+	private MultiFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
 			final boolean isHidden) {
-		final ExtendedFeature newFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, featureName);
+		final MultiFeature newFeature = (MultiFeature) factory.createFeature(extFeatureModel, featureName);
 		newFeature.getStructure().setMandatory(isMandatory);
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
 
 		final IFeature orgFeature = extFeatureModel.getFeature(featureName);
-		if ((orgFeature != null) && (orgFeature instanceof ExtendedFeature)) {
-			return (ExtendedFeature) orgFeature;
+		if ((orgFeature != null) && (orgFeature instanceof MultiFeature)) {
+			return (MultiFeature) orgFeature;
 		} else {
 			extFeatureModel.addFeature(newFeature);
 			parent.getStructure().addChild(newFeature.getStructure());
@@ -596,7 +596,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
-		final IFeatureModel fm = new ExtendedFeatureModelFactory().create();
+		final IFeatureModel fm = new MultiFeatureModelFactory().create();
 		fm.setSourceFile(file.toPath());
 		SimpleFileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
@@ -864,7 +864,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			case VelvetParser.ID:
 				extFeatureModelName = checkTree(curNode).getText();
 
-				final ExtendedFeature rootFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
+				final MultiFeature rootFeature = (MultiFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
 				rootFeature.getStructure().setAbstract(true);
 				rootFeature.getStructure().setMandatory(true);
 
@@ -1097,7 +1097,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 		}
 
-		final ExtendedFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
+		final MultiFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
 		if (moreDefinitions) {
 			parentStack.push(newFeature);
 			parseDefinitions(childNode);
@@ -1142,13 +1142,13 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
-			addExternalFeatures(fm, parentModelName, extFeatureModel.getStructure().getRoot(), ExtendedFeature.TYPE_INHERITED);
+			addExternalFeatures(fm, parentModelName, extFeatureModel.getStructure().getRoot(), MultiFeature.TYPE_INHERITED);
 		}
 	}
 
 	private void addExternalFeatures(IFeatureModel sourceModel, String sourceModelName, IFeatureStructure targetParentFeature, int type) {
-		if (sourceModel instanceof ExtendedFeatureModel) {
-			for (final UsedModel usedModel : ((ExtendedFeatureModel) sourceModel).getExternalModels().values()) {
+		if (sourceModel instanceof MultiFeatureModel) {
+			for (final UsedModel usedModel : ((MultiFeatureModel) sourceModel).getExternalModels().values()) {
 				extFeatureModel.addExternalModel(new UsedModel(usedModel, sourceModelName));
 			}
 		}
@@ -1161,13 +1161,13 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		final IFeatureStructure instanceRoot = sourceModel.getStructure().getRoot();
 
 		String connectorName = "";
-		if (type == ExtendedFeature.TYPE_INHERITED) {
+		if (type == MultiFeature.TYPE_INHERITED) {
 			connectorName = targetParentFeature.getFeature().getName();
 		} else {
 			connectorName = (targetParentFeature.isRoot() && targetParentFeature.getFeature().getName().equals(sourceModelName))
 				? targetParentFeature.getFeature().getName() : targetParentFeature.getFeature().getName() + "." + sourceModelName;
 		}
-		final ExtendedFeature connector = addFeature(targetParentFeature.getFeature(), connectorName, true, true, instanceRoot.isHidden());
+		final MultiFeature connector = addFeature(targetParentFeature.getFeature(), connectorName, true, true, instanceRoot.isHidden());
 		connector.setType(type);
 		connector.setExternalModelName(sourceModelName);
 		if (instanceRoot.isAlternative()) {
@@ -1181,7 +1181,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		for (final IConstraint constraint : sourceModel.getConstraints()) {
 			final Node constraintNode = constraint.getNode();
 			updateConstraintNode(constraintNode, connectorName, instanceRoot.getFeature().getName(), extFeatureModel);
-			final ExtendedConstraint newConstraint = (ExtendedConstraint) factory.createConstraint(extFeatureModel, constraintNode);
+			final MultiConstraint newConstraint = (MultiConstraint) factory.createConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
 			extFeatureModel.addConstraint(newConstraint);
 		}
@@ -1263,7 +1263,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 
 			for (final Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
-				if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
+				if (parameter.getValue().getType() == MultiFeature.TYPE_INTERFACE) {
 					final IFeatureStructure parameterFeature = mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 					parameterFeature.setOr();
 					parameterFeature.setAbstract(true);
@@ -1311,19 +1311,19 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		}
 
 		switch (usedModel.getType()) {
-		case ExtendedFeature.TYPE_INTERFACE:
+		case MultiFeature.TYPE_INTERFACE:
 			final IFeatureModel interfaceModel = getInterfaceFeatureModel(usedModel.getModelName(), useNameNode);
 			if (interfaceModel == null) {
 				return;
 			}
-			addExternalFeatures(interfaceModel, varName, parent.getStructure(), ExtendedFeature.TYPE_INTERFACE);
+			addExternalFeatures(interfaceModel, varName, parent.getStructure(), MultiFeature.TYPE_INTERFACE);
 			break;
-		case ExtendedFeature.TYPE_INSTANCE:
+		case MultiFeature.TYPE_INSTANCE:
 			final IFeatureModel instanceModel = getExternalFeatureModel(usedModel.getModelName(), useNameNode);
 			if (instanceModel == null) {
 				return;
 			}
-			addExternalFeatures(instanceModel, varName, parent.getStructure(), ExtendedFeature.TYPE_INSTANCE);
+			addExternalFeatures(instanceModel, varName, parent.getStructure(), MultiFeature.TYPE_INSTANCE);
 			break;
 		default:
 			reportWarning(useNameNode, format("The variable with the name %s is no interface or instance.", varName));
@@ -1389,7 +1389,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean initExtension() {
 		if (super.initExtension()) {
-			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, MultiFeatureModelFactory.ID);
 		}
 		return false;
 	}

@@ -42,9 +42,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -125,7 +125,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 
 	private boolean buildMPLProject() {
 		final IFeatureModel featureModel = externalFeatureProject.getFeatureModel();
-		if (!(featureModel instanceof ExtendedFeatureModel)) {
+		if (!(featureModel instanceof MultiFeatureModel)) {
 			return false;
 		}
 
@@ -165,7 +165,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 		}
 
 		// get mapping of other projects
-		final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) featureModel;
+		final MultiFeatureModel extFeatureModel = (MultiFeatureModel) featureModel;
 		final Configuration mappedProjects = new Configuration(new FeatureModelFormula(extFeatureModel.getMappingModel()));
 		try {
 			String mappingFileName = externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
@@ -204,7 +204,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 
 		// build instances
 		for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-			if (usedModel.getType() == ExtendedFeature.TYPE_INSTANCE) {
+			if (usedModel.getType() == MultiFeature.TYPE_INSTANCE) {
 				final String projectName = usedModel.getModelName();
 				final String configName = usedModel.getVarName();
 
@@ -238,8 +238,8 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			// Get partial configs
 			// TODO MPL: config for other MPL projects may not working
 			final IFeatureModel fm = rootFeatureProject.getFeatureModel();
-			if (fm instanceof ExtendedFeatureModel) {
-				final ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
+			if (fm instanceof MultiFeatureModel) {
+				final MultiFeatureModel efm = (MultiFeatureModel) fm;
 				final UsedModel usedModel = efm.getExternalModel(varName);
 				final String prefix = usedModel.getPrefix() + ".";
 

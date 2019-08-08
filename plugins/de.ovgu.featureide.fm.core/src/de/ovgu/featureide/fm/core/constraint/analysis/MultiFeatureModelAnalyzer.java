@@ -27,24 +27,24 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
- * Checks the {@link ExtendedFeatureModel} for validation.
+ * Checks the {@link MultiFeatureModel} for validation.
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer {
+public class MultiFeatureModelAnalyzer extends FeatureModelAnalyzer {
 
-	private final ExtendedFeatureModel efm;
+	private final MultiFeatureModel efm;
 	private final HashMap<String, Integer> map;
 	private List<DeRestriction> deFm;
 
 	private final UniqueId idGen;
 	private final RestrictionFactory<DeRestriction> deFactory;
 
-	public ExtendedFeatureModelAnalyzer(FeatureModelFormula formula, ExtendedFeatureModel featureModel) {
+	public MultiFeatureModelAnalyzer(FeatureModelFormula formula, MultiFeatureModel featureModel) {
 		super(formula);
 
 		efm = featureModel;

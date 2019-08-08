@@ -101,8 +101,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -416,7 +416,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 
 		// XXX MPL: hack for importing mpl projects
-		if (getFeatureModel() instanceof ExtendedFeatureModel) {
+		if (getFeatureModel() instanceof MultiFeatureModel) {
 			try {
 				modelFile.getModelFile().touch(null);
 			} catch (final CoreException e) {
@@ -525,9 +525,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 			final IFeatureModel featureModel = featureModelManager.getObject();
 			// create folders for all layers
-			if (featureModel instanceof ExtendedFeatureModel) {
+			if (featureModel instanceof MultiFeatureModel) {
 				for (final IFeature feature : featureModel.getFeatures()) {
-					if (feature.getStructure().isConcrete() && (feature instanceof ExtendedFeature) && !((ExtendedFeature) feature).isFromExtern()) {
+					if (feature.getStructure().isConcrete() && (feature instanceof MultiFeature) && !((MultiFeature) feature).isFromExtern()) {
 						createFeatureFolder(feature.getName());
 					}
 				}

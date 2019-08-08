@@ -57,7 +57,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -161,8 +161,8 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		setLabelIcon(featureProperties);
 
-		if (feature instanceof ExtendedFeature) {
-			final ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+		if (feature instanceof MultiFeature) {
+			final MultiFeature extendedFeature = (MultiFeature) feature;
 
 			if (extendedFeature.isInstance()) {
 				setBorder(FMPropertyManager.getImportedFeatureBorder());

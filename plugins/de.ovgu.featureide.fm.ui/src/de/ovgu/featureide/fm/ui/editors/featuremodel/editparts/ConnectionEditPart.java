@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
@@ -424,8 +424,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return false;
 		}
 		final IFeature target = graphicalTarget.getObject();
-		return ((source instanceof ExtendedFeature) && ((ExtendedFeature) source).isFromExtern() && (target instanceof ExtendedFeature)
-			&& ((ExtendedFeature) target).isFromExtern());
+		return ((source instanceof MultiFeature) && ((MultiFeature) source).isFromExtern() && (target instanceof MultiFeature)
+			&& ((MultiFeature) target).isFromExtern());
 	}
 
 	/*

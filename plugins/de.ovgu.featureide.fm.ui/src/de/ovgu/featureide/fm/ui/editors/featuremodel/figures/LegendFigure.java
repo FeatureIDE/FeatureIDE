@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelSt
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -238,8 +238,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 
-		if (featureModel instanceof ExtendedFeatureModel) {
-			final ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+		if (featureModel instanceof MultiFeatureModel) {
+			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
 			interfaced = extendedFeatureModel.hasInterface();
 			// interfaces hide other features
 			imported = !interfaced && extendedFeatureModel.hasInstance();

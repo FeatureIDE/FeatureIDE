@@ -33,15 +33,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  *
  * @author Sebastian Krieter
  */
-public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
+public class MultiFeatureModelFactory implements IFeatureModelFactory {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".ExtendedFeatureModelFactory";
+	public static final String ID = PluginID.PLUGIN_ID + ".MultiFeatureModelFactory";
 
-	public static ExtendedFeatureModelFactory getInstance() {
-		return new ExtendedFeatureModelFactory();
+	public static MultiFeatureModelFactory getInstance() {
+		return new MultiFeatureModelFactory();
 	}
 
-	public ExtendedFeatureModelFactory() {}
+	public MultiFeatureModelFactory() {}
 
 	@Override
 	public String getId() {
@@ -54,28 +54,28 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
-		return new ExtendedConstraint(featureModel, propNode);
+	public MultiConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
+		return new MultiConstraint(featureModel, propNode);
 	}
 
 	@Override
-	public ExtendedFeature createFeature(IFeatureModel featureModel, String name) {
-		return new ExtendedFeature(featureModel, name);
+	public MultiFeature createFeature(IFeatureModel featureModel, String name) {
+		return new MultiFeature(featureModel, name);
 	}
 
 	@Override
-	public ExtendedFeatureModel create() {
-		return new ExtendedFeatureModel(ID);
+	public MultiFeatureModel create() {
+		return new MultiFeatureModel(ID);
 	}
 
 	@Override
-	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+	public MultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
+		return (MultiFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
 	}
 
 	@Override
-	public ExtendedConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-		return (ExtendedConstraint) oldConstraint.clone(featureModel);
+	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
+		return (MultiConstraint) oldConstraint.clone(featureModel);
 	}
 
 }

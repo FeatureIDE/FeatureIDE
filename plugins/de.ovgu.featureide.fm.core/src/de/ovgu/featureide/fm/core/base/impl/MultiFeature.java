@@ -26,11 +26,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Feature for the {@link ExtendedFeatureModel}.
+ * Feature for the {@link MultiFeatureModel}.
  *
  * @author Sebastian Krieter
  */
-public class ExtendedFeature extends Feature {
+public class MultiFeature extends Feature {
 
 	public static final int TYPE_INTERN = 0, TYPE_INHERITED = 1, TYPE_INTERFACE = 2, TYPE_INSTANCE = 3;
 
@@ -38,11 +38,11 @@ public class ExtendedFeature extends Feature {
 	private String externalModelName = null;
 	private boolean newDefined = false;
 
-	public ExtendedFeature(IFeatureModel featureModel, String name) {
+	public MultiFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 	}
 
-	public ExtendedFeature(ExtendedFeature extendedFeature, IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+	public MultiFeature(MultiFeature extendedFeature, IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		super(extendedFeature, newFeatureModel, newStructure);
 		type = extendedFeature.type;
 		externalModelName = extendedFeature.externalModelName;
@@ -51,7 +51,7 @@ public class ExtendedFeature extends Feature {
 
 	@Override
 	protected IFeatureProperty createProperty() {
-		return new ExtendedFeatureProperty(this);
+		return new MultiFeatureProperty(this);
 	}
 
 	public int getType() {
@@ -96,7 +96,7 @@ public class ExtendedFeature extends Feature {
 
 	@Override
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new ExtendedFeature(this, newFeatureModel, newStructure);
+		return new MultiFeature(this, newFeatureModel, newStructure);
 	}
 
 }

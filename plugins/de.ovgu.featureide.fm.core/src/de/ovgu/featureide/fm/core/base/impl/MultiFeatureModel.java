@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel extends FeatureModel {
+public class MultiFeatureModel extends FeatureModel {
 
 	public static class UsedModel {
 
@@ -102,7 +102,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	private boolean isInterface;
 
-	public ExtendedFeatureModel(String factoryID) {
+	public MultiFeatureModel(String factoryID) {
 		super(factoryID);
 
 		integerAttributes = new FeatureAttributeMap<>();
@@ -119,7 +119,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		isInterface = false;
 	}
 
-	protected ExtendedFeatureModel(ExtendedFeatureModel extendedFeatureModel, IFeature newRoot) {
+	protected MultiFeatureModel(MultiFeatureModel extendedFeatureModel, IFeature newRoot) {
 		super(extendedFeatureModel, newRoot);
 
 		integerAttributes = new FeatureAttributeMap<>(extendedFeatureModel.integerAttributes);
@@ -169,15 +169,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
 	public boolean addInterface(final String varType, final String varName) {
-		return addModel(varType, varName, ExtendedFeature.TYPE_INTERFACE);
+		return addModel(varType, varName, MultiFeature.TYPE_INTERFACE);
 	}
 
 	public boolean addInstance(final String varType, final String varName) {
-		return addModel(varType, varName, ExtendedFeature.TYPE_INSTANCE);
+		return addModel(varType, varName, MultiFeature.TYPE_INSTANCE);
 	}
 
 	public boolean addInheritance(final String varType, final String varName) {
-		return addModel(varType, varName, ExtendedFeature.TYPE_INHERITED);
+		return addModel(varType, varName, MultiFeature.TYPE_INHERITED);
 	}
 
 	public boolean addExternalModel(final UsedModel model) {
@@ -229,7 +229,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInstance() {
 		for (final IFeature feature : featureTable.values()) {
-			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isInstance()) {
+			if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isInstance()) {
 				return true;
 			}
 		}
@@ -243,7 +243,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInherited() {
 		for (final IFeature feature : featureTable.values()) {
-			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isInherited()) {
+			if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isInherited()) {
 				return true;
 			}
 		}
@@ -252,7 +252,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public boolean hasInterface() {
 		for (final IFeature feature : featureTable.values()) {
-			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isInterface()) {
+			if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isInterface()) {
 				return true;
 			}
 		}
@@ -309,7 +309,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	@Override
 	public FeatureModel clone() {
-		return new ExtendedFeatureModel(this, null);
+		return new MultiFeatureModel(this, null);
 	}
 
 }
