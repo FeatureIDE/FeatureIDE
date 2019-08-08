@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -159,7 +160,10 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		viewer.getContentProvider().inputChanged(viewer, null, file);
+		final IContentProvider contentProvider = viewer.getContentProvider();
+		if (contentProvider != null) {
+			contentProvider.inputChanged(viewer, null, file);
+		}
 	}
 
 	@Override

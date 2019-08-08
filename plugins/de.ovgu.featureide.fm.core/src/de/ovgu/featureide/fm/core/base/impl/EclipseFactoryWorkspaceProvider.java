@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map.Entry;
 
@@ -113,11 +114,13 @@ public final class EclipseFactoryWorkspaceProvider implements IFactoryWorkspaceL
 
 		for (final IProject project : root.getProjects()) {
 			if (project.isAccessible()) {
-				final IFile file = project.getFile(getSubNode() + FACTORY_WORKSPACE_FILENAME + format.getSuffix());
-				final Path path = EclipseFileSystem.getPath(project);
-				final FactoryWorkspace factoryWorkspace = manager.addFactoryWorkspace(path);
-				if (SimpleFileHandler.load(EclipseFileSystem.getPath(file), factoryWorkspace, format.getInstance()).containsError()) {
-					manager.removeFactoryWorkspace(path);
+				final Path factoryWorkspacePath = EclipseFileSystem.getPath(project.getFile(getSubNode() + FACTORY_WORKSPACE_FILENAME + format.getSuffix()));
+				if (Files.exists(factoryWorkspacePath)) {
+					final Path path = EclipseFileSystem.getPath(project);
+					final FactoryWorkspace factoryWorkspace = manager.addFactoryWorkspace(path);
+					if (SimpleFileHandler.load(factoryWorkspacePath, factoryWorkspace, format.getInstance()).containsError()) {
+						manager.removeFactoryWorkspace(path);
+					}
 				}
 			}
 		}

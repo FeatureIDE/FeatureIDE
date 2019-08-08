@@ -596,6 +596,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
+		final Object source = event.getSource();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
 			IFeature newCompound = null;
@@ -638,7 +639,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setDirty();
 			final IFeature newFeature = (IFeature) event.getNewValue();
 			final IFeature parent = (IFeature) event.getOldValue();
-			final IFeatureModel fm = (IFeatureModel) event.getSource();
+			final IFeatureModel fm = (IFeatureModel) source;
 			if ((parent != null) && (parent != newFeature)) {
 				// Uncollapse if collapsed
 				final IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
@@ -703,19 +704,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.reload();
 			break;
 		case MANDATORY_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
 			setDirty();
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
-			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
+			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) source, graphicalFeatureModel)) {
 				f.update(event);
 			}
 			setDirty();
 			analyzeFeatureModel();
 			break;
 		case ATTRIBUTE_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
 			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
@@ -730,7 +731,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setDirty();
 			break;
 		case CONSTRAINT_MODIFY:
-			final IConstraint c = (IConstraint) event.getSource();
+			final IConstraint c = (IConstraint) source;
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
 			viewer.internRefresh(true);
@@ -778,7 +779,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case FEATURE_DELETE:
-			final IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
+			final IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) source);
 			deletedFeature.update(event);
 			final IFeature oldParent = (IFeature) event.getOldValue();
 			// Update the parent from
@@ -813,7 +814,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			viewer.reload();
 			refreshGraphics(null);
-			viewer.refreshChildAll(((IFeatureModel) event.getSource()).getStructure().getRoot().getFeature());
+			if (source instanceof IFeatureModel) {
+				viewer.refreshChildAll(((IFeatureModel) source).getStructure().getRoot().getFeature());
+			} else {
+				viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
+			}
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
@@ -826,14 +831,14 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(false);
 			break;
 		case FEATURE_HIDDEN_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) event.getSource()).getStructure())) {
+			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
+			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) source).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
 			viewer.reload(); // reload need to be called afterwards so that the events can apply to the to be hidden features. reload would remove the editparts
 							 // that
 			// leads to errors.
-			viewer.refreshChildAll((IFeature) event.getSource());
+			viewer.refreshChildAll((IFeature) source);
 			legendLayoutAction.refresh();
 			setDirty();
 			viewer.internRefresh(true);
@@ -843,15 +848,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Reload editpart to notify the diagramm that the IGraphicalModel has changed
 			viewer.reload();
 			if (event.getNewValue() == null) {
-				final IFeature selectedFeature = (IFeature) event.getSource();
+				final IFeature selectedFeature = (IFeature) source;
 				viewer.refreshChildAll(selectedFeature);
 				graphicalFeatureModel.writeFeature(graphicalFeatureModel.getGraphicalFeature(selectedFeature));
 			}
 			viewer.internRefresh(false);
 			setDirty();
 			// Center collapsed feature after operation
-			if (event.getSource() instanceof IFeature) {
-				viewer.centerPointOnScreen((IFeature) event.getSource());
+			if (source instanceof IFeature) {
+				viewer.centerPointOnScreen((IFeature) source);
 			}
 
 			// redraw the explanation after collapse
@@ -871,8 +876,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(activeExplanation);
 			break;
 		case FEATURE_COLOR_CHANGED:
-			if (event.getSource() instanceof List) {
-				final List<?> srcList = (List<?>) event.getSource();
+			if (source instanceof List) {
+				final List<?> srcList = (List<?>) source;
 
 				if (!srcList.isEmpty()) {
 					List<IGraphicalFeature> features;
@@ -898,7 +903,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 				}
 			} else {
-				FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + event.getSource());
+				FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + source);
 			}
 
 			viewer.reload();
@@ -945,12 +950,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 						if (element.getObject() instanceof IFeature) {
 							if (graphicalFeatureModel.getVisibleFeatures()
 									.contains(graphicalFeatureModel.getGraphicalFeature((IFeature) element.getObject()))) {
-								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+								element.update(new FeatureIDEEvent(source, EventType.ACTIVE_REASON_CHANGED, null, reason));
 							}
 						} else if (element.getObject() instanceof IConstraint) {
 							if (graphicalFeatureModel.getVisibleConstraints()
 									.contains(graphicalFeatureModel.getGraphicalConstraint((IConstraint) element.getObject()))) {
-								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+								element.update(new FeatureIDEEvent(source, EventType.ACTIVE_REASON_CHANGED, null, reason));
 							}
 						}
 

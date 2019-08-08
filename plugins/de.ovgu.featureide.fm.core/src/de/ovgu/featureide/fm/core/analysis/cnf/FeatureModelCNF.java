@@ -41,6 +41,10 @@ public class FeatureModelCNF extends CNF {
 
 	protected final boolean useOldNames;
 
+	public FeatureModelCNF(IFeatureModel featureModel) {
+		this(featureModel, false);
+	}
+
 	public FeatureModelCNF(IFeatureModel featureModel, boolean useOldNames) {
 		super(new Variables(useOldNames ? FeatureUtils.getOldFeatureNamesList(featureModel) : FeatureUtils.getFeatureNamesList(featureModel)));
 		this.featureModel = featureModel;
