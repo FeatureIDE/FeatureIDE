@@ -64,8 +64,6 @@ pipeline {
         }
     }
     post {
-        //always { 
-        //}
         success{
             script{
                 setBuildStatus("Build complete", "compile", "success")
