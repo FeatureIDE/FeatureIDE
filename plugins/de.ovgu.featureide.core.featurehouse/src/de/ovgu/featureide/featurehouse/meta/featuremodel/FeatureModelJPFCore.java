@@ -226,10 +226,11 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private String getFeature(IFeature f) {
 		final String featureName = f.toString().toLowerCase(Locale.ENGLISH);
 		final String start = featureName + "_ != null ? " + featureName + "_ : ";
-		if (deadFeatures.contains(f.getStructure().getParent())) {
+		final IFeature parent = FeatureUtils.getParent(f);
+		if (deadFeatures.contains(parent)) {
 			return start + "false";
 		}
-		if (coreFeatures.contains(f.getStructure().getParent())) {
+		if (coreFeatures.contains(parent)) {
 			return start + "true";
 		}
 		return start + f.getStructure().getParent().toString().toLowerCase(Locale.ENGLISH);
