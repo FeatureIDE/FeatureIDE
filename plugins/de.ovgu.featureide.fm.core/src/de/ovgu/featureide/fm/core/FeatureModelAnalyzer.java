@@ -645,7 +645,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		analysis.setAssumptions(new LiteralSet(variables.getVariable(feature1.getName())));
 		final LiteralSet result = LongRunningWrapper.runMethod(analysis);
 
-		final LiteralSet dependingVariables = variables.convertToVariables(Functional.mapToList(dependingFeatures, FeatureUtils.GET_FEATURE_NAME), false);
+		final LiteralSet dependingVariables = variables.convertToVariables(Functional.mapToList(dependingFeatures, IFeature::getName), false);
 		final LiteralSet negativeVariables = result.retainAll(dependingVariables);
 		return negativeVariables.isEmpty();
 	}

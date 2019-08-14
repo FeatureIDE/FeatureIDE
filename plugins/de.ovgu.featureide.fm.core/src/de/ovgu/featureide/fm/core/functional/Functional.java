@@ -169,9 +169,9 @@ public abstract class Functional {
 
 		/**
 		 * An iterable iterator that only yields elements of type <b>T</b> provided by a user-defined iterator <b>i</b> if and only if the elements satisfy a
-		 * user-defined filter condition defined by a {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter} <b>filter</b> of type <b>U</b>. Since this
-		 * is implemented using iterator logic, the evaluation of <i>c</i> on the entire collection of element is done in a lazy fashion. Furthermore, it is
-		 * guaranteed not to remove any element from the iterator <i>i</i>.
+		 * user-defined filter condition defined by a {@link Predicate Filter} <b>filter</b> of type <b>U</b>. Since this is implemented using iterator logic,
+		 * the evaluation of <i>c</i> on the entire collection of element is done in a lazy fashion. Furthermore, it is guaranteed not to remove any element
+		 * from the iterator <i>i</i>.
 		 *
 		 * @param it the iterable
 		 * @param filter the filter
@@ -221,9 +221,9 @@ public abstract class Functional {
 
 	/**
 	 * Filters an object named <b>source</b> that yields elements of type <b>T</b> by a given <b>predicate</b> over <b>U</b> and transforms all qualified
-	 * elements from <b>T</b> to <b>U</b> using a user-defined {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter}. This filtering is done in a lazy
-	 * manner using iterator logic. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>. <br> <br> It is assumed that
-	 * <b>source</b> and <b>predicate</b> are non-null. <br> <br> This is a <b>non-blocking</b> operation.
+	 * elements from <b>T</b> to <b>U</b> using a user-defined {@link Predicate Filter}. This filtering is done in a lazy manner using iterator logic.
+	 * Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>. <br> <br> It is assumed that <b>source</b> and <b>predicate</b> are
+	 * non-null. <br> <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @param predicate Filter condition

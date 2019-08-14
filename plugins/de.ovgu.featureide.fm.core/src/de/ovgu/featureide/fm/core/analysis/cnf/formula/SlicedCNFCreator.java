@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -44,8 +43,8 @@ public abstract class SlicedCNFCreator extends ACreator<CNF> {
 
 	@Override
 	protected CNF create() {
-		final CNFSlicer slicer = new CNFSlicer(formula.getElement(new CNFCreator()),
-				Functional.mapToList(formula.getFeatureModel().getFeatures(), filter, FeatureUtils.GET_FEATURE_NAME));
+		final CNFSlicer slicer =
+			new CNFSlicer(formula.getElement(new CNFCreator()), Functional.mapToList(formula.getFeatureModel().getFeatures(), filter, IFeature::getName));
 		return LongRunningWrapper.runMethod(slicer);
 	}
 

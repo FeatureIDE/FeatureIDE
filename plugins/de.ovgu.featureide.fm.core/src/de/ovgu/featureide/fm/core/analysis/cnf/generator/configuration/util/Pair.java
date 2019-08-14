@@ -23,11 +23,15 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util;
 import java.util.Objects;
 
 /**
- * A tupel of any two objects.
+ * A tuple consisting of any two elements.
+ *
+ * @param <A> class of first element
+ * @param <B> class of second element
  *
  * @author Sebastian Krieter
  */
 public class Pair<A, B> {
+
 	private final A key;
 	private final B value;
 

@@ -273,7 +273,7 @@ public class AnalysesCollection {
 
 			foAnalysis.setOptionalFeatures(Functional.filterToList(formula.getFeatureModel().getFeatures(), new OptionalFeatureFilter()));
 			final List<LiteralSet> foResult = foAnalysis.getResult();
-			initialAnomalies.setRedundantClauses(foResult == null ? null : Functional.removeNull(foResult));
+			initialAnomalies.setRedundantClauses(Functional.removeNull(foResult));
 
 			analysis.setAnomalies(initialAnomalies);
 			analysis.setClauseList(constraintClauses);
@@ -295,8 +295,8 @@ public class AnalysesCollection {
 
 		@Override
 		protected void configureAnalysis(CNF cnf, IndeterminedAnalysis analysis) {
-			final LiteralSet convertToVariables = cnf.getVariables().convertToVariables(
-					Functional.mapToList(formula.getFeatureModel().getFeatures(), new HiddenFeatureFilter(), FeatureUtils.GET_FEATURE_NAME));
+			final LiteralSet convertToVariables = cnf.getVariables()
+					.convertToVariables(Functional.mapToList(formula.getFeatureModel().getFeatures(), new HiddenFeatureFilter(), IFeature::getName));
 			analysis.setVariables(convertToVariables);
 		}
 	}

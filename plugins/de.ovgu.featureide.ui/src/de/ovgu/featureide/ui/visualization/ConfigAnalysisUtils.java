@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
@@ -88,6 +87,6 @@ public class ConfigAnalysisUtils {
 		final Predicate<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
 
 		final Predicate<IFeature> noCoreNoHiddenFilter = hiddenFeatureFilter.or(coreFeatureFilter).negate();
-		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
+		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, IFeature::getName);
 	}
 }

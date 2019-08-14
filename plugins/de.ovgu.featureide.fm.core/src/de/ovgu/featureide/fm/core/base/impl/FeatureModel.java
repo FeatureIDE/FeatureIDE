@@ -416,7 +416,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), IFeature::getName);
 		// TODO optimize performance
 		basicSet.removeAll(featureOrderList);
 		this.featureOrderList.clear();

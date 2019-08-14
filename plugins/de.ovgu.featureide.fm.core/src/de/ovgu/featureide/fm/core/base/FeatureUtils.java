@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -56,67 +57,12 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public final class FeatureUtils {
 
-	public static final Function<CharSequence, String> CHARSQUENCE_TO_STRING = new Function<CharSequence, String>() {
-
-		@Override
-		public String apply(CharSequence t) {
-			requireNonNull(t);
-
-			return t.toString();
-		}
-
-	};
-
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
 	public static final HiddenFeatureFilter HIDDEN_FEATURE_FILTER = new HiddenFeatureFilter();
 
-	public static final Function<IConstraint, Node> CONSTRAINT_TO_NODE = new Function<IConstraint, Node>() {
-
-		@Override
-		public Node apply(IConstraint t) {
-			requireNonNull(t);
-
-			return t.getNode();
-		}
-
-	};
-
-	public static final Function<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new Function<IFeature, IFeatureStructure>() {
-
-		@Override
-		public IFeatureStructure apply(IFeature t) {
-			requireNonNull(t);
-
-			return t.getStructure();
-		}
-	};
-
-	public static final Function<IFeature, String> GET_FEATURE_NAME = new Function<IFeature, String>() {
-
-		@Override
-		public String apply(IFeature t) {
-			return t.getName();
-		}
-	};
-
-	public static final Function<IFeature, String> GET_OLD_FEATURE_NAME = new Function<IFeature, String>() {
-
-		@Override
-		public String apply(IFeature t) {
-			return t.getFeatureModel().getRenamingsManager().getOldName(t.getName());
-		}
-	};
-
-	public static final Function<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new Function<IFeatureStructure, IFeature>() {
-
-		@Override
-		public IFeature apply(IFeatureStructure t) {
-			requireNonNull(t);
-
-			return t.getFeature();
-		}
-	};
+	public static final Function<IFeature, String> GET_OLD_FEATURE_NAME =
+		feature -> feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName());
 
 	public static final void addAnnotation(IFeatureModel featureModel, CharSequence annotation) {
 		requireNonNull(featureModel);
@@ -216,19 +162,19 @@ public final class FeatureUtils {
 	public static Iterable<IFeature> convertToFeatureIteration(List<IFeatureStructure> list) {
 		requireNonNull(list);
 
-		return Functional.map(list, STRUCTURE_TO_FEATURE);
+		return Functional.map(list, IFeatureStructure::getFeature);
 	}
 
 	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
 		requireNonNull(list);
 
-		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
+		return Functional.toList(Functional.map(list, IFeatureStructure::getFeature));
 	}
 
 	public static List<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
 		requireNonNull(list);
 
-		return Functional.toList(Functional.map(list, FEATURE_TO_STRUCTURE));
+		return Functional.toList(Functional.map(list, IFeature::getStructure));
 	}
 
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
@@ -291,8 +237,7 @@ public final class FeatureUtils {
 	 * object that yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy
 	 * filtering without modification of <b>features</b>.
 	 *
-	 * <br> <br> The extraction is done via
-	 * {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 * <br> <br> The extraction is done via {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, Predicate)}
 	 *
 	 * @since 3.0
 	 * @param features An iterable object providing features
@@ -329,7 +274,7 @@ public final class FeatureUtils {
 	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
 		requireNonNull(features);
 
-		return Functional.map(features, GET_FEATURE_NAME);
+		return Functional.map(features, IFeature::getName);
 	}
 
 	public static Iterable<String> extractOldFeatureNames(Iterable<IFeature> features) {
@@ -360,7 +305,7 @@ public final class FeatureUtils {
 	public static final Iterable<IFeature> getChildren(IFeature feature) {
 		requireNonNull(feature);
 
-		return Functional.map(feature.getStructure().getChildren(), STRUCTURE_TO_FEATURE);
+		return Functional.map(feature.getStructure().getChildren(), IFeatureStructure::getFeature);
 	}
 
 	public static final int getChildrenCount(IFeature feature) {
@@ -641,13 +586,13 @@ public final class FeatureUtils {
 	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		return Functional.mapToList(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
+		return Functional.mapToList(featureModel.getConstraints(), IConstraint::getNode);
 	}
 
 	public static List<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
 		requireNonNull(constraints);
 
-		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
+		return Functional.toList(Functional.map(constraints, IConstraint::getNode));
 	}
 
 	public static final Collection<IConstraint> getRelevantConstraints(IFeature feature) {
@@ -1046,7 +991,7 @@ public final class FeatureUtils {
 	public static final void setChildren(IFeature feature, Iterable<IFeature> children) {
 		requireNonNull(children);
 
-		feature.getStructure().setChildren(Functional.toList(Functional.map(children, FEATURE_TO_STRUCTURE)));
+		feature.getStructure().setChildren(Functional.toList(Functional.map(children, IFeature::getStructure)));
 	}
 
 	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {

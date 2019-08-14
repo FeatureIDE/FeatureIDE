@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -131,9 +131,8 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 		monitor.step();
 
 		if (!remainingClauses.isEmpty()) {
-			final List<LiteralSet> newClauseList =
-				Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
-			remainingClauses.removeAll(newClauseList);
+			final List<LiteralSet> result = LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses));
+			remainingClauses.removeIf(result::contains);
 		}
 		monitor.step();
 
@@ -161,8 +160,8 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 				}
 
 				if (!remainingClauses.isEmpty()) {
-					final List<LiteralSet> newClauseList =
-						Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
+					final List<LiteralSet> newClauseList = LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses));
+					newClauseList.removeIf(Objects::isNull);
 					if (!newClauseList.isEmpty()) {
 						getAnomalies(resultList, i).setRedundantClauses(newClauseList);
 						remainingClauses.removeAll(newClauseList);
