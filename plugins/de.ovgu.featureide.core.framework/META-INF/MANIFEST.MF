@@ -16,3 +16,4 @@ Bundle-Activator: de.ovgu.featureide.core.framework.activator.FrameworkCorePlugi
 Bundle-ClassPath: .
 Export-Package: de.ovgu.featureide.core.framework,
  de.ovgu.featureide.core.framework.activator
+Automatic-Module-Name: de.ovgu.featureide.core.framework

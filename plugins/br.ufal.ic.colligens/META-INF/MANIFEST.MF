@@ -104,3 +104,4 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
  de.fosd.typechef.typesystem,
  de.fosd.typechef.typesystem.linker,
  de.fosd.typechef.xtclexer
+Automatic-Module-Name: br.ufal.ic.colligens

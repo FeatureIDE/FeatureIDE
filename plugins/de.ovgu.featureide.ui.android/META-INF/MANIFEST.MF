@@ -18,3 +18,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.ovgu.featureide.ui.android,
  de.ovgu.featureide.ui.android.handlers,
  de.ovgu.featureide.ui.android.wizards
+Automatic-Module-Name: de.ovgu.featureide.ui.android

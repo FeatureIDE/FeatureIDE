@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.ovgu.featureide.munge_android
+Automatic-Module-Name: de.ovgu.featureide.core.munge.android

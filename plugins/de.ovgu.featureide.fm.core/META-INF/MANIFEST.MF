@@ -173,3 +173,4 @@ Export-Package: Jakarta.DRAttributes,
  splar.plugins.tests,
  splar.samples
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.ovgu.featureide.fm.core

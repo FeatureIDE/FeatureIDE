@@ -31,3 +31,4 @@ Export-Package: cide.features,
  de.ovgu.featureide.featurehouse.ui.handlers,
  de.ovgu.featureide.featurehouse.ui.handlers.toggle,
  fuji
+Automatic-Module-Name: de.ovgu.featureide.core.featurehouse

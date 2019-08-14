@@ -23,3 +23,4 @@ Export-Package: de.ovgu.featureide.munge,
  de.ovgu.featureide.munge.ui.handlers,
  de.ovgu.featureide.munge.ui.handlers.toggle,
  org.sonatype.plugins.munge
+Automatic-Module-Name: de.ovgu.featureide.core.munge

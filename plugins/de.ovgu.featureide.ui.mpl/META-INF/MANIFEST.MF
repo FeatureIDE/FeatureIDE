@@ -22,3 +22,4 @@ Export-Package: de.ovgu.featureide.ui.mpl,
  de.ovgu.featureide.ui.mpl.handlers.statistics,
  de.ovgu.featureide.ui.mpl.wizards,
  de.ovgu.featureide.ui.mpl.wizards.page
+Automatic-Module-Name: de.ovgu.featureide.ui.mpl

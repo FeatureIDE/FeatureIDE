@@ -17,3 +17,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.ovgu.featureide.migration.impl,
  de.ovgu.featureide.ui.migration.plugin,
  de.ovgu.featureide.ui.migration.wizard
+Automatic-Module-Name: de.ovgu.featureide.migration

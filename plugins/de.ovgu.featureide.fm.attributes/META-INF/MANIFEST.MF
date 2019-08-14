@@ -26,3 +26,4 @@ Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.view.actions,
  de.ovgu.featureide.fm.attributes.view.editingsupports
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.ovgu.featureide.fm.attributes

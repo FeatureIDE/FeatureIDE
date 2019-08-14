@@ -12,3 +12,4 @@ Bundle-ClassPath: .,
  lib/splar.jar,
  lib/log4j-api-2.2.jar,
  lib/log4j-core-2.2.jar
+Automatic-Module-Name: de.ovgu.featureide.fm.core-test

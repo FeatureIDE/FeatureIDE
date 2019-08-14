@@ -24,3 +24,4 @@ Export-Package: de.ovgu.featureide.core.mpl,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/fuji.jar,
  .
+Automatic-Module-Name: de.ovgu.featureide.core.mpl

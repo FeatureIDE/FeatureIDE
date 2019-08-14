@@ -53,3 +53,4 @@ Import-Package: org.eclipse.cdt.internal.ui.text.correction;resolution:=optional
  org.eclipse.jface.text.contentassist,
  org.eclipse.jface.text.quickassist,
  org.eclipse.jface.text.source
+Automatic-Module-Name: de.ovgu.featureide.Cloneanalysis

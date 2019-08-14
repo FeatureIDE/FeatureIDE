@@ -21,3 +21,4 @@ Export-Package: de.ovgu.featureide.ahead,
  jak2java,
  jampack,
  mixin
+Automatic-Module-Name: de.ovgu.featureide.core.ahead

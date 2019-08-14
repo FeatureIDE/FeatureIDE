@@ -7,3 +7,4 @@ Fragment-Host: de.ovgu.featureide.core.munge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
+Automatic-Module-Name: de.ovgu.featureide.core.munge-test

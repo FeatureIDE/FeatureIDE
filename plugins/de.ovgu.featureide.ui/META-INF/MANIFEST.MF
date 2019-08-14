@@ -105,3 +105,4 @@ Import-Package: org.eclipse.debug.ui,
  org.eclipse.ui.texteditor,
  org.junit.runner;resolution:=optional,
  org.junit.runner.notification;resolution:=optional
+Automatic-Module-Name: de.ovgu.featureide.ui

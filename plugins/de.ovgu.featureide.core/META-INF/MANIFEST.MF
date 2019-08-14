@@ -37,3 +37,4 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.internal.core,
  org.eclipse.ui.wizards.newresource
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.ovgu.featureide.core

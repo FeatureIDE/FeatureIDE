@@ -17,3 +17,4 @@ Bundle-Activator: de.ovgu.featureide.examples.ExamplePlugin
 Export-Package: de.ovgu.featureide.examples,
  de.ovgu.featureide.examples.utils,
  de.ovgu.featureide.examples.wizards
+Automatic-Module-Name: de.ovgu.featureide.examples

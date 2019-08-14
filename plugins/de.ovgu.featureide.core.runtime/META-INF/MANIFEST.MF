@@ -16,3 +16,4 @@ Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin
 Export-Package: de.ovgu.featureide.core.runtime,
  de.ovgu.featureide.core.runtime.activator
+Automatic-Module-Name: de.ovgu.featureide.core.runtime
