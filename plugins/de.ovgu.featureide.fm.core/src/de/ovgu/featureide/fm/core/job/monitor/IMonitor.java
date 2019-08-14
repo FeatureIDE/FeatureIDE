@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.job.monitor;
 
 import java.util.function.Consumer;
 
-import de.ovgu.featureide.fm.core.job.IJob;
-
 /**
  * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  *
@@ -84,26 +82,26 @@ public interface IMonitor<T> {
 	String getTaskName();
 
 	/**
-	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br/> Increases the monitor's progress.
+	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br> Increases the monitor's progress.
 	 */
 	void worked();
 
 	/**
-	 * <b>Use {@link #step(int)} or {@link #step(int, Object)}.</b><br/> Increases the monitor's progress.
+	 * <b>Use {@link #step(int)} or {@link #step(int, Object)}.</b><br> Increases the monitor's progress.
 	 *
 	 * @param work the amount of work done
 	 */
 	void worked(int work);
 
 	/**
-	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br/> Throws a {@link MethodCancelException} if the monitor's {@link #cancel()} method was called.
+	 * <b>Use {@link #step()} or {@link #step(Object)}.</b><br> Throws a {@link MethodCancelException} if the monitor's {@link #cancel()} method was called.
 	 *
 	 * @throws MethodCancelException
 	 */
 	void checkCancel() throws MethodCancelException;
 
 	/**
-	 * <b>Use {@link #step(Object)}.</b><br/> Calls the intermediate function.
+	 * <b>Use {@link #step(Object)}.</b><br> Calls the intermediate function.
 	 *
 	 * @param t the parameter for the intermediate function
 	 */

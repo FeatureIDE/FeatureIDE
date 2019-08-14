@@ -20,17 +20,15 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-
-import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
-import de.ovgu.featureide.fm.core.job.monitor.AMonitor;
 
 /**
  * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  *
- * @deprecated Use {@link AMonitor} instead.
+ * @deprecated Use {@link IMonitor} instead.
  *
  * @author Sebastian Krieter
  */
@@ -40,7 +38,7 @@ public abstract class AWorkMonitor {
 	private static final int maxRelativeWork = 100;
 
 	private IProgressMonitor monitor;
-	private IConsumer<Object> intermediateFunction = null;
+	private Consumer<Object> intermediateFunction = null;
 	private int relativeWorkDone = 0, absoluteWorkDone = 0, maxAbsoluteWork = 1;
 
 	public AWorkMonitor() {
@@ -76,7 +74,7 @@ public abstract class AWorkMonitor {
 
 	protected final void internalInvoke(Object t) {
 		if (intermediateFunction != null) {
-			intermediateFunction.invoke(t);
+			intermediateFunction.accept(t);
 		}
 	}
 
@@ -107,8 +105,8 @@ public abstract class AWorkMonitor {
 	 */
 	public abstract void invoke(Object t);
 
-	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<>();
+	public final void setIntermediateFunction(Consumer<Object> intermediateFunction) {
+		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : object -> {};
 	}
 
 	/**

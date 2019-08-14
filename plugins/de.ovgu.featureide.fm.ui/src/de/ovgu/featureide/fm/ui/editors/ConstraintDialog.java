@@ -38,6 +38,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -91,7 +92,6 @@ import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -437,10 +437,12 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private ContentProposalAdapter adapter;
 
-	private final IConsumer<ValidationMessage> onUpdate = new IConsumer<ValidationMessage>() {
+	private final Consumer<ValidationMessage> onUpdate = new Consumer<ValidationMessage>() {
+
 		@Override
-		public void invoke(final ValidationMessage message) {
+		public void accept(final ValidationMessage message) {
 			Display.getDefault().syncExec(new Runnable() {
+
 				@Override
 				public void run() {
 					if (message.getSeverity() != null) {
@@ -574,6 +576,7 @@ public class ConstraintDialog implements GUIDefaults {
 		final ToolItem helpButton = new ToolItem(helpButtonBar, SWT.NONE);
 		helpButton.setImage(HELP_IMAGE);
 		helpButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				Program.launch(StringTable.HREF_HELP_LINK);
@@ -614,6 +617,7 @@ public class ConstraintDialog implements GUIDefaults {
 		lastComposite.setTabList(new Control[] { okButton, cancelButton });
 
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				okButtonPressEvent();
@@ -673,6 +677,7 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setMargins(10, 5, 3, 5);
 
 		constraintText.addModifyListener(new ModifyListener() {
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				validate();

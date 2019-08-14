@@ -27,13 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.core.RenamingsManager;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. <br> <br> A feature model contains of a
@@ -69,9 +64,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * reference default implementation for feature models is <code> private static long NEXT_ID = 0;
  *
  * protected static final synchronized long getNextId() { return NEXT_ID++; } </code> <br> <br> <b>Compatibility Notes</b>: To provide compatibility to earlier
- * versions of FeatureIDE, the <i>out-dated</i> class {@link de.ovgu.featureide.fm.core.FeatureModel FeatureModel} is now a wrapper to an
- * <code>IFeatureModel</code> instance (but incompatible to it) and make use of convert-functionalities inside
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
+ * versions of FeatureIDE, the <i>out-dated</i> class {@link IFeatureModel FeatureModel} is now a wrapper to an <code>IFeatureModel</code> instance (but
+ * incompatible to it) and make use of convert-functionalities inside {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
  *
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureModel Default implementation of <code>IFeatureModel</code> (as starting point for custom implementations)
  *
@@ -113,7 +107,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @return the feature model factory ID.
 	 *
-	 * @see FMFactoryManager#getFactoryById(String)
+	 * @see FMFactoryManager#getFactory(String)
 	 *
 	 * @since 3.1
 	 */
@@ -381,7 +375,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @since 3.0
 	 *
-	 * @return
+	 * @return features of the feature model.
 	 */
 	Collection<IFeature> getFeatures();
 
@@ -397,6 +391,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * constructor for collection implementations, e.g., <br> <code>List&lt;IFeature&gt; list = new
 	 * LinkedList&lt;IFeature&gt;(Functional.toList(fm.getVisibleFeatures()));</code> <br> <b>Note</b>: Many operations of features in feature models runs over
 	 * iteration. This method returns an iterator rather than a collection for <i>lazy evaluation</i> purposes. <br>
+	 *
+	 * @param showHiddenFeatures whether hidden features should be included.
 	 *
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
@@ -456,7 +452,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	IFeatureModelStructure getStructure();
 
 	/**
-	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_CHANGED} to listeners.
+	 * Fires the the event {@link de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType#MODEL_DATA_CHANGED} to listeners.
 	 *
 	 * @since 3.0
 	 */
@@ -495,6 +491,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Removes the constraint at the specified position <code>index</code> in this collection of constraints in this model. When a constraint was removed, the
 	 * remaining constraints to the right are shifted one position to the left.
 	 *
+	 * @param index position of the constraint to be removed
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -507,13 +505,14 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @throws IndexOutOfBoundsException If the index is out of range
 	 * @since 3.0
-	 *
-	 * @param index position of the constraint to be removed
 	 */
 	void removeConstraint(int index);
 
 	/**
 	 * Replaces the constraint <code>constraint</code> at the specified position <code>index</code> in the collection of constraints of this feature model.
+	 *
+	 * @param constraint constraint which should be stored at <code>index</code>
+	 * @param index position for replacement
 	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -530,8 +529,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @since 3.0
 	 *
-	 * @param constraint constraint which should be stored at <code>index</code>
-	 * @param index position for replacement
 	 */
 	void replaceConstraint(IConstraint constraint, int index);
 
@@ -553,6 +550,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Sets the collections of constraints to the ones yielded by <code>constraints</code>. Existing constraint in the collection will be removed before this
 	 * operation.
 	 *
+	 * @param constraints Source of constraints which should be copied into this feature model
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -562,10 +561,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #removeConstraint(int)
 	 * @see #setConstraint(int, IConstraint)
 	 * @see #replaceConstraint(IConstraint, int)
-	 *
-	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
-	 *
-	 * @param constraints Source of constraints which should be copied into this feature model
 	 *
 	 * @since 3.0
 	 */
@@ -643,7 +638,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #getSourceFile()
 	 * @see #getStructure()
 	 * @see #getConstraints()
-	 * @see #getAnalyser()
 	 *
 	 * @return cloned instance of this model, such that the new instance is equal to this feature model but their references aren't identical
 	 */
@@ -653,6 +647,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Replaces the feature order item at the specified position <code>i</code> in this feature model's feature order list with the specified element
 	 * <code>newName</code>.
 	 *
+	 * @param i index of the element to replace
+	 * @param newName new name to be stored at the specified position
+	 *
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderList(List)
 	 * @see #setFeatureOrderUserDefined(boolean)
@@ -660,9 +657,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 *
 	 * @throws IndexOutOfBoundsException if the index is out of range
-	 *
-	 * @param i index of the element to replace
-	 * @param newName new name to be stored at the specified position
 	 */
 	void setFeatureOrderListItem(int i, String newName);
 
@@ -712,6 +706,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Overwrites the constraint stored in this feature model at position <code>index</code> with the constraint provided by the parameter
 	 * <code>constraint</code>.
 	 *
+	 * @param index index of the constraint to replace
+	 * @param constraint constraint to be stored at the specified position
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -725,9 +722,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 *
 	 * @throws IndexOutOfBoundsException if the index is out of range
-	 *
-	 * @param index index of the constraint to replace
-	 * @param constraint constraint to be stored at the specified position
 	 */
 	void setConstraint(int index, IConstraint constraint);
 

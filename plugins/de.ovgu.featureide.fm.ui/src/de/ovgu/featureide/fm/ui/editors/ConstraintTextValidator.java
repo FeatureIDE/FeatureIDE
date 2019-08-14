@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -42,7 +43,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionExcept
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
@@ -67,7 +67,7 @@ public final class ConstraintTextValidator {
 	private JobToken initToken;
 	private JobToken token;
 
-	public void init(FeatureModelFormula featureModel, IConstraint constraint, final IConsumer<ValidationMessage> onUpdate) {
+	public void init(FeatureModelFormula featureModel, IConstraint constraint, final Consumer<ValidationMessage> onUpdate) {
 		initToken = LongRunningWrapper.createToken(JobStartingStrategy.RETURN);
 		token = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 		final IRunner<InitialAnalysis.InitialResult> runner = LongRunningWrapper.getRunner(new InitialAnalysis(featureModel, constraint));
@@ -82,10 +82,10 @@ public final class ConstraintTextValidator {
 				} else {
 					m.setInitialAnalysisSuccess(false);
 				}
-				onUpdate.invoke(m);
+				onUpdate.accept(m);
 			}
 		});
-		onUpdate.invoke(new ValidationMessage(
+		onUpdate.accept(new ValidationMessage(
 				"Executing initial analysis...\nThis may take a while. Although it is not recommended, you can save the unchecked constraint."));
 		LongRunningWrapper.startJob(initToken, runner);
 	}
@@ -102,7 +102,7 @@ public final class ConstraintTextValidator {
 	 * @param constraintNode Test to text
 	 * @param onUpdate Update mechanism
 	 */
-	public boolean validateAsync(final Node constraintNode, final IConsumer<ValidationMessage> onUpdate) {
+	public boolean validateAsync(final Node constraintNode, final Consumer<ValidationMessage> onUpdate) {
 		if (initialResult != null) {
 			LongRunningWrapper.startJob(token, LongRunningWrapper.getRunner(new Analysis(initialResult, constraintNode, onUpdate)));
 			return true;
@@ -188,9 +188,9 @@ public final class ConstraintTextValidator {
 
 		private final InitialAnalysis.InitialResult initialResult;
 		private final Node constraintNode;
-		private final IConsumer<ValidationMessage> onUpdate;
+		private final Consumer<ValidationMessage> onUpdate;
 
-		public Analysis(InitialAnalysis.InitialResult initialResult, Node constraintNode, IConsumer<ValidationMessage> onUpdate) {
+		public Analysis(InitialAnalysis.InitialResult initialResult, Node constraintNode, Consumer<ValidationMessage> onUpdate) {
 			this.initialResult = initialResult;
 			this.constraintNode = constraintNode;
 			this.onUpdate = onUpdate;
@@ -198,7 +198,7 @@ public final class ConstraintTextValidator {
 
 		@Override
 		public Void execute(IMonitor<Void> monitor) throws Exception {
-			onUpdate.invoke(new ValidationMessage(
+			onUpdate.accept(new ValidationMessage(
 					"Checking constraint...\nThis may take a while. Although it is not recommended, you can save the unchecked constraint.",
 					DialogState.SAVE_CHANGES_DONT_MIND));
 
@@ -211,10 +211,10 @@ public final class ConstraintTextValidator {
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
-				onUpdate.invoke(new ValidationMessage("Constraint is a contradiction\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
+				onUpdate.accept(new ValidationMessage("Constraint is a contradiction\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			case TIMEOUT:
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			case TRUE:
@@ -232,10 +232,10 @@ public final class ConstraintTextValidator {
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
-				onUpdate.invoke(new ValidationMessage("Constraint is a tautology\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
+				onUpdate.accept(new ValidationMessage("Constraint is a tautology\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			case TIMEOUT:
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			case TRUE:
@@ -245,7 +245,7 @@ public final class ConstraintTextValidator {
 			}
 
 			if (!initialResult.valid) {
-				onUpdate.invoke(new ValidationMessage("Constraint successfully checked.\n(Feature model is already void)", DialogState.SAVE_CHANGES_ENABLED));
+				onUpdate.accept(new ValidationMessage("Constraint successfully checked.\n(Feature model is already void)", DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			}
 
@@ -259,18 +259,18 @@ public final class ConstraintTextValidator {
 					solver.addClauses(adaptClauseList);
 					satResult = solver.hasSolution();
 				} else {
-					onUpdate.invoke(
+					onUpdate.accept(
 							new ValidationMessage("Constraint contains invalid feature names\n", Problem.Severity.ERROR, DialogState.SAVE_CHANGES_DISABLED));
 					return null;
 				}
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
-				onUpdate.invoke(
+				onUpdate.accept(
 						new ValidationMessage("Constraint causes the feature model to be void\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			case TIMEOUT:
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			case TRUE:
@@ -288,17 +288,17 @@ public final class ConstraintTextValidator {
 					redundantSolver.addClauses(adaptClauseList);
 					satResult = redundantSolver.hasSolution();
 				} else {
-					onUpdate.invoke(
+					onUpdate.accept(
 							new ValidationMessage("Constraint contains invalid feature names\n", Problem.Severity.ERROR, DialogState.SAVE_CHANGES_DISABLED));
 					return null;
 				}
 			} catch (final RuntimeContradictionException e) {}
 			switch (satResult) {
 			case FALSE:
-				onUpdate.invoke(new ValidationMessage("Constraint is redundant\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
+				onUpdate.accept(new ValidationMessage("Constraint is redundant\n", Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			case TIMEOUT:
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			case TRUE:
@@ -312,12 +312,12 @@ public final class ConstraintTextValidator {
 			method.setAssumptions(initialResult.deadCore);
 			final LiteralSet newDeadCore = LongRunningWrapper.runMethod(method, monitor.subTask(1));
 			if (method.isTimeoutOccured()) {
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			}
 			if (newDeadCore == null) {
-				onUpdate.invoke(new ValidationMessage("A problem occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A problem occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			}
@@ -338,7 +338,7 @@ public final class ConstraintTextValidator {
 						}
 					}
 					sb.delete(sb.length() - 2, sb.length());
-					onUpdate.invoke(new ValidationMessage(sb.toString(), Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
+					onUpdate.accept(new ValidationMessage(sb.toString(), Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 					return null;
 				}
 			}
@@ -347,12 +347,12 @@ public final class ConstraintTextValidator {
 			final IndependentRedundancyAnalysis method2 = new IndependentRedundancyAnalysis(solver, initialResult.possibleFOFeatures);
 			final List<LiteralSet> possibleFOFeatures = LongRunningWrapper.runMethod(method2, monitor.subTask(0));
 			if (method2.isTimeoutOccured()) {
-				onUpdate.invoke(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A timeout occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			}
 			if (possibleFOFeatures == null) {
-				onUpdate.invoke(new ValidationMessage("A problem occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
+				onUpdate.accept(new ValidationMessage("A problem occured - Constraint could not be checked completely\n", Problem.Severity.WARNING,
 						DialogState.SAVE_CHANGES_DONT_MIND));
 				return null;
 			}
@@ -369,11 +369,11 @@ public final class ConstraintTextValidator {
 					sb.append(", ");
 				}
 				sb.delete(sb.length() - 2, sb.length());
-				onUpdate.invoke(new ValidationMessage(sb.toString(), Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
+				onUpdate.accept(new ValidationMessage(sb.toString(), Problem.Severity.WARNING, DialogState.SAVE_CHANGES_ENABLED));
 				return null;
 			}
 
-			onUpdate.invoke(new ValidationMessage("Constraint successfully checked.\n", DialogState.SAVE_CHANGES_ENABLED));
+			onUpdate.accept(new ValidationMessage("Constraint successfully checked.\n", DialogState.SAVE_CHANGES_ENABLED));
 			return null;
 		}
 

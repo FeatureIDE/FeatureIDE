@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -46,7 +47,6 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -56,10 +56,10 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public final class FeatureUtils {
 
-	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING = new IFunction<CharSequence, String>() {
+	public static final Function<CharSequence, String> CHARSQUENCE_TO_STRING = new Function<CharSequence, String>() {
 
 		@Override
-		public String invoke(CharSequence t) {
+		public String apply(CharSequence t) {
 			requireNonNull(t);
 
 			return t.toString();
@@ -71,10 +71,10 @@ public final class FeatureUtils {
 
 	public static final HiddenFeatureFilter HIDDEN_FEATURE_FILTER = new HiddenFeatureFilter();
 
-	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
+	public static final Function<IConstraint, Node> CONSTRAINT_TO_NODE = new Function<IConstraint, Node>() {
 
 		@Override
-		public Node invoke(IConstraint t) {
+		public Node apply(IConstraint t) {
 			requireNonNull(t);
 
 			return t.getNode();
@@ -82,36 +82,36 @@ public final class FeatureUtils {
 
 	};
 
-	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new IFunction<IFeature, IFeatureStructure>() {
+	public static final Function<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new Function<IFeature, IFeatureStructure>() {
 
 		@Override
-		public IFeatureStructure invoke(IFeature t) {
+		public IFeatureStructure apply(IFeature t) {
 			requireNonNull(t);
 
 			return t.getStructure();
 		}
 	};
 
-	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
+	public static final Function<IFeature, String> GET_FEATURE_NAME = new Function<IFeature, String>() {
 
 		@Override
-		public String invoke(IFeature t) {
+		public String apply(IFeature t) {
 			return t.getName();
 		}
 	};
 
-	public static final IFunction<IFeature, String> GET_OLD_FEATURE_NAME = new IFunction<IFeature, String>() {
+	public static final Function<IFeature, String> GET_OLD_FEATURE_NAME = new Function<IFeature, String>() {
 
 		@Override
-		public String invoke(IFeature t) {
+		public String apply(IFeature t) {
 			return t.getFeatureModel().getRenamingsManager().getOldName(t.getName());
 		}
 	};
 
-	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
+	public static final Function<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new Function<IFeatureStructure, IFeature>() {
 
 		@Override
-		public IFeature invoke(IFeatureStructure t) {
+		public IFeature apply(IFeatureStructure t) {
 			requireNonNull(t);
 
 			return t.getFeature();
@@ -312,9 +312,8 @@ public final class FeatureUtils {
 	}
 
 	/**
-	 * Extracts all concrete features from a feature model as a list of strings by calling
-	 * {@link de.ovgu.featureide.fm.core.base.util.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
-	 * <code>model.getFeatures()</code>.
+	 * Extracts all concrete features from a feature model as a list of strings by calling {@link Functional#mapToStringList(Iterable)} on the result of
+	 * {@link #extractConcreteFeatures(IFeatureModel)} using <code>model.getFeatures()</code>.
 	 *
 	 * @since 3.0
 	 * @param model A feature model

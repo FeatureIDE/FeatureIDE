@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
@@ -69,7 +70,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
@@ -131,7 +131,7 @@ public class AnalysesCollection {
 	 */
 	final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = explanationCreatorFactory.getRedundantConstraintExplanationCreator();
 
-	static class StringToFeature implements IFunction<String, IFeature> {
+	static class StringToFeature implements Function<String, IFeature> {
 
 		private final IFeatureModel featureModel;
 
@@ -140,7 +140,7 @@ public class AnalysesCollection {
 		}
 
 		@Override
-		public IFeature invoke(String name) {
+		public IFeature apply(String name) {
 			return featureModel.getFeature(name);
 		}
 	};

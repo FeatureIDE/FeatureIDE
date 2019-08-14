@@ -24,11 +24,6 @@ import java.util.Collection;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.base.impl.AConstraint;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-
 /**
  * The <code>IConstraint</code> interface represents any class which acts in the sense of a <i>Constraint</i> in FeatureIDE. <br> <br> A constraint is a
  * propositional formula on {@link IFeature features} inside a {@link IFeatureModel feature model} which gives further conditions a valid configuration must
@@ -120,15 +115,12 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * Returns the collection of features contained in the underlying formula of this constraint. <br> <br> A constraint contains one or more features. In the
 	 * default implementation, the propositional formula is constructed via nodes of a satisfiability solver (see {@link Node}). This method returns a view on
-	 * these items. <br> <br> <b>Note</b>: The returned collection is intended to be cached. If the cache is empty, {@link IConstraint#setContainedFeatures()}
-	 * is called automatically. The return collection might be out-dated until a new call to {@link IConstraint#setContainedFeatures()} is done manually.
+	 * these items. <br> <br> <b>Note</b>: The returned collection is intended to be cached.
 	 *
 	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>affects</b> the <b>members</b> in this
 	 * object.</li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
 	 *
 	 * @since 3.0
-	 *
-	 * @see #setContainedFeatures()
 	 *
 	 * @return a collections of features which are part of the propositional formula of this constraint
 	 */
@@ -301,20 +293,6 @@ public interface IConstraint extends IFeatureModelElement {
 	String getDisplayName();
 
 	/**
-	 * Sets the collection of <i>false-optional</i> features caused by this constraint to the values stored in <code>falseOptionalFeatures</code>.
-	 *
-	 * <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul> <li>does <b>affect</b> the <b>members</b> in this
-	 * object.</li> <li>does <b>not</b> affect the <b>parameter</b> <code>foFeatures</code>.</li> <li>the parameter <code>foFeatures</code> is expected to be
-	 * <b>non-null</b></li> </ul>
-	 *
-	 * @see #getFalseOptional()
-	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
-	 *
-	 * @param foFeatures iterable of features which are claimed to be falseOptional
-	 */
-	// void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
-
-	/**
 	 * Set the description
 	 *
 	 * @param description
@@ -324,7 +302,7 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * Returns the description
 	 *
-	 * @return
+	 * @return the description
 	 */
 	String getDescription();
 
