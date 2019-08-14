@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.core.signature.filter;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public class FieldFilter implements IFilter<AbstractSignature> {
+public class FieldFilter implements Predicate<AbstractSignature> {
 
 	@Override
 	public boolean test(AbstractSignature signature) {

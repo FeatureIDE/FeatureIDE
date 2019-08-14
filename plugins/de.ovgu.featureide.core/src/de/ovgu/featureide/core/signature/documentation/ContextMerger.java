@@ -20,9 +20,10 @@
  */
 package de.ovgu.featureide.core.signature.documentation;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
 import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Modul-Comment merger for context interfaces.
@@ -33,7 +34,7 @@ public class ContextMerger extends ADocumentationCommentMerger {
 
 	private static final long serialVersionUID = 2811545559986504025L;
 
-	private static final class BlockTagFilter implements IFilter<BlockTag> {
+	private static final class BlockTagFilter implements Predicate<BlockTag> {
 
 		@Override
 		public boolean test(BlockTag blockTag) {

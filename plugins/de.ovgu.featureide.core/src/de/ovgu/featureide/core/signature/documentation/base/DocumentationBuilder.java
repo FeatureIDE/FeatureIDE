@@ -21,12 +21,12 @@
 package de.ovgu.featureide.core.signature.documentation.base;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract documentation builder.
@@ -43,13 +43,13 @@ public class DocumentationBuilder {
 		parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
 	}
 
-	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<?>> filters) {
+	public final void build(ADocumentationCommentMerger merger, Collection<Predicate<BlockTag>> filters) {
 		final FSTModel fstModel = featureProject.getFSTModel();
 		if (fstModel != null) {
 			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();
 			if (projectSignatures != null) {
 				if (parser.addExtraFilters()) {
-					for (final IFilter<?> filter : filters) {
+					for (final Predicate<BlockTag> filter : filters) {
 						merger.addFilter(filter);
 					}
 				}

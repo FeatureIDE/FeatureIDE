@@ -33,11 +33,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import de.ovgu.featureide.fm.core.filter.base.AndFilter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Common interfaces for functional style.
@@ -163,7 +161,7 @@ public abstract class Functional {
 	 */
 	private static class FilterIterator<U, T extends U> implements Iterator<T>, Iterable<T> {
 
-		private final IFilter<U> filter;
+		private final Predicate<U> filter;
 
 		private final Iterator<T> collectionIterator;
 
@@ -181,11 +179,11 @@ public abstract class Functional {
 		 * @author Marcus Pinnecke
 		 * @since 3.0
 		 */
-		public FilterIterator(Iterable<T> it, IFilter<U> filter) {
+		public FilterIterator(Iterable<T> it, Predicate<U> filter) {
 			this(it.iterator(), filter);
 		}
 
-		public FilterIterator(Iterator<T> it, IFilter<U> filter) {
+		public FilterIterator(Iterator<T> it, Predicate<U> filter) {
 			assert (it != null);
 			assert (filter != null);
 
@@ -236,20 +234,11 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
+	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final Predicate<U> predicate) {
 		return predicate == null ? source : new FilterIterator<U, T>(source, predicate);
 	}
 
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final List<IFilter<U>> predicate) {
-		return predicate == null ? source : new FilterIterator<U, T>(source, new AndFilter<U>(predicate));
-	}
-
-	@SafeVarargs
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U>... predicate) {
-		return filter(source, Arrays.asList(predicate));
-	}
-
-	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
+	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final Predicate<U> predicate) {
 		return predicate == null ? new DefaultIterable<>(source) : new FilterIterator<>(source, predicate);
 	}
 
@@ -328,7 +317,7 @@ public abstract class Functional {
 		return collection;
 	}
 
-	public static <T, R> List<R> mapToList(final Iterable<T> source, IFilter<T> filter, Function<T, R> mapFunction) {
+	public static <T, R> List<R> mapToList(final Iterable<T> source, Predicate<T> filter, Function<T, R> mapFunction) {
 		return Functional.toList(Functional.map(Functional.filter(source, filter), mapFunction));
 	}
 
@@ -336,7 +325,7 @@ public abstract class Functional {
 		return Functional.toList(Functional.map(source, mapFunction));
 	}
 
-	public static <T> List<T> filterToList(final Iterable<T> source, IFilter<T> filter) {
+	public static <T> List<T> filterToList(final Iterable<T> source, Predicate<T> filter) {
 		return Functional.toList(Functional.filter(source, filter));
 	}
 

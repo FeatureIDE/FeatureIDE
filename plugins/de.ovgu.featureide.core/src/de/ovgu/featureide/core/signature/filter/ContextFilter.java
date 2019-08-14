@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.signature.filter;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -33,9 +34,8 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public class ContextFilter implements IFilter<AbstractSignature> {
+public class ContextFilter implements Predicate<AbstractSignature> {
 
 	private final ProjectSignatures projectSignatures;
 	private final Node fmNode;

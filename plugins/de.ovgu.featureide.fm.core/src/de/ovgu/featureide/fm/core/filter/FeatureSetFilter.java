@@ -21,19 +21,16 @@
 package de.ovgu.featureide.fm.core.filter;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Filters all features that are contained in a given collection.
  *
  * @author Sebastian Krieter
- *
- * @see Filter
  */
-public class FeatureSetFilter implements IFilter<IFeature> {
+public class FeatureSetFilter implements Predicate<IFeature> {
 
 	private final Collection<IFeature> features;
 
@@ -45,10 +42,5 @@ public class FeatureSetFilter implements IFilter<IFeature> {
 	public boolean test(IFeature object) {
 		return features.contains(object);
 	}
-
-//	@Override
-//	public boolean test(IFeature t) {
-//		return isValid(t);
-//	}
 
 }

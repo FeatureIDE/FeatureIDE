@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.signature.filter;
 
+import java.util.function.Predicate;
+
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -30,9 +32,8 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.base.IConstrainedObject;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public class ConstraintFilter implements IFilter<IConstrainedObject> {
+public class ConstraintFilter implements Predicate<IConstrainedObject> {
 
 	private final SatSolver solver;
 

@@ -21,10 +21,10 @@
 package de.ovgu.featureide.ui.visualization;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -38,9 +38,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
-import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
@@ -87,9 +84,10 @@ public class ConfigAnalysisUtils {
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
 		final FeatureModelFormula snapshot = featureProject.getFeatureModelManager().getPersistentFormula();
-		final IFilter<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures(null));
-		final IFilter<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
-		final IFilter<IFeature> noCoreNoHiddenFilter = new InverseFilter<>(new OrFilter<>(Arrays.asList(hiddenFeatureFilter, coreFeatureFilter)));
+		final Predicate<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures(null));
+		final Predicate<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
+
+		final Predicate<IFeature> noCoreNoHiddenFilter = hiddenFeatureFilter.or(coreFeatureFilter).negate();
 		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, FeatureUtils.GET_FEATURE_NAME);
 	}
 }

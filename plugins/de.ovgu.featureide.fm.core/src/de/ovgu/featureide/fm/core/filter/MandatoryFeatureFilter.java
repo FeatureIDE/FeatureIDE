@@ -20,17 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Checks whether a feature is mandatory in an AND group.
  *
  * @author Sebastian Krieter
  */
-public class MandatoryFeatureFilter implements IFilter<IFeature> {
+public class MandatoryFeatureFilter implements Predicate<IFeature> {
 
 	@Override
 	public boolean test(IFeature object) {

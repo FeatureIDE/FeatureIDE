@@ -26,6 +26,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
 import org.prop4j.Node;
@@ -41,7 +42,6 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.munge.MungePreprocessor;
 import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
@@ -162,7 +162,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 				model.setProjectSignatures(signatures);
 			}
 			sigIt = signatures.iterator();
-			sigIt.addFilter(new IFilter<AbstractSignature>() {
+			sigIt.addFilter(new Predicate<AbstractSignature>() {
 
 				@Override
 				public boolean test(AbstractSignature object) {

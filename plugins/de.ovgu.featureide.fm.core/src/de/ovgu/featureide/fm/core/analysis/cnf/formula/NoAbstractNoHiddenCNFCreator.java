@@ -20,12 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
-import java.util.Arrays;
-
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 
 /**
  * Creates a {@link CNF} without abstract and hidden features.
@@ -35,7 +32,7 @@ import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 public class NoAbstractNoHiddenCNFCreator extends SlicedCNFCreator {
 
 	public NoAbstractNoHiddenCNFCreator() {
-		super(new OrFilter<>(Arrays.asList(new HiddenFeatureFilter(), new AbstractFeatureFilter())));
+		super(new HiddenFeatureFilter().or(new AbstractFeatureFilter()));
 	}
 
 }

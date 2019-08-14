@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -58,7 +59,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -104,8 +104,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			return false;
 		}
 
-		final Collection<IFilter<?>> commentFilters = new LinkedList<>();
-		final Collection<IFilter<?>> signatureFilters = new LinkedList<>();
+		final Collection<Predicate<BlockTag>> commentFilters = new LinkedList<>();
+		final Collection<Predicate<?>> signatureFilters = new LinkedList<>();
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (merger instanceof VariantMerger) {
@@ -144,7 +144,6 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 						: new Literal(feature.getName(), feature.getSelection() == Selection.SELECTED);
 				}
 				signatureFilters.add(new ConstraintFilter(nodes));
-				commentFilters.add(new ConstraintFilter(nodes));
 
 				merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 			}
@@ -153,7 +152,6 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 			nodes[1] = new Literal(featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
-			commentFilters.add(new ConstraintFilter(nodes));
 
 			merger.setValidFeatureIDs(featureIDs.length, featureIDs);
 		} else if (merger instanceof FeatureModuleMerger) {
@@ -165,9 +163,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 				nodes[1] = new Literal(featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
-				commentFilters.add(new ConstraintFilter(nodes));
 
-				commentFilters.add(new IFilter<BlockTag>() {
+				commentFilters.add(new Predicate<BlockTag>() {
 
 					@Override
 					public boolean test(BlockTag object) {
@@ -182,7 +179,6 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 				});
 			} else {
 				signatureFilters.add(new FeatureFilter(index));
-				commentFilters.add(new FeatureFilter(index));
 			}
 		}
 

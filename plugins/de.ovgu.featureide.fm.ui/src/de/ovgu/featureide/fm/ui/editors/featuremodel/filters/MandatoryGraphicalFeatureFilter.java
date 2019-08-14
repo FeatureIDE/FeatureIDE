@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.filters;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
@@ -29,7 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  *
  * @author Christopher Sontag
  */
-public class MandatoryGraphicalFeatureFilter implements IFilter<IGraphicalFeature> {
+public class MandatoryGraphicalFeatureFilter implements Predicate<IGraphicalFeature> {
 
 	@Override
 	public boolean test(IGraphicalFeature object) {

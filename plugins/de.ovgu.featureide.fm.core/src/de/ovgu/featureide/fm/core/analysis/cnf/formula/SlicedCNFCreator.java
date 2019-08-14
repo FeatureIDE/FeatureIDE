@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
@@ -35,9 +36,9 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  */
 public abstract class SlicedCNFCreator extends ACreator<CNF> {
 
-	private final IFilter<IFeature> filter;
+	private final Predicate<IFeature> filter;
 
-	public SlicedCNFCreator(IFilter<IFeature> filter) {
+	public SlicedCNFCreator(Predicate<IFeature> filter) {
 		this.filter = filter;
 	}
 

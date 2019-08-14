@@ -20,15 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Checks whether a feature is hidden.
  *
  * @author Sebastian Krieter
  */
-public class HiddenFeatureFilter implements IFilter<IFeature> {
+public class HiddenFeatureFilter implements Predicate<IFeature> {
 
 	@Override
 	public boolean test(IFeature object) {

@@ -26,12 +26,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import java.util.function.Predicate;
 
 /**
  * Abstract merger for modul-comment.
@@ -45,7 +42,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int RULE_MERGE = 0, RULE_OVERRIDE = 1, RULE_DISCARD = 2;
 
-	private final List<IFilter<?>> filterList = new LinkedList<>();
+	private Predicate<BlockTag> filter = null;
 
 	protected int[] featureIDRanks = null;
 
@@ -64,7 +61,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	public String merge(List<BlockTag> generalTags, List<BlockTag> featureTags) {
 		// Filter.filter(generalTags, filterList);
-		Filter.filter(featureTags, filterList);
+		featureTags.removeIf(filter.negate());
 
 		sortFeatureList(featureTags);
 
@@ -208,8 +205,8 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		return featureIDRanks[tag1.getFeatureID()] - featureIDRanks[tag2.getFeatureID()];
 	}
 
-	public void addFilter(IFilter<?> filter) {
-		filterList.add(filter);
+	public void addFilter(Predicate<BlockTag> filter) {
+		this.filter = this.filter == null ? filter : this.filter.and(filter);
 	}
 
 }

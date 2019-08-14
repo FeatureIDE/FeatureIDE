@@ -20,18 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 
 /**
  * Checks whether a feature is optional.
  *
  * @author Sebastian Krieter
  */
-public class OptionalFeatureFilter implements IFilter<IFeature> {
+public class OptionalFeatureFilter implements Predicate<IFeature> {
 
-	private final IFilter<IFeature> optionalFeatureFilter = new InverseFilter<>(new MandatoryFeatureFilter());
+	private final Predicate<IFeature> optionalFeatureFilter = new MandatoryFeatureFilter().negate();
 
 	@Override
 	public boolean test(IFeature object) {

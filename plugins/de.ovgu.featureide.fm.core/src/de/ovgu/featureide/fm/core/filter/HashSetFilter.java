@@ -22,9 +22,7 @@ package de.ovgu.featureide.fm.core.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
-
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import java.util.function.Predicate;
 
 /**
  * Filters all features that are contained in a given collection.
@@ -33,7 +31,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  *
  * @see Filter
  */
-public class HashSetFilter<T> extends HashSet<T> implements IFilter<T> {
+public class HashSetFilter<T> extends HashSet<T> implements Predicate<T> {
 
 	private static final long serialVersionUID = -2813705402751330237L;
 

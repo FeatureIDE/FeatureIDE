@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.core.mpl.signature.filter;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public class ViewTagFilter implements IFilter<AbstractSignature> {
+public class ViewTagFilter implements Predicate<AbstractSignature> {
 	// private final ViewTag viewTag;
 
 	public ViewTagFilter(ViewTag viewTag) {
