@@ -33,7 +33,7 @@ public class LibraryManager {
 	/**
 	 * Deregister and uninstall all previously registered libraries.
 	 */
-	public static void deregisterLibraries() {
+	public static synchronized void deregisterLibraries() {
 		for (final ILibrary library : libraries) {
 			if (library != null) {
 				library.uninstall();
@@ -50,9 +50,17 @@ public class LibraryManager {
 	 * @see #deregisterLibraries()
 	 * @see #deregisterLibrary(ILibrary)
 	 */
-	public static void registerLibrary(@Nonnull ILibrary library) {
-		libraries.add(library);
-		library.install();
+	public static synchronized void registerLibrary(@Nonnull ILibrary library) {
+		if (!libraries.contains(library)) {
+			library.install();
+			for (final ListIterator<ILibrary> iterator = libraries.listIterator(); iterator.hasNext();) {
+				if (iterator.next() == null) {
+					iterator.set(library);
+					return;
+				}
+			}
+			libraries.add(library);
+		}
 	}
 
 	/**
@@ -63,10 +71,10 @@ public class LibraryManager {
 	 *
 	 * @see #deregisterLibraries()
 	 */
-	public static void deregisterLibrary(@Nonnull ILibrary library) {
+	public static synchronized void deregisterLibrary(@Nonnull ILibrary library) {
 		for (final ListIterator<ILibrary> iterator = libraries.listIterator(); iterator.hasNext();) {
 			final ILibrary curLibrary = iterator.next();
-			if ((curLibrary != null) && curLibrary.getClass().equals(library.getClass())) {
+			if ((curLibrary != null) && (curLibrary == library)) {
 				curLibrary.uninstall();
 				iterator.set(null);
 				break;

@@ -49,12 +49,12 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		LibraryManager.registerLibrary(new FMUIEclipseLibrary());
+		LibraryManager.registerLibrary(FMUIEclipseLibrary.getInstance());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		LibraryManager.deregisterLibrary(new FMUIEclipseLibrary());
+		LibraryManager.deregisterLibrary(FMUIEclipseLibrary.getInstance());
 		plugin = null;
 		super.stop(context);
 		final ExternalChangeListener listener = ExternalChangeListener.listener;

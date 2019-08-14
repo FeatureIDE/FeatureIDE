@@ -36,30 +36,31 @@ import de.ovgu.featureide.fm.core.init.LibraryManager;
 public class TFeatureAttributeFactory {
 
 	private static final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
-		
+
 	/**
 	 * Tests the creation of the different types of attributes.
+	 * 
 	 * @result The different attributes should contain the assigned information and should be of the correct type.
 	 */
 	@Test
 	public void test_AttributeInit() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 		ExtendedFeatureModel model = Commons.getBaseModel();
-		ExtendedFeature root = (ExtendedFeature)model.getFeature("Root");
+		ExtendedFeature root = (ExtendedFeature) model.getFeature("Root");
 
-		//Create all types of attributes with values
+		// Create all types of attributes with values
 		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(root, "stringTest", "EMPTY", "Ein Test", false, false);
 		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(root, "booleanTest", "State", true, true, false);
 		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(root, "longTest", "Euro", Long.MAX_VALUE, false, true);
 		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(root, "doubleTest", "Dollar", Double.MAX_VALUE, true, true);
 
-		//Create all types of attributes with null values
+		// Create all types of attributes with null values
 		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(root, "sNull", "", null, true, true);
 		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(root, "bNull", "", null, false, true);
 		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(root, "lNull", "", null, true, false);
 		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(root, "dNull", "", null, false, false);
-		
+
 		assertTrue(stringAttribute.getName().equals("stringTest"));
 		assertTrue(stringAttribute.getUnit().equals("EMPTY"));
 		assertTrue(stringAttribute.getValue().equals("Ein Test"));
@@ -89,19 +90,19 @@ public class TFeatureAttributeFactory {
 		assertTrue(stringAttributeNull.getUnit().equals(""));
 		assertTrue(stringAttributeNull.isRecursive());
 		assertTrue(stringAttributeNull.isConfigurable());
-		
+
 		assertTrue(booleanAttributeNull.getName().equals("bNull"));
 		assertTrue(booleanAttributeNull.getValue() == null);
 		assertTrue(booleanAttributeNull.getUnit().equals(""));
 		assertTrue(!booleanAttributeNull.isRecursive());
 		assertTrue(booleanAttributeNull.isConfigurable());
-		
+
 		assertTrue(longAttributeNull.getName().equals("lNull"));
 		assertTrue(longAttributeNull.getValue() == null);
 		assertTrue(longAttributeNull.getUnit().equals(""));
 		assertTrue(longAttributeNull.isRecursive());
 		assertTrue(!longAttributeNull.isConfigurable());
-		
+
 		assertTrue(doubleAttributeNull.getName().equals("dNull"));
 		assertTrue(doubleAttributeNull.getValue() == null);
 		assertTrue(doubleAttributeNull.getUnit().equals(""));

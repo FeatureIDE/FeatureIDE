@@ -35,6 +35,17 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormatMana
  */
 public class FMUIEclipseLibrary implements ILibrary {
 
+	private static FMUIEclipseLibrary instance;
+
+	public static FMUIEclipseLibrary getInstance() {
+		if (instance == null) {
+			instance = new FMUIEclipseLibrary();
+		}
+		return instance;
+	}
+
+	private FMUIEclipseLibrary() {}
+
 	private EclipseExternalChangeListener eclipseExternalChangeListener;
 
 	@Override

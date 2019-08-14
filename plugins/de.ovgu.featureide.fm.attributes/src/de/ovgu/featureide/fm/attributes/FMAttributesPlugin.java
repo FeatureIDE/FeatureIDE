@@ -44,11 +44,11 @@ public class FMAttributesPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		LibraryManager.registerLibrary(new FMAttributesEclipseLibrary());
+		LibraryManager.registerLibrary(FMAttributesEclipseLibrary.getInstance());
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		LibraryManager.deregisterLibrary(new FMAttributesEclipseLibrary());
+		LibraryManager.deregisterLibrary(FMAttributesEclipseLibrary.getInstance());
 		plugin = null;
 		super.stop(context);
 	}

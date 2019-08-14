@@ -156,7 +156,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		super.start(context);
 		plugin = this;
 
-		LibraryManager.registerLibrary(new CoreEclipseLibrary());
+		LibraryManager.registerLibrary(CoreEclipseLibrary.getInstance());
 
 		featureProjectMap = new HashMap<>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
@@ -203,7 +203,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		LibraryManager.deregisterLibrary(new CoreEclipseLibrary());
+		LibraryManager.deregisterLibrary(CoreEclipseLibrary.getInstance());
 
 		for (final IFeatureProject data : featureProjectMap.values()) {
 			data.dispose();

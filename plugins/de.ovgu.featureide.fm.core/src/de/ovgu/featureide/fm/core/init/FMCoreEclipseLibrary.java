@@ -49,6 +49,17 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  */
 public class FMCoreEclipseLibrary implements ILibrary {
 
+	private static FMCoreEclipseLibrary instance;
+
+	public static FMCoreEclipseLibrary getInstance() {
+		if (instance == null) {
+			instance = new FMCoreEclipseLibrary();
+		}
+		return instance;
+	}
+
+	private FMCoreEclipseLibrary() {}
+
 	@Override
 	public void install() {
 		FileSystem.INSTANCE = new EclipseFileSystem();

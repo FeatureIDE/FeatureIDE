@@ -53,7 +53,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		LibraryManager.registerLibrary(new FMCoreEclipseLibrary());
+		LibraryManager.registerLibrary(FMCoreEclipseLibrary.getInstance());
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	 * Creates a {@link LongRunningMethod} for every project with the given arguments.
 	 *
 	 * @param projects the list of projects
-	 * @param arguments the arguments for the job
+	 * @param jobName the job's name
 	 * @param autostart if {@code true} the jobs is started automatically.
 	 * @return the created job or a {@link JobSequence} if more than one project is given. Returns {@code null} if {@code projects} is empty.
 	 */

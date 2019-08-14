@@ -27,9 +27,9 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.CoreFactoryWorkspaceLoader;
 import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.configuration.EquationFormat;
 import de.ovgu.featureide.fm.core.configuration.ExpressionFormat;
@@ -52,7 +52,18 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-public class FMCoreLibrary implements ILibrary {
+public final class FMCoreLibrary implements ILibrary {
+
+	private static FMCoreLibrary instance;
+
+	public static FMCoreLibrary getInstance() {
+		if (instance == null) {
+			instance = new FMCoreLibrary();
+		}
+		return instance;
+	}
+
+	private FMCoreLibrary() {}
 
 	@Override
 	public void install() {

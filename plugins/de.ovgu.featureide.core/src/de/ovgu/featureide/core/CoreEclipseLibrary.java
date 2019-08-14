@@ -39,6 +39,17 @@ import de.ovgu.featureide.fm.core.init.ILibrary;
  */
 public class CoreEclipseLibrary implements ILibrary {
 
+	private static CoreEclipseLibrary instance;
+
+	public static CoreEclipseLibrary getInstance() {
+		if (instance == null) {
+			instance = new CoreEclipseLibrary();
+		}
+		return instance;
+	}
+
+	private CoreEclipseLibrary() {}
+
 	private IResourceChangeListener listener;
 
 	@Override

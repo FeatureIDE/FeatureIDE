@@ -43,8 +43,7 @@ import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 
 /**
- * Test suit containing multiple tests to ensure the correct operation of
- * extended feature models.
+ * Test suit containing multiple tests to ensure the correct operation of extended feature models.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -56,8 +55,8 @@ public class TExtendedFeatureModelSaveAndLoading {
 
 	@Before
 	public void prepareWorkbench() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 	}
 
 	@Test
@@ -85,8 +84,8 @@ public class TExtendedFeatureModelSaveAndLoading {
 
 	@Test
 	public void test_CreationAndSaving() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 
 		// At first create an empty extended feature model
 		IFeatureModel model = factory.create();
@@ -119,24 +118,16 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(eBaseFeature.getAttributes().size() == 0);
 
 		// Create all types of attributes with values
-		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(eRootFeature, "stringTest", "EMPTY",
-				"Ein Test", false, false);
-		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(eRootFeature, "booleanTest",
-				"State", true, false, false);
-		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(eRootFeature, "longTest", "Euro",
-				Long.MAX_VALUE, false, false);
-		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(eRootFeature, "doubleTest", "Dollar",
-				Double.MAX_VALUE, false, false);
+		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(eRootFeature, "stringTest", "EMPTY", "Ein Test", false, false);
+		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(eRootFeature, "booleanTest", "State", true, false, false);
+		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(eRootFeature, "longTest", "Euro", Long.MAX_VALUE, false, false);
+		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(eRootFeature, "doubleTest", "Dollar", Double.MAX_VALUE, false, false);
 
 		// Create all types of attributes with null values
-		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(eRootFeature, "sNull", "", null,
-				false, false);
-		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(eRootFeature, "bNull", "",
-				null, false, false);
-		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(eRootFeature, "lNull", "", null,
-				false, false);
-		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(eRootFeature, "dNull", "", null,
-				false, false);
+		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(eRootFeature, "sNull", "", null, false, false);
+		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(eRootFeature, "bNull", "", null, false, false);
+		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(eRootFeature, "lNull", "", null, false, false);
+		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(eRootFeature, "dNull", "", null, false, false);
 
 		// Add the attributes to the feature
 		eRootFeature.addAttribute(stringAttribute);
@@ -161,8 +152,7 @@ public class TExtendedFeatureModelSaveAndLoading {
 
 		// Get the extended subclasses
 		ExtendedFeature eReadRootFeature = (ExtendedFeature) readModel.getStructure().getRoot().getFeature();
-		ExtendedFeature eReadBaseFeature = (ExtendedFeature) readModel.getStructure().getRoot().getChildren().get(0)
-				.getFeature();
+		ExtendedFeature eReadBaseFeature = (ExtendedFeature) readModel.getStructure().getRoot().getChildren().get(0).getFeature();
 
 		assertTrue(eReadRootFeature.getAttributes().size() == 8);
 		assertTrue(eReadBaseFeature.getAttributes().size() == 0);

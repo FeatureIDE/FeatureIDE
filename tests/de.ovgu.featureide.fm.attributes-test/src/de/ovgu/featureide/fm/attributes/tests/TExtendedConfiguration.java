@@ -47,8 +47,8 @@ public class TExtendedConfiguration {
 
 	@Before
 	public void prepareWorkbench() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 	}
 
 	@Test
@@ -138,8 +138,7 @@ public class TExtendedConfiguration {
 	}
 
 	/**
-	 * The tests computes the maximum of a long attribute. The result is still
-	 * returned in java as double.
+	 * The tests computes the maximum of a long attribute. The result is still returned in java as double.
 	 */
 	@Test
 	public void testMaximumEstimationComputationLong() {
@@ -173,8 +172,7 @@ public class TExtendedConfiguration {
 	}
 
 	/**
-	 * The tests computes the minimum of a long attribute. The result is still
-	 * returned in java as double.
+	 * The tests computes the minimum of a long attribute. The result is still returned in java as double.
 	 */
 	@Test
 	public void testMinimumEstimationComputationLong() {

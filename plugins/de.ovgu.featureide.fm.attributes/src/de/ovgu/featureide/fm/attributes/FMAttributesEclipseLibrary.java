@@ -37,6 +37,17 @@ import de.ovgu.featureide.fm.core.init.ILibrary;
  */
 public class FMAttributesEclipseLibrary implements ILibrary {
 
+	private static FMAttributesEclipseLibrary instance;
+
+	public static FMAttributesEclipseLibrary getInstance() {
+		if (instance == null) {
+			instance = new FMAttributesEclipseLibrary();
+		}
+		return instance;
+	}
+
+	private FMAttributesEclipseLibrary() {}
+
 	@Override
 	public void install() {
 		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());

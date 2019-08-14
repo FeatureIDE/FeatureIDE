@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 public class Commons {
 
 	static {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
 	}
 
 	public static File getRemoteOrLocalFolder(String path) {

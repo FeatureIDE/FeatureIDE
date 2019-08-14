@@ -51,8 +51,8 @@ public class TExtendedFeatureTests {
 
 	@Before
 	public void prepareWorkbench() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 	}
 
 	/**
@@ -85,8 +85,7 @@ public class TExtendedFeatureTests {
 		// Get a feature
 		ExtendedFeature breadFeature = (ExtendedFeature) model.getFeature("Bread");
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value",
-				false, false);
+		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
 		// Add the attribute to the feature
 		assertTrue(breadFeature.getAttributes().size() == 3);
 		breadFeature.addAttribute(attribute);
@@ -104,8 +103,7 @@ public class TExtendedFeatureTests {
 		// Get a feature
 		ExtendedFeature breadFeature = (ExtendedFeature) model.getFeature("Bread");
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value",
-				false, false);
+		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
 		// Add the attribute to the feature
 		assertTrue(breadFeature.getAttributes().size() == 3);
 		breadFeature.addAttribute(attribute);
@@ -117,8 +115,7 @@ public class TExtendedFeatureTests {
 	}
 
 	/**
-	 * Checks
-	 * {@link ExtendedFeature#clone(IFeatureModel, de.ovgu.featureide.fm.core.base.IFeatureStructure)}
+	 * Checks {@link ExtendedFeature#clone(IFeatureModel, de.ovgu.featureide.fm.core.base.IFeatureStructure)}
 	 */
 	@Test
 	public void test_clone() {
@@ -127,8 +124,7 @@ public class TExtendedFeatureTests {
 		ExtendedFeature testFeature = factory.createFeature(model, "Test");
 
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(testFeature, "test", "Test", "Test Value",
-				true, true);
+		IFeatureAttribute attribute = attributeFactory.createStringAttribute(testFeature, "test", "Test", "Test Value", true, true);
 		// Add the attribute to the feature
 		testFeature.addAttribute(attribute);
 

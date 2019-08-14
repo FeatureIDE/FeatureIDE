@@ -45,13 +45,12 @@ public class TExtendedFeatureModel {
 
 	@Before
 	public void prepareWorkbench() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 	}
 
 	/**
-	 * Tests the method
-	 * {@link ExtendedFeatureModel#createDefaultValues(CharSequence)}
+	 * Tests the method {@link ExtendedFeatureModel#createDefaultValues(CharSequence)}
 	 */
 	@Test
 	public void test_createDefaultValues() {

@@ -43,8 +43,8 @@ public class TExtendedOutline {
 
 	@Before
 	public void prepareWorkbench() {
-		LibraryManager.registerLibrary(new FMCoreLibrary());
-		LibraryManager.registerLibrary(new FMAttributesLibrary());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 	}
 
 	@Test
