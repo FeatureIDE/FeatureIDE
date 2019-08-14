@@ -159,6 +159,7 @@ class TWiseConfiguration extends LiteralSet {
 			traverser = new Traverser(util.getMig());
 			traverser.setModel(literals);
 			visitor = new DefaultVisitor() {
+
 				@Override
 				public VisitResult visitStrong(int curLiteral) {
 					addLiteral(curLiteral);
@@ -330,22 +331,24 @@ class TWiseConfiguration extends LiteralSet {
 	}
 
 	public void updateSolverSolutions() {
-		solverSolutionIndex.clear();
-		final int[] array = solutionLiterals.toArray();
-		final LiteralSet[] solverSolutions = util.getSolverSolutions();
-		solutionLoop: for (int i = 0; i < solverSolutions.length; i++) {
-			final LiteralSet solverSolution = solverSolutions[i];
-			if (solverSolution == null) {
-				break;
-			}
-			final int[] solverSolutionLiterals = solverSolution.getLiterals();
-			for (int j = 0, length = solutionLiterals.size(); j < length; j++) {
-				final int k = Math.abs(array[j]) - 1;
-				if (solverSolutionLiterals[k] == -literals[k]) {
-					continue solutionLoop;
+		if (util.hasSolver()) {
+			solverSolutionIndex.clear();
+			final int[] array = solutionLiterals.toArray();
+			final LiteralSet[] solverSolutions = util.getSolverSolutions();
+			solutionLoop: for (int i = 0; i < solverSolutions.length; i++) {
+				final LiteralSet solverSolution = solverSolutions[i];
+				if (solverSolution == null) {
+					break;
 				}
+				final int[] solverSolutionLiterals = solverSolution.getLiterals();
+				for (int j = 0, length = solutionLiterals.size(); j < length; j++) {
+					final int k = Math.abs(array[j]) - 1;
+					if (solverSolutionLiterals[k] == -literals[k]) {
+						continue solutionLoop;
+					}
+				}
+				solverSolutionIndex.push(i);
 			}
-			solverSolutionIndex.push(i);
 		}
 	}
 

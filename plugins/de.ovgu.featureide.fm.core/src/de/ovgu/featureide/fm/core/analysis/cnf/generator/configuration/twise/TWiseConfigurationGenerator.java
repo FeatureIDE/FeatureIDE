@@ -170,8 +170,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		phaseCount = 0;
 
-		buildCombinations();
-
 		for (int i = 0; i < 4; i++) {
 			// TODO Variation Point: Removing low-contributing Configurations
 			trimConfigurations();
@@ -184,19 +182,22 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void trimConfigurations() {
-		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
-		statistic.fastCalc();
+		if (curResult != null) {
+			final TWiseConfigurationStatistic statistic =
+				new TWiseConfigurationStatistic(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
+			statistic.fastCalc();
 
-		final double[] normConfigValues = statistic.getConfigValues2();
-		double mean = 0;
-		for (final double d : normConfigValues) {
-			mean += d / normConfigValues.length;
+			final double[] normConfigValues = statistic.getConfigValues2();
+			double mean = 0;
+			for (final double d : normConfigValues) {
+				mean += d / normConfigValues.length;
+			}
+			final double reference = mean;
+
+			int index = 0;
+			index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
+			index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
 		}
-		final double reference = mean;
-
-		int index = 0;
-		index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
-		index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
 	}
 
 	private int removeSolutions(double[] values, final double reference, int index, List<TWiseConfiguration> solutionList) {
