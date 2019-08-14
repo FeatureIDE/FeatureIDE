@@ -45,6 +45,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	private boolean timeoutOccured = false;
 	private boolean throwTimeoutException = true;
+	private int timeout = 1000;
 
 	private T result = null;
 
@@ -69,6 +70,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		if (solver == null) {
 			return null;
 		}
+		solver.setTimeout(timeout);
 		if (assumptions != null) {
 			solver.assignmentPushAll(assumptions.getLiterals());
 		}
@@ -128,6 +130,14 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	public void setRandom(Random random) {
 		this.random = random;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 
 }
