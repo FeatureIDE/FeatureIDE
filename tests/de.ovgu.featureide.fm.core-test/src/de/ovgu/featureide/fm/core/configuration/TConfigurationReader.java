@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * Test class for the {@link ConfigurationReader}.
+ * Test class for the reading configurations.
  *
  * @author Stefan Krueger
  * @author Florian Proksch

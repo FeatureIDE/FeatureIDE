@@ -24,6 +24,10 @@ import java.util.Collection;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.base.impl.AConstraint;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+
 /**
  * The <code>IConstraint</code> interface represents any class which acts in the sense of a <i>Constraint</i> in FeatureIDE. <br> <br> A constraint is a
  * propositional formula on {@link IFeature features} inside a {@link IFeatureModel feature model} which gives further conditions a valid configuration must
@@ -34,7 +38,7 @@ import org.prop4j.Node;
  * <br> For ease of use, FeatureIDE provides an adapter for this interface, {@link AConstraint} which can be used as a starting point for custom
  * implementations. In a broader sense, constraints in FeatureIDE also satisfy the {@link IFeatureModelElement} element which deals with identification of
  * constraints and models. <br> <br> Instances of <code>IConstraint</code> are intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br>
- * <b>Example</b> <br> The following example shows the instantiation of a <code>IConstraint</code> instance using FeatureIDE's default {@link FeatureModel} and
+ * <b>Example</b> <br> The following example shows the instantiation of a <code>IConstraint</code> instance using FeatureIDE's default {@link IFeatureModel} and
  * {@link Constraint} implementation over the standard factories. The constraint created give the condition, that a feature <code>A</code> implies another
  * feature <code>B</code>. <code> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); IConstraint c =
  * FMFactoryManager.getFactory().createConstraint(model, new Implies(new Literal("A"), new Literal("B"))); </code>

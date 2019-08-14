@@ -196,7 +196,7 @@ public class DrawImageForProjectExplorer {
 	}
 
 	/**
-	 * @param colors: gets a list of Integer to create an Image with the color in the list
+	 * @param colors gets a list of Integer to create an Image with the color in the list
 	 * @return the image for the featureHouseExplorer with the folderIcon as default and only one color
 	 */
 	public static Image getFOPModuleImage(List<Integer> colors) {

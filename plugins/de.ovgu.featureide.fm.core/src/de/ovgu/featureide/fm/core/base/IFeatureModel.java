@@ -29,6 +29,9 @@ import java.util.Map;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. <br> <br> A feature model contains of a
@@ -57,11 +60,11 @@ import de.ovgu.featureide.fm.core.base.event.IEventManager;
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Caching notes</b>: A feature model implementation using the
  * <code>IFeatureModel</code> interface has to provide a map of feature names to the corresponding feature objects, the <i>feature table</i>. This data
  * structure is used in the {@link RenamingsManager} for instance. If the implementation utilizes this data structure for internal use, modifications to this
- * data structure must be protected against concurrent accesses. The default implementations {@link FeatureModel} uses a <code>ConcurrentHashMap</code> for this
- * purpose. <br> <br> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned
- * handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on thread safeness</b>: At
- * least the management of <code>IFeature</code> and <code>IFeatureModel</code> identifiers (e.g., getting the next free id) have to be thread safe. The
- * reference default implementation for feature models is <code> private static long NEXT_ID = 0;
+ * data structure must be protected against concurrent accesses. The default implementations {@link IFeatureModel} uses a <code>ConcurrentHashMap</code> for
+ * this purpose. <br> <br> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the
+ * old-fashioned handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on thread
+ * safeness</b>: At least the management of <code>IFeature</code> and <code>IFeatureModel</code> identifiers (e.g., getting the next free id) have to be thread
+ * safe. The reference default implementation for feature models is <code> private static long NEXT_ID = 0;
  *
  * protected static final synchronized long getNextId() { return NEXT_ID++; } </code> <br> <br> <b>Compatibility Notes</b>: To provide compatibility to earlier
  * versions of FeatureIDE, the <i>out-dated</i> class {@link IFeatureModel FeatureModel} is now a wrapper to an <code>IFeatureModel</code> instance (but

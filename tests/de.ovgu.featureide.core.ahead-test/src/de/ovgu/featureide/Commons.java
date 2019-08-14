@@ -84,7 +84,7 @@ public class Commons {
 	 * available, from <code>localClassPath</code>. The search for the file excludes files that have the extension specified with <b>filter</b>.
 	 * <code>featureModelXmlFilename</code>.
 	 *
-	 * @see {@link #loadFeatureModelFromFile(String, String, String) load model with extension equal to featureModelXmlFilename}
+	 * @see {@link #loadFeatureModelFromFile(String, File) load model with extension equal to featureModelXmlFilename}
 	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
 	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
 	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for

@@ -25,6 +25,8 @@ import java.util.function.Consumer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+
 /**
  * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  *

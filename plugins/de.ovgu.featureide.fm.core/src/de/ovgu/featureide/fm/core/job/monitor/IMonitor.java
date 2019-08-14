@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.job.monitor;
 
 import java.util.function.Consumer;
 
+import de.ovgu.featureide.fm.core.job.IJob;
+
 /**
  * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  *
