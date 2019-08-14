@@ -56,14 +56,14 @@ public class CNF implements Serializable {
 	}
 
 	/**
-	 * Copy constructor. <br/> Also copies clause list (no deep copy).
+	 * Copy constructor. <br> Also copies clause list (no deep copy).
 	 */
 	public CNF(CNF oldSatInstance) {
 		this(oldSatInstance, true);
 	}
 
 	/**
-	 * Copy constructor. <br/> Can either copy or neglect old clauses (no deep copy).
+	 * Copy constructor. <br> Can either copy or neglect old clauses (no deep copy).
 	 */
 	public CNF(CNF oldSatInstance, boolean copyClauses) {
 		variables = oldSatInstance.variables.clone();

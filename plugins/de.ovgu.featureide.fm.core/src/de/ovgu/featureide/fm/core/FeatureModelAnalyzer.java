@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 
-import org.sat4j.specs.TimeoutException;
-
 import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
 import de.ovgu.featureide.fm.core.AnalysesCollection.StringToFeature;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
@@ -165,7 +163,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Calculations for indeterminate hidden features
 	 *
-	 * @param changedAttributes
+	 * @param monitor a monitor for tracking the progress
+	 * @return a list of indetermined hidden features
 	 */
 	public List<IFeature> getIndeterminedHiddenFeatures(IMonitor<LiteralSet> monitor) {
 		final LiteralSet result = analysesCollection.determinedAnalysis.getResult(monitor);
@@ -297,8 +296,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	/**
-	 * @param monitor
-	 * @return
+	 * Analyzes the feature model.
+	 *
+	 * @param monitor monitor
 	 * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
 	 */
 	/*
@@ -599,7 +599,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param a set of features that form a conjunction
 	 * @param b set of features that form a disjunction
 	 * @return whether the conjunction of A always implies the disjunction of B in the current feature model
-	 * @throws TimeoutException
 	 *
 	 * @deprecated Use ConfigurationPropagator instead.
 	 */

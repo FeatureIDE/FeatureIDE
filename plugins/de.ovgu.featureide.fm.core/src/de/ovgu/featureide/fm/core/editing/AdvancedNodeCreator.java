@@ -391,7 +391,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	/**
-	 * {@link #includeBooleanValues}
+	 * Returns whether the boolean primitives true and false should be included in the formula.
 	 *
 	 * @return the currently set value
 	 */
@@ -413,7 +413,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	/**
-	 * {@link #includeBooleanValues}
+	 * Sets whether the boolean primitives true and false should be included in the formula.
 	 *
 	 * @param includeBooleanValues the value to set
 	 */

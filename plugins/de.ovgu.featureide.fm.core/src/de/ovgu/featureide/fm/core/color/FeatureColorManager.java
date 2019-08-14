@@ -147,7 +147,7 @@ public class FeatureColorManager implements IEventListener {
 	 *
 	 * @param featureModel the feature model
 	 * @param schmeName name of the scheme to check
-	 * @return
+	 * @return true if active
 	 */
 	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
 		final IProject project = getProject(featureModel);
@@ -156,7 +156,10 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	/**
-	 * Returns the current color scheme.
+	 * Returns the active color scheme for a feature model.
+	 *
+	 * @param feature feature of the feature model
+	 * @return the active color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeature feature) {
 		if (feature == null) {
@@ -166,7 +169,10 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	/**
-	 * Returns the current color scheme.
+	 * Returns the active color scheme for a feature model.
+	 *
+	 * @param featureModel feature model
+	 * @return the active color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
 		IProject project;

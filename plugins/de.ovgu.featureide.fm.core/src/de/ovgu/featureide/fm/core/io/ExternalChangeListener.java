@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
- * Is executed by a {@link FileManager file manager} when new data was read from a file.
+ * Is executed by a {@link IFileManager file manager} when new data was read from a file.
  *
  * @author Sebastian Krieter
  */

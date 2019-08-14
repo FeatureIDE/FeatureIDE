@@ -31,6 +31,8 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 /**
  * Returns custom factories to create instances of T.
  *
+ * @param <T> class for the element create by a factory
+ *
  * @author Sebastian Krieter
  */
 public abstract class FactoryManager<T> extends ExtensionManager<IFactory<T>> {
@@ -80,8 +82,7 @@ public abstract class FactoryManager<T> extends ExtensionManager<IFactory<T>> {
 	 * Returns a specific factory associated with the string <b>id</b>.
 	 *
 	 * @param id the (unique) identifier for an instance of {@link IFactory} to be returned
-	 * @return An instance of the factory associated with <b>id</b>, or throws a {@link NoSuchExtensionException} in case <b>id</b> is not associated with any
-	 *         factory.
+	 * @return An instance of the factory associated with <b>id</b>, or throws a NoSuchExtensionException in case <b>id</b> is not associated with any factory.
 	 * @throws NoSuchExtensionException If no factory with the given ID is registered.
 	 */
 	public IFactory<? extends T> getFactory(String id) throws NoSuchExtensionException {
@@ -100,12 +101,12 @@ public abstract class FactoryManager<T> extends ExtensionManager<IFactory<T>> {
 	/**
 	 * Returns the factory for the given path and format. (if none is specified an instance of the default factory is returned).
 	 *
-	 * @param path
-	 * @param format
+	 * @param path the path to the file
+	 * @param format the file format
 	 *
 	 * @return Returns the feature model factory for a certain path and format.
 	 *
-	 * @throws NoSuchExtensionException
+	 * @throws NoSuchExtensionException if no suitable factory was found
 	 */
 	public IFactory<? extends T> getFactory(Path path, IPersistentFormat<? extends T> format) throws NoSuchExtensionException {
 		final FactoryWorkspace factoryWorkspace = getFactoryWorkspace(path);
@@ -113,15 +114,15 @@ public abstract class FactoryManager<T> extends ExtensionManager<IFactory<T>> {
 	}
 
 	/**
-	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br/> <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(T)} instead to
-	 * ensure that the correct factory is used for the underlying feature model file.
+	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br> <br>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(Path, IPersistentFormat)} or {@link #getFactory(Object)} instead to ensure that the correct
+	 * factory is used for the underlying feature model file.
 	 *
-	 * @param format
+	 * @param format the file format
 	 *
 	 * @return Returns the default factory for a certain format.
 	 *
-	 * @throws NoSuchExtensionException
+	 * @throws NoSuchExtensionException if no suitable factory was found
 	 */
 	public IFactory<? extends T> getFactory(IPersistentFormat<? extends T> format) throws NoSuchExtensionException {
 		return getFactory(getDefaultFactoryWorkspace().getID(format));

@@ -28,6 +28,8 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 /**
  * Responsible to load and save all information for a feature model instance.
  *
+ * @param <T> the element stored within a file
+ *
  * @author Sebastian Krieter
  */
 public interface IFileManager<T> extends IManager<T> {

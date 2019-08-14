@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
+
 /**
- * Exception thrown when an {@link analysis IAnalysis} experiences a solver timeout.<br/> Doesn't need to be caught explicitly.
+ * Exception thrown when an {@link IAnalysis analysis} experiences a solver timeout.<br> Doesn't need to be caught explicitly.
  *
  * @author Sebastian Krieter
  */

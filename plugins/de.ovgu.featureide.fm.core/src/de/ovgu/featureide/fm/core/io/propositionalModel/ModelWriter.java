@@ -87,8 +87,6 @@ public class ModelWriter {
 
 	/**
 	 * Constructs the feature directory.
-	 *
-	 * @return the feature directory; not null
 	 */
 	private void constructFeatureDirectory(ArrayList<String> fd) {
 		for (final Entry<Object, Integer> e : variableIndexes.entrySet()) {

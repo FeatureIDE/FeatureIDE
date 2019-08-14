@@ -409,7 +409,7 @@ public abstract class Node {
 	/**
 	 * Returns a string representation of this node. The symbols for logical connectors, e.g. And, are given as a parameter.
 	 *
-	 * @see org.prop4j.NodeWriter#shortSymbols (default)
+	 * @see org.prop4j.NodeWriter#shortSymbols
 	 * @see org.prop4j.NodeWriter#logicalSymbols
 	 * @see org.prop4j.NodeWriter#textualSymbols
 	 *

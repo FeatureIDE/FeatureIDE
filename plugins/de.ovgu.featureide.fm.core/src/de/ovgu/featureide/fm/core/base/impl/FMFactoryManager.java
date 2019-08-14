@@ -58,7 +58,7 @@ public final class FMFactoryManager extends FactoryManager<IFeatureModel> {
 	/**
 	 * Returns the feature model factory that was used to create the given model. (if the factory is not available the default factory is returned).
 	 *
-	 * @param featureModel the feature model
+	 * @param object the feature model
 	 *
 	 * @return Returns the feature model factory for the given feature model.
 	 */

@@ -300,9 +300,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	/**
 	 * Creates solutions to cover the given features.
-	 *
-	 * @param features The features that should be covered.
-	 * @param selection true is the features should be selected, false otherwise.
 	 */
 	public class CoverFeatures implements LongRunningMethod<List<List<String>>> {
 
@@ -588,7 +585,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 *
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
-	 * @throws Exception
 	 */
 	@Override
 	public CoverFeatures coverFeatures(final Collection<String> features, final boolean selection) {
@@ -622,7 +618,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 * Counts the number of possible solutions.
 	 *
 	 * @param timeout The timeout in milliseconds.
-	 * @return A positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 * @return A positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	@Override

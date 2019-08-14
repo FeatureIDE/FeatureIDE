@@ -28,7 +28,7 @@ import org.sat4j.specs.ISolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
- * Modified variable order for {@link ISolver}.</br> Uses the {@link UniformRandomSelectionStrategy}.
+ * Modified variable order for {@link ISolver}.<br> Uses the {@link UniformRandomSelectionStrategy}.
  *
  * @author Sebastian Krieter
  */

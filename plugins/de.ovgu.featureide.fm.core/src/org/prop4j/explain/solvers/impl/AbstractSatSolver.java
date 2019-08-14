@@ -25,7 +25,7 @@ import org.prop4j.explain.solvers.SatSolver;
 /**
  * Abstract implementation of {@link SatSolver}.
  *
- * @param O oracle
+ * @param <O> oracle
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractSatSolver<O> extends AbstractSatProblem implements SatSolver {

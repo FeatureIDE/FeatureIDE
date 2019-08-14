@@ -46,7 +46,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	private Order order;
 
 	/**
-	 * Constructs a new clause from the given literals. Negates the given literals. <br/> <b>Does not modify the given literal array.</b>
+	 * Constructs a new clause from the given literals. Negates the given literals. <br> <b>Does not modify the given literal array.</b>
 	 *
 	 * @param literals literals of the clause
 	 * @return A newly constructed clause from the given literals (negated).
@@ -56,7 +56,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	}
 
 	/**
-	 * Constructs a new clause from the given literals. <br/> <b>Does not modify the given literal array.</b>
+	 * Constructs a new clause from the given literals. <br> <b>Does not modify the given literal array.</b>
 	 *
 	 * @param literals literals of the clause
 	 * @return A newly constructed clause from the given literals.
@@ -98,7 +98,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	}
 
 	/**
-	 * Constructs a new clause from the given literals. <br/> <b>The resulting clause is backed by the given literal array. The array will be sorted.</b>
+	 * Constructs a new clause from the given literals. <br> <b>The resulting clause is backed by the given literal array. The array will be sorted.</b>
 	 *
 	 * @param literals literals of the clause
 	 */
@@ -345,7 +345,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	/**
 	 * Returns a copy of the given array with all entries negated.
 	 *
-	 * @param solution the given array
 	 * @return Array with negated entries.
 	 */
 	public LiteralSet negate() {
@@ -416,7 +415,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	/**
 	 * Constructs a new {@link LiteralSet} that contains no duplicates and unwanted literals. Also checks whether the set contains a literal and its negation.
 	 *
-	 * @param literalSet The initial literal set.
 	 * @param unwantedVariables An array of variables that should be removed.
 	 * @return A new literal set or {@code null}, if the initial set contained a literal and its negation.
 	 */

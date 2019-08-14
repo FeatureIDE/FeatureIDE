@@ -69,7 +69,7 @@ public class ConfigurationAnalyzer {
 	 *
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
-	 * @throws Exception
+	 * @return a list of configurations (list of selected feature names)
 	 */
 	public List<List<String>> coverFeatures(final Collection<String> features, final boolean selection) {
 		final List<List<String>> result = LongRunningWrapper.runMethod(propagator.coverFeatures(features, selection));
@@ -92,9 +92,10 @@ public class ConfigurationAnalyzer {
 	}
 
 	/**
-	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
+	 * Ignores hidden features. Use this, when propagate is disabled (hidden features are not updated).
+	 * 
+	 * @return true, if configuration is valid
 	 */
-
 	public boolean isValidNoHidden() {
 		final Boolean result = LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 		return (result != null) ? result : false;
@@ -104,7 +105,7 @@ public class ConfigurationAnalyzer {
 	 * Counts the number of possible solutions.
 	 *
 	 * @param timeout The timeout in milliseconds.
-	 * @return A positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 * @return A positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
 	public long number(int timeout) {

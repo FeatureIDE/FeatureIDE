@@ -113,10 +113,10 @@ public interface IPropertyContainer {
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#set(String, Type, Object)} earlier. Properties are stored persistently if ValueProtection.NORMAL_PROTECTION or
-	 * ValueProtection.READ_ONLY_PERSISTENT was used when calling {@link IPropertyContainer#set(String, Type, Object)} or temporarily. The latest (maybe
-	 * volatile) state will be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key
-	 * is unknown</code>), the <code>defaultValue</code> will be returned.
+	 * {@link IPropertyContainer#set(String, String, String)} earlier. Properties are stored persistently if ValueProtection.NORMAL_PROTECTION or
+	 * ValueProtection.READ_ONLY_PERSISTENT was used when calling {@link IPropertyContainer#set(String, String, String)} or temporarily. The latest (maybe
+	 * volatile) state will be taken into account, depending on the call of {@link IPropertyContainer#remove(String, String)}. If no value was assigned (the
+	 * <code>key is unknown</code>), the <code>defaultValue</code> will be returned.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
@@ -138,9 +138,9 @@ public interface IPropertyContainer {
 	 * was not removed by calling {@link IPropertyContainer#remove(String, String)}. If no value was assigned (the <code>key is unknown</code>), a
 	 * <code>NoSuchPropertyException</code> will be thrown.
 	 *
-	 * @see IPropertyContainer#get(String, Object)
-	 * @see IPropertyContainer#has(String)
-	 * @see IPropertyContainer#remove(String)
+	 * @see IPropertyContainer#get(String, String)
+	 * @see IPropertyContainer#has(String, String)
+	 * @see IPropertyContainer#remove(String, String)
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
@@ -148,6 +148,7 @@ public interface IPropertyContainer {
 	 * @param key property name (case insensitive)
 	 * @param type type name (case insensitive)
 	 * @return value associated with <code>key</code> if set. If <code>key</code> is not known, throws <code>NoSuchPropertyException</code>.
+	 * @throws NoSuchPropertyException if no property could be found for the given key
 	 */
 	String get(String key, String type) throws NoSuchPropertyException;
 
@@ -188,17 +189,17 @@ public interface IPropertyContainer {
 	 * Removes a per-object user-defined property identified by a custom <code>key</code> and value assigned by calling
 	 * {@link IPropertyContainer#set(String, String, String)} earlier. Properties are stored persistently such that an assignment will be alive as long as it
 	 * this method does not remove the property. If this object does not contain any property associated to <code>key</code>, a
-	 * <code>NoSuchPropertyException</code>
-	 * will be thrown.
+	 * <code>NoSuchPropertyException</code> will be thrown.
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 *
-	 * @see IPropertyContainer#has(String)
-	 * @see IPropertyContainer#set(String, Type, Object)
+	 * @see IPropertyContainer#has(String, String)
+	 * @see IPropertyContainer#set(String, String, String)
 	 *
 	 * @param key property name (case insensitive)
 	 * @param type type name (case insensitive)
+	 * @return the removed entry or null
 	 */
 	Entry remove(final String key, String type);
 

@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 public interface ISimpleSatSolver extends Cloneable {
 
 	/**
-	 * Possible outcomes of a satisfiability solver call.<br/> One of {@code TRUE}, {@code FALSE}, or {@code TIMEOUT}.
+	 * Possible outcomes of a satisfiability solver call.<br> One of {@code TRUE}, {@code FALSE}, or {@code TIMEOUT}.
 	 *
 	 * @author Sebastian Krieter
 	 */
@@ -73,7 +73,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	List<IConstr> addInternalClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException;
 
 	/**
-	 * Removes a certain clause. If possible, instead of using this method consider using {@link #removeLastClause()} as it runs faster.<br/> <b>Note:</b> This
+	 * Removes a certain clause. If possible, instead of using this method consider using {@link #removeLastClause()} as it runs faster.<br> <b>Note:</b> This
 	 * method may not be supported by all solvers.
 	 *
 	 * @param constr The identifying constraint object for the clause.
@@ -84,7 +84,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	void removeClause(IConstr constr);
 
 	/**
-	 * Removes the last clause added to the solver. This method should be preferred over {@link #removeClause(IConstr)}, if possible.<br/> <b>Note:</b> This
+	 * Removes the last clause added to the solver. This method should be preferred over {@link #removeClause(IConstr)}, if possible.<br> <b>Note:</b> This
 	 * method may not be supported by all solvers.
 	 *
 	 * @see #addClauses(Iterable)
@@ -93,7 +93,7 @@ public interface ISimpleSatSolver extends Cloneable {
 	void removeLastClause();
 
 	/**
-	 * Removes the last clauses added to the solver. This method should be preferred over {@link #removeClause(IConstr)}, if possible.<br/> <b>Note:</b> This
+	 * Removes the last clauses added to the solver. This method should be preferred over {@link #removeClause(IConstr)}, if possible.<br> <b>Note:</b> This
 	 * method may not be supported by all solvers.
 	 *
 	 * @param numberOfClauses The number of clauses that should be removed.

@@ -57,7 +57,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is either a requires- or an excludes-constraint.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
 	public static boolean isSimple(Node node) {
@@ -81,7 +81,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is neither a requires- nor an excludes-constraint.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node is a complex constraint. False otherwise.
 	 */
 	public static boolean isComplex(Node node) {
@@ -91,7 +91,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node consists of a number of simple constraints. False otherwise.
 	 */
 	public static boolean isPseudoComplex(Node node) {
@@ -127,7 +127,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether there exist only constraints that can be refactored trivially.
 	 *
-	 * @param fm
+	 * @param fm fm
 	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
 	 */
 	public static boolean trivialRefactoring(final IFeatureModel fm) {
@@ -141,8 +141,10 @@ public class ComplexConstraintConverter {
 	/**
 	 * Eliminates complex constraints according to a given strategy.
 	 *
-	 * @param model
-	 * @return
+	 * @param model model
+	 * @param converter strategy
+	 * @param options options
+	 * @return converted feature model
 	 */
 	public IFeatureModel convert(IFeatureModel model, IConverterStrategy converter, Option... options) {
 		// check if model is valid

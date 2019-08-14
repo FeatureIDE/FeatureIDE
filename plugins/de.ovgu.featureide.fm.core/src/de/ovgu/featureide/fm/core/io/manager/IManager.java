@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 /**
  * Holds an object instance.
  *
+ * @param <T> the class of the object
+ *
  * @author Sebastian Krieter
  */
 public interface IManager<T> extends IEventManager {

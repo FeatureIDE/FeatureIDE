@@ -25,7 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
 
 /**
- * Provides the XML tags for {@link XmlFeatureModelReader} and {@link XmlFeatureModelWriter}.
+ * Provides the XML tags for {@link XmlFeatureModelFormat}.
  *
  * @author Jens Meinicke
  */

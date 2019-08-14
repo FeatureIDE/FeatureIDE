@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * Responsible to load and save all information from / to a file.
  *
  * @author Sebastian Krieter
+ * @param <T> the element stored within a file
  */
 public abstract class AFileManager<T> implements IFileManager<T> {
 
@@ -86,7 +87,11 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	/**
 	 * Removes an instance of a {@link IFileManager} for a certain file.
 	 *
-	 * @param identifier The {@link FileIdentifier identifier} for the file.
+	 * @param <T> element class
+	 * @param <R> file manager class
+	 *
+	 * @param identifier The {@link Path} for the file.
+	 * @param fileManagerClass the specific class for the file manager
 	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
 	 */
@@ -453,7 +458,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	/**
-	 * Compares the persistent with the variable object for equality.<br> Uses {@link #hasChanged(Object)}.
+	 * Compares the persistent with the variable object for equality.
 	 *
 	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */

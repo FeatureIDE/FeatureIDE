@@ -51,7 +51,6 @@ public class ModelReader {
 	 * Reads the input.
 	 *
 	 * @param in The source to read from.
-	 * @return a CNF; not null
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the MODEL CNF file format
 	 */
@@ -100,6 +99,7 @@ public class ModelReader {
 	}
 
 	private static class LineIterator {
+
 		private final BufferedReader reader;
 		private String line = null;
 		private int lineCount = 0;
@@ -141,7 +141,6 @@ public class ModelReader {
 	 * Reads the input. Calls {@link #read(Reader)}.
 	 *
 	 * @param in The string to read from.
-	 * @return a CNF; not null
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the MODEL CNF file format
 	 */

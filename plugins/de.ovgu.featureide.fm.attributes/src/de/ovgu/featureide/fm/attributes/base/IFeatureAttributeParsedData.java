@@ -66,8 +66,7 @@ public interface IFeatureAttributeParsedData {
 
 	/**
 	 * 
-	 * @return true, if the only specified parameters are name and value
-	 *         In this case the attribute is considered recursed
+	 * @return true, if the only specified parameters are name and value In this case the attribute is considered recursed
 	 */
 	public boolean isRecursed();
 }

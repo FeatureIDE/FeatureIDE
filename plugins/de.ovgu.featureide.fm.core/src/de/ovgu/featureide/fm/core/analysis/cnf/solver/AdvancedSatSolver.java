@@ -184,7 +184,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	}
 
 	/**
-	 * {@inheritDoc}<br/> <br/> Does only consider the given {@code assignment} and <b>not</b> the global assignment variable of the solver.
+	 * {@inheritDoc}<br> <br> Does only consider the given {@code assignment} and <b>not</b> the global assignment variable of the solver.
 	 */
 	@Override
 	public SatResult hasSolution(int... assignment) {

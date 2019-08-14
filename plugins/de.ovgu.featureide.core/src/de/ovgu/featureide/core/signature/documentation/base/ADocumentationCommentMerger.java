@@ -103,7 +103,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 						itf.previous();
 					} else if (comp == 0) {
 						sb.append(g);
-						sb.append("</br>");
+						sb.append("<br>");
 						sb.append(f.getDesc());
 					} else {
 						sb.append(f);
@@ -150,7 +150,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 						switch (getRuleForCommentPart(newTag)) {
 						case RULE_MERGE:
 							if (!oldTag.getDesc().isEmpty()) {
-								oldTag.setDesc(oldTag.getDesc() + ("</br>" + newTag.getDesc()));
+								oldTag.setDesc(oldTag.getDesc() + ("<br>" + newTag.getDesc()));
 							} else {
 								oldTag.setDesc(newTag.getDesc());
 							}

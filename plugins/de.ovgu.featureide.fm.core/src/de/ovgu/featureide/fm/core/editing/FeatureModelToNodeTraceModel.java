@@ -67,33 +67,33 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 	 * @author Timo G&uuml;nther
 	 */
 	public enum Origin {
-	/**
-	 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed upward. </p>
-	 *
-	 * The upward part of the child relationship is that of the following form: <pre><i>Child<sub>1</sub></i> &or; &hellip; &or; <i>Child<sub>n</sub></i> &rArr;
-	 * <i>Parent</i></pre> Every child relationship contains an upward part. In fact, optional child relationships consist of nothing but an upward part (with
-	 * <i>n</i> = 1).
-	 */
-	CHILD_UP,
-	/**
-	 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed downward. </p>
-	 *
-	 * The upward part of the child relationship is that of the following form: <pre><i>Parent</i> &rArr; <i>Child<sub>1</sub></i> &or; &hellip; &or;
-	 * <i>Child<sub>n</sub></i></pre> Every non-optional child relationship contains a downward part.
-	 */
-	CHILD_DOWN,
-	/**
-	 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} not directed {@link CHILD_UP upward} or {@link CHILD_DOWN
-	 * downward}. </p>
-	 *
-	 * This is the case for {@link FeatureStructure#isAlternative() alternative groups}, which (in addition to upward and downward parts) contain the following
-	 * part: <pre>atmost1(<i>Child<sub>1</sub></i>, &hellip;, <i>Child<sub>n</sub></i>)</pre>
-	 */
-	CHILD_HORIZONTAL,
-	/** Denotes that the literal's origin is the {@link FeatureStructure#isRoot() root feature}. */
-	ROOT,
-	/** Denotes that the literal's origin is a {@link IConstraint constraint}. */
-	CONSTRAINT
+		/**
+		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed upward. </p>
+		 *
+		 * The upward part of the child relationship is that of the following form: <pre><i>Child<sub>1</sub></i> &or; &hellip; &or; <i>Child<sub>n</sub></i>
+		 * &rArr; <i>Parent</i></pre> Every child relationship contains an upward part. In fact, optional child relationships consist of nothing but an upward
+		 * part (with <i>n</i> = 1).
+		 */
+		CHILD_UP,
+		/**
+		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed downward. </p>
+		 *
+		 * The upward part of the child relationship is that of the following form: <pre><i>Parent</i> &rArr; <i>Child<sub>1</sub></i> &or; &hellip; &or;
+		 * <i>Child<sub>n</sub></i></pre> Every non-optional child relationship contains a downward part.
+		 */
+		CHILD_DOWN,
+		/**
+		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} not directed upward (CHILD_UP) or downward
+		 * (CHILD_DOWN). </p>
+		 *
+		 * This is the case for {@link FeatureStructure#isAlternative() alternative groups}, which (in addition to upward and downward parts) contain the
+		 * following part: <pre>atmost1(<i>Child<sub>1</sub></i>, &hellip;, <i>Child<sub>n</sub></i>)</pre>
+		 */
+		CHILD_HORIZONTAL,
+		/** Denotes that the literal's origin is the {@link FeatureStructure#isRoot() root feature}. */
+		ROOT,
+		/** Denotes that the literal's origin is a {@link IConstraint constraint}. */
+		CONSTRAINT
 	}
 
 	/**

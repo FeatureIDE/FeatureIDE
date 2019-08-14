@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 /**
  * Capable of reading and writing a file in a certain format.
  *
- * @see FileManager
+ * @see IFileManager
  *
  * @author Sebastian Krieter
  */

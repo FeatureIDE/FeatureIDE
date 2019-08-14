@@ -38,24 +38,21 @@ public class NodeWriter {
 		 * <p> The infix notation. Operators are written between operands where possible.
 		 *
 		 * <p> Examples: <ul> <li><em>A &amp; B &amp; C</em></li> <li><em>A =&gt; B &lt;=&gt; -A | B</em></li> <li><em>atleast2(A, B, C, D) &amp; atmost3(A, B,
-		 * C,
-		 * D)</em></li> </ul>
+		 * C, D)</em></li> </ul>
 		 */
 		INFIX,
 		/**
 		 * <p> The prefix notation. Operators are written before the operands.
 		 *
 		 * <p> Examples: <ul> <li><em>(&amp; A B C)</em></li> <li><em>(&lt;=&gt; (=&gt; A B) (| (- A) B)</em></li> <li><em>(&amp; (atleast2 A B C D) (atmost3 A
-		 * B C
-		 * D))</em></li> </ul>
+		 * B C D))</em></li> </ul>
 		 */
 		PREFIX,
 		/**
 		 * <p> The postfix notation. Operators are written after the operands.
 		 *
 		 * <p> Examples: <ul> <li><em>(A B C &amp;)</em></li> <li><em>((A B =&gt;) ((A -) B |) &lt;=&gt;)</em></li> <li><em>((A B C D atleast2) (A B C D
-		 * atmost3)
-		 * &gt;)</em></li> </ul>
+		 * atmost3) &gt;)</em></li> </ul>
 		 */
 		POSTFIX,
 	}
@@ -121,7 +118,7 @@ public class NodeWriter {
 	/**
 	 * Sets the symbols to use for the operations. By index, these are: <ol start="0"> <li>{@link Not}</li> <li>{@link And}</li> <li>{@link Or}</li>
 	 * <li>{@link Implies}</li> <li>{@link Equals}</li> <li>the separator joining the operands of the following operations</li> <li>{@link Choose}</li>
-	 * <li>{@link AtLeast}</li> <li>{@link AtMost}</li> </ol> By default, the set of {@link shortSymbols short symbols} is used.
+	 * <li>{@link AtLeast}</li> <li>{@link AtMost}</li> </ol> By default, the set of short symbols is used.
 	 *
 	 * @param symbols symbols for the operations; not null
 	 * @see #logicalSymbols
