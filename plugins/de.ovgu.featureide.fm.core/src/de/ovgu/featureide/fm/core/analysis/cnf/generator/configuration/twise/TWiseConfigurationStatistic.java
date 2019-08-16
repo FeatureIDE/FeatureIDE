@@ -40,7 +40,7 @@ public class TWiseConfigurationStatistic {
 	private long numberOfUncoveredConditions;
 
 	private final double[] configValues;
-	private final long[] configValues2;
+	private final double[] configValues2;
 
 	private final TWiseConfigurationUtil util;
 	private final List<? extends LiteralSet> configurations;
@@ -53,7 +53,7 @@ public class TWiseConfigurationStatistic {
 		this.groupedPresenceConditions = groupedPresenceConditions;
 
 		configValues = new double[configurations.size()];
-		configValues2 = new long[configurations.size()];
+		configValues2 = new double[configurations.size()];
 	}
 
 	public void calculate(boolean countValid) {
@@ -226,6 +226,18 @@ public class TWiseConfigurationStatistic {
 					numberOfUncoveredConditions++;
 				}
 			}
+		}
+		int confIndex = 0;
+		for (final LiteralSet configuration : configurations) {
+			int count = 0;
+			for (final int literal : configuration.getLiterals()) {
+				if (literal == 0) {
+					count++;
+				}
+			}
+			final double d = (double) count / configuration.size();
+			final double factor = (2 - (d * d));
+			configValues2[confIndex++] *= factor;
 		}
 	}
 

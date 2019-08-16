@@ -131,8 +131,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
 
-	private ArrayList<LiteralSet> curResult = null;
-	private ArrayList<LiteralSet> bestResult = null;
+	private List<TWiseConfiguration> curResult = null;
+	private ArrayList<TWiseConfiguration> bestResult = null;
 
 	protected MonitorThread samplingMonitor;
 
@@ -170,15 +170,13 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		phaseCount = 0;
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			// TODO Variation Point: Removing low-contributing Configurations
 			trimConfigurations();
 			buildCombinations();
 		}
 
-		for (final LiteralSet configuration : bestResult) {
-			addResult(configuration);
-		}
+		bestResult.forEach(configuration -> addResult(configuration.getCompleteSolution()));
 	}
 
 	private void trimConfigurations() {
@@ -212,12 +210,17 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private void buildCombinations() {
 		// TODO Variation Point: Combination Order
+		if (phaseCount != 0) {
+			for (final List<PresenceCondition> pcs : presenceConditionManager.getGroupedPresenceConditions()) {
+				Collections.shuffle(pcs);
+			}
+		}
 		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
-
+		numberOfCombinations = it.size();
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
-				new CoverAll(util));
-		numberOfCombinations = it.size();
+				new CoverAll(util) //
+		);
 
 		coveredCount = 0;
 		invalidCount = 0;
@@ -231,7 +234,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			phaseCount++;
 			ICoverStrategy phase = phaseList.get(0);
 			while (it.hasNext()) {
-				combiner.combineConditions(it.next(), combinedCondition);
+				final PresenceCondition[] combination = it.next();
+				combiner.combineConditions(combination, combinedCondition);
 				if (combinedCondition.isEmpty()) {
 					invalidCount++;
 				} else {
@@ -286,12 +290,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			samplingMonitor.finish();
 		}
 
-		curResult = new ArrayList<>();
-		for (final TWiseConfiguration configuration : util.getResultList()) {
-			curResult.add(configuration.getCompleteSolution());
-		}
+		curResult = util.getResultList();
 		if ((bestResult == null) || (bestResult.size() > curResult.size())) {
-			bestResult = curResult;
+			bestResult = new ArrayList<>(curResult.size());
+			curResult.stream().map(TWiseConfiguration::clone).forEach(bestResult::add);
 		}
 	}
 
