@@ -159,6 +159,10 @@ public abstract class Node {
 		return cnf;
 	}
 
+	public static Node buildDNF(Node node) {
+		return node.clone().toDNF();
+	}
+
 	protected final Node eliminateNonCNFOperators() {
 		if (children != null) {
 			final Node[] newChildren = new Node[children.length];
