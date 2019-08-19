@@ -255,7 +255,7 @@ public final class Nodes {
 
 	private static LiteralSet getClause(IVariables s, Node clauseNode, boolean keepLiteralOrder, boolean cnf) {
 		int absoluteValueCount = 0;
-		boolean valid = true;
+		boolean tautology = false;
 
 		final Literal[] children = (clauseNode instanceof Literal) ? new Literal[] { (Literal) clauseNode }
 			: Arrays.copyOf(clauseNode.getChildren(), clauseNode.getChildren().length, Literal[].class);
@@ -268,7 +268,7 @@ public final class Nodes {
 			if (cnf) {
 				if (literal.var.equals(NodeCreator.varTrue)) {
 					if (literal.positive) {
-						valid = false;
+						tautology = true;
 					} else {
 						absoluteValueCount++;
 						children[j] = null;
@@ -278,13 +278,13 @@ public final class Nodes {
 						absoluteValueCount++;
 						children[j] = null;
 					} else {
-						valid = false;
+						tautology = true;
 					}
 				}
 			} else {
 				if (literal.var.equals(NodeCreator.varTrue)) {
 					if (!literal.positive) {
-						valid = false;
+						tautology = true;
 					} else {
 						absoluteValueCount++;
 						children[j] = null;
@@ -294,15 +294,17 @@ public final class Nodes {
 						absoluteValueCount++;
 						children[j] = null;
 					} else {
-						valid = false;
+						tautology = true;
 					}
 				}
 			}
 
 		}
 
-		if (valid) {
-			if (children.length == absoluteValueCount) {
+		if (tautology) {
+			return null;
+		} else {
+			if ((children.length == absoluteValueCount) && cnf) {
 				throw new RuntimeException("Model is void!");
 			}
 			final int[] newChildren = new int[children.length - absoluteValueCount];
@@ -315,8 +317,6 @@ public final class Nodes {
 				}
 			}
 			return new LiteralSet(newChildren, keepLiteralOrder ? Order.UNORDERED : Order.NATURAL);
-		} else {
-			return null;
 		}
 	}
 
