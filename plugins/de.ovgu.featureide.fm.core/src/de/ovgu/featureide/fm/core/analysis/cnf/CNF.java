@@ -169,6 +169,20 @@ public class CNF implements Serializable {
 		return "CNF\n\tvariables=" + variables + "\n\tclauses=" + clauses;
 	}
 
+	public String getClauseString() {
+		final StringBuilder sb = new StringBuilder();
+		for (final LiteralSet clause : clauses) {
+			sb.append("(");
+			final List<String> literals = variables.convertToString(clause, true, true, true);
+			for (final String literal : literals) {
+				sb.append(literal);
+			}
+			sb.append("), ");
+		}
+		sb.delete(sb.length() - 2, sb.length());
+		return sb.toString();
+	}
+
 	/**
 	 * Creates a new clause list from this CNF with all clauses adapted to a new variable mapping.
 	 *
@@ -199,7 +213,7 @@ public class CNF implements Serializable {
 	private ClauseList createAdaptedClauseList(IVariables newVariables) {
 		final ClauseList newClauses = new ClauseList(clauses.size());
 		for (final LiteralSet oldClause : clauses) {
-			newClauses.add(oldClause.reorder(variables, newVariables));
+			newClauses.add(oldClause.adapt(variables, newVariables));
 		}
 		return newClauses;
 	}

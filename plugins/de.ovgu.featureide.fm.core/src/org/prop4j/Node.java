@@ -104,10 +104,10 @@ public abstract class Node {
 	}
 
 	public Node toDNF() {
-		Node cnf = this;
-		cnf = cnf.eliminateNonCNFOperators();
-		cnf = deMorgan(cnf);
-		return cnf.clausifyDNF();
+		Node dnf = this;
+		dnf = dnf.eliminateNonCNFOperators();
+		dnf = deMorgan(dnf);
+		return dnf.clausifyDNF();
 	}
 
 	public Node toRegularCNF() {
@@ -129,6 +129,27 @@ public abstract class Node {
 			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
+	}
+
+	public Node toRegularDNF() {
+		final Node node = flatten();
+		node.simplify();
+		node.removeDuplicates();
+		Node regularDNFNode = node.toDNF();
+		if (regularDNFNode instanceof Or) {
+			final Node[] children = regularDNFNode.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
+				if (child instanceof Literal) {
+					children[i] = new And(child);
+				}
+			}
+		} else if (regularDNFNode instanceof And) {
+			regularDNFNode = new Or(regularDNFNode);
+		} else if (regularDNFNode instanceof Literal) {
+			regularDNFNode = new Or(new And(regularDNFNode));
+		}
+		return regularDNFNode;
 	}
 
 	public static Node buildCNF(Node node) {

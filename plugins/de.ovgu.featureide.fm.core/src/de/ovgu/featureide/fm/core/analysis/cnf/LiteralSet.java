@@ -487,7 +487,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return lengthDiff;
 	}
 
-	public LiteralSet reorder(IVariables oldVariables, IVariables newVariables) {
+	public LiteralSet adapt(IVariables oldVariables, IVariables newVariables) {
 		final int[] oldLiterals = literals;
 		final int[] newLiterals = new int[oldLiterals.length];
 		for (int i = 0; i < oldLiterals.length; i++) {

@@ -78,6 +78,14 @@ public final class Nodes {
 		return new CNF(mapping, clauses);
 	}
 
+	public static CNF slice(CNF cnf, Collection<String> errorNames) {
+		try {
+			return LongRunningWrapper.runMethod(new CNFSlicer(cnf, errorNames));
+		} catch (final Exception e) {
+			return null;
+		}
+	}
+
 	public static CNF convertSlicingErrorLiterals(IVariables satInstance, Node cnfNode, boolean keepLiteralOrder) {
 		final HashSet<String> varNames = new HashSet<>();
 		final HashSet<String> errorNames = new HashSet<>();
@@ -102,6 +110,28 @@ public final class Nodes {
 		}
 	}
 
+	public static CNF convertSlicingErrorLiterals(Node cnfNode) {
+		final HashSet<String> varNames = new HashSet<>();
+		final HashSet<String> errorNames = new HashSet<>();
+		collectVariables(cnfNode, varNames, errorNames);
+
+		if (!varNames.isEmpty()) {
+			final ArrayList<String> variableList = new ArrayList<>(varNames.size() + errorNames.size());
+			variableList.addAll(varNames);
+			variableList.addAll(errorNames);
+			final Variables mappingWithErrors = new Variables(variableList);
+			final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode, true);
+			final CNF orgCNF = new CNF(mappingWithErrors, clauses);
+
+			try {
+				return LongRunningWrapper.runMethod(new CNFSlicer(orgCNF, errorNames));
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
 	public static void collectVariables(IVariables variables, Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
 		for (final Node clause : cnfNode.getChildren()) {
 			final Node[] literals = clause.getChildren();
@@ -118,6 +148,46 @@ public final class Nodes {
 				}
 			}
 		}
+	}
+
+	public static void collectVariables(Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
+		for (final Node clause : cnfNode.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				final Literal literal = (Literal) literals[i];
+				final Object varObject = literal.var;
+				if (varObject != null) {
+					final String varName = varObject.toString();
+					if ((literal instanceof ErrorLiteral)) {
+						errorNames.add(varName);
+					} else {
+						varNames.add(varName);
+					}
+				}
+			}
+		}
+	}
+
+	public static Set<String> collectVariables(Node cnfNode, final Collection<String> errorNames) {
+		final Set<String> varNames = new HashSet<>();
+		for (final Node clause : cnfNode.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				final Literal literal = (Literal) literals[i];
+				final Object varObject = literal.var;
+				if (varObject instanceof String) {
+					final String varName = (String) varObject;
+					if ((literal instanceof ErrorLiteral)) {
+						if (errorNames != null) {
+							errorNames.add(varName);
+						}
+					} else {
+						varNames.add(varName);
+					}
+				}
+			}
+		}
+		return varNames;
 	}
 
 	public static Node convert(CNF satInstance) {
