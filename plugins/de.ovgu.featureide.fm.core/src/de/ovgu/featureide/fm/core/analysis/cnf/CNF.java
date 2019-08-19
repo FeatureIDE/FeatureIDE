@@ -178,9 +178,14 @@ public class CNF implements Serializable {
 				sb.append(literal);
 				sb.append(", ");
 			}
+			if (!literals.isEmpty()) {
+				sb.delete(sb.length() - 2, sb.length());
+			}
 			sb.append("), ");
 		}
-		sb.delete(sb.length() - 2, sb.length());
+		if (!clauses.isEmpty()) {
+			sb.delete(sb.length() - 2, sb.length());
+		}
 		return sb.toString();
 	}
 
