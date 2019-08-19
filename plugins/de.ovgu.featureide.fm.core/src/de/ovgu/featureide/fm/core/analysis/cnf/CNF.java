@@ -176,6 +176,7 @@ public class CNF implements Serializable {
 			final List<String> literals = variables.convertToString(clause, true, true, true);
 			for (final String literal : literals) {
 				sb.append(literal);
+				sb.append(", ");
 			}
 			sb.append("), ");
 		}
