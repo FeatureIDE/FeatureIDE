@@ -29,7 +29,6 @@ import org.prop4j.analyses.impl.general.ClearImplicationAnalysis;
 import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnalysis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
-import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.RedundantConstraintAnalysis;
 import org.prop4j.analyses.impl.general.TautologicalConstraintAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
@@ -86,8 +85,8 @@ public class JavaSmtSolverAnalysisFactoryTOGO extends AbstractSolverAnalysisFact
 			return getCoreDeadAnalysis(problem);
 		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
 			return getImplicationAnalysis(problem);
-		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
-			return getIndeterminedAnalysis(problem);
+//		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
+//			return getIndeterminedAnalysis(problem);
 		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
 			return getRedundantConstraintAnalysis(problem);
 		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
@@ -131,13 +130,13 @@ public class JavaSmtSolverAnalysisFactoryTOGO extends AbstractSolverAnalysisFact
 		}
 	}
 
-	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			return new IndeterminedAnalysis(solver, null);
-		} else {
-			return null;
-		}
-	}
+//	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			return new IndeterminedAnalysis(solver, null);
+//		} else {
+//			return null;
+//		}
+//	}
 
 	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {

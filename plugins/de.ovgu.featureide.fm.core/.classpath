@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/splar.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/checker-qual-2.5.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/com.microsoft.z3.jar"/>
@@ -18,12 +19,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SPLCAT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.pb.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>

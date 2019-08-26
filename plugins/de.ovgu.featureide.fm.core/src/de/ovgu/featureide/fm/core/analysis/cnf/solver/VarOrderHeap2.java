@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solverOld;
+package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 import org.sat4j.minisat.core.Heap;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;
@@ -51,16 +51,12 @@ public class VarOrderHeap2 extends VarOrderHeap {
 		heap = new Heap(activity);
 		heap.setBounds(nlength);
 		nlength--;
-		try {
-			for (int i = 0; i < nlength; i++) {
-				final int x = order[i];
-				activity[x] = 0.0;
-				if (lits.belongsToPool(x)) {
-					heap.insert(x);
-				}
+		for (int i = 0; i < nlength; i++) {
+			final int x = order[i];
+			activity[x] = 0.0;
+			if (lits.belongsToPool(x)) {
+				heap.insert(x);
 			}
-		} catch (final IndexOutOfBoundsException ioobe) {
-			System.out.println();
 		}
 	}
 

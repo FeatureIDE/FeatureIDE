@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
-import org.prop4j.solverOld.ISatSolver;
 
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;

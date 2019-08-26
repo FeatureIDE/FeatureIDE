@@ -25,14 +25,11 @@ import org.osgi.service.prefs.Preferences;
 import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
 import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
-import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 
-import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
-import de.ovgu.featureide.fm.core.IExtensionLoader;
 
 /**
- * Is responsible for loading all registered solver factories.
+ * Responsible to load and save all information for a solver.
  *
  * @author Joshua Sprey
  */
@@ -43,19 +40,12 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 	public final static String FEATURE_MODEL_DEFECT_SOLVER = "featureModelDefectSolver";
 	public final static String OTHER_ANALYSES_SOLVER = "otherAnalysesSolver";
 
-	private SolverManager() {
-		setExtensionLoaderInternal(
-				new CoreExtensionLoader<AbstractSolverFactory>(LtmsSatSolverFactory.class, Sat4JSatSolverFactory.class, JavaSmtSatSolverFactory.class));
-	}
+	private SolverManager() {}
 
 	private static SolverManager instance = new SolverManager();
 
 	public static SolverManager getInstance() {
 		return instance;
-	}
-
-	public static void setExtensionLoader(IExtensionLoader<AbstractSolverFactory> extensionLoader) {
-		instance.setExtensionLoaderInternal(extensionLoader);
 	}
 
 	public static AbstractSolverFactory getSelectedFeatureAttributeSolverFactory() {

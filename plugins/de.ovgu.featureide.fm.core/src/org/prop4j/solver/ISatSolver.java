@@ -18,81 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solverOld;
-
-import java.util.List;
-
-import org.prop4j.Node;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.RingList;
+package org.prop4j.solver;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Interface to identify the current solver as an sat solver.
  *
- * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public interface ISatSolver extends Cloneable {
+public interface ISatSolver extends ISolver {
 
-	public static final int DEFAULT_TIMEOUT = 1000;
+	public static final String CONFIG_TIMEOUT = "Timeout";
+	public static final String CONFIG_VERBOSE = "Verbose";
+	public static final String CONFIG_DB_SIMPLIFICATION_ALLOWED = "DBSimplification";
+	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
+
 	public static final int MAX_SOLUTION_BUFFER = 1000;
 
-	public static enum SatResult {
-		FALSE, TIMEOUT, TRUE
-	}
-
 	public static enum SelectionStrategy {
-		NEGATIVE, ORG, POSITIVE, RANDOM
+		NEGATIVE, ORG, POSITIVE, RANDOM, UNIFORM_RANDOM, FIXED
 	}
-
-	void assignmentClear(int size);
-
-	void assignmentPop();
-
-	void assignmentPush(int x);
-
-	void assignmentReplaceLast(int x);
-
-	ISatSolver clone();
-
-	int[] findModel();
-
-	void fixOrder();
-
-	IVecInt getAssignment();
-
-	int[] getAssignmentArray(int from, int to);
-
-	int[] getModel();
-
-	int getNumberOfSolutions();
-
-	SatInstance getSatInstance();
-
-	RingList<int[]> getSolutionList();
-
-	void initSolutionList(int size);
-
-	ISolver getInternalSolver();
-
-	SatResult isSatisfiable();
-
-	void setOrder(List<IFeature> orderList);
-
-	void setSelectionStrategy(SelectionStrategy strategy);
-
-	void shuffleOrder();
-
-	int[] getOrder();
-
-	List<IConstr> addClauses(Node constraint) throws ContradictionException;
-
-	boolean getGlobalTimeout();
-
-	void setGlobalTimeout(boolean globalTimeout);
-
 }

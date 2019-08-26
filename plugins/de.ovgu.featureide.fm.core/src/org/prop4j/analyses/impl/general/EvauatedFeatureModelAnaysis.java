@@ -31,7 +31,6 @@ import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactoryTOGO;
-import org.prop4j.analyses.impl.sat4j.Sat4JCoreDeadAnalysis;
 import org.prop4j.analyses.impl.sat4j.Sat4JImplicationAnalysis;
 import org.prop4j.solver.impl.SatProblem;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
@@ -241,18 +240,18 @@ public class EvauatedFeatureModelAnaysis {
 		cleanFalseOptionalAnalysis.add(entry);
 	}
 
-	private void evaluateSat4jCoreDead(String modelName) {
-		final EvaluationEntry entry = new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), allModelProblem.getClauses().length, modelName);
-		for (final AbstractSolverAnalysisFactory factory : factoryList) {
-			this.factory = factory;
-
-			if ((factory instanceof Sat4JSolverAnalysisFactory) || (factory instanceof Sat4JSolverAnalysisFactoryTOGO)) {
-				checkSat4jFeatureDead(entry);
-			}
-
-		}
-		sat4CoreDeadAnalysis.add(entry);
-	}
+//	private void evaluateSat4jCoreDead(String modelName) {
+//		final EvaluationEntry entry = new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), allModelProblem.getClauses().length, modelName);
+//		for (final AbstractSolverAnalysisFactory factory : factoryList) {
+//			this.factory = factory;
+//
+//			if ((factory instanceof Sat4JSolverAnalysisFactory) || (factory instanceof Sat4JSolverAnalysisFactoryTOGO)) {
+//				checkSat4jFeatureDead(entry);
+//			}
+//
+//		}
+//		sat4CoreDeadAnalysis.add(entry);
+//	}
 
 	private void evaluateOptiCoreDead(String modelName) {
 		final EvaluationEntry entry = new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), allModelProblem.getClauses().length, modelName);
@@ -356,27 +355,27 @@ public class EvauatedFeatureModelAnaysis {
 		entryValid.addTime(ges + initTime);
 	}
 
-	private void checkSat4jFeatureDead(EvaluationEntry entryValid) {
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		final Sat4JCoreDeadAnalysis coreDeadAnalysis = (Sat4JCoreDeadAnalysis) factory.getAnalysis(Sat4JCoreDeadAnalysis.class, allModelProblem);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entryValid.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		LongRunningWrapper.runMethod(coreDeadAnalysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		// Save time for the push pop operations
-		entryValid.addTime(coreDeadAnalysis.editTime);
-		// Save time for solving
-		entryValid.addTime(coreDeadAnalysis.solveTime);
-		// Save time for every data structure operation
-		entryValid.addTime(coreDeadAnalysis.gesamtTime);
-		// Save time for the complete analysis
-		entryValid.addTime(ges + initTime);
-	}
+//	private void checkSat4jFeatureDead(EvaluationEntry entryValid) {
+//		// Save time to create analysis which involves the creation of the solver
+//		long t1 = System.currentTimeMillis();
+//		final Sat4JCoreDeadAnalysis coreDeadAnalysis = (Sat4JCoreDeadAnalysis) factory.getAnalysis(Sat4JCoreDeadAnalysis.class, allModelProblem);
+//		final long initTime = (System.currentTimeMillis() - t1);
+//		entryValid.addTime(initTime);
+//
+//		// Save time run the complete analysis
+//		t1 = System.currentTimeMillis();
+//		LongRunningWrapper.runMethod(coreDeadAnalysis);
+//		final long ges = System.currentTimeMillis() - t1;
+//
+//		// Save time for the push pop operations
+//		entryValid.addTime(coreDeadAnalysis.editTime);
+//		// Save time for solving
+//		entryValid.addTime(coreDeadAnalysis.solveTime);
+//		// Save time for every data structure operation
+//		entryValid.addTime(coreDeadAnalysis.gesamtTime);
+//		// Save time for the complete analysis
+//		entryValid.addTime(ges + initTime);
+//	}
 
 	private void checkFeatureFalseOptional(List<int[]> possibleFOFeatures, EvaluationEntry entryValid) {
 		// Save time to create analysis which involves the creation of the solver

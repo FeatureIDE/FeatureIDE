@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -41,9 +41,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public class FMPrintAction extends PrintAction {
 
-	/**
-	 * @param part workbench part
-	 */
 	public FMPrintAction(IWorkbenchPart part) {
 		super(part);
 		setId(ActionFactory.PRINT.getId());
@@ -65,20 +62,19 @@ public class FMPrintAction extends PrintAction {
 		final Point minP = featureIter.next().getLocation().getCopy();
 
 		final ISelection selection = fmEditor.getViewer().getSelection();
-		move(featureModel, layout, features, featureIter, minP);
+		move(featureModel, features, featureIter, minP);
 		// lock the diagram to prevent the action from omitting the explanation which is currently shown to the user.
 		fmEditor.lockDiagram(true);
 		// print
 		super.run();
 		// unlock the diagram
 		fmEditor.lockDiagram(false);
-		moveBack(featureModel, layout, layoutOld, features, minP);
+		moveBack(featureModel, layoutOld, features, minP);
 		return;
 	}
 
-	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features,
-			Iterator<IGraphicalFeature> featureIter, Point minP) {
-		layout.setLayout(0);
+	private void move(IGraphicalFeatureModel featureModel, Collection<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
+		featureModel.getLayout().setLayout(0);
 		while (featureIter.hasNext()) {
 			final IGraphicalFeature f = featureIter.next();
 			final Point p = f.getLocation();
@@ -93,26 +89,26 @@ public class FMPrintAction extends PrintAction {
 		moveFeatures(features, minP);
 		moveConstraints(featureModel, minP);
 		if (!featureModel.isLegendHidden()) {
-			moveLegend(featureModel, layout, minP);
+			moveLegend(featureModel, minP);
 		}
 	}
 
-	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
+	private void moveBack(IGraphicalFeatureModel featureModel, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
 		final Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
-		moveLegend(featureModel, layout, minPneg);
-		layout.setLayout(layoutOld);
+		moveLegend(featureModel, minPneg);
+		featureModel.getLayout().setLayout(layoutOld);
 	}
 
-	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
+	private void moveLegend(IGraphicalFeatureModel featureModel, Point minP) {
 		final GraphicalViewer viewer = (GraphicalViewer) getWorkbenchPart().getAdapter(GraphicalViewer.class);
 		for (final Object obj : viewer.getEditPartRegistry().values()) {
 			if (obj instanceof LegendEditPart) {
-				final Point legendPos = layout.getLegendPos();
+				final Point legendPos = featureModel.getLegend().getPos();
 				final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
 				((LegendEditPart) obj).getFigure().setLocation(newLegendPos);
-				layout.setLegendPos(newLegendPos.x, newLegendPos.y);
+				featureModel.getLegend().setPos(newLegendPos);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,23 +21,19 @@
 package de.ovgu.featureide.ui.handlers;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 
-import org.prop4j.analysesOld.FGBuilder;
-import org.prop4j.solverOld.SatInstance;
-
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.MIGAdjListFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
@@ -53,16 +49,19 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	@Override
 	protected void endAction() {
 		for (final IFeatureProject project : projectList) {
-			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
-			final IFeatureModel fm = project.getFeatureModel();
-			final SatInstance sat =
-				new SatInstance(AdvancedNodeCreator.createRegularCNF(fm), Functional.mapToList(fm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
-			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(sat));
-			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
+			final Path path = EclipseFileSystem.getPath(project.getProject().getFile("model.fg"));
+			final IRunner<ModalImplicationGraph> runner = LongRunningWrapper.getRunner(new LongRunningMethod<ModalImplicationGraph>() {
 
 				@Override
-				public void jobFinished(IJob<IFeatureGraph> finishedJob) {
-					SimpleFileHandler.save(path, finishedJob.getResults(), new FeatureGraphFormat());
+				public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
+					return project.getFeatureModelManager().getPersistentFormula().getElement(new ModalImplicationGraphCreator());
+				}
+			});
+			runner.addJobFinishedListener(new JobFinishListener<ModalImplicationGraph>() {
+
+				@Override
+				public void jobFinished(IJob<ModalImplicationGraph> finishedJob) {
+					SimpleFileHandler.save(path, finishedJob.getResults(), new MIGAdjListFormat());
 				}
 			});
 			runner.schedule();

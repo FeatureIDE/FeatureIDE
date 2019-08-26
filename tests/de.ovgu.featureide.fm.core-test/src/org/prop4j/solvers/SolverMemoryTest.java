@@ -49,7 +49,7 @@ public class SolverMemoryTest {
 
 	public SolverMemoryTest() {
 		model = Commons.loadTestFeatureModelFromFile("car.xml");
-		problem = new SatProblem(model.getAnalyser().getCnf());
+		problem = new SatProblem(new Literal("A"));// model.getAnalyser().getCnf()); //TODO ATTRIBUTES
 	}
 
 	public MutableSolverMemory<Node, Node> getNewEmptyMemory() {

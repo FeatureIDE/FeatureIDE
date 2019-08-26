@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
-Bundle-Version: 3.5.5.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
 Require-Bundle: 
  org.eclipse.ui,
@@ -11,13 +11,13 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- org.eclipse.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
  org.eclipse.core.expressions,
- de.ovgu.featureide.fm.core;bundle-version="3.5.5"
+ org.eclipse.core.resources,
+ de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors;
@@ -67,3 +67,4 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.wizards
 Bundle-ClassPath: .,
  lib/org.abego.treelayout.core-1.0.3.jar
+Automatic-Module-Name: de.ovgu.featureide.fm.ui

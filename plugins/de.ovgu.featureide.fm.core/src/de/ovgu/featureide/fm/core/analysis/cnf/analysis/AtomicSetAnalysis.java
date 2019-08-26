@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,16 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analysesOld;
+package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
-import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
-
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -36,61 +36,65 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
+public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 
 	public AtomicSetAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
-	public AtomicSetAnalysis(SatInstance satInstance) {
+	public AtomicSetAnalysis(CNF satInstance) {
 		super(satInstance);
 	}
 
 	@Override
-	public List<int[]> analyze(IMonitor monitor) throws Exception {
-		final List<int[]> result = new ArrayList<>();
+	public List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception {
+		final List<LiteralSet> result = new ArrayList<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 = solver.findModel();
+		final int[] model1 = solver.findSolution();
+		solver.useSolutionList(1000);
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 = solver.findModel();
+			final int[] model2 = solver.findSolution();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			final byte[] done = new byte[model1.length];
 
 			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
 
-			SatInstance.updateModel(model1Copy, model2);
+			LiteralSet.resetConflicts(model1Copy, model2);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
-					switch (solver.isSatisfiable()) {
+					switch (solver.hasSolution()) {
 					case FALSE:
 						done[i] = 2;
 						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
+						reportTimeout();
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatInstance.updateModel(model1Copy, solver.getModel());
-						solver.shuffleOrder();
+						LiteralSet.resetConflicts(model1Copy, solver.getSolution());
+						solver.shuffleOrder(random);
 						break;
 					}
 				}
 			}
-			final int fixedSize = solver.getAssignment().size();
-			result.add(solver.getAssignmentArray(0, fixedSize));
+			final int fixedSize = solver.getAssignmentSize();
+			result.add(new LiteralSet(solver.getAssignmentArray(0, fixedSize)));
+
+			solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
 			for (int i = 0; i < model1.length; i++) {
 				if (done[i] == 0) {
 					done[i] = 2;
 
-					int c = 0;
+					// int c = 0;
 					int[] xModel0 = Arrays.copyOf(model1, model1.length);
 
 					final int mx0 = xModel0[i];
@@ -111,15 +115,17 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 
 							solver.assignmentPush(-my0);
 
-							switch (solver.isSatisfiable()) {
+							switch (solver.hasSolution()) {
 							case FALSE:
 								done[j] = 1;
 								break;
 							case TIMEOUT:
+								reportTimeout();
 								break;
 							case TRUE:
-								SatInstance.updateModel(xModel0, solver.getModel());
-								updateSolver(c++);
+								LiteralSet.resetConflicts(xModel0, solver.getSolution());
+								// updateSolver(c++);
+								solver.shuffleOrder(random);
 								break;
 							}
 							solver.assignmentPop();
@@ -129,16 +135,17 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 					solver.assignmentPop();
 					solver.assignmentPush(-mx0);
 
-					switch (solver.isSatisfiable()) {
+					switch (solver.hasSolution()) {
 					case FALSE:
 						break;
 					case TIMEOUT:
 						for (int j = i + 1; j < xModel0.length; j++) {
 							done[j] = 0;
 						}
+						reportTimeout();
 						break;
 					case TRUE:
-						xModel0 = solver.getModel();
+						xModel0 = solver.getSolution();
 						break;
 					}
 
@@ -148,7 +155,7 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 							if (my0 != 0) {
 								solver.assignmentPush(-my0);
 
-								switch (solver.isSatisfiable()) {
+								switch (solver.hasSolution()) {
 								case FALSE:
 									done[j] = 2;
 									solver.assignmentReplaceLast(my0);
@@ -156,11 +163,13 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 								case TIMEOUT:
 									done[j] = 0;
 									solver.assignmentPop();
+									reportTimeout();
 									break;
 								case TRUE:
 									done[j] = 0;
-									SatInstance.updateModel(xModel0, solver.getModel());
-									updateSolver(c++);
+									LiteralSet.resetConflicts(xModel0, solver.getSolution());
+									// updateSolver(c++);
+									solver.shuffleOrder(random);
 									solver.assignmentPop();
 									break;
 								}
@@ -170,7 +179,7 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 						}
 					}
 
-					result.add(solver.getAssignmentArray(fixedSize, solver.getAssignment().size()));
+					result.add(new LiteralSet(solver.getAssignmentArray(fixedSize, solver.getAssignmentSize())));
 					solver.assignmentClear(fixedSize);
 				}
 			}
@@ -178,13 +187,13 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 		return result;
 	}
 
-	private void updateSolver(int c) {
-		if (((c % 2) == 0)) {
-			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-		} else {
-			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-			solver.shuffleOrder();
-		}
-	}
+	// private void updateSolver(int c) {
+	// if ((c % 2 == 0)) {
+	// solver.setSelectionStrategy(SelectionStrategy.RANDOM);
+	// } else {
+	// solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+	// solver.shuffleOrder();
+	// }
+	// }
 
 }

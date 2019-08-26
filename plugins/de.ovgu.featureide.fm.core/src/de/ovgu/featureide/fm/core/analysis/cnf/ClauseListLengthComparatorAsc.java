@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,31 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analysesOld;
+package de.ovgu.featureide.fm.core.analysis.cnf;
 
-import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import java.util.Comparator;
+import java.util.List;
 
 /**
- * Determines whether a sat instance is satisfiable and returns the found model.
+ * Compares list of clauses by he number of literals.
  *
  * @author Sebastian Krieter
  */
-public class ValidAnalysis extends AbstractAnalysis<int[]> {
-
-	public ValidAnalysis(ISatSolver solver) {
-		super(solver);
-	}
-
-	public ValidAnalysis(SatInstance satInstance) {
-		super(satInstance);
-	}
+public class ClauseListLengthComparatorAsc implements Comparator<List<LiteralSet>> {
 
 	@Override
-	public int[] analyze(IMonitor monitor) throws Exception {
-		return solver.findModel();
+	public int compare(List<LiteralSet> o1, List<LiteralSet> o2) {
+		return addLengths(o1) - addLengths(o2);
+	}
+
+	protected int addLengths(List<LiteralSet> o) {
+		int count = 0;
+		for (final LiteralSet literalSet : o) {
+			count += literalSet.getLiterals().length;
+		}
+		return count;
 	}
 
 }

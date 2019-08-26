@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solverOld;
+package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
 import static org.sat4j.core.LiteralsUtils.negLit;
 import static org.sat4j.core.LiteralsUtils.posLit;
@@ -32,16 +32,17 @@ public class FixedLiteralSelectionStrategy implements IPhaseSelectionStrategy {
 
 	private final int[] model, phase;
 
-	public FixedLiteralSelectionStrategy(int[] model, boolean reverse) {
+	public FixedLiteralSelectionStrategy(int[] model, boolean min) {
+		super();
 		this.model = model;
 		phase = new int[model.length + 1];
-		if (reverse) {
+		if (min) {
 			for (int i = 0; i < model.length; i++) {
 				phase[i + 1] = model[i] >= 0 ? negLit(i + 1) : posLit(i + 1);
 			}
 		} else {
 			for (int i = 0; i < model.length; i++) {
-				phase[i + 1] = model[i] <= 0 ? negLit(i + 1) : posLit(i + 1);
+				phase[i + 1] = model[i] > 0 ? negLit(i + 1) : posLit(i + 1);
 			}
 		}
 	}

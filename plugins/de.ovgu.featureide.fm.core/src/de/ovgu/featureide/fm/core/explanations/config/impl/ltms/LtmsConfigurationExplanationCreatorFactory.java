@@ -18,30 +18,25 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
-import java.io.Serializable;
+import org.prop4j.solver.impl.Ltms.Ltms;
+import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
 
-import org.prop4j.solverOld.SatInstance;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationExplanationCreatorFactory;
 
-public interface IFeatureGraph extends Serializable {
+/**
+ * Provides instances of {@link ConfigurationExplanationCreator} using an {@link Ltms LTMS}.
+ *
+ * @author Timo G&uuml;nther
+ */
+public class LtmsConfigurationExplanationCreatorFactory extends MusConfigurationExplanationCreatorFactory {
 
-	boolean setEdge(int from, int to, byte edgeType);
-
-	byte getEdge(int fromIndex, int toIndex);
-
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getSize();
-
-	int[] getIndex();
-
-	SatInstance getSatInstance();
-
-	void copyValues(IFeatureGraph otherGraph);
-
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getFeatureIndex(String name);
-
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public LtmsConfigurationExplanationCreatorFactory() {
+		super(new LtmsSatSolverFactory());
+	}
 }

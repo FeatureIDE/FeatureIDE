@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +38,12 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
@@ -109,75 +111,66 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	/**
 	 * Sets the properties <i>icon, border and tooltips</i> of the {@link ConstraintFigure}.
 	 */
-	public void setConstraintProperties() {
+	@Override
+	public void updateProperties() {
 		init();
 
-		final IConstraint constraint = graphicalConstraint.getObject();
-
+		final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
+				.getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 
-		switch (constraint.getConstraintAttribute()) {
-		case NORMAL:
+		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
 			label.setIcon(null);
-			break;
-		case VOID_MODEL:
-			label.setIcon(null);
+		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {
+			label.setIcon(FM_ERROR);
 			add(label);
 			toolTipContent.add(new Label(VOID_MODEL));
-			break;
-		case UNSATISFIABLE:
+		} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
 			label.setIcon(FM_ERROR);
 			toolTipContent.add(new Label(UNSATISFIABLE));
-			break;
-		case TAUTOLOGY:
+		}
+
+		if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
 			label.setIcon(FM_WARNING);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
-			break;
-		case REDUNDANT:
-		case IMPLICIT:
+		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
+			label.setIcon(FM_WARNING);
+			add(label);
+			toolTipContent.add(new Label(REDUNDANCE));
+		} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
 			label.setIcon(FM_INFO);
 			add(label);
 			toolTipContent.add(new Label(REDUNDANCE));
-			break;
-		case DEAD:
-			if (!constraint.getDeadFeatures().isEmpty()) {
-				label.setIcon(null);
-				final List<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-				for (final IFeature dead : constraint.getDeadFeatures()) {
-					deadFeatures.add(dead.toString());
-				}
-				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				String s = DEAD_FEATURE;
-				for (final String dead : deadFeatures) {
-					s += "\n\u2022 " + dead;
-				}
-				toolTipContent.add(new Label(s));
-			}
-			break;
-		case FALSE_OPTIONAL:
-			if (!constraint.getFalseOptional().isEmpty()) {
-				label.setIcon(null);
-				final List<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
-				for (final IFeature feature : constraint.getFalseOptional()) {
-					falseOptionalFeatures.add(feature.toString());
-				}
-				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-
-				String s = FALSE_OPTIONAL;
-				for (final String feature : falseOptionalFeatures) {
-					s += "\n\u2022 " + feature;
-				}
-				toolTipContent.add(new Label(s));
-			}
-			break;
-		default:
-			break;
 		}
 
-		final String description = constraint.getDescription();
+		if (!constraintProperties.getDeadFeatures().isEmpty()) {
+			label.setIcon(null);
+			final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+
+			String s = DEAD_FEATURE;
+			for (final String dead : deadFeatures) {
+				s += "\n\u2022 " + dead;
+			}
+			toolTipContent.add(new Label(s));
+		}
+
+		if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
+			label.setIcon(null);
+			final List<String> falseOptionalFeatures =
+				Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+
+			String s = FALSE_OPTIONAL;
+			for (final String feature : falseOptionalFeatures) {
+				s += "\n\u2022 " + feature;
+			}
+			toolTipContent.add(new Label(s));
+		}
+
+		final String description = graphicalConstraint.getObject().getDescription();
 		if ((description != null) && !description.trim().isEmpty()) {
 			toolTipContent.add(new Label("Description:"));
 			toolTipContent.add(new Label(description));
