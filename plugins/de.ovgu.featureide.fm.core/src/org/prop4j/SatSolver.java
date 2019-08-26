@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Thomas Thuem
  */
+@Deprecated
 public class SatSolver {
 
 	public static enum ValueType {
@@ -83,8 +84,8 @@ public class SatSolver {
 	}
 
 	public SatSolver(Node node, long timeout, boolean createCNF) {
-		varToInt = new HashMap<Object, Integer>();
-		intToVar = new HashMap<Integer, Object>();
+		varToInt = new HashMap<>();
+		intToVar = new HashMap<>();
 		readVars(node);
 
 		initSolver(node, timeout, createCNF);
@@ -326,7 +327,6 @@ public class SatSolver {
 		if (test()) {
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
-			max = solver.nVars();
 
 			return atomicSuperSets(globalModel, done);
 		}
@@ -337,14 +337,12 @@ public class SatSolver {
 		if (test()) {
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
-			max = 0;
 
 			Arrays.fill(done, (byte) 2);
 			for (final String b : featureSet) {
 				final Integer x = varToInt.get(b);
 				if (x != null) {
 					done[x - 1] = 0;
-					max++;
 				} else {
 					throw new RuntimeException("Unkown Feature " + b);
 				}
@@ -355,8 +353,6 @@ public class SatSolver {
 		return Collections.emptyList();
 	}
 
-	private int max = 0;
-
 	private List<List<Literal>> atomicSuperSets(final int[] globalModel, final byte[] done) {
 		final List<List<Literal>> result = new ArrayList<>();
 		final ArrayList<Literal> coreList = new ArrayList<>();
@@ -364,12 +360,10 @@ public class SatSolver {
 
 		final IVecInt backbone = new VecInt();
 
-		int c = 0;
 		for (int i = 0; i < globalModel.length; i++) {
 			final int x = globalModel[i];
 			if (done[i] == 0) {
 				done[i] = 2;
-				System.out.println("\t\t" + ++c + " / " + max);
 
 				if (!sat(backbone, -x)) {
 					backbone.push(x);
@@ -399,7 +393,6 @@ public class SatSolver {
 							if (!sat(backbone, y)) {
 								done[j] = 2;
 								setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
-								System.out.println("\t\t" + ++c + " / " + max);
 							} else {
 								done[j] = 0;
 							}
@@ -426,7 +419,7 @@ public class SatSolver {
 	}
 
 	private List<Literal> convertToNodes(final IVecInt backbone) {
-		final ArrayList<Literal> list = new ArrayList<Literal>(backbone.size());
+		final ArrayList<Literal> list = new ArrayList<>(backbone.size());
 
 		final IteratorInt iter = backbone.iterator();
 		while (iter.hasNext()) {
@@ -442,7 +435,7 @@ public class SatSolver {
 	 * @return true if the formula is satisfiable
 	 * @throws TimeoutException
 	 */
-	public boolean isSatisfiable() throws TimeoutException {
+	public boolean hasSolution() throws TimeoutException {
 		return !contradiction && solver.isSatisfiable();
 	}
 
@@ -615,7 +608,7 @@ public class SatSolver {
 	}
 
 	public LinkedList<List<String>> getSolutionFeatures(Literal[] literals, int number) throws TimeoutException {
-		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
+		final LinkedList<List<String>> solutionList = new LinkedList<>();
 
 		if (!contradiction) {
 			final int[] unitClauses = new int[literals.length];
@@ -642,13 +635,13 @@ public class SatSolver {
 	}
 
 	public LinkedList<List<String>> getSolutionFeatures(int number) throws TimeoutException {
-		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
+		final LinkedList<List<String>> solutionList = new LinkedList<>();
 
 		if (!contradiction) {
 			final IProblem problem = new ModelIterator(solver);
 			int[] lastModel = null;
 			for (int i = 0; i < number; i++) {
-				final List<String> featureList = new LinkedList<String>();
+				final List<String> featureList = new LinkedList<>();
 
 				if (!problem.isSatisfiable(i > 0)) {
 					break;
@@ -739,8 +732,11 @@ public class SatSolver {
 	 *
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
+	 * @param monitor
+	 * @return A list of feature names in the solution.
+	 * @throws TimeoutException
 	 */
-	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor monitor) throws TimeoutException {
+	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor<?> monitor) throws TimeoutException {
 		final VecInt vector = new VecInt();
 		final List<String> coveredFeatures = new LinkedList<>();
 		for (final String feature : features) {
@@ -762,7 +758,7 @@ public class SatSolver {
 		}
 
 		final int[] model = solver.model();
-		final List<String> featureList = new ArrayList<String>(model.length);
+		final List<String> featureList = new ArrayList<>(model.length);
 		for (final int var : model) {
 			if (var > 0) {
 				featureList.add(intToVar.get(var).toString().intern());

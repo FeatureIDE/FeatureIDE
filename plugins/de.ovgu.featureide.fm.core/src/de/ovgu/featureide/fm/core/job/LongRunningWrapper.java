@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,15 +37,20 @@ public final class LongRunningWrapper {
 	private LongRunningWrapper() {}
 
 	public static <T> T runMethod(LongRunningMethod<T> method) {
-		return runMethod(method, null);
+		try {
+			return runMethod(method, new NullMonitor<T>());
+		} catch (final MethodCancelException e) {
+			assert false;
+		} catch (final Exception e) {
+			Logger.logError(e);
+		}
+		return null;
 	}
 
-	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
-		monitor = monitor != null ? monitor : new NullMonitor();
+	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor<T> monitor) throws MethodCancelException {
+		monitor = monitor != null ? monitor : new NullMonitor<T>();
 		try {
 			return method.execute(monitor);
-		} catch (final MethodCancelException e) {
-			return null;
 		} catch (final Exception e) {
 			Logger.logError(e);
 			return null;
@@ -70,16 +75,20 @@ public final class LongRunningWrapper {
 		return getThread(method, name, null);
 	}
 
-	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, IMonitor monitor) {
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, IMonitor<T> monitor) {
 		return getThread(method, "", monitor);
 	}
 
-	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor monitor) {
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name, IMonitor<T> monitor) {
 		return new LongRunningThread<>(name, method, monitor);
 	}
 
 	public static JobToken createToken(JobStartingStrategy strategy) {
 		return JobSynchronizer.createToken(strategy);
+	}
+
+	public static void removeToken(JobToken token) {
+		JobSynchronizer.removeToken(token);
 	}
 
 	public static void startJob(JobToken token, final IRunner<?> job) {

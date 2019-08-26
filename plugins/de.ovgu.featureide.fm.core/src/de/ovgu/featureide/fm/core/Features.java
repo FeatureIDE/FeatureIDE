@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -85,7 +84,7 @@ public final class Features {
 		return features;
 	}
 
-	public static final Collection<String> extractOperatorNamesFromFeatuers(final Set<String> features) {
+	public static final Collection<String> extractOperatorNamesFromFeatuers(final Collection<String> features) {
 		final List<String> result = new ArrayList<>();
 		for (final String feature : features) {
 			final String str = feature.toLowerCase().trim();

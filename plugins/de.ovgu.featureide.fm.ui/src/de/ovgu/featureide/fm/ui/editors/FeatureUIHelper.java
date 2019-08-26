@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -56,7 +56,7 @@ public class FeatureUIHelper {
 	}
 
 	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
-		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
+		return getGraphicalFeature(model.getFeatureModelManager().getSnapshot().getStructure().getRoot(), model);
 	}
 
 	public static IGraphicalElement getGraphicalElement(IFeatureModelElement element, IGraphicalFeatureModel model) {
@@ -151,7 +151,7 @@ public class FeatureUIHelper {
 			}
 		}
 		// without abego library
-		if (featureModel.getLayout().getHasVerticalLayout()) {
+		if (featureModel.getLayout().hasVerticalLayout()) {
 			return bounds.getLeft();
 		} else {
 			return bounds.getTop();
@@ -218,14 +218,15 @@ public class FeatureUIHelper {
 
 	/**
 	 * should not be used here
-	 * 
+	 *
 	 * @param feature feature
 	 * @param viewer viewer
 	 * @return connection edit parts
+	 * @deprecated will be moved...
 	 */
 	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
-		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
+		final List<ConnectionEditPart> editPartList = new LinkedList<>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
 		for (final FeatureConnection connection : feature.getTargetConnections()) {
 			final Object connectionEditPart = registry.get(connection);
@@ -281,18 +282,18 @@ public class FeatureUIHelper {
 			}
 		}
 //		without abego library
-		if (layout.getHasVerticalLayout()) {
+		if (layout.hasVerticalLayout()) {
 			return bounds.getRight();
 		}
 		return bounds.getBottom();
 	}
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {
-		featureModel.getLayout().setHasVerticalLayout(isVerticalLayout);
+		featureModel.getLayout().setVerticalLayout(isVerticalLayout);
 	}
 
 	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
-		return featureModel.getLayout().getHasVerticalLayout();
+		return featureModel.getLayout().hasVerticalLayout();
 	}
 
 	public static void setLeftRightInverted(boolean isLeftRightInverted, IGraphicalFeatureModel featureModel) {

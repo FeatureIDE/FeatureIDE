@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -167,7 +167,7 @@ public class And extends Node {
 
 	@Override
 	public void simplify() {
-		final List<Node> nodes = new ArrayList<Node>();
+		final List<Node> nodes = new ArrayList<>();
 
 		for (int i = 0; i < children.length; i++) {
 			collectChildren(children[i], nodes);

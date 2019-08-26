@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,12 +23,12 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.nio.file.Path;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -38,47 +38,40 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class ConfigurationManager extends AFileManager<Configuration> {
 
-	private static class ObjectCreator extends AFileManager.ObjectCreator<Configuration> {
-
-		private final Configuration configuration;
-
-		public ObjectCreator(Configuration configuration) {
-			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
-			this.configuration = configuration;
-		}
-
-		@Override
-		protected Configuration createObject(Path path, IPersistentFormat<Configuration> format) throws NoSuchExtensionException {
-			return configuration;
-		}
-	}
-
-	@Nonnull
-	public static IPersistentFormat<Configuration> getDefaultFormat() {
-		return new XMLConfFormat();
-	}
+	public static final int CHANGE_ALL = 0;
+	public static final int CHANGE_FEATURES = 1;
+	public static final int CHANGE_MANUAL = 2;
+	public static final int CHANGE_AUTOMATIC = 3;
+	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
-		return AFileManager.getInstance(path, new ObjectCreator(null), false);
+		return getOrCreateInstance(path, ConfigurationManager.class, null);
 	}
 
-	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, boolean createNewIfNeeded) {
-		return AFileManager.getInstance(path, new ObjectCreator(null), createNewIfNeeded);
+	public static boolean isFileSupported(Path filePath) {
+		return ConfigFormatManager.getInstance().hasFormat(filePath);
 	}
 
-	@CheckForNull
-	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
-		return AFileManager.getInstance(path, new ObjectCreator(configuration), true);
+	public static final Configuration load(Path path) {
+		return ConfigurationIO.getInstance().load(path);
 	}
 
-	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
-		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
+	public static FileHandler<Configuration> getFileHandler(Path path) {
+		return ConfigurationIO.getInstance().getFileHandler(path);
 	}
 
-	protected ConfigurationManager(Configuration configuration, FileIdentifier<Configuration> identifier) {
-		super(configuration, identifier);
+	public static final boolean save(Configuration configuration, Path path, IPersistentFormat<Configuration> format) {
+		return ConfigurationIO.getInstance().save(configuration, path, format);
+	}
+
+	protected ConfigurationManager(Path identifier) {
+		super(identifier, ConfigFormatManager.getInstance(), ConfigurationFactoryManager.getInstance());
+	}
+
+	@Override
+	public IConfigurationFormat getFormat() {
+		return (IConfigurationFormat) super.getFormat();
 	}
 
 	@Override
@@ -86,12 +79,47 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 		return oldObject.clone();
 	}
 
-	public void setConfiguration(Configuration configuration) {
-		variableObject = configuration;
-		synchronized (syncObject) {
-			// persistentObject = copyObject(variableObject);
-			setPersistentObject(copyObject(variableObject));
+	private IFeatureModelManager featureModelManager;
+
+	public void linkFeatureModel(IFeatureModelManager featureModelManager) {
+		fileOperationLock.lock();
+		try {
+			if ((featureModelManager == null) || (this.featureModelManager != featureModelManager)) {
+				this.featureModelManager = featureModelManager;
+				final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
+				getObject().updateFeatures(formula);
+				getVarObject().updateFeatures(formula);
+			}
+		} finally {
+			fileOperationLock.unlock();
 		}
+	}
+
+	public IFeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
+	}
+
+	public void update() {
+		if (featureModelManager != null) {
+			final FeatureModelFormula formula = featureModelManager.getPersistentFormula();
+			fileOperationLock.lock();
+			try {
+				getObject().updateFeatures(formula);
+				final Configuration configuration = getVarObject();
+				configuration.updateFeatures(formula);
+			} finally {
+				fileOperationLock.unlock();
+			}
+		}
+	}
+
+	@Override
+	protected Configuration createObject() throws Exception {
+		final Configuration configuration = super.createObject();
+		if (featureModelManager != null) {
+			configuration.updateFeatures(featureModelManager.getPersistentFormula());
+		}
+		return configuration;
 	}
 
 }

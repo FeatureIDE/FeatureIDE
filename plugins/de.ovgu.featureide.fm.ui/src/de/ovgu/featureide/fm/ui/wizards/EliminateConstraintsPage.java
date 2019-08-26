@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -231,10 +231,10 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 			updateErrorMessage("Exported model file must have " + fileExtension + " as file extension.");
 			return false;
 		}
-//		if (path.toFile().exists()) {
-//			updateStatusMessage("Selected file already exists. File will be overwritten.");
-//			return false;
-//		}
+		// if (path.toFile().exists()) {
+		// updateStatusMessage("Selected file already exists. File will be overwritten.");
+		// return false;
+		// }
 		updateErrorMessage(null);
 		// updateStatusMessage(null);
 
@@ -261,14 +261,9 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		return fileDialog.open();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage#putData()
-	 */
 	@Override
 	protected void putData() {
 		// TODO Auto-generated method stub
-
 	}
 
 }

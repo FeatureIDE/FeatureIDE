@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -44,10 +43,12 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -63,11 +64,11 @@ public class ImportHandler extends AFileHandler {
 
 	@Override
 	protected final void singleAction(IFile outputFile) {
-		final Path modelFilePath = Paths.get(outputFile.getLocationURI());
+		final Path modelFilePath = EclipseFileSystem.getPath(outputFile);
 
-		final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
+		final List<IPersistentFormat<IFeatureModel>> formatExtensions = FMFormatManager.getInstance().getExtensions();
 		int countReadableFormats = 0;
-		for (final IFeatureModelFormat format : formatExtensions) {
+		for (final IPersistentFormat<IFeatureModel> format : formatExtensions) {
 			if (format.supportsRead()) {
 				countReadableFormats++;
 			}
@@ -77,7 +78,7 @@ public class ImportHandler extends AFileHandler {
 		names[0] = "All files *.*";
 		extensions[0] = "*.*";
 		int index = 1;
-		for (final IFeatureModelFormat format : formatExtensions) {
+		for (final IPersistentFormat<IFeatureModel> format : formatExtensions) {
 			if (format.supportsRead()) {
 				final String extension = "*." + format.getSuffix();
 				names[index] = format.getName() + " " + extension;
@@ -105,7 +106,7 @@ public class ImportHandler extends AFileHandler {
 			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 		}
 
-		final FileHandler<IFeatureModel> filHandler = FeatureModelManager.load(inputFile.toPath());
+		final FileHandler<IFeatureModel> filHandler = FeatureModelIO.getInstance().getFileHandler(inputFile.toPath());
 		final ProblemList problems = filHandler.getLastProblems();
 		if (problems.containsError()) {
 			final StringBuilder sb = new StringBuilder("Error while loading file: \n");
@@ -118,7 +119,7 @@ public class ImportHandler extends AFileHandler {
 			}
 			MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
 		} else {
-			SimpleFileHandler.save(Paths.get(outputFile.getLocationURI()), filHandler.getObject(), new XmlFeatureModelFormat());
+			SimpleFileHandler.save(EclipseFileSystem.getPath(outputFile), filHandler.getObject(), new XmlFeatureModelFormat());
 			try {
 				openFileInEditor(outputFile);
 			} catch (final PartInitException e) {

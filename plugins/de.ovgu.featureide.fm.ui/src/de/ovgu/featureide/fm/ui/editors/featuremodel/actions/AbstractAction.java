@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 
 /**
@@ -39,35 +35,14 @@ public class AbstractAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.abstract";
 
-	private final IFeatureModel featureModel;
-
-	public AbstractAction(Object viewer, IFeatureModel featureModel) {
-		super("Abstract", viewer, ID);
-		this.featureModel = featureModel;
+	public AbstractAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Abstract", viewer, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		changeAbstractStatus(isEveryFeatureAbstract());
+		FeatureModelOperationWrapper.run(new SetFeatureToAbstractOperation(featureModelManager, getSelectedFeatures()));
 		setChecked(isEveryFeatureAbstract());
-	}
-
-	private boolean isEveryFeatureAbstract() {
-		for (final IFeature tempFeature : featureArray) {
-			if (!(tempFeature.getStructure().isAbstract())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void changeAbstractStatus(boolean allAbstract) {
-		final SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(featureModel, allAbstract, getSelectedFeatures());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
 	}
 
 	@Override
@@ -75,6 +50,10 @@ public class AbstractAction extends MultipleSelectionAction {
 		setEnabled(true);
 		// A selection of features is considered abstract if every feature is abstract.
 		setChecked(isEveryFeatureAbstract());
+	}
+
+	private boolean isEveryFeatureAbstract() {
+		return SetFeatureToAbstractOperation.isEveryFeatureAbstract(featureModelManager.getSnapshot(), featureArray);
 	}
 
 }

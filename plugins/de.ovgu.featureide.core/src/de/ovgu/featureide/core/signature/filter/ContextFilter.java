@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.signature.filter;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -33,9 +34,8 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public class ContextFilter implements IFilter<AbstractSignature> {
+public class ContextFilter implements Predicate<AbstractSignature> {
 
 	private final ProjectSignatures projectSignatures;
 	private final Node fmNode;
@@ -75,7 +75,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 	}
 
 	@Override
-	public boolean isValid(AbstractSignature signature) {
+	public boolean test(AbstractSignature signature) {
 		final AFeatureData[] ids = signature.getFeatureData();
 		final Node[] negativeLiterals = new Node[ids.length];
 		for (int i = 0; i < ids.length; ++i) {

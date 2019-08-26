@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,46 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 
 /**
  * Interface for methods that take a long time to finish.<br> Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
  *
  * @author Sebastian Krieter
  */
+@FunctionalInterface
 public interface LongRunningMethod<T> {
 
-	T execute(IMonitor monitor) throws Exception;
-
-	class Util {
-
-		public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
-			try {
-				return method.execute(monitor);
-			} catch (final MethodCancelException e) {
-				throw e;
-			} catch (final Exception e) {
-				Logger.logError(e);
-				return null;
-			}
-		}
-
-		public static <T> T runMethodInThread(LongRunningMethod<T> method, IMonitor monitor) {
-			final IRunner<T> thread = LongRunningWrapper.getThread(method, monitor);
-			monitor.checkCancel();
-			thread.schedule();
-			try {
-				thread.join();
-			} catch (final InterruptedException e) {
-				monitor.cancel();
-				throw new MethodCancelException();
-			}
-			monitor.checkCancel();
-			return thread.getResults();
-		}
-
-	}
+	T execute(IMonitor<T> monitor) throws Exception;
 
 }

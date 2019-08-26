@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import java.util.Random;
-
 /**
  * Object to identifier related jobs.
  *
@@ -33,18 +31,6 @@ import java.util.Random;
  */
 public class JobToken {
 
-	private final int id = new Random().nextInt();
-
 	JobToken() {}
-
-	@Override
-	public int hashCode() {
-		return id;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return this == obj;
-	}
 
 }

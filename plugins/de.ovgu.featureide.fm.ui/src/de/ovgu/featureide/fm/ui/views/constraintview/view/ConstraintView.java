@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -36,10 +34,11 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
  * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
@@ -70,13 +69,16 @@ public class ConstraintView implements GUIDefaults {
 	private Tree tree;
 	private Text searchBox;
 
+	private final ConstraintViewController controller;
+
 	private TreeColumn constraintColumn, descriptionColumn;
 
 	public void dispose() {
 		treeViewer.getTree().dispose();
 	}
 
-	public ConstraintView(Composite parent) {
+	public ConstraintView(Composite parent, ConstraintViewController controller) {
+		this.controller = controller;
 		init(parent);
 	}
 
@@ -91,7 +93,7 @@ public class ConstraintView implements GUIDefaults {
 		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
 		}
-		if (element.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+		if (controller.getConstraintProperty(element).hasStatus(ConstraintStatus.REDUNDANT)) {
 			item.setImage(FM_INFO);
 		}
 		tree.setHeaderVisible(true);
@@ -166,7 +168,7 @@ public class ConstraintView implements GUIDefaults {
 		for (final TreeItem item : tree.getItems()) {
 			if (item.getData() instanceof IConstraint) {
 				if (item.getData().equals(constraint)) {
-					if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+					if (controller.getConstraintProperty(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
 						item.setImage(FM_INFO);
 					} else {
 						item.setImage(IMAGE_EMPTY);
@@ -260,19 +262,7 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn.setMoveable(true);
 		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		constraintColumn.addSelectionListener(new SelectionListener() {
 
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("Constraint Header");
-
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
-		});
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);

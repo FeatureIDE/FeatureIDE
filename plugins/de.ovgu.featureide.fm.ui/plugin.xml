@@ -434,10 +434,6 @@
 				commandId="de.ovgu.featureide.fm.ui.commands.Convert">
 		</handler>
 		<handler
-				class="de.ovgu.featureide.fm.ui.handlers.AnalyzeVelvetHandler"
-				commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet">
-		</handler>
-		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.FeatureDependenciesHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies">
 		</handler>

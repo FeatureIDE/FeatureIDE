@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -45,7 +45,7 @@ public interface IFeatureStructure {
 
 	int getChildIndex(IFeatureStructure feature);
 
-	List<IFeatureStructure> getChildren();	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
+	List<IFeatureStructure> getChildren(); // Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	int getChildrenCount();
 
@@ -107,7 +107,7 @@ public interface IFeatureStructure {
 
 	void setAND(boolean and);
 
-	void setChildren(List<IFeatureStructure> children);	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
+	void setChildren(List<IFeatureStructure> children); // Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	void setHidden(boolean hid);
 
@@ -122,4 +122,6 @@ public interface IFeatureStructure {
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
+
+	IFeatureStructure clone(IFeatureModel newFeatureModel);
 }

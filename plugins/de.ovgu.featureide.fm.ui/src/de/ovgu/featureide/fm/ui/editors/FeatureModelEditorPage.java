@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,9 +28,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Basic class with some default methods for feature model editor pages.
@@ -40,27 +39,24 @@ import de.ovgu.featureide.fm.core.io.manager.IFileManager;
  */
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
-	protected final IFileManager<IFeatureModel> fmManager;
-	protected final IFileManager<IGraphicalFeatureModel> gfmManager;
+	protected final IFeatureModelManager fmManager;
 
 	private int index;
 
 	protected IEditorInput input;
 	protected IEditorSite site;
 
-	public FeatureModelEditorPage(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
+	public FeatureModelEditorPage(IFeatureModelManager fmManager) {
 		super();
 		this.fmManager = fmManager;
-		this.gfmManager = gfmManager;
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return fmManager.editObject();
+	public IFeatureModelManager getFeatureModel() {
+		return fmManager;
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
-	}
+	public void doSave(IProgressMonitor monitor) {}
 
 	@Override
 	public void doSaveAs() {}

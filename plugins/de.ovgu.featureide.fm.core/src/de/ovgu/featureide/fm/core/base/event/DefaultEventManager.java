@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,15 +37,28 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 	protected final List<IEventListener> listenerList = new LinkedList<>();
 
 	@Override
-	public synchronized void addListener(IEventListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
+	public void addListener(IEventListener listener) {
+		synchronized (this) {
+			if (!listenerList.contains(listener)) {
+				listenerList.add(listener);
+			}
 		}
 	}
 
 	@Override
-	public synchronized void fireEvent(FeatureIDEEvent event) {
-		for (final IEventListener listener : listenerList) {
+	public List<IEventListener> getListeners() {
+		synchronized (this) {
+			return Collections.unmodifiableList(listenerList);
+		}
+	}
+
+	@Override
+	public void fireEvent(FeatureIDEEvent event) {
+		ArrayList<IEventListener> tempList;
+		synchronized (this) {
+			tempList = new ArrayList<>(listenerList);
+		}
+		for (final IEventListener listener : tempList) {
 			callListener(event, listener);
 		}
 	}
@@ -57,8 +72,10 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 	}
 
 	@Override
-	public synchronized void removeListener(IEventListener listener) {
-		listenerList.remove(listener);
+	public void removeListener(IEventListener listener) {
+		synchronized (this) {
+			listenerList.remove(listener);
+		}
 	}
 
 	@Override

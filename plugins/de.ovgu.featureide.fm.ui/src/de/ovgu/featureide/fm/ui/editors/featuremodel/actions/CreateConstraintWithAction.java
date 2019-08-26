@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,13 +23,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_WITH;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -45,54 +42,36 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 
 	protected String selectedFeature;
 
-	public CreateConstraintWithAction(Object viewer, IFeatureModel featuremodel) {
-		super(viewer, featuremodel);
-		setId(ID);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		}
+	public CreateConstraintWithAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(viewer, featureModelManager, ID);
 	}
 
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-
-			if (selection.size() == 1) {
-				final Object editPart = selection.getFirstElement();
-
-				final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
-
-				if (feature != null) {
-					updateConstraintActionText(feature.getName());
-				}
-			}
-		}
-	};
-
-	/**
-	 * @param featureName
-	 */
 	protected void updateConstraintActionText(String featureName) {
 		selectedFeature = featureName;
 		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH + " \"" + featureName + "\""));
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction#run()
-	 */
 	@Override
 	public void run() {
-		final ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
-		dialog.setInputText(selectedFeature);
+		final ConstraintDialog dialog = new ConstraintDialog(featureModelManager, null);
+		if (selectedFeature != null) {
+			dialog.setInputText(selectedFeature);
+		}
 	}
-	
+
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		return selection.size() == 1;
+		if ((selection != null) && (selection.size() == 1)) {
+			final Object editPart = selection.getFirstElement();
+
+			final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
+
+			if (feature != null) {
+				updateConstraintActionText(feature.getName());
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

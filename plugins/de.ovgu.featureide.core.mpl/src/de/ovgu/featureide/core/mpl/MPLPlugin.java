@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -46,14 +46,15 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
-import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
 import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Plug-in activator with miscellaneous function for an interface project.
@@ -197,9 +198,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 			@Override
 			public void propertyChange(FeatureIDEEvent evt) {
 				if (EventType.MODEL_DATA_CHANGED == evt.getEventType()) {
-//					interfaceProject.loadSignatures(true);
+					// interfaceProject.loadSignatures(true);
 				} else if (EventType.MODEL_LAYOUT_CHANGED == evt.getEventType()) {
-//					interfaceProject.loadSignatures(true);
+					// interfaceProject.loadSignatures(true);
 				}
 			}
 		});
@@ -264,10 +265,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 
-//	public void buildJavaProject(IFile featureListFile, String name) {
-//		new JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile, name);
-//	}
-
 	public void setCurrentMapping(IProject project, String name) {
 		try {
 			project.setPersistentProperty(mappingConfigID, name);
@@ -279,31 +276,31 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void addViewTag(IProject project, String name) {
 		final InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-//			interfaceProject.getRoleMap().addDefaultViewTag(name);
-//			refresh(interfaceProject);
+			// interfaceProject.getRoleMap().addDefaultViewTag(name);
+			// refresh(interfaceProject);
 		}
 	}
 
 	public void scaleUpViewTag(IProject project, String name, int level) {
 		final InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-//			interfaceProject.scaleUpViewTag(name, level);
-//			refresh(interfaceProject);
+			// interfaceProject.scaleUpViewTag(name, level);
+			// refresh(interfaceProject);
 		}
 	}
 
 	public void deleteViewTag(IProject project, String name) {
 		final InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-//			interfaceProject.removeViewTag(name);
-//			refresh(interfaceProject);
+			// interfaceProject.removeViewTag(name);
+			// refresh(interfaceProject);
 		}
 	}
 
 	public void refresh(IProject project) {
 		final InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-//			interfaceProject.loadSignatures(true);
+			// interfaceProject.loadSignatures(true);
 			try {
 				project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 			} catch (final CoreException e) {
@@ -314,49 +311,50 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(projects.size());
 		for (final IProject iProject : projects) {
-			arguments.add(new PrintFeatureInterfacesJob.Arguments(folder, iProject));
+			arguments.add(new PrintFeatureInterfacesJob(folder, iProject));
 		}
-		FMCorePlugin.getDefault().startJobs(arguments, true);
+		FMCorePlugin.startJobs(arguments, StringTable.BUILD_FEATURE_INTERFACES, true);
 	}
 
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
-//		for (IProject iProject : projects) {
-//			arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
-//		}
-//		FMCorePlugin.getDefault().startJobs(arguments, true);
+		// ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		// for (IProject iProject : projects) {
+		// arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
+		// }
+		// FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
-//		for (IProject iProject : projects) {
-//			arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
-//		}
-//		FMCorePlugin.getDefault().startJobs(arguments, true);
+		// ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		// for (IProject iProject : projects) {
+		// arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
+		// }
+		// FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
-//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
-//		for (IProject iProject : projects) {
-//			arguments.add(new PrintExtendedSignaturesJob.Arguments(folder, iProject));
-//		}
-//		FMCorePlugin.getDefault().startJobs(arguments, true);
+		// ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		// for (IProject iProject : projects) {
+		// arguments.add(new PrintExtendedSignaturesJob.Arguments(folder,
+		// iProject));
+		// }
+		// FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void printStatistics(LinkedList<IProject> projects, String folder) {
-//		ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
-//		for (IProject iProject : projects) {
-//			arguments.add(new PrintStatisticsJob.Arguments(folder, iProject));
-//		}
-//		FMCorePlugin.getDefault().startJobs(arguments, true);
+		// ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+		// for (IProject iProject : projects) {
+		// arguments.add(new PrintStatisticsJob.Arguments(folder, iProject));
+		// }
+		// FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
-		final ArrayList<JobArguments> arguments = new ArrayList<>(1);
-		arguments.add(new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames));
-		FMCorePlugin.getDefault().startJobs(arguments, true);
+		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(1);
+		arguments.add(new SliceFeatureModel(featureProject.getFeatureModel(), featureNames, true));
+		FMCorePlugin.startJobs(arguments, StringTable.CREATE_INTERFACE, true);
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -227,8 +227,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	protected void computeHashCode() {
 		hashCode = 1;
 		hashCode = (hashCodePrime * hashCode) + fullName.hashCode();
-//		hashCode = hashCodePrime * hashCode + type.hashCode();
-//		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
+		// hashCode = hashCodePrime * hashCode + type.hashCode();
+		// hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
 	}
 
 	@Override
@@ -245,8 +245,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 
 	protected boolean sigEquals(AbstractSignature otherSig) {
 		if (!fullName.equals(otherSig.fullName)
-//				|| !type.equals(otherSig.type)
-//				|| !Arrays.equals(modifiers, otherSig.modifiers)
+		// || !type.equals(otherSig.type)
+		// || !Arrays.equals(modifiers, otherSig.modifiers)
 		) {
 			return false;
 		}

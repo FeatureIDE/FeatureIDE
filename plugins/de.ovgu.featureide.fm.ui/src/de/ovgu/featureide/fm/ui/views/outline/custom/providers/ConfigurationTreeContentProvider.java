@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.computations.ConfigurationOutlineStandardBundle;
@@ -47,7 +47,6 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 
 	private static final String ENTRY_EXTENSION_ID = "de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry";
 
-	private IFeatureModel fModel;
 	private Configuration config;
 
 	@Override
@@ -55,17 +54,13 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 		if (newInput != null) {
 			if (newInput instanceof Configuration) {
 				config = ((Configuration) newInput);
-				fModel = config.getFeatureModel();
 			} else if (newInput instanceof IFile) {
-				if (((IFile) newInput).exists()) {
-					try {
-						final ConfigurationManager confManager = ConfigurationManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()), true);
-						if (confManager == null) {
-							return;
-						}
-						config = confManager.getObject();
-						fModel = config.getFeatureModel();
-					} catch (final ClassCastException e) {}
+				final IFile iFile = (IFile) newInput;
+				if (iFile.exists()) {
+					final Path filePath = EclipseFileSystem.getPath(iFile);
+					if (ConfigurationManager.isFileSupported(filePath)) {
+						config = ConfigurationManager.getInstance(filePath).getObject();
+					}
 				}
 			}
 		}

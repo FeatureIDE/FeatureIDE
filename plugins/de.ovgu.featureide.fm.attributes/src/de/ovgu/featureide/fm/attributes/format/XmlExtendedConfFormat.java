@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.fm.attributes.format;
 
 import java.util.List;
@@ -10,7 +30,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedConfigurationFactory;
 import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -55,6 +77,7 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+		object.reset();
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
@@ -65,7 +88,7 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(featureName);
+					selectablefeature = object.getSelectableFeature(featureName);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
@@ -204,6 +227,15 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 	@Override
 	public boolean supportsContent(LazyReader content) {
 		return super.supportsContent(content, CONTENT_REGEX);
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			ConfigurationFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(ID, ExtendedConfigurationFactory.ID);
+			return true;
+		}
+		return false;
 	}
 
 }

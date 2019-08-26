@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -34,7 +34,7 @@ import java.util.TreeSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -83,12 +83,8 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 			}
 
 			if (viewer instanceof StructuredViewer) {
-				((StructuredViewer) viewer).setSorter(new ViewerSorter() {
+				((StructuredViewer) viewer).setComparator(new ViewerComparator() {
 
-					/*
-					 * (non-Javadoc)
-					 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-					 */
 					@Override
 					public int compare(Viewer viewer, Object o1, Object o2) {
 						final int startLineO1 = getLine(o1);

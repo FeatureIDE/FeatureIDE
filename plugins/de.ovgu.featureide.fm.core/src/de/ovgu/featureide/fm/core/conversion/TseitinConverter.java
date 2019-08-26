@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 public class TseitinConverter extends NNFConverter {
 
 	private int number = 0;
-	private final Set<String> auxVariables = new HashSet<String>();
+	private final Set<String> auxVariables = new HashSet<>();
 
 	private IFeature addClause(IFeature top, String name) {
 		final IFeature clause = factory.createFeature(top.getFeatureModel(), name);
@@ -108,7 +108,7 @@ public class TseitinConverter extends NNFConverter {
 			NodeWriter.noSymbol, NodeWriter.noSymbol };
 		node = node.eliminateNotSupportedSymbols(supported);
 
-		final List<Node> result = new LinkedList<Node>();
+		final List<Node> result = new LinkedList<>();
 
 		for (Node encoded : tseitinEncoding(constraint.getFeatureModel(), node, "x" + (number))) {
 			encoded = encoded.toCNF();
@@ -123,7 +123,7 @@ public class TseitinConverter extends NNFConverter {
 	}
 
 	private List<Node> tseitinEncoding(IFeatureModel fm, Node node, String var) {
-		final List<Node> tseitinEncoding = new ArrayList<Node>();
+		final List<Node> tseitinEncoding = new ArrayList<>();
 
 		// Unary node
 		if (node.getContainedFeatures().size() == 1) {
@@ -139,7 +139,7 @@ public class TseitinConverter extends NNFConverter {
 			tseitinEncoding.add(new Or(var, "x" + (number)));
 			tseitinEncoding.add(new Or(new Not(var), new Not("x" + (number))));
 		} else if (node instanceof Or) {
-			final List<Node> tmp = new ArrayList<Node>();
+			final List<Node> tmp = new ArrayList<>();
 			for (final Node child : node.getChildren()) {
 				if (child.getContainedFeatures().size() == 1) {
 					tmp.add(child);
@@ -154,7 +154,7 @@ public class TseitinConverter extends NNFConverter {
 				tseitinEncoding.add(new Or(var, new Not(y)));
 			}
 		} else {
-			final List<Node> tmp = new ArrayList<Node>();
+			final List<Node> tmp = new ArrayList<>();
 			for (final Node child : node.getChildren()) {
 				if (child.getContainedFeatures().size() == 1) {
 					tmp.add(child);
@@ -163,7 +163,7 @@ public class TseitinConverter extends NNFConverter {
 					tseitinEncoding.addAll(tseitinEncoding(fm, child, "x" + number));
 				}
 			}
-			final List<Node> neg = new ArrayList<Node>();
+			final List<Node> neg = new ArrayList<>();
 			for (final Node y : tmp) {
 				neg.add(new Not(y));
 			}

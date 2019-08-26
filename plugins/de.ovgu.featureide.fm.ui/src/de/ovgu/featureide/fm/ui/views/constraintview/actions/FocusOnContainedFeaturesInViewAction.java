@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,16 +22,15 @@ package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_CONTAINED_FEATURES;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * This class represents the Action to focus on contained Features of a constraint selected in the ConstraintView.
@@ -54,12 +53,7 @@ public class FocusOnContainedFeaturesInViewAction extends Action {
 
 	@Override
 	public void run() {
-		final ExpandConstraintOperation op = new ExpandConstraintOperation(graphicalFeatureModel, (IConstraint) selection.getFirstElement());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new ExpandConstraintOperation(graphicalFeatureModel, (IConstraint) selection.getFirstElement()));
 	}
 
 	/**

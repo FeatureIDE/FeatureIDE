@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,8 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import de.ovgu.featureide.fm.core.functional.Functional;
+import java.util.stream.Collectors;
 
 /**
  * Tree element.
@@ -68,14 +67,6 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	}
 
-	private static final class Converter<M, E> implements Functional.IFunction<ModelTree<M, E>, E> {
-
-		@Override
-		public E invoke(ModelTree<M, E> tree) {
-			return tree.object;
-		}
-	}
-
 	protected final M treeModel;
 
 	protected final List<ModelTree<M, E>> children = new ArrayList<>();
@@ -98,7 +89,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public Iterable<E> getChildrenObjects() {
-		return Functional.map(children, new Converter<M, E>());
+		return children.stream().map(ModelTree::getObject).collect(Collectors.toList());
 	}
 
 	public ModelTree<M, E> getParent() {
@@ -114,15 +105,15 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	@Override
 	public TreeIterator<E> iterator() {
-		return new PreOrderIterator<M, E>(this);
+		return new PreOrderIterator<>(this);
 	}
 
 	public TreeIterator<E> preOrderIterator() {
-		return new PreOrderIterator<M, E>(this);
+		return new PreOrderIterator<>(this);
 	}
 
 	public TreeIterator<E> levelOrderIterator() {
-		return new LevelOrderIterator<M, E>(this);
+		return new LevelOrderIterator<>(this);
 	}
 
 	public void addNode(E newChildObject) {

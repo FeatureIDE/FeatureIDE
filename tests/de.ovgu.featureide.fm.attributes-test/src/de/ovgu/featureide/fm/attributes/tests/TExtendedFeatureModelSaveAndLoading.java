@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,51 +22,73 @@ package de.ovgu.featureide.fm.attributes.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesLibrary;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
-import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * Test suit containing multiple tests to ensure the correct operation of
- * extended feature models.
+ * Test suit containing multiple tests to ensure the correct operation of extended feature models.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
 public class TExtendedFeatureModelSaveAndLoading {
-	private static final String MODEL_NAME = "EmptyExtendedFeatureModel.xml";
-	private static final String COMPARISON_MODEL = "featureAttributesCompare.xml";
-	private static final String TEMP_SAVED_MODEL = "EmptyExtendedFeatureModel_tmp.xml";
 
 	private static final IFeatureModelFactory factory = new ExtendedFeatureModelFactory();
 	private static final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
 
+	@Before
+	public void prepareWorkbench() {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
+	}
+
+	@Test
+	public void test_ReadSaveRead() {
+		ExtendedFeatureModel testModelOldFormat1 = Commons.getSandwitchModel();
+		ExtendedFeatureModel testModelOldFormat2 = Commons.getBaseModel();
+		ExtendedFeatureModel testModelNewFormat = Commons.getNewFormatBikeModel();
+
+		ExtendedFeatureModel resultModel1 = (ExtendedFeatureModel) writeAndReadModel(testModelOldFormat1);
+		ExtendedFeatureModel resultModel2 = (ExtendedFeatureModel) writeAndReadModel(testModelOldFormat2);
+		ExtendedFeatureModel resultModel3 = (ExtendedFeatureModel) writeAndReadModel(testModelNewFormat);
+
+		assertEquals(true, Commons.compareByAttributeValues(testModelOldFormat1, resultModel1));
+		assertEquals(true, Commons.compareByAttributeValues(testModelOldFormat2, resultModel2));
+		assertEquals(true, Commons.compareByAttributeValues(testModelNewFormat, resultModel3));
+
+		assertEquals(false, Commons.compareByAttributeValues(resultModel1, resultModel2));
+		assertEquals(false, Commons.compareByAttributeValues(testModelOldFormat1, resultModel2));
+
+		ExtendedFeature ext = (ExtendedFeature) resultModel1.getFeature("Bread");
+		ext.addAttribute(new BooleanFeatureAttribute(ext, "New", "", true, false, false));
+		assertEquals(false, Commons.compareByAttributeValues(testModelOldFormat1, resultModel1));
+
+	}
+
 	@Test
 	public void test_CreationAndSaving() {
-		FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(XmlExtendedFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
-		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
-		FMFactoryManager.getInstance().addExtension(new ExtendedFeatureModelFactory());
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 
 		// At first create an empty extended feature model
-		IFeatureModel model = factory.createFeatureModel();
+		IFeatureModel model = factory.create();
 		IFeature rootFeature = factory.createFeature(model, "Root");
 		model.addFeature(rootFeature);
 		model.getStructure().setRoot(rootFeature.getStructure());
@@ -74,7 +96,7 @@ public class TExtendedFeatureModelSaveAndLoading {
 		model.addFeature(baseFeature);
 		rootFeature.getStructure().addChild(baseFeature.getStructure());
 
-		//Test structure and attributes of the features
+		// Test structure and attributes of the features
 		assertEquals(2, model.getNumberOfFeatures());
 		assertEquals(rootFeature.getName(), "Root");
 		assertEquals(rootFeature.getStructure().getChildrenCount(), 1);
@@ -86,28 +108,28 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(rootFeature instanceof ExtendedFeature);
 		assertTrue(baseFeature instanceof ExtendedFeature);
 
-		//Get the extended subclasses
+		// Get the extended subclasses
 		ExtendedFeatureModel eModel = (ExtendedFeatureModel) model;
 		ExtendedFeature eRootFeature = (ExtendedFeature) rootFeature;
-		ExtendedFeature eBaseFeature= (ExtendedFeature) baseFeature;
-		
-		//No attribute when created by factory
+		ExtendedFeature eBaseFeature = (ExtendedFeature) baseFeature;
+
+		// No attribute when created by factory
 		assertTrue(eRootFeature.getAttributes().size() == 0);
 		assertTrue(eBaseFeature.getAttributes().size() == 0);
-		
-		//Create all types of attributes with values
+
+		// Create all types of attributes with values
 		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(eRootFeature, "stringTest", "EMPTY", "Ein Test", false, false);
 		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(eRootFeature, "booleanTest", "State", true, false, false);
 		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(eRootFeature, "longTest", "Euro", Long.MAX_VALUE, false, false);
 		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(eRootFeature, "doubleTest", "Dollar", Double.MAX_VALUE, false, false);
 
-		//Create all types of attributes with null values
+		// Create all types of attributes with null values
 		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(eRootFeature, "sNull", "", null, false, false);
 		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(eRootFeature, "bNull", "", null, false, false);
 		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(eRootFeature, "lNull", "", null, false, false);
 		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(eRootFeature, "dNull", "", null, false, false);
-		
-		//Add the attributes to the feature 
+
+		// Add the attributes to the feature
 		eRootFeature.addAttribute(stringAttribute);
 		eRootFeature.addAttribute(booleanAttribute);
 		eRootFeature.addAttribute(longAttribute);
@@ -116,22 +138,21 @@ public class TExtendedFeatureModelSaveAndLoading {
 		eRootFeature.addAttribute(booleanAttributeNull);
 		eRootFeature.addAttribute(longAttributeNull);
 		eRootFeature.addAttribute(doubleAttributeNull);
-		
+
 		assertTrue(eRootFeature.getAttributes().size() == 8);
-		
-		//Save and load model
+
+		// Save and load model
 		IFeatureModel readModel = writeAndReadModel(eModel);
-		
-		//Compare the attributes
+
+		// Compare the attributes
 		assertTrue(readModel.getNumberOfFeatures() == 2);
 		assertTrue(readModel instanceof ExtendedFeatureModel);
 		assertTrue(readModel.getStructure().getRoot().getFeature() instanceof ExtendedFeature);
 		assertTrue(readModel.getStructure().getRoot().getChildren().get(0).getFeature() instanceof ExtendedFeature);
 
-		//Get the extended subclasses
-		ExtendedFeatureModel eReadModel = (ExtendedFeatureModel) readModel;
+		// Get the extended subclasses
 		ExtendedFeature eReadRootFeature = (ExtendedFeature) readModel.getStructure().getRoot().getFeature();
-		ExtendedFeature eReadBaseFeature= (ExtendedFeature) readModel.getStructure().getRoot().getChildren().get(0).getFeature();
+		ExtendedFeature eReadBaseFeature = (ExtendedFeature) readModel.getStructure().getRoot().getChildren().get(0).getFeature();
 
 		assertTrue(eReadRootFeature.getAttributes().size() == 8);
 		assertTrue(eReadBaseFeature.getAttributes().size() == 0);
@@ -164,12 +185,12 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(doubleAttribute.getValue().equals(Double.MAX_VALUE));
 		assertTrue(!doubleAttribute.isRecursive());
 		assertTrue(!doubleAttribute.isConfigurable());
-		
-		//Check Attributes with null values
+
+		// Check Attributes with null values
 		IFeatureAttribute sN = eReadRootFeature.getAttributes().get(4);
-		IFeatureAttribute bN= eReadRootFeature.getAttributes().get(5);
-		IFeatureAttribute lN= eReadRootFeature.getAttributes().get(6);
-		IFeatureAttribute dN= eReadRootFeature.getAttributes().get(7);
+		IFeatureAttribute bN = eReadRootFeature.getAttributes().get(5);
+		IFeatureAttribute lN = eReadRootFeature.getAttributes().get(6);
+		IFeatureAttribute dN = eReadRootFeature.getAttributes().get(7);
 
 		assertTrue(sN.getName().equals("sNull"));
 		assertTrue(sN.getValue() == null);
@@ -181,12 +202,12 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(dN.getValue() == null);
 	}
 
-	
 	private final IFeatureModel writeAndReadModel(IFeatureModel origFm) {
-		IFeatureModel newFm = factory.createFeatureModel();
+		IFeatureModel newFm = factory.create();
 		final IFeatureModelFormat format = new XmlExtendedFeatureModelFormat();
 		final String write = format.getInstance().write(origFm);
 		format.getInstance().read(newFm, write);
 		return newFm;
 	}
+
 }

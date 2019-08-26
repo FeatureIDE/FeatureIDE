@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -33,21 +33,21 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class AtomicParentNode extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public AtomicParentNode(String description, IFeatureModel model) {
+	public AtomicParentNode(String description, FeatureModelFormula model) {
 		super(description, "(expand to calculate)");
 		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
+		final List<List<IFeature>> atomicSets = model.getAnalyzer().getAtomicSets(null);
 
 		int i = 0;
 		for (final List<IFeature> list : atomicSets) {
 			if (list.size() > 1) {
-				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
+				addChild(new FeatureListNode(model, "Atomic Set #" + ++i, list, list.size(), false));
 			}
 		}
 		setValue(i);

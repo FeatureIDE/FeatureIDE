@@ -8,7 +8,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TYPECHEF_DID_N
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,7 +30,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.internal.util.BundleUtility;
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import br.ufal.ic.colligens.activator.Colligens;
@@ -40,10 +38,10 @@ import de.fosd.typechef.options.FrontendOptions;
 import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
 import de.fosd.typechef.options.Options;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 @SuppressWarnings(RESTRICTION)
 public class TypeChef {
@@ -65,28 +63,13 @@ public class TypeChef {
 	private void prepareFeatureModel() {
 		final File inputFile = new File(project.getLocation().toOSString() + System.getProperty("file.separator") + "model.xml");
 		final File outputFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "cnf.fm");
-		BufferedWriter print = null;
-		try {
-			print = new BufferedWriter(new FileWriter(outputFile));
-
-			final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath()).getObject();
-
-			final Node nodes = AdvancedNodeCreator.createCNF(fm);
-			final StringBuilder cnf = new StringBuilder();
-			cnf.append(nodes.toString(NodeWriter.javaSymbols));
-			print.write(cnf.toString());
-		} catch (final FileNotFoundException e) {
-			Colligens.getDefault().logError(e);
+		final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath());
+		try (final BufferedWriter print = new BufferedWriter(new FileWriter(outputFile))) {
+			final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(fm)));
+			nodeWriter.setSymbols(NodeWriter.javaSymbols);
+			print.write(nodeWriter.nodeToString());
 		} catch (final IOException e) {
 			Colligens.getDefault().logError(e);
-		} finally {
-			if (print != null) {
-				try {
-					print.close();
-				} catch (final IOException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
-			}
 		}
 	}
 

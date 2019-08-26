@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,12 +26,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.prop4j.And;
-import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.io.dimacs.DimacsWriter;
 
 /**
@@ -82,33 +81,19 @@ public class DimacsWriterTests {
 	}
 
 	@Test
-	public void testNotNode() {
-		final Node in = new Not("A");
-		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter().write(in);
-	}
-
-	@Test
-	public void testImplies() {
-		final Node in = new Implies("A", "B");
-		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter().write(in);
-	}
-
-	@Test
 	public void testNull() {
 		final Node in = null;
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter().write(in);
+		new DimacsWriter(Nodes.convert(in)).write();
 	}
 
 	@Test
 	public void testVariableDirectory() {
 		final Node in = new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
-		final DimacsWriter w = new DimacsWriter();
+		final DimacsWriter w = new DimacsWriter(Nodes.convert(in));
 		w.setWritingVariableDirectory(true);
-		final String actual = w.write(in);
-		final String expected = "c 1 A" + LN + "c 2 B" + LN + "c 3 C" + LN + getDefaultExpected();
+		final String actual = w.write();
+		final String expected = getDirectoryExpected() + getDefaultExpected();
 		assertEquals(expected, actual);
 	}
 
@@ -117,12 +102,26 @@ public class DimacsWriterTests {
 	}
 
 	private void testEquals(Node in, String expected) {
-		final DimacsWriter w = new DimacsWriter();
-		final String actual = w.write(in);
+		final DimacsWriter w = new DimacsWriter(Nodes.convert(in));
+		w.setWritingVariableDirectory(false);
+		final String actual = w.write();
 		assertEquals(expected, actual);
 	}
 
-	private String getDefaultExpected() {
-		return "p cnf 3 2" + LN + "1 -2 0" + LN + "3 2 -1 0" + LN;
+	private String getDirectoryExpected() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("c 1 A").append(LN);
+		sb.append("c 2 B").append(LN);
+		sb.append("c 3 C").append(LN);
+		return sb.toString();
 	}
+
+	private String getDefaultExpected() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("p cnf 3 2").append(LN);
+		sb.append("1 -2 0").append(LN);
+		sb.append("3 2 -1 0").append(LN);
+		return sb.toString();
+	}
+
 }

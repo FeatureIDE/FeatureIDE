@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,6 +31,7 @@ import java.io.StringReader;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -52,11 +53,10 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
-		final boolean orgPropagate = configuration.isPropagate();
-		configuration.setPropagate(false);
 		configuration.resetValues();
 
 		String line = null;
@@ -100,9 +100,9 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
-					final String name = renamingsManager.getNewName(line.substring(2));
+					final String name = renamingsManager == null ? line.substring(2) : renamingsManager.getNewName(line.substring(2));
 
-					final SelectableFeature feature = configuration.getSelectablefeature(name);
+					final SelectableFeature feature = configuration.getSelectableFeature(name);
 					if (feature == null) {
 						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {
@@ -118,9 +118,7 @@ public class FeatureIDEFormat extends APersistentFormat<Configuration> implement
 			}
 		} catch (final IOException e) {
 			warnings.add(new Problem(e));
-		} finally {
-			configuration.setPropagate(orgPropagate);
-		}
+		} finally {}
 		return warnings;
 	}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.xml;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -52,6 +53,7 @@ import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -64,10 +66,15 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 
 	public static final String FILE_EXTENSION = "xml";
 
+	private static final Pattern completeTagPattern = Pattern.compile("<(\\w+)[^\\/]*>.*<\\/\\1.*>");
+	private static final Pattern incompleteTagPattern = Pattern.compile("(<\\w+[^\\/>]*>)|(<\\/\\w+[^>]*>)");
+
 	protected T object;
 
 	/**
-	 * @param nodeList
+	 * Returns a list of elements within the given node list.
+	 *
+	 * @param nodeList the node list.
 	 * @return The child nodes from type Element of the given NodeList.
 	 */
 	protected static final List<Element> getElements(NodeList nodeList) {
@@ -81,6 +88,103 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 		}
 		return elements;
 	}
+
+	protected String prettyPrint(String text) {
+		final StringBuilder result = new StringBuilder();
+		int indentLevel = 0;
+		try (final BufferedReader reader = new BufferedReader(new StringReader(text))) {
+			for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+				final String trimmedLine = line.trim();
+				if (!trimmedLine.isEmpty()) {
+					if (completeTagPattern.matcher(trimmedLine).matches()) {
+						appendLine(result, indentLevel, trimmedLine);
+					} else {
+						final Matcher matcher = incompleteTagPattern.matcher(trimmedLine);
+						int start = 0;
+						while (matcher.find()) {
+							appendLine(result, indentLevel, trimmedLine.substring(start, matcher.start()));
+							final String openTag = matcher.group(1);
+							final String closeTag = matcher.group(2);
+							if (openTag != null) {
+								appendLine(result, indentLevel, openTag);
+								indentLevel++;
+							} else if (closeTag != null) {
+								indentLevel--;
+								appendLine(result, indentLevel, closeTag);
+							}
+							start = matcher.end();
+						}
+						appendLine(result, indentLevel, trimmedLine.substring(start, trimmedLine.length()));
+					}
+				}
+			}
+		} catch (final IOException e) {
+			Logger.logError(e);
+		}
+		return result.toString();
+	}
+
+	private void appendLine(final StringBuilder result, int indentLevel, String line) {
+		final String trimmedLine = line.trim();
+		if (!trimmedLine.isEmpty()) {
+			for (int i = 0; i < indentLevel; i++) {
+				result.append("\t");
+			}
+			result.append(trimmedLine);
+			result.append("\n");
+		}
+	}
+
+	protected List<Element> getElement(final Element element, final String nodeName, boolean allowEmpty) throws UnsupportedModelException {
+		final List<Element> elements = getElements(element.getElementsByTagName(nodeName));
+		if (elements.size() != 1) {
+			if (elements.size() > 1) {
+				throwWarning("Multiple nodes of " + nodeName + " defined.", element);
+			} else if (!allowEmpty) {
+				throwError("Node " + nodeName + " not defined!", element);
+			}
+		}
+		return elements;
+	}
+
+	protected List<Element> getElement(final Document document, final String nodeName, boolean allowEmpty) throws UnsupportedModelException {
+		final List<Element> elements = getElements(document.getElementsByTagName(nodeName));
+		if (elements.size() != 1) {
+			if (elements.size() > 1) {
+				addProblem(new Problem("Multiple nodes of " + nodeName + " defined.", 0, Severity.WARNING));
+			} else if (!allowEmpty) {
+				throwError("Node " + nodeName + " not defined!", document);
+			}
+		}
+		return elements;
+	}
+
+	/**
+	 * Throws an error that will be used for error markers
+	 *
+	 * @param message The error message
+	 * @param tempNode The node that causes the error. this node is used for positioning.
+	 */
+	protected static void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
+		final Object userData = node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		throw new UnsupportedModelException(message, userData == null ? 0 : Integer.parseInt(userData.toString()));
+	}
+
+	protected void addToProblemsList(String message, org.w3c.dom.Node node) {
+		addProblem(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+	}
+
+	protected void throwWarning(String message, org.w3c.dom.Node node) {
+		addProblem(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()), Severity.WARNING));
+	}
+
+	/**
+	 * Can be overwritten be implementing classes to control how to handle problems. Does nothing on default.
+	 *
+	 * @param problem a problem.
+	 */
+	protected void addProblem(final Problem problem) {}
 
 	@Override
 	public String getSuffix() {
@@ -138,7 +242,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 			transformer.setOutputProperty(OutputKeys.METHOD, FILE_EXTENSION);
 			transformer.setOutputProperty(OutputKeys.INDENT, YES);
 			transformer.transform(new DOMSource(doc), streamResult);
-			return streamResult.getWriter().toString();
+			return prettyPrint(streamResult.getWriter().toString());
 		} catch (final IOException | TransformerException e) {
 			Logger.logError(e);
 			return "";

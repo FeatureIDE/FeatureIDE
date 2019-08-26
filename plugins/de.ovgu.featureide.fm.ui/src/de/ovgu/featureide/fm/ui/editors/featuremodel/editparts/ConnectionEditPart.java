@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
@@ -37,18 +36,17 @@ import org.eclipse.gef.editparts.AbstractConnectionEditPart;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 import org.eclipse.gef.requests.SelectionRequest;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -60,6 +58,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionDecoratio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -153,14 +152,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 						final Point requestLocation = ((SelectionRequest) request).getLocation();
 						((CircleDecoration) child).translateToRelative(requestLocation);
 						if (decoratorBounds.contains(requestLocation)) {
-							final IFeatureModel featureModel = feature.getFeatureModel();
-							final MandatoryFeatureOperation op = new MandatoryFeatureOperation(feature, featureModel);
-							try {
-								PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-							} catch (final ExecutionException e) {
-								FMUIPlugin.getDefault().logError(e);
+							if (FeatureModelOperationWrapper
+									.run(new MandatoryFeatureOperation(feature.getName(), FeatureModelManager.getInstance(feature.getFeatureModel())))) {
+								return true;
 							}
-							return true;
 						}
 					}
 				}
@@ -187,14 +182,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		} else {
 			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
 		}
+
 		// Blocks unintentional FeatureGroupTypeChange when Parent is collapsed (Issue #806)
 		if (!newModel.isCollapsed()) {
-			final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+			FeatureModelOperationWrapper.run(new ChangeFeatureGroupTypeOperation(groupType, feature.getName(), FeatureModelManager.getInstance(featureModel)));
 		}
 	}
 
@@ -433,8 +424,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			return false;
 		}
 		final IFeature target = graphicalTarget.getObject();
-		return ((source instanceof ExtendedFeature) && ((ExtendedFeature) source).isFromExtern() && (target instanceof ExtendedFeature)
-			&& ((ExtendedFeature) target).isFromExtern());
+		return ((source instanceof MultiFeature) && ((MultiFeature) source).isFromExtern() && (target instanceof MultiFeature)
+			&& ((MultiFeature) target).isFromExtern());
 	}
 
 	/*

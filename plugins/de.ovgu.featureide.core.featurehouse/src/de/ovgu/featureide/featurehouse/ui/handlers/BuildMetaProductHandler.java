@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -48,7 +48,7 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 			final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
+				public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 					try {
 						featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 					} catch (final CoreException e) {

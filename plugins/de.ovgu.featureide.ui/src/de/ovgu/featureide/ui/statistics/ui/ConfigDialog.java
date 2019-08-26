@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -65,7 +65,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	private static final String MINUTE = "60";
 
 	private int priority;
-	private long timeout;
+	private int timeout;
 
 	private Combo timeOutComboBox;
 	private Combo priorityComboBox;
@@ -77,7 +77,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		return priority;
 	}
 
-	public long getTimeout() {
+	public int getTimeout() {
 		return timeout;
 	}
 
@@ -221,7 +221,7 @@ public class ConfigDialog extends TitleAreaDialog {
 
 		final String t = timeOutComboBox.getText();
 		try {
-			timeout = 1000 * Long.parseLong(t);
+			timeout = 1000 * Integer.parseInt(t);
 		} catch (final NumberFormatException ex) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "That was not a valid number!\n(integer only)");
 			return;

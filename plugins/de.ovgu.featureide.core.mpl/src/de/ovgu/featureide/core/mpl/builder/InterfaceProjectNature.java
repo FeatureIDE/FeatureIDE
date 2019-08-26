@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -39,22 +39,24 @@ public class InterfaceProjectNature implements IProjectNature {
 
 	@Override
 	public void configure() throws CoreException {
-//		IProjectDescription desc = project.getDescription();
-//		ICommand[] commands = desc.getBuildSpec();
-//
-//		for (int i = 0; i < commands.length; ++i) {
-//			if (commands[i].getBuilderName().equals(InterfaceProjectBuilder.BUILDER_ID)) {
-//				return;
-//			}
-//		}
-//
-//		ICommand[] newCommands = new ICommand[commands.length + 1];
-//		System.arraycopy(commands, 0, newCommands, 1, commands.length);
-//		ICommand command = desc.newCommand();
-//		command.setBuilderName(InterfaceProjectBuilder.BUILDER_ID);
-//		newCommands[0] = command;
-//		desc.setBuildSpec(newCommands);
-//		project.setDescription(desc, null);
+		// IProjectDescription desc = project.getDescription();
+		// ICommand[] commands = desc.getBuildSpec();
+		//
+		// for (int i = 0; i < commands.length; ++i) {
+		// if
+		// (commands[i].getBuilderName().equals(InterfaceProjectBuilder.BUILDER_ID))
+		// {
+		// return;
+		// }
+		// }
+		//
+		// ICommand[] newCommands = new ICommand[commands.length + 1];
+		// System.arraycopy(commands, 0, newCommands, 1, commands.length);
+		// ICommand command = desc.newCommand();
+		// command.setBuilderName(InterfaceProjectBuilder.BUILDER_ID);
+		// newCommands[0] = command;
+		// desc.setBuildSpec(newCommands);
+		// project.setDescription(desc, null);
 	}
 
 	@Override

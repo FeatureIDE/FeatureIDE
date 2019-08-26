@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,12 +33,14 @@ import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Defines the content of the feature model class specific for JPF-Core.
@@ -83,9 +85,9 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 		}
 
 		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		coreFeatures = deadCoreList.get(0);
-		deadFeatures = deadCoreList.get(1);
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
+		coreFeatures = analyzer.getCoreFeatures(null);
+		deadFeatures = analyzer.getDeadFeatures(null);
 		fields.append(NEWLINE + "\t/**" + NEWLINE + "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE
 			+ "\t * All other features have unknown selection states." + NEWLINE + "\t */" + NEWLINE + "\tstatic {" + NEWLINE);
 		for (final IFeature f : features) {
@@ -224,10 +226,11 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private String getFeature(IFeature f) {
 		final String featureName = f.toString().toLowerCase(Locale.ENGLISH);
 		final String start = featureName + "_ != null ? " + featureName + "_ : ";
-		if (deadFeatures.contains(f.getStructure().getParent())) {
+		final IFeature parent = FeatureUtils.getParent(f);
+		if (deadFeatures.contains(parent)) {
 			return start + "false";
 		}
-		if (coreFeatures.contains(f.getStructure().getParent())) {
+		if (coreFeatures.contains(parent)) {
 			return start + "true";
 		}
 		return start + f.getStructure().getParent().toString().toLowerCase(Locale.ENGLISH);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,17 +22,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_SIBLINGS;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCollapsedOperation;
 
 /**
@@ -73,7 +72,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	 *
 	 */
 	public CollapseSiblingsAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(COLLAPSE_SIBLINGS, viewer, ID);
+		super(COLLAPSE_SIBLINGS, viewer, ID, graphicalFeatureModel.getFeatureModelManager());
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		setEnabled(false);
@@ -86,16 +85,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-
-		final SetSiblingsToCollapsedOperation op = new SetSiblingsToCollapsedOperation(feature, graphicalFeatureModel);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
-
+		FeatureModelOperationWrapper.run(new SetSiblingsToCollapsedOperation(feature.getName(), graphicalFeatureModel));
 	}
 
 	@Override

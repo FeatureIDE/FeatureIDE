@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -87,10 +87,10 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	}
 
 	private IFeatureModel prepareFeatureModel() {
-		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+		final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 		// setup a test model
-		newFm = factory.createFeatureModel();
+		newFm = factory.create();
 		final IFeature root = factory.createFeature(newFm, "root");
 
 		newFm.addFeature(root);

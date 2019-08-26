@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_A_TAUTOLOGY_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_NOT_SATISFIABLE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_COMPOUND_FEATURE_;
@@ -34,6 +32,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.prop4j.And;
 import org.prop4j.Choose;
@@ -43,7 +43,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -96,12 +95,16 @@ import guidsl.VarStmt;
  */
 public class GuidslReader {
 
+	private static final String NO_ABSTRACT = "//NoAbstractFeatures";
+
+	private static final Pattern commentPattern = Pattern.compile("//(.*)");
+
 	/**
 	 * Needed because the GUIDSL parser uses static variables and should not be used by different threads at the same time.
 	 */
-	private static Object lock = new Object();
+	private static final Object lock = new Object();
 
-	private final List<Integer> annLine = new LinkedList<Integer>();
+	private final List<Integer> annLine = new LinkedList<>();
 
 	private boolean noAbstractFeatures = false;
 
@@ -121,7 +124,6 @@ public class GuidslReader {
 				final Model root = (Model) myParser.parseAll();
 				readModelData(root);
 			}
-			featureModel.handleModelDataLoaded();
 		} catch (final ParseException e) {
 			final int line = e.currentToken.next.beginLine;
 			throw new UnsupportedModelException(e.getMessage(), line);
@@ -130,7 +132,7 @@ public class GuidslReader {
 
 	// converts a string with "\n" to a list of lines
 	private List<String> stringToList(String str) {
-		final List<String> result = new LinkedList<String>();
+		final List<String> result = new LinkedList<>();
 		while (str.contains("\n")) {
 			final int ind = str.indexOf('\n');
 			if (ind > 0) {
@@ -145,31 +147,19 @@ public class GuidslReader {
 	}
 
 	private void readModelData(Model root) throws UnsupportedModelException {
-
 		featureModel.reset();
+
 		String guidsl = root.toString();
 
-		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
+		noAbstractFeatures = (guidsl.startsWith(NO_ABSTRACT));
+		if (noAbstractFeatures) {
+			guidsl = guidsl.substring(NO_ABSTRACT.length());
+		}
 
 		// Reading comments
-		if (noAbstractFeatures) {
-			guidsl = guidsl.substring(20);
-		}
-
-		final List<String> comments = new LinkedList<String>();
-		while (guidsl.contains("//")) {
-			guidsl = guidsl.substring(guidsl.indexOf("//"));
-			final int index = guidsl.indexOf('\n');
-			if (index > 0) {
-				comments.add(guidsl.substring(2, index - 1));
-			} else {
-				comments.add(guidsl.substring(2, guidsl.length() - 1));
-			}
-			guidsl = guidsl.substring(guidsl.indexOf("//") + 2);
-		}
-
-		for (int i = 0; i < comments.size(); i++) {
-			featureModel.getProperty().addComment(comments.get(i));
+		final Matcher matcher = commentPattern.matcher(guidsl);
+		while (matcher.find()) {
+			featureModel.getProperty().addComment(matcher.group(1));
 		}
 
 		final Prods prods = ((MainModel) root).getProds();
@@ -227,8 +217,6 @@ public class GuidslReader {
 				}
 			}
 		}
-
-		featureModel.handleModelDataLoaded();
 	}
 
 	private void readGProduction(GProduction gProduction, IFeature feature) throws UnsupportedModelException {
@@ -338,22 +326,11 @@ public class GuidslReader {
 		return feature;
 	}
 
-	private int line;
-
 	private void readConsStmt(ConsStmt consStmt) throws UnsupportedModelException {
 		final ESList eSList = consStmt.getESList();
 		AstListNode astListNode = (AstListNode) eSList.arg[0];
 		do {
-			line = 1;
 			final Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
-			try {
-				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable()) {
-					warnings.add(new Problem(CONSTRAINT_IS_A_TAUTOLOGY_, line));
-				}
-				if (!new SatSolver(node.clone(), 250).isSatisfiable()) {
-					warnings.add(new Problem(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
-				}
-			} catch (final Exception e) {}
 			featureModel.addConstraint(new Constraint(featureModel, node));
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
@@ -362,7 +339,6 @@ public class GuidslReader {
 	private Node exprToNode(Expr expr) throws UnsupportedModelException {
 		if (expr instanceof Bvar) {
 			final AstToken token = ((Bvar) expr).getIDENTIFIER();
-			line = token.lineNum();
 			final String var = token.name;
 			if (featureModel.getFeature(var) == null) {
 				throw new UnsupportedModelException(THE_FEATURE_ + var + "' does not occur in the grammar!", token.lineNum());
@@ -391,7 +367,7 @@ public class GuidslReader {
 		if (expr instanceof BChoose1) {
 			final ExprList exprList = ((BChoose1) expr).getExprList();
 			AstListNode astListNode = (AstListNode) exprList.arg[0];
-			final LinkedList<Node> nodes = new LinkedList<Node>();
+			final LinkedList<Node> nodes = new LinkedList<>();
 			do {
 				nodes.add(exprToNode((Expr) astListNode.arg[0]));
 				astListNode = (AstListNode) astListNode.right;

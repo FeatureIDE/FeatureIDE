@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -48,10 +48,10 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
 	HashMap<String, Double> configsDistancesResult = new HashMap<String, Double>();
 
-	private final IFeatureModel featureModel;
+	private final FeatureModelFormula featureModel;
 
-	public PriorizationSorter(IFeatureModel featureModel) {
-		super(featureModel);
+	public PriorizationSorter(FeatureModelFormula featureModel) {
+		super(featureModel.getFeatureModel());
 		super.sorted = false;
 		this.featureModel = featureModel;
 	}
@@ -59,7 +59,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private int configurationCounter = 1;
 
 	@Override
-	protected int sort(final IMonitor monitor) {
+	protected int sort(final IMonitor<?> monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
@@ -77,14 +77,14 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	private BuilderConfiguration createConfiguration(final List<String> solution, int i) {
-		final Configuration configuration = new Configuration(featureModel, false);
+		final Configuration configuration = new Configuration(featureModel);
 		for (final String selection : solution) {
 			configuration.setManual(selection, Selection.SELECTED);
 		}
 		return new BuilderConfiguration(configuration, i);
 	}
 
-	protected List<List<String>> sortConfigs(List<List<String>> configs, IMonitor monitor) {
+	protected List<List<String>> sortConfigs(List<List<String>> configs, IMonitor<?> monitor) {
 		// bring the first product with maximum number of optional feature.\
 		System.err.println("START sort");
 		allconfigs.addAll(configs);
@@ -105,7 +105,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return allconfigs.size() + configurations.size();
 	}
 
-	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor monitor) {
+	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor<?> monitor) {
 		configsDistancesResult = new HashMap<String, Double>();
 		String mapKey;
 		for (int i = 0; i < allConfig.size(); i++) {

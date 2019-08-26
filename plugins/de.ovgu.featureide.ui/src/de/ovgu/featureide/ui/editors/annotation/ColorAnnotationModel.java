@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -67,11 +67,12 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Assigns color annotations to the editor.
@@ -153,8 +154,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		});
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return project.getFeatureModel();
+	public IFeatureModelManager getFeatureModelManager() {
+		return project.getFeatureModelManager();
 	}
 
 	public IFeature getFeature(int line) {
@@ -388,7 +389,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		for (int i = 0; i < document.getNumberOfLines(); i++) {
 			try {
 				lines.add(document.get(document.getLineOffset(i), document.getLineLength(i)));
-			} catch (final BadLocationException e) {}
+			} catch (final BadLocationException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 
 		return composer.buildModelDirectivesForFile(lines);
@@ -632,7 +635,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 					overViewStartOffset = -1;
 					overViewLength = 0;
 				}
-			} catch (final BadLocationException e) {}
+			} catch (final BadLocationException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 
 		fireModelChanged(event);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -53,21 +53,21 @@ public class ConstraintViewKeyListener implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		if (e.keyCode == SWT.DEL) {
 			// pressing the del button while having a constraint selected will delete it
-			new DeleteConstraintInViewAction(viewer.getViewer(), controller.getCurrentModel()).run();
+			new DeleteConstraintInViewAction(viewer.getViewer(), controller.getFeatureModelManager()).run();
 		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
 			// pressing CTRL + F will get you in the search box
 			viewer.getSearchBox().setFocus();
 		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == Z_BUTTON_PRESSED))) {
 			// pressing CTRL + Z will undo operations
 			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) controller.getCurrentModel().getUndoContext(), null,
-						null);
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
+						null, null);
 			} catch (final ExecutionException e1) {}
 		} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
 			// pressing CTRL + SHIFT + Z will redo undos
 			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) controller.getCurrentModel().getUndoContext(), null,
-						null);
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
+						null, null);
 			} catch (final ExecutionException e1) {}
 		} else if (e.keyCode == SWT.ESC) {
 			// pressing the escape button will remove the focus or current selection

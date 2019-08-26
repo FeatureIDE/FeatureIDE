@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERA
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.EditPolicy;
@@ -34,7 +33,6 @@ import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -52,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -67,6 +66,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	FeatureEditPart(IGraphicalFeature feature) {
 		setModel(feature);
+		activate();
 	}
 
 	@Override
@@ -99,15 +99,14 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
-	private DirectEditManager manager;
+	private DirectEditManager editManager;
 
 	public void showRenameManager() {
-		if (manager == null) {
-			final IGraphicalFeature f = getModel();
-			manager =
-				new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()), f.getGraphicalModel().getFeatureModel());
+		if (editManager == null) {
+			editManager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFigure()),
+					getModel().getGraphicalModel().getFeatureModelManager());
 		}
-		manager.show();
+		editManager.show();
 	}
 
 	@Override
@@ -124,13 +123,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			final CollapseFeatureOperation op = new CollapseFeatureOperation(feature, featureModel, COLLAPSE_OPERATION);
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
-
-			}
+			FeatureModelOperationWrapper.run(new CollapseFeatureOperation(feature.getName(), featureModel, COLLAPSE_OPERATION));
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			for (final IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
@@ -191,6 +184,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 	@Override
 	public void deactivate() {
+		getModel().deregisterUIObject();
 		super.deactivate();
 	}
 
@@ -215,7 +209,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case LOCATION_CHANGED:
 			getFigure().setLocation(getModel().getLocation());
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
 			if (sourceConnection != null) {
 				final IGraphicalFeature target = sourceConnection.getTarget();
@@ -237,7 +231,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			break;
 		case GROUP_TYPE_CHANGED:
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
 			ConnectionEditPart connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			if (connectionEditPart != null) {
@@ -260,9 +254,9 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			connectionEditPart.propertyChange(event);
 			break;
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
-			getFigure().setProperties();
+			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
 			if (getModel().isCollapsed()) {
 				final List<FeatureConnection> connections = getModel().getSourceConnectionAsList();
@@ -279,8 +273,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				}
 			}
 			break;
-		case COLLAPSED_ALL_CHANGED:
-		case COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
+		case FEATURE_COLLAPSED_CHANGED:
 			/*
 			 * Reset the active reason in case we missed that it was set to null while this was collapsed. In case it should not be null, the active reason will
 			 * be set to the correct value in the upcoming feature model analysis anyway.
@@ -307,8 +301,8 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 				}
 			}
 			break;
-		case HIDDEN_CHANGED:
-			getFigure().setProperties();
+		case FEATURE_HIDDEN_CHANGED:
+			getFigure().updateProperties();
 			sourceConnection = getModel().getSourceConnection();
 			connectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
@@ -342,7 +336,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		) || (activeReason.getSubject().getOrigin() == Origin.CHILD_HORIZONTAL)) {
 			final FeatureFigure figure = getFigure();
 			figure.setActiveReason(activeReason);
-			figure.setProperties();
+			figure.updateProperties();
 		}
 
 		// Update the source connection.

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.configMap.filters;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
@@ -44,19 +45,15 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		final IFeatureModel featureModel = configurationMap.getFeatureProject().getFeatureModel();
+		final FeatureModelFormula snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = snapshot.getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
-			coreFeatures = analyser.getCoreFeatures();
+			final FeatureModelAnalyzer analyser = snapshot.getAnalyzer();
+			coreFeatures = analyser.getCoreFeatures(null);
 			featureModelFilterIsInitializedFor = featureModel;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
-	 * de.ovgu.featureide.fm.core.base.IFeature)
-	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
 		return coreFeatures.contains(feature);

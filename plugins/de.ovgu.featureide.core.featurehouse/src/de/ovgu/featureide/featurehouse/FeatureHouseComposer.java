@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -51,9 +51,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
-import org.sat4j.specs.TimeoutException;
 
 import AST.Problem;
 import AST.Program;
@@ -83,13 +81,20 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -367,7 +372,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		assert (featureProject != null) : "Invalid project given";
 
 		final Path temporaryConfigrationFile = createTemporaryConfigrationFile(config);
@@ -455,14 +460,16 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 
 			} else {
-				final IFeatureModel featureModel = featureProject.getFeatureModel();
-				final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+				final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+				final IFeatureModel featureModel = formula.getFeatureModel();
+				final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+				final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 				for (final FSTClass c : fstModel.getClasses()) {
 					for (final FSTRole r : c.getRoles()) {
 						final IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (final FSTMethod m : r.getClassFragment().getMethods()) {
-							final List<IFeature> currentFeatureList = new LinkedList<IFeature>();
-							final List<IFeature> originalList = new LinkedList<IFeature>();
+							final List<IFeature> currentFeatureList = new LinkedList<>();
+							final List<IFeature> originalList = new LinkedList<>();
 
 							currentFeatureList.add(factory.createFeature(featureModel, r.getFeature().getName()));
 
@@ -482,17 +489,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									}
 
 									if (checkForIllegitimateMethodRefinement(m, mm)) {
-										final List<IFeature> finalMethodList = new LinkedList<IFeature>();
+										final List<IFeature> finalMethodList = new LinkedList<>();
 										finalMethodList.add(featureRole2);
-										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, finalMethodList)) {
+										if (FeatureModelManager.getAnalyzer(featureModel).checkIfFeatureCombinationPossible(featureRole1, finalMethodList)) {
 											setContractErrorMarker(m, "keyword \"\\final_method\" found but possibly later refinement.");
 										}
 									}
 
 									if (checkForIllegitimateContract(m, mm)) {
-										final List<IFeature> finalContractList = new LinkedList<IFeature>();
+										final List<IFeature> finalContractList = new LinkedList<>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && analyzer.checkIfFeatureCombinationPossible(
 												factory.createFeature(featureModel, r.getFeature().getName()), finalContractList)) {
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 										}
@@ -501,7 +508,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									if (checkForIllegitimaterefinement(m, mm)) {
 										final LinkedList<IFeature> treeDependencyList = new LinkedList<IFeature>();
 										treeDependencyList.add(featureRole2);
-										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, treeDependencyList)) {
+										if (analyzer.checkIfFeatureCombinationPossible(featureRole1, treeDependencyList)) {
 											setContractErrorMarker(m, "Contract with composition keyword " + mm.getCompKey()
 												+ " possibily illegitimately redefined with keyword " + m.getCompKey() + ".");
 										}
@@ -510,7 +517,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 								}
 							}
 							if (m.getContract().contains(ORIGINAL)
-								&& !(!originalList.isEmpty() ? featureModel.getAnalyser().checkImplies(currentFeatureList, originalList) : false)) {
+								&& !(!originalList.isEmpty() ? analyzer.checkImplies(currentFeatureList, originalList) : false)) {
 								setContractErrorMarker(m, "keyword \"\\original\" found but no mandatory previous introduction.");
 							}
 						}
@@ -519,10 +526,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		} catch (final CoreException e2) {
 			LOGGER.logError(e2);
-		} catch (final TimeoutException e) {
-			LOGGER.logError(e);
 		}
-
 	}
 
 	/**
@@ -603,11 +607,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addCompositionErrorListener(compositionErrorListener);
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = formula.getFeatureModel();
 		final Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		final LinkedList<String> deadFeatures = new LinkedList<String>();
-		for (final IFeature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
+		for (final IFeature deadFeature : FeatureModelManager.getAnalyzer(featureModel).getDeadFeatures(null)) {
 			deadFeatures.add(deadFeature.getName());
 		}
 
@@ -622,7 +627,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		try {
 			final String[] args = getArguments(configPath, basePath, outputPath, getContractParameter());
 			final FeatureModelInfo modelInfo =
-				new FeatureIDEModelInfo(featureModel, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
+				new FeatureIDEModelInfo(formula, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
 			composerExtension.setModelInfo(modelInfo);
 			composerExtension.buildMetaProduct(args, features);
 		} catch (final TokenMgrError e) {} catch (final Error e) {
@@ -645,19 +650,16 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
+			final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureProject.getFeatureModel())));
+			nodeWriter.setSymbols(NodeWriter.javaSymbols);
+			String input = nodeWriter.nodeToString();
+			input = input.replace("!", "! ");
+
 			final IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
-			final Node nodes = AdvancedNodeCreator.createCNF(featureProject.getFeatureModel());
-			String input = nodes.toString(NodeWriter.javaSymbols);
-			input = input.replaceAll("!", "! ");
-			final InputStream cnfSource = new ByteArrayInputStream(input.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
-				if (cnfFile.exists()) {
-					cnfFile.setContents(cnfSource, false, true, null);
-				} else {
-					cnfFile.create(cnfSource, true, null);
-				}
-				cnfFile.setDerived(true);
-			} catch (final CoreException e) {
+				FileSystem.write(EclipseFileSystem.getPath(cnfFile), input);
+				cnfFile.setDerived(true, null);
+			} catch (final IOException e) {
 				LOGGER.logError(e);
 			}
 
@@ -670,8 +672,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			newArgs[i] = CmdLineInterpreter.INPUT_OPTION_LIFTING + language;
 			composer.run(newArgs);
 
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			final IFolder verificationClasses =
-				featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]).getFolder("verificationClasses");
+				featureProject.getBuildFolder().getFolder(FileHandler.getFileName(currentConfiguration)).getFolder("verificationClasses");
 			verificationClasses.create(true, true, null);
 			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_ONE, null);
 			for (final IResource res : featureProject.getBuildFolder().members()) {
@@ -718,7 +721,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);
@@ -745,7 +748,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		Program ast = null;
 		try {
 			final IFeatureModel fm = featureProject.getFeatureModel();
-			fm.getAnalyser().setDependencies();
+			// fm.getAnalyser().setDependencies();
 
 			final Main fuji = new Main(fujiOptions, fm, null);
 
@@ -1000,7 +1003,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return;
 		}
 		final String configPath;
-		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+		final Path currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
 			final Path temporaryConfigrationFile = createTemporaryConfigrationFile(currentConfiguration);
 			if (temporaryConfigrationFile == null) {
@@ -1045,7 +1048,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
-		final IFile configurationFile = folder.getFile(congurationName + '.' + getConfigurationExtension());
+		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationExtension());
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
@@ -1134,7 +1137,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setProperty(USE_FUJI, useFuji);
 
 		if (useFuji) {
-			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			if (currentConfiguration != null) {
 				performFullBuild(currentConfiguration);
 			}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,15 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalFeatureBelowOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Creates a new feature as a child of the currently selected feature.
@@ -46,21 +45,14 @@ public class CreateFeatureBelowAction extends SingleSelectionAction {
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	public CreateFeatureBelowAction(Object viewer, IGraphicalFeatureModel featureModel) {
-		super(CREATE_FEATURE_BELOW + " (Ins)", viewer, ID);
+		super(CREATE_FEATURE_BELOW + " (Ins)", viewer, ID, featureModel.getFeatureModelManager());
 		setImageDescriptor(createImage);
 		graphicalFeatureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final CreateFeatureBelowOperation op =
-			new CreateFeatureBelowOperation(graphicalFeatureModel.getGraphicalFeature(feature), graphicalFeatureModel.getFeatureModel());
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new CreateGraphicalFeatureBelowOperation(feature.getName(), graphicalFeatureModel));
 	}
 
 	@Override

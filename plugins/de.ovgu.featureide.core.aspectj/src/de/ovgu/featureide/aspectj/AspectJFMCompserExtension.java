@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -75,10 +75,6 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
-	 */
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
@@ -220,10 +216,6 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
-	 */
 	@Override
 	public boolean hasFeatureOrder() {
 		return false;

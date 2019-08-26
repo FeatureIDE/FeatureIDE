@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.editors;
 
+import java.nio.file.Path;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -35,6 +37,7 @@ import org.eclipse.ui.PartInitException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -72,12 +75,9 @@ public class JavaEditor extends CompilationUnitEditor {
 				} else {
 					if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
 						// case: a composed file
-						final IFile configuration = featureProject.getCurrentConfiguration();
+						final Path configuration = featureProject.getCurrentConfiguration();
 						if (configuration != null) {
-							final String config = configuration.getName().split("[.]")[0];
-							if (config != null) {
-								setPartName(file.getName() + "<" + config + ">");
-							}
+							setPartName(file.getName() + "<" + FileHandler.getFileName(configuration) + ">");
 						}
 					} else {
 						final String configuration = getConfiguration(file.getParent());

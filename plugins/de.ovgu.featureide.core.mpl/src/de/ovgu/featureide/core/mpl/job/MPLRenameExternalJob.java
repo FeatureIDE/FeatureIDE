@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.PACKAGES_RENAMED_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_PACKAGES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
 import java.util.Iterator;
@@ -56,34 +55,26 @@ import org.eclipse.ltk.core.refactoring.RefactoringCore;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  *
  * @author Sebastian Krieter
  */
 @SuppressWarnings(RESTRICTION)
-public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments, Boolean> {
+public class MPLRenameExternalJob implements LongRunningMethod<Boolean> {
 
-	public static class Arguments extends JobArguments {
+	private final IProject externalProject;
+	private final String prefix;
+	private final IPath srcPath;
 
-		private final IProject externalProject;
-		private final String prefix;
-		private final IPath srcPath;
-
-		public Arguments(IProject externalProject, String prefix, IPath srcPath) {
-			super(Arguments.class);
-			this.externalProject = externalProject;
-			this.prefix = prefix;
-			this.srcPath = srcPath;
-		}
-	}
-
-	protected MPLRenameExternalJob(Arguments arguments) {
-		super(RENAMING_PACKAGES, arguments);
-		javaProject = new JavaProject(arguments.externalProject, null);
+	protected MPLRenameExternalJob(IProject externalProject, String prefix, IPath srcPath) {
+		this.externalProject = externalProject;
+		this.prefix = prefix;
+		this.srcPath = srcPath;
+		// super(RENAMING_PACKAGES, arguments);
+		javaProject = new JavaProject(externalProject, null);
 	}
 
 	private static int getJavaBuildPathEntry(JavaProject javaProject) {
@@ -159,11 +150,10 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 	private final JavaProject javaProject;
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 		try {
-			this.workMonitor = workMonitor;
 			formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
-			formerSourcePath = setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
+			formerSourcePath = setJavaBuildPath(javaProject, srcPath, formerSourcePathIndex);
 		} finally {
 			resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
 		}
@@ -188,7 +178,7 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 
 		ICompilationUnit[] defaultCompilationUnits = null;
-		final Pattern p = Pattern.compile(arguments.prefix.replace(".", "\\.") + "(\\..*)?");
+		final Pattern p = Pattern.compile(prefix.replace(".", "\\.") + "(\\..*)?");
 
 		final Iterator<IPackageFragment> it = packages.iterator();
 		while (it.hasNext()) {
@@ -222,7 +212,7 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 
 		try {
-			arguments.externalProject.refreshLocal(IResource.DEPTH_INFINITE, null);
+			externalProject.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
@@ -241,10 +231,10 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 		final RefactoringContribution contribution = RefactoringCore.getRefactoringContribution(IJavaRefactorings.RENAME_PACKAGE);
 		final RenameJavaElementDescriptor descriptor = (RenameJavaElementDescriptor) contribution.createDescriptor();
-		descriptor.setProject(arguments.externalProject.getName());
+		descriptor.setProject(externalProject.getName());
 		descriptor.setUpdateReferences(true);
 		descriptor.setJavaElement(pckg);
-		descriptor.setNewName(arguments.prefix + "." + pckg.getElementName());
+		descriptor.setNewName(prefix + "." + pckg.getElementName());
 
 		final RefactoringStatus status = new RefactoringStatus();
 		try {
@@ -263,8 +253,8 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 			final RefactoringContribution contribution = RefactoringCore.getRefactoringContribution(IJavaRefactorings.MOVE);
 			final MoveDescriptor descriptor = (MoveDescriptor) contribution.createDescriptor();
 
-			descriptor.setProject(arguments.externalProject.getName());
-			descriptor.setDestination(packageFragmentRoot.getPackageFragment(arguments.prefix));
+			descriptor.setProject(externalProject.getName());
+			descriptor.setDestination(packageFragmentRoot.getPackageFragment(prefix));
 			descriptor.setMoveResources(new IFile[0], new IFolder[0], compilationUnits);
 			descriptor.setUpdateReferences(true);
 

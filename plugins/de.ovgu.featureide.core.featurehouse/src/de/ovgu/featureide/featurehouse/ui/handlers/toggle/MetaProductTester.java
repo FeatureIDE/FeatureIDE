@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -43,9 +43,8 @@ public class MetaProductTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		// Cast is necessary, don't remove
-		final State state =
-			((ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
+		// Cast is necessary for backward compatibility, don't remove
+		final State state = PlatformUI.getWorkbench().getService(ICommandService.class).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
 		final IProject curProject = SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
 		if (curProject != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(curProject);

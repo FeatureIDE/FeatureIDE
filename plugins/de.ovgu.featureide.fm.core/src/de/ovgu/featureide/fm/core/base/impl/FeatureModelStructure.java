@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -181,16 +178,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	}
 
 	@Override
-	public boolean hasIndetHidden() {
-		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
 	public boolean hasMandatoryFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
 			final IFeatureStructure parent = f.getStructure().getParent();
@@ -256,66 +243,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public void setRoot(IFeatureStructure root) {
 		rootFeature = root;
-	}
-
-	private boolean existsFeatureWithStatus(FeatureStatus status) {
-		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
-			if ((!f.getStructure().hasHiddenParent() || showHiddenFeatures)) {
-				if (f.getProperty().getFeatureStatus() == status) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasFalseOptionalFeatures() {
-		return existsFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL);
-	}
-
-	@Override
-	public boolean hasDeadFeatures() {
-		return existsFeatureWithStatus(FeatureStatus.DEAD);
-	}
-
-	@Override
-	public boolean hasUnsatisfiableConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.UNSATISFIABLE);
-	}
-
-	@Override
-	public boolean hasTautologyConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.TAUTOLOGY);
-	}
-
-	@Override
-	public boolean hasDeadConstraints() {
-		for (final IConstraint c : getFeatureModel().getConstraints()) {
-			if ((c.getConstraintAttribute() == ConstraintAttribute.DEAD) || !c.getDeadFeatures().isEmpty()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasVoidModelConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.VOID_MODEL);
-	}
-
-	private boolean existsConstraintWithAttribute(ConstraintAttribute attribute) {
-		for (final IConstraint c : getFeatureModel().getConstraints()) {
-			if (c.getConstraintAttribute() == attribute) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean hasRedundantConstraints() {
-		return existsConstraintWithAttribute(ConstraintAttribute.REDUNDANT);
 	}
 
 }

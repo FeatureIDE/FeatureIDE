@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -68,12 +68,12 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	@Override
 	public String getFormula() {
 		return "";
-//		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
-//		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
-//		if (formula.contains("  &&  true  &&  ! false")) {
-//			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
-//		}
-//		return VALID + "return " + formula + ";\r\n\t}\r\n";
+		// final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		// String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		// if (formula.contains(" && true && ! false")) {
+		// formula = formula.substring(0, formula.indexOf(" && true && ! false"));
+		// }
+		// return VALID + "return " + formula + ";\r\n\t}\r\n";
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -51,7 +52,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected boolean constraintSelected;
 
-	protected IFeature feature;
+	protected IFeature featureObject;
 
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
@@ -67,7 +68,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		feature = correspondingFeature;
+		featureObject = correspondingFeature;
 		sourceConnection = new FeatureConnection(this);
 	}
 
@@ -76,14 +77,15 @@ public class GraphicalFeature implements IGraphicalFeature {
 		constraintSelected = graphicalFeature.constraintSelected;
 		location = graphicalFeature.location;
 		dimension = graphicalFeature.dimension;
-		feature = graphicalFeature.feature;
+		featureObject = graphicalFeature.featureObject;
 		graphicalFeatureModel = graphicalFeature.graphicalFeatureModel;
 		sourceConnection = graphicalFeature.sourceConnection;
 	}
 
 	@Override
 	public IFeature getObject() {
-		return feature;
+		final IFeatureModelElement element = graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(featureObject.getInternalId());
+		return element instanceof IFeature ? (IFeature) element : featureObject;
 	}
 
 	@Override
@@ -139,7 +141,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public FeatureConnection getSourceConnection() {
-		sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(feature, graphicalFeatureModel));
+		sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(getObject(), graphicalFeatureModel));
 		return sourceConnection;
 	}
 
@@ -159,7 +161,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
-		for (final IFeatureStructure child : feature.getStructure().getChildren()) {
+		for (final IFeatureStructure child : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
 			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent()) {
 				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
@@ -170,6 +172,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public String toString() {
+		final IFeature feature = getObject();
 		if (feature != null) {
 			return feature.toString();
 		} else {
@@ -190,9 +193,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((feature == null) ? 0 : feature.hashCode());
-		return result;
+		return (int) (prime * featureObject.getInternalId());
 	}
 
 	@Override
@@ -200,21 +201,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof GraphicalFeature)) {
+		if ((obj == null) || !(obj instanceof GraphicalFeature)) {
 			return false;
 		}
 		final GraphicalFeature other = (GraphicalFeature) obj;
-		if (feature == null) {
-			if (other.feature != null) {
-				return false;
-			}
-		} else if (!feature.equals(other.feature)) {
-			return false;
-		}
-		return true;
+		return featureObject.getInternalId() == other.featureObject.getInternalId();
 	}
 
 	@Override
@@ -227,6 +218,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void registerUIObject(IEventListener listener) {
 		uiObject = listener;
+	}
+
+	@Override
+	public void deregisterUIObject() {
+		uiObject = null;
 	}
 
 	@Override
@@ -263,7 +259,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public List<IGraphicalFeature> getGraphicalChildren(boolean showHidden) {
-		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		final List<IGraphicalFeature> features = new ArrayList<>();
 		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
 			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
@@ -273,19 +269,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 		return Collections.unmodifiableList(features);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#setCollapsedDecoration(de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration)
-	 */
 	@Override
 	public void setCollapsedDecoration(CollapsedDecoration decoration) {
 		deco = decoration;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#getCollapsedDecoration()
-	 */
 	@Override
 	public CollapsedDecoration getCollapsedDecoration() {
 		return deco;

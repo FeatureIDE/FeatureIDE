@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,16 +24,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_CO
 
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Action to switch auto-layout for contraints on/off.
@@ -63,16 +60,7 @@ public class AutoLayoutConstraintAction extends Action {
 		}
 		final int counter = oldPos.size();
 		oldPos.add(newList);
-		final AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
-		// TODO _interfaces Removed Code
-		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new AutoLayoutConstraintOperation(featureModel, oldPos, counter));
 	}
 
 }

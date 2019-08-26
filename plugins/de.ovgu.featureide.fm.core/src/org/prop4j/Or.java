@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -141,42 +141,6 @@ public class Or extends Node implements Cloneable {
 		clauses.add(newClause);
 	}
 
-//	private void createClauseSet(LinkedList<Node> clauses, LinkedList<Node> clause, Node[] nodes, int i) {
-//		if (i == nodes.length) {
-//			//TO DO check if clause already contained in clauses
-//			clauses.add(new Or(clause).clone());
-//			return;
-//		}
-//		Node[] children = nodes[i] instanceof And ?	nodes[i].children : new Node[] { nodes[i] };
-//		for (Node node : children) {
-//			Node[] children2 = node instanceof Or ? node.children : new Node[] { node };
-//			int added = 0;
-//			try {
-//				for (Node node2 : children2) {
-//					Literal literal = (Literal) node2;
-//					if (contains(clause, new Literal(literal.var, !literal.positive)))
-//						throw new Exception(); //resulting clause is always true
-//					if (!contains(clause, literal)) {
-//						clause.addLast(literal);
-//						added++;
-//					}
-//				}
-//				createClauseSet(clauses, clause, nodes, i+1);
-//			} catch (Exception e) {
-//			} finally {
-//				while (added-- > 0)
-//					clause.removeLast();
-//			}
-//		}
-//	}
-//
-//	private boolean contains(LinkedList<Node> clauses, Node node) {
-//		for (Node child : clauses)
-//			if (child.equals(node))
-//				return true;
-//		return false;
-//	}
-
 	protected void collectChildren(Node node, List<Node> nodes) {
 		if (node instanceof Or) {
 			for (final Node childNode : node.getChildren()) {
@@ -189,7 +153,7 @@ public class Or extends Node implements Cloneable {
 
 	@Override
 	public void simplify() {
-		final List<Node> nodes = new ArrayList<Node>();
+		final List<Node> nodes = new ArrayList<>();
 
 		for (int i = 0; i < children.length; i++) {
 			collectChildren(children[i], nodes);

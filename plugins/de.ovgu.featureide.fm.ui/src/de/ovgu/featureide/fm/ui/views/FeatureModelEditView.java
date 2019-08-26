@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -47,6 +47,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -93,7 +94,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					if (featureModelEditor == null) {
 						contentProvider.defaultContent();
 					} else {
-						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+						final FeatureModelManager fmManager = featureModelEditor.getFeatureModelManager();
+						contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormula(), monitor);
 					}
 					return Status.OK_STATUS;
 				}
@@ -168,7 +170,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			case FEATURE_ADD:
 			case FEATURE_ADD_ABOVE:
 			case FEATURE_DELETE:
-			case FEATURE_MODIFY:
 			case GROUP_TYPE_CHANGED:
 			case MANDATORY_CHANGED:
 				refresh();
@@ -246,7 +247,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		getSite().getPage().removePartListener(editorListener);
 		if (featureModelEditor != null) {
 			featureModelEditor.removeEventListener(modelListener);
-			featureModelEditor.getFeatureModel().removeListener(modelListener);
+			featureModelEditor.getFeatureModelManager().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 		super.dispose();
@@ -267,14 +268,14 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 		if (featureModelEditor != null) {
 			featureModelEditor.removeEventListener(modelListener);
-			featureModelEditor.getFeatureModel().removeListener(modelListener);
+			featureModelEditor.getFeatureModelManager().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 
 		if (activeEditor instanceof FeatureModelEditor) {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
 			featureModelEditor.addEventListener(modelListener);
-			featureModelEditor.getFeatureModel().addListener(modelListener);
+			featureModelEditor.getFeatureModelManager().addListener(modelListener);
 		}
 		refresh();
 	}
@@ -317,7 +318,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
 						} else {
-							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+							final FeatureModelManager fmManager = featureModelEditor.getFeatureModelManager();
+							contentProvider.calculateContent(fmManager.getPersistentFormula(), fmManager.getVariableFormula(), monitor);
 						}
 						return Status.OK_STATUS;
 					}

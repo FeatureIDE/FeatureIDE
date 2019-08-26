@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.core.runtime;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -33,11 +30,9 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
 
@@ -55,12 +50,11 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 		if ((featureProject != null) && featureProject.getComposerID().equals(COMPOSER_ID)
 			&& RuntimeParameters.RUN_CONFIGURATION.equals(featureProject.getCompositionMechanism())) {
 
-			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
-
+			final Configuration featureProjectConfig = featureProject.loadCurrentConfiguration();
+			if (featureProjectConfig == null) {
+				return;
+			}
 			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
-
-			final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
-			SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
 			String args = userDefinedArgs;
 			for (final SelectableFeature f : featureProjectConfig.getFeatures()) {

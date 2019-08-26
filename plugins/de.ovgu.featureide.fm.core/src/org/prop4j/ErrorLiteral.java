@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -30,7 +30,11 @@ import java.util.Map;
 public class ErrorLiteral extends Literal {
 
 	public ErrorLiteral(Object var) {
-		super(var, true);
+		super(var);
+	}
+
+	public ErrorLiteral(Object var, boolean positive) {
+		super(var, positive);
 	}
 
 	public ErrorLiteral(ErrorLiteral oldLiteral) {

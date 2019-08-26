@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,8 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
@@ -113,7 +111,10 @@ public abstract class Node {
 	}
 
 	public Node toRegularCNF() {
-		Node regularCNFNode = toCNF();
+		final Node node = flatten();
+		node.simplify();
+		node.removeDuplicates();
+		Node regularCNFNode = node.toCNF();
 		if (regularCNFNode instanceof And) {
 			final Node[] children = regularCNFNode.getChildren();
 			for (int i = 0; i < children.length; i++) {
@@ -151,7 +152,7 @@ public abstract class Node {
 
 	protected abstract Node eliminateNonCNFOperators(Node[] newChildren);
 
-	private static Node deMorgan(Node node) {
+	public static Node deMorgan(Node node) {
 		if (node instanceof Literal) {
 			return node;
 		} else if (node instanceof Not) {
@@ -342,6 +343,35 @@ public abstract class Node {
 		}
 	}
 
+	public Node flatten() {
+		if (children.length == 1) {
+			return children[0];
+		} else {
+			for (int i = 0; i < children.length; i++) {
+				children[i] = children[i].flatten();
+			}
+			return this;
+		}
+	}
+
+	public void removeDuplicates() {
+		if ((children != null) && (children.length > 1)) {
+			final HashSet<Node> childrenSet = new HashSet<>();
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
+				child.removeDuplicates();
+				childrenSet.add(child);
+			}
+			if (childrenSet.size() < children.length) {
+				final Node[] newChildren = new Node[childrenSet.size()];
+				int i = 0;
+				for (final Node child : childrenSet) {
+					newChildren[i++] = child;
+				}
+			}
+		}
+	}
+
 	@Override
 	abstract public Node clone();
 
@@ -379,7 +409,7 @@ public abstract class Node {
 	/**
 	 * Returns a string representation of this node. The symbols for logical connectors, e.g. And, are given as a parameter.
 	 *
-	 * @see org.prop4j.NodeWriter#shortSymbols (default)
+	 * @see org.prop4j.NodeWriter#shortSymbols
 	 * @see org.prop4j.NodeWriter#logicalSymbols
 	 * @see org.prop4j.NodeWriter#textualSymbols
 	 *
@@ -403,7 +433,7 @@ public abstract class Node {
 	}
 
 	public static LinkedList<Node> clone(LinkedList<Node> list) {
-		final LinkedList<Node> newList = new LinkedList<Node>();
+		final LinkedList<Node> newList = new LinkedList<>();
 		for (final Node node : list) {
 			newList.add(node.clone());
 		}
@@ -430,11 +460,11 @@ public abstract class Node {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
-	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature) {
+	public List<Node> replaceFeature(String feature, String replaceWithFeature) {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
+	protected List<Node> replaceFeature(String feature, String replaceWithFeature, List<Node> list) {
 		for (final Node child : children) {
 			child.replaceFeature(feature, replaceWithFeature, list);
 		}
@@ -671,7 +701,7 @@ public abstract class Node {
 		final Set<Object> keys = getUniqueVariables();
 		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
 		for (int assignment = 0; assignment < (1 << keys.size()); assignment++) {
-			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
+			final Map<Object, Boolean> map = new LinkedHashMap<>();
 			int i = 0;
 			for (final Object key : keys) {
 				map.put(key, (assignment & (1 << i)) != 0);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,13 +25,16 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
 
 /**
- * Provides the XML tags for {@link XmlFeatureModelReader} and {@link XmlFeatureModelWriter}.
+ * Provides the XML tags for {@link XmlFeatureModelFormat}.
  *
  * @author Jens Meinicke
  */
 public interface XMLFeatureModelTags {
 
 	static final String PROPERTIES = "properties";
+	static final String PROPERTY = "property";
+	static final String GRAPHICS = "graphics";
+	static final String CALCULATIONS = "calculations";
 	static final String FEATURE_MODEL = "featureModel";
 	static final String EXTENDED_FEATURE_MODEL = "extendedFeatureModel";
 	static final String STRUCT = "struct";
@@ -78,4 +81,10 @@ public interface XMLFeatureModelTags {
 	static final String ATTRIBUTE_VALUE = "value";
 	static final String ATTRIBUTE_RECURSIVE = "recursive";
 	static final String ATTRIBUTE_CONFIGURABLE = "configurable";
+
+	static final String KEY = "key";
+	static final String VALUE = "value";
+	static final String TYPE = "data-type";
+	static final String TYPE_CUSTOM = "custom";
+
 }

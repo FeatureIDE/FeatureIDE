@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -50,9 +49,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Framework composer updating .classpath file of eclipse
@@ -138,19 +135,19 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
-		final Path configPath = Paths.get(config.getLocationURI());
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+	public void performFullBuild(Path configPath) {
+		final Configuration configuration = featureProject.loadConfiguration(configPath);
+		if (configuration == null) {
+			return;
+		}
 
-		SimpleFileHandler.load(configPath, configuration, ConfigFormatManager.getInstance());
-
-		selectedFeatures = new LinkedList<String>();
+		selectedFeatures = new LinkedList<>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
 			if (feature.getStructure().isConcrete()) {
 				selectedFeatures.add(feature.getName());
 			}
 		}
-		final IProject project = config.getProject();
+		final IProject project = featureProject.getProject();
 		try {
 			project.deleteMarkers("de.ovgu.featureide.core.featureModuleMarker", true, IResource.DEPTH_ZERO);
 		} catch (final CoreException e) {
@@ -233,7 +230,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		try {
 			final IJavaProject javaProject = JavaCore.create(project);
 			final IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
-			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+			final List<IClasspathEntry> entries = new ArrayList<>();
 			/** copy existing non-feature entries **/
 			for (int i = 0; i < oldEntries.length; i++) {
 				if (oldEntries[i].getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
@@ -273,7 +270,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	 * @return list of jars inside parentFolder
 	 */
 	private List<IPath> createNewIPath(IResource parentFolder) {
-		final List<IPath> result = new ArrayList<IPath>();
+		final List<IPath> result = new ArrayList<>();
 		try {
 			final IResource[] members = ((IFolder) parentFolder).members();
 			if (members.length <= 0) {

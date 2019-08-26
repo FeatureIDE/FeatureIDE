@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.properties;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
@@ -35,16 +34,13 @@ public class FormatTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IFile res = SelectionWrapper.checkClass(receiver, IFile.class);
-		return checkFormat(getFormatManager(property), res, expectedValue);
+		return checkFormat(getFormatManager(property), SelectionWrapper.checkClass(receiver, IFile.class), expectedValue);
 	}
 
 	protected boolean checkFormat(final FormatManager<?> formatManager, final IFile res, Object expectedValue) {
-		if (res != null) {
-			if (formatManager != null) {
-				final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(Paths.get(res.getLocationURI()));
-				return (expectedValue == null) ? formatByContent != null : expectedValue.equals(formatByContent.getId());
-			}
+		if ((res != null) && (formatManager != null)) {
+			final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(EclipseFileSystem.getPath(res));
+			return (expectedValue == null) ? formatByContent != null : expectedValue.equals(formatByContent.getId());
 		}
 		return false;
 	}

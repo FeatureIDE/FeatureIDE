@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Menu;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
@@ -69,10 +68,10 @@ public class ConstraintViewContextMenu {
 	 * Fills the dynamic context menu
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
-		contextMenu.add(new CreateConstraintAction(viewer, controller.getCurrentModel()));
-		contextMenu.add(new FocusOnContainedFeaturesInViewAction(viewer, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()));
-		contextMenu.add(new FocusOnExplanationInViewAction(FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel(), viewer));
-		contextMenu.add(new EditConstraintInViewAction(viewer, controller.getCurrentModel()));
-		contextMenu.add(new DeleteConstraintInViewAction(viewer, controller.getCurrentModel()));
+		contextMenu.add(new CreateConstraintAction(viewer, controller.getFeatureModelManager()));
+		contextMenu.add(new FocusOnContainedFeaturesInViewAction(viewer, controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel()));
+		contextMenu.add(new FocusOnExplanationInViewAction(controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel(), viewer));
+		contextMenu.add(new EditConstraintInViewAction(viewer, controller.getFeatureModelManager()));
+		contextMenu.add(new DeleteConstraintInViewAction(viewer, controller.getFeatureModelManager()));
 	}
 }

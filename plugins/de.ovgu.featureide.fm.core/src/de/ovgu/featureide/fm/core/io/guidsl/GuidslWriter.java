@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -115,16 +115,12 @@ public class GuidslWriter {
 		out.append("\r\n");
 	}
 
-//	private void writeAnnotations(StringBuffer out) {
-//		if (featureModel.getAnnotations() != null)
-//			out.append(featureModel.getAnnotations() + "\r\n\r\n");
-//	}
+	// private void writeAnnotations(StringBuffer out) {
+	// if (featureModel.getAnnotations() != null)
+	// out.append(featureModel.getAnnotations() + "\r\n\r\n");
+	// }
 
 	private void writeRule(IFeature mainFeature, StringBuilder out) {
-
-//		if (mainFeature.isAbstract())
-//			this.hasAbstract = true;
-
 		// check if there is a rule to write
 		if (!mainFeature.getStructure().hasChildren()) {
 			return;

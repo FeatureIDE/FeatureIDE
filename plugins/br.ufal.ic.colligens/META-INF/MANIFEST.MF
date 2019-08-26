@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ltk.ui.refactoring,
  org.eclipse.ui.workbench.texteditor
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.cdt.internal.core.model,
  org.eclipse.cdt.ui.text.contentassist
@@ -104,3 +104,4 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
  de.fosd.typechef.typesystem,
  de.fosd.typechef.typesystem.linker,
  de.fosd.typechef.xtclexer
+Automatic-Module-Name: br.ufal.ic.colligens

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -110,7 +110,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 				if (config == null) {
 					featureList.add(structure.getFeature());
 				} else {
-					SelectableFeature selectableF = config.getSelectablefeature(structure.getFeature().getName());
+					SelectableFeature selectableF = config.getSelectableFeature(structure.getFeature().getName());
 					if (selectableF.getSelection() == Selection.SELECTED) {
 						featureList.add(structure.getFeature());
 					}

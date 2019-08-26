@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,13 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.nio.file.Paths;
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
 
@@ -36,11 +35,9 @@ public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
 			|| ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
 			final IResource resource = delta.getResource();
 			if (resource instanceof IFile) {
-				final List<IFileManager<?>> instanceList = AFileManager.getInstanceList(Paths.get(resource.getLocationURI()));
-				if (instanceList != null) {
-					for (final IFileManager<?> instance : instanceList) {
-						instance.read();
-					}
+				final IFileManager<?> instance = AFileManager.getInstance(EclipseFileSystem.getPath(resource));
+				if (instance != null) {
+					instance.read();
 				}
 			}
 		}

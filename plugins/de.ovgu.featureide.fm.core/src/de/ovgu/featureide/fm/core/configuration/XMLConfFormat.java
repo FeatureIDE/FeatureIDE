@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,6 +28,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -49,7 +51,8 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + "configuration" + "[\\s>]");
+
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration\\s*/?>");
 
 	@Override
 	public XMLConfFormat getInstance() {
@@ -58,7 +61,9 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		object.resetValues();
+		object.reset();
+		final IFeatureModel featureModel = object.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
@@ -70,7 +75,8 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(object.getFeatureModel().getRenamingsManager().getNewName(featureName));
+					selectablefeature = object.getSelectableFeature(renamingsManager == null ? featureName : renamingsManager.getNewName(featureName),
+							object.getFeatureModel() == null);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
@@ -154,9 +160,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
-			if ((feature.getManual() == Selection.UNDEFINED) && (feature.getAutomatic() == Selection.UNDEFINED)) {
-				continue;
-			}
 			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
 			if (feature.getManual() != Selection.UNDEFINED) {

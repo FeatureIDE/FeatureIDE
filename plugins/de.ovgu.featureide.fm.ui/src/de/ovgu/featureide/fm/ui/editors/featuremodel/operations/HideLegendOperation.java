@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -31,26 +32,23 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Marcus Pinnecke
  * @author Joshua Sprey
  */
-public class HideLegendOperation extends AbstractFeatureModelOperation {
+public class HideLegendOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private static final String LABEL = "Show/Hide Legend";
 
-	IGraphicalFeatureModel model;
-
 	public HideLegendOperation(IGraphicalFeatureModel featureModel) {
-		super(featureModel.getFeatureModel(), LABEL);
-		model = featureModel;
+		super(featureModel, LABEL);
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		model.setLegendHidden(!model.isLegendHidden());
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		graphicalFeatureModel.setLegendHidden(!graphicalFeatureModel.isLegendHidden());
 		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
 }

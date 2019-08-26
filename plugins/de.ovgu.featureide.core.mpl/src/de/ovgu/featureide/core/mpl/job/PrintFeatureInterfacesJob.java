@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,17 +20,14 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_FEATURE_INTERFACES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_FEATURE_INTERFACES;
 
-import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -38,47 +35,39 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Builds interfaces for a single feature.
  *
  * @author Sebastian Krieter
  */
-public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterfacesJob.Arguments, Boolean> {
+public class PrintFeatureInterfacesJob implements LongRunningMethod<Boolean> {
 
-	public static class Arguments extends JobArguments {
+	private final String foldername;
+	private final IProject project;
 
-		private final String foldername;
-		private final IProject project;
-
-		public Arguments(String foldername, IProject project) {
-			super(Arguments.class);
-			this.foldername = foldername;
-			this.project = project;
-		}
-	}
-
-	protected PrintFeatureInterfacesJob(Arguments arguments) {
-		super(BUILD_FEATURE_INTERFACES, arguments);
+	public PrintFeatureInterfacesJob(String foldername, IProject project) {
+		this.foldername = foldername;
+		this.project = project;
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
+		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(project.getName() + " is no Interface Project!");
 			return false;
 		}
 		final ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();
-		final List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
+		final Collection<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 
-		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
+		IFolder folder = FMCorePlugin.createFolder(interfaceProject.getProjectReference(), foldername);
 
 		try {
 			folder.delete(true, null);
@@ -100,15 +89,15 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 			for (final AbstractClassFragment role : structure.getClasses()) {
 				final String packagename = role.getSignature().getPackage();
 
-				final String path = arguments.foldername + "/" + feature.getName() + (packagename.isEmpty() ? "" : "/" + packagename);
+				final String path = foldername + "/" + feature.getName() + (packagename.isEmpty() ? "" : "/" + packagename);
 
-				folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
+				folder = FMCorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 
-				FileSystem.write(Paths.get(folder.getFile(role.getSignature().getName() + ".java").getLocationURI()), role.toShortString());
+				FileSystem.write(EclipseFileSystem.getPath(folder.getFile(role.getSignature().getName() + ".java")), role.toShortString());
 			}
 			workMonitor.worked();
 		}
-		FileSystem.write(Paths.get(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt").getLocationURI()),
+		FileSystem.write(EclipseFileSystem.getPath(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt")),
 				projectSignatures.getStatisticsString());
 		MPLPlugin.getDefault().logInfo(BUILT_FEATURE_INTERFACES);
 

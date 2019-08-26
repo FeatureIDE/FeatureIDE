@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -44,9 +44,10 @@ import org.eclipse.ui.part.IPageSite;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 
 /**
@@ -64,8 +65,7 @@ public class FmOutlinePageContextMenu {
 	private final Object site;
 	private FeatureModelEditor fTextEditor;
 	private final TreeViewer viewer;
-	private IFeatureModel fInput;
-	private IGraphicalFeatureModel graphicalFeatureModel;
+	private final IFeatureModelManager fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
 	private Action collapseAllAction;
@@ -78,49 +78,36 @@ public class FmOutlinePageContextMenu {
 	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IGraphicalFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput) {
 		this(site, viewer, fInput);
 		this.fTextEditor = fTextEditor;
-		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IGraphicalFeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModelManager fInput) {
 		this.site = site;
 		this.viewer = viewer;
-		this.fInput = fInput.getFeatureModel();
-		graphicalFeatureModel = fInput;
+		this.fInput = fInput;
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput,
+			boolean syncCollapsedFeatures) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
 		this.fInput = fInput;
 		this.syncCollapsedFeatures = syncCollapsedFeatures;
-		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
-	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IGraphicalFeatureModel fInput, boolean registerContextMenu) {
-		this.site = site;
-		this.viewer = viewer;
-		this.fInput = fInput.getFeatureModel();
-		graphicalFeatureModel = fInput;
-		this.registerContextMenu = registerContextMenu;
-		initContextMenu();
-	}
-
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures,
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModelManager fInput, boolean syncCollapsedFeatures,
 			boolean registerContextMenu) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
-		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		this.viewer = viewer;
 		this.fInput = fInput;
 		this.syncCollapsedFeatures = syncCollapsedFeatures;
 		this.registerContextMenu = registerContextMenu;
-		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
@@ -249,12 +236,8 @@ public class FmOutlinePageContextMenu {
 		return fTextEditor;
 	}
 
-	public IFeatureModel getFeatureModel() {
+	public IManager<IFeatureModel> getFeatureModelManager() {
 		return fInput;
-	}
-
-	public void setFeatureModel(IFeatureModel fm) {
-		fInput = fm;
 	}
 
 	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {

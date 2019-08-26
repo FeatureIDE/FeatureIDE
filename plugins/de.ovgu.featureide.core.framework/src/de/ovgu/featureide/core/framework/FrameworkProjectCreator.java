@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -91,7 +91,7 @@ public class FrameworkProjectCreator {
 		binFolder.create(true, true, null);
 		javaProject.setOutputLocation(binFolder.getFullPath(), null);
 
-		final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+		final List<IClasspathEntry> entries = new ArrayList<>();
 		final IVMInstall vmInstall = JavaRuntime.getDefaultVMInstall();
 		final LibraryLocation[] locations = JavaRuntime.getLibraryLocations(vmInstall);
 		for (final LibraryLocation element : locations) {

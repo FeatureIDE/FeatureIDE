@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -28,6 +29,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * The operation to change the color of a feature. Enables redo and undo compatibility.
@@ -36,46 +39,45 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  */
 public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 
-	ArrayList<FeatureColor> oldColor;
-	FeatureColor newColor;
-	ArrayList<IFeature> features;
+	private final ArrayList<FeatureColor> oldColor = new ArrayList<>();
+	private final FeatureColor newColor;
+	private final List<String> featureNameList;
 
-	public SetFeatureColorOperation(IFeatureModel featureModel, ArrayList<IFeature> featureListBuffer, FeatureColor newColor) {
-		super(featureModel, "Change feature color");
-		features = featureListBuffer;
+	public SetFeatureColorOperation(IFeatureModelManager featureModelManager, List<String> featureNameList, FeatureColor newColor) {
+		super(featureModelManager, "Change feature color");
+		this.featureNameList = featureNameList;
 		this.newColor = newColor;
-		oldColor = new ArrayList<>();
-		for (int i = 0; i < featureListBuffer.size(); i++) {
-			oldColor.add(FeatureColorManager.getColor(featureListBuffer.get(i)));
-		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#operation()
-	 */
 	@Override
-	protected FeatureIDEEvent operation() {
-		for (int i = 0; i < features.size(); i++) {
-			final IFeature feature = features.get(i);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		oldColor.clear();
+		final ArrayList<IFeature> featureList = new ArrayList<>(featureNameList.size());
+		for (final String name : featureNameList) {
+			final IFeature feature = featureModel.getFeature(name);
+			oldColor.add(FeatureColorManager.getColor(feature));
+			featureList.add(feature);
 			FeatureColorManager.setColor(feature, newColor);
 		}
-		FeatureColorManager.notifyColorChange(features);
-		return new FeatureIDEEvent(features, EventType.COLOR_CHANGED);
+		FeatureColorManager.notifyColorChange(featureList);
+		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#inverseOperation()
-	 */
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		for (int i = 0; i < features.size(); i++) {
-			final IFeature feature = features.get(i);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final ArrayList<IFeature> featureList = new ArrayList<>(featureNameList.size());
+		for (int i = 0; i < featureNameList.size(); i++) {
+			final IFeature feature = featureModel.getFeature(featureNameList.get(i));
+			featureList.add(feature);
 			FeatureColorManager.setColor(feature, oldColor.get(i));
 		}
-		FeatureColorManager.notifyColorChange(features);
-		return new FeatureIDEEvent(features, EventType.COLOR_CHANGED);
+		FeatureColorManager.notifyColorChange(featureList);
+		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_GRAPHICS;
 	}
 
 }

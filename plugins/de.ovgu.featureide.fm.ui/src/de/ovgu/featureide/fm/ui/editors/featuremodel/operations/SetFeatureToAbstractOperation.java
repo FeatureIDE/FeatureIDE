@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT_OPERATION;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to set Features abstract. Enables undo/redo functionality.
@@ -35,22 +39,42 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 
-	private final boolean allAbstract;
-	private final IFeature[] featureArray;
+	public static final String ID = ID_PREFIX + "SetFeatureToAbstractOperation";
 
-	public SetFeatureToAbstractOperation(IFeatureModel featureModel, boolean allAbstract, IFeature[] featureArray) {
-		super(featureModel, ABSTRACT_OPERATION);
-		this.allAbstract = allAbstract;
-		this.featureArray = featureArray;
+	public SetFeatureToAbstractOperation(IFeatureModelManager featureModelManager, List<String> featureNames) {
+		super(featureModelManager, ABSTRACT_OPERATION, featureNames);
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
-			if(allAbstract || !tempFeature.getStructure().isAbstract()) {
-				final AbstractFeatureOperation op = new AbstractFeatureOperation(tempFeature, featureModel);
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		final boolean allAbstract = isEveryFeatureAbstract(featureModel, featureNames);
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
+			if (allAbstract || !tempFeature.getStructure().isAbstract()) {
+				final AbstractFeatureOperation op = new AbstractFeatureOperation(name, featureModelManager);
 				operations.add(op);
 			}
-		}		
+		}
 	}
+
+	public static boolean isEveryFeatureAbstract(IFeatureModel featureModel, List<String> featureNames) {
+		for (final String name : featureNames) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (!(feature.getStructure().isAbstract())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
+	}
+
 }

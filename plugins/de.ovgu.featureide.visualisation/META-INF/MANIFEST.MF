@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visualisation
+Bundle-SymbolicName: de.ovgu.featureide.visualisation;singleton:=true
+Bundle-Version: 3.1.2.qualifier
+Bundle-Activator: de.ovgu.featureide.visualisation.activator.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.ovgu.featureide.fm.ui,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: de.ovgu.featureide.visualisation

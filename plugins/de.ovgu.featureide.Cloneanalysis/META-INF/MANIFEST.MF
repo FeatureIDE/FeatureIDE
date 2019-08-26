@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Cloneanalysis
 Bundle-SymbolicName: de.ovgu.featureide.Cloneanalysis;singleton:=true
-Bundle-Version: 3.4.0.qualifier
+Bundle-Version: 3.6.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.filesystem
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/pmd-core-5.2.2.jar,
  lib/pmd-java-5.2.2.jar,
  .,
@@ -53,3 +53,4 @@ Import-Package: org.eclipse.cdt.internal.ui.text.correction;resolution:=optional
  org.eclipse.jface.text.contentassist,
  org.eclipse.jface.text.quickassist,
  org.eclipse.jface.text.source
+Automatic-Module-Name: de.ovgu.featureide.Cloneanalysis

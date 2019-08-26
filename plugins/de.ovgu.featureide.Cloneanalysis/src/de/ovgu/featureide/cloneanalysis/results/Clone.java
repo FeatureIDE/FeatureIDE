@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.results;
 
 import java.util.ArrayList;
@@ -16,6 +36,7 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 
 public class Clone implements Comparable<Clone> {
+
 	private int lineCount;
 	private int tokenCount;
 	private int fileCount;
@@ -25,8 +46,7 @@ public class Clone implements Comparable<Clone> {
 	private String code;
 
 	/**
-	 * Value for an occurence is the Handle to an eclipse {@link IResource}
-	 * interface for ease of use.
+	 * Value for an occurence is the Handle to an eclipse {@link IResource} interface for ease of use.
 	 */
 	protected Map<CloneOccurence, IFile> occurences = null;
 
@@ -41,8 +61,7 @@ public class Clone implements Comparable<Clone> {
 	}
 
 	/**
-	 * Adds Occurences from the given {@link Set} into the Clones occurences
-	 * {@link Map},
+	 * Adds Occurences from the given {@link Set} into the Clones occurences {@link Map},
 	 * 
 	 * 
 	 * @param occurenceSet
@@ -55,11 +74,9 @@ public class Clone implements Comparable<Clone> {
 
 			assert project.exists() : "clone found in a file not associated to any existing project.";
 
-			if (relevantProjects == null)
-				relevantProjects = new HashSet<IProject>();
+			if (relevantProjects == null) relevantProjects = new HashSet<IProject>();
 
-			if (!relevantProjects.contains(project))
-				relevantProjects.add(project);
+			if (!relevantProjects.contains(project)) relevantProjects.add(project);
 
 			occurences.put(occurence, file);
 		}
@@ -67,12 +84,9 @@ public class Clone implements Comparable<Clone> {
 
 	@Override
 	public int compareTo(Clone other) {
-		if (other == null)
-			return 1;
-		if (getNumberOfFiles() != other.getNumberOfFiles())
-			return getNumberOfFiles() - other.getNumberOfFiles();
-		else
-			return getLineCount() - other.getLineCount();
+		if (other == null) return 1;
+		if (getNumberOfFiles() != other.getNumberOfFiles()) return getNumberOfFiles() - other.getNumberOfFiles();
+		else return getLineCount() - other.getLineCount();
 	}
 
 	/**
@@ -104,17 +118,15 @@ public class Clone implements Comparable<Clone> {
 	}
 
 	/**
-	 * Convenience function that returns the {@link IPath} of all Files that
-	 * contain an occurence of the clone in a {@link List}. Each {@link IPath}
-	 * is only listed once, even if its file contains multiple occurences.
+	 * Convenience function that returns the {@link IPath} of all Files that contain an occurence of the clone in a {@link List}. Each {@link IPath} is only
+	 * listed once, even if its file contains multiple occurences.
 	 * 
 	 * @return List containing the {@link IPath} of every file.
 	 */
 	public List<IPath> getDistinctFiles() {
 		Set<IPath> files = new HashSet<IPath>();
-		if (occurences != null)
-			for (CloneOccurence snippet : occurences.keySet())
-				files.add(snippet.getFile());
+		if (occurences != null) for (CloneOccurence snippet : occurences.keySet())
+			files.add(snippet.getFile());
 		return new ArrayList<IPath>(files);
 	}
 

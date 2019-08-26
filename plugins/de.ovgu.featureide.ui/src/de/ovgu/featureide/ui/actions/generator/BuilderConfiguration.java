@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -47,26 +47,8 @@ public class BuilderConfiguration extends Configuration {
 		this.number = number;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
-		if (name == null) {
-			final String zeros;
-			if (number < 10) {
-				zeros = "0000";
-			} else if (number < 100) {
-				zeros = "000";
-			} else if (number < 1000) {
-				zeros = "00";
-			} else if (number < 10000) {
-				zeros = "0";
-			} else {
-				zeros = "";
-			}
-			return zeros + number;
-		}
-		return name;
+		return (name != null) ? name : String.format("%05d", number);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -46,6 +46,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.featurecpp.model.FeatureCppModelBuilder;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 /**
  * A FeatureIDE extension to compose FeatureC++ files.
@@ -130,12 +131,12 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(java.nio.file.Path config) {
 		if (!isPluginInstalled(PLUGIN_ID)) {
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		if (!isInitialized()) {
-			final IFeatureProject configFeatureProject = CorePlugin.getFeatureProject(config);
+			final IFeatureProject configFeatureProject = CorePlugin.getFeatureProject(EclipseFileSystem.getResource(config));
 			if (configFeatureProject == null) {
 				return;
 			}
@@ -272,7 +273,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			} catch (final CoreException e) {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
-			featureCppModelWrapper.compose(createTemporaryConfigrationFile(file));
+			featureCppModelWrapper.compose(createTemporaryConfigrationFile(EclipseFileSystem.getPath(file)));
 			try {
 				tempFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (final CoreException e) {
@@ -289,7 +290,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		try {
 			for (final IResource res : folder.members()) {
 				if ((res instanceof IFile) && getConfigurationExtension().equals(res.getFileExtension())) {
-					featureCpp.compose(createTemporaryConfigrationFile((IFile) res));
+					featureCpp.compose(createTemporaryConfigrationFile(EclipseFileSystem.getPath(res)));
 				}
 			}
 		} catch (final CoreException e) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Sebastian Krieter
  */
-public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
+public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> implements IGraphicalFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GraphicalFeatureModelFormat.class.getSimpleName();
 
@@ -63,9 +63,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		final String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
 		if (layout.equals(TRUE)) {
-			object.getLayout().setHasVerticalLayout(false);
+			object.getLayout().setVerticalLayout(false);
 		} else if (layout.equals(FALSE)) {
-			object.getLayout().setHasVerticalLayout(true);
+			object.getLayout().setVerticalLayout(true);
 		}
 		final String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
 		if (showHidden.equals(TRUE)) {
@@ -113,7 +113,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 						final String xLegend = legend.getAttribute("X");
 						final String yLegend = legend.getAttribute("Y");
 
-						object.getLayout().setLegendPos(Integer.parseInt(xLegend), Integer.parseInt(yLegend));
+						object.getLegend().setPos(new Point(Integer.parseInt(xLegend), Integer.parseInt(yLegend)));
 					} else {
 						object.getLayout().setLegendAutoLayout(true);
 					}
@@ -239,7 +239,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		final Element constraints = doc.createElement(CONSTRAINTS);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, Integer.toString(object.getLayout().getLayoutAlgorithm()));
 
-		if (object.getLayout().getHasVerticalLayout()) {
+		if (object.getLayout().hasVerticalLayout()) {
 			root.setAttribute(HORIZONTAL_LAYOUT, FALSE);
 		} else {
 			root.setAttribute(HORIZONTAL_LAYOUT, TRUE);
@@ -259,7 +259,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		}
 		if (!object.getLayout().hasLegendAutoLayout()) {
 			legend.setAttribute(LEGEND_AUTO_LAYOUT, FALSE);
-			final Point legendPos = object.getLayout().getLegendPos();
+			final Point legendPos = object.getLegend().getPos();
 			legend.setAttribute("X", Integer.toString(legendPos.x));
 			legend.setAttribute("Y", Integer.toString(legendPos.y));
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -138,7 +138,7 @@ abstract public class Restriction {
 
 	// transform all terms to have a positive variable (e.g. -3~x=0 <=> 3x=3)
 	protected void makeVarsPositive() {
-		final List<Term> positiveVars = new ArrayList<Term>();
+		final List<Term> positiveVars = new ArrayList<>();
 		for (final Term term : terms) {
 			if (!term.isPositive()) {
 				positiveVars.add(term.flipBoth());
@@ -152,7 +152,7 @@ abstract public class Restriction {
 
 	// transform all term to have a positive coefficient (e.g. -3x=0 <=> 3~x=3)
 	protected void makeCoefficientsPositive() {
-		final List<Term> positiveTerms = new ArrayList<Term>();
+		final List<Term> positiveTerms = new ArrayList<>();
 		for (final Term term : terms) {
 			if (term.getCoefficient() < 0) {
 				positiveTerms.add(term.flipBoth());
@@ -166,7 +166,7 @@ abstract public class Restriction {
 
 	protected void negateBothSides() {
 		// negate the terms
-		final List<Term> negativedTerms = new ArrayList<Term>();
+		final List<Term> negativedTerms = new ArrayList<>();
 		for (final Term term : terms) {
 			negativedTerms.add(term.flipCoefficientSign());
 		}
@@ -184,7 +184,7 @@ abstract public class Restriction {
 	}
 
 	protected static List<Term> makeDefensiveCopy(List<Term> terms) {
-		final List<Term> copy = new ArrayList<Term>();
+		final List<Term> copy = new ArrayList<>();
 		for (final Term term : terms) {
 			copy.add(new Term(term));
 		}

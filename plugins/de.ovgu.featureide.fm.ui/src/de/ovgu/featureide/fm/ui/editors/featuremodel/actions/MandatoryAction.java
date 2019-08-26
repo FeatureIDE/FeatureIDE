@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
@@ -40,22 +38,21 @@ public class MandatoryAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
-	private final IFeatureModel featureModel;
-
-	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
-		super("Mandatory", viewer, ID);
-		this.featureModel = featureModel;
+	public MandatoryAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super("Mandatory", viewer, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		changeMandatoryStatus(isEveryFeatureMandatory());
+		FeatureModelOperationWrapper.run(new SetFeatureToMandatoryOperation(featureModelManager, getSelectedFeatures()));
 		setChecked(isEveryFeatureMandatory());
 	}
 
 	private boolean selectionContainsOptionalFeature() {
-		for (final IFeature tempFeature : featureArray) {
-			if (!tempFeature.getStructure().isRoot() && tempFeature.getStructure().getParent().isAnd()) {
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
+		for (final String name : featureArray) {
+			final IFeatureStructure structure = featureModel.getFeature(name).getStructure();
+			if (!structure.isRoot() && structure.getParent().isAnd()) {
 				return true;
 			}
 		}
@@ -63,22 +60,7 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private boolean isEveryFeatureMandatory() {
-		for (final IFeature tempFeature : featureArray) {
-			if (!(tempFeature.getStructure().isMandatory())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void changeMandatoryStatus(boolean allMandatory) {
-		final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(featureModel, allMandatory, getSelectedFeatures());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		return SetFeatureToMandatoryOperation.isEveryFeatureMandatory(featureModelManager.getSnapshot(), featureArray);
 	}
 
 	@Override

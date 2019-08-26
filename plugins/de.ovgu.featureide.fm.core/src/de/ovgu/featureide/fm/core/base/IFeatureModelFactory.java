@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,15 +22,12 @@ package de.ovgu.featureide.fm.core.base;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.IExtension;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-
 /**
  * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFactory extends IExtension {
+public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 
 	public static String extensionPointID = "FMFactory";
 
@@ -40,8 +37,8 @@ public interface IFeatureModelFactory extends IExtension {
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
-	IFeatureModel createFeatureModel();
+	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
 
-	SelectableFeature createSelectableFeature(IFeature feature);
+	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
 
 }

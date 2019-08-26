@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -34,28 +38,39 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 
+	public static final String ID = ID_PREFIX + "SetFeatureToCollapseOperation";
+
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private final IFeature[] featureArray;
 	private final boolean allCollapsed;
 	private final String operationLabel;
 
-	public SetFeatureToCollapseOperation(IFeature[] featureArray, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
-		super(graphicalFeatureModel.getFeatureModel(), operationLabel);
+	public SetFeatureToCollapseOperation(List<String> featureNames, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
+		super(graphicalFeatureModel.getFeatureModelManager(), operationLabel, featureNames);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.featureArray = featureArray;
 		this.allCollapsed = allCollapsed;
 		this.operationLabel = operationLabel;
 	}
 
 	@Override
-	protected void createSingleOperations() {
-		for (final IFeature tempFeature : featureArray) {
+	protected String getID() {
+		return ID;
+	}
+
+	@Override
+	protected void createSingleOperations(IFeatureModel featureModel) {
+		for (final String name : featureNames) {
+			final IFeature tempFeature = featureModel.getFeature(name);
 			if (allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
-				final CollapseFeatureOperation op = new CollapseFeatureOperation(tempFeature, graphicalFeatureModel, operationLabel);
+				final CollapseFeatureOperation op = new CollapseFeatureOperation(name, graphicalFeatureModel, operationLabel);
 				operations.add(op);
 			}
 		}
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_GRAPHICS;
 	}
 
 }

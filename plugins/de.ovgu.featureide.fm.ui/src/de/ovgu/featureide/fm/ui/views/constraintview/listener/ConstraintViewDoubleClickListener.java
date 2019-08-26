@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -46,7 +46,7 @@ public class ConstraintViewDoubleClickListener implements IDoubleClickListener {
 		if (event.getSource() instanceof TreeViewer) {
 			final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 			if (treeSelection.getFirstElement() instanceof IConstraint) {
-				new EditConstraintInViewAction(controller.getView().getViewer(), controller.getCurrentModel()).run();
+				new EditConstraintInViewAction(controller.getView().getViewer(), controller.getFeatureModelManager()).run();
 			}
 		}
 	}

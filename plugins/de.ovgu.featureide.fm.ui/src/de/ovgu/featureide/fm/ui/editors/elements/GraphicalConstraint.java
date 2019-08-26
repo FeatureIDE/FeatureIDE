@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,6 +25,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -40,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalConstraint implements IGraphicalConstraint {
 
-	protected final IConstraint correspondingConstraint;
+	protected final IConstraint constraintObject;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 	protected boolean featureSelected = false;
 	public boolean isImplicit = false;
@@ -51,20 +52,21 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
 		featureSelected = constraint.featureSelected;
-		correspondingConstraint = constraint.correspondingConstraint;
+		constraintObject = constraint.constraintObject;
 		graphicalFeatureModel = constraint.graphicalFeatureModel;
 		location = constraint.location;
 		dimension = constraint.dimension;
 	}
 
 	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
-		this.correspondingConstraint = correspondingConstraint;
+		constraintObject = correspondingConstraint;
 		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
 	public IConstraint getObject() {
-		return correspondingConstraint;
+		final IFeatureModelElement element = graphicalFeatureModel.getFeatureModelManager().getVarObject().getElement(constraintObject.getInternalId());
+		return element instanceof IConstraint ? (IConstraint) element : constraintObject;
 	}
 
 	@Override
@@ -108,8 +110,9 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!newLocation.equals(location)) {
+			final Point oldLocation = location;
 			location = newLocation;
-			update(FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE));
+			update(new FeatureIDEEvent(getObject(), EventType.CONSTRAINT_MOVE_LOCATION, newLocation, oldLocation));
 		}
 	}
 
@@ -151,8 +154,13 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	}
 
 	@Override
+	public void deregisterUIObject() {
+		uiObject = null;
+	}
+
+	@Override
 	public boolean isCollapsed() {
-		for (final IFeature f : correspondingConstraint.getContainedFeatures()) {
+		for (final IFeature f : getObject().getContainedFeatures()) {
 			if (!graphicalFeatureModel.getGraphicalFeature(f).hasCollapsedParent()) {
 				return false;
 			}

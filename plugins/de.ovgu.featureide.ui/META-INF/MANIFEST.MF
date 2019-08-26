@@ -2,25 +2,23 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 3.5.5.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.ide,
- org.eclipse.debug.ui,
  org.eclipse.jdt.ui,
  org.eclipse.gef,
+ org.eclipse.core.expressions,
+ org.eclipse.core.resources,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
- de.ovgu.featureide.core,
- org.eclipse.core.expressions
+ de.ovgu.featureide.core
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/SPLACAT.jar,
- lib/commons-math-2.2.jar,
- lib/FeatureIDEAnnotations.jar,
+Bundle-ClassPath: lib/FeatureIDEAnnotations.jar,
  .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
  de.ovgu.featureide,
@@ -95,37 +93,9 @@ Export-Package:
    org.eclipse.swt.widgets,
    org.eclipse.swt.layout,
    de.ovgu.featureide.core.builder,
-   de.ovgu.featureide.fm.core",
- no.sintef.ict.splcatool,
- org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception",
- splar.apps,
- splar.apps.experiments,
- splar.apps.generator,
- splar.core.constraints,
- splar.core.constraints.parsing,
- splar.core.fm,
- splar.core.fm.clustering,
- splar.core.fm.configuration,
- splar.core.fm.randomization,
- splar.core.fm.reasoning,
- splar.core.heuristics,
- splar.core.util,
- splar.core.util.alloy,
- splar.core.util.hypergraphs,
- splar.plugins.configuration.bdd.javabdd,
- splar.plugins.configuration.bdd.javabdd.catalog,
- splar.plugins.configuration.sat.sat4j,
- splar.plugins.configuration.tests,
- splar.plugins.configuration.tests.bdd.javabdd,
- splar.plugins.configuration.tests.sat.sat4j,
- splar.plugins.reasoners.bdd.javabdd,
- splar.plugins.reasoners.sat.sat4j,
- splar.plugins.reasoners.tests,
- splar.plugins.reasoners.tests.bdd.javabdd,
- splar.plugins.reasoners.tests.sat.sat4j,
- splar.plugins.tests,
- splar.samples
-Import-Package: org.eclipse.jdt.core,
+   de.ovgu.featureide.fm.core"
+Import-Package: org.eclipse.debug.ui,
+ org.eclipse.jdt.core,
  org.eclipse.jdt.core.compiler.batch,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
@@ -135,3 +105,4 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.ui.texteditor,
  org.junit.runner;resolution:=optional,
  org.junit.runner.notification;resolution:=optional
+Automatic-Module-Name: de.ovgu.featureide.ui

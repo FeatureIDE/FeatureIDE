@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -54,7 +54,7 @@ public class SAT4JPBSolver implements PBSolver {
 	@Override
 	public <T extends Restriction> void addRestriction(T restriction) {
 		final IVecInt ids = new VecInt(restriction.getIds());
-		final Vec<BigInteger> coefficients = new Vec<BigInteger>(restriction.getCoefficients());
+		final Vec<BigInteger> coefficients = new Vec<>(restriction.getCoefficients());
 		final BigInteger degree = BigInteger.valueOf(restriction.getDegree());
 
 		try {
@@ -106,7 +106,7 @@ public class SAT4JPBSolver implements PBSolver {
 
 	@Override
 	public Set<Integer> backbone(Set<Integer> varibales) {
-		final Set<Integer> backbone = new HashSet<Integer>();
+		final Set<Integer> backbone = new HashSet<>();
 
 		for (final Integer variable : varibales) {
 			if (!isSatisfiable(new int[] { variable })) {

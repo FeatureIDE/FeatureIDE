@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,10 +37,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory#createFeatureAttribute(java.lang.String)
-	 */
 	@Override
 	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature)
 			throws FeatureAttributeParseException, UnknownFeatureAttributeTypeException {
@@ -102,4 +98,5 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			boolean configurable) {
 		return (new DoubleFeatureAttribute(correspondingFeature, name, unit, value, recursive, configurable));
 	}
+
 }

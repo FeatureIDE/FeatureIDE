@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.filters;
 
+import java.util.function.Predicate;
+
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
@@ -29,10 +30,10 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  *
  * @author Christopher Sontag
  */
-public class MandatoryGraphicalFeatureFilter implements IFilter<IGraphicalFeature> {
+public class MandatoryGraphicalFeatureFilter implements Predicate<IGraphicalFeature> {
 
 	@Override
-	public boolean isValid(IGraphicalFeature object) {
+	public boolean test(IGraphicalFeature object) {
 		final IFeatureStructure parent = object.getObject().getStructure().getParent();
 		if ((parent != null) && parent.isAnd() && object.getObject().getStructure().isMandatory()) {
 			return true;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
@@ -59,7 +60,7 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
 		final Collection<? extends IGraphicalFeature> expandedFeatures =
 			FeatureUIHelper.getGraphicalFeatures(FeatureUtils.getParents(explanation.getAffectedFeatures()), graphicalFeatureModel);
-		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModel.getNumberOfFeatures());
+		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModelManager.getSnapshot().getNumberOfFeatures());
 		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
 			final boolean collapse = !expandedFeatures.contains(feature);
 			if (feature.isCollapsed() == collapse) { // already in the target state, therefore no change necessary
@@ -71,14 +72,14 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		super.operation();
-		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		super.operation(featureModel);
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		super.inverseOperation();
-		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		super.inverseOperation(featureModel);
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 }

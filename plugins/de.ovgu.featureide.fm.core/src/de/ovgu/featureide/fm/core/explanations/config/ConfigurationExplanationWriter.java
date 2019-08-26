@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -58,6 +58,7 @@ public abstract class ConfigurationExplanationWriter<E extends ConfigurationExpl
 			break;
 		case UNDEFINED:
 			selectionString = "neither selected nor unselected";
+			break;
 		default:
 			throw new IllegalStateException("Unknown feature selection state");
 		}
@@ -71,6 +72,6 @@ public abstract class ConfigurationExplanationWriter<E extends ConfigurationExpl
 		default:
 			throw new IllegalStateException("Unknown feature selection state");
 		}
-		return String.format("%s is %s.", selection.getFeature().getName(), selectionString);
+		return String.format("%s is %s.", selection.getName(), selectionString);
 	}
 }

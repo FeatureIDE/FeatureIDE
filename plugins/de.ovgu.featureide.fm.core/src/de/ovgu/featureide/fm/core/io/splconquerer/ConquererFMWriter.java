@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -106,9 +106,9 @@ public class ConquererFMWriter extends AFeatureModelFormat {
 		plm.setAttribute("name", featureModel.getStructure().getRoot().getFeature().getName());
 		plm.setAttribute("canReuseInstance", "true");
 
-		require = new HashMap<String, Set<String>>();
-		exclude = new HashMap<String, Set<String>>();
-		final List<Node> furtherNodes = new LinkedList<Node>();
+		require = new HashMap<>();
+		exclude = new HashMap<>();
+		final List<Node> furtherNodes = new LinkedList<>();
 		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
 		final Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
 		Node node = new And(nodeArray);
@@ -130,14 +130,14 @@ public class ConquererFMWriter extends AFeatureModelFormat {
 						if (literalB.positive) {
 							Set<String> set = require.get(literalA.var);
 							if (set == null) {
-								set = new HashSet<String>();
+								set = new HashSet<>();
 								require.put(literalA.var.toString(), set);
 							}
 							set.add(literalB.var.toString());
 						} else {
 							Set<String> set = exclude.get(literalA.var);
 							if (set == null) {
-								set = new HashSet<String>();
+								set = new HashSet<>();
 								exclude.put(literalA.var.toString(), set);
 							}
 							set.add(literalB.var.toString());
@@ -374,7 +374,7 @@ public class ConquererFMWriter extends AFeatureModelFormat {
 	private HashMap<String, Integer> ids;
 
 	private void initializeIDs() {
-		ids = new HashMap<String, Integer>();
+		ids = new HashMap<>();
 		initializeIDs(featureModel.getStructure().getRoot().getFeature());
 	}
 

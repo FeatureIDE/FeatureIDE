@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.core.featuremodeling;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -28,7 +28,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
@@ -36,6 +35,7 @@ import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 public class FeatureModeling extends ComposerExtensionClass {
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 
 	}
 
@@ -99,9 +99,10 @@ public class FeatureModeling extends ComposerExtensionClass {
 			if (!parent.exists()) {
 				folder.create(true, true, null);
 			}
+			final Path parentPath = EclipseFileSystem.getPath(parent);
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
-			final IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
-			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			final Path configurationFile = parentPath.resolve(congurationName + "." + format.getSuffix());
+			SimpleFileHandler.save(configurationFile, configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);

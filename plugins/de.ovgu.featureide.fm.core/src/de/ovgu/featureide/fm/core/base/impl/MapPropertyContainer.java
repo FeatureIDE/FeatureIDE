@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -32,124 +34,102 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
  */
 public class MapPropertyContainer implements IPropertyContainer {
 
-	public MapPropertyContainer() {
-
-	}
+	public MapPropertyContainer() {}
 
 	public MapPropertyContainer(IPropertyContainer other) {
-		setEntrySet(other.entrySet());
+		setProperties(other.getProperties());
 	}
 
-	public static Object copyObject(Type type, Object value) {
-		switch (type) {
-		case BOOLEAN:
-			return new Boolean((Boolean) value);
-		case BYTE:
-			return new Byte((Byte) value);
-		case CHAR:
-			return new Character((Character) value);
-		case DOUBLE:
-			return new Double((Double) value);
-		case FLOAT:
-			return new Float((Float) value);
-		case INT:
-			return new Integer((Integer) value);
-		case LONG:
-			return new Long((Long) value);
-		case SHORT:
-			return new Short((Short) value);
-		case STRING:
-			return new String((String) value);
-		default:
-			throw new RuntimeException("Unknown type:" + type);
+	protected Map<Entry, Entry> properties = new HashMap<>();
+
+	@Override
+	public String get(String key, String type, String defaultValue) {
+		final Entry newEntry = new Entry(key, type);
+		final Entry retrievedEntry = properties.get(newEntry);
+		if (retrievedEntry == null) {
+			newEntry.setValue(defaultValue);
+			return defaultValue;
 		}
-	}
-
-	Map<String, Object> properties = new HashMap<>();
-	Map<String, Type> types = new HashMap<>();
-
-	protected String makeKey(String key) {
-		return key.toLowerCase();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(String key, T defaultValue) {
-		final String mapKey = makeKey(key);
-		return properties.containsKey(mapKey) ? (T) properties.get(mapKey) : defaultValue;
+		return retrievedEntry.getValue();
 	}
 
 	@Override
-	public Type getDataType(String key) throws NoSuchPropertyException {
-		final String mapKey = makeKey(key);
-		if (!properties.containsKey(mapKey)) {
-			throw new NoSuchPropertyException(mapKey);
-		} else {
-			return types.get(mapKey);
+	public String get(String key, String type) throws NoSuchPropertyException {
+		final Entry newEntry = new Entry(key, type);
+		final Entry retrievedEntry = properties.get(newEntry);
+		if (retrievedEntry == null) {
+			throw new NoSuchPropertyException(newEntry.toString());
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(String key) throws NoSuchPropertyException {
-		final String mapKey = makeKey(key);
-		if (!properties.containsKey(mapKey)) {
-			throw new NoSuchPropertyException(mapKey);
-		} else {
-			return (T) properties.get(mapKey);
-		}
+		return retrievedEntry.getValue();
 	}
 
 	@Override
-	public boolean has(String key) {
-		final String mapKey = makeKey(key);
-		return properties.containsKey(mapKey);
+	public boolean has(String key, String type) {
+		return properties.containsKey(new Entry(key, type));
 	}
 
 	@Override
-	public Set<String> keySet() {
+	public Set<Entry> getProperties() {
 		return properties.keySet();
 	}
 
 	@Override
-	public Set<Entry<String, Type, Object>> entrySet() {
-		final HashSet<Entry<String, Type, Object>> entries = new HashSet<>();
-		for (final String key : properties.keySet()) {
-			entries.add(new Entry<String, IPropertyContainer.Type, Object>(key, types.get(key), properties.get(key)));
+	public Set<Entry> getProperties(String type) {
+		final HashSet<Entry> filteredSet = new HashSet<>();
+		for (final Entry entry : properties.keySet()) {
+			if (Objects.equals(entry.getType(), type)) {
+				filteredSet.add(entry);
+			}
 		}
-		return entries;
+		return filteredSet;
 	}
 
 	@Override
-	public void setEntrySet(Set<Entry<String, Type, Object>> entries) {
+	public void setProperties(Collection<Entry> entries) {
 		properties.clear();
-		types.clear();
-
-		for (final Entry<String, Type, Object> entry : entries) {
-			final String key = makeKey(new String(entry.getKey()));
-			final Type type = entry.getType();
-			final Object obj = copyObject(type, entry.getValue());
-			properties.put(key, obj);
-			types.put(key, type);
-			System.out.println("key=" + key + ",type=" + type.toString() + ", val=" + obj);
+		for (final Entry entry : entries) {
+			final Entry copiedEntry = new Entry(entry);
+			properties.put(copiedEntry, copiedEntry);
 		}
 	}
 
 	@Override
-	public void remove(String key) throws NoSuchPropertyException {
-		final String mapKey = makeKey(key);
-		if (!properties.containsKey(mapKey)) {
-			throw new NoSuchPropertyException(mapKey);
-		}
-		properties.remove(mapKey);
-		types.remove(mapKey);
+	public Entry remove(String key, String type) {
+		return properties.remove(new Entry(key, type));
 	}
 
 	@Override
-	public <T> void set(String key, Type type, T value) {
-		final String mapKey = makeKey(key);
-		properties.put(mapKey, value);
-		types.put(mapKey, type);
+	public void set(String key, String type, String value) {
+		final Entry newEntry = new Entry(key, type);
+		final Entry retrievedEntry = properties.get(newEntry);
+		if (retrievedEntry == null) {
+			newEntry.setValue(value);
+			properties.put(newEntry, newEntry);
+		} else {
+			retrievedEntry.setValue(value);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		int result = properties.size();
+		for (final Entry entry : properties.keySet()) {
+			result += entry.hashCode();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
+			return false;
+		}
+
+		final MapPropertyContainer other = (MapPropertyContainer) obj;
+		return Objects.equals(properties, other.properties);
 	}
 
 }

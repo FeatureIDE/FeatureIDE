@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,19 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import java.io.File;
-
-import org.eclipse.core.resources.IFile;
-
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public interface IConfigurationEditor {
 
-	Configuration getConfiguration();
+	ConfigurationManager getConfigurationManager();
 
-	IFile getFile();
-
-	File getModelFile();
+	FeatureModelManager getFeatureModelManager();
 
 	boolean isAutoSelectFeatures();
 
@@ -40,12 +35,18 @@ public interface IConfigurationEditor {
 
 	boolean hasValidFeatureModel();
 
-	enum EXPAND_ALGORITHM {
-		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	boolean isIOError();
+
+	boolean isReadConfigurationError();
+
+	boolean isReadFeatureModelError();
+
+	enum ExpandAlgorithm {
+		NONE, CURRENTLY_SELECTED, ALL_SELECTED, OPEN_CLAUSES, ALL_SELECTED_OPEN_CLAUSE
 	}
 
-	EXPAND_ALGORITHM getExpandAlgorithm();
+	ExpandAlgorithm getExpandAlgorithm();
 
-	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
+	void setExpandAlgorithm(ExpandAlgorithm expandAlgorithm);
 
 }

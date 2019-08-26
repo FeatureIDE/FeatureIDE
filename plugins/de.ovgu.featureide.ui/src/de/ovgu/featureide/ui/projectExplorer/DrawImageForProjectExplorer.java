@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -196,7 +196,7 @@ public class DrawImageForProjectExplorer {
 	}
 
 	/**
-	 * @param colors: gets a list of Integer to create an Image with the color in the list
+	 * @param colors gets a list of Integer to create an Image with the color in the list
 	 * @return the image for the featureHouseExplorer with the folderIcon as default and only one color
 	 */
 	public static Image getFOPModuleImage(List<Integer> colors) {

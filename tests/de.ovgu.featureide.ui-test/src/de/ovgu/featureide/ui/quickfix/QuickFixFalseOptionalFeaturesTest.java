@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -35,16 +35,15 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Creates configurations where false optional features are unused.
@@ -58,9 +57,9 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	protected String failureMessage;
 
-	private final IFeatureModel fm;
+	private final FeatureModelFormula fm;
 
-	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s) throws UnsupportedModelException {
+	public QuickFixFalseOptionalFeaturesTest(FeatureModelFormula fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
 		failureMessage = "(" + s + ")";
 
@@ -72,9 +71,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 		for (final File f : Commons.getFeatureModelFolder().listFiles(getFileFilter(".xml"))) {
 			final Object[] models = new Object[2];
 
-			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
-			SimpleFileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
-			models[0] = fm;
+			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
+			models[0] = new FeatureModelFormula(fm);
 			models[1] = f.getName();
 			params.add(models);
 		}
@@ -95,9 +93,9 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
-		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm.getFeatureModel());
+		final Collection<IFeature> core = fm.getAnalyzer().getCoreFeatures(null);
+		final Collection<String> falseOptionalFeatures = new LinkedList<>();
 
 		for (final IFeature feature : concrete) {
 			if (!core.contains(feature)) {

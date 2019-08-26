@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,12 +33,12 @@ import org.eclipse.core.runtime.Platform;
  */
 public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
 
-	protected final Class<T> classObject;
+	protected final Class<? extends T> classObject;
 	protected final String pluginID;
 	protected final String extensionID;
 	protected final String extensionPointID;
 
-	public EclipseExtensionLoader(String pluginID, String extensionPointID, String extensionID, Class<T> classObject) {
+	public EclipseExtensionLoader(String pluginID, String extensionPointID, String extensionID, Class<? extends T> classObject) {
 		this.pluginID = pluginID;
 		this.extensionPointID = extensionPointID;
 		this.extensionID = extensionID;
@@ -51,12 +51,7 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 		for (final IExtension extension : extensions) {
 			final IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 			for (final IConfigurationElement configurationElement : configurationElements) {
-				final T extensionInstance = parseExtension(configurationElement);
-				if (extensionInstance != null) {
-					if (extensionInstance.initExtension()) {
-						extensionManager.addExtension(extensionInstance);
-					}
-				}
+				extensionManager.addExtension(parseExtension(configurationElement));
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -73,7 +73,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 				final Object var = NodeCreator.getVariable(featureSelection.getFeature());
 				final boolean value;
-				if (featureSelection == getSubject()) {
+				if (featureSelection.getName().equals(getSubject().getName())) {
 					switch (featureSelection.getAutomatic()) {
 					case SELECTED:
 						value = false;
@@ -88,7 +88,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					}
 					oracle.push(new Literal(var, value)); // Assumptions do not show up in the explanation. TODO ATTRIBUTES they do in the new solver rework :/
 				} else {
-					switch (featureSelection.getManual()) {
+					switch (featureSelection.getSelection()) {
 					case SELECTED:
 						value = true;
 						break;

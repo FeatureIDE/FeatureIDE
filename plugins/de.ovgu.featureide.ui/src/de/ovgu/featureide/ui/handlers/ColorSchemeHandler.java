@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -49,20 +49,15 @@ import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
  */
 public class ColorSchemeHandler extends AbstractHandler {
 
-	/*
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
-
 	private IEditorPart editorPart;
 	private IDocumentProvider provider;
 	private ITextEditor editor;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
 		editorPart = HandlerUtil.getActiveEditor(event);
-		// Cast is necessary, don't remove
-		editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+		// Cast is necessary for backward compatibility, don't remove
+		editor = editorPart.getAdapter(ITextEditor.class);
 		provider = editor.getDocumentProvider();
 
 		final int line = getCursorPos();
@@ -84,7 +79,7 @@ public class ColorSchemeHandler extends AbstractHandler {
 				return true;
 			}
 			final IStructuredSelection structuredSelection = new StructuredSelection(feature);
-			final SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModel());
+			final SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModelManager());
 			sfca.run();
 			return true;
 		}

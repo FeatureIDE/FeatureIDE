@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -183,9 +183,9 @@ public class FeatureCppWrapper {
 							}
 						}
 						/** Lines to debug executing FeatureC++ **/
-//						else {
-//							FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
-//						}
+						// else {
+						// FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
+						// }
 					}
 					while ((line = error.readLine()) != null) {
 						FeatureCppCorePlugin.getDefault().logWarning(line);

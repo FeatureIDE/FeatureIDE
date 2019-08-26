@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -94,13 +95,19 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 	@Override
 	public void pageChangeTo(int index) {
-		final Configuration configuration = configurationEditor.getConfiguration();
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null) {
+			configurationManager.editObject(this::resetAbstractDeselected, ConfigurationManager.CHANGE_ALL);
+		}
+		super.pageChangeTo(index);
+	}
+
+	private void resetAbstractDeselected(final Configuration configuration) {
 		for (final SelectableFeature feature : configuration.getFeatures()) {
 			if ((feature.getAutomatic() == Selection.UNDEFINED) && (feature.getManual() == Selection.UNSELECTED)) {
 				configuration.setManual(feature, Selection.UNDEFINED);
 			}
 		}
-		super.pageChangeTo(index);
 	}
 
 }

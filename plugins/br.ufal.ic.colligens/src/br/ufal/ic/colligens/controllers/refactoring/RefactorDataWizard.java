@@ -13,7 +13,8 @@ public class RefactorDataWizard extends RefactoringWizard {
 
 	@Override
 	protected void addUserInputPages() {
-//		addPage(new RefactoringDataInputPage("IntroduceIndirectionInputPage"));
+		// addPage(new
+		// RefactoringDataInputPage("IntroduceIndirectionInputPage"));
 	}
 
 }
