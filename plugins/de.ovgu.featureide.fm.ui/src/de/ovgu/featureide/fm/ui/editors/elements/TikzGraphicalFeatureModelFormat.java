@@ -350,14 +350,21 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		private void printLegend(StringBuilder str) {
 			boolean check = false;
 			final StringBuilder myString = new StringBuilder();
+			if (legend[0] && legend[1]) {
+				check = true;
+				myString.append("		\\node [abstract,label=right:Abstract Feature] {}; \\\\" + lnSep);
+				legend[0] = false;
+				myString.append("		\\node [concrete,label=right:Concrete Feature] {}; \\\\" + lnSep);
+				legend[1] = false;
+			}
 			if (legend[0]) {
 				check = true;
-				myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
+				myString.append("		\\node [abstract,label=right:Feature] {}; \\\\" + lnSep);
 				legend[0] = false;
 			}
 			if (legend[1]) {
 				check = true;
-				myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
+				myString.append("		\\node [concrete,label=right:Feature] {}; \\\\" + lnSep);
 				legend[1] = false;
 			}
 			if (legend[2]) {
@@ -376,15 +383,15 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
 				myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
 					+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
-					+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
+					+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or Group] {}; \\\\");
 				legend[4] = false;
 			}
 			if (legend[5]) {
 				check = true;
 				// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
 				// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
-				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);"
-					+ lnSep + "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
+				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+					+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative Group] {}; \\\\");
 				legend[5] = false;
 			}
 			if (legend[6]) {
