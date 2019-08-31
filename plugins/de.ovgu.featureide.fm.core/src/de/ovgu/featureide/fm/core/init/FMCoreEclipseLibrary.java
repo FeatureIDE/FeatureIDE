@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.init;
 
+import org.prop4j.solver.AbstractSolverFactory;
+import org.prop4j.solver.impl.SolverManager;
+
 import de.ovgu.featureide.fm.core.EclipseExtensionLoader;
 import de.ovgu.featureide.fm.core.EclipseLogger;
 import de.ovgu.featureide.fm.core.Logger;
@@ -78,6 +81,9 @@ public class FMCoreEclipseLibrary implements ILibrary {
 
 		ConfigFormatManager.getInstance().addExtensions(new EclipseExtensionLoader<IPersistentFormat<Configuration>>(PluginID.PLUGIN_ID,
 				IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
+
+		SolverManager.getInstance().addExtensions(new EclipseExtensionLoader<AbstractSolverFactory>(PluginID.PLUGIN_ID, AbstractSolverFactory.extensionPointID,
+				AbstractSolverFactory.extensionID, AbstractSolverFactory.class));
 	}
 
 	@Override

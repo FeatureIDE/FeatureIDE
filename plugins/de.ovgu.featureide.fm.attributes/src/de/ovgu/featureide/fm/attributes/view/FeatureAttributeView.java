@@ -556,6 +556,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void clear() {
+		if (fmManager == null) {
+			return;
+		}
 		fmManager.removeListener(this);
 	}
 
