@@ -36,6 +36,7 @@ import org.prop4j.solvers.impl.javasmt.SolverMemory;
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Test to check the functionality of {@link SolverMemory}
@@ -49,7 +50,7 @@ public class SolverMemoryTest {
 
 	public SolverMemoryTest() {
 		model = Commons.loadTestFeatureModelFromFile("car.xml");
-		problem = new SatProblem(new Literal("A"));// model.getAnalyser().getCnf()); //TODO ATTRIBUTES
+		problem = new SatProblem(FeatureModelManager.getInstance(model).getPersistentFormula().getCNFNode());// model.getAnalyser().getCnf()); //TODO ATTRIBUTES
 	}
 
 	public MutableSolverMemory<Node, Node> getNewEmptyMemory() {
