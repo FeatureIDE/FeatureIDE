@@ -67,6 +67,15 @@ public class RenamingsManager implements IEventManager, Cloneable {
 		renamings.addAll(renamingsManager.renamings);
 	}
 
+	/**
+	 * @param renamingsManager
+	 * @param oldModel
+	 */
+	protected RenamingsManager(RenamingsManager renamingsManager, IFeatureModel newModel) {
+		model = newModel;
+		renamings.addAll(renamingsManager.renamings);
+	}
+
 	public boolean renameFeature(final String oldName, final String newName) {
 		final Map<String, IFeature> featureTable = model.getFeatureTable();
 		if (!featureTable.containsKey(oldName) || featureTable.containsKey(newName)) {
@@ -189,6 +198,10 @@ public class RenamingsManager implements IEventManager, Cloneable {
 	@Override
 	public RenamingsManager clone() {
 		return new RenamingsManager(this);
+	}
+
+	public RenamingsManager clone(IFeatureModel newModel) {
+		return new RenamingsManager(this, newModel);
 	}
 
 }
