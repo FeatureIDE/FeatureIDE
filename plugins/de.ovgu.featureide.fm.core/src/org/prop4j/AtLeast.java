@@ -43,16 +43,6 @@ public class AtLeast extends Node {
 	}
 
 	@Override
-	public boolean isConjunctiveNormalForm() {
-		return false;
-	}
-
-	@Override
-	public boolean isClausalNormalForm() {
-		return false;
-	}
-
-	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
 		return new And(chooseKofN(newChildren, (newChildren.length - min) + 1, false));
 	}

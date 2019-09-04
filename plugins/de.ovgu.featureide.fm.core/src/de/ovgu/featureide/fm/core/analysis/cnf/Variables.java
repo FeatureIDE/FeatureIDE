@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 
 	public Variables(Collection<String> varNameList) {
 		intToVar = new String[varNameList.size() + 1];
-		varToInt = new HashMap<>((int) (1.5 * varNameList.size()));
+		varToInt = new LinkedHashMap<>((int) (1.5 * varNameList.size()));
 
 		int index = 0;
 		for (final String feature : varNameList) {
@@ -66,7 +66,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 
 	protected Variables(Variables oldSatMapping) {
 		intToVar = Arrays.copyOf(oldSatMapping.intToVar, oldSatMapping.intToVar.length);
-		varToInt = new HashMap<>(oldSatMapping.varToInt);
+		varToInt = new LinkedHashMap<>(oldSatMapping.varToInt);
 	}
 
 	@Override

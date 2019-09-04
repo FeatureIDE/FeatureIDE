@@ -43,16 +43,6 @@ public class Choose extends Node {
 	}
 
 	@Override
-	public boolean isConjunctiveNormalForm() {
-		return false;
-	}
-
-	@Override
-	public boolean isClausalNormalForm() {
-		return false;
-	}
-
-	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
 		return new And(new AtMost(n, newChildren).eliminateNonCNFOperators(), new AtLeast(n, newChildren).eliminateNonCNFOperators());
 	}

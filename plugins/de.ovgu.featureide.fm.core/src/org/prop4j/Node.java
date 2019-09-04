@@ -25,7 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -86,7 +88,13 @@ public abstract class Node {
 	 *
 	 * @return true iff this is in conjunctive normal form.
 	 */
-	public abstract boolean isConjunctiveNormalForm();
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	public boolean isDisjunctiveNormalForm() {
+		return false;
+	}
 
 	/**
 	 * Returns true iff this is in clausal normal form. This is a more narrow case of conjunctive normal form. Specifically, redundant nodes may not be omitted.
@@ -94,27 +102,54 @@ public abstract class Node {
 	 *
 	 * @return true iff this is in clausal normal form
 	 */
-	public abstract boolean isClausalNormalForm();
+	public boolean isRegularConjunctiveNormalForm() {
+		return false;
+	}
+
+	public boolean isRegularDisjunctiveNormalForm() {
+		return false;
+	}
 
 	public Node toCNF() {
-		Node cnf = this;
-		cnf = cnf.eliminateNonCNFOperators();
-		cnf = deMorgan(cnf);
-		return cnf.clausifyCNF();
+		return toCNF(false);
 	}
 
 	public Node toDNF() {
-		Node dnf = this;
-		dnf = dnf.eliminateNonCNFOperators();
-		dnf = deMorgan(dnf);
-		return dnf.clausifyDNF();
+		return toDNF(false);
+	}
+
+	public Node toCNF(boolean simplify) {
+		if (isConjunctiveNormalForm()) {
+			return clone();
+		} else {
+			final Node prepareNF = prepareNF();
+			return (prepareNF instanceof And) ? prepareNF.clausifyCNF(simplify) : new And(prepareNF).clausifyCNF(simplify);
+		}
+	}
+
+	public Node toDNF(boolean simplify) {
+		if (isDisjunctiveNormalForm()) {
+			return clone();
+		} else {
+			final Node prepareNF = prepareNF();
+			return ((prepareNF instanceof Or) ? prepareNF : new Or(prepareNF)).clausifyDNF(simplify);
+		}
+	}
+
+	private Node prepareNF() {
+		Node cnf = this.eliminateNonCNFOperators();
+		cnf = cnf.deMorgan();
+		cnf = cnf.simplifyTree();
+		cnf.removeDuplicates();
+		return cnf;
 	}
 
 	public Node toRegularCNF() {
-		final Node node = flatten();
-		node.simplify();
-		node.removeDuplicates();
-		Node regularCNFNode = node.toCNF();
+		return toRegularCNF(false);
+	}
+
+	public Node toRegularCNF(boolean simplify) {
+		Node regularCNFNode = toCNF(simplify);
 		if (regularCNFNode instanceof And) {
 			final Node[] children = regularCNFNode.getChildren();
 			for (int i = 0; i < children.length; i++) {
@@ -132,10 +167,11 @@ public abstract class Node {
 	}
 
 	public Node toRegularDNF() {
-		final Node node = flatten();
-		node.simplify();
-		node.removeDuplicates();
-		Node regularDNFNode = node.toDNF();
+		return toRegularDNF(false);
+	}
+
+	public Node toRegularDNF(boolean simplify) {
+		Node regularDNFNode = toDNF(simplify);
 		if (regularDNFNode instanceof Or) {
 			final Node[] children = regularDNFNode.getChildren();
 			for (int i = 0; i < children.length; i++) {
@@ -152,17 +188,6 @@ public abstract class Node {
 		return regularDNFNode;
 	}
 
-	public static Node buildCNF(Node node) {
-		Node cnf = node.eliminateNonCNFOperators();
-		cnf = deMorgan(cnf);
-		cnf = buildCNF_rec(cnf);
-		return cnf;
-	}
-
-	public static Node buildDNF(Node node) {
-		return node.clone().toDNF();
-	}
-
 	protected final Node eliminateNonCNFOperators() {
 		if (children != null) {
 			final Node[] newChildren = new Node[children.length];
@@ -177,151 +202,11 @@ public abstract class Node {
 
 	protected abstract Node eliminateNonCNFOperators(Node[] newChildren);
 
-	public static Node deMorgan(Node node) {
-		if (node instanceof Literal) {
-			return node;
-		} else if (node instanceof Not) {
-			final Node notChild = node.getChildren()[0];
-			if (notChild instanceof Literal) {
-				final Literal clone = (Literal) notChild.clone();
-				clone.flip();
-				return clone;
-			} else if (notChild instanceof Not) {
-				return deMorgan(notChild.getChildren()[0]);
-			} else if (notChild instanceof Or) {
-				final Node[] children = notChild.getChildren();
-				final Node[] newChildren = new Node[children.length];
-				for (int i = 0; i < children.length; i++) {
-					newChildren[i] = deMorgan(new Not(children[i]));
-				}
-				return new And(newChildren);
-			} else {
-				final Node[] children = notChild.getChildren();
-				final Node[] newChildren = new Node[children.length];
-				for (int i = 0; i < children.length; i++) {
-					newChildren[i] = deMorgan(new Not(children[i]));
-				}
-				return new Or(newChildren);
-			}
-		} else {
-			final Node[] children = node.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				children[i] = deMorgan(children[i]);
-			}
-			return node;
+	public Node deMorgan() {
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].deMorgan();
 		}
-	}
-
-	private static Node buildCNF_rec(Node node) {
-		if (node instanceof Literal) {
-			return node;
-		} else if (node instanceof Or) {
-			final ArrayList<Node> newChildren = new ArrayList<>();
-			Node[] children = node.getChildren();
-			boolean containsAnd = false;
-			for (int i = 0; i < children.length; i++) {
-				final Node newNode = buildCNF_rec(children[i]);
-				if (newNode != null) {
-					if (newNode instanceof And) {
-						containsAnd = true;
-						newChildren.add(newNode);
-					} else if (newNode instanceof Or) {
-						newChildren.addAll(Arrays.asList(newNode.getChildren()));
-					} else {
-						newChildren.add(newNode);
-					}
-				}
-			}
-
-			if (containsAnd) {
-				final int[][] sizeArrays = new int[newChildren.size()][];
-				children = null;
-				node.setChildren(null);
-				for (int i = 0; i < newChildren.size(); i++) {
-					final Node newChild = newChildren.get(i);
-					if (newChild instanceof And) {
-						final Node[] newChildChildren = newChild.getChildren();
-						final int[] curSizeArray = new int[newChildChildren.length];
-						sizeArrays[i] = curSizeArray;
-						for (int j = 0; j < newChildChildren.length; j++) {
-							final Node child = newChildChildren[j];
-							curSizeArray[j] = (child instanceof Or) ? child.getChildren().length : -1;
-						}
-					} else {
-						sizeArrays[i] = null;
-					}
-				}
-				final HashSet<Node> newCleanChildren = new HashSet<>();
-
-				final int[] indexArray = new int[newChildren.size()];
-				boolean carry;
-				do {
-					carry = true;
-					int sum = 0;
-					for (int i = 0; i < sizeArrays.length; i++) {
-						final int[] curSizeArray = sizeArrays[i];
-						if (curSizeArray != null) {
-							int index = indexArray[i];
-							if (carry) {
-								index++;
-								if (index >= curSizeArray.length) {
-									index = 0;
-									carry = true;
-								} else {
-									carry = false;
-								}
-								indexArray[i] = index;
-							}
-							sum += Math.abs(curSizeArray[index]);
-						} else {
-							sum++;
-						}
-					}
-
-					final Node[] newClause = new Node[sum];
-					int curIndex = 0;
-					for (int i = 0; i < sizeArrays.length; i++) {
-						final Node newChild = newChildren.get(i);
-						final int[] curSizeArray = sizeArrays[i];
-
-						if (curSizeArray != null) {
-							final int index = indexArray[i];
-							final Node newChildChild = newChild.getChildren()[index];
-							if (curSizeArray[index] < 0) {
-								newClause[curIndex++] = newChildChild;
-							} else {
-								final Node[] newChildChildChildren = newChildChild.getChildren();
-								System.arraycopy(newChildChildChildren, 0, newClause, curIndex, newChildChildChildren.length);
-								curIndex += newChildChildChildren.length;
-							}
-						} else {
-							newClause[curIndex++] = newChild;
-						}
-					}
-
-					newCleanChildren.add(new Or(newClause));
-				} while (!carry);
-				return new And(newCleanChildren);
-			} else {
-				node.setChildren(newChildren.toArray(new Node[newChildren.size()]));
-				return node;
-			}
-		} else {
-			final ArrayList<Node> newChildren = new ArrayList<>();
-			final Node[] children = node.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				final Node newNode = buildCNF_rec(children[i]);
-				if (newNode != null) {
-					if (newNode instanceof And) {
-						newChildren.addAll(Arrays.asList(newNode.getChildren()));
-					} else {
-						newChildren.add(newNode);
-					}
-				}
-			}
-			node.setChildren(newChildren.toArray(new Node[newChildren.size()]));
-			return node;
-		}
+		return this;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -362,15 +247,22 @@ public abstract class Node {
 		return node;
 	}
 
-	public void simplify() {
+	public Node simplifyTree() {
+		return flatten().simplify();
+	}
+
+	protected Node simplify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
 		}
+		return this;
 	}
 
-	public Node flatten() {
-		if (children.length == 1) {
-			return children[0];
+	protected Node flatten() {
+		if (children == null) {
+			return this;
+		} else if (children.length == 1) {
+			return children[0].flatten();
 		} else {
 			for (int i = 0; i < children.length; i++) {
 				children[i] = children[i].flatten();
@@ -393,6 +285,7 @@ public abstract class Node {
 				for (final Node child : childrenSet) {
 					newChildren[i++] = child;
 				}
+				children = newChildren;
 			}
 		}
 	}
@@ -457,8 +350,8 @@ public abstract class Node {
 		return newArray;
 	}
 
-	public static LinkedList<Node> clone(LinkedList<Node> list) {
-		final LinkedList<Node> newList = new LinkedList<>();
+	public static List<Node> clone(List<Node> list) {
+		final List<Node> newList = new ArrayList<>(list.size());
 		for (final Node node : list) {
 			newList.add(node.clone());
 		}
@@ -477,11 +370,11 @@ public abstract class Node {
 		return this;
 	}
 
-	protected Node clausifyCNF() {
+	protected Node clausifyCNF(boolean simplify) {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
-	protected Node clausifyDNF() {
+	protected Node clausifyDNF(boolean simplify) {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
@@ -496,28 +389,109 @@ public abstract class Node {
 		return list;
 	}
 
-	protected final void fuseWithSimilarChildren() {
-		int count = children.length;
-		for (final Node child : children) {
-			if (getClass().isInstance(child)) {
-				count += child.children.length - 1;
-			}
-		}
-		final Node[] newChildren = new Node[count];
-		int i = 0;
-		for (final Node child : children) {
-			if (getClass().isInstance(child)) {
-				System.arraycopy(child.children, 0, newChildren, i, child.children.length);
-				i += child.children.length;
-			} else {
-				newChildren[i++] = child;
-			}
-		}
-		children = newChildren;
-	}
-
 	protected static Node getNode(Object object) {
 		return object instanceof Node ? (Node) object : new Literal(object);
+	}
+
+	protected void createNF(Node parent, LinkedList<LinkedHashSet<Literal>> newClauseList, boolean simplify) {
+		final Node[] children = (parent instanceof Literal) ? new Node[] { parent } : parent.children;
+		final ArrayList<List<Literal[]>> oldClauses = collectClauses(children);
+		buildClauses(oldClauses, newClauseList, new LinkedHashSet<>(), 0, simplify);
+	}
+
+	private ArrayList<List<Literal[]>> collectClauses(Node[] children) {
+		final ArrayList<List<Literal[]>> oldClauses = new ArrayList<>(children.length);
+		for (final Node child : children) {
+			final ArrayList<Literal[]> oldClause = new ArrayList<>();
+			if (child instanceof Literal) {
+				oldClause.add(new Literal[] { (Literal) child });
+			} else {
+				for (final Node grandchild : child.children) {
+					if (grandchild instanceof Literal) {
+						oldClause.add(new Literal[] { (Literal) grandchild });
+					} else {
+						oldClause.add(Arrays.copyOf(grandchild.children, grandchild.children.length, Literal[].class));
+					}
+				}
+			}
+			oldClauses.add(oldClause);
+		}
+		for (final List<Literal[]> clause : oldClauses) {
+			Collections.sort(clause, (a, b) -> b.length - a.length);
+		}
+		Collections.sort(oldClauses, (a, b) -> a.size() - b.size());
+		return oldClauses;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void buildClauses(ArrayList<List<Literal[]>> clauseList, LinkedList<LinkedHashSet<Literal>> newClauseList, LinkedHashSet<Literal> literals,
+			int depth, boolean simplify) {
+		for (final LinkedHashSet<Literal> hashSet : newClauseList) {
+			if (literals.containsAll(hashSet)) {
+				// is subsumed
+				return;
+			}
+		}
+		if (depth == clauseList.size()) {
+			for (final Iterator<LinkedHashSet<Literal>> iterator = newClauseList.iterator(); iterator.hasNext();) {
+				final LinkedHashSet<Literal> otherLiterals = iterator.next();
+				if (otherLiterals.size() > literals.size()) {
+					if (otherLiterals.containsAll(literals)) {
+						// subsumes prior clause
+						iterator.remove();
+					}
+				}
+			}
+			newClauseList.add((LinkedHashSet<Literal>) literals.clone());
+		} else {
+			final List<Literal[]> clause = clauseList.get(depth);
+			final ArrayList<Literal> addedLiterals = new ArrayList<>();
+			clauseLoop: for (int j = 0; j < clause.size(); j++) {
+				for (final Literal l : clause.get(j)) {
+					if (simplify && literals.contains(new Literal(l.var, !l.positive))) {
+						literals.removeAll(addedLiterals);
+						addedLiterals.clear();
+						continue clauseLoop;
+					} else {
+						if (literals.add(l)) {
+							addedLiterals.add(l);
+						}
+					}
+				}
+				buildClauses(clauseList, newClauseList, literals, depth + 1, simplify);
+				literals.removeAll(addedLiterals);
+				addedLiterals.clear();
+			}
+		}
+	}
+
+	protected boolean unitPropagation(LinkedList<LinkedHashSet<Literal>> newClauseList) {
+		boolean newUnitClauses = false;
+		final HashSet<Literal> unitClauses = new HashSet<>();
+		for (final LinkedHashSet<Literal> clause : newClauseList) {
+			if (clause.isEmpty()) {
+				return true;
+			} else if (clause.size() == 1) {
+				final Literal literal = clause.iterator().next();
+				unitClauses.add(new Literal(literal.var, !literal.positive));
+				newUnitClauses = true;
+			}
+		}
+		while (newUnitClauses) {
+			newUnitClauses = false;
+			for (final LinkedHashSet<Literal> clause : newClauseList) {
+				if (clause.removeAll(unitClauses)) {
+					if (clause.isEmpty()) {
+						return true;
+					} else if (clause.size() == 1) {
+						final Literal literal = clause.iterator().next();
+						unitClauses.add(new Literal(literal.var, !literal.positive));
+						newUnitClauses = true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	protected Node[] chooseKofN(Node[] elements, int k, boolean negated) {
@@ -738,4 +712,5 @@ public abstract class Node {
 		}
 		return assignments;
 	}
+
 }

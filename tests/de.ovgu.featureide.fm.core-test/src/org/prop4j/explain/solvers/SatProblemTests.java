@@ -350,8 +350,14 @@ public abstract class SatProblemTests {
 	public void testGetClause() {
 		final SatProblem instance = getInstance();
 		instance.addFormula(new And("A", new Equals("A", "B"), "C"));
-		final Node expected = new Or(new Literal("B", false), "A");
-		final Node actual = instance.getClause(2);
+		Node expected = new Or(new Literal("A"));
+		Node actual = instance.getClause(0);
+		assertEquals(expected, actual);
+		expected = new Or(new Literal("A", false), "B");
+		actual = instance.getClause(1);
+		assertEquals(expected, actual);
+		expected = new Or(new Literal("C"));
+		actual = instance.getClause(2);
 		assertEquals(expected, actual);
 	}
 
@@ -359,7 +365,7 @@ public abstract class SatProblemTests {
 	public void testGetClauseCount() {
 		final SatProblem instance = getInstance();
 		instance.addFormula(new And("A", new Equals("A", "B"), "C"));
-		final int expected = 4;
+		final int expected = 3;
 		final int actual = instance.getClauseCount();
 		assertEquals(expected, actual);
 	}

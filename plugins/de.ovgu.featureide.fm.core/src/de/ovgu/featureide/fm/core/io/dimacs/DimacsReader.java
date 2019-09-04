@@ -120,7 +120,7 @@ public class DimacsReader {
 			}
 			Node node = new And(clauses);
 			if (flattenCNF) {
-				node = node.flatten();
+				node = node.simplifyTree();
 			}
 			return node;
 		}
