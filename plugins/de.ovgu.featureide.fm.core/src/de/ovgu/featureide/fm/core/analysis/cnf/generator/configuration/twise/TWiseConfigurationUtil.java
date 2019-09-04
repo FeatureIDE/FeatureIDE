@@ -203,7 +203,7 @@ class TWiseConfigurationUtil {
 			}
 			return false;
 		}
-		return true;
+		return !clauses.isEmpty();
 	}
 
 	public boolean isCombinationInvalidMIG(LiteralSet literals) {

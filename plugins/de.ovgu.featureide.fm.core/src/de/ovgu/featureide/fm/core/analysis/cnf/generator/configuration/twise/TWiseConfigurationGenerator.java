@@ -212,7 +212,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		// TODO Variation Point: Combination Order
 		if (phaseCount != 0) {
 			for (final List<PresenceCondition> pcs : presenceConditionManager.getGroupedPresenceConditions()) {
-				Collections.shuffle(pcs);
+				Collections.shuffle(pcs, random);
 			}
 		}
 		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
