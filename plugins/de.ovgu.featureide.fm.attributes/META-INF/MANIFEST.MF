@@ -17,13 +17,18 @@ Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.base,
  de.ovgu.featureide.fm.attributes.base.exceptions,
  de.ovgu.featureide.fm.attributes.base.impl,
+ de.ovgu.featureide.fm.attributes.composer,
+ de.ovgu.featureide.fm.attributes.computations.impl,
+ de.ovgu.featureide.fm.attributes.config,
  de.ovgu.featureide.fm.attributes.format,
  de.ovgu.featureide.fm.attributes.formula,
  de.ovgu.featureide.fm.attributes.formula.aggregates,
  de.ovgu.featureide.fm.attributes.formula.formulas,
  de.ovgu.featureide.fm.attributes.formula.provider,
+ de.ovgu.featureide.fm.attributes.outlineentry,
  de.ovgu.featureide.fm.attributes.view,
  de.ovgu.featureide.fm.attributes.view.actions,
- de.ovgu.featureide.fm.attributes.view.editingsupports
+ de.ovgu.featureide.fm.attributes.view.editingsupports,
+ de.ovgu.featureide.fm.attributes.view.labelprovider
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: de.ovgu.featureide.fm.attributes

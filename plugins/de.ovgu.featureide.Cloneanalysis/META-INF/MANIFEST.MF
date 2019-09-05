@@ -11,11 +11,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- de.ovgu.featureide.ui,
  org.eclipse.ui.editors,
  org.eclipse.text,
- org.eclipse.ui.ide,
- org.eclipse.core.filesystem
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/pmd-core-5.2.2.jar,
@@ -47,10 +45,11 @@ Bundle-ClassPath: lib/pmd-core-5.2.2.jar,
  lib/jcommon-1.0.23.jar,
  lib/jfreechart-1.0.19.jar
 Export-Package: de.ovgu.featureide.cloneanalysis.impl,
- de.ovgu.featureide.cloneanalysis.results
-Import-Package: org.eclipse.cdt.internal.ui.text.correction;resolution:=optional,
- org.eclipse.jface.text,
- org.eclipse.jface.text.contentassist,
- org.eclipse.jface.text.quickassist,
- org.eclipse.jface.text.source
+ de.ovgu.featureide.cloneanalysis.markers,
+ de.ovgu.featureide.cloneanalysis.plugin,
+ de.ovgu.featureide.cloneanalysis.pmd,
+ de.ovgu.featureide.cloneanalysis.results,
+ de.ovgu.featureide.cloneanalysis.utils,
+ de.ovgu.featureide.cloneanalysis.views
+Import-Package: org.eclipse.jface.text
 Automatic-Module-Name: de.ovgu.featureide.Cloneanalysis

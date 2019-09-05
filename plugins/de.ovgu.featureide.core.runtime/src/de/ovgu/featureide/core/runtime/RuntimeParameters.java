@@ -379,6 +379,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			return;
 		}
 
+		final IFile filePropInBuild = featureProject.getBuildFolder().getFile("runtime.properties");
 		final IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 			buildFSTModel();
@@ -409,9 +410,19 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			} else {
 				createFile(fileProp, inputStream);
 			}
+			if (filePropInBuild.exists()) {
+				try {
+					filePropInBuild.setContents(inputStream, IResource.FORCE, null);
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				createFile(filePropInBuild, inputStream);
+			}
 
 		} else {
 			deleteFile(fileProp);
+			deleteFile(filePropInBuild);
 		}
 	}
 

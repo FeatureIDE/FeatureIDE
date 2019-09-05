@@ -49,9 +49,9 @@ public class English implements ILanguage {
 
 	private static final String LEGEND = "Legend:";
 	private static final String MANDATORY = "Mandatory";
-	private static final String ABSTRACT = "Abstract feature";
+	private static final String ABSTRACT = "Abstract Feature";
 	private static final String INTERFACED = FROM_INTERFACE;
-	private static final String CONCRETE = "Concrete feature";
+	private static final String CONCRETE = "Concrete Feature";
 	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = "Hidden";
 	private static final String COLLAPSED = "Collapsed";
@@ -60,7 +60,7 @@ public class English implements ILanguage {
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
 	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
-	private static final String IMPLICIT = "Implicit constraint";
+	private static final String IMPLICIT = "Implicit Constraint";
 	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
 	private static final String VOID_MODEL_CONST = FEATURE_MODELIS_VOID;
