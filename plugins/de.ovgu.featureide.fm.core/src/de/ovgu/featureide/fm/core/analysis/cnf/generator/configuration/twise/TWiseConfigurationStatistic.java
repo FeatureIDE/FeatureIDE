@@ -78,10 +78,11 @@ public class TWiseConfigurationStatistic {
 		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
 			final int n = expressions.size();
 			final int[] c = new int[t + 1];
-			for (int i = 0; i <= t; i++) {
-				c[i] = i - 1;
+			c[0] = -1;
+			for (int i = 1; i <= t; i++) {
+				c[i] = n - (t - i);
 			}
-			c[t]--;
+			boolean first = true;
 
 			combinationLoop: while (true) {
 				int i = t;
@@ -93,7 +94,11 @@ public class TWiseConfigurationStatistic {
 				}
 
 				if (i == 0) {
-					break combinationLoop;
+					if (first) {
+						first = false;
+					} else {
+						break combinationLoop;
+					}
 				}
 
 				for (int j = i + 1; j <= t; j++) {
@@ -101,15 +106,17 @@ public class TWiseConfigurationStatistic {
 				}
 
 				for (int j = i; j <= t; j++) {
-					final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
-					final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
-					curList.clear();
-					final PresenceCondition presenceCondition = expressions.get(c[j]);
-					entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
-						for (final LiteralSet literals : presenceCondition) {
-							if (entry.getValue().containsAll(literals)) {
-								curList.add(entry);
-								continue entryLoop;
+					if (j > 0) {
+						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
+						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
+						curList.clear();
+						final PresenceCondition presenceCondition = expressions.get(c[j]);
+						entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
+							for (final LiteralSet literals : presenceCondition) {
+								if (entry.getValue().containsAll(literals)) {
+									curList.add(entry);
+									continue entryLoop;
+								}
 							}
 						}
 					}
@@ -167,10 +174,11 @@ public class TWiseConfigurationStatistic {
 		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
 			final int n = expressions.size();
 			final int[] c = new int[t + 1];
-			for (int i = 0; i <= t; i++) {
-				c[i] = i - 1;
+			c[0] = -1;
+			for (int i = 1; i <= t; i++) {
+				c[i] = n - (t - i);
 			}
-			c[t]--;
+			boolean first = true;
 
 			combinationLoop: while (true) {
 				int i = t;
@@ -182,7 +190,11 @@ public class TWiseConfigurationStatistic {
 				}
 
 				if (i == 0) {
-					break combinationLoop;
+					if (first) {
+						first = false;
+					} else {
+						break combinationLoop;
+					}
 				}
 
 				for (int j = i + 1; j <= t; j++) {
@@ -190,15 +202,17 @@ public class TWiseConfigurationStatistic {
 				}
 
 				for (int j = i; j < t; j++) {
-					final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
-					final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
-					curList.clear();
-					final PresenceCondition presenceCondition = expressions.get(c[j]);
-					entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
-						for (final LiteralSet literals : presenceCondition) {
-							if (entry.getValue().containsAll(literals)) {
-								curList.add(entry);
-								continue entryLoop;
+					if (j > 0) {
+						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
+						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
+						curList.clear();
+						final PresenceCondition presenceCondition = expressions.get(c[j]);
+						entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
+							for (final LiteralSet literals : presenceCondition) {
+								if (entry.getValue().containsAll(literals)) {
+									curList.add(entry);
+									continue entryLoop;
+								}
 							}
 						}
 					}
