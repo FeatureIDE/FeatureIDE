@@ -215,7 +215,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Variable count is not an integer", lineIterator.getLineCount());
 		}
-		if (variableCount <= 0) {
+		if (variableCount < 0) {
 			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
 
@@ -224,7 +224,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Clause count is not an integer", lineIterator.getLineCount());
 		}
-		if (clauseCount <= 0) {
+		if (clauseCount < 0) {
 			throw new ParseException("Clause count is not positive", lineIterator.getLineCount());
 		}
 	}
