@@ -25,14 +25,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
-/**
- *
- * @author Sebastian Krieter
- */
 class PresenceConditionManager {
 
 	private final List<List<PresenceCondition>> dictonary = new ArrayList<>();
@@ -82,6 +79,7 @@ class PresenceConditionManager {
 					}
 					mappedPc.addGroup(groupIndex);
 					Collections.sort(mappedPc, new Comparator<LiteralSet>() {
+
 						@Override
 						public int compare(LiteralSet o1, LiteralSet o2) {
 							return o1.size() - o2.size();
@@ -93,24 +91,30 @@ class PresenceConditionManager {
 			groupedPresenceConditions.add(newNodeList);
 			groupIndex++;
 		}
+	}
 
-		for (final List<PresenceCondition> list : groupedPresenceConditions) {
-			final Comparator<PresenceCondition> comparator = new Comparator<PresenceCondition>() {
-				@Override
-				public int compare(PresenceCondition o1, PresenceCondition o2) {
-					final int clauseCountDiff = o1.size() - o2.size();
-					if (clauseCountDiff != 0) {
-						return clauseCountDiff;
-					}
-					int clauseLengthDiff = 0;
-					for (int i = 0; i < o1.size(); i++) {
-						clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
-					}
-					return clauseLengthDiff;
-				}
-			};
-			Collections.sort(list, comparator);
+	public void shuffle(Random random) {
+		for (final List<PresenceCondition> pcs : groupedPresenceConditions) {
+			Collections.shuffle(pcs, random);
 		}
+	}
+
+	public void sort() {
+		for (final List<PresenceCondition> list : groupedPresenceConditions) {
+			Collections.sort(list, this::comparePresenceConditions);
+		}
+	}
+
+	private int comparePresenceConditions(PresenceCondition o1, PresenceCondition o2) {
+		final int clauseCountDiff = o1.size() - o2.size();
+		if (clauseCountDiff != 0) {
+			return clauseCountDiff;
+		}
+		int clauseLengthDiff = 0;
+		for (int i = 0; i < o1.size(); i++) {
+			clauseLengthDiff += o2.get(i).size() - o1.get(i).size();
+		}
+		return clauseLengthDiff;
 	}
 
 	public List<List<PresenceCondition>> getDictonary() {

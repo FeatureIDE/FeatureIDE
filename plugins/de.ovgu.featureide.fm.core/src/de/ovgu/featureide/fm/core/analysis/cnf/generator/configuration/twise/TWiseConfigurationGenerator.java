@@ -122,6 +122,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return TWiseCombiner.convertExpressions(expressions);
 	}
 
+	// TODO Variation Point: Iterations of removing low-contributing Configurations
+	private static final int iterations = 3;
+
 	protected final TWiseConfigurationUtil util;
 	protected final TWiseCombiner combiner;
 
@@ -157,7 +160,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		util.setRandom(random);
 		util.setMaxSampleSize(maxSampleSize);
-		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		// TODO Variation Point: Building Combinations
 		combiner = new TWiseCombiner(cnf.getVariables().size());
@@ -170,8 +172,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		phaseCount = 0;
 
-		for (int i = 0; i < 5; i++) {
-			// TODO Variation Point: Removing low-contributing Configurations
+		for (int i = 0; i < iterations; i++) {
 			trimConfigurations();
 			buildCombinations();
 		}
@@ -209,18 +210,16 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void buildCombinations() {
-		// TODO Variation Point: Combination Order
-		if (phaseCount != 0) {
-			for (final List<PresenceCondition> pcs : presenceConditionManager.getGroupedPresenceConditions()) {
-				Collections.shuffle(pcs, random);
-			}
-		}
-		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
-		numberOfCombinations = it.size();
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
 				new CoverAll(util) //
 		);
+
+		// TODO Variation Point: Combination order
+		final MergeIterator it;
+		presenceConditionManager.shuffle(random);
+		it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.RandomPartition);
+		numberOfCombinations = it.size();
 
 		coveredCount = 0;
 		invalidCount = 0;
