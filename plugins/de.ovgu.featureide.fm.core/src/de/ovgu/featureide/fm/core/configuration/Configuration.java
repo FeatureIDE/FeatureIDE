@@ -334,12 +334,4 @@ public class Configuration implements Cloneable {
 		return DefaultConfigurationFactory.ID;
 	}
 
-	public String getRootIdentifier() {
-		return rootIdentifier;
-	}
-
-	public void setRootIdentifier(String identifier) {
-		rootIdentifier = identifier;
-	}
-
 }

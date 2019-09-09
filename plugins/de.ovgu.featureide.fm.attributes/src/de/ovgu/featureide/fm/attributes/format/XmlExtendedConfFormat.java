@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.core.io.xml.PositionalXMLHandler;
-import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 
 public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
@@ -85,7 +84,6 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 			return;
 		}
 		if (root.getNodeName().equals(EXTENDED_CONFIGURATION)) {
-			object.setRootIdentifier(XMLFeatureModelTags.EXTENDED_FEATURE_MODEL);
 			for (final Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {

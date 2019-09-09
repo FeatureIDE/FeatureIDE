@@ -161,7 +161,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			if (featureModel == null) {
+			if (getFeatureModel() == null) {
 				return;
 			}
 			if (!synchToFeatureDiagram) {
@@ -564,6 +564,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void clear() {
+		if (fmManager == null) {
+			return;
+		}
 		fmManager.removeListener(this);
 	}
 

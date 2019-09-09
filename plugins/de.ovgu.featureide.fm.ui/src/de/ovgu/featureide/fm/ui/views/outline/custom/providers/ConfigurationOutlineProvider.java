@@ -41,7 +41,6 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
-import de.ovgu.featureide.fm.ui.editors.configuration.TextEditorPage;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
@@ -87,7 +86,7 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		return ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file));
 	}
 
