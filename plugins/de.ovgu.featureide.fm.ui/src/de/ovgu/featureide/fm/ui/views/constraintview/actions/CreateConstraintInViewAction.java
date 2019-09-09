@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,38 +20,39 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
  * A modified CreateConstraintAction for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
-public class CreateConstraintInViewAction extends Action {
-	private IFeatureModel featuremodel;
+public class CreateConstraintInViewAction extends AbstractConstraintEditorAction {
+
+	public static final String ID = "de.ovgu.featureide.createconstraintinview";
+
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	public CreateConstraintInViewAction(IFeatureModel featuremodel) {
-		super(StringTable.CREATE_CONSTRAINT, createImage);
-		this.featuremodel = featuremodel;
+	public CreateConstraintInViewAction(Object viewer, IFeatureModelManager fmManager) {
+		super(viewer, fmManager, StringTable.CREATE_CONSTRAINT, ID);
+		setImageDescriptor(createImage);
 	}
 
 	@Override
 	public void run() {
-		new ConstraintDialog(featuremodel, null);
+		new ConstraintDialog(featureModelManager, null);
 	}
 
-	/**
-	 * This method updates the feature model
-	 */
-	public void update(IFeatureModel featuremodel) {
-		this.featuremodel = featuremodel;
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		return true;
 	}
 }

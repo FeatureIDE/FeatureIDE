@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -55,11 +55,6 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	@Override
 	public String toString() {
 		final StringBuilder methodString = new StringBuilder();
-
-//		methodString.append(super.toString());
-//		if (methodString.length() > 0) {
-//			methodString.append(LINE_SEPARATOR);
-//		}
 
 		if (mergedjavaDocComment != null) {
 			methodString.append(mergedjavaDocComment);

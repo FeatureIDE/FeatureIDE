@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -40,10 +41,12 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public abstract class AbstractConfigurationTest {
 
 	public IFeatureModel fm;
+	public FeatureModelFormula formula;
 
 	@Before
 	public void setModel() {
 		fm = loadModel();
+		formula = new FeatureModelFormula(fm);
 	}
 
 	/**
@@ -54,6 +57,14 @@ public abstract class AbstractConfigurationTest {
 	 */
 
 	abstract IFeatureModel loadModel();
+
+	public ConfigurationAnalyzer getConfigurationAnalyzer(FeatureModelFormula formula, Configuration configuration) {
+		return new ConfigurationAnalyzer(formula, configuration);
+	}
+
+	public ConfigurationPropagator getConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
+		return new ConfigurationPropagator(formula, configuration);
+	}
 
 	protected static IFeatureModel loadGUIDSL(String grammar) {
 		return load(new GuidslFormat(), grammar);
@@ -81,8 +92,8 @@ public abstract class AbstractConfigurationTest {
 
 	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
 		try {
-			final IFeatureModel fm = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
-			if (format.read(fm, xml).containsError()) {
+			final IFeatureModel fm = FMFactoryManager.getInstance().getFactory(format).create();
+			if (format.getInstance().read(fm, xml).containsError()) {
 				fail();
 			}
 			return fm;

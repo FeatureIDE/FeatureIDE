@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.io.File;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +40,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Handles feature renamings.
@@ -48,22 +48,32 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class RenamingsManager implements IEventManager {
+public class RenamingsManager implements IEventManager, Cloneable {
 
 	/**
 	 * a list containing all renamings since the last save
 	 */
-	private final List<Renaming> renamings = new LinkedList<Renaming>();
+	private final List<Renaming> renamings = new LinkedList<>();
 	private final IFeatureModel model;
 
 	private final DefaultEventManager eventManager = new DefaultEventManager();
 
-	/*
-	 * ***************************************************************** Renaming #
-	 *****************************************************************/
-
 	public RenamingsManager(IFeatureModel model) {
 		this.model = model;
+	}
+
+	protected RenamingsManager(RenamingsManager renamingsManager) {
+		model = renamingsManager.model;
+		renamings.addAll(renamingsManager.renamings);
+	}
+
+	/**
+	 * @param renamingsManager
+	 * @param oldModel
+	 */
+	protected RenamingsManager(RenamingsManager renamingsManager, IFeatureModel newModel) {
+		model = newModel;
+		renamings.addAll(renamingsManager.renamings);
 	}
 
 	public boolean renameFeature(final String oldName, final String newName) {
@@ -90,7 +100,6 @@ public class RenamingsManager implements IEventManager {
 				break;
 			}
 		}
-		fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_NAME_CHANGED, oldName, newName));
 		return true;
 	}
 
@@ -98,35 +107,16 @@ public class RenamingsManager implements IEventManager {
 		return (!renamings.isEmpty());
 	}
 
-	public void performRenamings() {
-		final List<IConstraint> constraints = model.getConstraints();
+	public void notifyAboutRenamings() {
+		final IFeatureModelManager instance = FeatureModelManager.getInstance(model);
 		for (final Renaming renaming : renamings) {
-			for (final IConstraint c : constraints) {
-				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
-			}
+			instance.fireEvent(new FeatureIDEEvent(model, EventType.FEATURE_NAME_PERSISTENTLY_CHANGED, renaming.oldName, renaming.newName));
 		}
 		renamings.clear();
-	};
-
-	public void performRenamings(File file) {
-		performRenamings(file.toPath());
 	}
 
-	public void performRenamings(Path path) {
-		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
-		if (instance == null) {
-			return;
-		}
-		final IFeatureModel projectModel = instance.getObject();
-		for (final Renaming renaming : renamings) {
-			// TODO check weather all these events are necessary
-			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
-			projectModel.fireEvent(event);
-			model.fireEvent(event);
-			// call to FMComposerExtension
-			instance.fireEvent(event);
-		}
-		renamings.clear();
+	public List<Renaming> getRenamings() {
+		return new ArrayList<>(renamings);
 	}
 
 	private void renameVariables(Node node, String oldName, String newName) {
@@ -173,7 +163,7 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public Set<String> getOldFeatureNames() {
-		final HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
+		final HashSet<String> names = new HashSet<>(model.getFeatureTable().keySet());
 		for (final Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);
@@ -191,6 +181,11 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
+	}
+
+	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
 	}
@@ -199,4 +194,14 @@ public class RenamingsManager implements IEventManager {
 	public void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
 	}
+
+	@Override
+	public RenamingsManager clone() {
+		return new RenamingsManager(this);
+	}
+
+	public RenamingsManager clone(IFeatureModel newModel) {
+		return new RenamingsManager(this, newModel);
+	}
+
 }

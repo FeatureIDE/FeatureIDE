@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,8 +21,10 @@
 package de.ovgu.featureide.fm.core.io.dimacs;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,10 +32,11 @@ import org.prop4j.And;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -48,15 +51,7 @@ public class DIMACSFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
-	/** Token leading a (single-line) comment. */
-	static final String COMMENT = "c";
-	static final String COMMENT_START = COMMENT + " ";
-	/** Token leading the problem definition. */
-	static final String PROBLEM = "p";
-	/** Token identifying the problem type as CNF. */
-	static final String CNF = "cnf";
-	/** Token denoting the end of a clause. */
-	static final String CLAUSE_END = "0";
+	private boolean flattenCNF = false;
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -66,12 +61,18 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		// Transform the input into a propositional node.
 		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		try {
-			addNodeToFeatureModel(featureModel, r.read(source.toString()));
-		} catch (final IllegalStateException | IOException e) {
-			problemList.add(new Problem(e));
+		r.setFlattenCNF(flattenCNF);
+		try (StringReader reader = new StringReader(source.toString())) {
+			final Node node = r.read(reader);
+			final Collection<String> variables = r.getVariables();
+
+			// Add the propositional node to the feature model.
+			featureModel.reset();
+			addNodeToFeatureModel(featureModel, node, variables);
 		} catch (final ParseException e) {
 			problemList.add(new Problem(e, e.getErrorOffset()));
+		} catch (final IOException e) {
+			problemList.add(new Problem(e));
 		}
 
 		return problemList;
@@ -83,8 +84,9 @@ public class DIMACSFormat extends AFeatureModelFormat {
 	 *
 	 * @param featureModel feature model to edit
 	 * @param node propositional node to add
+	 * @param variables the variables of the propositional node
 	 */
-	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
+	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, Collection<String> variables) {
 		// Add a dummy feature as root.
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
 		rootFeature.getStructure().setAbstract(true);
@@ -92,24 +94,28 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		// Add a feature for each variable.
-		for (final String variable : node.getUniqueContainedFeatures()) {
-			final IFeature feature = factory.createFeature(featureModel, variable);
-			featureModel.addFeature(feature);
-			rootFeature.getStructure().addChild(feature.getStructure());
+		for (final String variable : variables) {
+			final IFeature feature = factory.createFeature(featureModel, variable.toString());
+			FeatureUtils.addFeature(featureModel, feature);
+			FeatureUtils.addChild(rootFeature, feature);
 		}
 
 		// Add a constraint for each conjunctive clause.
 		final List<Node> clauses = node instanceof And ? Arrays.asList(node.getChildren()) : Collections.singletonList(node);
 		for (final Node clause : clauses) {
-			featureModel.addConstraint(factory.createConstraint(featureModel, clause));
+			FeatureUtils.addConstraint(featureModel, factory.createConstraint(featureModel, clause));
 		}
+	}
+
+	public void setFlattenCNF(boolean flattenCNF) {
+		this.flattenCNF = flattenCNF;
 	}
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final DimacsWriter w = new DimacsWriter();
+		final DimacsWriter w = new DimacsWriter(new FeatureModelFormula(featureModel).getCNF());
 		w.setWritingVariableDirectory(true);
-		return w.write(AdvancedNodeCreator.createRegularCNF(featureModel));
+		return w.write();
 	}
 
 	@Override

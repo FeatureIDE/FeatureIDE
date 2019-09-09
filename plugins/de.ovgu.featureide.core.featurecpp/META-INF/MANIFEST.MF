@@ -10,8 +10,9 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.featurecpp,
  de.ovgu.featureide.featurecpp.model,
  de.ovgu.featureide.featurecpp.wrapper
+Automatic-Module-Name: de.ovgu.featureide.core.featurecpp

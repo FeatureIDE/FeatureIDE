@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,8 +29,7 @@ import java.util.List;
  *
  * @author Sebastian Krieter
  */
-// TODO Check synchronization for get and add extension methods
-public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
+public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {
 
@@ -43,31 +42,26 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	private final List<T> extensions = new ArrayList<>();
 
-	private IExtensionLoader<T> extensionLoader;
-
-	protected void setExtensionLoaderInternal(IExtensionLoader<T> extensionLoader) {
-		this.extensionLoader = extensionLoader;
+	public synchronized final void addExtensions(IExtensionLoader<T> extensionLoader) {
+		extensionLoader.loadProviders(this);
 	}
 
-	public boolean addExtension(T extension) {
-		for (final T t : extensions) {
-			if (t.getId().equals(extension.getId())) {
-				return false;
+	public synchronized boolean addExtension(T extension) {
+		if (extension != null) {
+			for (final T t : extensions) {
+				if (t.getId().equals(extension.getId())) {
+					return false;
+				}
+			}
+			if (extension.initExtension()) {
+				extensions.add(extension);
+				return true;
 			}
 		}
-		extensions.add(extension);
-		return true;
+		return false;
 	}
 
 	public synchronized List<T> getExtensions() {
-		if (extensionLoader != null) {
-			synchronized (extensions) {
-				if (extensionLoader != null) {
-					extensionLoader.loadProviders(this);
-					extensionLoader = null;
-				}
-			}
-		}
 		return Collections.unmodifiableList(extensions);
 	}
 

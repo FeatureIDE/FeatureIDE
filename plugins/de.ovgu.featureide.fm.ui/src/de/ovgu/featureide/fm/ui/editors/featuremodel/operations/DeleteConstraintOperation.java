@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,10 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation to delete a constraint.
@@ -35,26 +39,33 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 
-	private final IConstraint constraint;
+	public static final String ID = ID_PREFIX + "DeleteConstraintOperation";
 
-	private int index;
+	private final int constraintIndex;
+	private IConstraint oldConstraint;
 
-	public DeleteConstraintOperation(IConstraint constraint, IFeatureModel featureModel) {
-		super(featureModel, DELETE_CONSTRAINT);
-		this.constraint = constraint;
+	public DeleteConstraintOperation(IConstraint constraint, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, DELETE_CONSTRAINT);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		index = featureModel.getConstraintIndex(constraint);
-		featureModel.removeConstraint(constraint);
-		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		oldConstraint = featureModel.getConstraints().get(constraintIndex);
+		featureModel.removeConstraint(constraintIndex);
+		return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_DELETE, featureModel, oldConstraint, null);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModel.addConstraint(constraint, index);
-		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).copyConstraint(featureModel, oldConstraint);
+		featureModel.addConstraint(constraint, constraintIndex);
+		return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_ADD, featureModel, null, constraint);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

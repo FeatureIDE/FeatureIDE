@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -38,7 +37,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.TextEditorPage;
@@ -55,7 +55,6 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  */
 public class ConfigurationOutlineProvider extends OutlineProvider {
 
-	Configuration config;
 	TreeViewer viewer;
 	IDoubleClickListener dblClickListener;
 
@@ -67,87 +66,34 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		super(treeProvider, labelProvider);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
-		// TODO Auto-generated method stub
+	public void selectionChanged(SelectionChangedEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeCollapsed(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
-	public void treeCollapsed(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
+	public void treeCollapsed(TreeExpansionEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeViewerListener#treeExpanded(org.eclipse.jface.viewers.TreeExpansionEvent)
-	 */
 	@Override
-	public void treeExpanded(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
+	public void treeExpanded(TreeExpansionEvent event) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#initContextMenuActions(org.eclipse.jface.action.IMenuManager)
-	 */
 	@Override
-	protected void initContextMenuActions(IMenuManager manager) {
-		// TODO Auto-generated method stub
+	protected void initContextMenuActions(IMenuManager manager) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#initToolbarActions(org.eclipse.jface.action.IToolBarManager)
-	 */
 	@Override
-	protected void initToolbarActions(IToolBarManager manager) {
-		// TODO Auto-generated method stub
+	protected void initToolbarActions(IToolBarManager manager) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#getFilters()
-	 */
 	@Override
 	protected List<IOutlineFilter> getFilters() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#isSupported(org.eclipse.core.resources.IFile)
-	 */
 	@Override
-	public boolean isSupported(IEditorPart part, IFile file) {
-		try {
-			final boolean isConfig = ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null;
-			if (part instanceof ConfigurationEditor) {
-				final ConfigurationEditor editor = (ConfigurationEditor) part;
-				final boolean isNotSourceEditor = !(editor.getSelectedPage() instanceof TextEditorPage);
-				return isConfig && isNotSourceEditor;
-			}
-			return isConfig;
-		} catch (final ClassCastException e) {
-			return false;
-		}
+	public boolean isSupported(IFile file) {
+		return ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file));
 	}
 
 	private void initListeners() {
 		dblClickListener = new IDoubleClickListener() {
+
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IOutlineEntry)) {
@@ -159,10 +105,6 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#handleUpdate(org.eclipse.jface.viewers.TreeViewer, org.eclipse.core.resources.IFile)
-	 */
 	@Override
 	public void handleUpdate(TreeViewer viewer, IFile iFile) {
 		this.viewer = viewer;
@@ -175,9 +117,10 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor instanceof ConfigurationEditor) {
 			final ConfigurationEditor confEditor = (ConfigurationEditor) activeEditor;
-			config = confEditor.getConfiguration();
-
-			getTreeProvider().inputChanged(viewer, null, config);
+			final ConfigurationManager configurationManager = confEditor.getConfigurationManager();
+			if (configurationManager != null) {
+				getTreeProvider().inputChanged(viewer, null, configurationManager.getSnapshot());
+			}
 		}
 
 	}

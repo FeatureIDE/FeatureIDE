@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,7 +49,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -93,7 +91,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return superImage;
 			}
-			readCurrentConfiguration(featureProject);
+			setCurrentlySelectedFeatures(featureProject);
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
@@ -126,7 +124,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return superImage;
 			}
-			readCurrentConfiguration(featureProject);
+			setCurrentlySelectedFeatures(featureProject);
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
@@ -241,17 +239,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * Stores all selected Features in a string list.
 	 *
 	 * @param featureProject
-	 *
-	 * @deprecated TODO This should be included in {@link IFeatureProject}.
 	 */
-	@Deprecated
-	private void readCurrentConfiguration(IFeatureProject featureProject) {
-		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
-		if (currentConfiguration != null) {
-			final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(currentConfiguration.getLocationURI()),
-					new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY));
-			selectedFeatures = (instance != null) ? new ArrayList<String>(instance.getObject().getSelectedFeatureNames()) : Collections.<String> emptyList();
-		}
+	private void setCurrentlySelectedFeatures(IFeatureProject featureProject) {
+		final Configuration currentConfiguration = featureProject.loadCurrentConfiguration();
+		selectedFeatures = (currentConfiguration != null) ? new ArrayList<>(currentConfiguration.getSelectedFeatureNames()) : Collections.emptyList();
 	}
 
 	private boolean isJavaFile(final IFile file) {
@@ -419,7 +410,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				return null;
 			}
 
-			readCurrentConfiguration(featureProject);
+			setCurrentlySelectedFeatures(featureProject);
 
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {

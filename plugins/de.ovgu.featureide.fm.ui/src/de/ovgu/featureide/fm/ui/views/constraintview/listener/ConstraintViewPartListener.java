@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview.listener;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -33,6 +34,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author Rosiak Kamil
  */
 public class ConstraintViewPartListener implements IPartListener2 {
+
 	private final ConstraintViewController controller;
 
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
@@ -51,12 +53,14 @@ public class ConstraintViewPartListener implements IPartListener2 {
 			controller.getView().removeAll();
 			controller.getView().addNoFeatureModelItem();
 			controller.getSettingsMenu().setStateOfActions(false);
+			controller.setFeatureModelEditor(null);
 		}
 	}
 
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference part) {
-		if (!(part.getPart(false) instanceof FeatureModelEditor)) {
+		final IWorkbenchPart activePart = part.getPart(false);
+		if (!(activePart instanceof FeatureModelEditor)) {
 			controller.getView().addNoFeatureModelItem();
 			controller.getSettingsMenu().setStateOfActions(false);
 		}
@@ -64,10 +68,11 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partActivated(IWorkbenchPartReference part) {
-		if (part.getPart(false) instanceof FeatureModelEditor) {
+		final IWorkbenchPart activePart = part.getPart(false);
+		if (activePart instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
 			controller.checkForRefresh();
-		}
-		if (part.getPart(false) instanceof IEditorPart) {
+		} else if (activePart instanceof IEditorPart) {
 			controller.setConstraintsHidden(controller.isConstraintsHidden());
 		}
 	}

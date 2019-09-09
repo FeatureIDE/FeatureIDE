@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,16 +21,15 @@
 package de.ovgu.featureide.fm.core.base;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.RenamingsManager;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -61,16 +60,15 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Caching notes</b>: A feature model implementation using the
  * <code>IFeatureModel</code> interface has to provide a map of feature names to the corresponding feature objects, the <i>feature table</i>. This data
  * structure is used in the {@link RenamingsManager} for instance. If the implementation utilizes this data structure for internal use, modifications to this
- * data structure must be protected against concurrent accesses. The default implementations {@link FeatureModel} uses a <code>ConcurrentHashMap</code> for this
- * purpose. <br> <br> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned
- * handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on thread safeness</b>: At
- * least the management of <code>IFeature</code> and <code>IFeatureModel</code> identifiers (e.g., getting the next free id) have to be thread safe. The
- * reference default implementation for feature models is <code> private static long NEXT_ID = 0;
+ * data structure must be protected against concurrent accesses. The default implementations {@link IFeatureModel} uses a <code>ConcurrentHashMap</code> for
+ * this purpose. <br> <br> <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the
+ * old-fashioned handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br> <br> <b>Notes on thread
+ * safeness</b>: At least the management of <code>IFeature</code> and <code>IFeatureModel</code> identifiers (e.g., getting the next free id) have to be thread
+ * safe. The reference default implementation for feature models is <code> private static long NEXT_ID = 0;
  *
  * protected static final synchronized long getNextId() { return NEXT_ID++; } </code> <br> <br> <b>Compatibility Notes</b>: To provide compatibility to earlier
- * versions of FeatureIDE, the <i>out-dated</i> class {@link de.ovgu.featureide.fm.core.FeatureModel FeatureModel} is now a wrapper to an
- * <code>IFeatureModel</code> instance (but incompatible to it) and make use of convert-functionalities inside
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
+ * versions of FeatureIDE, the <i>out-dated</i> class {@link IFeatureModel FeatureModel} is now a wrapper to an <code>IFeatureModel</code> instance (but
+ * incompatible to it) and make use of convert-functionalities inside {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
  *
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureModel Default implementation of <code>IFeatureModel</code> (as starting point for custom implementations)
  *
@@ -112,7 +110,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @return the feature model factory ID.
 	 *
-	 * @see FMFactoryManager#getFactoryById(String)
+	 * @see FMFactoryManager#getFactory(String)
 	 *
 	 * @since 3.1
 	 */
@@ -263,17 +261,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	void deleteFeatureFromTable(IFeature feature);
 
 	/**
-	 * Returns an instance of {@link FeatureModelAnalyzer} which is bound to this feature model. Since analysis of feature models are computational expensive in
-	 * general, results for analysis are cached in the instance of a analyzer. When calling methods on the return value of this method, changes are indirectly
-	 * automatically stored in this feature model by object references.
-	 *
-	 * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
-	 *
-	 * @since 3.0
-	 */
-	FeatureModelAnalyzer getAnalyser();
-
-	/**
 	 * @return Returns the number of constraints contained in this feature model.
 	 *
 	 * @see #addConstraint(IConstraint)
@@ -352,6 +339,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	IFeature getFeature(CharSequence name);
 
+	IFeatureModelElement getElement(long id);
+
 	/**
 	 * Returns the ordered collection of feature names according to the given feature order. If an order is given, the method returns the corresponding list of
 	 * feature names according to their order. If no order is set, the method returns the names of features according to a pre-order traversation of the root
@@ -389,9 +378,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @since 3.0
 	 *
-	 * @return
+	 * @return features of the feature model.
 	 */
-	Iterable<IFeature> getFeatures();
+	Collection<IFeature> getFeatures();
 
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model, which are not hidden and not collapsed. This method is intend to
@@ -405,6 +394,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * constructor for collection implementations, e.g., <br> <code>List&lt;IFeature&gt; list = new
 	 * LinkedList&lt;IFeature&gt;(Functional.toList(fm.getVisibleFeatures()));</code> <br> <b>Note</b>: Many operations of features in feature models runs over
 	 * iteration. This method returns an iterator rather than a collection for <i>lazy evaluation</i> purposes. <br>
+	 *
+	 * @param showHiddenFeatures whether hidden features should be included.
 	 *
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
@@ -464,18 +455,11 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	IFeatureModelStructure getStructure();
 
 	/**
-	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_CHANGED} to listeners.
+	 * Fires the the event {@link de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType#MODEL_DATA_CHANGED} to listeners.
 	 *
 	 * @since 3.0
 	 */
 	void handleModelDataChanged();
-
-	/**
-	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_LOADED} to listeners.
-	 *
-	 * @since 3.0
-	 */
-	void handleModelDataLoaded();
 
 	/**
 	 * @since 3.0
@@ -510,6 +494,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Removes the constraint at the specified position <code>index</code> in this collection of constraints in this model. When a constraint was removed, the
 	 * remaining constraints to the right are shifted one position to the left.
 	 *
+	 * @param index position of the constraint to be removed
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -522,13 +508,14 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @throws IndexOutOfBoundsException If the index is out of range
 	 * @since 3.0
-	 *
-	 * @param index position of the constraint to be removed
 	 */
 	void removeConstraint(int index);
 
 	/**
 	 * Replaces the constraint <code>constraint</code> at the specified position <code>index</code> in the collection of constraints of this feature model.
+	 *
+	 * @param constraint constraint which should be stored at <code>index</code>
+	 * @param index position for replacement
 	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -545,8 +532,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @since 3.0
 	 *
-	 * @param constraint constraint which should be stored at <code>index</code>
-	 * @param index position for replacement
 	 */
 	void replaceConstraint(IConstraint constraint, int index);
 
@@ -568,6 +553,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Sets the collections of constraints to the ones yielded by <code>constraints</code>. Existing constraint in the collection will be removed before this
 	 * operation.
 	 *
+	 * @param constraints Source of constraints which should be copied into this feature model
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -577,10 +564,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #removeConstraint(int)
 	 * @see #setConstraint(int, IConstraint)
 	 * @see #replaceConstraint(IConstraint, int)
-	 *
-	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
-	 *
-	 * @param constraints Source of constraints which should be copied into this feature model
 	 *
 	 * @since 3.0
 	 */
@@ -658,41 +641,17 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #getSourceFile()
 	 * @see #getStructure()
 	 * @see #getConstraints()
-	 * @see #getAnalyser()
 	 *
 	 * @return cloned instance of this model, such that the new instance is equal to this feature model but their references aren't identical
 	 */
 	IFeatureModel clone();
 
 	/**
-	 * Returns the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming
-	 * or feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
-	 * <code>FeatureDiagramEditor</code> feature model diagram editor.
-	 *
-	 * @since 3.0
-	 *
-	 * @see #setUndoContext(Object)
-	 *
-	 * @return undo-context of this feature model
-	 */
-	Object getUndoContext();
-
-	/**
-	 * Sets the modifiable undo-context of this feature model. To undo-context enables undoing of actions performed to this feature model, such as renaming or
-	 * feature removing over the user interface. The undo context is intended to work streamlessly with the eclipse framework used, e.g., in the
-	 * <code>FeatureDiagramEditor</code> feature model diagram editor.
-	 *
-	 * @since 3.0
-	 *
-	 * @see #getUndoContext()
-	 *
-	 * @param undoContext
-	 */
-	void setUndoContext(Object undoContext);
-
-	/**
 	 * Replaces the feature order item at the specified position <code>i</code> in this feature model's feature order list with the specified element
 	 * <code>newName</code>.
+	 *
+	 * @param i index of the element to replace
+	 * @param newName new name to be stored at the specified position
 	 *
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderList(List)
@@ -701,9 +660,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 *
 	 * @throws IndexOutOfBoundsException if the index is out of range
-	 *
-	 * @param i index of the element to replace
-	 * @param newName new name to be stored at the specified position
 	 */
 	void setFeatureOrderListItem(int i, String newName);
 
@@ -753,6 +709,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * Overwrites the constraint stored in this feature model at position <code>index</code> with the constraint provided by the parameter
 	 * <code>constraint</code>.
 	 *
+	 * @param index index of the constraint to replace
+	 * @param constraint constraint to be stored at the specified position
+	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -766,10 +725,11 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 *
 	 * @throws IndexOutOfBoundsException if the index is out of range
-	 *
-	 * @param index index of the constraint to replace
-	 * @param constraint constraint to be stored at the specified position
 	 */
 	void setConstraint(int index, IConstraint constraint);
+
+	List<IEventListener> getListenerList();
+
+	void setEventManager(IEventManager eventManager);
 
 }

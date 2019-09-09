@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -78,16 +78,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 
-//		for (ImportDecl importDecl : importList) {
-//			sb.append("import ");
-//			sb.append(importDecl.typeName());
-//			sb.append(';');
-//			sb.append(LINE_SEPARATOR);
-//		}
-
-//		sb.append(super.toString());
-//		sb.append(LINE_SEPARATOR);
-
 		if (mergedjavaDocComment != null) {
 			sb.append(mergedjavaDocComment);
 		}
@@ -108,10 +98,10 @@ public class FujiClassSignature extends AbstractClassSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-//		hashCode *= hashCodePrime;
-//		for (TypeDecl thisSuperType : superTypes) {
-//			hashCode += thisSuperType.hashCode();
-//		}
+		// hashCode *= hashCodePrime;
+		// for (TypeDecl thisSuperType : superTypes) {
+		// hashCode += thisSuperType.hashCode();
+		// }
 	}
 
 	@Override

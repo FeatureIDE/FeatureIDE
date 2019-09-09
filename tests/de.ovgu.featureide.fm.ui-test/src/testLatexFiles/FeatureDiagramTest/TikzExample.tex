@@ -6,17 +6,17 @@
 	};
 	\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {
 		\node [label=center:\underline{Legend:}] {}; \\
-		\node [abstract,label=right:Abstract] {}; \\
-		\node [concrete,label=right:Concrete] {}; \\
+		\node [abstract,label=right:Abstract Feature] {}; \\
+		\node [concrete,label=right:Concrete Feature] {}; \\
 		\node [mandatory,label=right:Mandatory] {}; \\
 		\node [optional,label=right:Optional] {}; \\
 			\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);
 			\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);
 			\draw[drawColor] (0.1,0) -- +(0.2,-0.4);
 			\fill[drawColor] (0,-0.2) arc (240:300:0.2);
-		\node [or,label=right:Or] {}; \\			\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);
+		\node [or,label=right:Or Group] {}; \\			\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);
 			\draw[drawColor] (0.1,0) -- +(0.2,-0.4);
 			\draw[drawColor] (0,-0.2) arc (240:300:0.2);
-		\node [alternative,label=right:Alternative] {}; \\		\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\
+		\node [alternative,label=right:Alternative Group] {}; \\		\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\
 	};
 \end{forest}

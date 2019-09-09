@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -363,7 +363,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			tree.setInput(new Object());
 			updateGUI(true);
 		} else {
-			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModelManager());
 		}
 
 		// Set the child as the scrolled content of the ScrolledComposite
@@ -451,7 +451,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		featuresColumn.setWidth(featureColumnWidth);
 
 		// Callback will handle creating columns
-		configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		configurations = loader.loadConfigurations(featureProject.getFeatureModelManager().getPersistentFormula(), featureProject.getConfigPath());
 		// update header
 		final TreeColumn[] columns = tableTree.getColumns();
 		final List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
@@ -678,7 +678,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			updateTree();
 			break;
 		case MODEL_DATA_SAVED:

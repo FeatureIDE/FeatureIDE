@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -378,6 +378,7 @@ public class StringTable {
 	public static final String AUTOSELECT_FEATURES = "Autoselect Features";
 	public static final String CALCULATING____ = "Calculating ...";
 	public static final String VALID_COMMA_ = "valid, ";
+	public static final String CONFLICTING_COMMA_ = "conflicting, ";
 	public static final String MORE_THAN = "more than ";
 	public static final String POSSIBLE_CONFIGURATIONS = " possible configurations";
 	public static final String THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_ =
@@ -577,12 +578,12 @@ public class StringTable {
 	public static final String IMPORTED = "Imported";
 	public static final String INHERITED = "Inherited";
 	public static final String FROM_INTERFACE = "from Interface";
-	public static final String FALSE_OPTIONAL_FEATURE = "False-optional feature";
-	public static final String INDETERMINATE_HIDDEN = "Indeterminate hidden";
-	public static final String REDUNDANT_CONSTRAINT = "Redundant constraint";
-	public static final String UNSATISFIABLE_CONSTRAINT = "Unsatisfiable constraint";
-	public static final String CONSTRAINT_IS_TAUTOLOGY = "Constraint is tautology";
-	public static final String FEATURE_MODELIS_VOID = "Feature model is void";
+	public static final String FALSE_OPTIONAL_FEATURE = "False-Optional Feature";
+	public static final String INDETERMINATE_HIDDEN = "Indeterminate Hidden";
+	public static final String REDUNDANT_CONSTRAINT = "Redundant Constraint";
+	public static final String UNSATISFIABLE_CONSTRAINT = "Unsatisfiable Constraint";
+	public static final String CONSTRAINT_IS_TAUTOLOGY = "Constraint is a Tautology";
+	public static final String FEATURE_MODELIS_VOID = "Feature Model is Void";
 	public static final String GERMAN = "German";
 	public static final String OBLIGATORISCH = "Obligatorisch";
 	public static final String ABSTRAKT = "Abstrakt";

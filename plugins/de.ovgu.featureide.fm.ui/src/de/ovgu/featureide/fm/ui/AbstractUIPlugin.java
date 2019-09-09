@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -107,7 +107,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 * @param message A message that should be written to the eclipse log file
 	 */
 	public void logInfo(String message) {
-		log(IStatus.INFO, message, new Exception());
+		log(IStatus.INFO, message, null);
 	}
 
 	/**
@@ -116,7 +116,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 * @param message A message that should be written to the eclipse log file
 	 */
 	public void logWarning(String message) {
-		log(IStatus.WARNING, message, new Exception());
+		log(IStatus.WARNING, message, null);
 	}
 
 	/**

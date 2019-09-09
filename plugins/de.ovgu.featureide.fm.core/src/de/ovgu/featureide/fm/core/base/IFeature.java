@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.base;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
  * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. A feature contains both <ul> <li>certain fixed
@@ -45,8 +46,8 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * provide a {@link Object#equals(Object)} implementation when the feature implementation should be fully useable in the FeatureIDE system (and therefore, have
  * to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the internal identifier of two features are the same, and
  * otherwise <b>false</b>. <br> <br> <b>Compatibility Notes</b>: To provide compatibility to earlier versions of FeatureIDE, the <i>out-dated</i> class
- * {@link de.ovgu.featureide.fm.core.Feature Feature} also implements the <code>IFeature</code> interface. Developers should neither use nor extend this
- * obsolete class since it is deprecated and will be removed in one of the next versions.
+ * {@link Feature Feature} also implements the <code>IFeature</code> interface. Developers should neither use nor extend this obsolete class since it is
+ * deprecated and will be removed in one of the next versions.
  *
  * @see de.ovgu.featureide.fm.core.base.impl.AFeature Default implementation of <code>IFeature</code> (as starting point for custom implementations)
  *
@@ -95,17 +96,6 @@ public interface IFeature extends IFeatureModelElement {
 	 * @return Implementation-specific feature properties.
 	 */
 	IFeatureProperty getProperty();
-
-	/**
-	 * Returns the feature's custom-defined properties. These properties can be get and set without changes to the code base, or the need for a custom
-	 * {@link IFeatureProperty} implementation (see {@link #getProperty()}). Custom-Properties do map a Java primitive value to a string key and can stored to
-	 * the file system.
-	 *
-	 * @since 3.0
-	 *
-	 * @return Implementation-independent custom feature properties.
-	 */
-	IPropertyContainer getCustomProperties();
 
 	/**
 	 * Returns the feature structure, in which this feature lives in. The structure gives information about (and setter to) the children and the parent of this

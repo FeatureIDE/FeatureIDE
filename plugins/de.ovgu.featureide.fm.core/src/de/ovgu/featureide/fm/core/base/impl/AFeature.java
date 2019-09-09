@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -38,13 +38,13 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * the listener/observer pattern. <br> <br> This class is intended to be a starting point for user-defined implementation, such that a subclass of
  * <code>AFeature</code> only have to provide an implementation of {@link IFeature#clone(IFeatureModel, IFeatureStructure)}. FeatureIDE provides a default
  * non-abstract implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature} which extends <code>AFeature</code> in this sense. <br> <br> An
- * instance of a subclass of <code>AFeature</code> is intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The
- * following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>AFeature</code> implementation
+ * instance of a subclass of <code>AFeature</code> is intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The following
+ * example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>AFeature</code> implementation
  * {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
  * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
  * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
- * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A
- * unified handling of certain <code>AFeature</code> (<code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved with the use of
+ * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A unified
+ * handling of certain <code>AFeature</code> (<code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved with the use of
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br> <br> <b>Notes on equals method</b>: The <code>AFeature</code>
  * implementation inherits the {@link Object#equals(Object)} capability from {@link AFeatureModelElement}. The feature equality is defined as the equality of
  * the underlying internal identifiers per feature. <br> <br>
@@ -77,7 +77,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	 * <code>featureModel</code>, and a feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see
 	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br> <br> <b>Note</b>: The parameter
 	 * <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as an subclass of
-	 * {@link AFeatureModelElement) can be <b>null</b>.
+	 * {@link AFeatureModelElement} can be <b>null</b>.
 	 *
 	 * @param oldFeature used to copy the original feature's identifier, and the original feature's name (if available)
 	 * @param featureModel is used to set the new feature's feature model if <code>featureModel</code> is non-null. If <code>featureModel</code> is <b>null</b>,
@@ -93,7 +93,6 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
 		propertyContainer = clonePropertyContainer(oldFeature);
-		propertyContainer.setEntrySet(oldFeature.getCustomProperties().entrySet());
 	}
 
 	/**

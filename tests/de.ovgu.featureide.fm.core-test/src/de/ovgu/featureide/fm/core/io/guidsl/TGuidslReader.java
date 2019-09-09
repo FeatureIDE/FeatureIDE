@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -85,7 +85,7 @@ public class TGuidslReader {
 	private IFeatureModel load(String input) {
 		try {
 			final IFeatureModelFormat format = new GuidslFormat();
-			final IFeatureModel model = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			final IFeatureModel model = FMFactoryManager.getInstance().getFactory(format).create();
 			if (format.read(model, input).containsError()) {
 				fail();
 			}

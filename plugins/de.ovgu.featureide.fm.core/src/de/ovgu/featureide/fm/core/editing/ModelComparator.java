@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -52,7 +52,7 @@ public class ModelComparator {
 		WithoutIdenticalRules, SingleTesting, SingleTestingAborted
 	};
 
-	private final Set<Strategy> strategy = new HashSet<Strategy>();
+	private final Set<Strategy> strategy = new HashSet<>();
 
 	private IFeatureModel oldModel;
 
@@ -146,7 +146,7 @@ public class ModelComparator {
 	}
 
 	private Set<String> calculateAddedFeatures(IFeatureModel oldModel, IFeatureModel newModel) {
-		final Set<String> addedFeatures = new HashSet<String>();
+		final Set<String> addedFeatures = new HashSet<>();
 		for (final IFeature feature : newModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
 				final String name = newModel.getRenamingsManager().getOldName(feature.getName());
@@ -160,7 +160,7 @@ public class ModelComparator {
 	}
 
 	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
-		final List<Object> toBeRemoved = new LinkedList<Object>();
+		final List<Object> toBeRemoved = new LinkedList<>();
 		for (final Entry<Object, Node> entry : oldMap.entrySet()) {
 			final Object var = entry.getKey();
 			if (newMap.containsKey(var)) {
@@ -181,7 +181,7 @@ public class ModelComparator {
 		if (addedFeatures.isEmpty()) {
 			return node;
 		}
-		final LinkedList<Node> children = new LinkedList<Node>();
+		final LinkedList<Node> children = new LinkedList<>();
 		for (final Object var : addedFeatures) {
 			children.add(new Literal(var, false));
 		}
@@ -199,7 +199,7 @@ public class ModelComparator {
 		if (!strategy.contains(Strategy.WithoutIdenticalRules)) {
 			return node;
 		}
-		final LinkedList<Node> updatedNodes = new LinkedList<Node>();
+		final LinkedList<Node> updatedNodes = new LinkedList<>();
 		for (final Node child : node.getChildren()) {
 			if (!containedIn(child, referenceNode.getChildren())) {
 				updatedNodes.add(child);
@@ -216,7 +216,7 @@ public class ModelComparator {
 		if (!strategy.contains(Strategy.SingleTesting)) {
 			final Node node = new And(a.clone(), new Not(b.clone()));
 			final SatSolver solver = new SatSolver(node, timeout);
-			return !solver.isSatisfiable();
+			return !solver.hasSolution();
 		}
 
 		example.setLeft(a);

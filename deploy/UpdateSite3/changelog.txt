@@ -7,6 +7,51 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+## Release 3.6.0 (August 2019) 
+* Increased required Java version to 1.8
+* New constraint view added listing cross-tree constraints
+  * Filter of constraints based on selection in feature diagram
+  * Filter based on keyword search
+  * Pro tip: use hashtags in the constraint description to filter groups of constraints
+* Improved feature diagram editor
+  * Improved constraint editor functionality
+  * Added additional tree layouts for feature diagram editor
+  * Added TikZ (Latex) export for feature diagrams
+  * Improved legend behavior (#603)
+  * Improved/Fixed UI (#787, #802, #804 #806, #809, #821, #827, #845, #884)
+* Improved configuration editor
+  * Added proper error page
+  * Improved handling for conflicting configurations due to feature model changes (#678)
+  * Revised internal job handling
+* Revised feature model format
+  * Integrated graphical information for feature model
+  * Removed separated file for storing graphical information of feature model
+* Improved ant build scripts for fm.core and fm.attributes library and added readme.md files.
+  * Added support for building fm.core library with maven (experimental)
+* Improved configuration generators
+  * Moved configuration generators to fm.core plug-in (also available in fm.core library)
+  * Added new t-wise configuration generator (experimental)
+  * Added new uniform random configuration generator (experimental)
+  * Added testing and statistic tool for configuration generators (experimental)
+* Revised/Refactored several classes
+  * Added new framework for handling SAT problems and SAT solvers 
+  * Revised feature model analyses and configuration analyses
+  * Revised internal file handling for feature models and configurations
+  * Revised handling and loading of extension (e.g. file formats)
+  * Replaced some interfaces with standard functional interfaces of Java 1.8
+  * Removed several deprecated classes and methods
+* Fixed several issues regarding:
+  * Configuration editor (#882)
+  * Feature model edits view (#408)
+  * Feature attribute view (#863)
+  * Configuration map (#867)
+  * Obfuscated feature model export (#877)
+  * Editing color scheme (#890)
+  * Configuration format (#764, #783)
+  * DIMACS format (#764, #868, #869)
+  * GUIDSL format (#871)
+  * Extended feature model format (feature model attributes) (#855, #876)
+
 Release 3.5.5 (June 2019)
 * Hotfix containing only stability improvements over v3.5.4
 * Added example called FeatureModelAnalysis to illustrate how to analyze a feature model with the FeatureIDE library

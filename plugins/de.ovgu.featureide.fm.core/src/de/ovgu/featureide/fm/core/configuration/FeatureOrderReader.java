@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -52,7 +52,7 @@ public class FeatureOrderReader {
 	 */
 
 	public LinkedList<String> featureOrderRead() {
-		final LinkedList<String> list = new LinkedList<String>();
+		final LinkedList<String> list = new LinkedList<>();
 		try {
 			final Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {

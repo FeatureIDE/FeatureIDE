@@ -1,5 +1,6 @@
 de/ovgu/featureide/fm/attributes/AbstractUIPlugin.java
 de/ovgu/featureide/fm/attributes/FMAttributesPlugin.java
+de/ovgu/featureide/fm/attributes/FMAttributesEclipseLibrary.java
 de/ovgu/featureide/fm/attributes/composer/ExtendedFeatureModeling.java
 de/ovgu/featureide/fm/attributes/composer/ExtendedFeatureModelingFMExtension.java
 de/ovgu/featureide/fm/attributes/outlineentry/AttributeComputationBundle.java

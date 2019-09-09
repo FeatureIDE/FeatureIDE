@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,6 +24,8 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -49,7 +51,8 @@ public class FeatureInOnlyOneConfigFilter extends ConfigurationMapFilter {
 		boolean isInConfig = false;
 
 		for (final Configuration config : configs) {
-			if (config.getSelectedFeatures().contains(feature)) {
+			final SelectableFeature selectableFeature = config.getSelectableFeature(feature);
+			if ((selectableFeature != null) && (selectableFeature.getSelection() == Selection.SELECTED)) {
 				if (isInConfig) {
 					return false;
 				} else {

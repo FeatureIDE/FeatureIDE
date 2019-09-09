@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -59,7 +59,7 @@ public abstract class ExplanationCreatorTests<S, E extends Explanation<S>, C ext
 	protected boolean isValid(E explanation) {
 		final Node node = new And(explanation.toNode(), new Not(explanation.getImplication()));
 		try {
-			return !new SatSolver(node, 1000).isSatisfiable();
+			return !new SatSolver(node, 1000).hasSolution();
 		} catch (final TimeoutException e) {
 			throw new RuntimeException(e);
 		}

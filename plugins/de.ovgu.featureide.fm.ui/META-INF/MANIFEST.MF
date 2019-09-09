@@ -11,13 +11,13 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- org.eclipse.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
  org.eclipse.core.expressions,
+ org.eclipse.core.resources,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors;
@@ -42,6 +42,7 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors.featuremodel.editparts,
  de.ovgu.featureide.fm.ui.editors.featuremodel.figures,
  de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors,
+ de.ovgu.featureide.fm.ui.editors.featuremodel.filters,
  de.ovgu.featureide.fm.ui.editors.featuremodel.layouts,
  de.ovgu.featureide.fm.ui.editors.featuremodel.operations,
  de.ovgu.featureide.fm.ui.editors.featuremodel.policies,
@@ -56,14 +57,26 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.utils,
  de.ovgu.featureide.fm.ui.views,
  de.ovgu.featureide.fm.ui.views.constraintview,
+ de.ovgu.featureide.fm.ui.views.constraintview.actions,
+ de.ovgu.featureide.fm.ui.views.constraintview.listener,
+ de.ovgu.featureide.fm.ui.views.constraintview.util,
+ de.ovgu.featureide.fm.ui.views.constraintview.view,
  de.ovgu.featureide.fm.ui.views.featuremodeleditview,
  de.ovgu.featureide.fm.ui.views.outline,
  de.ovgu.featureide.fm.ui.views.outline.computations,
+ de.ovgu.featureide.fm.ui.views.outline.computations.impl,
  de.ovgu.featureide.fm.ui.views.outline.custom,
  de.ovgu.featureide.fm.ui.views.outline.custom.action,
  de.ovgu.featureide.fm.ui.views.outline.custom.filters,
  de.ovgu.featureide.fm.ui.views.outline.custom.providers,
  de.ovgu.featureide.fm.ui.views.outline.standard,
- de.ovgu.featureide.fm.ui.wizards
+ de.ovgu.featureide.fm.ui.wizards,
+ org.abego.treelayout,
+ org.abego.treelayout.internal.util,
+ org.abego.treelayout.internal.util.java.lang,
+ org.abego.treelayout.internal.util.java.lang.string,
+ org.abego.treelayout.internal.util.java.util,
+ org.abego.treelayout.util
 Bundle-ClassPath: .,
  lib/org.abego.treelayout.core-1.0.3.jar
+Automatic-Module-Name: de.ovgu.featureide.fm.ui

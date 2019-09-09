@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -207,7 +207,7 @@ public class AheadBuildErrorEvent {
 		/*
 		 * Removed because layer declaration is not supported and necessary anymore. It caused a wrong line calculation.
 		 */
-//		jakLine += lineNumberOfLayerDeclaration(jakFile);
+		// jakLine += lineNumberOfLayerDeclaration(jakFile);
 		return jakLine;
 	}
 
@@ -246,7 +246,7 @@ public class AheadBuildErrorEvent {
 			return newFile;
 		}
 
-//		AheadCorePlugin.getDefault().logWarning(WAS_NOT_ABLE_TO_LOCATE_AN_ERROR_IN_THE_SOURCE_JAK_FILE_ + filename + "'");
+		// AheadCorePlugin.getDefault().logWarning(WAS_NOT_ABLE_TO_LOCATE_AN_ERROR_IN_THE_SOURCE_JAK_FILE_ + filename + "'");
 		return null;
 	}
 
@@ -266,13 +266,13 @@ public class AheadBuildErrorEvent {
 		return content.lineNumber() - 1;
 	}
 
-//	private int lineNumberOfLayerDeclaration(IFile jakFile) throws CoreException, IOException {
-//		jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
-//		String contentString = getString(jakFile);
-//		PosString content = new PosString(contentString);
-//		content.pos = contentString.indexOf("layer");
-//		return content.lineNumber() - 1;
-//	}
+	// private int lineNumberOfLayerDeclaration(IFile jakFile) throws CoreException, IOException {
+	// jakFile.refreshLocal(IResource.DEPTH_ZERO, null);
+	// String contentString = getString(jakFile);
+	// PosString content = new PosString(contentString);
+	// content.pos = contentString.indexOf("layer");
+	// return content.lineNumber() - 1;
+	// }
 
 	public int getLine() {
 		return line;

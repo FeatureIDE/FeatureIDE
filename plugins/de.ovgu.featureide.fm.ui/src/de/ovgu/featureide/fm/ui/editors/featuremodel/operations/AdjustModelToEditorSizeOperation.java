@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
 *
 * This file is part of FeatureIDE.
 *
@@ -24,14 +24,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_T
 
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -44,42 +41,40 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Maximilian Kühl
  * @author Christopher Sontag
  */
-public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperation {
+public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureModelOperation {
+
+	private final FeatureDiagramEditor editor;
+	private final LinkedList<String> affectedFeatureList = new LinkedList<>();
 
 	private boolean collapse;
-	private final IFeatureModel featureModel;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private final LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
-
-	public AdjustModelToEditorSizeOperation(IGraphicalFeatureModel graphicalFeatureModel, Object editor) {
-		super(graphicalFeatureModel.getFeatureModel(), ADJUST_MODEL_TO_EDITOR);
-		featureModel = graphicalFeatureModel.getFeatureModel();
-		this.graphicalFeatureModel = graphicalFeatureModel;
+	public AdjustModelToEditorSizeOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureDiagramEditor editor) {
+		super(graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 		this.editor = editor;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		// 0 is the manual layout, there is no greedy for manual layout
 		if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 			return new FeatureIDEEvent(null, EventType.DEFAULT);
 		}
-		getVisibleFeatures();
-		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
+		new CollapseAllOperation(graphicalFeatureModel, true).operation(featureModel);
+		checkChildren(featureModel.getStructure().getRoot().getFeature());
+		return new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 			return new FeatureIDEEvent(null, EventType.DEFAULT);
+		} else {
+			// TODO implement reverse operation
+			for (final String name : affectedFeatureList) {
+				graphicalFeatureModel.getGraphicalFeature(featureModel.getFeature(name)).setCollapsed(!collapse);
+			}
+			return new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED);
 		}
-		for (final IFeature f : affectedFeatureList) {
-			final IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
-			graphicalF.setCollapsed(!collapse);
-		}
-		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
-
 	}
 
 	private void checkChildren(IFeature root) {
@@ -90,7 +85,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			final IGraphicalFeature left = graphicalFeatureModel.getGraphicalFeature(layer.get(0));
 			final IGraphicalFeature right = graphicalFeatureModel.getGraphicalFeature(layer.getLast());
 
-			boolean isLayerSomewhereOutOfSight = getEditor().getViewer().isNodeOutOfSight(left) || getEditor().getViewer().isNodeOutOfSight(right);
+			boolean isLayerSomewhereOutOfSight = editor.getViewer().isNodeOutOfSight(left) || editor.getViewer().isNodeOutOfSight(right);
 			if (isLayerSomewhereOutOfSight) {
 				break;
 			}
@@ -99,22 +94,22 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			}
 			for (final IFeature node : layer) {
 				final IGraphicalFeature gf = graphicalFeatureModel.getGraphicalFeature(node);
-				getEditor().getViewer().internRefresh(true);
-				getEditor().propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-				if (getEditor().getViewer().isNodeOutOfSight(gf)) {
+				editor.getViewer().internRefresh(true);
+				editor.propertyChange(new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+				if (editor.getViewer().isNodeOutOfSight(gf)) {
 					gf.setCollapsed(true);
 					break;
 				} else {
 					gf.setCollapsed(false);
-					getEditor().propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
-					final boolean leftestChildIsOutOfSight = getEditor().getViewer().isNodeOutOfSight(leftestChild);
+					editor.propertyChange(new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+					final boolean leftestChildIsOutOfSight = editor.getViewer().isNodeOutOfSight(leftestChild);
 					final int lastChildIndex = gf.getAllGraphicalChildren().size() - 1;
 					final boolean rightestChildIsOutOfSight;
 					if (lastChildIndex < 0) {
 						rightestChildIsOutOfSight = false;
 					} else {
-						rightestChildIsOutOfSight = getEditor().getViewer().isNodeOutOfSight(gf.getAllGraphicalChildren().get(lastChildIndex));
-						isLayerSomewhereOutOfSight = getEditor().getViewer().isNodeOutOfSight(left) || getEditor().getViewer().isNodeOutOfSight(right);
+						rightestChildIsOutOfSight = editor.getViewer().isNodeOutOfSight(gf.getAllGraphicalChildren().get(lastChildIndex));
+						isLayerSomewhereOutOfSight = editor.getViewer().isNodeOutOfSight(left) || editor.getViewer().isNodeOutOfSight(right);
 					}
 					if (leftestChildIsOutOfSight || rightestChildIsOutOfSight || isLayerSomewhereOutOfSight) {
 						gf.setCollapsed(true);
@@ -124,26 +119,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		}
 	}
 
-	private void collapseGraphicalFeatureModel() {
-		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, true);
-		try {
-			op.execute(null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-
-	private void getVisibleFeatures() {
-		final IFeature root = featureModel.getStructure().getRoot().getFeature();
-		collapseGraphicalFeatureModel();
-		checkChildren(root);
-	}
-
-	@Override
-	public FeatureDiagramEditor getEditor() {
-		return (FeatureDiagramEditor) super.getEditor();
-	}
-
 	/**
 	 * Calculates the levels from the given IGraphicalFeature by iterating through the levels of features.
 	 *
@@ -151,12 +126,12 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 * @return list of levels, which are again lists of IFeatures
 	 */
 	private LinkedList<LinkedList<IFeature>> calculateLevels(IFeature root) {
-		final LinkedList<LinkedList<IFeature>> levels = new LinkedList<LinkedList<IFeature>>();
-		LinkedList<IFeature> level = new LinkedList<IFeature>();
+		final LinkedList<LinkedList<IFeature>> levels = new LinkedList<>();
+		LinkedList<IFeature> level = new LinkedList<>();
 		level.add(root);
 		while (!level.isEmpty()) {
 			levels.add(level);
-			final LinkedList<IFeature> newLevel = new LinkedList<IFeature>();
+			final LinkedList<IFeature> newLevel = new LinkedList<>();
 			for (final IFeature feature : level) {
 				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 				for (final IFeatureStructure child : graphicalFeature.getObject().getStructure().getChildren()) {

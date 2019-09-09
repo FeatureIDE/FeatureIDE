@@ -14,10 +14,11 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core.ahead,
  de.ovgu.featureide.core.featurehouse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.core.conversion.ahead_featurehouse,
  de.ovgu.featureide.core.conversion.ahead_featurehouse.actions;uses:="org.eclipse.jdt.core,de.ovgu.featureide.core,org.eclipse.core.resources",
  de.ovgu.featureide.core.conversion.ahead_featurehouse.handlers
 Bundle-ClassPath: .
+Automatic-Module-Name: de.ovgu.featureide.core.conversion.ahead-featurehouse

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job.monitor;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -28,12 +27,12 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public class ConsoleMonitor extends ATaskMonitor {
+public class ConsoleMonitor<T> extends ATaskMonitor<T> {
 
-	private boolean output = true;
+	protected boolean output = true;
 
-	private boolean canceled = false;
-	private int work = 0;
+	protected boolean canceled = false;
+	protected int work = 0;
 
 	public ConsoleMonitor() {
 		super();
@@ -44,11 +43,10 @@ public class ConsoleMonitor extends ATaskMonitor {
 		this.output = output;
 	}
 
-	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, AMonitor parent) {
+	private ConsoleMonitor(boolean output, boolean canceled, AMonitor<?> parent) {
 		super(parent);
 		this.output = output;
 		this.canceled = canceled;
-		setIntermediateFunction(intermediateFunction);
 	}
 
 	@Override
@@ -57,7 +55,9 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public void done() {}
+	public void done() {
+		worked(getRemainingWork());
+	}
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
@@ -67,14 +67,21 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public final void setRemainingWork(int work) {
+	public synchronized final void setRemainingWork(int work) {
 		this.work = work;
 	}
 
 	@Override
-	public void worked() {
-		work--;
-		print("\t" + work);
+	public synchronized int getRemainingWork() {
+		return work;
+	}
+
+	@Override
+	public synchronized void worked(int work) {
+		if (work > 0) {
+			this.work -= work;
+			print("\t" + this.work);
+		}
 	}
 
 	public boolean isOutput() {
@@ -86,23 +93,21 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public void setTaskName(String name) {
+	public synchronized void setTaskName(String name) {
 		super.setTaskName(name);
 		print(getTaskName());
 	}
 
-	private void print(String name) {
+	protected void print(String name) {
 		if (output) {
 			System.out.println(name);
 		}
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		final ConsoleMonitor consoleMonitor = new ConsoleMonitor(output, canceled, intermediateFunction, this);
-		consoleMonitor.setRemainingWork(size);
-		work -= size;
-		return consoleMonitor;
+	public synchronized <R> IMonitor<R> subTask(int size) {
+		worked(size);
+		return new ConsoleMonitor<>(output, canceled, this);
 	}
 
 }

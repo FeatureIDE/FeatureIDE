@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,10 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.utils;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -32,30 +36,28 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * @author Rosiak Kamil
  */
 public class FeatureModelUtil {
+
 	/**
 	 * This method returns the active feature model editor if available, else it returns null.
+	 *
+	 * @return the active feature model editor or {@code null} if none is available.
 	 */
+	@CheckForNull
 	public static FeatureModelEditor getActiveFMEditor() {
-		final IEditorPart viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		if (viewReferences instanceof FeatureModelEditor) {
-			return (FeatureModelEditor) viewReferences;
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null) {
+			final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
+			if (activeWorkbenchWindow != null) {
+				final IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
+				if (activePage != null) {
+					final IEditorPart viewReferences = activePage.getActiveEditor();
+					if (viewReferences instanceof FeatureModelEditor) {
+						return (FeatureModelEditor) viewReferences;
+					}
+				}
+			}
 		}
 		return null;
 	}
 
-	/**
-	 * This method returns the feature model of the active editor.
-	 */
-	public static IFeatureModel getFeatureModel() {
-		final FeatureModelEditor fmEditor = getActiveFMEditor();
-		return fmEditor.getFeatureModel();
-	}
-
-	/**
-	 * This method returns the original feature model of the active editor.
-	 */
-	public static IFeatureModel getOriginalFeatureModel() {
-		final FeatureModelEditor fmEditor = getActiveFMEditor();
-		return fmEditor.getOriginalFeatureModel();
-	}
 }

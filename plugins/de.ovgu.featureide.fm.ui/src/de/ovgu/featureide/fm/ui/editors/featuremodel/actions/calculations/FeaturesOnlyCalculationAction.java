@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEATURES;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * Action to specify feature model analysis.<br> Only features will be analyzed and not constraints.
@@ -33,35 +34,38 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class FeaturesOnlyCalculationAction extends Action {
+public class FeaturesOnlyCalculationAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.featuresonlycalculations";
 
-	private final IFeatureModel featureModel;
-
-	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(CALCULATE_FEATURES);
-		this.featureModel = featureModel;
-		setToolTipText("Test");
-		setChecked(featureModel.getAnalyser().calculateFeatures);
-		setId(ID);
+	public FeaturesOnlyCalculationAction(IFeatureModelManager featureModelManager) {
+		super(CALCULATE_FEATURES, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateFeatures) {
-			featureModel.getAnalyser().calculateFeatures = false;
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
-			featureModel.getAnalyser().calculateDeadConstraints = false;
-			featureModel.getAnalyser().calculateFOConstraints = false;
+		final IFeatureModel featureModel;
+		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
+		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
+		featureModel = variableFormula.getFeatureModel();
+		if (analyzer.getAnalysesCollection().isCalculateFeatures()) {
+			analyzer.getAnalysesCollection().setCalculateFeatures(false);
+			analyzer.getAnalysesCollection().setCalculateConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateRedundantConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateTautologyConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateDeadConstraints(false);
+			analyzer.getAnalysesCollection().setCalculateFOConstraints(false);
 		} else {
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+			analyzer.getAnalysesCollection().setCalculateFeatures(true);
+			analyzer.getAnalysesCollection().setCalculateDeadConstraints(true);
+			analyzer.getAnalysesCollection().setCalculateFOConstraints(true);
 		}
 		featureModel.handleModelDataChanged();
+	}
+
+	@Override
+	public void update() {
+		setChecked(featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().isCalculateFeatures());
 	}
 
 }

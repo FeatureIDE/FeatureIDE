@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.core.mpl.job;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COPIED_SOURCE_FILES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COPYING_SOURCE_FILES;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -29,39 +28,30 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments, Boolean> {
+public class MPLCopyExternalJob implements LongRunningMethod<Boolean> {
 
-	public static class Arguments extends JobArguments {
+	private final IFolder srcFolder;
+	private final IFolder destFolder;
 
-		private final IFolder srcFolder;
-		private final IFolder destFolder;
-
-		public Arguments(IFolder srcFolder, IFolder destFolder) {
-			super(Arguments.class);
-			this.srcFolder = srcFolder;
-			this.destFolder = destFolder;
-		}
-	}
-
-	protected MPLCopyExternalJob(Arguments arguments) {
-		super(COPYING_SOURCE_FILES, arguments);
+	protected MPLCopyExternalJob(IFolder srcFolder, IFolder destFolder) {
+		this.srcFolder = srcFolder;
+		this.destFolder = destFolder;
+		// super(COPYING_SOURCE_FILES, arguments);
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		final IPath destPath = arguments.destFolder.getFullPath();
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
+		final IPath destPath = destFolder.getFullPath();
 
 		try {
-			final IResource[] srcMembers = arguments.srcFolder.members();
+			final IResource[] srcMembers = srcFolder.members();
 			for (int i = 0; i < srcMembers.length; i++) {
 				final IResource srcMember = srcMembers[i];
 				final IPath px = destPath.append(srcMember.getName());

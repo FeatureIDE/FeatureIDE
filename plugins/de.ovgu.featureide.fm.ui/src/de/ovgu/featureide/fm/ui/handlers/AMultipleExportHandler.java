@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -36,6 +36,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -69,6 +70,7 @@ public abstract class AMultipleExportHandler<T> extends AContainerHandler {
 		final List<IFile> files = new ArrayList<>();
 		try {
 			modelFolder.accept(new IResourceVisitor() {
+
 				@Override
 				public boolean visit(IResource child) throws CoreException {
 					if (child instanceof IFile) {
@@ -79,7 +81,7 @@ public abstract class AMultipleExportHandler<T> extends AContainerHandler {
 			}, IResource.DEPTH_ONE, IResource.NONE);
 			if (!files.isEmpty()) {
 				for (final IFile file : files) {
-					final Path modelFilePath = Paths.get(file.getLocationURI());
+					final Path modelFilePath = EclipseFileSystem.getPath(file);
 					String fileName = modelFilePath.getFileName().toString();
 					final int extIndex = fileName.lastIndexOf('.');
 					if (extIndex > 0) {
@@ -94,7 +96,7 @@ public abstract class AMultipleExportHandler<T> extends AContainerHandler {
 		}
 	}
 
-	protected abstract FormatManager<? extends IPersistentFormat<T>> getFormatManager();
+	protected abstract FormatManager<T> getFormatManager();
 
 	protected abstract FileHandler<T> read(final Path modelFilePath);
 

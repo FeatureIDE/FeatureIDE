@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IT_CAN_NOT_BE_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,14 +42,20 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -64,18 +71,52 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  */
 public class ElementDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
+	public static final String ID = ID_PREFIX + "ElementDeleteOperation";
+
 	private final Object viewer;
 
-	public ElementDeleteOperation(Object viewer, IFeatureModel featureModel) {
-		super(featureModel, DELETE);
+	public ElementDeleteOperation(Object viewer, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, DELETE, getFeatureNames(viewer));
 		this.viewer = viewer;
+	}
+
+	@Override
+	protected String getID() {
+		return ID;
+	}
+
+	private static List<String> getFeatureNames(Object viewer) {
+		final IStructuredSelection selection;
+		if (viewer instanceof GraphicalViewerImpl) {
+			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+		} else if (viewer instanceof TreeViewer) {
+			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+		} else {
+			return Collections.emptyList();
+		}
+
+		final ArrayList<String> featureNames = new ArrayList<>();
+		for (final Object element : selection.toArray()) {
+			IFeature feature;
+			if (element instanceof IFeature) {
+				feature = ((IFeature) element);
+			} else if (element instanceof FeatureEditPart) {
+				feature = ((FeatureEditPart) element).getModel().getObject();
+			} else {
+				feature = null;
+			}
+			if (feature != null) {
+				featureNames.add(feature.getName());
+			}
+		}
+		return featureNames;
 	}
 
 	/**
 	 * Executes the requested delete operation.
 	 */
 	@Override
-	public void createSingleOperations() {
+	public void createSingleOperations(IFeatureModel featureModel) {
 		/**
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the corresponding List.
 		 */
@@ -87,8 +128,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			if (removeConstraint(element)) {
 				continue;
 			}
-			final IFeature parent = removeFeature(element, removalMap, alreadyDeleted);
-
+			final IFeature parent = createFeatureDeleteOperation(featureModel, element, removalMap, alreadyDeleted);
 			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
 		}
 
@@ -123,11 +163,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
 			final IConstraint constraint = ((ConstraintEditPart) element).getModel().getObject();
-			operations.add(new DeleteConstraintOperation(constraint, featureModel));
+			operations.add(new DeleteConstraintOperation(constraint, featureModelManager));
 			return true;
 		} else if (element instanceof IConstraint) {
 			final IConstraint constraint = ((IConstraint) element);
-			operations.add(new DeleteConstraintOperation(constraint, featureModel));
+			operations.add(new DeleteConstraintOperation(constraint, featureModelManager));
 			return true;
 		}
 		return false;
@@ -140,7 +180,9 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private IFeature removeFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
+	// TODO Revise. Could possibly block other operations due to the complex calculation of FeatureDependencies.
+	private IFeature createFeatureDeleteOperation(IFeatureModel featureModel, Object element, Map<IFeature, List<IFeature>> removalMap,
+			List<IFeature> alreadyDeleted) {
 		IFeature feature = null;
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
@@ -151,15 +193,20 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			final IFeature parent = FeatureUtils.getParent(feature);
 			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
-				operations.add(new DeleteFeatureOperation(featureModel, feature));
+				operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName()));
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
-				final FeatureDependencies featureDependencies = new FeatureDependencies(featureModel, false);
-				final List<IFeature> equivalent = new LinkedList<IFeature>();
-				for (final IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
-					if (featureDependencies.isAlways(f2, feature)) {
-						equivalent.add(f2);
+				final FeatureModelFormula formula = featureModelManager.getVariableFormula();
+				final IVariables variables = formula.getVariables();
+				final int variable = variables.getVariable(feature.getName());
+
+				final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+
+				final List<IFeature> equivalent = new ArrayList<>();
+				for (final int strongylConnectedVar : MIGUtils.getStronglyConnected(modalImplicationGraph, variable)) {
+					if (MIGUtils.isStronglyConnected(modalImplicationGraph, strongylConnectedVar, variable)) {
+						equivalent.add(featureModel.getFeature(variables.getName(strongylConnectedVar)));
 					}
 				}
 				removalMap.put(feature, equivalent);
@@ -196,7 +243,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 			if (hasDeletableFeature) {
 				// case: features can be replaced with an equivalent feature
-				new DeleteOperationAlternativeDialog(featureModel, removalMap, this);
+				new DeleteOperationAlternativeDialog(featureModelManager, removalMap, this);
 			} else {
 				// case: features can NOT be replaced with an equivalent feature
 				openErrorDialog(notDeletable);
@@ -225,6 +272,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 						: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_),
 				MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

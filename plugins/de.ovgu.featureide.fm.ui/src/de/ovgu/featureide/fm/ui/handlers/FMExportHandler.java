@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
@@ -39,7 +39,7 @@ public class FMExportHandler extends AExportHandler<IFeatureModel> {
 
 	@Override
 	protected FileHandler<IFeatureModel> read(Path modelFilePath) {
-		return FeatureModelManager.load(modelFilePath);
+		return FeatureModelIO.getInstance().getFileHandler(modelFilePath);
 	}
 
 	@Override

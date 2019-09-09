@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import java.util.function.Consumer;
+
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -99,6 +100,6 @@ public interface IJob<T> {
 
 	void setPriority(int priority);
 
-	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
+	void setIntermediateFunction(Consumer<T> intermediateFunction);
 
 }

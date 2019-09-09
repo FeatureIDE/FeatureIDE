@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job.monitor;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import java.util.function.Consumer;
+
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -28,13 +29,13 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public abstract class AMonitor implements IMonitor {
+public abstract class AMonitor<T> implements IMonitor<T> {
 
-	protected final AMonitor parent;
+	protected final AMonitor<?> parent;
 
-	protected IConsumer<Object> intermediateFunction = null;
+	protected Consumer<T> intermediateFunction = null;
 
-	public AMonitor(AMonitor parent) {
+	public AMonitor(AMonitor<?> parent) {
 		this.parent = parent;
 	}
 
@@ -43,26 +44,41 @@ public abstract class AMonitor implements IMonitor {
 	}
 
 	@Override
-	public final void invoke(Object t) {
+	public final void invoke(T t) {
 		if (intermediateFunction != null) {
-			intermediateFunction.invoke(t);
+			intermediateFunction.accept(t);
 		}
 	}
 
 	@Override
-	public final void step() throws MethodCancelException {
-		step(null);
+	public void worked() {
+		worked(1);
 	}
 
 	@Override
-	public final void step(Object t) throws MethodCancelException {
-		worked();
+	public final void step() throws MethodCancelException {
+		step(1, null);
+	}
+
+	@Override
+	public final void step(int work) throws MethodCancelException {
+		step(work, null);
+	}
+
+	@Override
+	public final void step(T t) throws MethodCancelException {
+		step(1, t);
+	}
+
+	@Override
+	public final void step(int work, T t) throws MethodCancelException {
+		worked(work);
 		invoke(t);
 		checkCancel();
 	}
 
 	@Override
-	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
+	public final void setIntermediateFunction(Consumer<T> intermediateFunction) {
 		this.intermediateFunction = intermediateFunction;
 	}
 

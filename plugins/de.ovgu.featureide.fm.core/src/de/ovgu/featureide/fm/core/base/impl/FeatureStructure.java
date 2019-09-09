@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -56,9 +56,15 @@ public class FeatureStructure implements IFeatureStructure {
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
+		this(oldStructure, newFeatureModel, false);
+	}
+
+	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel, boolean copySubtree) {
 		if (newFeatureModel != null) {
 			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
-			newFeatureModel.addFeature(correspondingFeature);
+			if (copySubtree) {
+				newFeatureModel.addFeature(correspondingFeature);
+			}
 		} else {
 			correspondingFeature = oldStructure.correspondingFeature;
 		}
@@ -69,8 +75,10 @@ public class FeatureStructure implements IFeatureStructure {
 		multiple = oldStructure.multiple;
 		hidden = oldStructure.hidden;
 
-		for (final IFeatureStructure child : oldStructure.children) {
-			addNewChild(child.cloneSubtree(newFeatureModel));
+		if (copySubtree) {
+			for (final IFeatureStructure child : oldStructure.children) {
+				addNewChild(child.cloneSubtree(newFeatureModel));
+			}
 		}
 	}
 
@@ -134,7 +142,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel) {
-		return new FeatureStructure(this, newFeatureModel);
+		return new FeatureStructure(this, newFeatureModel, true);
+	}
+
+	@Override
+	public IFeatureStructure clone(IFeatureModel newFeatureModel) {
+		return new FeatureStructure(this, newFeatureModel, false);
 	}
 
 	protected void fireAttributeChanged() {
@@ -148,7 +161,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.FEATURE_HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -163,7 +176,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
+	public List<IFeatureStructure> getChildren() {
 		return children;
 	}
 
@@ -211,6 +224,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public Collection<IConstraint> getRelevantConstraints() {
+		setRelevantConstraints();
 		return partOfConstraints;
 	}
 
@@ -380,7 +394,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public void setChildren(List<IFeatureStructure> children) {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
+	public void setChildren(List<IFeatureStructure> children) {
 		this.children.clear();
 		for (final IFeatureStructure child : children) {
 			addNewChild(child);

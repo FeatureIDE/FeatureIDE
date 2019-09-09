@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
  .
@@ -31,3 +31,4 @@ Export-Package: cide.features,
  de.ovgu.featureide.featurehouse.ui.handlers,
  de.ovgu.featureide.featurehouse.ui.handlers.toggle,
  fuji
+Automatic-Module-Name: de.ovgu.featureide.core.featurehouse

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,7 @@ package de.ovgu.featureide.fm.core;
  */
 public class Logger {
 
-	static ILogger logger = new JavaLogger();
+	public static ILogger logger = new JavaLogger();
 
 	public static void logInfo(String message) {
 		logger.logInfo(message);

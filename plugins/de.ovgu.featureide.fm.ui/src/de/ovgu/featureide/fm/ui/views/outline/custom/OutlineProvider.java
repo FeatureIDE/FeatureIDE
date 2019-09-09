@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IEditorPart;
 
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
@@ -45,6 +46,10 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 
 	private OutlineTreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
+
+	protected TreeViewer viewer;
+	protected IFile file;
+	protected FeatureModelManager featureModelManager;
 
 	public OutlineProvider() {}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.job;
 
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
@@ -76,7 +75,7 @@ public final class JobSynchronizer {
 
 		private void start(IRunner<?> job) {
 			jobs.offer(job);
-			new Starter(semaphore, jobs).start();
+			new Starter(this).start();
 		}
 
 		public synchronized void cancelAll() {
@@ -90,27 +89,25 @@ public final class JobSynchronizer {
 
 	private static class Starter extends Thread {
 
-		private final Semaphore semaphore;
-		private final Queue<IRunner<?>> jobs;
+		private final JobEntry jobEntry;
 
-		public Starter(Semaphore semaphore, Queue<IRunner<?>> jobs) {
-			this.semaphore = semaphore;
-			this.jobs = jobs;
+		public Starter(JobEntry jobEntry) {
+			this.jobEntry = jobEntry;
 		}
 
 		@Override
 		public void run() {
 			try {
-				semaphore.acquire();
+				jobEntry.semaphore.acquire();
 				try {
-					final IRunner<?> job = jobs.peek();
+					final IRunner<?> job = jobEntry.jobs.peek();
 					if (job != null) {
 						job.schedule();
 						job.join();
 					}
 				} finally {
-					jobs.poll();
-					semaphore.release();
+					jobEntry.jobs.poll();
+					jobEntry.semaphore.release();
 				}
 			} catch (final InterruptedException e) {
 				return;
@@ -129,6 +126,10 @@ public final class JobSynchronizer {
 		return token;
 	}
 
+	static void removeToken(JobToken token) {
+		jobMap.remove(token);
+	}
+
 	static void startJob(JobToken token, final IRunner<?> job) {
 		if (job == null) {
 			return;
@@ -137,7 +138,10 @@ public final class JobSynchronizer {
 	}
 
 	static void cancelAllJobs(JobToken token) {
-		jobMap.get(token).cancelAll();
+		final JobEntry jobEntry = jobMap.get(token);
+		if (jobEntry != null) {
+			jobEntry.cancelAll();
+		}
 	}
 
 }

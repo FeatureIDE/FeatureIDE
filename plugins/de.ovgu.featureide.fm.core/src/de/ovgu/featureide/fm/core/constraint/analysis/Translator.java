@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -85,7 +85,7 @@ public class Translator {
 
 	public static <T> void createAssumption(int id, boolean assumption, Collection<T> rs, RestrictionFactory<T> factory) {
 
-		final List<Term> terms = new ArrayList<Term>();
+		final List<Term> terms = new ArrayList<>();
 		terms.add(new Term(id, 1, assumption));
 		factory.createAndAdd(terms, RelationOperator.GREATER_EQUAL, 1, rs);
 	}
@@ -106,7 +106,7 @@ public class Translator {
 	}
 
 	public static <T> List<T> translateFmTree(Map<String, Integer> map, IFeatureModel fm, RestrictionFactory<T> factory) {
-		final List<T> rs = new ArrayList<T>();
+		final List<T> rs = new ArrayList<>();
 
 		// root has to be included (r == 1)
 		createAssumption(map.get(fm.getStructure().getRoot().getFeature().getName()), true, rs, factory);
@@ -117,7 +117,7 @@ public class Translator {
 	}
 
 	public static <T> List<T> translateFmConstraints(Map<String, Integer> m, IFeatureModel fm, RestrictionFactory<T> factory) {
-		final List<T> rs = new ArrayList<T>();
+		final List<T> rs = new ArrayList<>();
 
 		translateFmConstraints(m, fm.getConstraints(), rs, factory);
 
@@ -141,7 +141,7 @@ public class Translator {
 
 	private static <T> void translateFmTreeAlternative(Map<String, Integer> m, IFeatureStructure f, List<T> rs, RestrictionFactory<T> factory) {
 
-		final List<Term> terms = new ArrayList<Term>();
+		final List<Term> terms = new ArrayList<>();
 		terms.add(new Term(m.get(f.getFeature().getName()), 1, true));
 
 		for (final IFeatureStructure child : f.getChildren()) {
@@ -156,7 +156,7 @@ public class Translator {
 
 		final int numChildren = f.getChildren().size();
 
-		final List<Term> terms = new ArrayList<Term>();
+		final List<Term> terms = new ArrayList<>();
 		terms.add(new Term(m.get(f.getFeature().getName()), numChildren, true));
 
 		for (final IFeatureStructure child : f.getChildren()) {
@@ -173,8 +173,8 @@ public class Translator {
 	private static <T> void translateFmTreeAnd(Map<String, Integer> m, IFeatureStructure f, List<T> rs, RestrictionFactory<T> factory) {
 
 		for (final IFeatureStructure child : f.getChildren()) {
-			final List<Term> terms1 = new ArrayList<Term>();
-			final List<Term> terms2 = new ArrayList<Term>();
+			final List<Term> terms1 = new ArrayList<>();
+			final List<Term> terms2 = new ArrayList<>();
 			terms1.add(new Term(m.get(f.getFeature().getName()), 1, true));
 			terms2.add(new Term(m.get(f.getFeature().getName()), 1, true));
 			terms1.add(new Term(m.get(child.getFeature().getName()), -1, true));
@@ -216,7 +216,7 @@ public class Translator {
 	 */
 	private static <T> void literal2Constraint(Map<String, Integer> map, List<T> rs, Literal l, RestrictionFactory<T> factory) {
 
-		final List<Term> terms = new ArrayList<Term>();
+		final List<Term> terms = new ArrayList<>();
 		terms.add(new Term(map.get(l.var), 1, l.positive));
 
 		factory.createAndAdd(terms, RelationOperator.GREATER_EQUAL, 1, rs);
@@ -227,7 +227,7 @@ public class Translator {
 	 */
 	private static <T> void clause2Constraint(Map<String, Integer> map, List<T> rs, Or clause, RestrictionFactory<T> factory) {
 
-		final List<Term> terms = new ArrayList<Term>();
+		final List<Term> terms = new ArrayList<>();
 		for (final Node node : clause.getChildren()) {
 			final Literal l = (Literal) node;
 			terms.add(new Term(map.get(l.var), 1, l.positive));
@@ -239,12 +239,12 @@ public class Translator {
 	public static <T> List<T> translateEquations(Map<String, Integer> map, IFeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Equation> equations,
 			RestrictionFactory<T> factory) {
 
-		final List<T> rs = new ArrayList<T>();
+		final List<T> rs = new ArrayList<>();
 
 		for (final Equation equation : equations) {
 
 			// process the variables
-			final List<Term> terms = new ArrayList<Term>();
+			final List<Term> terms = new ArrayList<>();
 			for (final WeightedTerm term : equation.getWeightedTerms()) {
 				transformVars(map, fm, attributes, terms, term);
 			}
@@ -286,7 +286,7 @@ public class Translator {
 
 	private static List<String> getSubtreeFeatureNames(IFeatureModel fm, String featureName) {
 
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 
 		final Queue<IFeatureStructure> bfsStack = new LinkedList<>();
 		bfsStack.add(fm.getFeature(featureName).getStructure());

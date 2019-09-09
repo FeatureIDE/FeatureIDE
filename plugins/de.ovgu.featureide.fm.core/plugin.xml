@@ -24,7 +24,7 @@
             name="DefaultFeatureModelFactory">
       </fmFactory>
       <fmFactory
-            class="de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory"
+            class="de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory"
             id="de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory"
             name="ExtendedFeatureModelFactory">
       </fmFactory>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,12 +26,13 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Action used to create an attribute. Depending on the {@link #attributeType} the action creates an attribute of the given type.
@@ -41,51 +42,47 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class AddFeatureAttributeAction extends Action {
 
-	private final ExtendedFeatureModel featureModel;
-	private final ExtendedFeature feature;
+	private final FeatureModelManager fmManager;
+	private final String featureName;
 	private final String attributeType;
 
-	public AddFeatureAttributeAction(ExtendedFeatureModel featureModel, ExtendedFeature feature, String attributeType, String actionName) {
+	public AddFeatureAttributeAction(FeatureModelManager fmManager, String featureName, String attributeType, String actionName) {
 		super(actionName);
-		this.featureModel = featureModel;
-		this.feature = feature;
+		this.fmManager = fmManager;
+		this.featureName = featureName;
 		this.attributeType = attributeType;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
-		String name = getUniqueAttributeName(attributeType);
-		switch (attributeType) {
-		case FeatureAttribute.BOOLEAN:
-			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, name, "", null, false, false);
-			feature.addAttribute(attributeBoolean);
-			featureModel.fireEvent(new FeatureIDEEvent(attributeBoolean, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
-			break;
-		case FeatureAttribute.DOUBLE:
-			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, name, "", null, false, false);
-			feature.addAttribute(attributeDouble);
-			featureModel.fireEvent(new FeatureIDEEvent(attributeDouble, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
-			break;
-		case FeatureAttribute.LONG:
-			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, name, "", null, false, false);
-			feature.addAttribute(attributeLong);
-			featureModel.fireEvent(new FeatureIDEEvent(attributeLong, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
-			break;
-		case FeatureAttribute.STRING:
-			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, name, "", null, false, false);
-			feature.addAttribute(attributeString);
-			featureModel.fireEvent(new FeatureIDEEvent(attributeString, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
-			break;
-		default:
-			break;
-		}
+		fmManager.editObject(this::addAttribute, FeatureModelManager.CHANGE_ATTRIBUTES);
 	}
 
-	private String getUniqueAttributeName(String type) {
+	private void addAttribute(IFeatureModel featureModel) {
+		final ExtendedFeature feature = (ExtendedFeature) featureModel.getFeature(featureName);
+		final String name = getUniqueAttributeName(attributeType, feature);
+		final IFeatureAttribute attribute;
+		switch (attributeType) {
+		case FeatureAttribute.BOOLEAN:
+			attribute = new BooleanFeatureAttribute(feature, name, "", null, false, false);
+			break;
+		case FeatureAttribute.DOUBLE:
+			attribute = new DoubleFeatureAttribute(feature, name, "", null, false, false);
+			break;
+		case FeatureAttribute.LONG:
+			attribute = new LongFeatureAttribute(feature, name, "", null, false, false);
+			break;
+		case FeatureAttribute.STRING:
+			attribute = new StringFeatureAttribute(feature, name, "", null, false, false);
+			break;
+		default:
+			return;
+		}
+		feature.addAttribute(attribute);
+		featureModel.fireEvent(new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
+	}
+
+	private String getUniqueAttributeName(String type, ExtendedFeature feature) {
 		int amountOfAttributes = 0;
 		while (true) {
 			boolean isUnique = true;

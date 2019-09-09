@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -35,19 +36,17 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 /**
  * Operation with functionality to expand only features of this constraint. Enables undo/redo functionality. Enables undo/redo functionality.
  *
- * @author Maximilian K�hl
+ * @author Maximilian Köhl
  * @author Christopher Sontag
  */
-public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
+public class ExpandConstraintOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private final IConstraint iConstraint;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
+	private final int constraintIndex;
+	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<>();
 
-	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
-		super(graphicalFeatureModel.getFeatureModel(), FOCUS_ON_CONTAINED_FEATURES);
-		this.iConstraint = iConstraint;
-		this.graphicalFeatureModel = graphicalFeatureModel;
+	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint constraint) {
+		super(graphicalFeatureModel, FOCUS_ON_CONTAINED_FEATURES);
+		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
 	public void expandParents(IFeature feature) {
@@ -70,36 +69,39 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		getCollapsedFeatures();
 		final CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
-		collapseAll.operation();
+		collapseAll.operation(featureModel);
 
-		for (final IFeature feature : iConstraint.getContainedFeatures()) {
+		for (final IFeature feature : constraint.getContainedFeatures()) {
 			expandParents(feature);
 		}
 
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, iConstraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, constraint);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		final CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
-		collapseAll.operation();
+		collapseAll.operation(featureModel);
 		for (final IGraphicalFeature f : affectedFeatureList) {
 			expandFeature(f);
 		}
-		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.COLLAPSED_ALL_CHANGED, null, iConstraint);
+		return new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, constraint);
 	}
 
 	/**
 	 * Collects all features that are not collapsed from the featureModel.
 	 */
 	private void getCollapsedFeatures() {
+		affectedFeatureList.clear();
 		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
 			if (!f.isCollapsed()) {
 				affectedFeatureList.add(f);

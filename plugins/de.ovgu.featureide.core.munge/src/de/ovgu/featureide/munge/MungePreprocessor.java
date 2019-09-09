@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,10 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,7 +130,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		if (!prepareFullBuild(config)) {
 			return;
 		}
@@ -241,11 +242,11 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	 * @param res file
 	 */
 	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
-		expressionStack = new Stack<Node>();
+		expressionStack = new ArrayDeque<>();
 
 		// count of if, ifelse and else to remove after processing of else from
 		// stack
-		ifelseCountStack = new Stack<Integer>();
+		ifelseCountStack = new ArrayDeque<>();
 		ifelseCountStack.push(0);
 
 		commentSection = false;
@@ -560,7 +561,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		setProperty(CREATE_SIGNATURE, signature);
 
 		if (signature) {
-			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			final Path currentConfiguration = featureProject.getCurrentConfiguration();
 			if (currentConfiguration != null) {
 				performFullBuild(currentConfiguration);
 			}

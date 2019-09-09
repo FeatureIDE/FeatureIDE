@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -266,7 +266,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void reload() {// TODO do not layout twice
 		// internRefresh(true);
-		((AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel)).refresh();
+		final Map<?, ?> editPartRegistry = getEditPartRegistry();
+		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) editPartRegistry.get(graphicalFeatureModel);
+		abstractGraphicalEditPart.refresh();
 		internRefresh(true);
 	}
 
@@ -314,6 +316,17 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	public void deregisterEditParts(IGraphicalFeature feature) {
+		final Map<?, ?> registry = getEditPartRegistry();
+		registry.remove(feature);
+		registry.remove(feature.getSourceConnection());
+	}
+
+	public void deregisterEditParts(IGraphicalConstraint constraint) {
+		final Map<?, ?> registry = getEditPartRegistry();
+		registry.remove(constraint);
+	}
+
 	/**
 	 * Scrolls to the given points and center the view
 	 *
@@ -358,10 +371,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		// Refresh Connection
 		for (final FeatureConnection connection : graphicalFeature.getTargetConnections()) {
-			final Map<?, ?> registry2 = getEditPartRegistry();
-			final ConnectionEditPart connectionEditPart2 = (ConnectionEditPart) registry2.get(connection);
-			if (connectionEditPart2 != null) {
-				connectionEditPart2.refresh();
+			final ConnectionEditPart connectionEditPart = (ConnectionEditPart) getEditPartRegistry().get(connection);
+			if (connectionEditPart != null) {
+				connectionEditPart.refresh();
 			}
 		}
 		// Refresh Feature
@@ -372,7 +384,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	 * Stops the analyzing job when the editor is closed.
 	 */
 	public void dispose() {
-		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
+		graphicalFeatureModel.getFeatureModelManager().removeListener(editorKeyHandler);
 	}
 
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {

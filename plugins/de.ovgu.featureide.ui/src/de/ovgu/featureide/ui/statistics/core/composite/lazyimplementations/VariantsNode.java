@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class VariantsNode extends ConfigNode {
 
-	public VariantsNode(String description, IFeatureModel innerModel) {
-		super(description, innerModel);
+	public VariantsNode(String description, FeatureModelFormula model) {
+		super(description, model);
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class VariantsNode extends ConfigNode {
 			super.startCalculating(start);
 		} else {
 			super.startCalculating(start);
-			if (FeatureUtils.hasHidden(innerModel)) {
+			if (FeatureUtils.hasHidden(innerModel.getFeatureModel())) {
 				setImage(WARNING_IMAGE);
 				setNote("(Note: Indeterminate hidden features in the feature model may distort this value.)");
 			}

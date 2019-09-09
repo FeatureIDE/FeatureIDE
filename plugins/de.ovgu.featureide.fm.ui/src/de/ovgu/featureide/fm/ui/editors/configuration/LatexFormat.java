@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.prop4j.Node;
-
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -298,7 +297,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printConfiguration(Configuration config, IFeature node, StringBuilder tree) {
-		_printConfiguration(config.getSelectablefeature(node.getName()), tree);
+		_printConfiguration(config.getSelectableFeature(node.getName()), tree);
 	}
 
 	private static void _printConfiguration(SelectableFeature node, StringBuilder tree) {
@@ -316,7 +315,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printNodeName(Configuration config, IFeature node, StringBuilder tree) {
-		_printNodeName(config.getSelectablefeature(node.getName()), tree);
+		_printNodeName(config.getSelectableFeature(node.getName()), tree);
 	}
 
 	/**
@@ -328,11 +327,11 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	 */
 	private static void _printNodeName(SelectableFeature node, StringBuilder tree) {
 		if (node.getOpenClauses().size() > 0) {
-			final Collection<Node> myOpenClauses = node.getOpenClauses();
+			final Collection<LiteralSet> myOpenClauses = node.getOpenClauses();
 			final StringBuilder myOpenFeatures = new StringBuilder();
 			final List<String> myOpenFeaturesList = new ArrayList<String>();
-			for (final Node myClause : myOpenClauses) {
-				myOpenFeatures.append(myClause.toString() + " |");
+			for (final LiteralSet myClause : myOpenClauses) {
+				myOpenFeatures.append(node.getVariables().convertToString(myClause, true, true, true).toString() + " |");
 			}
 
 			for (int i = 0, begin = 0, end = 0; i < myOpenFeatures.length(); ++i) {

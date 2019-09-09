@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,11 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
@@ -33,21 +36,38 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.FileSystem.IFileSystem;
 
 public class EclipseFileSystem implements IFileSystem {
 
 	public static IPath getIPath(Path path) {
-		return org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
+		return path == null ? null : org.eclipse.core.runtime.Path.fromOSString(path.toAbsolutePath().toString());
 	}
 
 	public static IResource getResource(Path path) {
-		final IPath iPath = getIPath(path);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
-		return res;
+		if ((path != null) && Files.exists(path)) {
+			final IPath iPath = getIPath(path);
+			if (iPath != null) {
+				final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+				return Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+			}
+		}
+		return null;
+	}
+
+	public static final Path getPath(IResource res) {
+		if (res != null) {
+			final URI locationURI = res.getLocationURI();
+			if (locationURI != null) {
+				return Paths.get(locationURI);
+			}
+		}
+		return null;
 	}
 
 	private final JavaFileSystem JAVA = new JavaFileSystem();
@@ -133,6 +153,18 @@ public class EclipseFileSystem implements IFileSystem {
 			return JAVA.exists(path);
 		} else {
 			return res.isAccessible();
+		}
+	}
+
+	@Override
+	public Path getLib(Path path) {
+		URL url = FileLocator.find(FMCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("lib/cover.exe"), null);
+		try {
+			url = FileLocator.toFileURL(url);
+			return Paths.get(url.getPath().substring(1)).normalize();
+		} catch (final IOException e) {
+			Logger.logError(e);
+			return null;
 		}
 	}
 

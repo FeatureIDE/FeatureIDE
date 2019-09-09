@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,9 +37,9 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean showHiddenFeatures;
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
+	private final Point legendPos;
 	private boolean leftRightInverted;
 	private boolean topDownInverted;
-	private Point legendPos;
 
 	private int selectedLayoutAlgorithm;
 	private boolean showShortNames;
@@ -105,23 +105,13 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	}
 
 	@Override
-	public boolean getHasVerticalLayout() {
+	public boolean hasVerticalLayout() {
 		return hasVerticalLayout;
 	}
 
 	@Override
-	public void setHasVerticalLayout(boolean b) {
+	public void setVerticalLayout(boolean b) {
 		hasVerticalLayout = b;
-	}
-
-	@Override
-	public Point getLegendPos() {
-		return legendPos;
-	}
-
-	@Override
-	public void setLegendPos(int x, int y) {
-		legendPos = new Point(x, y);
 	}
 
 	@Override

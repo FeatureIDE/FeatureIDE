@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,16 +21,14 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 /**
@@ -40,45 +38,39 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public abstract class AbstractConstraintEditorAction extends Action {
+public abstract class AbstractConstraintEditorAction extends AFeatureModelAction {
 
 	protected Object viewer;
-
-	protected IFeatureModel featuremodel;
-
-	protected IFeatureModelFormat writer;
-
-	protected String featuretext;
+	protected IStructuredSelection selection;
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
+			setSelection(event.getSelection());
 		}
 	};
 
-	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname, String id) {
-		super(menuname);
+	public AbstractConstraintEditorAction(Object viewer, IFeatureModelManager featureModelManager, String menuname, String id) {
+		super(menuname, id, featureModelManager);
 		this.viewer = viewer;
-		this.featuremodel = featuremodel;
-		setId(id);
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		} else {
+			setSelection(((TreeViewer) viewer).getSelection());
+		} else if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+			setSelection(((GraphicalViewerImpl) viewer).getSelection());
+		} else {
+			setSelection(null);
 		}
 	}
 
-	@Override
-	public void run() {
-		writer = new XmlFeatureModelFormat();
-		featuretext = writer.write(featuremodel);
+	protected void setSelection(final ISelection viewerSelection) {
+		selection = (viewerSelection instanceof IStructuredSelection) ? (IStructuredSelection) viewerSelection : null;
+		setEnabled(isValidSelection(selection));
 	}
 
 	protected void openEditor(IConstraint constraint) {
-		new ConstraintDialog(featuremodel, constraint);
+		new ConstraintDialog(featureModelManager, constraint);
 	}
 
 	protected abstract boolean isValidSelection(IStructuredSelection selection);

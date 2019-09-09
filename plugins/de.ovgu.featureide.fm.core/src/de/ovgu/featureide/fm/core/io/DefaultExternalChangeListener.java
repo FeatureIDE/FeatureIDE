@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
  * Default implementation of {@link ExternalChangeListener}.<br> Calls the override function of the corresponding file manager.
@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 public class DefaultExternalChangeListener extends ExternalChangeListener {
 
 	@Override
-	protected void doUpdate(AFileManager<?> fileManager) {
-		fileManager.override();
+	protected void doUpdate(IFileManager<?> fileManager) {
+		fileManager.overwrite();
 	}
 
 }

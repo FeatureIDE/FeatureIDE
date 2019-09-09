@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURAT
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -51,9 +50,11 @@ import org.eclipse.ui.ide.IDE;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -94,8 +95,8 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		configFolder = page.getContainerObject();
 		final IFeatureProject featureProject = page.getFeatureProject();
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
-		final IConfigurationFormat format = page.getFormat();
+		final FeatureModelFormula featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IPersistentFormat<Configuration> format = page.getFormat();
 
 		final String suffix = "." + format.getSuffix();
 		final String name = page.getFileName();
@@ -129,20 +130,20 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	/**
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
 	 */
-	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
-			throws CoreException {
+	private void doFinish(IContainer container, String fileName, FeatureModelFormula featureModel, IPersistentFormat<Configuration> format,
+			IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
 		if (!container.isAccessible()) {
 			if (container.getProject().isAccessible()) {
-				CorePlugin.createFolder(container.getProject(), container.getProjectRelativePath().toString());
+				FMCorePlugin.createFolder(container.getProject(), container.getProjectRelativePath().toString());
 			} else {
 				throwCoreException(CONTAINER_DOES_NOT_EXIST_);
 			}
 		}
 
 		final IFile file = container.getFile(new Path(fileName));
-		SimpleFileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(file), new Configuration(featureModel), format);
 
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,12 +29,14 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * TODO description
@@ -55,7 +57,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is either a requires- or an excludes-constraint.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
 	public static boolean isSimple(Node node) {
@@ -79,7 +81,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is neither a requires- nor an excludes-constraint.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node is a complex constraint. False otherwise.
 	 */
 	public static boolean isComplex(Node node) {
@@ -89,7 +91,7 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints.
 	 *
-	 * @param node
+	 * @param node node
 	 * @return true if node consists of a number of simple constraints. False otherwise.
 	 */
 	public static boolean isPseudoComplex(Node node) {
@@ -125,11 +127,11 @@ public class ComplexConstraintConverter {
 	/**
 	 * Checks whether there exist only constraints that can be refactored trivially.
 	 *
-	 * @param fm
+	 * @param fm fm
 	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
 	 */
 	public static boolean trivialRefactoring(final IFeatureModel fm) {
-		final List<Node> nodes = new LinkedList<Node>();
+		final List<Node> nodes = new LinkedList<>();
 		for (final IConstraint c : fm.getConstraints()) {
 			nodes.add(c.getNode());
 		}
@@ -139,8 +141,10 @@ public class ComplexConstraintConverter {
 	/**
 	 * Eliminates complex constraints according to a given strategy.
 	 *
-	 * @param model
-	 * @return
+	 * @param model model
+	 * @param converter strategy
+	 * @param options options
+	 * @return converted feature model
 	 */
 	public IFeatureModel convert(IFeatureModel model, IConverterStrategy converter, Option... options) {
 		// check if model is valid
@@ -166,7 +170,7 @@ public class ComplexConstraintConverter {
 
 		// Work with a clone
 		fm = model.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 
 		// Basic cleaning
 		if (removeRedundncy && !prepare()) {
@@ -180,7 +184,7 @@ public class ComplexConstraintConverter {
 		final List<IConstraint> complexConstraints = pruneComplexConstraints();
 
 		// Minimize constraints
-		final List<Node> minComplexNodes = new ArrayList<Node>();
+		final List<Node> minComplexNodes = new ArrayList<>();
 		for (final IConstraint c : complexConstraints) {
 			final List<Node> nodes = converter.preprocess(c);
 
@@ -190,7 +194,7 @@ public class ComplexConstraintConverter {
 				if (ComplexConstraintConverter.isSimple(minNode)) {
 					fm.addConstraint(factory.createConstraint(fm, minNode));
 				} else if (minNode instanceof And) {
-					final List<Node> conj = new LinkedList<Node>();
+					final List<Node> conj = new LinkedList<>();
 					for (final Node sub : minNode.getChildren()) {
 						if (ComplexConstraintConverter.isSimple(sub)) {
 							fm.addConstraint(factory.createConstraint(fm, sub));
@@ -228,20 +232,19 @@ public class ComplexConstraintConverter {
 	 * created.
 	 */
 	protected boolean prepare() {
-		final FeatureModelAnalyzer analyzer = fm.getAnalyser();
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(fm);
 
-		analyzer.calculateFeatures = true;
-		analyzer.calculateConstraints = true;
-		analyzer.calculateRedundantConstraints = true;
-		analyzer.calculateTautologyConstraints = true;
+		analyzer.getAnalysesCollection().setCalculateFeatures(true);
+		analyzer.getAnalysesCollection().setCalculateConstraints(true);
+		analyzer.getAnalysesCollection().setCalculateRedundantConstraints(true);
+		analyzer.getAnalysesCollection().setCalculateTautologyConstraints(true);
 
 		analyzer.analyzeFeatureModel(null);
-		final List<IConstraint> toRemove = new LinkedList<IConstraint>();
+		final List<IConstraint> toRemove = new LinkedList<>();
 
 		for (final IConstraint c : fm.getConstraints()) {
-			final ConstraintAttribute attribute = c.getConstraintAttribute();
-
-			if ((attribute == ConstraintAttribute.REDUNDANT) || (attribute == ConstraintAttribute.TAUTOLOGY)) {
+			final ConstraintProperties constraintProperties = analyzer.getConstraintProperties(c);
+			if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY))) {
 				toRemove.add(c);
 			}
 		}
@@ -256,7 +259,7 @@ public class ComplexConstraintConverter {
 	 * Splits up a complex constraint into simple constraints if possible.
 	 */
 	protected void refactorPseudoComplexConstraints() {
-		final List<IConstraint> pseudoComplexConstraints = new LinkedList<IConstraint>();
+		final List<IConstraint> pseudoComplexConstraints = new LinkedList<>();
 		for (final IConstraint c : fm.getConstraints()) {
 			if (ComplexConstraintConverter.isPseudoComplex(c.getNode().clone())) {
 				pseudoComplexConstraints.add(c);
@@ -282,7 +285,7 @@ public class ComplexConstraintConverter {
 	 * @return List of complex constraints
 	 */
 	protected List<IConstraint> pruneComplexConstraints() {
-		final List<IConstraint> complexConstraints = new LinkedList<IConstraint>();
+		final List<IConstraint> complexConstraints = new LinkedList<>();
 
 		for (final IConstraint c : fm.getConstraints()) {
 			if (ComplexConstraintConverter.isComplex(c.getNode())) {

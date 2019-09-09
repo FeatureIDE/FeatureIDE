@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -38,7 +38,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureDependencies;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -55,8 +59,8 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		IProject project = null;
 		if (!(element instanceof IProject)) {
 			if (element instanceof IAdaptable) {
-				// Cast is necessary, don't remove
-				project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				// Cast is necessary for backward compatibility, don't remove
+				project = ((IAdaptable) element).getAdapter(IProject.class);
 			}
 		} else {
 			project = (IProject) element;
@@ -112,19 +116,28 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 	}
 
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
 
 		// Get feature in the center
-		final IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
+		final IFeature fc = formula.getFeatureModel().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
-		final List<String> formalizedRequires = new ArrayList<String>();
-		final List<String> formalizedExcludes = new ArrayList<String>();
-		final FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
-		for (final IFeature f : fd.always(fc)) {
-			formalizedRequires.add(f.getName());
-		}
-		for (final IFeature f : fd.never(fc)) {
-			formalizedExcludes.add(f.getName());
+		final List<String> formalizedRequires = new ArrayList<>();
+		final List<String> formalizedExcludes = new ArrayList<>();
+
+		final IVariables variables = formula.getVariables();
+		final int variable = variables.getVariable(fc.getName());
+
+		final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+
+		for (final int strongylConnectedVar : MIGUtils.getStronglyConnected(modalImplicationGraph, variable)) {
+			if (MIGUtils.isStronglyConnected(modalImplicationGraph, strongylConnectedVar, variable)) {
+				if (strongylConnectedVar > 0) {
+					formalizedRequires.add(variables.getName(strongylConnectedVar));
+				} else {
+					formalizedExcludes.add(variables.getName(strongylConnectedVar));
+				}
+			}
 		}
 
 		// Get all features in order ignoring the mandatory features

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -40,13 +41,13 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 /**
  * Capable of reading and writing a file in a certain format.
  *
- * @see AFileManager
+ * @see IFileManager
  *
  * @author Sebastian Krieter
  */
 public class SimpleFileHandler<T> {
 
-	private static final Charset DEFAULT_CHARSET;
+	public static final Charset DEFAULT_CHARSET;
 	static {
 		final Charset utf8 = Charset.forName("UTF-8");
 		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
@@ -74,8 +75,20 @@ public class SimpleFileHandler<T> {
 	}
 
 	/**
-	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
-	 * extension, but ".file.txt" would return "txt".
+	 * Retrieves the file name of a {@link Path} without its extension.
+	 *
+	 * @param fileName the file name with a (possible) extension
+	 * @return the file name
+	 */
+	@Nonnull
+	public static String getFileName(String fileName) {
+		final int extensionIndex = fileName.lastIndexOf('.');
+		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
+	}
+
+	/**
+	 * Retrieves the file extension of a {@link Path}.<br> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * but ".file.txt" would return "txt".
 	 *
 	 * @param path the given path
 	 * @return the file extension
@@ -114,11 +127,11 @@ public class SimpleFileHandler<T> {
 		return fileHandler.getLastProblems();
 	}
 
-	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+	public static <T> ProblemList load(Path path, T object, FormatManager<T> formatManager) {
 		return load(new SimpleFileHandler<>(path, object, null), formatManager);
 	}
 
-	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<T> formatManager) {
 		final String content = fileHandler.getContent();
 
 		if (content != null) {
@@ -153,11 +166,11 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> String saveToString(T object, IPersistentFormat<T> format) {
-		return format.write(object);
+		return format.getInstance().write(object);
 	}
 
 	public static <T> ProblemList loadFromString(String source, T object, IPersistentFormat<T> format) {
-		return format.read(object, source);
+		return format.getInstance().read(object, source);
 	}
 
 	public SimpleFileHandler(Path path, T object, IPersistentFormat<T> format) {
@@ -205,17 +218,19 @@ public class SimpleFileHandler<T> {
 	}
 
 	String getContent() {
-		if (!Files.exists(path)) {
-			problemList.add(new Problem(new FileNotFoundException(path.toString())));
-			return null;
-		}
-
 		try {
-			return new String(FileSystem.read(path), DEFAULT_CHARSET);
+			return readContent();
 		} catch (final Exception e) {
 			problemList.add(new Problem(e));
 			return null;
 		}
+	}
+
+	String readContent() throws IOException {
+		if (!Files.exists(path)) {
+			throw new FileNotFoundException(path.toString());
+		}
+		return new String(FileSystem.read(path), DEFAULT_CHARSET);
 	}
 
 	private String getContent(InputStream inputStream) {

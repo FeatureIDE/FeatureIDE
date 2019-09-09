@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -63,10 +62,12 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
-import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
@@ -363,7 +364,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
 			final IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			SimpleFileHandler.save(EclipseFileSystem.getPath(configurationFile), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
@@ -467,21 +468,16 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @param config The configuration file to read from.
 	 * @return The temporary configuration file.
 	 */
-	public java.nio.file.Path createTemporaryConfigrationFile(IFile config) {
-		String configName = config.getName();
-		final int extIndex = configName.lastIndexOf('.');
-		if (extIndex > 0) {
-			configName = configName.substring(0, extIndex);
-		}
+	public java.nio.file.Path createTemporaryConfigrationFile(java.nio.file.Path config) {
+		final String configName = FileHandler.getFileName(config);
 		CorePlugin.getDefault().logInfo("create config " + configName);
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY);
-
-		final ProblemList problems = SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-		if (problems.containsError()) {
+		final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(config);
+		if (fileHandler.getLastProblems().containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;
 		}
+		final Configuration configuration = fileHandler.getObject();
 
 		try {
 			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + new DefaultFormat().getSuffix());

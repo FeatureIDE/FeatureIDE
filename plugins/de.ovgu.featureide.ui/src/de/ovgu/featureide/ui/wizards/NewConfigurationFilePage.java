@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -55,8 +55,9 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -68,7 +69,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewConfigurationFilePage extends WizardPage {
 
-	private final List<IConfigurationFormat> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
+	private final List<IPersistentFormat<Configuration>> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
 
 	private Combo featureComboProject;
 	private Combo formatCombo;
@@ -193,7 +194,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		if (configFolder != null) {
 			featureComboProject.setText(configFolder.getProject().getName());
 		}
-		for (final IConfigurationFormat format : formatExtensions) {
+		for (final IPersistentFormat<?> format : formatExtensions) {
 			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
 		}
 		try {
@@ -263,7 +264,7 @@ public class NewConfigurationFilePage extends WizardPage {
 		return fileText.getText();
 	}
 
-	public IConfigurationFormat getFormat() {
+	public IPersistentFormat<Configuration> getFormat() {
 		return formatExtensions.get(formatCombo.getSelectionIndex());
 	}
 

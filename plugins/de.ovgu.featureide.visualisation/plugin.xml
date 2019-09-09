@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+         <menu
+               icon="icons/FeatureIconSmall.ico"
+               id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualisations"
+               label="Visualisation">
+               				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
+					</reference>
+				</visibleWhen>
+            <command
+                  commandId="de.ovgu.featureide.visualisation.command.featurerelations"
+                  label="Feature Relations Graph"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
+            id="de.ovgu.featureide.visualisation.command.featurerelations"
+            name="Feature Relations Graph">
+      </command>
+   </extension>
+
+</plugin>

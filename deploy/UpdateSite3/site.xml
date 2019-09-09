@@ -1,13 +1,466 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description name="FeatureIDE v3.x Experimental" url="http://featureide.cs.ovgu.de/update/v3-experimental/">
+   <description name="FeatureIDE v3.x" url="http://featureide.cs.ovgu.de/update/v3/">
       FeatureIDE
    </description>
-   <feature url="features/de.ovgu.featureide_3.5.0.201804131252.jar" id="de.ovgu.featureide" version="3.5.0.201804131252">
-      <category name="FeatureIDE 3.5 Experimental"/>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201605191752.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201605191752">
+      <category name="FeatureIDE 3.0"/>
    </feature>
-   <feature url="features/de.ovgu.featureide.featuremodeling_3.5.0.201804131252.jar" id="de.ovgu.featureide.featuremodeling" version="3.5.0.201804131252">
-      <category name="FeatureIDE 3.5 Experimental"/>
+   <feature url="features/de.ovgu.featureide_3.0.0.201605191752.jar" id="de.ovgu.featureide" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.0.0.201605191752.jar" id="de.ovgu.featureide.ahead" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.0.0.201605191752.jar" id="de.ovgu.featureide.antenna" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.0.0.201605191752.jar" id="de.ovgu.featureide.aspectj" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.0.0.201605191752.jar" id="de.ovgu.featureide.exampleprojects" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.0.0.201605191752.jar" id="de.ovgu.featureide.featurecpp" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.0.0.201605191752.jar" id="de.ovgu.featureide.featurehouse" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.0.0.201605191752.jar" id="de.ovgu.featureide.featuremodeling" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.0.0.201605191752.jar" id="de.ovgu.featureide.munge" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.0.0.201605191752.jar" id="de.ovgu.featureide.munge.android" version="3.0.0.201605191752">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.0.1.201605191759.jar" id="de.ovgu.featureide" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.0.1.201605191759.jar" id="de.ovgu.featureide.ahead" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.0.1.201605191759.jar" id="de.ovgu.featureide.antenna" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.0.1.201605191759.jar" id="de.ovgu.featureide.aspectj" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.0.1.201605191759.jar" id="de.ovgu.featureide.exampleprojects" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.0.1.201605191759.jar" id="de.ovgu.featureide.featurecpp" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.0.1.201605191759.jar" id="de.ovgu.featureide.featurehouse" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.0.1.201605191759.jar" id="de.ovgu.featureide.featuremodeling" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.0.1.201605191759.jar" id="de.ovgu.featureide.munge" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.0.1.201605191759.jar" id="de.ovgu.featureide.munge.android" version="3.0.1.201605191759">
+      <category name="FeatureIDE 3.0"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201607211032.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.1.0.201607211032.jar" id="de.ovgu.featureide" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.1.0.201607211032.jar" id="de.ovgu.featureide.ahead" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.1.0.201607211032.jar" id="de.ovgu.featureide.antenna" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.1.0.201607211032.jar" id="de.ovgu.featureide.aspectj" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.1.0.201607211032.jar" id="de.ovgu.featureide.exampleprojects" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.1.0.201607211032.jar" id="de.ovgu.featureide.featurecpp" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.1.0.201607211032.jar" id="de.ovgu.featureide.featurehouse" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.1.0.201607211032.jar" id="de.ovgu.featureide.featuremodeling" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.1.0.201607211032.jar" id="de.ovgu.featureide.munge" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.1.0.201607211032.jar" id="de.ovgu.featureide.munge.android" version="3.1.0.201607211032">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201609161419.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.1.1.201609161419.jar" id="de.ovgu.featureide" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.1.1.201609161419.jar" id="de.ovgu.featureide.ahead" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.1.1.201609161419.jar" id="de.ovgu.featureide.antenna" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.1.1.201609161419.jar" id="de.ovgu.featureide.aspectj" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.1.1.201609161419.jar" id="de.ovgu.featureide.exampleprojects" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.1.1.201609161419.jar" id="de.ovgu.featureide.featurecpp" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.1.1.201609161419.jar" id="de.ovgu.featureide.featurehouse" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.1.1.201609161419.jar" id="de.ovgu.featureide.featuremodeling" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.1.1.201609161419.jar" id="de.ovgu.featureide.munge" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.1.1.201609161419.jar" id="de.ovgu.featureide.munge.android" version="3.1.1.201609161419">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201610041906.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.1.2.201610041906.jar" id="de.ovgu.featureide" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.1.2.201610041906.jar" id="de.ovgu.featureide.ahead" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.1.2.201610041906.jar" id="de.ovgu.featureide.antenna" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.1.2.201610041906.jar" id="de.ovgu.featureide.aspectj" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.1.2.201610041906.jar" id="de.ovgu.featureide.exampleprojects" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.1.2.201610041906.jar" id="de.ovgu.featureide.featurecpp" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.1.2.201610041906.jar" id="de.ovgu.featureide.featurehouse" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.1.2.201610041906.jar" id="de.ovgu.featureide.featuremodeling" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.1.2.201610041906.jar" id="de.ovgu.featureide.munge" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.1.2.201610041906.jar" id="de.ovgu.featureide.munge.android" version="3.1.2.201610041906">
+      <category name="FeatureIDE 3.1"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201612201459.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.2.0.201612201459.jar" id="de.ovgu.featureide" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.2.0.201612201459.jar" id="de.ovgu.featureide.ahead" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.2.0.201612201459.jar" id="de.ovgu.featureide.antenna" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.2.0.201612201459.jar" id="de.ovgu.featureide.aspectj" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.2.0.201612201459.jar" id="de.ovgu.featureide.exampleprojects" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.2.0.201612201459.jar" id="de.ovgu.featureide.featurecpp" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.2.0.201612201459.jar" id="de.ovgu.featureide.featurehouse" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.2.0.201612201459.jar" id="de.ovgu.featureide.featuremodeling" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.2.0.201612201459.jar" id="de.ovgu.featureide.munge" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.2.0.201612201459.jar" id="de.ovgu.featureide.munge.android" version="3.2.0.201612201459">
+      <category name="FeatureIDE 3.2"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201704072234.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.3.0.201704072234.jar" id="de.ovgu.featureide" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.3.0.201704072234.jar" id="de.ovgu.featureide.ahead" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.3.0.201704072234.jar" id="de.ovgu.featureide.antenna" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.3.0.201704072234.jar" id="de.ovgu.featureide.aspectj" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.3.0.201704072234.jar" id="de.ovgu.featureide.exampleprojects" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.3.0.201704072234.jar" id="de.ovgu.featureide.featurecpp" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.3.0.201704072234.jar" id="de.ovgu.featureide.featurehouse" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.3.0.201704072234.jar" id="de.ovgu.featureide.featuremodeling" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.3.0.201704072234.jar" id="de.ovgu.featureide.munge" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.3.0.201704072234.jar" id="de.ovgu.featureide.munge.android" version="3.3.0.201704072234">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201705051335.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.3.1.201705051335.jar" id="de.ovgu.featureide" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.3.1.201705051335.jar" id="de.ovgu.featureide.ahead" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.3.1.201705051335.jar" id="de.ovgu.featureide.antenna" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.3.1.201705051335.jar" id="de.ovgu.featureide.aspectj" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.3.1.201705051335.jar" id="de.ovgu.featureide.exampleprojects" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.3.1.201705051335.jar" id="de.ovgu.featureide.featurecpp" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.3.1.201705051335.jar" id="de.ovgu.featureide.featurehouse" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.3.1.201705051335.jar" id="de.ovgu.featureide.featuremodeling" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.3.1.201705051335.jar" id="de.ovgu.featureide.munge" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.3.1.201705051335.jar" id="de.ovgu.featureide.munge.android" version="3.3.1.201705051335">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201707191742.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.3.2.201707191742.jar" id="de.ovgu.featureide" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.3.2.201707191742.jar" id="de.ovgu.featureide.ahead" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.3.2.201707191742.jar" id="de.ovgu.featureide.antenna" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.3.2.201707191742.jar" id="de.ovgu.featureide.aspectj" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.3.2.201707191742.jar" id="de.ovgu.featureide.exampleprojects" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.3.2.201707191742.jar" id="de.ovgu.featureide.featurecpp" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.3.2.201707191742.jar" id="de.ovgu.featureide.featurehouse" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.3.2.201707191742.jar" id="de.ovgu.featureide.featuremodeling" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.3.2.201707191742.jar" id="de.ovgu.featureide.munge" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.3.2.201707191742.jar" id="de.ovgu.featureide.munge.android" version="3.3.2.201707191742">
+      <category name="FeatureIDE 3.3"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201709191542.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.4.0.201709191542.jar" id="de.ovgu.featureide" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.4.0.201709191542.jar" id="de.ovgu.featureide.ahead" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.4.0.201709191542.jar" id="de.ovgu.featureide.antenna" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.4.0.201709191542.jar" id="de.ovgu.featureide.aspectj" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.4.0.201709191542.jar" id="de.ovgu.featureide.exampleprojects" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.4.0.201709191542.jar" id="de.ovgu.featureide.featurecpp" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.4.0.201709191542.jar" id="de.ovgu.featureide.featurehouse" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.4.0.201709191542.jar" id="de.ovgu.featureide.featuremodeling" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.4.0.201709191542.jar" id="de.ovgu.featureide.munge" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.4.0.201709191542.jar" id="de.ovgu.featureide.munge.android" version="3.4.0.201709191542">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201710251937.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.4.1.201710251937.jar" id="de.ovgu.featureide" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.4.1.201710251937.jar" id="de.ovgu.featureide.ahead" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.4.1.201710251937.jar" id="de.ovgu.featureide.antenna" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.4.1.201710251937.jar" id="de.ovgu.featureide.aspectj" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.4.1.201710251937.jar" id="de.ovgu.featureide.exampleprojects" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.4.1.201710251937.jar" id="de.ovgu.featureide.featurecpp" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.4.1.201710251937.jar" id="de.ovgu.featureide.featurehouse" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.4.1.201710251937.jar" id="de.ovgu.featureide.featuremodeling" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.4.1.201710251937.jar" id="de.ovgu.featureide.munge" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.4.1.201710251937.jar" id="de.ovgu.featureide.munge.android" version="3.4.1.201710251937">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201712271025.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.4.2.201712271025.jar" id="de.ovgu.featureide" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.4.2.201712271025.jar" id="de.ovgu.featureide.ahead" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.4.2.201712271025.jar" id="de.ovgu.featureide.antenna" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.4.2.201712271025.jar" id="de.ovgu.featureide.aspectj" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.4.2.201712271025.jar" id="de.ovgu.featureide.exampleprojects" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.4.2.201712271025.jar" id="de.ovgu.featureide.featurecpp" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.4.2.201712271025.jar" id="de.ovgu.featureide.featurehouse" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.4.2.201712271025.jar" id="de.ovgu.featureide.featuremodeling" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.4.2.201712271025.jar" id="de.ovgu.featureide.munge" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.4.2.201712271025.jar" id="de.ovgu.featureide.munge.android" version="3.4.2.201712271025">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201802121457.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.4.3.201802121457.jar" id="de.ovgu.featureide" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.4.3.201802121457.jar" id="de.ovgu.featureide.ahead" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.4.3.201802121457.jar" id="de.ovgu.featureide.antenna" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.4.3.201802121457.jar" id="de.ovgu.featureide.aspectj" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.4.3.201802121457.jar" id="de.ovgu.featureide.exampleprojects" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.4.3.201802121457.jar" id="de.ovgu.featureide.featurecpp" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.4.3.201802121457.jar" id="de.ovgu.featureide.featurehouse" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.4.3.201802121457.jar" id="de.ovgu.featureide.featuremodeling" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.4.3.201802121457.jar" id="de.ovgu.featureide.munge" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.4.3.201802121457.jar" id="de.ovgu.featureide.munge.android" version="3.4.3.201802121457">
+      <category name="FeatureIDE 3.4"/>
+   </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201804061108.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.5.0.201804061108.jar" id="de.ovgu.featureide" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.5.0.201804061108.jar" id="de.ovgu.featureide.ahead" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.5.0.201804061108.jar" id="de.ovgu.featureide.antenna" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.5.0.201804061108.jar" id="de.ovgu.featureide.aspectj" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.5.0.201804061108.jar" id="de.ovgu.featureide.exampleprojects" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.5.0.201804061108.jar" id="de.ovgu.featureide.featurecpp" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.5.0.201804061108.jar" id="de.ovgu.featureide.featurehouse" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.5.0.201804061108.jar" id="de.ovgu.featureide.featuremodeling" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.5.0.201804061108.jar" id="de.ovgu.featureide.munge" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.5.0.201804061108.jar" id="de.ovgu.featureide.munge.android" version="3.5.0.201804061108">
+      <category name="FeatureIDE 3.5"/>
    </feature>
    <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201806301305.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201806301305">
       <category name="FeatureIDE 3.5"/>
@@ -174,7 +627,46 @@
    <feature url="features/de.ovgu.featureide.munge.android_3.5.5.201906282321.jar" id="de.ovgu.featureide.munge.android" version="3.5.5.201906282321">
       <category name="FeatureIDE 3.5"/>
    </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201908302227.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.6.0.201908302227.jar" id="de.ovgu.featureide" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.6.0.201908302227.jar" id="de.ovgu.featureide.ahead" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.6.0.201908302227.jar" id="de.ovgu.featureide.antenna" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.6.0.201908302227.jar" id="de.ovgu.featureide.aspectj" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.6.0.201908302227.jar" id="de.ovgu.featureide.exampleprojects" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.6.0.201908302227.jar" id="de.ovgu.featureide.featurecpp" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.6.0.201908302227.jar" id="de.ovgu.featureide.featurehouse" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.6.0.201908302227.jar" id="de.ovgu.featureide.featuremodeling" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.6.0.201908302227.jar" id="de.ovgu.featureide.munge" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.6.0.201908302227.jar" id="de.ovgu.featureide.munge.android" version="3.6.0.201908302227">
+      <category name="FeatureIDE 3.6"/>
+   </feature>
    <archive path="FeatureIDE v2.5 and earlier versions" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>
    <archive path="FeatureIDE v2.6 and v2.7" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/"/>
-   <category-def name="FeatureIDE 3.5 Experimental" label="FeatureIDE 3.5 Experimental"/>
+   <category-def name="FeatureIDE 3.0" label="FeatureIDE 3.0"/>
+   <category-def name="FeatureIDE 3.1" label="FeatureIDE 3.1"/>
+   <category-def name="FeatureIDE 3.2" label="FeatureIDE 3.2"/>
+   <category-def name="FeatureIDE 3.3" label="FeatureIDE 3.3"/>
+   <category-def name="FeatureIDE 3.4" label="FeatureIDE 3.4"/>
+   <category-def name="FeatureIDE 3.5" label="FeatureIDE 3.5"/>
+   <category-def name="FeatureIDE 3.6" label="FeatureIDE 3.6"/>
 </site>

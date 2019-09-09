@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,8 +37,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -97,7 +95,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 		for (final File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			final Object[] models = new Object[2];
-			final IFeatureModel fm = FeatureModelManager.load(f.toPath()).getObject();
+			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
 			models[0] = fm;
 			models[1] = f.getName();
 			params.add(models);
@@ -121,7 +119,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureNames() throws FileNotFoundException, UnsupportedModelException {
-		assertTrue(failureMessage, Functional.equals(origFm.getFeatures(), newFm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
+		assertTrue(failureMessage, Functional.equals(origFm.getFeatures(), newFm.getFeatures(), IFeature::getName));
 	}
 
 	@Test
@@ -246,11 +244,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
 		IFeatureModel newFm = null;
-		try {
-			newFm = FMFactoryManager.getDefaultFactoryForPath(origFm.getFactoryID()).createFeatureModel();
-		} catch (final NoSuchExtensionException e) {
-			fail();
-		}
+		newFm = FMFactoryManager.getInstance().getFactory(origFm).create();
 		final IFeatureModelFormat format = getFormat();
 		final String write = format.getInstance().write(origFm);
 		format.getInstance().read(newFm, write);

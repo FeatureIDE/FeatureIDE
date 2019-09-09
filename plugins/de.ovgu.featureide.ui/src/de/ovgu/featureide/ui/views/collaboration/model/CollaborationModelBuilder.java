@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,15 +22,13 @@ package de.ovgu.featureide.ui.views.collaboration.model;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_CONFIGURATION;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -46,7 +44,10 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * The builder does some modifucations on the FSTModel for presentation at the CollaborationView.
@@ -60,8 +61,8 @@ public class CollaborationModelBuilder {
 	/**
 	 * Every feature project has its own filter
 	 */
-	private final static Map<IFeatureProject, Set<String>> classFilter = new HashMap<IFeatureProject, Set<String>>();
-	private final static Map<IFeatureProject, Set<String>> featureFilter = new HashMap<IFeatureProject, Set<String>>();
+	private final static Map<IFeatureProject, Set<String>> classFilter = new HashMap<>();
+	private final static Map<IFeatureProject, Set<String>> featureFilter = new HashMap<>();
 
 	public IFile configuration = null;
 	private static FSTModel fSTModel;
@@ -273,14 +274,14 @@ public class CollaborationModelBuilder {
 	 * Adds the configuration to the model.
 	 */
 	private void addConfigurationToModel() {
-		final IFile config = project.getCurrentConfiguration();
+		final Path config = project.getCurrentConfiguration();
 		final FSTConfiguration c;
 		if (config == null) {
 			c = new FSTConfiguration(NO_CONFIGURATION, configuration, false);
 		} else if ((configuration == null) || configuration.equals(config)) {
-			c = new FSTConfiguration(config.getName().split("[.]")[0] + " ", configuration, true);
+			c = new FSTConfiguration(FileHandler.getFileName(config) + " ", configuration, true);
 		} else {
-			c = new FSTConfiguration(configuration.getName().split("[.]")[0] + " ", configuration, false);
+			c = new FSTConfiguration(FileHandler.getFileName(configuration.getName()) + " ", configuration, false);
 		}
 		c.setSelectedFeatures(getSelectedFeatures(project));
 		fSTModel.setConfiguration(c);
@@ -291,56 +292,21 @@ public class CollaborationModelBuilder {
 			return Collections.emptySet();
 		}
 
-		final IFile iFile;
-		if (configuration == null) {
-			iFile = featureProject.getCurrentConfiguration();
-		} else {
-			iFile = configuration;
-		}
+		final Path file = (configuration == null) ? featureProject.getCurrentConfiguration() : EclipseFileSystem.getPath(configuration);
 
-		if ((iFile == null) || !iFile.exists()) {
+		if ((file == null) || !Files.exists(file)) {
 			return Collections.emptySet();
 		}
 
-		final File file = iFile.getRawLocation().toFile();
 		return readFeaturesfromConfigurationFile(file);
 	}
 
-	// TODO move to configuration reader
-	private Collection<String> readFeaturesfromConfigurationFile(File file) {
-		Set<String> list;
-		Scanner scanner = null;
-		if (!file.exists()) {
-			return Collections.emptySet();
-		}
-
-		try {
-			scanner = new Scanner(file, "UTF-8");
-		} catch (final FileNotFoundException e) {
-			UIPlugin.getDefault().logError(e);
-		}
-
-		if (scanner.hasNext()) {
-			boolean featuresSelected = false;
-			list = new HashSet<String>();
-			while (scanner.hasNextLine()) {
-				final String cur = scanner.nextLine().trim();
-				if (cur.contains("manual=\"selected") || cur.contains("automatic=\"selected")) {
-					if (cur.contains("name=\"")) {
-						list.add(cur.substring(cur.indexOf("name=\"") + 6, cur.length() - 3));
-						featuresSelected = true;
-					}
-				}
-			}
-			scanner.close();
-			if (featuresSelected) {
-				return list;
-			} else {
-				return Collections.emptySet();
-			}
+	private Collection<String> readFeaturesfromConfigurationFile(Path file) {
+		final Configuration configuration = ConfigurationIO.getInstance().load(file);
+		if (configuration != null) {
+			return configuration.getSelectedFeatureNames();
 		} else {
-			scanner.close();
-			return Collections.emptySet();
+			return null;
 		}
 	}
 }

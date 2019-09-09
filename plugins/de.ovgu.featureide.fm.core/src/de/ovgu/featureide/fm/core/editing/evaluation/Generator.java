@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,7 +32,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -41,13 +40,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * A generator for feature models.
  *
- * @author Thomas Th�m
+ * @author Thomas Thüm
  * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class Generator {
@@ -67,9 +68,9 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
-		final IFeatureModel fm = factory.createFeatureModel();
-		final List<IFeature> leaves = new LinkedList<IFeature>();
+		final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
+		final IFeatureModel fm = factory.create();
+		final List<IFeature> leaves = new LinkedList<>();
 		leaves.add(fm.getFeature("C1"));
 		int count = 1;
 		while (count < numberOfFeatures) {
@@ -94,19 +95,13 @@ public abstract class Generator {
 			}
 			count += childrenCount;
 		}
-		fm.getRenamingsManager().performRenamings();
 		return fm;
 	}
 
 	public static void generateConstraints(IFeatureModel fm, Random random, int numberOfConstraints) {
-		boolean valid = true;
-		try {
-			valid = fm.getAnalyser().isValid();
-			if (!valid) {
-				Logger.logInfo("Feature model not valid!");
-			}
-		} catch (final TimeoutException e) {
-			Logger.logError(e);
+		final boolean valid = FeatureModelManager.getAnalyzer(fm).isValid(null);
+		if (!valid) {
+			Logger.logInfo("Feature model not valid!");
 		}
 		final Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
 		int k = 0;
@@ -131,17 +126,12 @@ public abstract class Generator {
 				}
 			}
 			fm.addConstraint(new Constraint(fm, node));
-			try {
-				if (!valid || fm.getAnalyser().isValid()) {
-					i++;
-					System.out.println("E\t" + i + "\t" + node);
-				} else {
-					fm.getConstraints().remove(new Constraint(fm, node));
-					Logger.logInfo("F\t" + ++k + "\t" + node);
-				}
-			} catch (final TimeoutException e) {
-				Logger.logError(e);
-				fm.addConstraint(new Constraint(fm, node));
+			if (!valid || FeatureModelManager.getAnalyzer(fm).isValid(null)) {
+				i++;
+				System.out.println("E\t" + i + "\t" + node);
+			} else {
+				fm.getConstraints().remove(new Constraint(fm, node));
+				Logger.logInfo("F\t" + ++k + "\t" + node);
 			}
 		}
 	}
@@ -151,8 +141,8 @@ public abstract class Generator {
 		final Random random = new Random(id);
 
 		for (int i = 0; i < numberOfEdits; i++) {
-			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList = new LinkedList<IFeature>();
+			final List<IFeature> list = new LinkedList<>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
@@ -162,7 +152,7 @@ public abstract class Generator {
 				for (final IFeature feature : randomizedList) {
 					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isAlternative()) {
 						feature.getStructure().changeToOr();
-						final LinkedList<Node> nodes = new LinkedList<Node>();
+						final LinkedList<Node> nodes = new LinkedList<>();
 						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							nodes.add(new Literal(child.getFeature().getName()));
 						}
@@ -200,12 +190,12 @@ public abstract class Generator {
 
 	public static IFeatureModel generalization(IFeatureModel originalFM, long id, int numberOfEdits) {
 		final IFeatureModel fm = originalFM.clone(null);
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
 		final Random random = new Random(id);
 
 		for (int i = 0; i < numberOfEdits; i++) {
-			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList = new LinkedList<IFeature>();
+			final List<IFeature> list = new LinkedList<>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
@@ -320,21 +310,16 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel arbitraryEdits(IFeatureModel originalFM, long id, int numberOfEdits) {
-		boolean valid = false;
-		try {
-			valid = originalFM.getAnalyser().isValid();
-		} catch (final TimeoutException e) {
-			Logger.logError(e);
-		}
+		final boolean valid = FeatureModelManager.getAnalyzer(originalFM).isValid(null);
 		IFeatureModel fm = originalFM.clone(null);
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(fm);
 		final Random random = new Random(id);
 
 		for (int i = 0; i < numberOfEdits; i++) {
 			final IFeatureModel backup = valid ? fm.clone(null) : null;
 
-			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList = new LinkedList<IFeature>();
+			final List<IFeature> list = new LinkedList<>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
@@ -421,14 +406,10 @@ public abstract class Generator {
 				}
 			}
 
-			try {
-				if (valid && !fm.getAnalyser().isValid()) {
-					System.out.println("Void feature model by arbitrary edit	" + r);
-					fm = backup;
-					i--;
-				}
-			} catch (final TimeoutException e) {
-				Logger.logError(e);
+			if (valid && !FeatureModelManager.getAnalyzer(fm).isValid(null)) {
+				System.out.println("Void feature model by arbitrary edit	" + r);
+				fm = backup;
+				i--;
 			}
 		}
 		return fm;

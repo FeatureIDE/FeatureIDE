@@ -4,6 +4,7 @@ Bundle-Name: AHEAD Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.core.ahead-test;singleton:=true
 Bundle-Version: 3.6.0.qualifier
 Fragment-Host: de.ovgu.featureide.core.conversion.ahead-featurehouse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
+Automatic-Module-Name: de.ovgu.featureide.core.ahead-test

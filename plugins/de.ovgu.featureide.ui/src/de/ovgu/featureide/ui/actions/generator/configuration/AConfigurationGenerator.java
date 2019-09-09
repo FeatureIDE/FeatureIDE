@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,52 +20,47 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
- * Abstract class to generater configurations.
+ * Abstract class to generate configurations.
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
+public abstract class AConfigurationGenerator implements LongRunningMethod<List<LiteralSet>> {
 
-	protected IFeatureModel featureModel;
+	protected final FeatureModelFormula snapshot;
 
-	protected ConfigurationBuilder builder;
-
-	/**
-	 * This is the configuration where the {@link ConfigurationReader} saves the read configuration.
-	 */
-	protected Configuration configuration;
+	protected final ConfigurationBuilder builder;
 
 	/**
 	 * The count of found configurations.
 	 */
 	protected long confs = 0;
 
-	protected final IFeatureProject featureProject;
-
-	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
+	public AConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
 		this.builder = builder;
-		this.featureModel = featureModel;
-		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel, Configuration.PARAM_NONE);
+		snapshot = formula;
 	}
 
 	protected void cancelGenerationJobs() {
 		builder.cancelGenerationJobs();
 	}
 
-	protected int maxConfigs() {
-		return (int) builder.configurationNumber;
+	protected final void setConfigurationNumber(int foundConfigurations) {
+		builder.configurationNumber = foundConfigurations;
 	}
 
-	protected void addConfiguration(Configuration configuration) {
+	protected final void addConfiguration(Configuration configuration) {
 		builder.addConfiguration(new BuilderConfiguration(configuration, ++confs));
 	}
+
 }

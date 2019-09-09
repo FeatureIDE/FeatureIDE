@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -63,15 +63,15 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 		if (child instanceof ConstraintEditPart) {
 			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
 		} else if (child instanceof FeatureEditPart) {
-// TODO _Interface : Removed Code
-//			if (featureModel instanceof ExtendedFeatureModel) {
-//				IFeature feature = ((FeatureEditPart) child).getFeature();
-//				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-//					if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
-//						return null;
-//					}
-//				}
-//			}
+			// TODO _Interface : Removed Code
+			// if (featureModel instanceof ExtendedFeatureModel) {
+			// IFeature feature = ((FeatureEditPart) child).getFeature();
+			// if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+			// if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
+			// return null;
+			// }
+			// }
+			// }
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
 			return new LegendMoveEditPolicy();

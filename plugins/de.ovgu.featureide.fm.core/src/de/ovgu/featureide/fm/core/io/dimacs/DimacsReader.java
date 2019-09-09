@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,11 +49,11 @@ import org.prop4j.Or;
  */
 public class DimacsReader {
 
-	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSFormat.COMMENT + "\\s*(.*)\\Z");
-	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSFormat.PROBLEM + "\\s+" + DIMACSFormat.CNF + "\\s+(\\d+)\\s+(\\d+)");
+	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSConstants.COMMENT + "\\s*(.*)\\Z");
+	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSConstants.PROBLEM + "\\s+" + DIMACSConstants.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
-	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
+	private final Map<Integer, String> indexVariables = new LinkedHashMap<>();
 	/**
 	 * The amount of variables as declared in the problem definition. May differ from the actual amount of variables found.
 	 */
@@ -61,6 +62,7 @@ public class DimacsReader {
 	private int clauseCount;
 	/** True to read the variable directory for naming variables. */
 	private boolean readVariableDirectory = false;
+	private boolean flattenCNF = false;
 	/** True when currently reading the comment section at the beginning of the file and parsing variable names. */
 	private boolean readingVariables;
 
@@ -77,6 +79,18 @@ public class DimacsReader {
 	}
 
 	/**
+	 * <p> Sets the flatten CNF flag. If true, the reader will try to compact the resulting CNF nodes by replacing node with just one child with their
+	 * child.</p>
+	 *
+	 * <p> Defaults to false. </p>
+	 *
+	 * @param flattenCNF whether to flatten the resulting CNF node
+	 */
+	public void setFlattenCNF(boolean flattenCNF) {
+		this.flattenCNF = flattenCNF;
+	}
+
+	/**
 	 * Reads the input.
 	 *
 	 * @param in The source to read from.
@@ -86,6 +100,9 @@ public class DimacsReader {
 	 */
 	@Nonnull
 	public Node read(Reader in) throws ParseException, IOException {
+		indexVariables.clear();
+		variableCount = -1;
+		clauseCount = -1;
 		readingVariables = readVariableDirectory;
 		try (final BufferedReader reader = new BufferedReader(in)) {
 			final LineIterator lineIterator = new LineIterator(reader);
@@ -101,11 +118,11 @@ public class DimacsReader {
 			if (variableCount != actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
 			}
-			return new And(clauses);
-		} finally {
-			indexVariables.clear();
-			variableCount = -1;
-			clauseCount = -1;
+			Node node = new And(clauses);
+			if (flattenCNF) {
+				node = node.flatten();
+			}
+			return node;
 		}
 	}
 
@@ -121,6 +138,7 @@ public class DimacsReader {
 	}
 
 	private static class LineIterator {
+
 		private final BufferedReader reader;
 		private String line = null;
 		private int lineCount = 0;
@@ -242,7 +260,7 @@ public class DimacsReader {
 				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
 				readClausesCount++;
 
-				if (!DIMACSFormat.CLAUSE_END.equals(literalQueue.removeFirst())) {
+				if (!DIMACSConstants.CLAUSE_END.equals(literalQueue.removeFirst())) {
 					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
 				}
 				literalList = literalQueue;
@@ -275,7 +293,7 @@ public class DimacsReader {
 				throw new ParseException("Illegal literal", lineIterator.getLineCount());
 			}
 			final Integer key = Math.abs(index);
-			Object variable = indexVariables.get(key);
+			String variable = indexVariables.get(key);
 			if (variable == null) {
 				variable = String.valueOf(key);
 				indexVariables.put(key, variable);
@@ -321,4 +339,9 @@ public class DimacsReader {
 		}
 		return true;
 	}
+
+	public Collection<String> getVariables() {
+		return indexVariables.values();
+	}
+
 }

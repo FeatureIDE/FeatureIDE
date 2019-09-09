@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,20 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * This class represents the Action to delete one or multiply Constraints selected in the ConstraintView.
@@ -41,36 +38,24 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
  * @author Rosiak Kamil
  * @author Rahel Arens
  */
-public class DeleteConstraintInViewAction extends Action {
-	private IFeatureModel featureModel;
-	private IStructuredSelection selection;
-	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
-	private TreeViewer viewer;
+public class DeleteConstraintInViewAction extends AbstractConstraintEditorAction {
 
-	public DeleteConstraintInViewAction(Object viewer, IFeatureModel featureModel) {
-		super("Delete (Del)", deleteImage);
-		if (viewer instanceof TreeViewer) {
-			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-			this.featureModel = featureModel;
-			setEnabled(isValidSelection(selection));
-			this.viewer = (TreeViewer) viewer;
-		}
+	public static final String ID = "de.ovgu.featureide.deleteconstraintinview";
+
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+
+	public DeleteConstraintInViewAction(Object viewer, FeatureModelManager fmManager) {
+		super(viewer, fmManager, "Delete (Del)", ID);
+		setImageDescriptor(deleteImage);
 	}
 
 	@Override
 	public void run() {
-		AbstractFeatureModelOperation abstractFeatureModelOperation = null;
 		// Decision single or multiply selection of constraints
 		if (selection.toList().size() == 1) {
-			abstractFeatureModelOperation = new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModel);
+			FeatureModelOperationWrapper.run(new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModelManager));
 		} else if (selection.toList().size() > 1) {
-			abstractFeatureModelOperation = new ElementDeleteOperation(viewer, featureModel);
-		}
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(abstractFeatureModelOperation, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
+			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager));
 		}
 	}
 
@@ -79,17 +64,20 @@ public class DeleteConstraintInViewAction extends Action {
 	 *
 	 * @return returns true if this action can process the selected items else false.
 	 */
+	@Override
 	public boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
-			return true;
-		} else if ((selection.size() > 1)) {
-			// checking that every selected item is a constraint
-			for (final Object sel : selection.toList()) {
-				if (!(sel instanceof IConstraint)) {
-					return false;
+		if (selection != null) {
+			if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
+				return true;
+			} else if ((selection.size() > 1)) {
+				// checking that every selected item is a constraint
+				for (final Object sel : selection.toList()) {
+					if (!(sel instanceof IConstraint)) {
+						return false;
+					}
 				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}

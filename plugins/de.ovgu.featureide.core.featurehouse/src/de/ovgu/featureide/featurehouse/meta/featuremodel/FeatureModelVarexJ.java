@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,15 +25,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Defines the content of the feature model class specific for VarexJ.
@@ -70,10 +71,12 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		final StringBuilder fields = new StringBuilder();
-		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
+		final List<IFeature> coreList = analyzer.getCoreFeatures(null);
+		final List<IFeature> deadList = analyzer.getDeadFeatures(null);
 		for (final IFeature feature : features) {
-			final boolean isCoreFeature = deadCoreList.get(0).contains(feature);
-			final boolean isDeadFeature = deadCoreList.get(1).contains(feature);
+			final boolean isCoreFeature = coreList.contains(feature);
+			final boolean isDeadFeature = deadList.contains(feature);
 			if (!isCoreFeature && !isDeadFeature) {
 				fields.append(ANNOTATION);
 			}
@@ -90,12 +93,10 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
-		nc.setCnfType(CNFType.Compact);
-		nc.setIncludeBooleanValues(false);
-		final Node node = nc.createNodes();
-		final String formula = node.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
-		return VALID + "return " + formula + ";\r\n\t}\r\n\r\n";
+		final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureModel)));
+		nodeWriter.setSymbols(NodeWriter.javaSymbols);
+		return VALID + "return " + nodeWriter.nodeToString().toLowerCase(Locale.ENGLISH) + ";" + System.lineSeparator() + "\t}" + System.lineSeparator()
+			+ System.lineSeparator();
 	}
 
 	@Override

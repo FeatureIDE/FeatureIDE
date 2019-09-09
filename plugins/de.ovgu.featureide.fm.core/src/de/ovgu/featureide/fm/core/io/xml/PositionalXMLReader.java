@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -60,7 +60,7 @@ public class PositionalXMLReader {
 		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 		doc = docBuilder.newDocument();
-		final Stack<Element> elementStack = new Stack<Element>();
+		final Stack<Element> elementStack = new Stack<>();
 		final StringBuilder textBuffer = new StringBuilder();
 		final DefaultHandler handler = new DefaultHandler() {
 

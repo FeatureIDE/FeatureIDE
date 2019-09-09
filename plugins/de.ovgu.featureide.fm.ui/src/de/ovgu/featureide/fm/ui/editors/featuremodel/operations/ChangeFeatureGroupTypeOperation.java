@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Operation with functionality to change group types. Enables undo/redo functionality.
@@ -39,19 +41,20 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 	public static final int AND = 1;
 	public static final int OR = 2;
 
-	protected IFeature feature;
+	private final String featureName;
 	private final int groupType;
-	private final int oldGroupType;
+	private int oldGroupType;
 
-	public ChangeFeatureGroupTypeOperation(int groupType, IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, CHANGE_GROUP_TYPE);
+	public ChangeFeatureGroupTypeOperation(int groupType, String featureName, IFeatureModelManager featureModelManager) {
+		super(featureModelManager, CHANGE_GROUP_TYPE);
 		this.groupType = groupType;
-		oldGroupType = getGroupType(feature);
-		this.feature = feature;
+		this.featureName = featureName;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IFeature feature = featureModel.getFeature(featureName);
+		oldGroupType = getGroupType(feature);
 		if (groupType == ALTERNATIVE) {
 			feature.getStructure().changeToAlternative();
 		} else if (groupType == OR) {
@@ -63,7 +66,8 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeature feature = featureModel.getFeature(featureName);
 		if (oldGroupType == ALTERNATIVE) {
 			feature.getStructure().changeToAlternative();
 		} else if (oldGroupType == AND) {
@@ -82,6 +86,11 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			return OR;
 		}
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

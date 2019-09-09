@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.nio.file.Paths;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -28,9 +28,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -44,21 +46,21 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  */
 public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 
-	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
+		super(builder, featureProject.getFeatureModelManager().getPersistentFormula());
 		builder.configurationNumber = Math.min(builder.configurationNumber, countConfigurations(featureProject.getConfigFolder()));
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
+	public List<LiteralSet> execute(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		buildCurrentConfigurations(builder.featureProject, monitor);
 		return null;
 	}
 
-	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
+	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor<?> monitor) {
 		try {
 			for (final IResource configuration : featureProject.getConfigFolder().members()) {
-				if (confs >= maxConfigs()) {
+				if (confs >= builder.configurationNumber) {
 					break;
 				}
 				try {
@@ -83,9 +85,10 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @param configuration The configuration file
 	 * @param monitor
 	 */
-	private void build(IResource configuration, IMonitor monitor) {
-		SimpleFileHandler.load(Paths.get(configuration.getLocationURI()), this.configuration, ConfigFormatManager.getInstance());
-		builder.addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
+	private void build(IResource configuration, IMonitor<?> monitor) {
+		final Configuration config = ConfigurationManager.load(EclipseFileSystem.getPath(configuration));
+		config.updateFeatures(snapshot);
+		builder.addConfiguration(new BuilderConfiguration(config, configuration.getName().split("[.]")[0]));
 	}
 
 	/**
@@ -93,7 +96,7 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()));
+		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(res));
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,11 +68,9 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  *
@@ -377,16 +374,20 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	 * Every time the project is built, the config will be read and written into runtime.properties.
 	 */
 	@Override
-	public void performFullBuild(final IFile config) {
+	public void performFullBuild(final Path config) {
 		if (featureProject == null) {
 			return;
 		}
 
+		final IFile filePropInBuild = featureProject.getBuildFolder().getFile("runtime.properties");
 		final IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 			buildFSTModel();
 
-			final Configuration configuration = readConfig();
+			final Configuration configuration = featureProject.loadConfiguration(config);
+			if (configuration == null) {
+				return;
+			}
 
 			String configString = "";
 			for (final SelectableFeature f : configuration.getFeatures()) {
@@ -409,27 +410,24 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			} else {
 				createFile(fileProp, inputStream);
 			}
+			if (filePropInBuild.exists()) {
+				try {
+					filePropInBuild.setContents(inputStream, IResource.FORCE, null);
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				createFile(filePropInBuild, inputStream);
+			}
 
 		} else {
 			deleteFile(fileProp);
+			deleteFile(filePropInBuild);
 		}
 	}
 
 	@Override
 	public void postCompile(final IResourceDelta delta, final IFile buildFile) {}
-
-	/**
-	 * Reads and returns current feature config.
-	 *
-	 * @return
-	 */
-	private Configuration readConfig() {
-		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
-		final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
-		SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
-
-		return featureProjectConfig;
-	}
 
 	/**
 	 * Sets the parent-child-relations within the FSTModel by adding children to parent directives. To determine these relations the parent-child-relations of
@@ -514,7 +512,10 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			}
 		});
 
-		final Configuration configuration = readConfig();
+		final Configuration configuration = featureProject.loadCurrentConfiguration();
+		if (configuration == null) {
+			return;
+		}
 
 		// check whether the feature corresponding with the
 		// FeatureLocation-object is in the current config

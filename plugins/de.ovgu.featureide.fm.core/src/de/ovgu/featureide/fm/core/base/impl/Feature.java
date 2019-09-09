@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,32 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
-
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 
 /**
  * Implementation of {@link AFeature} used as default implementation inside FeatureIDE. <br> <br> This class implements the functionality required by
  * {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}. <br> <br> This class is intended to be the default implementation for
- * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link ExtendedFeature} and inside
- * {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}. <br> <br> An instance of a <code>Feature</code> is intended to be instantiated by a
- * {@link IFeatureModelFactory}. <br> <br> <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
- * FeatureIDE's default <code>IFeature</code> ( <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the
- * corresponding default factory {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory
- * class {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
+ * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link MultiFeature} and inside
+ * {@link SXFMFormat}. <br> <br> An instance of a <code>Feature</code> is intended to be instantiated by a {@link IFeatureModelFactory}. <br> <br>
+ * <b>Example</b><br> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>IFeature</code> (
+ * <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
+ * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the convenient factory class
+ * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> IFeatureModel model =
  * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </code> A unified
  * handling of certain <code>Feature</code> (<code>AFeature</code>, <code>IFeature</code>) implementations (in terms of conviennent methods) can be achieved
  * with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
@@ -70,21 +61,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class Feature extends AFeature {
 
-	private static String ABSTRACT = " Abstract";
-	private static String HIDDEN = " hidden";
-	private static String HIDDEN_PARENT = INHERITED_HIDDEN;
-	private static String DEAD = IS_DEAD;
-	private static String FEATURE = " feature ";
-	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
-	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
-	private static String VOID = FEATURE_MODEL_IS_VOID;
-
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
 	 * <code>featureModel</code>, and a feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see
 	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br> <br> <b>Note</b>: The parameter
 	 * <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as an subclass of
-	 * {@link AFeatureModelElement) can be <b>null</b>.
+	 * {@link AFeatureModelElement} can be <b>null</b>.
 	 *
 	 * @param oldFeature used to copy the original feature's identifier, and the original feature's name (if available)
 	 * @param featureModel is used to set the new feature's feature model if <code>featureModel</code> is non-null. If <code>featureModel</code> is <b>null</b>,
@@ -127,55 +109,4 @@ public class Feature extends AFeature {
 		return new Feature(this, newFeatureModel, newStructure);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.impl.AFeature#createTooltip(java.lang.Object[])
-	 */
-	@Override
-	public String createTooltip(Object... objects) {
-		final StringBuilder toolTip = new StringBuilder();
-		final FeatureModelAnalyzer analyser = getFeatureModel().getAnalyser();
-
-		toolTip.append(getStructure().isConcrete() ? CONCRETE : ABSTRACT);
-
-		if (getStructure().hasHiddenParent()) {
-			toolTip.append(getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
-		}
-
-		toolTip.append(getStructure().isRoot() ? ROOT : FEATURE);
-
-		switch (getProperty().getFeatureStatus()) {
-		case DEAD:
-			toolTip.append(DEAD);
-			break;
-		case FALSE_OPTIONAL:
-			toolTip.append(FALSE_OPTIONAL);
-			break;
-		case INDETERMINATE_HIDDEN:
-			toolTip.append(INDETERMINATE_HIDDEN);
-			break;
-		default:
-			break;
-		}
-
-		if (!analyser.valid()) {
-			toolTip.setLength(0);
-			toolTip.trimToSize();
-			toolTip.append(VOID);
-		}
-
-		final String description = getProperty().getDescription();
-		if ((description != null) && !description.trim().isEmpty()) {
-			toolTip.append("\n\nDescription:\n");
-			toolTip.append(description);
-		}
-
-		final String contraints = FeatureUtils.getRelevantConstraintsString(this);
-		if (!contraints.isEmpty()) {
-			toolTip.append("\n\nConstraints:\n");
-			toolTip.append(contraints);
-		}
-
-		return toolTip.toString();
-	}
 }

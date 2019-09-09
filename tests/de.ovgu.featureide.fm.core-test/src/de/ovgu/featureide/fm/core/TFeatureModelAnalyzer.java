@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,17 +20,18 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.HashMap;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -55,55 +56,49 @@ public class TFeatureModelAnalyzer {
 		}
 	};
 
-	private final IFeatureModel FM_test_1 = init("test_1.xml");
-	private final IFeature FM1_F1 = FM_test_1.getFeature("F1");
-	private final IFeature FM1_F2 = FM_test_1.getFeature("F2");
-	private final IConstraint FM1_C1 = FM_test_1.getConstraints().get(0);
-	private final HashMap<Object, Object> FM1_DATA = FM_test_1.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_1 = init("test_1.xml");
+	private static IFeature FM1_F1 = FM_test_1.getFeature("F1");
+	private static IFeature FM1_F2 = FM_test_1.getFeature("F2");
+	private static IConstraint FM1_C1 = FM_test_1.getConstraints().get(0);
 
-	private final IFeatureModel FM_test_2 = init("test_2.xml");
-	private final IFeature FM2_F1 = FM_test_2.getFeature("F1");
-	private final IFeature FM2_F2 = FM_test_2.getFeature("F2");
-	private final IFeature FM2_F3 = FM_test_2.getFeature("F3");
-	private final IConstraint FM2_C1 = FM_test_2.getConstraints().get(0);
-	private final IConstraint FM2_C2 = FM_test_2.getConstraints().get(1);
-	private final IConstraint FM2_C3 = FM_test_2.getConstraints().get(2);
-	private final HashMap<Object, Object> FM2_DATA = FM_test_2.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_2 = init("test_2.xml");
+	private static IFeature FM2_F1 = FM_test_2.getFeature("F1");
+	private static IFeature FM2_F2 = FM_test_2.getFeature("F2");
+	private static IFeature FM2_F3 = FM_test_2.getFeature("F3");
+	private static IConstraint FM2_C1 = FM_test_2.getConstraints().get(0);
+	private static IConstraint FM2_C2 = FM_test_2.getConstraints().get(1);
+	private static IConstraint FM2_C3 = FM_test_2.getConstraints().get(2);
 
-	private final IFeatureModel FM_test_3 = init("test_3.xml");
-	private final IFeature FM3_F2 = FM_test_3.getFeature("F2");
-	private final IFeature FM3_F3 = FM_test_3.getFeature("F3");
-	private final IConstraint FM3_C1 = FM_test_3.getConstraints().get(0);
-	private final HashMap<Object, Object> FM3_DATA = FM_test_3.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_3 = init("test_3.xml");
+	private static IFeature FM3_F2 = FM_test_3.getFeature("F2");
+	private static IFeature FM3_F3 = FM_test_3.getFeature("F3");
+	private static IConstraint FM3_C1 = FM_test_3.getConstraints().get(0);
 
-	private final IFeatureModel FM_test_4 = init("test_4.xml");
-	private final IFeature FM4_F1 = FM_test_4.getFeature("I");
-	private final IFeature FM4_F2 = FM_test_4.getFeature("D");
-	private final IFeature FM4_F3 = FM_test_4.getFeature("E");
-	private final IFeature FM4_F4 = FM_test_4.getFeature("K");
-	private final IFeature FM4_F5 = FM_test_4.getFeature("L");
-	private final IFeature FM4_F6 = FM_test_4.getFeature("N");
-	private final IFeature FM4_F7 = FM_test_4.getFeature("P");
-	private final IFeature FM4_F8 = FM_test_4.getFeature("M");
-	private final IFeature FM4_F9 = FM_test_4.getFeature("C");
-	private final IFeature FM4_F10 = FM_test_4.getFeature("J");
-	private final HashMap<Object, Object> FM4_DATA = FM_test_4.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_4 = init("test_4.xml");
+	private static IFeature FM4_F1 = FM_test_4.getFeature("I");
+	private static IFeature FM4_F2 = FM_test_4.getFeature("D");
+	private static IFeature FM4_F3 = FM_test_4.getFeature("E");
+	private static IFeature FM4_F4 = FM_test_4.getFeature("K");
+	private static IFeature FM4_F5 = FM_test_4.getFeature("L");
+	private static IFeature FM4_F6 = FM_test_4.getFeature("N");
+	private static IFeature FM4_F7 = FM_test_4.getFeature("P");
+	private static IFeature FM4_F8 = FM_test_4.getFeature("M");
+	private static IFeature FM4_F9 = FM_test_4.getFeature("C");
+	private static IFeature FM4_F10 = FM_test_4.getFeature("J");
 
-	private final IFeatureModel FM_test_7 = init("test_7.xml");
-	private final IFeature FM7_F1 = FM_test_7.getFeature("H");
-	private final IConstraint FM7_C1 = FM_test_7.getConstraints().get(0);
-	private final HashMap<Object, Object> FM7_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_7 = init("test_7.xml");
+	private static IFeature FM7_F1 = FM_test_7.getFeature("H");
+	private static IConstraint FM7_C1 = FM_test_7.getConstraints().get(0);
 
-	private final IFeatureModel FM_test_8 = init("test_8.xml");
-	private final IFeature FM8_F1 = FM_test_8.getFeature("B");
-	private final IFeature FM8_F2 = FM_test_8.getFeature("C");
-	private final HashMap<Object, Object> FM8_DATA = FM_test_8.getAnalyser().analyzeFeatureModel(null);
+	private static IFeatureModel FM_test_8 = init("test_8.xml");
+	private static IFeature FM8_F1 = FM_test_8.getFeature("B");
+	private static IFeature FM8_F2 = FM_test_8.getFeature("C");
 
-	private final IFeatureModel init(String name) {
+	private static final IFeatureModel init(String name) {
 		IFeatureModel fm = null;
 		for (final File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				fm = FeatureModelManager.load(f.toPath()).getObject();
+				fm = FeatureModelManager.load(f.toPath());
 				if (fm != null) {
 					break;
 				}
@@ -112,179 +107,196 @@ public class TFeatureModelAnalyzer {
 		return fm;
 	}
 
+	private static AnalysesCollection FM1_DATA;
+	private static AnalysesCollection FM2_DATA;
+	private static AnalysesCollection FM3_DATA;
+	private static AnalysesCollection FM4_DATA;
+	private static AnalysesCollection FM7_DATA;
+	private static AnalysesCollection FM8_DATA;
+
+	@BeforeClass
+	public static void analyseModels() {
+		FM1_DATA = FeatureModelManager.getAnalyzer(FM_test_1).analyzeFeatureModel(null);
+		FM2_DATA = FeatureModelManager.getAnalyzer(FM_test_2).analyzeFeatureModel(null);
+		FM3_DATA = FeatureModelManager.getAnalyzer(FM_test_3).analyzeFeatureModel(null);
+		FM4_DATA = FeatureModelManager.getAnalyzer(FM_test_4).analyzeFeatureModel(null);
+		FM7_DATA = FeatureModelManager.getAnalyzer(FM_test_7).analyzeFeatureModel(null);
+		FM8_DATA = FeatureModelManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
+	}
+
 	@Test
 	public void TFalseOptional_FM1_F1() {
-		assertEquals(FM1_DATA.get(FM1_F1), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM1_DATA.getFeatureProperty(FM1_F1).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM1_F2() {
-		assertEquals(FM1_DATA.get(FM1_F2), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM1_DATA.getFeatureProperty(FM1_F2).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM1_C1() {
-		assertEquals(FM1_DATA.get(FM1_C1), ConstraintAttribute.FALSE_OPTIONAL);
+		assertFalse(FM1_DATA.getConstraintProperty(FM1_C1).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
 	public void TFalseOptional_FM1_C1_F1() {
-		assertTrue(FM1_C1.getFalseOptional().contains(FM1_F1));
+		assertTrue(FM1_DATA.getConstraintProperty(FM1_C1).getFalseOptionalFeatures().contains(FM1_F1));
 	}
 
 	@Test
 	public void TFalseOptional_FM1_C1_F2() {
-		assertTrue(FM1_C1.getFalseOptional().contains(FM1_F2));
+		assertTrue(FM1_DATA.getConstraintProperty(FM1_C1).getFalseOptionalFeatures().contains(FM1_F2));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_F1() {
-		assertEquals(FM2_DATA.get(FM2_F1), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM2_DATA.getFeatureProperty(FM2_F1).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_F2() {
-		assertEquals(FM2_DATA.get(FM2_F2), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM2_DATA.getFeatureProperty(FM2_F2).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_F3() {
-		assertEquals(FM2_DATA.get(FM2_F3), null);
+		assertTrue(FM2_DATA.getFeatureProperty(FM2_F3).hasStatus(FeatureStatus.OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C1() {
-		assertEquals(FM2_DATA.get(FM2_C1), ConstraintAttribute.FALSE_OPTIONAL);
+		assertFalse(FM2_DATA.getConstraintProperty(FM2_C1).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C1_F1() {
-		assertTrue(FM2_C1.getFalseOptional().contains(FM2_F1));
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C1).getFalseOptionalFeatures().contains(FM2_F1));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C1_F2() {
-		assertTrue(FM2_C1.getFalseOptional().contains(FM2_F2));
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C1).getFalseOptionalFeatures().contains(FM2_F2));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C1_F3() {
-		assertTrue(!FM2_C1.getFalseOptional().contains(FM2_F3));
+		assertFalse(FM2_DATA.getConstraintProperty(FM2_C1).getFalseOptionalFeatures().contains(FM2_F3));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C2() {
-		assertEquals(FM2_DATA.get(FM2_C2), ConstraintAttribute.REDUNDANT);
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C2).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C2_F() {
-		assertTrue(FM2_C2.getFalseOptional().isEmpty());
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C2).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C3() {
-		assertEquals(FM2_DATA.get(FM2_C3), ConstraintAttribute.REDUNDANT);
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C3).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C3_F() {
-		assertTrue(FM2_C3.getFalseOptional().isEmpty());
+		assertTrue(FM2_DATA.getConstraintProperty(FM2_C3).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
 	public void TFalseOptional_FM3_F2() {
-		assertEquals(FM3_DATA.get(FM3_F2), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM3_DATA.getFeatureProperty(FM3_F2).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TDead_FM3_F2() {
-		assertEquals(FM3_DATA.get(FM3_F3), FeatureStatus.DEAD);
+		assertTrue(FM3_DATA.getFeatureProperty(FM3_F3).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TFalseOptional_FM3_C1() {
-		assertEquals(FM3_DATA.get(FM3_C1), ConstraintAttribute.DEAD);
+		assertFalse(FM3_DATA.getConstraintProperty(FM3_C1).getDeadFeatures().isEmpty());
 	}
 
 	@Test
 	public void TFalseOptional_FM3_C1_contains() {
-		assertTrue(FM3_C1.getFalseOptional().contains(FM3_F2));
+		assertTrue(FM3_DATA.getConstraintProperty(FM3_C1).getFalseOptionalFeatures().contains(FM3_F2));
 	}
 
 	@Test
 	public void TDead_FM3_C1_contains() {
-		assertTrue(FM3_C1.getDeadFeatures().contains(FM3_F3));
+		assertTrue(FM3_DATA.getConstraintProperty(FM3_C1).getDeadFeatures().contains(FM3_F3));
 	}
 
 	@Test
 	public void TFalseOptional_FM4_F1() {
-		assertEquals(FM4_DATA.get(FM4_F10), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM4_DATA.getFeatureProperty(FM4_F10).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM7_F1() {
-		assertEquals(FM7_DATA.get(FM7_F1), FeatureStatus.FALSE_OPTIONAL);
+		assertTrue(FM7_DATA.getFeatureProperty(FM7_F1).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TRedundantConstr_FM7_C1() {
-		assertEquals(FM7_DATA.get(FM7_C1), ConstraintAttribute.REDUNDANT);
+		assertTrue(FM7_DATA.getConstraintProperty(FM7_C1).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
 	public void TDead_FM8_F1() {
-		assertEquals(FM8_DATA.get(FM8_F1), FeatureStatus.DEAD);
+		assertTrue(FM8_DATA.getFeatureProperty(FM8_F1).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TDead_FM8_F2() {
-		assertEquals(FM8_DATA.get(FM8_F2), FeatureStatus.DEAD);
+		assertTrue(FM8_DATA.getFeatureProperty(FM8_F2).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F0() {
-		assertFalse(FM4_F2.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_DATA.getFeatureProperty(FM4_F2).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F1() {
-		assertTrue(FM4_F3.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_DATA.getFeatureProperty(FM4_F3).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F2() {
-		assertFalse(FM4_F4.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_DATA.getFeatureProperty(FM4_F4).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F3() {
-		assertFalse(FM4_F5.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_DATA.getFeatureProperty(FM4_F5).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F4() {
-		assertTrue(FM4_F6.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_DATA.getFeatureProperty(FM4_F6).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F5() {
-		assertTrue(FM4_F7.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_DATA.getFeatureProperty(FM4_F7).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F6() {
-		assertFalse(FM4_F8.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_DATA.getFeatureProperty(FM4_F8).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F7() {
-		assertFalse(FM4_F9.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_DATA.getFeatureProperty(FM4_F9).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F8() {
-		assertTrue(FM4_F1.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_DATA.getFeatureProperty(FM4_F1).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 }

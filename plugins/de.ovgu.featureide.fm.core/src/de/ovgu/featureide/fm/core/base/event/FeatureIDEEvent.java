@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,10 +37,15 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
+		FEATURE_MODEL_OPERATION,
 		/**
 		 * The constraint was moved.
 		 */
 		CONSTRAINT_MOVE,
+		/**
+		 * A constraint's graphical position was modified.
+		 */
+		CONSTRAINT_MOVE_LOCATION,
 		/**
 		 * A constraint was modified.
 		 */
@@ -53,14 +58,6 @@ public class FeatureIDEEvent {
 		 * A constraint was added.
 		 */
 		CONSTRAINT_ADD,
-		/**
-		 * A constraint was selected.
-		 */
-		CONSTRAINT_SELECTED,
-		/**
-		 * A feature was modified.
-		 */
-		FEATURE_MODIFY,
 		/**
 		 * A feature was deleted.
 		 */
@@ -82,25 +79,29 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
+		 * A feature's name was changed and persistently saved.
+		 */
+		FEATURE_NAME_PERSISTENTLY_CHANGED,
+		/**
 		 * All features changed their name representation.
 		 */
 		ALL_FEATURES_CHANGED_NAME_TYPE,
 		/**
 		 * A color was changed.
 		 */
-		COLOR_CHANGED,
+		FEATURE_COLOR_CHANGED,
 		/**
 		 * A hidden feature was changed.
 		 */
-		HIDDEN_CHANGED,
+		FEATURE_HIDDEN_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_CHANGED,
+		FEATURE_COLLAPSED_CHANGED,
 		/**
 		 * A collapsed feature was changed.
 		 */
-		COLLAPSED_ALL_CHANGED,
+		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
 		 * The location of an object was changed.
 		 */
@@ -142,13 +143,9 @@ public class FeatureIDEEvent {
 		 */
 		MODEL_DATA_SAVED,
 		/**
-		 * The model data was loaded from file.
-		 */
-		MODEL_DATA_LOADED,
-		/**
 		 * The model data loaded from a file has overridden the internal model instance.
 		 */
-		MODEL_DATA_OVERRIDDEN,
+		MODEL_DATA_OVERWRITTEN,
 		/**
 		 * The diagram was redrawn.
 		 */
@@ -183,7 +180,8 @@ public class FeatureIDEEvent {
 		/**
 		 * Default. Do nothing.
 		 */
-		DEFAULT,
+		// TODO !!! implement feature order event
+		DEFAULT, FEATURE_ORDER_CHANGED,
 	}
 
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

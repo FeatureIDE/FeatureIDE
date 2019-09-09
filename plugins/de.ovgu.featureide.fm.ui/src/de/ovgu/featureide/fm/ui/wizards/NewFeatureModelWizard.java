@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_N
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,9 +36,11 @@ import org.eclipse.ui.IWorkbench;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -47,6 +48,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
+ * @author Sebastian Krieter
  */
 // TOOD add copy of an other model file
 public class NewFeatureModelWizard extends Wizard implements INewWizard {
@@ -58,28 +60,28 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		final IFeatureModelFormat format = formatPage.getFormat();
+		final IPersistentFormat<IFeatureModel> format = formatPage.getFormat();
 		final Path fmPath = getNewFilePath(format);
 		IFeatureModel featureModel;
 		try {
-			featureModel = FMFactoryManager.getFactory(fmPath.toString(), format).createFeatureModel();
+			featureModel = FMFactoryManager.getInstance().getFactory(fmPath, format).create();
 		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);
-			featureModel = FMFactoryManager.getEmptyFeatureModel();
+			featureModel = DefaultFeatureModelFactory.getInstance().create();
 		}
 		featureModel.createDefaultValues("");
-		FileHandler.save(fmPath, featureModel, format);
+		SimpleFileHandler.save(fmPath, featureModel, format);
 
 		assert (Files.exists(fmPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 		return true;
 	}
 
-	public Path getNewFilePath(IFeatureModelFormat format) {
+	public Path getNewFilePath(IPersistentFormat<IFeatureModel> format) {
 		String fileName = locationpage.getFileName();
 		if (!fileName.matches(".+\\." + Pattern.quote(format.getSuffix()))) {
 			fileName += "." + format.getSuffix();
 		}
-		return Paths.get(ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName)).getLocationURI());
+		return EclipseFileSystem.getPath(ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName)));
 	}
 
 	@Override

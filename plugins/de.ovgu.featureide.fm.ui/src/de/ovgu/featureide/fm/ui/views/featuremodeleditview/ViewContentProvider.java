@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -38,6 +38,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASKS_TO_FINISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASK_TO_FINISH;
 
+import java.util.ConcurrentModificationException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -48,8 +50,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.editing.Comparison;
@@ -95,7 +99,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
 	private static final int TIMEOUT = 20000;
-	private static final long TIMEOUT_CONFIGURATION = 10000;
+	private static final int TIMEOUT_CONFIGURATION = 10000;
 
 	private static final int INDEX_HEAD = 0;
 	private static final int INDEX_ADDED = 2;
@@ -187,8 +191,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
 
-	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
-		if ((oldModel.getStructure().getRoot() == null) || (newModel.getStructure().getRoot() == null)) {
+	public void calculateContent(final FeatureModelFormula oldModel, final FeatureModelFormula newModel, IProgressMonitor monitor) {
+		if ((FeatureUtils.getRoot(oldModel.getFeatureModel()) == null) || (FeatureUtils.getRoot(newModel.getFeatureModel()) == null)) {
 			return;
 		}
 
@@ -288,7 +292,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param oldModel
 	 * @param newModel
 	 */
-	private void setHeadAndExamples(IProgressMonitor monitor, IFeatureModel oldModel, IFeatureModel newModel) {
+	private void setHeadAndExamples(IProgressMonitor monitor, FeatureModelFormula oldModel, FeatureModelFormula newModel) {
 		monitor.setTaskName(COMPARE_MODELS);
 		final TreeObject head = calculateHead(oldModel, newModel, comparator);
 		final TreeElement[] children = invisibleRoot.getChildren();
@@ -301,10 +305,10 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	/**
 	 * Calculates the content of the first line Compares the old with the new model
 	 */
-	private TreeObject calculateHead(IFeatureModel oldModel, IFeatureModel newModel, ModelComparator comparator) {
+	private TreeObject calculateHead(FeatureModelFormula oldModel, FeatureModelFormula newModel, ModelComparator comparator) {
 		final long start = System.currentTimeMillis();
 
-		final Comparison comparison = comparator.compare(oldModel, newModel);
+		final Comparison comparison = comparator.compare(oldModel.getFeatureModel(), newModel.getFeatureModel());
 
 		String message;
 		Image image;
@@ -345,16 +349,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated
 	 * @param monitor The monitor of the running job
 	 */
-	private void addStatistics(TreeParent root, final String text, final IFeatureModel model, int position, boolean init, IProgressMonitor monitor) {
+	private void addStatistics(TreeParent root, final String text, final FeatureModelFormula model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.setTaskName("Calculate: \"" + text + "\"");
 		}
 
-		final int features = model.getNumberOfFeatures();
-		final int constraints = model.getConstraintCount();
-		final int concrete = model.getAnalyser().countConcreteFeatures();
-		final int terminal = model.getAnalyser().countTerminalFeatures();
-		final int hidden = model.getAnalyser().countHiddenFeatures();
+		final int features = model.getFeatureModel().getNumberOfFeatures();
+		final int constraints = model.getFeatureModel().getConstraintCount();
+		final int concrete = model.getAnalyzer().countConcreteFeatures();
+		final int terminal = model.getAnalyzer().countTerminalFeatures();
+		final int hidden = model.getAnalyzer().countHiddenFeatures();
 
 		if (init) {
 			// case: init
@@ -363,8 +367,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 				@Override
 				public void initChildren() {
-					// Cached validity for speed
-					addChild(MODEL_VOID + model.getAnalyser().valid());
+					// TODO catch time put
+					addChild(MODEL_VOID + model.getAnalyzer().isValid(null));
 					addChild(NUMBER_FEATURES + features);
 					addChild(NUMBER_CONCRETE + concrete);
 					addChild(NUMBER_ABSTRACT + (features - concrete));
@@ -382,13 +386,14 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			// calculates the statistics
 			final TreeObject statistics = (TreeObject) root.getChildren()[position];
 			final TreeElement[] children = statistics.getChildren();
-			if (children[INDEX_VALID] instanceof SelectableFeature) {
-				// Cached validity for speed
-				((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().valid());
-			} else {
-				// Cached validity for speed
-				((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().valid());
-			}
+			try {
+				// TODO catch time put
+				if (children[INDEX_VALID] instanceof SelectableFeature) {
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid(null));
+				} else {
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyzer().isValid(null));
+				}
+			} catch (final ConcurrentModificationException e) {}
 			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
 			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
 			((TreeObject) children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT + (features - concrete));
@@ -442,7 +447,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		}
 	}
 
-	private TreeParent calculateNumberOfVariants(IFeatureModel model, boolean ignoreAbstractFeatures) {
+	private TreeParent calculateNumberOfVariants(FeatureModelFormula model, boolean ignoreAbstractFeatures) {
 
 		final String variants = ignoreAbstractFeatures ? CONFIGURATIONS : PROGRAM_VARIANTS;
 		final TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {
@@ -451,13 +456,15 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			public void initChildren() {}
 		};
 
-		if (!ignoreAbstractFeatures && (model.getAnalyser().countConcreteFeatures() == 0)) {
+		if (!ignoreAbstractFeatures && (model.getAnalyzer().countConcreteFeatures() == 0)) {
 			// case: there is no concrete feature so there is only one program variant,
 			// without this the calculation least much to long
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION, !ignoreAbstractFeatures);
+		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(model, new Configuration(model));
+		analyzer.setIncludeAbstractFeatures(!ignoreAbstractFeatures);
+		final long number = analyzer.number(TIMEOUT_CONFIGURATION);
 		String s = "";
 		if (number < 0) {
 			s += MORE_THAN + (-1 - number);

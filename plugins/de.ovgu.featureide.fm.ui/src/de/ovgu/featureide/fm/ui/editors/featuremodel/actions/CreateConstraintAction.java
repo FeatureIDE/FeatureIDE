@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * Creates a new propositional constraint below the feature diagram.
@@ -42,8 +42,12 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	public CreateConstraintAction(Object viewer, IFeatureModel featuremodel) {
-		super(viewer, featuremodel, CREATE_CONSTRAINT, ID);
+	public CreateConstraintAction(Object viewer, IFeatureModelManager featureModelManager) {
+		this(viewer, featureModelManager, ID);
+	}
+
+	protected CreateConstraintAction(Object viewer, IFeatureModelManager featureModelManager, String id) {
+		super(viewer, featureModelManager, CREATE_CONSTRAINT, id);
 		setImageDescriptor(createImage);
 	}
 
@@ -54,7 +58,6 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
 	@Override
 	public void run() {
-		super.run();
 		openEditor(null);
 	}
 

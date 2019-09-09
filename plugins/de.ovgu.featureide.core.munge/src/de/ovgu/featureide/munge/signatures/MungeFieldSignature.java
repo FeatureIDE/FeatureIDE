@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -46,10 +46,10 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 	public String toString() {
 		final StringBuilder fieldString = new StringBuilder();
 
-//		fieldString.append(super.toString());
-//		if (fieldString.length() > 0) {
-//			fieldString.append(LINE_SEPARATOR);
-//		}
+		// fieldString.append(super.toString());
+		// if (fieldString.length() > 0) {
+		// fieldString.append(LINE_SEPARATOR);
+		// }
 
 		if (mergedjavaDocComment != null) {
 			fieldString.append(mergedjavaDocComment);

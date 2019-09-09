@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _hDk9IOvTEee9ofvBkamr2g
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 7/7/19 5:07 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/18/19 10:55 PM
 Testcase-Type: ecl
 Verifications: _UKIhUOvaEee9ofvBkamr2g,_TfaZAIa1Eemi6KBWYfLE5Q,_7uNdoOvcEee9ofvBkamr2g,_AxTkEOvdEee9ofvBkamr2g,_gxx6IOvhEee9ofvBkamr2g,_qiKvwOvZEee9ofvBkamr2g
 
@@ -66,6 +66,7 @@ with [get-view "Project Explorer"] {
             | double-click
     }
 }
+
 /*
 with [get-editor "Elevator-Antenna-v1.2 Model"] {
     click
@@ -125,6 +126,15 @@ with [get-editor "Request.java" | get-text-viewer] {
     key-type "M1+s"
     hover-text 177 38
 }
+
+with [get-view "Package Explorer"] {
+    click
+    with [get-tree] {
+        select "Elevator-Antenna-v1.2/src/de.ovgu.featureide.examples.elevator.core.controller/ITriggerListener.java" 
+            | double-click
+    }
+}
+/*
 get-view Problems | get-tree | select "Warnings \\(4 items\\)/This annotation causes a dead code block.\r\n"
     + "The presence condition of Sabbath is a contradiction because:\r\n"
     + "• Sabbath and FIFO are alternatives \\(i.e., ¬\\(Sabbath ∧ FIFO\\)\\).\r\n"
@@ -133,6 +143,7 @@ get-view Problems | get-tree | select "Warnings \\(4 items\\)/This annotation ca
     + "• DirectedCall ⇒ ShortestPath is a constraint.\r\n"
     + "• UndirectedCall ⇒ FIFO ∨ ShortestPath is a constraint.\r\n"
     + "• The expression is nested within a block annotated with CallButtons." | double-click
+*/
 with [get-editor "ITriggerListener.java" | get-text-viewer] {
     set-caret-pos 37 5
     key-type Right
@@ -140,31 +151,42 @@ with [get-editor "ITriggerListener.java" | get-text-viewer] {
     key-type Del
     key-type "M1+s"
 }
+
+/*
 get-view Problems | get-tree 
     | select "Warnings \\(3 items\\)/This expression is a contradiction and causes a dead code block." | double-click
+*/
 with [get-editor "Request.java" | get-text-viewer] {
-    set-caret-pos 66 5
-    key-type Right
-    key-type "M2+ARROW_DOWN" -times 4
-    key-type Del
+    set-caret-pos 67 1
+    key-type "M1+d"
+    key-type Down
+    key-type "M1+d"
     key-type "M1+s"
 }
+
+/*
 get-view Problems | get-tree | select "Warnings \\(2 items\\)/This annotation is superfluous.\r\n"
     + "The presence condition of CallButtons is a tautology because:\r\n"
     + "• The expression is nested within a block annotated with CallButtons. \\(2\\/3\\)" | double-click
+*/
 with [get-editor "Request.java" | get-text-viewer] {
-    key-type Del -times 2
-    key-type Down -times 3
-    key-type "M2+ARROW_DOWN"
-    key-type Del
+    set-caret-pos 131 1
+    key-type "M1+d"
+    key-type Down
+    key-type Down
+    key-type Down
+    key-type "M1+d"
     key-type "M1+s"
 }
+
+/*
 get-view Problems | get-tree | select "Warnings \\(1 item\\)/This annotation is superfluous.\r\n"
     + "The presence condition of Sabbath ∨ FIFO ∨ ShortestPath is a tautology because:\r\n"
     + "• DirectedCall and UndirectedCall are alternative children of CallButtons \\(i.e., CallButtons ⇒ DirectedCall ∨ UndirectedCall\\).\r\n"
     + "• CallButtons ∨ Sabbath is a constraint.\r\n"
     + "• DirectedCall ⇒ ShortestPath is a constraint.\r\n"
     + "• UndirectedCall ⇒ FIFO ∨ ShortestPath is a constraint." | double-click
+*/
 with [get-editor "ControlUnit.java" | get-text-viewer] {
     set-caret-pos 39 5
     key-type Right

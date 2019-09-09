@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -103,10 +103,10 @@ public class Commons {
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
 		for (final File f : modelFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.load(f.toPath()).getObject();
+				return FeatureModelManager.load(f.toPath());
 			}
 		}
-		return FMFactoryManager.getEmptyFeatureModel();
+		return DefaultFeatureModelFactory.getInstance().create();
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

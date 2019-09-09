@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,10 +29,10 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
@@ -53,13 +53,10 @@ public class TikzFormatTest {
 
 	@Test
 	public void testLatexExporter() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel tikzExample = Commons.loadTestFeatureModelFromFile(TEST_XML_FILE_NAME);
+		final FeatureModelManager tikzExample = Commons.loadTestFeatureModelFromFile(TEST_XML_FILE_NAME);
 		final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzGraphicalFeatureModelFormat.TikZHeadFormat();
-		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat().new TikZMainFormat();
+		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzGraphicalFeatureModelFormat.TikZMainFormat();
 		final IPersistentFormat<IGraphicalFeatureModel> formatbody = new TikzGraphicalFeatureModelFormat.TikZBodyFormat(TEST_TEX_MAIN_FILE_NAME);
-		String head = new String();
-		String main = new String();
-		String body = new String();
 		String testHead = new String();
 		String testBody = new String();
 		String testMain = new String();
@@ -93,9 +90,9 @@ public class TikzFormatTest {
 		}
 
 		// execute Tikz-Exporter
-		head = formatHead.write(gFM).replace(System.lineSeparator(), "\n");
-		main = formatMain.write(gFM).replace(System.lineSeparator(), "\n");
-		body = formatbody.write(gFM).replace(System.lineSeparator(), "\n");
+		final String head = formatHead.write(gFM).replace(System.lineSeparator(), "\n");
+		final String main = formatMain.write(gFM).replace(System.lineSeparator(), "\n");
+		final String body = formatbody.write(gFM).replace(System.lineSeparator(), "\n");
 
 		// test the Tikz-Exporter
 		assertEquals(testHead, head);

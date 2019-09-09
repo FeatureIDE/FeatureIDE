@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -315,16 +315,17 @@ abstract public class FeatureDiagramLayoutManager {
 		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 
 		// Check the first four positions for intersections with the features
-		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().getHasVerticalLayout());
+		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().hasVerticalLayout());
 
 		// Add the position next to the featureModel and check for hits with the constraints
 		rects.add(new Rectangle(new Point(max.x + FMPropertyManager.getFeatureSpaceX(), min.y), legendSize));
-		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().getHasVerticalLayout());
+		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().hasVerticalLayout());
 
 		if (rects.size() > 0) {
 			// At this point, rects does only contain positions for the legend that are acceptable. So we take the first
-			featureModel.getLayout().setLegendPos(rects.get(0).getLocation().x, rects.get(0).getLocation().y);
-			return featureModel.getLayout().getLegendPos();
+			final Point location = rects.get(0).getLocation();
+			featureModel.getLegend().setPos(location);
+			return location;
 		}
 
 		// It was not possible to find any empty space, probably there is an intersection with a constraint.
@@ -332,8 +333,9 @@ abstract public class FeatureDiagramLayoutManager {
 		final Rectangle boundsOfEverything = featureModelBound.getFeatureModelBounds(featureModel.getVisibleConstraints());
 		boundsOfEverything.union(featureModelBounds);
 
-		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
-		return featureModel.getLayout().getLegendPos();
+		final Point pos = new Point(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		featureModel.getLegend().setPos(pos);
+		return pos;
 	}
 
 	/**

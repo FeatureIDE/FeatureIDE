@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -48,45 +48,28 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 public class ConfigurationLoader {
 
 	private final IConfigurationLoaderCallback callback;
-	private boolean propagateConfigs;
 
 	public ConfigurationLoader() {
 		this(null);
 	}
 
 	public ConfigurationLoader(IConfigurationLoaderCallback callback) {
-		this(callback, false);
-	}
-
-	public ConfigurationLoader(IConfigurationLoaderCallback callback, boolean propagateConfigs) {
 		this.callback = callback;
-		this.propagateConfigs = propagateConfigs;
 	}
 
-	/**
-	 * @return If the configfs should be propagated. The default value is false.
-	 */
-	public boolean isPropagatingConfigs() {
-		return propagateConfigs;
-	}
-
-	public void setPropagateConfigs(boolean propagateConfigs) {
-		this.propagateConfigs = propagateConfigs;
-	}
-
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, String path) {
 		return loadConfigurations(featureModel, Paths.get(path));
 	}
 
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, Path path) {
 		return loadConfigurations(featureModel, path, null);
 	}
 
-	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path, String excludeFile) {
+	public List<Configuration> loadConfigurations(FeatureModelFormula featureModel, String path, String excludeFile) {
 		return loadConfigurations(featureModel, Paths.get(path), excludeFile);
 	}
 
-	public List<Configuration> loadConfigurations(final IFeatureModel featureModel, Path path, final String excludeFile) {
+	public List<Configuration> loadConfigurations(final FeatureModelFormula featureModel, Path path, final String excludeFile) {
 		final List<Configuration> configs = new ArrayList<>();
 		final HashSet<String> configurationNames = new HashSet<>();
 
@@ -105,9 +88,10 @@ public class ConfigurationLoader {
 						final int extensionIndex = fileName.lastIndexOf('.');
 						final String configurationName = (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
 						if (configurationNames.add(configurationName)) {
-							final Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
-							final FileHandler<Configuration> fileHandler = ConfigurationManager.load(file, currentConfiguration);
+							final FileHandler<Configuration> fileHandler = ConfigurationManager.getFileHandler(file);
 							if (!fileHandler.getLastProblems().containsError()) {
+								final Configuration currentConfiguration = fileHandler.getObject();
+								currentConfiguration.updateFeatures(featureModel);
 								configs.add(currentConfiguration);
 								if (callback != null) {
 									callback.onConfigurationLoaded(currentConfiguration, file);

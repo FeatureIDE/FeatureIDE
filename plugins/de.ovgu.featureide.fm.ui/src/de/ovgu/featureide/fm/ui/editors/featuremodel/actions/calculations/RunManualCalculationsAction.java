@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,13 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CALCULATIONS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * Action to specify feature model analysis.<br> A manual call of the feature model analysis.
@@ -36,25 +37,21 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class RunManualCalculationsAction extends Action {
+public class RunManualCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.runmanualcalculations";
 
-	private final IFeatureModel featureModel;
-
-	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(RUN_MANUAL_CALCULATIONS);
+	public RunManualCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(RUN_MANUAL_CALCULATIONS, ID, featureModelManager);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"));
-		this.featureModel = featureModel;
-		setId(ID);
 	}
 
 	@Override
 	public void run() {
-		final boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
-		featureModel.getAnalyser().runCalculationAutomatically = true;
-		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
+		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
+		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
+		analyzer.analyzeFeatureModel(new NullMonitor<>());
+		featureModelManager.fireEvent(new FeatureIDEEvent(variableFormula.getFeatureModel(), EventType.REDRAW_DIAGRAM));
 	}
 
 }

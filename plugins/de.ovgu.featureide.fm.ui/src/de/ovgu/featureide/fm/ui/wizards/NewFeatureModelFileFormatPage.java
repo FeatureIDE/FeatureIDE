@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -38,8 +38,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
@@ -51,7 +52,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  */
 public class NewFeatureModelFileFormatPage extends WizardPage {
 
-	private final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
+	private final List<IPersistentFormat<IFeatureModel>> formatExtensions = FMFormatManager.getInstance().getExtensions();
 
 	private Combo formatCombo;
 
@@ -98,7 +99,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 	}
 
 	private void initialize() {
-		for (final IFeatureModelFormat format : formatExtensions) {
+		for (final IPersistentFormat<IFeatureModel> format : formatExtensions) {
 			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
 		}
 		try {
@@ -117,7 +118,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 		setPageComplete(message == null);
 	}
 
-	public IFeatureModelFormat getFormat() {
+	public IPersistentFormat<IFeatureModel> getFormat() {
 		return formatExtensions.get(formatCombo.getSelectionIndex());
 	}
 

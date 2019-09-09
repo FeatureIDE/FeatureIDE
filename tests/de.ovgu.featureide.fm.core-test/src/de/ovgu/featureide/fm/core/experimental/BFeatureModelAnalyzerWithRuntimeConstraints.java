@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.experimental;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.runtimetest.RuntimeTest;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.Constraint;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.WarmUp;
@@ -56,7 +57,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes the model completely.
 	 */
 	private static void analyze(final int i) {
-		getFM(i).getAnalyser().analyzeFeatureModel(null);
+		FeatureModelManager.getAnalyzer(getFM(i)).analyzeFeatureModel(null);
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1500)
@@ -113,60 +114,60 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
-		getFM(i).getAnalyser().updateConstraints();
+		FeatureModelManager.getAnalyzer(getFM(i)).updateConstraints();
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1500)
+	@Constraint(samples = 5, allowedPlus = 15000)
 	public final void BUpdateConstraints0001() {
 		BUpdateConstraints(1);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1350)
+	@Constraint(samples = 5, allowedPlus = 13500)
 	public final void BUpdateConstraints0002() {
 		BUpdateConstraints(2);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1100)
+	@Constraint(samples = 5, allowedPlus = 11000)
 	public final void BUpdateConstraints0010() {
 		BUpdateConstraints(10);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1050)
+	@Constraint(samples = 5, allowedPlus = 10500)
 	public final void BUpdateConstraints0020() {
 		BUpdateConstraints(20);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1050)
+	@Constraint(samples = 5, allowedPlus = 10500)
 	public final void BUpdateConstraints0021() {
 		BUpdateConstraints(21);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1050)
+	@Constraint(samples = 5, allowedPlus = 10500)
 	public final void BUpdateConstraints0050() {
 		BUpdateConstraints(50);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1050)
+	@Constraint(samples = 5, allowedPlus = 10500)
 	public final void BUpdateConstraints0100() {
 		BUpdateConstraints(100);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1150)
+	@Constraint(samples = 5, allowedPlus = 11500)
 	public final void BUpdateConstraints0200() {
 		BUpdateConstraints(201);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 1250)
+	@Constraint(samples = 5, allowedPlus = 12500)
 	public final void BUpdateConstraints0201() {
 		BUpdateConstraints(201);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 2500)
+	@Constraint(samples = 5, allowedPlus = 25000)
 	public final void BUpdateConstraints0500() {
 		BUpdateConstraints(500);
 	}
 
-	@Constraint(samples = 5, allowedPlus = 5800)
+	@Constraint(samples = 5, allowedPlus = 58000)
 	public final void BUpdateConstraints1000() {
 		BUpdateConstraints(1000);
 	}
@@ -175,7 +176,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
-		getFM(i).getAnalyser().updateFeatures();
+		FeatureModelManager.getAnalyzer(getFM(i)).updateFeatures();
 	}
 
 	@Constraint(samples = 5, allowedPlus = 1100)

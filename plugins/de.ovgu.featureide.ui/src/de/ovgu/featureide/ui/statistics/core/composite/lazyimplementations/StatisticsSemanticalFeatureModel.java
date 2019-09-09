@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
@@ -32,9 +32,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public class StatisticsSemanticalFeatureModel extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
+	public StatisticsSemanticalFeatureModel(String description, FeatureModelFormula model) {
 		super(description);
 		this.model = model;
 	}
@@ -42,7 +42,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	@Override
 	protected void initChildren() {
 		// Cached validity for speed
-		final boolean isValid = model.getAnalyser().valid();
+		final boolean isValid = model.getAnalyzer().isValid(null);
 
 		addChild(new Parent(MODEL_VOID, isValid));
 

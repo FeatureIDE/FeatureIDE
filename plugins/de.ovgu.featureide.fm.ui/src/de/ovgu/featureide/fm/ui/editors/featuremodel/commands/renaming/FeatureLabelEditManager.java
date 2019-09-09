@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -52,11 +53,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 
-	private final IFeatureModel featureModel;
+	private final IManager<IFeatureModel> featureModelManager;
 
-	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, IFeatureModel featureModel) {
+	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator,
+			IManager<IFeatureModel> featureModelManager) {
 		super(editpart, editorType, locator);
-		this.featureModel = featureModel;
+		this.featureModelManager = featureModelManager;
 	}
 
 	@Override
@@ -82,13 +84,18 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
 					} else {
+						final IFeatureModel featureModel = featureModelManager.getSnapshot();
 						final IProject project =
 							ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(featureModel.getSourceFile().toString())).getProject();
 						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(project);
 						if ((!fmComposerExtension.isValidFeatureName(value))) {
 							createTooltip(fmComposerExtension.getErrorMessage(), SWT.ICON_ERROR);
-						} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
-							createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
+						} else {
+							final Iterable<String> extractFeatureNames;
+							extractFeatureNames = FeatureUtils.extractFeatureNames(featureModel.getFeatures());
+							if (Functional.toList(extractFeatureNames).contains(value)) {
+								createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
+							}
 						}
 					}
 				}

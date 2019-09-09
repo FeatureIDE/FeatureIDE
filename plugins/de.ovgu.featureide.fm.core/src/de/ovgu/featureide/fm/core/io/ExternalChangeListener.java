@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
- * Is executed by a {@link AFileManager file manager} when new data was read from a file.
+ * Is executed by a {@link IFileManager file manager} when new data was read from a file.
  *
  * @author Sebastian Krieter
  */
@@ -31,10 +31,10 @@ public abstract class ExternalChangeListener {
 
 	public static ExternalChangeListener listener = new DefaultExternalChangeListener();
 
-	public static void update(AFileManager<?> fileManager) {
+	public static void update(IFileManager<?> fileManager) {
 		listener.doUpdate(fileManager);
 	}
 
-	protected abstract void doUpdate(AFileManager<?> fileManager);
+	protected abstract void doUpdate(IFileManager<?> fileManager);
 
 }

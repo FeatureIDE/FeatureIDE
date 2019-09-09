@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,10 +33,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -123,7 +124,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(Path config) {
 		if (!prepareFullBuild(config)) {
 			return;
 		}
@@ -330,10 +331,10 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param res file
 	 */
 	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
-		expressionStack = new Stack<Node>();
+		expressionStack = new ArrayDeque<>();
 
 		// count of if, ifelse and else to remove after processing of else from stack
-		ifelseCountStack = new Stack<Integer>();
+		ifelseCountStack = new ArrayDeque<>();
 
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
@@ -353,7 +354,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					ifelseCountStack.push(0);
 				}
 
-				if (!ifelseCountStack.empty() && !containsPreprocessorDirective(line, "else")) {
+				if (!ifelseCountStack.isEmpty() && !containsPreprocessorDirective(line, "else")) {
 					ifelseCountStack.push(ifelseCountStack.pop() + 1);
 				}
 
@@ -361,7 +362,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 				setMarkersNotConcreteFeatures(line, res, j + 1);
 			} else if (containsPreprocessorDirective(line, "endif")) {
-				while (!ifelseCountStack.empty()) {
+				while (!ifelseCountStack.isEmpty()) {
 					if (ifelseCountStack.peek() == 0) {
 						break;
 					}
@@ -373,7 +374,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					ifelseCountStack.push(ifelseCountStack.pop() - 1);
 				}
 
-				if (!ifelseCountStack.empty()) {
+				if (!ifelseCountStack.isEmpty()) {
 					ifelseCountStack.pop();
 				}
 			}
@@ -555,15 +556,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			featureList.deleteCharAt(length - 1);
 		}
 
-		featureModel = AdvancedNodeCreator.createNodes(configuration.getFeatureModel());
-
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
 			final Preprocessor preprocessor = new Preprocessor(new AntennaLogger(), new AntennaLineFilter());
 			preprocessor.addDefines(featureList.toString());
 			// preprocess for all files in source folder
-			preprocessSourceFiles(folder, preprocessor, congurationName);
+			preprocessSourceFiles(folder, preprocessor, congurationName, AdvancedNodeCreator.createNodes(featureModel));
 		} catch (CoreException | IOException | PPException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
@@ -572,12 +571,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	/**
 	 * Customized build for buildConfiguration().
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName)
+	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName, Node featureModelNode)
 			throws CoreException, FileNotFoundException, IOException {
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively
-				preprocessSourceFiles((IFolder) res, preprocessor, null);
+				preprocessSourceFiles((IFolder) res, preprocessor, null, featureModelNode);
 			} else if (res instanceof IFile) {
 				if (res.getName().equals(congurationName + "." + getConfigurationExtension())) {
 					continue;
@@ -586,7 +585,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
 
 				// do checking and some stuff
-				if (featureModel != null) {// TODO check why the FM is null when generating products
+				if (featureModelNode != null) {// TODO check why the FM is null when generating products
 					processLinesOfFile(lines, (IFile) res);
 				}
 				boolean changed = false;

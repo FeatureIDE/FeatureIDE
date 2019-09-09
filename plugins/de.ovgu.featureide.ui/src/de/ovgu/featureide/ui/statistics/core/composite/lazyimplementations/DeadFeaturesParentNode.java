@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -33,9 +33,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class DeadFeaturesParentNode extends LazyParent {
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public DeadFeaturesParentNode(String description, IFeatureModel model) {
+	public DeadFeaturesParentNode(String description, FeatureModelFormula model) {
 		super(description, null);
 		this.model = model;
 		calculateChidren(false);
@@ -44,11 +44,11 @@ public class DeadFeaturesParentNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 		// TODO Performance: Dead and core features should be calculated together.
-		final List<IFeature> deadFeatures = model.getAnalyser().getDeadFeatures();
+		final List<IFeature> deadFeatures = model.getAnalyzer().getDeadFeatures(null);
 		setValue(deadFeatures.size());
 
 		for (final IFeature feature : deadFeatures) {
-			addChild(new FeatureNode(feature, true));
+			addChild(new FeatureNode(model, feature, true));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,14 +24,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
-
-import de.ovgu.featureide.fm.core.filter.base.AndFilter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Common interfaces for functional style.
@@ -41,116 +45,9 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 public abstract class Functional {
 
 	/**
-	 * Represents a function that takes one argument of type <b>T</b> and returns a result of type <b>R</b>. <br> <br> <b>Example</b> The following example
-	 * shows a function which takes an integer and converts this integer to its string representation (Java 1.8 syntax used). <code> IFunction&lt;Integer,
-	 * String&gt; toString = (integer) -&gt; { integer.toString() }; String seven = toString(7); // seven.equals("7") </code>
-	 *
-	 * @see Functional#map(Iterable, IFunction)
-	 * @see Functional#join(Iterable, String, IFunction)
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
-	 * @see Functional#equals(Object)
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static interface IFunction<T, R> {
-
-		R invoke(T t);
-	}
-
-	/**
-	 * Represents a function that takes two arguments of type <b>T</b> and <b>U</b>. It returns a result of type <b>R</b>. <br> <br> <b>Example</b> The
-	 * following example shows a function which takes two integer and converts the sum of these to its string representation (Java 1.8 syntax used). <code>
-	 * IBinaryFunction&lt;Integer, Integer, String&gt; toString = (a,b) &rArr; { new Integer(a.intValue() + b.intValue()).toString() }; String seven =
-	 * toString(2,5); // seven.equals("7") </code>
-	 *
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
-	 *
-	 * @see Functional#map(Iterable, IFunction)
-	 * @see Functional#join(Iterable, String, IFunction)
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
-	 * @see Functional#equals(Object)
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static interface IBinaryFunction<T, U, R> {
-
-		R invoke(T t, U u);
-	}
-
-	/**
-	 * Represents an operation that takes one arguments of type <b>T</b> and produces no result. <br> <br> <b>Example</b> The following example demonstrate the
-	 * usage of <code>IConsumer</code>. For each element in a collection, the value is printed to the standard out (Java 1.8 syntax). <code>
-	 * IConsumer&lt;MyClass&gt; print = (myInstance) -&gt; { System.out.println(myInstance) }; for (MyClass myInstance : collectionOfMyClassInstances)
-	 * print.invoke(myInstance); </code>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static interface IConsumer<T> {
-
-		void invoke(T t);
-	}
-
-	/**
-	 * Represents an operation that takes no arguments but produces a result of type <b>T</b>. <br> <br> <b>Example</b> The following example demonstrate the
-	 * usage of <code>IProvider</code>. For each call, a new random number is created (Java 1.8 syntax). <code> IProvider&lt;Integer&gt; random = () -&gt; { new
-	 * Random().nextInt() }; System.out.println(random.invoke()); // unlikely to print "42" to the console </code> This function is of interest when a new
-	 * instance of a complex should be generated on-demand.
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static interface IProvider<T> {
-
-		T invoke();
-	}
-
-	public static class NullConsumer<T> implements IConsumer<T> {
-
-		@Override
-		public void invoke(T t) {}
-	};
-
-	/**
-	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type. <br> <br> <b>Example</b> The following example
-	 * shows a function which takes an integer and applied 2 times this integer (Java 1.8 syntax used). <code> IdentityFunction&lt;Integer&gt; twoTimes =
-	 * (integer) -&gt; { integer.intValue() * 2 }; Integer value = twoTimes(7); // seven.equals("14") </code>
-	 *
-	 * @see Functional#map(Iterable, IFunction)
-	 * @see Functional#join(Iterable, String, IFunction)
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
-	 * @see Functional#equals(Object)
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static class IdentityFunction<T> implements IFunction<T, T> {
-
-		@Override
-		public T invoke(T t) {
-			return t;
-		}
-	};
-
-	/**
-	 * Returns <code>null</code> independent of the input argument.
-	 *
-	 * @author Sebastian Krieter
-	 * @since 3.0
-	 *
-	 */
-	public static class NullFunction<T, U> implements IFunction<T, U> {
-
-		@Override
-		public U invoke(T t) {
-			return null;
-		}
-	};
-
-	/**
 	 * Convenience function to invoke {@link Object#toString()} on the input parameter.
+	 *
+	 * @param <T> element class
 	 *
 	 * @see Functional#mapToString(Iterable)
 	 * @see Functional.ToCharSequenceFunction
@@ -159,10 +56,10 @@ public abstract class Functional {
 	 * @since 3.0
 	 *
 	 */
-	public static class ToStringFunction<T> implements IFunction<T, String> {
+	public static class ToStringFunction<T> implements Function<T, String> {
 
 		@Override
-		public String invoke(T t) {
+		public String apply(T t) {
 			return t.toString();
 		}
 	};
@@ -171,17 +68,18 @@ public abstract class Functional {
 	 * Convenience function to invoke {@link Object#toString()} on the input parameter. Afterwards the resulting string is converted to an instance of
 	 * {@link CharSequence}.
 	 *
+	 * @param <T> element class
+	 *
 	 * @see Functional.ToStringFunction
-	 * @see Functional#mapToCharSequenceList(Iterable)
 	 * @see Functional#mapToString(Iterable)
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static class ToCharSequenceFunction<T> implements IFunction<T, CharSequence> {
+	public static class ToCharSequenceFunction<T> implements Function<T, CharSequence> {
 
 		@Override
-		public CharSequence invoke(T t) {
+		public CharSequence apply(T t) {
 			return t.toString();
 		}
 	};
@@ -201,7 +99,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Implements an iterable iterator that invokes a user-defined {@link Functional.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on each element
+	 * Implements an iterable iterator that invokes a user-defined {@link Functional.Function Function} <i>f</i> of type <b>T</b> and <b>U</b> on each element
 	 * that is yield by a user provided iterator <i>i</i> of type <b>T</b>. Since this is implemented using iterator logic, the application of <i>f</i> on the
 	 * entire collection of element is done in a lazy fashion. Furthermore, it is guaranteed no element from the iterator <i>i</i> is removed during this
 	 * process.
@@ -211,19 +109,19 @@ public abstract class Functional {
 	 */
 	private static class MapIterator<U, T> implements Iterator<U>, Iterable<U> {
 
-		private final IFunction<T, U> function;
+		private final Function<T, U> function;
 
 		private final Iterator<T> collectionIterator;
 
 		/**
-		 * An iterable iterator that invokes a user-defined {@link Functional.IFunction Function} of type <b>T</b> and <b>U</b> on each element providing by the
-		 * iterator of <b>it</b> over type <b>T</b> and returns the modified element afterwards. It is guaranteed not to remove any element from <b>it</b>
-		 * during this process.
+		 * An iterable iterator that invokes a user-defined {@link Function} of type <b>T</b> and <b>U</b> on each element providing by the iterator of
+		 * <b>it</b> over type <b>T</b> and returns the modified element afterwards. It is guaranteed not to remove any element from <b>it</b> during this
+		 * process.
 		 *
-		 * @param collection
-		 * @param function
+		 * @param it the iterable
+		 * @param function the function
 		 */
-		public MapIterator(Iterable<T> it, IFunction<T, U> function) {
+		public MapIterator(Iterable<T> it, Function<T, U> function) {
 			assert (it != null);
 			assert (function != null);
 
@@ -238,7 +136,7 @@ public abstract class Functional {
 
 		@Override
 		public U next() {
-			return function.invoke(collectionIterator.next());
+			return function.apply(collectionIterator.next());
 		}
 
 		@Override
@@ -263,7 +161,7 @@ public abstract class Functional {
 	 */
 	private static class FilterIterator<U, T extends U> implements Iterator<T>, Iterable<T> {
 
-		private final IFilter<U> filter;
+		private final Predicate<U> filter;
 
 		private final Iterator<T> collectionIterator;
 
@@ -271,18 +169,21 @@ public abstract class Functional {
 
 		/**
 		 * An iterable iterator that only yields elements of type <b>T</b> provided by a user-defined iterator <b>i</b> if and only if the elements satisfy a
-		 * user-defined filter condition defined by a {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter} <b>filter</b> of type <b>U</b>. Since this
-		 * is implemented using iterator logic, the evaluation of <i>c</i> on the entire collection of element is done in a lazy fashion. Furthermore, it is
-		 * guaranteed not to remove any element from the iterator <i>i</i>.
+		 * user-defined filter condition defined by a {@link Predicate Filter} <b>filter</b> of type <b>U</b>. Since this is implemented using iterator logic,
+		 * the evaluation of <i>c</i> on the entire collection of element is done in a lazy fashion. Furthermore, it is guaranteed not to remove any element
+		 * from the iterator <i>i</i>.
+		 *
+		 * @param it the iterable
+		 * @param filter the filter
 		 *
 		 * @author Marcus Pinnecke
 		 * @since 3.0
 		 */
-		public FilterIterator(Iterable<T> it, IFilter<U> filter) {
+		public FilterIterator(Iterable<T> it, Predicate<U> filter) {
 			this(it.iterator(), filter);
 		}
 
-		public FilterIterator(Iterator<T> it, IFilter<U> filter) {
+		public FilterIterator(Iterator<T> it, Predicate<U> filter) {
 			assert (it != null);
 			assert (filter != null);
 
@@ -294,7 +195,7 @@ public abstract class Functional {
 		public boolean hasNext() {
 			while (collectionIterator.hasNext()) {
 				next = collectionIterator.next();
-				if (filter.isValid(next)) {
+				if (filter.test(next)) {
 					return true;
 				}
 			}
@@ -320,53 +221,44 @@ public abstract class Functional {
 
 	/**
 	 * Filters an object named <b>source</b> that yields elements of type <b>T</b> by a given <b>predicate</b> over <b>U</b> and transforms all qualified
-	 * elements from <b>T</b> to <b>U</b> using a user-defined {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter}. This filtering is done in a lazy
-	 * manner using iterator logic. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>. <br> <br> It is assumed that
-	 * <b>source</b> and <b>predicate</b> are non-null. <br> <br> This is a <b>non-blocking</b> operation.
+	 * elements from <b>T</b> to <b>U</b> using a user-defined {@link Predicate Filter}. This filtering is done in a lazy manner using iterator logic.
+	 * Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>. <br> <br> It is assumed that <b>source</b> and <b>predicate</b> are
+	 * non-null. <br> <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
 	 * @param predicate Filter condition
-	 * @param <U>
-	 * @param <T>
+	 * @param <U> mapped element class
+	 * @param <T> element class
 	 * @return An iterable object that yields all qualified elements of <b>source</b>
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
+	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final Predicate<U> predicate) {
 		return predicate == null ? source : new FilterIterator<U, T>(source, predicate);
 	}
 
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final List<IFilter<U>> predicate) {
-		return predicate == null ? source : new FilterIterator<U, T>(source, new AndFilter<U>(predicate));
-	}
-
-	@SafeVarargs
-	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U>... predicate) {
-		return filter(source, Arrays.asList(predicate));
-	}
-
-	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
-		return predicate == null ? new DefaultIterable<>(source) : new FilterIterator<U, T>(source, predicate);
+	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final Predicate<U> predicate) {
+		return predicate == null ? new DefaultIterable<>(source) : new FilterIterator<>(source, predicate);
 	}
 
 	/**
-	 * Maps a user-defined {@link IFunction} that takes elements of type <b>T</b> and returns for each element a result of type <b>U</b> on each element of an
+	 * Maps a user-defined {@link Function} that takes elements of type <b>T</b> and returns for each element a result of type <b>U</b> on each element of an
 	 * object named <b>source</b> that yields elements of type <b>T</b>. This mapping process is done in a lazy manner using iterator logic. Furthermore, it is
 	 * guaranteed not to remove any element from the iterator <i>i</i>. <br> <br> It is assumed that <b>source</b> and <b>function</b> are non-null. <br> <br>
 	 * This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
-	 * @param function user-defined {@link IFunction}
-	 * @param <U>
-	 * @param <T>
+	 * @param function user-defined {@link Function}
+	 * @param <U> mapped element class
+	 * @param <T> element class
 	 * @return An iterable object that yields all elements of <b>source</b> after applying <b>function</b>
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <U, T> Iterable<U> map(final Iterable<T> source, IFunction<T, U> function) {
-		return new MapIterator<U, T>(source, function);
+	public static <U, T> Iterable<U> map(final Iterable<T> source, Function<T, U> function) {
+		return new MapIterator<>(source, function);
 	}
 
 	/**
@@ -374,7 +266,7 @@ public abstract class Functional {
 	 * to not remove any element from the iterator. <br> <br> This is a <b>non-blocking</b> operation.
 	 *
 	 * @param source Source of elements
-	 * @param <T>
+	 * @param <T> element class
 	 * @return An iterable object that yields all elements of <b>source</b> after invoking <code>toString</code> on them
 	 *
 	 * @see Functional.ToStringFunction
@@ -386,23 +278,23 @@ public abstract class Functional {
 		return map(source, new ToCharSequenceFunction<T>());
 	}
 
+	public static <T> Collection<T> toCollection(Iterable<T> elements) {
+		return (elements instanceof Collection) ? ((Collection<T>) elements) : Functional.toList(elements);
+	}
+
 	/**
 	 * Converts the iterator <i>i</i> of type <b>T</b> into a list of type <b>T</b> by adding each element of <i>i</i> to the result list. <br> <br> It is
 	 * guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b> operation. The resulting list <b>is not modifiable</b>
 	 *
 	 * @param source Source of elements
-	 * @param <T>
+	 * @param <T> element class
 	 * @return A list of object that were yielded by <b>source</b>
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
 	public static <T> List<T> toList(final Iterable<T> source) {
-		final ArrayList<T> retval = new ArrayList<T>();
-		for (final T t : source) {
-			retval.add(t);
-		}
-		return retval;
+		return collect(source, new ArrayList<>());
 	}
 
 	/**
@@ -410,26 +302,31 @@ public abstract class Functional {
 	 * guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b> operation. The resulting set <b>is not modifiable</b>.
 	 *
 	 * @param source Source of elements
-	 * @param <T>
+	 * @param <T> element class
 	 * @return A list of object that were yielded by <b>source</b>
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
 	public static <T> Set<T> toSet(final Iterable<T> source) {
-		final HashSet<T> retval = new HashSet<T>();
-		for (final T t : source) {
-			retval.add(t);
-		}
-		return retval;
+		return collect(source, new HashSet<>());
 	}
 
-	public static <T, R> List<R> mapToList(final Iterable<T> source, IFilter<T> filter, IFunction<T, R> mapFunction) {
+	private static <T, C extends Collection<T>> C collect(final Iterable<T> source, C collection) {
+		source.forEach(collection::add);
+		return collection;
+	}
+
+	public static <T, R> List<R> mapToList(final Iterable<T> source, Predicate<T> filter, Function<T, R> mapFunction) {
 		return Functional.toList(Functional.map(Functional.filter(source, filter), mapFunction));
 	}
 
-	public static <T, R> List<R> mapToList(final Iterable<T> source, IFunction<T, R> mapFunction) {
+	public static <T, R> List<R> mapToList(final Iterable<T> source, Function<T, R> mapFunction) {
 		return Functional.toList(Functional.map(source, mapFunction));
+	}
+
+	public static <T> List<T> filterToList(final Iterable<T> source, Predicate<T> filter) {
+		return Functional.toList(Functional.filter(source, filter));
 	}
 
 	/**
@@ -438,7 +335,7 @@ public abstract class Functional {
 	 * operation.
 	 *
 	 * @param source Source of elements
-	 * @param <T>
+	 * @param <T> element class
 	 * @return A collection of strings that were yielded by <b>source</b>
 	 *
 	 * @author Marcus Pinnecke
@@ -454,7 +351,7 @@ public abstract class Functional {
 	 * operation.
 	 *
 	 * @param source Source of elements
-	 * @param <T>
+	 * @param <T> element class
 	 * @return A collection of strings that were yielded by <b>source</b>
 	 *
 	 * @author Marcus Pinnecke
@@ -465,54 +362,16 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>source</i> of type <b>T</b> into a collection of <b>CharSequence</b> using a binary function invoking {@link Object#toString()}
-	 * on each element in <b>source</b> and finally {@link #toList(Iterable)} on the result. <br> <br> It is guaranteed not to remove any element from the
-	 * iterator. <br> <br> This is a <b>blocking</b> operation.
-	 *
-	 * @param source Source of elements
-	 * @param <T>
-	 * @return A collection of CharSequence that were yielded by <b>source</b>
-	 *
-	 * @see Functional.ToCharSequenceFunction
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
-		return toList(map(source, new ToCharSequenceFunction<T>()));
-	}
-
-	/**
-	 * Converts the enumeration <i>enumeration</i> of type <b>T</b> into an Iterable of <b>T</b>. The enumeration is read into a intermediate collection which
-	 * is then used to create the result value. <br> It is guaranteed not to remove any element from the iterator. <br> <br> This is a <b>blocking</b>
-	 * operation.
-	 *
-	 * @param enumeration Enumeration of elements
-	 * @param <T>
-	 * @return An iterable of <b>T</b> that were yielded by <b>enumeration</b>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
-		final Collection<T> collection = new ArrayList<>();
-		while (enumeration.hasMoreElements()) {
-			collection.add(enumeration.nextElement());
-		}
-		return collection;
-	}
-
-	/**
 	 * Joins the elements of type <b>T</b> in <code>source</code> using <code>delimiter</code> as the delimiting element between a pair of elements from
 	 * <code>source</code> into a combined object of type <b>R</b>. The method first constructs a new instance of <b>R</b> as the <i>result</i> using the
 	 * <code>newInstanceOfR</code> parameter. Afterwards <code>source</code> is converted to a list of type <b>T</b>. For each element in this list the function
 	 * parameter <code>concat</code> is invoked with <i>result</i> as the first parameter and the current element of the list as second parameter. For each pair
 	 * of elements, <code>concat</code> is invoked again to add the delimiter. <br> <br> <b>Example</b><br> The convenience method
-	 * {@link Functional#join(Iterable, String, IFunction)} which takes the elements yielded by <code>source</code> and joins these elements into a string is
-	 * implemented using the general method {@link Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)}:. <code> &lt;T&gt; String
-	 * join(Iterable&lt;T&gt; source, String delimiter, IFunction&lt;T, String&gt; convert) { return join(source, delimiter, new IProvider&lt;String&gt;() {
-	 * String invoke() { return ""; } }, convert, new IBinaryFunction&lt;String, String, String&gt;() { String invoke(String t, String u) { return t + u; } });
-	 * } </code> <br>
+	 * {@link Functional#join(Iterable, String, Function)} which takes the elements yielded by <code>source</code> and joins these elements into a string is
+	 * implemented using the general method {@link Functional#join(Iterable, Object, Supplier, Function, BiFunction)}:. <code> &lt;T&gt; String
+	 * join(Iterable&lt;T&gt; source, String delimiter, Function&lt;T, String&gt; convert) { return join(source, delimiter, new Supplier&lt;String&gt;() {
+	 * String invoke() { return ""; } }, convert, new BiFunction&lt;String, String, String&gt;() { String invoke(String t, String u) { return t + u; } }); }
+	 * </code> <br>
 	 *
 	 * @param <T> The type of elements whose iterable source should be joined to an object of type <b>R</b>
 	 * @param <R> The targeted type of the joined elements of <code>source</code>
@@ -527,14 +386,14 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <T, R> R join(final Iterable<T> source, final R delimiter, final IProvider<R> newInstanceOfR, final IFunction<T, R> convert,
-			final IBinaryFunction<R, R, R> concat) {
-		R result = newInstanceOfR.invoke();
+	public static <T, R> R join(final Iterable<T> source, final R delimiter, final Supplier<R> newInstanceOfR, final Function<T, R> convert,
+			final BiFunction<R, R, R> concat) {
+		R result = newInstanceOfR.get();
 		final List<T> list = toList(source);
 		for (int i = 0; i < list.size(); i++) {
-			result = concat.invoke(result, convert.invoke(list.get(i)));
+			result = concat.apply(result, convert.apply(list.get(i)));
 			if ((i + 1) < list.size()) {
-				result = concat.invoke(result, delimiter);
+				result = concat.apply(result, delimiter);
 			}
 		}
 		return result;
@@ -543,11 +402,11 @@ public abstract class Functional {
 	/**
 	 * Takes the elements yielded by <code>source</code> and joins these elements into a string. The parameter <code>delimiter</code> is the delimiting element
 	 * between two elements in the string. Since <code>source</code> is a iterable over a arbitrary type <b>T</b>, the parameter <code>convert</code> of type
-	 * <code>IFunction</code> deals with the converting from <b>T</b> to <b>String</b>. <br> <br> <b>Example</b><br> In the following example, the list of
-	 * double values <code>{7.7534, 2.322, 14.532}</code> is joined using {@link Functional#join(Iterable, String, IFunction)}. Each value is rounded to one
-	 * decimal place. The entire rounded values are then joined using a whitespace. The result <code>7,8 2,4 14,6</code> is printed to standard out. <code>
-	 * final DecimalFormat df = new DecimalFormat("#.#"); df.setRoundingMode(RoundingMode.CEILING); IFunction&lt;Double, String&gt; roundDoubleToString = new
-	 * IFunction&lt;Double, String&gt;() { &#64;Override public String invoke(Double input) { return df.format(input.doubleValue()).toString(); } };
+	 * <code>Function</code> deals with the converting from <b>T</b> to <b>String</b>. <br> <br> <b>Example</b><br> In the following example, the list of double
+	 * values <code>{7.7534, 2.322, 14.532}</code> is joined using {@link Functional#join(Iterable, String, Function)}. Each value is rounded to one decimal
+	 * place. The entire rounded values are then joined using a whitespace. The result <code>7,8 2,4 14,6</code> is printed to standard out. <code> final
+	 * DecimalFormat df = new DecimalFormat("#.#"); df.setRoundingMode(RoundingMode.CEILING); Function&lt;Double, String&gt; roundDoubleToString = new
+	 * Function&lt;Double, String&gt;() { &#64;Override public String invoke(Double input) { return df.format(input.doubleValue()).toString(); } };
 	 *
 	 * List&lt;Double&gt; list = new ArrayList&lt;&gt;(Arrays.asList(new Double[] {7.7534, 2.322, 14.532})); String joinedValues = Functional.join(list, " ",
 	 * roundDoubleToString); System.out.println(joinedValues); </code> It is good practise to store multiple occurrences of the function <code>convert</code>
@@ -561,22 +420,22 @@ public abstract class Functional {
 	 * @param convert A function to convert from <b>T</b> to <b>String</b>
 	 * @return A string representation of the joined elements of <code>source</code> using <code>delimited</code> as delimiting string
 	 *
-	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
+	 * @see Functional#join(Iterable, Object, Supplier, Function, BiFunction)
 	 *
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <T> String join(final Iterable<T> source, final String delimiter, final IFunction<T, String> convert) {
-		return join(source, delimiter, new IProvider<String>() {
+	public static <T> String join(final Iterable<T> source, final String delimiter, final Function<T, String> convert) {
+		return join(source, delimiter, new Supplier<String>() {
 
 			@Override
-			public String invoke() {
+			public String get() {
 				return "";
 			}
-		}, convert, new IBinaryFunction<String, String, String>() {
+		}, convert, new BiFunction<String, String, String>() {
 
 			@Override
-			public String invoke(String t, String u) {
+			public String apply(String t, String u) {
 				return t + u;
 			}
 
@@ -599,29 +458,10 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 */
-	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T, U> map) {
+	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final Function<T, U> map) {
 		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
 		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
 		return left.equals(right);
-	}
-
-	/**
-	 * Returns an type-safe empty iterable of type <b>T</b> as convenience counterpart to {@link Collections#emptyIterator()} or
-	 * {@link Collections#emptyList()}. <br> <br> The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time. <br> <br>
-	 * <b>Example</b> The following example shows how to create an empty iterable of type <code>IFeature</code>. <code> Iterable&lt;IFeature&gt; it =
-	 * Functional.getEmptyIterable(IFeature.class)); </code>
-	 *
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 *
-	 * @param <T> the infered type of the iterable, must be compatible to <code>className</code>
-	 * @param className the class name of the type <b>T</b>
-	 *
-	 * @return Returns an empty type-safe iterable of type <b>T</b>
-	 */
-	public static <T> Iterable<T> getEmptyIterable(Class<? extends T> className) {
-		final Collection<T> collection = new ArrayList<T>(0);
-		return collection;
 	}
 
 	/**
@@ -637,6 +477,44 @@ public abstract class Functional {
 	 */
 	public static <T> boolean isEmpty(Iterable<T> iterable) {
 		return !iterable.iterator().hasNext();
+	}
+
+	public static <T> Integer[] getSortedIndex(final List<T> list, final Comparator<T> comparator) {
+		final Integer[] index = getIndex(list.size());
+		Arrays.sort(index, new Comparator<Integer>() {
+
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return comparator.compare(list.get(o1), list.get(o2));
+			}
+		});
+		return index;
+	}
+
+	public static Integer[] getRandomizedIndex(int size) {
+		return getRandomizedIndex(size, new Random());
+	}
+
+	public static Integer[] getRandomizedIndex(int size, Random random) {
+		final Integer[] index = getIndex(size);
+		Collections.shuffle(Arrays.asList(index), random);
+		return index;
+	}
+
+	public static Integer[] getIndex(int size) {
+		final Integer[] index = new Integer[size];
+		for (int i = 0; i < index.length; i++) {
+			index[i] = i;
+		}
+		return index;
+	}
+
+	public static <T> List<T> removeNull(List<T> oldList) {
+		if (oldList == null) {
+			return null;
+		} else {
+			return oldList.stream().filter(Objects::nonNull).collect(Collectors.toList());
+		}
 	}
 
 }

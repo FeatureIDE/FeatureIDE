@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -33,63 +35,21 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class FeatureModelProperty implements IFeatureModelProperty {
+public class FeatureModelProperty extends MapPropertyContainer implements IFeatureModelProperty {
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());
-		result = (prime * result) + ((comments == null) ? 0 : comments.hashCode());
-		result = (prime * result) + (featureOrderInXML ? 1231 : 1237);
-		return result;
+		return super.hashCode() * Objects.hash(featureOrderInXML, annotations, comments);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
+		if (super.equals(obj)) {
+			final FeatureModelProperty other = (FeatureModelProperty) obj;
+			return (featureOrderInXML == other.featureOrderInXML) && Objects.equals(annotations, other.annotations) && Objects.equals(comments, other.comments);
+		} else {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final FeatureModelProperty other = (FeatureModelProperty) obj;
-		if (annotations == null) {
-			if (other.annotations != null) {
-				return false;
-			}
-		} else if (!annotations.equals(other.annotations)) {
-			return false;
-		}
-		if (comments == null) {
-			if (other.comments != null) {
-				return false;
-			}
-		} else if (!comments.equals(other.comments)) {
-			return false;
-		}
-		if (correspondingFeatureModel == null) {
-			if (other.correspondingFeatureModel != null) {
-				return false;
-			}
-		}
-//		else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
-//			return false;
-		if (featureOrderInXML != other.featureOrderInXML) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -107,6 +67,7 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	protected boolean featureOrderInXML;
 
 	protected FeatureModelProperty(FeatureModelProperty oldProperty, IFeatureModel correspondingFeatureModel) {
+		super(oldProperty);
 		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldProperty.correspondingFeatureModel;
 
 		featureOrderInXML = oldProperty.featureOrderInXML;
@@ -116,6 +77,7 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
+		super();
 		this.correspondingFeatureModel = correspondingFeatureModel;
 
 		featureOrderInXML = false;
@@ -141,12 +103,12 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	@Override
-	public Iterable<String> getAnnotations() {
+	public Collection<String> getAnnotations() {
 		return annotations;
 	}
 
 	@Override
-	public Iterable<String> getComments() {
+	public Collection<String> getComments() {
 		return comments;
 	}
 
@@ -165,6 +127,7 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 		featureOrderInXML = false;
 		comments.clear();
 		annotations.clear();
+		properties.clear();
 	}
 
 	@Override

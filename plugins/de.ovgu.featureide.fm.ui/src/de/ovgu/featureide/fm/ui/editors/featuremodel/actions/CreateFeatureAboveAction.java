@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -38,11 +37,11 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Creates a new feature with the currently selected features as children.
@@ -58,7 +57,7 @@ public class CreateFeatureAboveAction extends Action {
 
 	private IFeature parent = null;
 
-	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
+	private final LinkedList<String> selectedFeatures = new LinkedList<>();
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
@@ -85,16 +84,7 @@ public class CreateFeatureAboveAction extends Action {
 
 	@Override
 	public void run() {
-		// if (selectedFeatures.size() != 1)
-		// throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		final CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(graphicalFeatureModel, selectedFeatures);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
+		FeatureModelOperationWrapper.run(new CreateGraphicalFeatureAboveOperation(graphicalFeatureModel, selectedFeatures));
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -129,7 +119,7 @@ public class CreateFeatureAboveAction extends Action {
 				}
 			}
 
-			selectedFeatures.add(feature);
+			selectedFeatures.add(feature.getName());
 		}
 		return !selectedFeatures.isEmpty();
 	}

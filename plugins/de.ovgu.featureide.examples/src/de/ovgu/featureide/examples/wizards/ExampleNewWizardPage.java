@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -43,8 +43,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -267,7 +267,7 @@ public class ExampleNewWizardPage extends WizardPage {
 			contCheckTreeV.setLabelProvider(new ExampleLabelProvider());
 			contCheckTreeV.addCheckStateListener(checkStateList);
 
-			final ViewerSorter viewerSorter = new ViewerSorter(new Collator() {
+			final ViewerComparator viewerSorter = new ViewerComparator(new Collator() {
 
 				@Override
 				public int hashCode() {
@@ -285,7 +285,7 @@ public class ExampleNewWizardPage extends WizardPage {
 				}
 			});
 
-			contCheckTreeV.setSorter(viewerSorter);
+			contCheckTreeV.setComparator(viewerSorter);
 			contCheckTreeV.addSelectionChangedListener(selChangeList);
 
 			contCheckTreeV.setInput(ExampleNewWizardPage.this);

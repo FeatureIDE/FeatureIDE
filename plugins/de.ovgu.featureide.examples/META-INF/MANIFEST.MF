@@ -10,10 +10,11 @@ Require-Bundle: org.eclipse.core.resources,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: de.ovgu.featureide.examples.ExamplePlugin
 Export-Package: de.ovgu.featureide.examples,
  de.ovgu.featureide.examples.utils,
  de.ovgu.featureide.examples.wizards
+Automatic-Module-Name: de.ovgu.featureide.examples
