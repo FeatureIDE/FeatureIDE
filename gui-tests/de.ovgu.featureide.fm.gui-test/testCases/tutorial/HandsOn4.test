@@ -121,8 +121,8 @@ get-view Problems | get-tree
 with [get-editor "Request.java" | get-text-viewer] {
     set-caret-pos 176 29
     select-range 176 30 176 21
-    type-text e
-    key-type "M1+SPACE"
+    type-text edCall
+    wait 1000
     key-type "M1+s"
     hover-text 177 38
 }

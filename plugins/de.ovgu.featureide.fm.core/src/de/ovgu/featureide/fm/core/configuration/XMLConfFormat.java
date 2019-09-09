@@ -51,6 +51,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
+	private static final String CONFIGURATION = "configuration";
 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration\\s*/?>");
 
@@ -70,7 +71,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
 			return;
 		}
-		if (root.getNodeName().equals("configuration")) {
+		if (root.getNodeName().equals(CONFIGURATION)) {
 			for (final Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {

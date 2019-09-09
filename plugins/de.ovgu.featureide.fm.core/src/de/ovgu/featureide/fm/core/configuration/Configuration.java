@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
 public class Configuration implements Cloneable {
 
 	protected final LinkedHashMap<String, SelectableFeature> selectableFeatures = new LinkedHashMap<>();
-
 	protected FeatureModelFormula featureModel;
 	protected SelectableFeature root;
 

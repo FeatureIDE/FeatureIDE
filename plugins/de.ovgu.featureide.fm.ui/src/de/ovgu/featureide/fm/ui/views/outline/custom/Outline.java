@@ -42,6 +42,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -67,6 +69,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.ChangeOutlineProviderAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.CollapseAllAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.ExpandAllAction;
@@ -85,7 +89,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.NotAvailableOutli
  * @author Daniel Psche
  * @author Christopher Sontag
  */
-public class Outline extends ViewPart implements ISelectionChangedListener, ITreeViewerListener, IPropertyListener {
+public class Outline extends ViewPart implements ISelectionChangedListener, ITreeViewerListener, IPropertyListener, IPageChangedListener {
 
 	private static final String OUTLINE_ID = "de.ovgu.featureide.fm.ui.Outline";
 	public static final String ID = "de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline";
@@ -94,6 +98,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	private TreeViewer viewer;
 	private IFile curFile;
 	private UIJob updateOutlineJob;
+	private IEditorPart part;
 
 	private final List<OutlineProvider> providers = new ArrayList<>();
 	private final OutlineProvider defaultProvider = new NotAvailableOutlineProvider();
@@ -103,16 +108,38 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 		@Override
 		public void partOpened(IWorkbenchPart part) {
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			} else if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			}
 			if (part instanceof IEditorPart) {
 				setEditorActions(part);
 			}
 		}
 
 		@Override
-		public void partDeactivated(IWorkbenchPart part) {}
+		public void partDeactivated(IWorkbenchPart part) {
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				editor.removePageChangedListener(Outline.this);
+			} else if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				editor.removePageChangedListener(Outline.this);
+			}
+		}
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				editor.removePageChangedListener(Outline.this);
+			} else if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				editor.removePageChangedListener(Outline.this);
+			}
 			if (part instanceof IEditorPart) {
 				setEditorActions(part);
 			}
@@ -120,6 +147,13 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			} else if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			}
 			if (part instanceof IEditorPart) {
 				setEditorActions(part);
 			}
@@ -127,6 +161,13 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 		@Override
 		public void partActivated(IWorkbenchPart part) {
+			if (part instanceof ConfigurationEditor) {
+				final ConfigurationEditor editor = (ConfigurationEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			} else if (part instanceof FeatureModelEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) part;
+				editor.addPageChangedListener(Outline.this);
+			}
 			if ((part instanceof IEditorPart) || (part instanceof ViewPart)) {
 				setEditorActions(part);
 			}
@@ -162,8 +203,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	private void setEditorActions(IWorkbenchPart activeEditor) {
 		OutlineProvider newProvider = null;
 		IFile file = null;
-
-		IEditorPart part = null;
+		part = null;
 
 		if (activeEditor != null) {
 			final IWorkbenchPage page = activeEditor.getSite().getPage();
@@ -172,7 +212,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 				if (part != null) {
 					final IEditorInput editorInput = part.getEditorInput();
 					if (editorInput instanceof FileEditorInput) {
-
 						// case: open editor
 						final FileEditorInput inputFile = (FileEditorInput) part.getEditorInput();
 						file = inputFile.getFile();
@@ -183,10 +222,10 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 							if (file != null) {
 								// Check whether we must change the actual provider
-								if (!provider.isSupported(file) || (provider == defaultProvider)) {
+								if (!provider.isSupported(part, file) || (provider == defaultProvider)) {
 									// Get the first provider that supports the resource
 									for (final OutlineProvider p : providers) {
-										if (p.isSupported(file)) {
+										if (p.isSupported(part, file)) {
 											newProvider = p;
 											break;
 										}
@@ -216,7 +255,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		viewer.setAutoExpandLevel(2);
+		viewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
 		viewer.addSelectionChangedListener(this);
 		viewer.addTreeListener(this);
 
@@ -345,7 +384,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 				if (curFile != null) {
 					for (final OutlineProvider p : providers) {
-						if (p.isSupported(curFile) && !p.getProviderName().isEmpty()) {
+						if (p.isSupported(part, curFile) && !p.getProviderName().isEmpty()) {
 							final IAction providerSelectionSpecific = new ChangeOutlineProviderAction(p, provider == p) {
 
 								@Override
@@ -434,7 +473,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 							if (viewer != null) {
 								if ((viewer.getControl() != null) && !viewer.getControl().isDisposed()) {
 									viewer.getControl().setRedraw(false);
-
 									viewer.setContentProvider(provider.getTreeProvider());
 									viewer.setLabelProvider(provider.getLabelProvider());
 									if (iFile != null) {
@@ -443,10 +481,10 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 										fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 										fillContextMenu();
 									}
-
 									viewer.getControl().setRedraw(true);
 									viewer.getControl().setEnabled(true);
 									viewer.refresh();
+									viewer.expandAll();
 								}
 							}
 							return Status.OK_STATUS;
@@ -477,6 +515,15 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	@Override
 	public void propertyChanged(Object source, int propId) {
 		update(curFile);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IPageChangedListener#pageChanged(org.eclipse.jface.dialogs.PageChangedEvent)
+	 */
+	@Override
+	public void pageChanged(PageChangedEvent event) {
+		setEditorActions(part);
 	}
 
 }
