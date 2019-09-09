@@ -502,7 +502,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			if (page instanceof FeatureDiagramEditor) {
 				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 				final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
-				IFeatureModel curFeatureModel = featureModelManager.getSnapshot();
+				IFeatureModel curFeatureModel = featureModelManager.getVarObject();
 				if (curFeatureModel instanceof ExtendedFeatureModel) {
 					setManager(featureModelManager);
 					fmManager.addListener(this);
@@ -532,10 +532,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (currentEditor instanceof ConfigurationEditor) {
 			if (page instanceof ConfigurationPage) {
 				final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
-				if (editor.getFeatureModelManager().getSnapshot() instanceof ExtendedFeatureModel) {
+				if (editor.getFeatureModelManager().getVarObject() instanceof ExtendedFeatureModel) {
 					clear();
 					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(editor.getConfigurationManager().getSnapshot());
+						treeViewer.setInput(editor.getConfigurationManager().getVarObject());
 					}
 					treeViewer.expandAll();
 					repackAllColumns();
@@ -574,7 +574,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.refresh(fmManager.getSnapshot());
+				treeViewer.refresh(fmManager.getVarObject());
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getOldValue() != null && event.getOldValue() instanceof Boolean && event.getNewValue() != null
