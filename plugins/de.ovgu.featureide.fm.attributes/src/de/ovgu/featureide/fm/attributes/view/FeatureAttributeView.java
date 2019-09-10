@@ -177,10 +177,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			if (selection instanceof IStructuredSelection) {
 				for (Object obj : ((IStructuredSelection) selection).toList()) {
 					if (!(obj instanceof FeatureEditPart)) {
-						selectedManualFeatures = null;
-						treeViewer.refresh();
-						treeViewer.expandToLevel(2);
-						return;
+						continue;
+						/*
+						 * selectedManualFeatures = null; treeViewer.refresh(); treeViewer.expandToLevel(2); return;
+						 */
 					} else {
 						FeatureEditPart editPart = (FeatureEditPart) obj;
 						selectedManualFeatures.add(editPart.getModel().getObject());
