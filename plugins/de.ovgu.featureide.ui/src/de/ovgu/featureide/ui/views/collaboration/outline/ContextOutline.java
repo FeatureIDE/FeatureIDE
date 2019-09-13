@@ -25,5 +25,5 @@ public class ContextOutline extends FSTOutline {
 	public ContextOutline() {
 		super(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
 	}
-
+  
 }

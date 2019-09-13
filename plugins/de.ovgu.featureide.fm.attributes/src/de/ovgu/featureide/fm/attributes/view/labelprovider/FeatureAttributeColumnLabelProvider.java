@@ -57,29 +57,13 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 		if (element instanceof IFeatureAttribute) {
 			IFeatureAttribute attribute = (IFeatureAttribute) element;
 			IFeature feature = attribute.getFeature();
-			if (view.selectedManualFeatures == null) {
-				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
-				return ColorPalette.toSwtColor(featureColor);
-			} else {
-				if (!view.selectedManualFeatures.contains(feature)) {
-					return ColorPalette.toSwtColor(FeatureColor.Light_Gray);
-				} else {
-					return ColorPalette.toSwtColor(FeatureColor.Light_Green);
-				}
-			}
+			final FeatureColor featureColor = FeatureColorManager.getColor(feature);
+			return ColorPalette.toSwtColor(featureColor);
 		}
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
-			if (view.selectedManualFeatures == null) {
-				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
-				return ColorPalette.toSwtColor(featureColor);
-			} else {
-				if (!view.selectedManualFeatures.contains(feature)) {
-					return ColorPalette.toSwtColor(FeatureColor.Light_Gray);
-				} else {
-					return ColorPalette.toSwtColor(FeatureColor.Light_Green);
-				}
-			}
+			final FeatureColor featureColor = FeatureColorManager.getColor(feature);
+			return ColorPalette.toSwtColor(featureColor);
 		}
 		return null;
 	}

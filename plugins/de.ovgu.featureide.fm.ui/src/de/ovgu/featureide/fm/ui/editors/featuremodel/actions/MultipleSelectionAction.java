@@ -108,13 +108,17 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected) {
 			for (final Object obj : selection.toArray()) {
-				final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
-				features.add(tempFeature.getName());
+				if (obj instanceof ConnectionEditPart) {
+					final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
+					features.add(tempFeature.getName());
+				}
 			}
 			return features;
 		} else if (part instanceof FeatureEditPart) {
 			for (final Object obj : selection.toArray()) {
-				features.add(((FeatureEditPart) obj).getModel().getObject().getName());
+				if (obj instanceof FeatureEditPart) {
+					features.add(((FeatureEditPart) obj).getModel().getObject().getName());
+				}
 			}
 		}
 		return features;

@@ -119,8 +119,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	FeatureModelManager fmManager;
 	IGraphicalFeatureModel gfm;
 
-	// indicates if layout information had to be created
-	private boolean createdLayoutInformation;
 	private boolean closeEditor;
 
 	private int currentPageIndex;
@@ -404,9 +402,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
-						if (createdLayoutInformation) {
-							diagramEditor.setAdjustModelToEditorSize();
-						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();
@@ -525,7 +520,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			} else {
 				setPartName(modelFileName + " (" + modelFile.getProject().getName() + ")");
 			}
-			createLayoutInformation();
 		} else {
 			setPartName(input.getName());
 		}
@@ -660,9 +654,5 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 		fmManager.removeListener(listener);
-	}
-
-	private void createLayoutInformation() {
-		createdLayoutInformation = true;
 	}
 }

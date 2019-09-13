@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
@@ -80,7 +81,9 @@ public class AttributeComputationBundle implements IOutlineEntry {
 
 	@Override
 	public boolean supportsType(Object element) {
-		return config.getFeatureModel() instanceof ExtendedFeatureModel;
+		boolean isExtendedFeatureModel = config.getFeatureModel() instanceof ExtendedFeatureModel;
+		boolean isExtendedConfiguration = config instanceof ExtendedConfiguration;
+		return isExtendedFeatureModel && isExtendedConfiguration;
 	}
 
 	private List<IFeatureAttribute> getUniqueAttributes() {

@@ -121,7 +121,7 @@ public class FeatureModel implements IFeatureModel {
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
 
-		renamingsManager = oldFeatureModel.renamingsManager.clone();
+		renamingsManager = oldFeatureModel.renamingsManager.clone(this);
 
 		sourceFile = oldFeatureModel.sourceFile;
 

@@ -210,11 +210,13 @@ Library.
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="de.ovgu.featureide.ui"/>
       <import plugin="org.eclipse.ui.console"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.ltk.ui.refactoring"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.cdt.ui"/>
    </requires>
 
    <plugin

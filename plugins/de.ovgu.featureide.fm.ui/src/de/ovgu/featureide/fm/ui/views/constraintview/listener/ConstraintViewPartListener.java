@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
@@ -72,6 +73,10 @@ public class ConstraintViewPartListener implements IPartListener2 {
 		if (activePart instanceof FeatureModelEditor) {
 			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
 			controller.checkForRefresh();
+			// Check if the constraints view is currently visible
+			if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(controller)) {
+				controller.setConstraintsHidden(true);
+			}
 		} else if (activePart instanceof IEditorPart) {
 			controller.setConstraintsHidden(controller.isConstraintsHidden());
 		}

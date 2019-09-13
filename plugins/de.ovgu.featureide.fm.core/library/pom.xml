@@ -51,6 +51,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>annotations</groupId>
 			<artifactId>annotations</artifactId>
 			<scope>system</scope>
