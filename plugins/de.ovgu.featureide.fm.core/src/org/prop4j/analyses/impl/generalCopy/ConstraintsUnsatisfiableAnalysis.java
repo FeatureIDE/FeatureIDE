@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.generalCopy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,8 +100,8 @@ public class ConstraintsUnsatisfiableAnalysis extends GeneralSolverAnalysis<Map<
 
 	private boolean checkConstraintContradiction(Node constraintNode) {
 		final ISatProblem problem = new SatProblem(constraintNode);
-		final org.prop4j.analyses.impl.general.ValidAnalysis validAnalysis =
-			(org.prop4j.analyses.impl.general.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ValidAnalysis.class, problem);
+		final org.prop4j.analyses.impl.generalCopy.ValidAnalysis validAnalysis =
+			(org.prop4j.analyses.impl.generalCopy.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.generalCopy.ValidAnalysis.class, problem);
 		return LongRunningWrapper.runMethod(validAnalysis, new NullMonitor()) == null;
 	}
 }

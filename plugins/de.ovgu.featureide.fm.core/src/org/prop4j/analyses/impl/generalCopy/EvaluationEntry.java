@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.generalCopy;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.generalCopy;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ISatResult;
