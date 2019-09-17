@@ -38,7 +38,7 @@
                 </aut>
                 	
                 <tests>
-					<!--<test>ExplainingAnomaliesInFeatureDiagram.test</test>-->
+					<test>ExplainingAnomaliesInFeatureDiagram.test</test>
                 	<test>CreateFeatureModelInFeatureIDEProject.test</test>
                 	<test>CreateFeatureModelInJavaProject.test</test>
                 	<test>CreateFeaturesInFeatureDiagram.test</test>
