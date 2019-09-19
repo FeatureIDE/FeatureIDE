@@ -171,7 +171,18 @@ public class TWiseConfigurationStatistic {
 			}
 		}
 
-		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
+		for (List<PresenceCondition> expressions : groupedPresenceConditions) {
+			if (expressions.size() < t) {
+				if (expressions.size() == 0) {
+					continue;
+				}
+				final ArrayList<PresenceCondition> paddedExpressions = new ArrayList<>(t);
+				paddedExpressions.addAll(expressions);
+				for (int i = expressions.size(); i < t; i++) {
+					paddedExpressions.add(expressions.get(0));
+				}
+				expressions = paddedExpressions;
+			}
 			final int n = expressions.size();
 			final int[] c = new int[t + 1];
 			c[0] = -1;
@@ -251,6 +262,7 @@ public class TWiseConfigurationStatistic {
 			}
 			final double d = (double) count / configuration.size();
 			final double factor = (2 - (d * d));
+//			final double factor = (1 - d);
 			configValues2[confIndex++] *= factor;
 		}
 	}

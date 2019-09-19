@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -96,6 +99,21 @@ class PresenceConditionManager {
 	public void shuffle(Random random) {
 		for (final List<PresenceCondition> pcs : groupedPresenceConditions) {
 			Collections.shuffle(pcs, random);
+		}
+	}
+
+	public void shuffleSort(Random random) {
+		for (final List<PresenceCondition> list : groupedPresenceConditions) {
+			final Map<Integer, List<PresenceCondition>> groupedPCs = list.stream().collect(Collectors.groupingBy(pc -> pc.size()));
+			for (final List<PresenceCondition> pcList : groupedPCs.values()) {
+				Collections.shuffle(pcList, random);
+			}
+			final List<Entry<Integer, List<PresenceCondition>>> shuffledPCs = new ArrayList<>(groupedPCs.entrySet());
+			Collections.sort(shuffledPCs, (a, b) -> a.getKey() - b.getKey());
+			list.clear();
+			for (final Entry<Integer, List<PresenceCondition>> entry : shuffledPCs) {
+				list.addAll(entry.getValue());
+			}
 		}
 	}
 

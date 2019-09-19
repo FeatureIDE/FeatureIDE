@@ -259,6 +259,10 @@ class TWiseConfiguration extends LiteralSet {
 		return countLiterals == numberOfVariableLiterals;
 	}
 
+	public int countLiterals() {
+		return countLiterals;
+	}
+
 	public void autoComplete() {
 		if (!isComplete()) {
 			if (util.hasSolver()) {

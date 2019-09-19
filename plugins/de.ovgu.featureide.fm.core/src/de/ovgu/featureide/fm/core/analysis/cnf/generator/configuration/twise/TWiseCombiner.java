@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
  *
  * @author Sebastian Krieter
  */
-class TWiseCombiner {
+public class TWiseCombiner {
 
 	/**
 	 * Converts a set of single literals into a grouped expression list.

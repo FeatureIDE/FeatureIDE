@@ -32,8 +32,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICoverStrategy.CombinationStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationSupplier;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator3;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.SingleIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
@@ -123,7 +124,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	// TODO Variation Point: Iterations of removing low-contributing Configurations
-	private static final int iterations = 3;
+	private static final int iterations = 5;
 
 	protected final TWiseConfigurationUtil util;
 	protected final TWiseCombiner combiner;
@@ -189,8 +190,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			final double[] normConfigValues = statistic.getConfigValues2();
 			double mean = 0;
 			for (final double d : normConfigValues) {
-				mean += d / normConfigValues.length;
+				mean += d;
 			}
+			mean /= normConfigValues.length;
+
 			final double reference = mean;
 
 			int index = 0;
@@ -216,9 +219,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		);
 
 		// TODO Variation Point: Combination order
-		final MergeIterator it;
-		presenceConditionManager.shuffle(random);
-		it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.RandomPartition);
+		final ICombinationSupplier<ClauseList> it;
+		presenceConditionManager.shuffleSort(random);
+		final List<List<PresenceCondition>> groupedPresenceConditions = presenceConditionManager.getGroupedPresenceConditions();
+		if (groupedPresenceConditions.size() == 1) {
+			it = new SingleIterator(t, util.getCnf().getVariables().size(), groupedPresenceConditions.get(0));
+		} else {
+			it = new MergeIterator3(t, util.getCnf().getVariables().size(), groupedPresenceConditions);
+		}
 		numberOfCombinations = it.size();
 
 		coveredCount = 0;
@@ -228,13 +236,33 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		try {
 			samplingMonitor.start();
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
-			ClauseList combinedCondition = new ClauseList();
 			count = coveredCount;
 			phaseCount++;
 			ICoverStrategy phase = phaseList.get(0);
-			while (it.hasNext()) {
-				final PresenceCondition[] combination = it.next();
-				combiner.combineConditions(combination, combinedCondition);
+			while (true) {
+				final ClauseList combinedCondition = it.get();
+				if (combinedCondition == null) {
+					break;
+				}
+//		final MergeIterator it;
+//		presenceConditionManager.shuffleSort(random);
+//		it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.RandomPartition);
+//		numberOfCombinations = it.size();
+//
+//		coveredCount = 0;
+//		invalidCount = 0;
+//
+//		samplingMonitor = new MonitorThread(new SamplingMonitor());
+//		try {
+//			samplingMonitor.start();
+//			final List<ClauseList> combinationListUncovered = new ArrayList<>();
+//			ClauseList combinedCondition = new ClauseList();
+//			count = coveredCount;
+//			phaseCount++;
+//			ICoverStrategy phase = phaseList.get(0);
+//			while (it.hasNext()) {
+//				final PresenceCondition[] combination = it.next();
+//				combiner.combineConditions(combination, combinedCondition);
 				if (combinedCondition.isEmpty()) {
 					invalidCount++;
 				} else {
@@ -242,7 +270,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 					switch (covered) {
 					case NOT_COVERED:
 						combinationListUncovered.add(combinedCondition);
-						combinedCondition = new ClauseList();
+//						combinedCondition = new ClauseList();
 						break;
 					case COVERED:
 						coveredCount++;

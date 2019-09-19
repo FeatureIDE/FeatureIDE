@@ -18,47 +18,28 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
+package de.ovgu.featureide.fm.core.analysis.mig;
 
-public class BinomialCalculator {
+import org.sat4j.core.VecInt;
 
-	private final long[][] binomial;
-	private final long[] factorial;
+public class CollectingStrongVisitor implements Visitor<VecInt[]> {
 
-	public BinomialCalculator(int t, int n) {
-		binomial = new long[n + 1][t + 1];
-		factorial = new long[t + 1];
+	final VecInt[] literalList = new VecInt[] { new VecInt(), new VecInt() };
+
+	@Override
+	public VisitResult visitStrong(int curLiteral) {
+		literalList[0].push(curLiteral);
+		return VisitResult.Continue;
 	}
 
-	public long factorial(int k) {
-		long f = factorial[k];
-		if (f == 0) {
-			f = 1;
-			for (int i = 2; i <= k; i++) {
-				f *= i;
-			}
-			factorial[k] = f;
-		}
-		return f;
+	@Override
+	public VisitResult visitWeak(int curLiteral) {
+		literalList[1].push(curLiteral);
+		return VisitResult.Skip;
 	}
 
-	public long binomial(int n, int k) {
-		if (n < k) {
-			return 0;
-		}
-		long b = binomial[n][k];
-		if (b == 0) {
-			if (k > (n - k)) {
-				k = n - k;
-			}
-
-			b = 1;
-			for (int i = 1, m = n; i <= k; i++, m--) {
-				b = Math.multiplyExact(b, m) / i;
-			}
-			binomial[n][k] = b;
-		}
-		return b;
+	@Override
+	public VecInt[] getResult() {
+		return literalList;
 	}
-
 }
