@@ -20,14 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -47,18 +39,15 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
+import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -207,7 +196,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			final IFeature feature = this.feature.getObject();
 
 			final StringBuilder toolTip = new StringBuilder();
-			toolTip.append(createTooltip(new Object[0]));
+			final FeatureModelFormula variableFormula = this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
+			final AnalysesCollection properties = variableFormula.getAnalyzer().getAnalysesCollection();
+			toolTip.append(createTooltip(properties));
 			if (getActiveReason() != null) {
 				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
@@ -236,55 +227,8 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		return toolTipFigure;
 	}
 
-	private static String ABSTRACT = " Abstract";
-	private static String HIDDEN = " hidden";
-	private static String HIDDEN_PARENT = INHERITED_HIDDEN;
-	private static String DEAD = IS_DEAD;
-	private static String FEATURE = " feature ";
-	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
-	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
-	private static String VOID = FEATURE_MODEL_IS_VOID;
-
 	private String createTooltip(Object... objects) {
-		final StringBuilder toolTip = new StringBuilder();
-		final IFeatureStructure structure = feature.getObject().getStructure();
-		toolTip.append(structure.isConcrete() ? CONCRETE : ABSTRACT);
-
-		if (structure.hasHiddenParent()) {
-			toolTip.append(structure.isHidden() ? HIDDEN : HIDDEN_PARENT);
-		}
-
-		toolTip.append(structure.isRoot() ? ROOT : FEATURE);
-
-		final FeatureModelFormula variableFormula = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
-		final FeatureModelProperties properties = variableFormula.getAnalyzer().getAnalysesCollection().getFeatureModelProperties();
-		if (properties.hasStatus(FeatureStatus.DEAD)) {
-			toolTip.append(DEAD);
-		} else if (properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-			toolTip.append(FALSE_OPTIONAL);
-		} else if (properties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
-			toolTip.append(INDETERMINATE_HIDDEN);
-		}
-
-		if (properties.hasStatus(FeatureModelStatus.VOID)) {
-			toolTip.setLength(0);
-			toolTip.trimToSize();
-			toolTip.append(VOID);
-		}
-
-		final String description = feature.getObject().getProperty().getDescription();
-		if ((description != null) && !description.trim().isEmpty()) {
-			toolTip.append("\n\nDescription:\n");
-			toolTip.append(description);
-		}
-
-		final String contraints = FeatureUtils.getRelevantConstraintsString(feature.getObject());
-		if (!contraints.isEmpty()) {
-			toolTip.append("\n\nConstraints:\n");
-			toolTip.append(contraints);
-		}
-
-		return toolTip.toString();
+		return feature.getObject().createTooltip(objects);
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {
