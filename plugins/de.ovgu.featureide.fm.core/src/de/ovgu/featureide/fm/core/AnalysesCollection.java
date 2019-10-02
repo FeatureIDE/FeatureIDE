@@ -420,7 +420,8 @@ public class AnalysesCollection {
 		Arrays.asList(validAnalysis, atomicSetAnalysis, coreDeadAnalysis, foAnalysis, determinedAnalysis, constraintContradictionAnalysis,
 				constraintVoidAnalysis, constraintTautologyAnalysis, constraintRedundancyAnalysis, constraintAnomaliesAnalysis);
 
-	<D extends IFeatureModelElement> Explanation<?> createExplanation(ExplanationCreator<?, ?> creator, D element, FeatureModelFormula formula) {
+	<D extends IFeatureModelElement> Explanation<?> createExplanation(ExplanationCreator<D, ?> creator, D element, FeatureModelFormula formula) {
+		creator.setSubject(element);
 		return creator.getExplanation();
 	}
 
