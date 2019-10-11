@@ -20,21 +20,27 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.io.File;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 public class CustomPropertiesTest {
 
-	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
+	static final Path modelFile = Paths.get("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
 	static final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 	@Before
@@ -65,13 +71,13 @@ public class CustomPropertiesTest {
 
 		model.getStructure().setRoot(f1.getStructure());
 
-		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		Commons.saveFeatureModel(modelFile, model, new XmlFeatureModelFormat());
 	}
 
 	@Test
 	public void testCustomProperties() {
 		final IFeatureModel model = factory.create();
-		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		final ProblemList problems = Commons.loadFeatureModel(modelFile, model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.containsError());
 
 		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
@@ -91,11 +97,16 @@ public class CustomPropertiesTest {
 		model.getFeature("A").getCustomProperties().remove("key1", XmlFeatureModelFormat.TYPE_CUSTOM);
 		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
-		modelFile.delete();
-		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		try {
+			Files.delete(modelFile);
+		} catch (final IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+		Commons.saveFeatureModel(modelFile, model, new XmlFeatureModelFormat());
 
 		final IFeatureModel model2 = factory.create();
-		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
+		final ProblemList problems2 = Commons.loadFeatureModel(modelFile, model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {
 			System.out.println(p.message);
@@ -107,8 +118,13 @@ public class CustomPropertiesTest {
 
 	}
 
+	@After
 	public void cleanUp() {
-		modelFile.delete();
+		try {
+			Files.deleteIfExists(modelFile);
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

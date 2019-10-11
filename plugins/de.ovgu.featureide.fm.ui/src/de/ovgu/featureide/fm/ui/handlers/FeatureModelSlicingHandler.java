@@ -48,7 +48,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(final IFile file) {
-		final FeatureModelManager manager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file.getProject()));
+		final FeatureModelManager manager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file));
 		final IFeatureModel featureModel = manager.getObject();
 		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");

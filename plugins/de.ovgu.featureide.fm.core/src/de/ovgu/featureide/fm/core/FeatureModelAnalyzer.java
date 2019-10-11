@@ -545,9 +545,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
 
 			if (constraintProperties != null) {
-				if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
+				if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
 					explanation = constraintProperties.getRedundantExplanation();
-					if (explanation != null) {
+					if (explanation == null) {
 						// TODO use context
 						explanation = analysesCollection.createExplanation(analysesCollection.redundantConstraintExplanationCreator, constraint, context);
 						constraintProperties.setRedundantExplanation(explanation);
@@ -571,14 +571,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 			if (featureProperties != null) {
 				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 					explanation = featureProperties.getDeadExplanation();
-					if (explanation != null) {
+					if (explanation == null) {
 						explanation = analysesCollection.createExplanation(analysesCollection.deadFeatureExplanationCreator, feature, context);
 						featureProperties.setDeadExplanation(explanation);
 					}
 				}
 				if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 					explanation = featureProperties.getFalseOptionalExplanation();
-					if (explanation != null) {
+					if (explanation == null) {
 						explanation = analysesCollection.createExplanation(analysesCollection.falseOptionalFeatureExplanationCreator, feature, context);
 						featureProperties.setFalseOptionalExplanation(explanation);
 					}

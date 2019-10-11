@@ -51,6 +51,10 @@ Here, is a list of high-level enhancements.
   * DIMACS format (#764, #868, #869)
   * GUIDSL format (#871)
   * Extended feature model format (feature model attributes) (#855, #876)
+* Critical and major bugs _introduced_ with this version
+  * Feature attributes cannot be updated (#903)
+  * Configuration editor requires minutes after every click (#907)
+  * Wrong explanations for feature-model defects (#905, #906)
 
 Release 3.5.5 (June 2019)
 * Hotfix containing only stability improvements over v3.5.4
