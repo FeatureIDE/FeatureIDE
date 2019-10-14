@@ -24,11 +24,11 @@ import org.prop4j.Node;
 import org.prop4j.explain.solvers.ISolverTests;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SatProblem;
-import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolver;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 
 /**
- * Tests for {@link Sat4jSatSolver}.
+ * Tests for {@link Sat4JSatSolver}.
  *
  * @author Timo G&uuml;nther
  */
@@ -36,6 +36,6 @@ public class JavaSmtSatSolverTests extends ISolverTests {
 
 	@Override
 	protected ISolver getInstance(Node cnf) {
-		return new JavaSmtSatSolverFactory().getSolver(new SatProblem(cnf));
+		return new JavaSmtSatSolverFactory().getAnalysisSolver(new SatProblem(cnf));
 	}
 }

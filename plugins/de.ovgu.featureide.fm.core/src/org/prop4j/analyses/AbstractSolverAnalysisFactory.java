@@ -22,9 +22,6 @@ package org.prop4j.analyses;
 
 import java.util.HashMap;
 
-import org.prop4j.analyses.impl.GeneralSolverAnalysisFactory;
-import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
-import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.solver.ISolverProblem;
 
 /**
@@ -48,26 +45,26 @@ public abstract class AbstractSolverAnalysisFactory {
 	 */
 	public abstract void setDefaultConfiguration(HashMap<String, Object> map);
 
-	/**
-	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}
-	 *
-	 * @return Default factory.
-	 */
-	public static AbstractSolverAnalysisFactory getDefault() {
-		return new GeneralSolverAnalysisFactory();
-	}
+//	/**
+//	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}
+//	 *
+//	 * @return Default factory.
+//	 */
+//	public static AbstractSolverAnalysisFactory getDefault() {
+//		return new GeneralSolverAnalysisFactory();
+//	}
+//
+//	/**
+//	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}
+//	 *
+//	 * @return Default factory.
+//	 */
+//	public static AbstractSolverAnalysisFactory getJavaSmtFactory() {
+//		return new JavaSmtSolverAnalysisFactory();
+//	}
 
 	/**
-	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}
-	 *
-	 * @return Default factory.
-	 */
-	public static AbstractSolverAnalysisFactory getJavaSmtFactory() {
-		return new JavaSmtSolverAnalysisFactory();
-	}
-
-	/**
-	 * Creates an anylsis for a given class. Also determine especially which solver is used to solve the analysis.
+	 * Creates an analysis for a given class. Also determine especially which solver is used to solve the analysis.
 	 *
 	 * @param analysisClass Class of the analysis as Object.
 	 * @param problem Problem which should be looked at at the analysis.

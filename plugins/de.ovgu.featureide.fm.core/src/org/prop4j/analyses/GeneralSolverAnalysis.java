@@ -20,17 +20,14 @@
  */
 package org.prop4j.analyses;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Random;
 
 import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISolver;
-import org.prop4j.solver.impl.SolverUtils;
 
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AnalysisResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -38,98 +35,139 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Joshua Sprey
  */
-public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, LongRunningMethod<T> {
+public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T> {
 
-	protected ISolver solver;
-	public long solveTime = 0;
-	public long editTime = 0;
-	public long gesamtTime = 0;
+	/** The list containing all assumption that are added to the solver before the analysis. */
+	protected LiteralSet assumptions = null;
 
-	protected GeneralSolverAnalysis(ISolver solver) {
-		this.solver = solver;
-	}
+	/** Random object used to randomize the execution of the analysis. */
+	protected Random random = new Random(112358);
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.job.LongRunningMethod#execute(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	/** The result for the analysis. */
+	private T result = null;
+
+	/** Indicate that a timeout exception should be thrown when the timeout was exceeded. */
+	private boolean throwTimeoutException = true;
+	/** The time in ms before the solver timeouts. */
+	private int timeout = 1000;
+
+	/** Indicate that a timeout occurred. */
+	private boolean timeoutOccured = false;
+
+	/**
+	 * This method executes the analysis that should be realized. The monitor should be used at the appropriate placed for {@link IMonitor#checkCancel()} to
+	 * interrupt an analysis effectively.
+	 *
+	 * @param monitor Monitor to monitor the analysis. Shoudl be used for cancel checks.
+	 * @return The results of the analysis. The result can also be retrieved via {@link GeneralSolverAnalysis#getResult()}.
+	 * @throws Exception
 	 */
+	protected abstract T analyze(IMonitor<T> monitor) throws Exception;
+
 	@Override
-	public final T execute(IMonitor monitor) throws Exception {
-		if (solver == null) {
+	public final T execute(IMonitor<T> monitor) throws Exception {
+		if (getSolver() == null) {
 			return null;
 		}
-		monitor.checkCancel();
-		try {
-			final T value = analyze(monitor);
-			gesamtTime = solveTime + editTime;
-			return value;
-		} catch (final Throwable e) {
-			throw e;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.analyses.ISolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
-	 */
-	@Override
-	public T analyze(IMonitor monitor) {
-		return null;
-	}
-
-	public Literal getLiteralFromIndex(int index) {
-		final Object variable = solver.getProblem().getVariableOfIndex(Math.abs(index));
-		final Literal literal = new Literal(variable, index > 0);
-		return literal;
-	}
-
-	public int[] getIntegerAssumptions() {
-		final ArrayList<Integer> solution = new ArrayList<>();
-		Node currentNode = solver.pop();
-		while (currentNode != null) {
-			if (currentNode instanceof Literal) {
-				final Literal literal = (Literal) currentNode;
-				solution.add(solver.getProblem().getSignedIndexOfVariable(literal));
-				currentNode = solver.pop();
+		getSolver().setConfiguration(ISolver.CONFIG_TIMEOUT, timeout);
+		if (assumptions != null) {
+			// TODO SOLVERS Better handling of assumptions
+			for (final int literal : assumptions.getLiterals()) {
+				getSolver().push(new Literal(getSolver().getProblem().getVariableOfIndex(Math.abs(literal)), literal >= 0 ? true : false));
 			}
 		}
-		Collections.reverse(solution);
+		// TODO SOLVER Sebastian
+		// assumptions = new LiteralSet(solver.getAssignmentArray());
+		timeoutOccured = false;
 
-		return SolverUtils.getIntModel((Integer[]) solution.toArray(new Integer[solution.size()]));
+		monitor.checkCancel();
+		try {
+			result = analyze(monitor);
+			return result;
+		} catch (final Throwable e) {
+			throw e;
+		} finally {
+			getSolver().popAll();
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.analyses.ISolverAnalysis#getSolver()
-	 */
 	@Override
-	public ISolver getSolver() {
-		return solver;
+	public final LiteralSet getAssumptions() {
+		return assumptions;
 	}
 
-	protected ISatResult solverSatisfiable() {
-		final long time = System.currentTimeMillis();
-		final ISatResult result = solver.isSatisfiable();
-		solveTime += (System.currentTimeMillis() - time);
-		return result;
+	public Random getRandom() {
+		return random;
 	}
 
-	protected void solverPush(Node... node) throws ContradictionException {
-		final long time = System.currentTimeMillis();
-		solver.push(node);
-		editTime += (System.currentTimeMillis() - time);
+	@Override
+	public final AnalysisResult<T> getResult() {
+		return new AnalysisResult<>(this.getClass().getName(), assumptions, result);
 	}
 
-	protected void solverPop() {
-		final long time = System.currentTimeMillis();
-		solver.pop();
-		editTime += (System.currentTimeMillis() - time);
+	public int getTimeout() {
+		return timeout;
 	}
 
-	protected void solverPop(int count) {
-		final long time = System.currentTimeMillis();
-		solver.pop(count);
-		editTime += (System.currentTimeMillis() - time);
+	public final boolean isThrowTimeoutException() {
+		return throwTimeoutException;
 	}
 
+	public final boolean isTimeoutOccured() {
+		return timeoutOccured;
+	}
+
+	/**
+	 * This method can be used to indicate that a timeout occurred when executing the analysis.
+	 *
+	 * @throws RuntimeTimeoutException Whether a timeout occurs and {@link GeneralSolverAnalysis#throwTimeoutException} is true then a RuntimeTimeoutException
+	 *         is thrown.
+	 */
+	protected final void reportTimeout() throws RuntimeTimeoutException {
+		timeoutOccured = true;
+		if (throwTimeoutException) {
+			throw new RuntimeTimeoutException();
+		}
+	}
+
+	@Override
+	public final void setAssumptions(LiteralSet assumptions) {
+		this.assumptions = assumptions;
+	}
+
+	/**
+	 * Sets a new random instance.
+	 *
+	 * @param random
+	 */
+	public void setRandom(Random random) {
+		this.random = random;
+	}
+
+	/**
+	 * Determine whether the analysis should throw a {@link RuntimeTimeoutException} when a timeout occurs.
+	 *
+	 * @param throwTimeoutException
+	 */
+	public final void setThrowTimeoutException(boolean throwTimeoutException) {
+		this.throwTimeoutException = throwTimeoutException;
+	}
+
+	/**
+	 * Set the timeout for the solver in ms.
+	 *
+	 * @param timeout Timeout time in ms.
+	 */
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	// TODO SOLVERS remove later when switching to solvers with
+	public Literal getLiteralFromIndex(int index) {
+		final Object variable = getSolver().getProblem().getVariableOfIndex(index);
+		if (variable == null) {
+			return null;
+		}
+		return new Literal(variable, index > 0);
+	}
 }

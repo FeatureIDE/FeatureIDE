@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**

@@ -37,6 +37,12 @@ public interface ISolverProblem {
 	 */
 	Node getRoot();
 
+	/**
+	 * Return the index of the variable when the given Literal is true, otherwise the negative value of the index is returned.
+	 *
+	 * @param variable
+	 * @return
+	 */
 	int getSignedIndexOfVariable(Literal variable);
 
 	/**

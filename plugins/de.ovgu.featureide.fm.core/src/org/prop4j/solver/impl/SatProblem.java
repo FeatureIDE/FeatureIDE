@@ -29,10 +29,11 @@ import java.util.Set;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 
 /**
- * Abstract class representing a satisfiability problem in CNF that is given as input for the sat solver.
+ * Abstract class representing a satisfiability problem in CNF that is given as input for the {@link AbstractSatSolver}.
  *
  * @author Joshua Sprey
  */
@@ -173,7 +174,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		if ((index >= intToVar.size())) {
+		if ((Math.abs(index) >= intToVar.size())) {
 			return null;
 		}
 		return intToVar.get(Math.abs(index));

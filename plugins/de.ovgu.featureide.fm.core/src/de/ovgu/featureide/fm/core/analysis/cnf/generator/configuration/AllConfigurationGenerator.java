@@ -25,8 +25,8 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**

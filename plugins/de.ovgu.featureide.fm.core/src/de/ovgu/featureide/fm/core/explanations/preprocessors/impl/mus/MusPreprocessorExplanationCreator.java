@@ -64,7 +64,7 @@ public abstract class MusPreprocessorExplanationCreator<S, E extends Preprocesso
 
 	@Override
 	protected IMusExtractor createOracle() {
-		final IMusExtractor oracle = getSatSolverFactory().getMusExtractor(new SatProblem(getCnf()));
+		final IMusExtractor oracle = getSatSolverFactory().getExplanationSolver(new SatProblem(getCnf()));
 		return oracle;
 	}
 }

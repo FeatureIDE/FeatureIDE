@@ -40,10 +40,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractNoHiddenCNFCrea
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoHiddenCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.OneWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver.SelectionStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;

@@ -40,8 +40,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseCon
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;

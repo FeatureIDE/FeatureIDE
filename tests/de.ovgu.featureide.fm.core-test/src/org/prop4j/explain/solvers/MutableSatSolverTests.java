@@ -34,7 +34,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISolver;
 
 /**
@@ -52,18 +52,18 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("A", "C"));
 		expected.add(new Or("A", "C"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
@@ -71,10 +71,10 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		final ISolver instance = getInstance(null);
 		final List<Node> expected = Collections.emptyList();
 		assertTrue(instance.getClauses() == null);
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		assertTrue(instance.getClauses() == null);
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
@@ -85,12 +85,12 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("D", "A"));
 		instance.push(new Or("B", "D"));
 		expected.add(new Or("D", "A"));
@@ -98,24 +98,24 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("C", "D"));
 		expected.add(new Or("C", "D"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Implies("C", "B"));
 		expected.add(new Or(new Literal("C", false), "B"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
@@ -126,24 +126,24 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("A", "C"));
 		expected.add(new Or("A", "C"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 //
 //	@Test
@@ -161,12 +161,12 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("D"));
 		instance.push(new Or("B", "D"));
 		expected.add(new Or("D"));
@@ -174,13 +174,13 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Or("C", "D"));
 		expected.add(new Or("C", "D"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.pop(3);
 		expected.removeLast();
 		expected.removeLast();
@@ -188,24 +188,24 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Implies("C", "B"));
 		expected.add(new Or(new Literal("C", false), "B"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.pop();
 	}
 
@@ -217,24 +217,24 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Literal("B", true));
 		expected.add(new Literal("B", true));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.pop();
 		expected.removeLast();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
@@ -246,22 +246,22 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 		instance.push(new Literal("A", false));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.FALSE);
+		assertTrue(instance.isSatisfiable() == SatResult.FALSE);
 		instance.pop();
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
 		}
-		assertTrue(instance.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Override

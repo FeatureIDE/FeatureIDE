@@ -24,22 +24,12 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ClearCoreDeadAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ClearImplicationAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ConstraintsUnsatisfiableAnalysis;
-import org.prop4j.analyses.impl.generalCopy.CoreDeadAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ImplicationAnalysis;
-import org.prop4j.analyses.impl.generalCopy.RedundantConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.TautologicalConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ValidAnalysis;
-import org.prop4j.analyses.impl.smt.FeatureAttributeRangeAnalysis;
+import org.prop4j.analyses.impl.general.sat.ClearCoreDeadAnalysis;
+import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISmtProblem;
-import org.prop4j.solver.ISmtSolver;
-import org.prop4j.solver.ISolver;
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
-import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -77,60 +67,67 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 	 */
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
-		if (analysisClass.equals(ValidAnalysis.class)) {
-			return getValidAnalyis(problem);
-		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
-			return getCoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
-			return getImplicationAnalysis(problem);
+//		if (analysisClass.equals(ValidAnalysis.class)) {
+//			return getValidAnalyis(problem);
+//		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
+//			return getCoreDeadAnalysis(problem);
+//		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
+//			return getImplicationAnalysis(problem);
 //		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
 //			return getIndeterminedAnalysis(problem);
-		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
-			return getRedundantConstraintAnalysis(problem);
-		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
-			return getConstraintsUnsatisfiableAnaylsis(problem);
-		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
-			return getConstraintsTautologyAnaylsis(problem);
-		} else if (analysisClass.equals(FeatureAttributeRangeAnalysis.class)) {
-			return getFeatureAttributeRangeAnalysis(problem);
-		}
-
-		// Check for AAA analysis
-		if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
-			return getAAACoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(ClearImplicationAnalysis.class)) {
-			return getAAAImplicationAnalysis(problem);
+//		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
+//			return getRedundantConstraintAnalysis(problem);
+//		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
+//			return getConstraintsUnsatisfiableAnaylsis(problem);
+//		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
+//			return getConstraintsTautologyAnaylsis(problem);
+//		} else if (analysisClass.equals(FeatureAttributeRangeAnalysis.class)) {
+//			return getFeatureAttributeRangeAnalysis(problem);
+//		}
+		if (analysisClass.equals(CoreDeadAnalysis.class)) {
+			return getCoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
+			return getClearCoreDeadAnalysis(problem);
 		}
 		return null;
 	}
 
 	private CoreDeadAnalysis getCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			final ISatSolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
 			return new CoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
 	}
 
-	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+	private ClearCoreDeadAnalysis getClearCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new ValidAnalysis(solver);
+			final ISatSolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			return new ClearCoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
 	}
 
-	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new ImplicationAnalysis(solver);
-		} else {
-			return null;
-		}
-	}
-
+//	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new ValidAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new ImplicationAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
 //	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
 //		if (problem instanceof ISatProblem) {
 //			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
@@ -139,58 +136,58 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 //			return null;
 //		}
 //	}
-
-	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new RedundantConstraintAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
-
-	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new ConstraintsUnsatisfiableAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
-
-	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new TautologicalConstraintAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
-
-	private FeatureAttributeRangeAnalysis getFeatureAttributeRangeAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISmtProblem) {
-			final ISmtSolver solver = new JavaSmtSolver((ISmtProblem) problem, Solvers.Z3, defaultConfiguration);
-			return new FeatureAttributeRangeAnalysis(solver);
-		} else {
-			return null;
-		}
-	}
-
-	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new ClearCoreDeadAnalysis(solver);
-		} else {
-			return null;
-		}
-	}
-
-	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
-			return new ClearImplicationAnalysis(solver);
-		} else {
-			return null;
-		}
-	}
+//
+//	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new RedundantConstraintAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new ConstraintsUnsatisfiableAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new TautologicalConstraintAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private FeatureAttributeRangeAnalysis getFeatureAttributeRangeAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISmtProblem) {
+//			final ISmtSolver solver = new JavaSmtSolver((ISmtProblem) problem, Solvers.Z3, defaultConfiguration);
+//			return new FeatureAttributeRangeAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new ClearCoreDeadAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+//			return new ClearImplicationAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
 }

@@ -42,7 +42,7 @@ import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solvers.impl.javasmt.MutableSolverMemory;
@@ -132,7 +132,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
-		if (isSatisfiable() == ISatResult.TRUE) {
+		if (isSatisfiable() == SatResult.TRUE) {
 			return getSolution();
 		}
 		return null;
@@ -379,11 +379,11 @@ public class Ltms implements IMusExtractor, ISatSolver {
 	}
 
 	@Override
-	public ISatResult isSatisfiable() {
+	public SatResult isSatisfiable() {
 		if (getAllMinimalUnsatisfiableSubsets().isEmpty()) {
-			return ISatResult.FALSE;
+			return SatResult.FALSE;
 		} else {
-			return ISatResult.TRUE;
+			return SatResult.TRUE;
 		}
 	}
 

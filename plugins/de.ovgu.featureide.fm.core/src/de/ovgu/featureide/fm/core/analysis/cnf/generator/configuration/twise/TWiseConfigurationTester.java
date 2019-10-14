@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.LexicographicIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedSatSolver;
 
 /**
  * Test whether a set of configurations achieves t-wise feature coverage.

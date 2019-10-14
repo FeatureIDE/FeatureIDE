@@ -25,7 +25,7 @@ package org.prop4j.solver;
  *
  * @author Joshua Sprey
  */
-public interface IOptimizationSolver extends ISolver {
+public interface IOptimizationSolver extends ISmtSolver {
 
 	Object minimum(Object variable);
 

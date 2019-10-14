@@ -372,6 +372,7 @@ public class AnalysesCollection {
 		protected void configureAnalysis(CNF cnf, IndependentRedundancyAnalysis analysis) {
 			final List<LiteralSet> literalSetList = new ArrayList<>();
 			final IVariables variables = cnf.getVariables();
+
 			for (final IFeature iFeature : optionalFeatures) {
 				literalSetList.add(new LiteralSet(variables.getVariable(FeatureUtils.getParent(iFeature).getName(), false),
 						variables.getVariable(iFeature.getName(), true)));

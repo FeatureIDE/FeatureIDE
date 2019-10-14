@@ -20,7 +20,10 @@
  */
 package org.prop4j.analyses;
 
+import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISmtProblem;
 import org.prop4j.solver.ISmtSolver;
+import org.prop4j.solver.ISolverProblem;
 
 /**
  * Special abstract class for analysis that are only fitted for smt solvers.
@@ -32,10 +35,30 @@ public abstract class AbstractSmtSolverAnalysis<T> extends GeneralSolverAnalysis
 	protected ISmtSolver solver;
 
 	/**
-	 * @param solver
+	 * Creates a new instance of an analysis with a given solver. It is no longer necessary to create a solver.
+	 *
+	 * @param solver The solver that should be used for this analysis.
 	 */
-	protected AbstractSmtSolverAnalysis(ISmtSolver solver) {
-		super(solver);
+	public AbstractSmtSolverAnalysis(ISmtSolver solver) {
+		this.solver = solver;
 	}
 
+	/**
+	 * Creates a new instance of an analysis with a given solver. It is necessary to create a solver by overriding
+	 * {@link GeneralSolverAnalysis#initSolver(ISolverProblem)}.
+	 *
+	 * @param problemInstance A valid {@link ISatProblem} that should be used for the creation of the solver.
+	 */
+	public AbstractSmtSolverAnalysis(ISmtProblem instance) {
+		this.solver = initSolver(instance);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysis#getSolver()
+	 */
+	@Override
+	public abstract ISmtSolver getSolver();
+
+	public abstract ISmtSolver initSolver(ISmtProblem problem);
 }

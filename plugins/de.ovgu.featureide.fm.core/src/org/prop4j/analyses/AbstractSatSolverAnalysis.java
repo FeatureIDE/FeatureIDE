@@ -20,7 +20,9 @@
  */
 package org.prop4j.analyses;
 
+import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISolverProblem;
 
 /**
  * Special abstract class for analysis that are only fitted for sat solvers.
@@ -32,10 +34,32 @@ public abstract class AbstractSatSolverAnalysis<T> extends GeneralSolverAnalysis
 	protected ISatSolver solver;
 
 	/**
-	 * @param solver
+	 * Creates a new instance of an analysis with a given solver. It is no longer necessary to create a solver.
+	 *
+	 * @param solver The solver that should be used for this analysis.
 	 */
-	protected AbstractSatSolverAnalysis(ISatSolver solver) {
-		super(solver);
+	public AbstractSatSolverAnalysis(ISatSolver solver) {
+		this.solver = solver;
 	}
 
+	/**
+	 * Creates a new instance of an analysis with a given solver. It is necessary to create a solver by overriding
+	 * {@link GeneralSolverAnalysis#initSolver(ISolverProblem)}.
+	 *
+	 * @param problemInstance A valid {@link ISatProblem} that should be used for the creation of the solver.
+	 */
+	public AbstractSatSolverAnalysis(ISatProblem instance) {
+		this.solver = initSolver(instance);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysis#getSolver()
+	 */
+	@Override
+	public ISatSolver getSolver() {
+		return solver;
+	}
+
+	public abstract ISatSolver initSolver(ISatProblem problem);
 }

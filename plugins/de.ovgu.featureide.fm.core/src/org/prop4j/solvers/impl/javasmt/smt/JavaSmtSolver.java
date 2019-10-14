@@ -31,7 +31,7 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSmtSolver;
 import org.prop4j.solver.IOptimizationSolver;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISmtProblem;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
 import org.prop4j.solvers.impl.javasmt.SolverMemory;
@@ -114,18 +114,18 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	 * @see org.prop4j.solver.ISolver#isSatisfiable()
 	 */
 	@Override
-	public ISatResult isSatisfiable() {
+	public SatResult isSatisfiable() {
 		try (ProverEnvironment prover = context.newProverEnvironment()) {
 			final List<BooleanFormula> formulas = pushstack.getFormulasAsList();
 			for (final BooleanFormula booleanFormula : formulas) {
 				prover.addConstraint(booleanFormula);
 			}
 			final boolean isSat = !prover.isUnsat();
-			return isSat ? ISatResult.TRUE : ISatResult.FALSE;
+			return isSat ? SatResult.TRUE : SatResult.FALSE;
 		} catch (final SolverException e) {
-			return ISatResult.TIMEOUT;
+			return SatResult.TIMEOUT;
 		} catch (final InterruptedException e) {
-			return ISatResult.TIMEOUT;
+			return SatResult.TIMEOUT;
 		}
 	}
 

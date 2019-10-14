@@ -31,7 +31,7 @@ import org.prop4j.Node;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.xplain.Xplain;
@@ -41,7 +41,7 @@ import org.sat4j.tools.xplain.Xplain;
  *
  * @author Joshua Sprey
  */
-public class Sat4JSatMusSolver extends Sat4jSatSolver implements IMusExtractor {
+public class Sat4JSatMusSolver extends Sat4JSatSolver implements IMusExtractor {
 
 	public Sat4JSatMusSolver(ISatProblem problem, Map<String, Object> config) throws ContradictionException {
 		super(problem, config);
@@ -79,7 +79,7 @@ public class Sat4JSatMusSolver extends Sat4jSatSolver implements IMusExtractor {
 
 	@Override
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		if (isSatisfiable() == ISatResult.TRUE) {
+		if (isSatisfiable() == SatResult.TRUE) {
 			throw new IllegalStateException("Problem is satisfiable");
 		}
 		final int[] indexes;

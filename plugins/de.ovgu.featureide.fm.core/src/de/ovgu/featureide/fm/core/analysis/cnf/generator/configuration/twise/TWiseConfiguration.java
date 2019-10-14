@@ -25,9 +25,9 @@ import java.util.Arrays;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver.SelectionStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.DefaultVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;

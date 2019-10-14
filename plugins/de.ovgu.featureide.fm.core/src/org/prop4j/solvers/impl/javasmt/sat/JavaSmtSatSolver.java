@@ -31,7 +31,7 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
 import org.prop4j.solvers.impl.javasmt.SolverMemory;
 import org.sosy_lab.common.ShutdownManager;
@@ -120,15 +120,15 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#isSatisfiable()
 	 */
 	@Override
-	public ISatResult isSatisfiable() {
+	public SatResult isSatisfiable() {
 		try {
 			final List<BooleanFormula> formulas = pushstack.getAssumtions();
 			final boolean isSat = !prover.isUnsatWithAssumptions(formulas);
-			return isSat ? ISatResult.TRUE : ISatResult.FALSE;
+			return isSat ? SatResult.TRUE : SatResult.FALSE;
 		} catch (final SolverException e) {
-			return ISatResult.TIMEOUT;
+			return SatResult.TIMEOUT;
 		} catch (final InterruptedException e) {
-			return ISatResult.TIMEOUT;
+			return SatResult.TIMEOUT;
 		}
 	}
 

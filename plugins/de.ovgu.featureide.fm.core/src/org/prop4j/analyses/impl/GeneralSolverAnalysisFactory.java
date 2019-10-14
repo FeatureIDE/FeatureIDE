@@ -24,18 +24,15 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ConstraintsUnsatisfiableAnalysis;
-import org.prop4j.analyses.impl.generalCopy.CoreDeadAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ImplicationAnalysis;
-import org.prop4j.analyses.impl.generalCopy.RedundantConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.TautologicalConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ValidAnalysis;
+import org.prop4j.analyses.impl.general.sat.ClearCoreDeadAnalysis;
+import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISolver;
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.SolverManager;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolver;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
@@ -51,8 +48,8 @@ public class GeneralSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 
 	public GeneralSolverAnalysisFactory() {
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
-		defaultConfiguration.put(AbstractSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-		defaultConfiguration.put(AbstractSatSolver.CONFIG_VERBOSE, false);
+		defaultConfiguration.put(Sat4JSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
+		defaultConfiguration.put(Sat4JSatSolver.CONFIG_VERBOSE, false);
 		factory = SolverManager.getSelectedFeatureAttributeSolverFactory();
 		FMCorePlugin.getDefault().logInfo("Habe Factory: " + factory.getId());
 	}
@@ -81,27 +78,32 @@ public class GeneralSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 	 */
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
-		if (analysisClass.equals(ValidAnalysis.class)) {
-			return getValidAnalyis(problem);
-		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
-			return getCoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
-			return getImplicationAnalysis(problem);
+//		if (analysisClass.equals(ValidAnalysis.class)) {
+//			return getValidAnalyis(problem);
+//		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
+//			return getCoreDeadAnalysis(problem);
+//		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
+//			return getImplicationAnalysis(problem);
 //		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
 //			return getIndeterminedAnalysis(problem);
-		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
-			return getRedundantConstraintAnalysis(problem);
-		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
-			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
-		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
-			return getConstraintsTautologyAnaylsis(problem);
+//		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
+//			return getRedundantConstraintAnalysis(problem);
+//		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
+//			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
+//		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
+//			return getConstraintsTautologyAnaylsis(problem);
+//		}
+		if (analysisClass.equals(CoreDeadAnalysis.class)) {
+			return getCoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
+			return getClearCoreDeadAnalysis(problem);
 		}
 		return null;
 	}
 
 	private CoreDeadAnalysis getCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
+			final ISatSolver solver = factory.getAnalysisSolver((ISatProblem) problem);
 			solver.setConfiguration(defaultConfiguration);
 			return new CoreDeadAnalysis(solver);
 		} else {
@@ -109,26 +111,36 @@ public class GeneralSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 		}
 	}
 
-	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+	private ClearCoreDeadAnalysis getClearCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
+			final ISatSolver solver = factory.getAnalysisSolver((ISatProblem) problem);
 			solver.setConfiguration(defaultConfiguration);
-			return new ValidAnalysis(solver);
+			return new ClearCoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
 	}
 
-	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
-			solver.setConfiguration(defaultConfiguration);
-			return new ImplicationAnalysis(solver);
-		} else {
-			return null;
-		}
-	}
-
+//	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = factory.getAnalysisSolver((ISatProblem) problem);
+//			solver.setConfiguration(defaultConfiguration);
+//			return new ValidAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = factory.getAnalysisSolver((ISatProblem) problem);
+//			solver.setConfiguration(defaultConfiguration);
+//			return new ImplicationAnalysis(solver);
+//		} else {
+//			return null;
+//		}
+//	}
+//
 //	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
 //		if (problem instanceof ISatProblem) {
 //			final ISolver solver = factory.getSolver((ISatProblem) problem);
@@ -138,34 +150,34 @@ public class GeneralSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 //			return null;
 //		}
 //	}
-
-	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
-			solver.setConfiguration(defaultConfiguration);
-			return new RedundantConstraintAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
-
-	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
-			solver.setConfiguration(defaultConfiguration);
-			return new ConstraintsUnsatisfiableAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
-
-	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			final ISolver solver = factory.getSolver((ISatProblem) problem);
-			solver.setConfiguration(defaultConfiguration);
-			return new TautologicalConstraintAnalysis(solver, this);
-		} else {
-			return null;
-		}
-	}
+//
+//	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = factory.getAnalysisSolver((ISatProblem) problem);
+//			solver.setConfiguration(defaultConfiguration);
+//			return new RedundantConstraintAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = factory.getAnalysisSolver((ISatProblem) problem);
+//			solver.setConfiguration(defaultConfiguration);
+//			return new ConstraintsUnsatisfiableAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			final ISolver solver = factory.getAnalysisSolver((ISatProblem) problem);
+//			solver.setConfiguration(defaultConfiguration);
+//			return new TautologicalConstraintAnalysis(solver, this);
+//		} else {
+//			return null;
+//		}
+//	}
 }

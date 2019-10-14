@@ -462,7 +462,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	@Override
 	public String toString() {
-		return "Clause <" + Arrays.toString(literals) + ">";
+		return "Clause " + literals.length + "x<" + Arrays.toString(literals) + ">";
 	}
 
 	@Override

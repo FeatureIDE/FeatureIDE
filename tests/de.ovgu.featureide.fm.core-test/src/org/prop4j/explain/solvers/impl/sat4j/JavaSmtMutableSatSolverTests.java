@@ -39,6 +39,6 @@ public class JavaSmtMutableSatSolverTests extends MutableSatSolverTests {
 	 */
 	@Override
 	protected ISatSolver getInstance(Node cnf) {
-		return new JavaSmtSatSolverFactory().getSolver(new SatProblem(cnf));
+		return new JavaSmtSatSolverFactory().getAnalysisSolver(new SatProblem(cnf));
 	}
 }

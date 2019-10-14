@@ -45,29 +45,6 @@ public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 	public Sat4JSatSolverFactory() {}
 
 	@Override
-	public IMusExtractor getMusExtractor(ISatProblem problem) {
-		try {
-			return new Sat4JSatMusSolver(problem, null);
-		} catch (final ContradictionException e) {
-			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
-		}
-	}
-
-	@Override
-	public ISatSolver getSolver(ISatProblem problem) {
-		try {
-			return new Sat4JSatMusSolver(problem, null);
-		} catch (final ContradictionException e) {
-			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
-		}
-	}
-
-	@Override
-	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
-		throw new UnsupportedOperationException("Sat4J does not support optimizing.");
-	}
-
-	@Override
 	public boolean initExtension() {
 		return true;
 	}
@@ -82,9 +59,54 @@ public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 		return "Default SAT solver used by Feature IDE.";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingAnalysisSolver()
+	 */
 	@Override
-	public boolean isSupportingOptimizations() {
+	public boolean isProvidingAnalysisSolver() {
+		return true;
+	}
+
+	@Override
+	public ISatSolver getAnalysisSolver(ISatProblem problem) {
+		try {
+			return new Sat4JSatMusSolver(problem, null);
+		} catch (final ContradictionException e) {
+			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingExplanationSolver()
+	 */
+	@Override
+	public boolean isProvidingExplanationSolver() {
+		return true;
+	}
+
+	@Override
+	public IMusExtractor getExplanationSolver(ISatProblem problem) {
+		try {
+			return new Sat4JSatMusSolver(problem, null);
+		} catch (final ContradictionException e) {
+			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingOptimizationSolver()
+	 */
+	@Override
+	public boolean isProvidingOptimizationSolver() {
 		return false;
+	}
+
+	@Override
+	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
+		throw new UnsupportedOperationException("Sat4J does not support optimizing.");
 	}
 
 	@Override

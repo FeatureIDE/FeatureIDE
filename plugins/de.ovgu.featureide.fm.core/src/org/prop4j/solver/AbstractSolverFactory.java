@@ -25,7 +25,7 @@ import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 import de.ovgu.featureide.fm.core.IExtension;
 
 /**
- * Factory used to create solvers.
+ * This factory can be extended to add solvers to FeatureIDE.
  *
  * @author Joshua Sprey
  */
@@ -46,19 +46,29 @@ public abstract class AbstractSolverFactory implements IExtension {
 	public abstract String getDisplayDescription();
 
 	/**
-	 * Does the factory support an optimization solver
+	 * Does the factory provides an explanation solver (SAT) that can be used by FeatureIDE to explain anomalies in the feature model.
 	 */
-	public abstract boolean isSupportingOptimizations();
+	public abstract boolean isProvidingExplanationSolver();
+
+	/**
+	 * Does the factory provides an analysis solver (SAT) that can be used by FeatureIDE to detect anomalies in the feature model.
+	 */
+	public abstract boolean isProvidingAnalysisSolver();
+
+	/**
+	 * Does the factory provides an optimization solver (SMT) that can be used by FeatureIDE to optimize attributes.
+	 */
+	public abstract boolean isProvidingOptimizationSolver();
 
 	/**
 	 * Return a solver with a mus extractor interface
 	 */
-	public abstract IMusExtractor getMusExtractor(ISatProblem problem);
+	public abstract IMusExtractor getExplanationSolver(ISatProblem problem);
 
 	/**
 	 * Return a solver to solve sat querys
 	 */
-	public abstract ISatSolver getSolver(ISatProblem problem);
+	public abstract ISatSolver getAnalysisSolver(ISatProblem problem);
 
 	/**
 	 * Return a solver with a optimization interface
@@ -66,9 +76,7 @@ public abstract class AbstractSolverFactory implements IExtension {
 	public abstract IOptimizationSolver getOptimizationSolver(ISmtProblem problem);
 
 	/**
-	 * Returns the default factory for Sat4J solver
-	 *
-	 * @return
+	 * Returns the default factory used by FeatureIDE.
 	 */
 	public static AbstractSolverFactory getDefault() {
 		return new Sat4JSatSolverFactory();
@@ -76,8 +84,6 @@ public abstract class AbstractSolverFactory implements IExtension {
 
 	/**
 	 * Returns a new instance of the solver factory.
-	 * 
-	 * @return
 	 */
 	public abstract AbstractSolverFactory getNewFactory();
 }

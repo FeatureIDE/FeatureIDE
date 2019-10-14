@@ -33,9 +33,18 @@ import org.prop4j.Node;
 public interface ISolver {
 
 	/**
+	 * Configuration identifier that can be given to the solver via {@link ISolver#setConfiguration(String, Object)} to set the timeout for the solver. Note:
+	 * Not every solver must implement this configuration.
+	 *
+	 */
+	public static final String CONFIG_TIMEOUT = "timeout";
+
+	public int MAX_SOLUTION_BUFFER = 1000;
+
+	/**
 	 * @return true, when the problem given to the solver is satisfiable.
 	 */
-	ISatResult isSatisfiable();
+	SatResult isSatisfiable();
 
 	/**
 	 * Used to set specific solver configuration when the solver initiated and also during runtime.

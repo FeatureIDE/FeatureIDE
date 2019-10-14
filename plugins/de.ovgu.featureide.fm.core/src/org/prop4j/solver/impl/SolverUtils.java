@@ -124,7 +124,7 @@ public class SolverUtils {
 	}
 
 	/**
-	 * Creates a pretty printed version of an model list
+	 * Creates a pretty printed version of a model list
 	 *
 	 * @param list List of models
 	 * @return String to print

@@ -34,7 +34,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISolver;
 
 /**
@@ -49,63 +49,63 @@ public abstract class ISolverTests {
 	@Test
 	public void testSatisfiable() {
 		final ISolver solver = getInstance(new And(new Literal("A"), new Implies(new Literal("A"), new Literal("B"))));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
 	public void testSatisfiableContradiction() {
 		final ISolver solver = getInstance(new And("A", new Not("A")));
-		assertTrue(solver.isSatisfiable() == ISatResult.FALSE);
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
 	}
 
 	@Test
 	public void testSatisfiableUnsatisfiable() {
 		final ISolver solver = getInstance(new And("A", new Implies("A", "B"), new Not("B")));
-		assertTrue(solver.isSatisfiable() == ISatResult.FALSE);
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
 	}
 
 	@Test
 	public void testSatisfiableEmpty() {
 		final ISolver solver = getInstance(null);
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
 	public void testSatisfiableMultiple() {
 		final ISolver solver = getInstance(new And("A", new Implies("A", "B")));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 	}
 
 	@Test
 	public void testSatisfiableIncremental() throws ContradictionException {
 		final ISolver solver = getInstance(new And(new Or("A", "B")));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Or("A", new Not("A")));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Equals("A", "B").toRegularCNF());
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Or(new Not("A"), new Not("B")));
-		assertFalse(solver.isSatisfiable() == ISatResult.FALSE);
+		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
 		solver.push(new Or("B", new Not("B")));
-		assertFalse(solver.isSatisfiable() == ISatResult.FALSE);
+		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
 	}
 
 	@Test
 	public void testSatisfiableAssumptions() throws ContradictionException {
 		final ISolver solver = getInstance(new And("A", new Implies("A", "B")));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Literal("B", true));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.pop();
 		solver.push(new Literal("B", false));
-		assertTrue(solver.isSatisfiable() == ISatResult.FALSE);
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
 		solver.pop();
 		solver.push(new Literal("B", true));
-		assertTrue(solver.isSatisfiable() == ISatResult.TRUE);
+		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Literal("A", false));
-		assertTrue(solver.isSatisfiable() == ISatResult.FALSE);
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
 	}
 
 	@Test

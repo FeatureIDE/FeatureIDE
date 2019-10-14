@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract class for the smt solvers
+ * Abstract class that should be implemented by SAT solvers.
  *
  * @author Joshua Sprey
  */
@@ -56,7 +56,7 @@ public abstract class AbstractSmtSolver implements ISmtSolver {
 
 	/**
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.prop4j.solver.ISolver#getProblem()
 	 */
 	@Override

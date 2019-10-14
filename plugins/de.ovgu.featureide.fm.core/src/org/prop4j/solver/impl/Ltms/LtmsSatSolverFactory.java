@@ -44,21 +44,6 @@ public class LtmsSatSolverFactory extends AbstractSolverFactory {
 	public LtmsSatSolverFactory() {}
 
 	@Override
-	public IMusExtractor getMusExtractor(ISatProblem problem) {
-		return new Ltms(problem, null);
-	}
-
-	@Override
-	public ISatSolver getSolver(ISatProblem problem) {
-		return new Ltms(problem, null);
-	}
-
-	@Override
-	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
-		throw new UnsupportedOperationException("Ltms does not support optimizing attributes.");
-	}
-
-	@Override
 	public boolean initExtension() {
 		return true;
 	}
@@ -73,9 +58,50 @@ public class LtmsSatSolverFactory extends AbstractSolverFactory {
 		return "The logic truth maintenence system is a boolean constraint propagator. It is fast but does not always provide a solution.";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingAnalysisSolver()
+	 */
 	@Override
-	public boolean isSupportingOptimizations() {
+	public boolean isProvidingAnalysisSolver() {
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#getAnalysisSolver(org.prop4j.solver.ISatProblem)
+	 */
+	@Override
+	public ISatSolver getAnalysisSolver(ISatProblem problem) {
+		throw new UnsupportedOperationException("Ltms cannot always find a solution, thus, it does not suit as an anylsis solver.");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingExplanationSolver()
+	 */
+	@Override
+	public boolean isProvidingExplanationSolver() {
+		return true;
+	}
+
+	@Override
+	public IMusExtractor getExplanationSolver(ISatProblem problem) {
+		return new Ltms(problem, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingOptimizationSolver()
+	 */
+	@Override
+	public boolean isProvidingOptimizationSolver() {
+		return false;
+	}
+
+	@Override
+	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
+		throw new UnsupportedOperationException("Ltms does not support optimizing attributes.");
 	}
 
 	@Override

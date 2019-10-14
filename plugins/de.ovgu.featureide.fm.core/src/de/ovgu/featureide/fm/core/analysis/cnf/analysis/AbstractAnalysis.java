@@ -24,10 +24,10 @@ import java.util.Random;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeTimeoutException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**

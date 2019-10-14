@@ -52,29 +52,6 @@ public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 		solver = Solvers.SMTINTERPOL;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
-	 */
-	@Override
-	public IMusExtractor getMusExtractor(ISatProblem problem) {
-		return new JavaSmtSatMusExtractor(problem, solver, null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.SatSolverFactory#getSolver()
-	 */
-	@Override
-	public ISatSolver getSolver(ISatProblem problem) {
-		return new JavaSmtSatSolver(problem, solver, null);
-	}
-
-	@Override
-	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
-		return new JavaSmtSolver(problem, solver, null);
-	}
-
 	@Override
 	public boolean initExtension() {
 		return true;
@@ -90,9 +67,58 @@ public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 		return "JavaSMT is an interface for multiple SMT solver. JavaSMT can also be used to solve SAT problems.";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingAnalysisSolver()
+	 */
 	@Override
-	public boolean isSupportingOptimizations() {
+	public boolean isProvidingAnalysisSolver() {
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.SatSolverFactory#getSolver()
+	 */
+	@Override
+	public ISatSolver getAnalysisSolver(ISatProblem problem) {
+		return new JavaSmtSatSolver(problem, solver, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingExplanationSolver()
+	 */
+	@Override
+	public boolean isProvidingExplanationSolver() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
+	 */
+	@Override
+	public IMusExtractor getExplanationSolver(ISatProblem problem) {
+		return new JavaSmtSatMusExtractor(problem, solver, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#isProvidingOptimizationSolver()
+	 */
+	@Override
+	public boolean isProvidingOptimizationSolver() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.AbstractSolverFactory#getOptimizationSolver(org.prop4j.solver.ISmtProblem)
+	 */
+	@Override
+	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
+		return new JavaSmtSolver(problem, solver, null);
 	}
 
 	@Override

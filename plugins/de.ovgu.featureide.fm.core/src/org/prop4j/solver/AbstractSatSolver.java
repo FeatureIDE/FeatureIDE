@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract class for the sat solvers.
+ * Abstract class that should be implemented by SAT solvers.
  *
  * @author Joshua Sprey
  */

@@ -36,7 +36,7 @@ public class JavaSmtMusExtractorTests extends MusExtractorTests {
 
 	@Override
 	protected IMusExtractor getInstance(Node cnf) {
-		return new JavaSmtSatSolverFactory().getMusExtractor(new SatProblem(cnf));
+		return new JavaSmtSatSolverFactory().getExplanationSolver(new SatProblem(cnf));
 	}
 
 }

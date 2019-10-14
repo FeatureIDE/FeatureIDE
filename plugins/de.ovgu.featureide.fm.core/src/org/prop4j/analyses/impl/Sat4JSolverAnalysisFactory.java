@@ -24,21 +24,14 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ClearCoreDeadAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ClearImplicationAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ConstraintsUnsatisfiableAnalysis;
-import org.prop4j.analyses.impl.generalCopy.CoreDeadAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ImplicationAnalysis;
-import org.prop4j.analyses.impl.generalCopy.RedundantConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.TautologicalConstraintAnalysis;
-import org.prop4j.analyses.impl.generalCopy.ValidAnalysis;
-import org.prop4j.analyses.impl.sat4j.Sat4JImplicationAnalysis;
+import org.prop4j.analyses.impl.general.sat.ClearCoreDeadAnalysis;
+import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISolver;
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
-import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolver;
 
 /**
  * Default factory used to create analysis with their appropriate solver.
@@ -49,13 +42,10 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
 
-	/**
-	 *
-	 */
 	public Sat4JSolverAnalysisFactory() {
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
-		defaultConfiguration.put(AbstractSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-		defaultConfiguration.put(AbstractSatSolver.CONFIG_VERBOSE, false);
+		defaultConfiguration.put(Sat4JSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
+		defaultConfiguration.put(Sat4JSatSolver.CONFIG_VERBOSE, false);
 	}
 
 	/*
@@ -82,42 +72,33 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	 */
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
-		if (analysisClass.equals(ValidAnalysis.class)) {
-			return getValidAnalyis(problem);
-		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
-			return getCoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
-			return getImplicationAnalysis(problem);
+//		if (analysisClass.equals(ValidAnalysis.class)) {
+//			return getValidAnalyis(problem);
+//		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
+//			return getCoreDeadAnalysis(problem);
+//		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
+//			return getImplicationAnalysis(problem);
 //		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
 //			return getIndeterminedAnalysis(problem);
-		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
-			return getRedundantConstraintAnalysis(problem);
-		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
-			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
-		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
-			return getConstraintsTautologyAnaylsis(problem);
-		}
-
-		// Check for AAA analysis
-		if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
-			return getAAACoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(ClearImplicationAnalysis.class)) {
-			return getAAAImplicationAnalysis(problem);
-		}
-
-		// Check for SAT4J analysis
-//		if (analysisClass.equals(Sat4JCoreDeadAnalysis.class)) {
-//			return getSat4JCoreDeadAnalysis(problem);
-//		} else if (analysisClass.equals(Sat4JImplicationAnalysis.class)) {
-//			return getSat4JImplicationAnalysis(problem);
+//		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
+//			return getRedundantConstraintAnalysis(problem);
+//		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
+//			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
+//		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
+//			return getConstraintsTautologyAnaylsis(problem);
 //		}
+		if (analysisClass.equals(CoreDeadAnalysis.class)) {
+			return getCoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
+			return getClearCoreDeadAnalysis(problem);
+		}
 		return null;
 	}
 
 	private CoreDeadAnalysis getCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+				final ISatSolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
 				return new CoreDeadAnalysis(solver);
 			} catch (final ContradictionException e) {
 				return null;
@@ -127,11 +108,11 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 		}
 	}
 
-	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+	private ClearCoreDeadAnalysis getClearCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ValidAnalysis(solver);
+				final ISatSolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+				return new ClearCoreDeadAnalysis(solver);
 			} catch (final ContradictionException e) {
 				return null;
 			}
@@ -139,20 +120,33 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 			return null;
 		}
 	}
-
-	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
+//
+//	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new ValidAnalysis(solver);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new ImplicationAnalysis(solver);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
 //	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
 //		if (problem instanceof ISatProblem) {
 //			try {
@@ -165,90 +159,77 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 //			return null;
 //		}
 //	}
-
-	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new RedundantConstraintAnalysis(solver, this);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ConstraintsUnsatisfiableAnalysis(solver, this);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new TautologicalConstraintAnalysis(solver, this);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ClearCoreDeadAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ClearImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	private Sat4JImplicationAnalysis getSat4JImplicationAnalysis(ISolverProblem problem) {
-		if (problem instanceof ISatProblem) {
-			try {
-				final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new Sat4JImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-//	private Sat4JCoreDeadAnalysis getSat4JCoreDeadAnalysis(ISolverProblem problem) {
+//
+//	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
 //		if (problem instanceof ISatProblem) {
 //			try {
-//				final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-//				return new Sat4JCoreDeadAnalysis(solver);
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new RedundantConstraintAnalysis(solver, this);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new ConstraintsUnsatisfiableAnalysis(solver, this);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new TautologicalConstraintAnalysis(solver, this);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new ClearCoreDeadAnalysis(solver);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final ISolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new ClearImplicationAnalysis(solver);
+//			} catch (final ContradictionException e) {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	private Sat4JImplicationAnalysis getSat4JImplicationAnalysis(ISolverProblem problem) {
+//		if (problem instanceof ISatProblem) {
+//			try {
+//				final Sat4JSatSolver solver = new Sat4JSatSolver((ISatProblem) problem, defaultConfiguration);
+//				return new Sat4JImplicationAnalysis(solver);
 //			} catch (final ContradictionException e) {
 //				return null;
 //			}

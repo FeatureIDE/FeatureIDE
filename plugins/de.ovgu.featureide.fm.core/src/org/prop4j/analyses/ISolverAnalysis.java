@@ -22,7 +22,9 @@ package org.prop4j.analyses;
 
 import org.prop4j.solver.ISolver;
 
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AnalysisResult;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
  * Interface given to specify a class to be an analysis. The generic type <T> indicates the object hat should be returned after the analysis is done. So the
@@ -30,17 +32,31 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Joshua Sprey
  */
-public interface ISolverAnalysis<T> {
+public interface ISolverAnalysis<T> extends LongRunningMethod<T> {
 
 	/**
-	 * Determine what should happen in the analysis. Also gives back the result.
+	 * Returns a {@link LiteralSet} containing the assumptions set for the analyis.
 	 *
-	 * @return Result of the analysis.
+	 * @return
 	 */
-	T analyze(IMonitor monitor);
+	LiteralSet getAssumptions();
 
 	/**
-	 * Returns the solver that is used to solve the analysis.
+	 * Set the assumptions for the analysis. When creating the solver the assumptions are pushed to the solver.
+	 *
+	 * @param assumptions Assumptions to set
+	 */
+	void setAssumptions(LiteralSet assumptions);
+
+	/**
+	 * Returns the result of the analysis.
+	 *
+	 * @return
+	 */
+	AnalysisResult<T> getResult();
+
+	/**
+	 * Returns the solver that is used to solve the analysis. This method can be overridden to initialize the used solver.
 	 *
 	 * @return Solver
 	 */

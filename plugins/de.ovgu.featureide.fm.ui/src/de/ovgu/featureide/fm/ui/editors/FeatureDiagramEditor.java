@@ -128,6 +128,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EvaluationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
@@ -180,6 +181,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private Label infoLabel;
 
+	private EvaluationAction evaluationAction;
 	private CalculateDependencyAction calculateDependencyAction;
 	private CreateFeatureBelowAction createFeatureBelowAction;
 	private CreateFeatureAboveAction createFeatureAboveAction;
@@ -333,6 +335,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		exportFeatureModelAction = addAction(new ExportFeatureModelAction(this));
 		convertGraphicalFileAction = addAction(new ConvertGraphicalFileAction(this));
 		colorSelectedFeatureAction = addAction(new SetFeatureColorAction(viewer, graphicalFeatureModel.getFeatureModelManager()));
+
+		// TODO SOLVER EVAL remove eval artifact
+		evaluationAction = new EvaluationAction(featureModelManager);
 
 		viewer.addSelectionChangedListener(new SelectionAction(graphicalFeatureModel));
 	}
@@ -1201,6 +1206,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else {
 			// nothing selected, build presentation menu
 			menuManager.add(createConstraintAction);
+			menuManager.add(new Separator());
+			menuManager.add(evaluationAction);
 			menuManager.add(new Separator());
 			menuManager.add(collapseAllAction);
 			menuManager.add(expandAllAction);

@@ -64,7 +64,7 @@ public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureMode
 
 	@Override
 	protected IMusExtractor createOracle() {
-		final IMusExtractor oracle = getSatSolverFactory().getMusExtractor(new SatProblem(getCnf()));
+		final IMusExtractor oracle = getSatSolverFactory().getExplanationSolver(new SatProblem(getCnf()));
 		return oracle;
 	}
 
