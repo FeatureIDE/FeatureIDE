@@ -301,11 +301,11 @@ public class AnalysesCollection {
 		}
 	}
 
-	static class ConstraintAnalysisWrapper<A extends AClauseAnalysis<List<LiteralSet>>> extends AConstraintAnalysisWrapper<List<LiteralSet>, A> {
+	public static class ConstraintAnalysisWrapper<A extends AClauseAnalysis<List<LiteralSet>>> extends AConstraintAnalysisWrapper<List<LiteralSet>, A> {
 
 		private List<IConstraint> constraints;
 
-		private ConstraintAnalysisWrapper(Class<A> analysis, ACreator<CNF> cnfCreator) {
+		public ConstraintAnalysisWrapper(Class<A> analysis, ACreator<CNF> cnfCreator) {
 			super(analysis, cnfCreator);
 		}
 

@@ -21,11 +21,7 @@
 package org.prop4j.analyses.impl.general.sat;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -35,8 +31,6 @@ import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.impl.SolverManager;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -46,7 +40,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Joshua Sprey
  * @author Sebastian Krieter
  */
-public class RedundancyAnalysis extends AbstractSatSolverAnalysis<List<LiteralSet>> {
+public class RedundancyAnalysis extends AbstractSatSolverAnalysis<List<IConstraint>> {
 
 	private final List<IConstraint> constraints;
 
@@ -78,138 +72,98 @@ public class RedundancyAnalysis extends AbstractSatSolverAnalysis<List<LiteralSe
 	 * @see org.prop4j.analyses.GeneralSolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
 	 */
 	@Override
-	protected List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception {
+	protected List<IConstraint> analyze(IMonitor<List<IConstraint>> monitor) throws Exception {
 		if ((constraints == null) || constraints.isEmpty()) {
-			return new ArrayList<LiteralSet>();
+			return new ArrayList<IConstraint>();
 		}
-		final Map<IConstraint, ConstraintAttribute> map = new HashMap<>();
+		final List<IConstraint> resultList = new ArrayList<>();
 		final List<Node> cnfNodes = new ArrayList<>();
-		final List<IConstraint> constraintsLocal = new ArrayList<>(3);
-		for (final IConstraint iConstraint : constraints) {
-			constraintsLocal.add(iConstraint);
-		}
+		final List<Node> cnfNegatedNodes = new ArrayList<>();
 
-		// Sort the constraint by the length of their children
-		Collections.sort(constraintsLocal, new Comparator<IConstraint>() {
+//		// Sort the constraint by the length of their children
+//		Collections.sort(constraintsLocal, new Comparator<IConstraint>() {
+//
+//			@Override
+//			public int compare(IConstraint o1, IConstraint o2) {
+//				final int o1Childs = o1.getNode().toRegularCNF().getChildren().length;
+//				final int o2Childs = o2.getNode().toRegularCNF().getChildren().length;
+//				if (o1Childs == o2Childs) {
+//					return 0;
+//				} else if (o1Childs > o2Childs) {
+//					return 1;
+//				} else {
+//					return -1;
+//				}
+//			}
+//		});
 
-			@Override
-			public int compare(IConstraint o1, IConstraint o2) {
-				final int o1Childs = o1.getNode().toRegularCNF().getChildren().length;
-				final int o2Childs = o2.getNode().toRegularCNF().getChildren().length;
-				if (o1Childs == o2Childs) {
-					return 0;
-				} else if (o1Childs > o2Childs) {
-					return 1;
-				} else {
-					return -1;
-				}
-			}
-		});
-
-		for (int i = 0; i < constraintsLocal.size(); i++) {
-			final Node cnf = constraintsLocal.get(i).getNode().toRegularCNF();
+		for (int i = 0; i < constraints.size(); i++) {
+			final Node cnf = constraints.get(i).getNode().toRegularCNF();
 			cnfNodes.add(cnf);
-			try {
-				solver.push(cnf.getChildren());
-			} catch (final ContradictionException e) {}
+			cnfNegatedNodes.add(new Not(cnf).toRegularCNF());
+			// Skip first constraint because we want to check it first and dont need to remove it later.
+			if (i > 0) {
+				try {
+					solver.push(cnf);
+				} catch (final ContradictionException e) {}
+			}
 		}
+
 		monitor.checkCancel();
 
-		for (int j = constraintsLocal.size() - 1; j >= 0; j--) {
-			final IConstraint constraint = constraintsLocal.get(j);
+		for (int j = 0; j < constraints.size(); j++) {
 			boolean redundant = false;
-
-			// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
-			for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
-				if (i >= j) {
-					final IConstraint constraintStack = constraintsLocal.get(i);
-					// Pop all non redundant constraints till we reach our constraint
-					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-						solver.pop(cnfNodes.get(i).getChildren().length);
-					}
-				} else {
-					break;
-				}
-
-			}
-
-			// Push all constraints which where popped before except the redundant ones
-			for (int i = j + 1; i < constraintsLocal.size(); i++) {
-				if (i > j) {
-					final IConstraint constraintStack = constraintsLocal.get(i);
-					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-						try {
-							solver.push(cnfNodes.get(i).getChildren());
-						} catch (final ContradictionException e) {}
-					}
-				}
-			}
-
-			final Node constraintNode = new Not(cnfNodes.get(j)).toRegularCNF();
-			final Node[] clauses = constraintNode.getChildren();
-			for (int i = 0; i < clauses.length; i++) {
-				try {
-					solver.push(clauses[i]);
-				} catch (final ContradictionException e) {
-					// Unsatisfiable => redundant
-					redundant = true;
-					solver.pop(i);
-				}
+			// Negated constraint contains multiple clauses. The solver can handle cnf and nodes. We only need to pop one time.
+			final Node negatedConstraint = cnfNegatedNodes.get(j);
+			try {
+				solver.push(negatedConstraint);
+			} catch (final ContradictionException e) {
+				// Unsatisfiable => redundant
+				redundant = true;
+				solver.pop();
 			}
 			if (!redundant) {
 				switch (solver.isSatisfiable()) {
 				case TRUE:
+					solver.pop();
+					break;
 				case TIMEOUT:
-					solver.pop(clauses.length);
+					reportTimeout();
+					solver.pop();
 					break;
 				case FALSE:
 					redundant = true;
-					solver.pop(clauses.length);
+					solver.pop();
 					break;
 				default:
 					break;
 				}
 			}
 
-			if (redundant) {
-				map.put(constraint, ConstraintAttribute.REDUNDANT);
-			} else {
-				// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
-				for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
-					if (i > j) {
-						final IConstraint constraintStack = constraintsLocal.get(i);
-						// Pop all non redundant constraints till we reach our constraint
-						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-							solver.pop(cnfNodes.get(i).getChildren().length);
-						}
-					} else {
-						break;
-					}
+			// Now the solver does no longer contain the checked constraint but only with index >j
+			try {
+				// Remove all until index j
+				solver.pop(constraints.size() - 1 - j);
 
+				// Add checked constraint to solver if not redundant
+				if (redundant) {
+					// Don't add the redundant constraint to the solver
+					resultList.add(constraints.get(j));
+				} else {
+					solver.push(cnfNodes.get(j));
 				}
 
-				try {
-					solver.push(cnfNodes.get(j).getChildren());
-				} catch (final ContradictionException e1) {}
-
-				// Push all constraints which where popped before except the redundant ones
-				for (int i = j + 1; i < constraintsLocal.size(); i++) {
-					if (i > j) {
-						final IConstraint constraintStack = constraintsLocal.get(i);
-						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-							try {
-								solver.push(cnfNodes.get(i).getChildren());
-							} catch (final ContradictionException e) {}
-						}
-					} else {
-						break;
-					}
+				// Add remaining constraints (index [j+2]-[n]) and skip the next checked constraint (index [j+1])
+				// because it will be added as negation in the next iteration
+				for (int j2 = j + 2; j2 < constraints.size(); j2++) {
+					solver.push(cnfNodes.get(j2));
 				}
-			}
+			} catch (final ContradictionException e1) {}
 
 			monitor.checkCancel();
 		}
-		return new ArrayList<LiteralSet>();
+
+		return resultList;
 	}
 
 }

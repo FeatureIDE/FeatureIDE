@@ -43,7 +43,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	private HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
 
 	public Sat4JSolverAnalysisFactory() {
-		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
+		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 10_000);
 		defaultConfiguration.put(Sat4JSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
 		defaultConfiguration.put(Sat4JSatSolver.CONFIG_VERBOSE, false);
 	}

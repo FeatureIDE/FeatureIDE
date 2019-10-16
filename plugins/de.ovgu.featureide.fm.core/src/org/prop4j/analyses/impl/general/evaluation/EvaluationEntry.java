@@ -77,13 +77,14 @@ public class EvaluationEntry {
 			}
 		}
 		name += "; " + (equa ? "Identical" : "Mismatch");
-		name += "; ";
+		name += ";\n\n";
 		for (int i = 0; i < results.size(); i++) {
 			name += results.get(i);
 			if (i != (results.size() - 1)) {
-				name += "; ";
+				name += ";\n";
 			}
 		}
+		name += "\n\n";
 		return name;
 	}
 

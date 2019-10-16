@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.generalCopy;
+package org.prop4j.analyses.impl.general.sat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,36 +29,60 @@ import java.util.Map;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.analyses.AbstractSolverAnalysisFactory;
-import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.ISolver;
+import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.impl.SolverManager;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds redundant constraints.
+ * Finds redundancies by removing single constraints.
  *
  * @author Joshua Sprey
+ * @author Sebastian Krieter
  */
-public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<IConstraint, ConstraintAttribute>> {
+public class RedundancyAnalysis3 extends AbstractSatSolverAnalysis<List<IConstraint>> {
 
-	public RedundantConstraintAnalysis(ISolver solver, AbstractSolverAnalysisFactory factory) {
-		super(solver);
-		this.factory = factory;
+	private final List<IConstraint> constraints;
+
+	public RedundancyAnalysis3(ISatProblem instance, List<IConstraint> constraints) {
+		super(instance);
+		this.constraints = constraints;
 	}
 
-	AbstractSolverAnalysisFactory factory;
-	private List<IConstraint> constraints;
+	public RedundancyAnalysis3(ISatSolver solver, List<IConstraint> constraints) {
+		super(solver);
+		this.constraints = constraints;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.GeneralSolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
 	@Override
-	public Map<IConstraint, ConstraintAttribute> analyze(IMonitor monitor) {
+	public ISatSolver initSolver(ISatProblem problem) {
+		if (solver == null) {
+			// Create new solver
+			solver = SolverManager.getSelectedFeatureAttributeSolverFactory().getAnalysisSolver(problem);
+		}
+		return solver;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.GeneralSolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
+	@Override
+	protected List<IConstraint> analyze(IMonitor<List<IConstraint>> monitor) throws Exception {
 		if ((constraints == null) || constraints.isEmpty()) {
-			return new HashMap<>();
+			return new ArrayList<IConstraint>();
 		}
 		final Map<IConstraint, ConstraintAttribute> map = new HashMap<>();
+		final List<IConstraint> resultList = new ArrayList<>();
 		final List<Node> cnfNodes = new ArrayList<>();
 		final List<IConstraint> constraintsLocal = new ArrayList<>(3);
 		for (final IConstraint iConstraint : constraints) {
@@ -67,6 +91,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 
 		// Sort the constraint by the length of their children
 		Collections.sort(constraintsLocal, new Comparator<IConstraint>() {
+
 			@Override
 			public int compare(IConstraint o1, IConstraint o2) {
 				final int o1Childs = o1.getNode().toRegularCNF().getChildren().length;
@@ -85,7 +110,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 			final Node cnf = constraintsLocal.get(i).getNode().toRegularCNF();
 			cnfNodes.add(cnf);
 			try {
-				solverPush(cnf.getChildren());
+				solver.push(cnf.getChildren());
 			} catch (final ContradictionException e) {}
 		}
 		monitor.checkCancel();
@@ -100,7 +125,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 					final IConstraint constraintStack = constraintsLocal.get(i);
 					// Pop all non redundant constraints till we reach our constraint
 					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-						solverPop(cnfNodes.get(i).getChildren().length);
+						solver.pop(cnfNodes.get(i).getChildren().length);
 					}
 				} else {
 					break;
@@ -114,7 +139,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 					final IConstraint constraintStack = constraintsLocal.get(i);
 					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
 						try {
-							solverPush(cnfNodes.get(i).getChildren());
+							solver.push(cnfNodes.get(i).getChildren());
 						} catch (final ContradictionException e) {}
 					}
 				}
@@ -124,22 +149,24 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 			final Node[] clauses = constraintNode.getChildren();
 			for (int i = 0; i < clauses.length; i++) {
 				try {
-					solverPush(clauses[i]);
+					solver.push(clauses[i]);
 				} catch (final ContradictionException e) {
 					// Unsatisfiable => redundant
 					redundant = true;
-					solverPop(i);
+					solver.pop(i);
 				}
 			}
 			if (!redundant) {
-				switch (solverSatisfiable()) {
+				switch (solver.isSatisfiable()) {
 				case TRUE:
+					solver.pop(clauses.length);
+					break;
 				case TIMEOUT:
-					solverPop(clauses.length);
+					reportTimeout();
 					break;
 				case FALSE:
 					redundant = true;
-					solverPop(clauses.length);
+					solver.pop(clauses.length);
 					break;
 				default:
 					break;
@@ -148,6 +175,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 
 			if (redundant) {
 				map.put(constraint, ConstraintAttribute.REDUNDANT);
+				resultList.add(constraint);
 			} else {
 				// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
 				for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
@@ -155,7 +183,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 						final IConstraint constraintStack = constraintsLocal.get(i);
 						// Pop all non redundant constraints till we reach our constraint
 						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-							solverPop(cnfNodes.get(i).getChildren().length);
+							solver.pop(cnfNodes.get(i).getChildren().length);
 						}
 					} else {
 						break;
@@ -164,7 +192,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 				}
 
 				try {
-					solverPush(cnfNodes.get(j).getChildren());
+					solver.push(cnfNodes.get(j).getChildren());
 				} catch (final ContradictionException e1) {}
 
 				// Push all constraints which where popped before except the redundant ones
@@ -173,7 +201,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 						final IConstraint constraintStack = constraintsLocal.get(i);
 						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
 							try {
-								solverPush(cnfNodes.get(i).getChildren());
+								solver.push(cnfNodes.get(i).getChildren());
 							} catch (final ContradictionException e) {}
 						}
 					} else {
@@ -184,14 +212,8 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 
 			monitor.checkCancel();
 		}
-		return map;
+
+		return resultList;
 	}
 
-	public List<IConstraint> getConstraints() {
-		return constraints;
-	}
-
-	public void setConstraints(List<IConstraint> constraints) {
-		this.constraints = constraints;
-	}
 }

@@ -111,7 +111,7 @@ public class Sat4JSatSolver extends AbstractSatSolver {
 
 		// Init Solver with configuration
 		solver = createSolver();
-		solver.setTimeoutMs(1000);
+		solver.setTimeoutMs(10_000);
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
 		setConfiguration(config);
@@ -267,15 +267,22 @@ public class Sat4JSatSolver extends AbstractSatSolver {
 		if (pushstack.isEmpty()) {
 			return null;
 		}
+		// Remove last node from pushstack
 		final Node oldNode = pushstack.pop();
-		if (oldNode instanceof Literal) {
+
+		// If Node is AND and is in CNF then pop all childs
+		if ((oldNode instanceof And) && oldNode.isConjunctiveNormalForm()) {
+			pop(oldNode.getChildren().length);
+			return oldNode;
+		} else if (oldNode instanceof Literal) {
+			// Handle Literal
 			assignment.pop();
 		} else if (oldNode instanceof Or) {
-			final Node[] children = oldNode.getChildren();
-			// Or with only one literal, just add the literal as assumption
-			if ((children.length == 1) && (children[0] instanceof Literal)) {
+			// Handle Or with only one Literal
+			if (oldNode.getChildren().length == 1) {
 				assignment.pop();
 			} else {
+				// Handle Or with multiple Literals
 				final IConstr constraint = memory.popFormula();
 				if (constraint != null) {
 					try {
@@ -320,44 +327,70 @@ public class Sat4JSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public int push(Node formula) throws org.prop4j.solver.ContradictionException {
+		// If Node is AND and is in CNF then push every child seperately
+		if ((formula instanceof And) && formula.isConjunctiveNormalForm()) {
+			final int clauses = push(formula.getChildren());
+			// Put and node on stack
+			pushstack.addFirst(formula);
+			return clauses;
+		} else if ((formula instanceof And) && !formula.isConjunctiveNormalForm()) {
+			throw new UnsupportedOperationException("The SAT solver can only handle And nodes in conjunctive normal form");
+		}
+
+		if (!(formula instanceof Literal) && !(formula instanceof Or)) {
+			throw new UnsupportedOperationException("The SAT solver can only handle the node types: And, Or and Literal");
+		}
+
+		// Handle Literals
 		if (formula instanceof Literal) {
+			// Add as assumption
 			final Literal literal = (Literal) formula;
 			assignment.push(getProblem().getSignedIndexOfVariable(literal));
-			pushstack.push(formula);
+			pushstack.addFirst(formula);
 			return 0;
 		}
-		formula = formula.toCNF();
-		if (formula instanceof And) {
-			if (formula.getChildren().length > 1) {
-				return 0;
-			}
-			formula = formula.getChildren()[0];
-		}
+
+		// Handle Or Nodes
 		if (formula instanceof Or) {
-			try {
-				final Node[] children = formula.getChildren();
-				// Or with only one literal, just add the literal as assumption
-				if ((children.length == 1) && (children[0] instanceof Literal)) {
-					final Literal literal = (Literal) children[0];
-					assignment.push(getProblem().getSignedIndexOfVariable(literal));
-					pushstack.push(formula);
-					return 0;
+			final Node[] children = formula.getChildren();
+
+			// Verify at least one children
+			if (children.length == 0) {
+				throw new UnsupportedOperationException("Cannot push Or node with zero childs");
+
+			}
+
+			// Verify each children as literal
+			for (final Node node : children) {
+				if (!(node instanceof Literal)) {
+					throw new UnsupportedOperationException("Can only push Or nodes containing Literals");
 				}
-				final int[] clause = new int[children.length];
-				for (int i = 0; i < children.length; i++) {
-					final Literal literal = (Literal) children[i];
-					clause[i] = getProblem().getSignedIndexOfVariable(literal);
-				}
-				final IConstr constaint = solver.addClause(new VecInt(clause));
-				memory.push(formula, constaint);
-				pushstack.push(formula);
-				if (constaint != null) {
-					return 1;
-				} else {
-					return 0;
-				}
-			} catch (final ContradictionException e) {
-				throw new org.prop4j.solver.ContradictionException();
+			}
+
+			// Handle Or with only one Literal
+			if (children.length == 1) {
+				// Add as assumption
+				final Literal literal = (Literal) children[0];
+				assignment.push(getProblem().getSignedIndexOfVariable(literal));
+				pushstack.addFirst(formula);
+				return 0;
+			} else {
+				try {
+					// Create clause for Sat4J
+					final int[] clause = new int[children.length];
+					for (int i = 0; i < children.length; i++) {
+						final Literal literal = (Literal) children[i];
+						clause[i] = getProblem().getSignedIndexOfVariable(literal);
+					}
+					final IConstr constaint = solver.addClause(new VecInt(clause));
+					memory.push(formula, constaint);
+					pushstack.addFirst(formula);
+					if (constaint != null) {
+						return 1;
+					} else {
+						return 0;
+					}
+				} catch (final ContradictionException cex) {}
 			}
 		}
 		return 0;

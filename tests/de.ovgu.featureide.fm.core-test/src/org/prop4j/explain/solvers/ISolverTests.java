@@ -34,8 +34,8 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISolver;
+import org.prop4j.solver.SatResult;
 
 /**
  * Tests for {@link ISolver}.
@@ -82,13 +82,13 @@ public abstract class ISolverTests {
 	public void testSatisfiableIncremental() throws ContradictionException {
 		final ISolver solver = getInstance(new And(new Or("A", "B")));
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
-		solver.push(new Or("A", new Not("A")));
+		solver.push(new Or("A", new Not("A")).toRegularCNF().getChildren());
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
-		solver.push(new Equals("A", "B").toRegularCNF());
+		solver.push(new Equals("A", "B").toRegularCNF().getChildren());
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
-		solver.push(new Or(new Not("A"), new Not("B")));
+		solver.push(new Or(new Not("A"), new Not("B")).toRegularCNF().getChildren());
 		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
-		solver.push(new Or("B", new Not("B")));
+		solver.push(new Or("B", new Not("B")).toRegularCNF().getChildren());
 		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
 	}
 

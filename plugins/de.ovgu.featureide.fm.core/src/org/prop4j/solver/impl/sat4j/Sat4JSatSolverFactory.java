@@ -71,7 +71,7 @@ public class Sat4JSatSolverFactory extends AbstractSolverFactory {
 	@Override
 	public ISatSolver getAnalysisSolver(ISatProblem problem) {
 		try {
-			return new Sat4JSatMusSolver(problem, null);
+			return new Sat4JSatSolver(problem, null);
 		} catch (final ContradictionException e) {
 			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
 		}

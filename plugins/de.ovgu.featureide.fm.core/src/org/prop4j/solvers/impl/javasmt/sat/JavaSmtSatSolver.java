@@ -167,11 +167,45 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 		if (pushstack.isStackEmpty()) {
 			return null;
 		}
+
 		final Node node = pushstack.pop();
-		if (!(node instanceof Literal) || ((node.getChildren() != null) && (node.getChildren().length != 1))) {
-			// Is clause so pop from context
-			prover.pop();
+		// If Node is AND and is in CNF then pop all childs
+		if ((node instanceof And) && node.isConjunctiveNormalForm()) {
+			pop(node.getChildren().length);
+			return node;
 		}
+
+		// Handle Literals
+		if (node instanceof Literal) {
+			// Do nothing the assumption is removed from the memory with pushstack.pop
+		}
+
+		// Handle Or Nodes
+		if (node instanceof Or) {
+			final Node[] children = node.getChildren();
+
+			// Verify at least one children
+			if (children.length == 0) {
+				throw new UnsupportedOperationException("Cannot push Or node with zero childs");
+
+			}
+
+			// Verify each children as literal
+			for (final Node child : children) {
+				if (!(child instanceof Literal)) {
+					throw new UnsupportedOperationException("Can only push Or nodes containing Literals");
+				}
+			}
+
+			// Handle Or with only one Literal
+			if (children.length == 1) {
+				// Do nothing the assumption is removed from the memory with pushstack.pop
+			} else {
+				// Is clause so pop from context
+				prover.pop();
+			}
+		}
+
 		return node;
 	}
 
@@ -208,19 +242,57 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public int push(Node formula) {
-		formula = formula.toCNF();
-		if (formula instanceof And) {
-			if (formula.getChildren().length > 1) {
-				return 0;
-			}
-			formula = formula.getChildren()[0];
+		// If Node is AND and is in CNF then push every child seperately
+		if ((formula instanceof And) && formula.isConjunctiveNormalForm()) {
+			final int clauses = push(formula.getChildren());
+			// Put and node on stack
+			pushstack.push(formula, null);
+			return clauses;
+		} else if ((formula instanceof And) && !formula.isConjunctiveNormalForm()) {
+			throw new UnsupportedOperationException("The SAT solver can only handle And nodes in conjunctive normal form");
 		}
-		if ((formula instanceof Literal) || (formula instanceof Or)) {
+
+		// Only accept Literals or OR nodes with Literals
+		if (!(formula instanceof Literal) && !(formula instanceof Or)) {
+			throw new UnsupportedOperationException("The SAT solver can only handle the node types: Or(Literals...) and Literal");
+		}
+
+		// Handle Literals
+		if (formula instanceof Literal) {
+			// Add as assumption
 			final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
 			pushstack.push(formula, formulaJavaSmt);
-			if ((formula instanceof Literal)) {
-				return 0;
+			// Do not add directly to solver because assumptions are given as parameter to isSatisfiable
+
+		}
+
+		// Handle Or Nodes
+		if (formula instanceof Or) {
+			final Node[] children = formula.getChildren();
+
+			// Verify at least one children
+			if (children.length == 0) {
+				throw new UnsupportedOperationException("Cannot push Or node with zero childs");
+
+			}
+
+			// Verify each children as literal
+			for (final Node node : children) {
+				if (!(node instanceof Literal)) {
+					throw new UnsupportedOperationException("Can only push Or nodes containing Literals");
+				}
+			}
+
+			// Handle Or with only one Literal
+			if (children.length == 1) {
+				// Add as assumption
+				final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
+				pushstack.push(formula, formulaJavaSmt);
+				// Do not add directly to solver because assumptions are given as parameter to isSatisfiable
 			} else {
+				// Add as formula
+				final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
+				pushstack.push(formula, formulaJavaSmt);
 				try {
 					prover.push(formulaJavaSmt);
 				} catch (final InterruptedException e) {}

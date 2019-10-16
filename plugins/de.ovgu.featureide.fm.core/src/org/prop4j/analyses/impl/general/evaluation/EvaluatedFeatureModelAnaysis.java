@@ -32,6 +32,7 @@ import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.sat.CountSolutionsAnalysis;
 import org.prop4j.analyses.impl.general.sat.HasSolutionAnalysis;
 import org.prop4j.analyses.impl.general.sat.ImplicationAnalysis;
+import org.prop4j.analyses.impl.general.sat.RedundancyAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.impl.SatProblem;
@@ -39,12 +40,15 @@ import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
+import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentRedundancyAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureTreeCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -54,6 +58,7 @@ import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace the corresponding methods in {@link IFeatureModel}
@@ -322,7 +327,6 @@ public class EvaluatedFeatureModelAnaysis {
 		final List<LiteralSet> result = LongRunningWrapper.runMethod(analysis);
 		final long ges = System.currentTimeMillis() - t1;
 
-		// Count found FO Features
 		final List<String> featureNamesFO = new ArrayList<>();
 		for (final LiteralSet literalSet : result) {
 			if (literalSet != null) {
@@ -388,21 +392,21 @@ public class EvaluatedFeatureModelAnaysis {
 		final String modelName = fm.getSourceFile().getName(fm.getSourceFile().getNameCount() - 1).toString();
 
 		// Void Model
-		evaluateVoidAnalysis(modelName);
+		// evaluateVoidAnalysis(modelName);
 
 		// Core and Dead Features
-		evaluateClearCoreDead(modelName);
-		evaluateOptiCoreDead(modelName);
+		// evaluateClearCoreDead(modelName);
+		// evaluateOptiCoreDead(modelName);
 
 		// False-Optional Features
-		evaluateClearFOFeatures(modelName);
-		evaluateOptiFOFeatures(modelName);
+		// evaluateClearFOFeatures(modelName);
+		// evaluateOptiFOFeatures(modelName);
 
 		// Redundant constraints
 		evaluateRedundantCostraints(modelName);
 
 		// Count Solutions
-		evaluateCountSolutionsAnalysis(modelName);
+		// evaluateCountSolutionsAnalysis(modelName);
 
 		// Save and write the results to a file
 		printResult();
@@ -412,30 +416,66 @@ public class EvaluatedFeatureModelAnaysis {
 		final EvaluationEntry entry =
 			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
 
-		// checkRedundantConstraints(entry, sat4jSolverFull);
-		// checkRedundantConstraints(entry, smtInterpolSolverFull);
+		checkRedundantConstraints(entry, sat4jSolverStructure);
+		checkRedundantConstraints(entry, smtInterpolSolverStrucutre);
 		checkRedundantConstraintsNative(entry, sat4jNativeSolver);
 
 		redundantConstraints.add(entry);
+	}
+
+	private void checkRedundantConstraints(EvaluationEntry entry, ISatSolver solver) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		final RedundancyAnalysis analysis = new RedundancyAnalysis(solver, fm.getConstraints());
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<IConstraint> result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			resultList.add(result.get(i).getDisplayName());
+		}
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
 	}
 
 	private void checkRedundantConstraintsNative(EvaluationEntry entry,
 			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver) {
 		// Add sebastians native approach
 		long t1 = System.currentTimeMillis();
-		// Setup clauses
-
-		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis analysis =
-			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis(sat4jNativeSolver);
+		final ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis> constraintRedundancyAnalysis =
+			new ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis>(
+					de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis.class, new FeatureTreeCNFCreator());
+		constraintRedundancyAnalysis.setFormula(FeatureModelManager.getInstance(fm).getPersistentFormula());
+		constraintRedundancyAnalysis.setConstraints(fm.getConstraints());
 		final long initTime = (System.currentTimeMillis() - t1);
 		entry.addTime(initTime);
 
 		// Save time run the complete analysis
 		t1 = System.currentTimeMillis();
-		final List<LiteralSet> result = LongRunningWrapper.runMethod(analysis);
+		final List<LiteralSet> result = constraintRedundancyAnalysis.getResult(new NullMonitor<>());
 		final long ges = System.currentTimeMillis() - t1;
 
-		entry.results.add("[" + result + "]");
+		if (result == null) {
+			entry.results.add("[EMPTY]");
+		} else {
+			final List<String> resultList = new ArrayList<>();
+			for (int i = 0; i < constraintRedundancyAnalysis.getClauseGroupSize().length; i++) {
+				if (result.get(i) != null) {
+					resultList.add(fm.getConstraints().get(i).getDisplayName());
+				}
+			}
+			Collections.sort(resultList);
+			entry.results.add("" + resultList);
+		}
 
 		// Save time for the complete analysis
 		entry.addTime(ges);
@@ -576,10 +616,6 @@ public class EvaluatedFeatureModelAnaysis {
 		entry.addTime(ges + initTime);
 	}
 
-	/**
-	 * @param entry
-	 * @param sat4jSolverFull2
-	 */
 	private void checkCountSolutions(EvaluationEntry entry, ISatSolver solver) {
 		long t1 = System.currentTimeMillis();
 		final CountSolutionsAnalysis analysis = new CountSolutionsAnalysis(solver);

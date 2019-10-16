@@ -39,6 +39,7 @@ import org.prop4j.solver.Tupel;
  * @author Joshua Sprey
  */
 public class SolverMemory<T> {
+
 	/**
 	 * Creates a new push solver stack.
 	 *
@@ -92,7 +93,7 @@ public class SolverMemory<T> {
 	 * @param formula Formula that represents the Node for the given Solver.
 	 */
 	public void push(Node node, T formula) {
-		insertionStack.push(new Tupel<Node, T>(node, formula));
+		insertionStack.addFirst(new Tupel<Node, T>(node, formula));
 	}
 
 	/**
@@ -293,6 +294,9 @@ public class SolverMemory<T> {
 		final List<T> assumtions = new ArrayList<>();
 		for (final Tupel<Node, T> tupel : insertionStack) {
 			if (tupel.key instanceof Literal) {
+				assumtions.add(tupel.value);
+			}
+			if ((tupel.key instanceof Or) && (((Or) tupel.key).getChildren().length == 1)) {
 				assumtions.add(tupel.value);
 			}
 		}

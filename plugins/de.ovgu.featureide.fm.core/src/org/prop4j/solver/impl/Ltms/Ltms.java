@@ -42,9 +42,9 @@ import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISolverProblem;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solvers.impl.javasmt.MutableSolverMemory;
 
 /**
@@ -74,8 +74,7 @@ public class Ltms implements IMusExtractor, ISatSolver {
 
 	/** Contains information and mappings for pushed clauses and assumptions */
 	private final MutableSolverMemory<Node, Literal> memory;
-	/** Hold information about pushed nodes which can be clauses or assumptions. */
-	protected LinkedList<Node> pushstack = new LinkedList<>();
+
 	/**
 	 * The reason for a derived truth value, represented by a clause. The literals of this clause are the antecedents of the variable. The antecedents are the
 	 * literals whose values were referenced when deriving a new truth value.
