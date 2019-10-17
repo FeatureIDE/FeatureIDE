@@ -262,7 +262,6 @@ public class TWiseConfigurationStatistic {
 			}
 			final double d = (double) count / configuration.size();
 			final double factor = (2 - (d * d));
-//			final double factor = (1 - d);
 			configValues2[confIndex++] *= factor;
 		}
 	}

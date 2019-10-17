@@ -244,25 +244,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				if (combinedCondition == null) {
 					break;
 				}
-//		final MergeIterator it;
-//		presenceConditionManager.shuffleSort(random);
-//		it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.RandomPartition);
-//		numberOfCombinations = it.size();
-//
-//		coveredCount = 0;
-//		invalidCount = 0;
-//
-//		samplingMonitor = new MonitorThread(new SamplingMonitor());
-//		try {
-//			samplingMonitor.start();
-//			final List<ClauseList> combinationListUncovered = new ArrayList<>();
-//			ClauseList combinedCondition = new ClauseList();
-//			count = coveredCount;
-//			phaseCount++;
-//			ICoverStrategy phase = phaseList.get(0);
-//			while (it.hasNext()) {
-//				final PresenceCondition[] combination = it.next();
-//				combiner.combineConditions(combination, combinedCondition);
 				if (combinedCondition.isEmpty()) {
 					invalidCount++;
 				} else {
@@ -270,7 +251,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 					switch (covered) {
 					case NOT_COVERED:
 						combinationListUncovered.add(combinedCondition);
-//						combinedCondition = new ClauseList();
 						break;
 					case COVERED:
 						coveredCount++;
