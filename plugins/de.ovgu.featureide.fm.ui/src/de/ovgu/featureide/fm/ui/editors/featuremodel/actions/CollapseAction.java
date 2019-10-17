@@ -207,21 +207,24 @@ public class CollapseAction extends MultipleSelectionAction {
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected) {
 			for (final Object obj : selection.toArray()) {
-				final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
-				if (tempFeature.getStructure().hasChildren()) {
-					features.add(tempFeature.getName());
+				if (obj instanceof ConnectionEditPart) {
+					final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
+					if (tempFeature.getStructure().hasChildren()) {
+						features.add(tempFeature.getName());
+					}
 				}
 			}
 			return features;
 		} else if (part instanceof FeatureEditPart) {
 			for (final Object obj : selection.toArray()) {
-				final IFeature feature = ((FeatureEditPart) obj).getModel().getObject();
-				if (feature.getStructure().hasChildren()) {
-					features.add(feature.getName());
+				if (obj instanceof FeatureEditPart) {
+					final IFeature feature = ((FeatureEditPart) obj).getModel().getObject();
+					if (feature.getStructure().hasChildren()) {
+						features.add(feature.getName());
+					}
 				}
 			}
 		}
 		return features;
 	}
-
 }

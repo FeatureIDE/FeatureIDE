@@ -20,6 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_HIDDEN;
+
+import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -109,4 +126,55 @@ public class Feature extends AFeature {
 		return new Feature(this, newFeatureModel, newStructure);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.impl.AFeature#createTooltip(java.lang.Object[])
+	 */
+	@Override
+	public String createTooltip(Object... objects) {
+		final StringBuilder toolTip = new StringBuilder();
+		final IFeatureStructure structure = getStructure();
+		toolTip.append(structure.isConcrete() ? CONCRETE : TOOLTIP_ABSTRACT);
+
+		if (structure.hasHiddenParent()) {
+			toolTip.append(structure.isHidden() ? TOOLTIP_HIDDEN : INHERITED_HIDDEN);
+		}
+
+		toolTip.append(structure.isRoot() ? ROOT : TOOLTIP_FEATURE);
+
+		// Handle analysis results if available
+		if ((objects.length > 0) && (objects[0] instanceof AnalysesCollection)) {
+			final AnalysesCollection collection = (AnalysesCollection) objects[0];
+
+			final FeatureModelProperties properties = collection.getFeatureModelProperties();
+			if (properties.hasStatus(FeatureModelStatus.VOID)) {
+				toolTip.setLength(0);
+				toolTip.trimToSize();
+				toolTip.append(FEATURE_MODEL_IS_VOID);
+			}
+
+			final FeatureProperties featureProperties = collection.getFeatureProperty(this);
+			if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+				toolTip.append(IS_DEAD);
+			} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+				toolTip.append(IS_FALSE_OPTIONAL);
+			} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+				toolTip.append(IS_HIDDEN_AND_INDETERMINATE);
+			}
+		}
+
+		final String description = getProperty().getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			toolTip.append("\n\nDescription:\n");
+			toolTip.append(description);
+		}
+
+		final String contraints = FeatureUtils.getRelevantConstraintsString(this);
+		if (!contraints.isEmpty()) {
+			toolTip.append("\n\nConstraints:\n");
+			toolTip.append(contraints);
+		}
+
+		return toolTip.toString();
+	}
 }

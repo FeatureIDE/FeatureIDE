@@ -271,7 +271,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	@Override
 	public void setTimeout(int timeout) {
 		if (!contradiction) {
-			solver.setTimeout(timeout);
+			solver.setTimeoutMs(timeout);
 		}
 	}
 

@@ -567,6 +567,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 				setActiveExplanation();
 				viewer.getContents().refresh();
+				viewer.internRefresh(true);
 				return Status.OK_STATUS;
 			}
 
@@ -774,7 +775,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.deregisterEditParts();
 			graphicalFeatureModel.init();
 			viewer.setContents(graphicalFeatureModel);
-			viewer.setLayout();
+			viewer.internRefresh(true);
 			setDirty();
 			analyzeFeatureModel();
 			break;

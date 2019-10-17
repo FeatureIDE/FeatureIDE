@@ -429,35 +429,35 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 			outer: for (final LiteralSet clause : solver.getSatInstance().getClauses()) {
 				final int[] literals = clause.getLiterals();
-				int childrenCount = literals.length;
+				final int[] nonCoreLiterals = new int[literals.length];
+				int nonCoreCount = 0;
 				for (int i = 0; i < literals.length; i++) {
 					final int var = literals[i];
 					final int coreB = var * core[Math.abs(var) - 1];
 					if (coreB > 0) {
 						continue outer;
-					} else if (coreB < 0) {
-						childrenCount--;
-						literals[i] = 0;
+					} else if (coreB == 0) {
+						nonCoreLiterals[nonCoreCount++] = var;
 					}
 				}
-				if (childrenCount < 2) {
+				if (nonCoreCount < 2) {
 					continue;
 				}
-				if (childrenCount == 2) {
-					final int x = literals[0];
-					final int y = literals[1];
+				if (nonCoreCount == 2) {
+					final int x = nonCoreLiterals[0];
+					final int y = nonCoreLiterals[1];
 					if (Math.abs(x) < Math.abs(y)) {
 						addRelation(-x, y);
 					} else {
 						addRelation(-y, x);
 					}
 				}
-				for (int i = 0; i < literals.length; i++) {
-					final int var = literals[i];
+				for (int i = 0; i < nonCoreLiterals.length; i++) {
+					final int var = nonCoreLiterals[i];
 					if (var != 0) {
 						final int x = Math.abs(var) - 1;
-						for (int j = i + 1; j < childrenCount; j++) {
-							final int y = Math.abs(literals[j]) - 1;
+						for (int j = i + 1; j < nonCoreCount; j++) {
+							final int y = Math.abs(nonCoreLiterals[j]) - 1;
 							combinations[(x * numVariables) + y] |= BIT_CHECK;
 							combinations[(y * numVariables) + x] |= BIT_CHECK;
 						}

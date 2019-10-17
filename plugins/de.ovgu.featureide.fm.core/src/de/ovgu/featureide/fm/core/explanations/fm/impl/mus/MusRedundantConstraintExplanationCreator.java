@@ -93,7 +93,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		try {
 			// Add each constraint but the redundant one.
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-				if (constraint == getSubject()) {
+				if (constraint.equals(getSubject())) {
 					continue;
 				}
 				constraintClauseCount += addConstraint(constraint, true);

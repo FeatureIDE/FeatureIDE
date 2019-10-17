@@ -25,5 +25,4 @@ public class ExtendedOutline extends FSTOutline {
 	public ExtendedOutline() {
 		super(new ExtendedContentProvider(), new ExtendedOutlineLabelProvider());
 	}
-
 }

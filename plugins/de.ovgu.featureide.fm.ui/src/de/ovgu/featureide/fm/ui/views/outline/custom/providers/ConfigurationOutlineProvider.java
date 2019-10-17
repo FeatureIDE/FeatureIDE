@@ -86,7 +86,7 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		return ConfigFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file));
 	}
 

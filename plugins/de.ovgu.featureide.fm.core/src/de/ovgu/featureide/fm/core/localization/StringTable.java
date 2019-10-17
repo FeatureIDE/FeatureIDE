@@ -488,6 +488,9 @@ public class StringTable {
 	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = "Constraint is a tautology and should be removed. ";
 	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = "Constraint is redundant and could be removed. ";
 	public static final String CONCRETE = " Concrete";
+	public static final String TOOLTIP_ABSTRACT = " Abstract";
+	public static final String TOOLTIP_HIDDEN = " hidden";
+	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
