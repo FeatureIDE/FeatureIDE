@@ -204,7 +204,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 
 	private ArrayList<CallLocation[]> getCallersOf(final IMethod m) {
 
-		final CallHierarchy callHierarchy = new CallHierarchy();
+		final CallHierarchy callHierarchy = CallHierarchy.getDefault();
 		final IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
 		callHierarchy.setSearchScope(scope);
 
