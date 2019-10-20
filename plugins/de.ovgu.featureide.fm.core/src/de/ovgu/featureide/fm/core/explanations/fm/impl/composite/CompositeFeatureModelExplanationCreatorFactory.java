@@ -56,8 +56,7 @@ public class CompositeFeatureModelExplanationCreatorFactory extends FeatureModel
 
 	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new CompositeFalseOptionalFeatureExplanationCreator(Arrays.asList(ltms.getFalseOptionalFeatureExplanationCreator(),
-				musSat4J.getFalseOptionalFeatureExplanationCreator(), musJavaSmtInterpol.getFalseOptionalFeatureExplanationCreator()));
+		return new CompositeFalseOptionalFeatureExplanationCreator(Arrays.asList(musJavaSmtInterpol.getFalseOptionalFeatureExplanationCreator()));
 	}
 
 	@Override

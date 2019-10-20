@@ -28,12 +28,14 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ModifiableSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
+ * TODO SOLVER Sebastian Duplicate for the {@link ContradictionAnalysis} when passing empty {@link CNF}
+ *
  * Finds contradictions.
  *
  * @author Sebastian Krieter

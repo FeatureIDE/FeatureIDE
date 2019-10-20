@@ -20,7 +20,6 @@
  */
 package org.prop4j.solver.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +27,6 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 
@@ -39,83 +37,107 @@ import org.prop4j.solver.ISatProblem;
  */
 public class SatProblem implements ISatProblem {
 
+	/** Root node for the problem. Needs to be a And node containing every clause. */
 	protected Node root;
-	protected HashMap<Object, Integer> varToInt = new HashMap<>();
-	protected ArrayList<Object> intToVar;
-	protected HashMap<Node, Integer> clauseToInt = new HashMap<>();
-	protected ArrayList<Node> intToClause;
+	/** Maps the variables to indexes. Variable index start by 1 */
+	protected HashMap<Object, Integer> varToInt;
+	/** Contains every variables that can be accessed by the index. Starts with 1 */
+	protected Object[] intToVar;
+	/** Maps clauses to integer */
+	protected HashMap<Node, Integer> clauseToInt;
+	/** Contains every clause that can be accessed by the index */
+	protected Node[] intToClause;
+	/**
+	 * Contains the positive Literal object for every variable. This prevents the creation of many Literal object from the index at the runtime of the solver.
+	 */
+	protected Literal[] intToVariableNodePositive;
+	/**
+	 * Contains the positive Literal object for every variable. This prevents the creation of many Literal object from the index at the runtime of the solver.
+	 */
+	protected Literal[] intToVariableNodeNegative;
 
 	/**
 	 * Initiates the problem with a root node and a given feature list that represent variables.
 	 *
-	 * @param rootNode
+	 * Note: For convienience you can get a distinctive set of variables of a {@link Node} by calling {@link #getDistinctVariableObjects(Node)}
+	 *
+	 * @param rootNode Represents the problem as {@link Node}
+	 * @param variables Contains the variables as string list
 	 */
-	public SatProblem(Node rootNode, Collection<?> featureList) {
+	public SatProblem(Node rootNode, Collection<Object> variables) {
+		intToVar = new Object[variables.size() + 1];
+		intToVariableNodePositive = new Literal[variables.size() + 1];
+		intToVariableNodeNegative = new Literal[variables.size() + 1];
+		intToClause = new Node[rootNode.getChildren().length];
+
 		root = rootNode;
+		// Check for CNF
+		if (!root.isConjunctiveNormalForm()) {
+			throw new IllegalStateException("The given root node to create a smt problem need to be in conjunctive normal form like form.");
 
-		if (rootNode != null) {
-			intToClause = new ArrayList<>();
-
-			if (!rootNode.isConjunctiveNormalForm()) {
-				rootNode = rootNode.toRegularCNF();
-			}
-
-			// Create mapping from index to clauses starting from 0
-			int indexClauses = 0;
-			for (final Node node : rootNode.getChildren()) {
-				clauseToInt.put(node, indexClauses++);
-				intToClause.add(node);
-			}
-		} else {
-			intToClause = new ArrayList<>();
 		}
 
-		if (featureList != null) {
-			intToVar = new ArrayList<>();
-			intToVar.add(null);
-			// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
-			int indexVariables = 0;
-			for (final Object feature : featureList) {
-				final String name = feature.toString();
-				if (name == null) {
-					throw new RuntimeException();
-				}
-				varToInt.put(name, ++indexVariables);
-				intToVar.add(name);
+		// Create mapping from index to clauses starting from 0
+		clauseToInt = new HashMap<>();
+		if (root != null) {
+			int indexClauses = 0;
+			for (final Node node : rootNode.getChildren()) {
+				clauseToInt.put(node, indexClauses);
+				intToClause[indexClauses++] = node;
 			}
-		} else {
-			intToVar = new ArrayList<>();
-			intToVar.add(null);
+		}
+
+		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+		varToInt = new HashMap<>();
+		int indexVariables = 0;
+		for (final Object feature : variables) {
+			final String name = feature.toString();
+			if (name == null) {
+				throw new RuntimeException();
+			}
+			varToInt.put(name, ++indexVariables);
+			intToVar[indexVariables] = feature; // Contains the feature name
+			intToVariableNodePositive[indexVariables] = new Literal(feature, true);
+			intToVariableNodeNegative[indexVariables] = new Literal(feature, false);
 		}
 	}
 
+	/**
+	 * Creates a new sat problem for the given node. The variables are extracted from the node with {@link #getDistinctVariableObjects(Node)}. This method
+	 * should be avoided when creating very large problems.
+	 *
+	 * @param rootNode The problem in node representation.
+	 */
 	public SatProblem(Node rootNode) {
 		this(rootNode, getDistinctVariableObjects(rootNode));
 	}
 
-	public static Set<Object> getDistinctVariableObjects(Node cnf) {
-		if (cnf == null) {
-			return null;
-		}
-		if (!cnf.isConjunctiveNormalForm()) {
-			cnf = cnf.toRegularCNF();
-		} else {
-			for (int i = 0; i < cnf.getChildren().length; i++) {
-				if (cnf.getChildren()[i] instanceof Literal) {
-					cnf.getChildren()[i] = new Or(cnf.getChildren()[i]);
-				}
-			}
-		}
+	/**
+	 * Travels the complete {@link Node} structure and searches for Literals. The found {@link Literal} are returned.
+	 *
+	 * @param node The given {@link Node} to search.
+	 * @return {@link Set} containing all found variable objects
+	 */
+	public static Set<Object> getDistinctVariableObjects(Node node) {
+		// Result set for our node
 		final HashSet<Object> result = new HashSet<>();
-		for (final Node clause : cnf.getChildren()) {
-			final Node[] literals = clause.getChildren();
-			for (int i = 0; i < literals.length; i++) {
-				if (!result.contains(((Literal) literals[i]).var)) {
-					result.add(((Literal) literals[i]).var);
+
+		// If null return empty set
+		if (node == null) {
+			return result;
+		} else {
+			if (node.getChildren() != null) {
+				for (final Node child : node.getChildren()) {
+					// Add all child node variables
+					result.addAll(getDistinctVariableObjects(child));
 				}
 			}
+			// If literal return the object for the literal
+			if (node instanceof Literal) {
+				result.add(((Literal) node).var);
+			}
+			return result;
 		}
-		return result;
 	}
 
 	/*
@@ -162,10 +184,10 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node getClauseOfIndex(int index) {
-		if ((index >= intToClause.size())) {
+		if ((index >= intToClause.length)) {
 			return null;
 		}
-		return intToClause.get(index);
+		return intToClause[index];
 	}
 
 	/*
@@ -174,10 +196,10 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		if ((Math.abs(index) >= intToVar.size())) {
+		if ((Math.abs(index) >= intToVar.length)) {
 			return null;
 		}
-		return intToVar.get(Math.abs(index));
+		return intToVar[Math.abs(index)];
 	}
 
 	/*
@@ -186,7 +208,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.size() - 1;
+		return intToVar.length - 1;
 	}
 
 	/*
@@ -195,7 +217,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node[] getClauses() {
-		return intToClause.toArray(new Node[getClauseCount()]);
+		return intToClause;
 
 	}
 
@@ -214,23 +236,26 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public int getClauseCount() {
-		return intToClause.size();
+		return intToClause.length;
 	}
 
-	/**
-	 * Adds a new clause to the problem.
-	 *
-	 * @param clause Clause to add
-	 * @return the index for the new clause
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getVariableAsNode(int)
 	 */
-	protected int addClause(Node clause) {
-		if (clause.getChildren().length == 0) {
-			throw new IllegalArgumentException("Empty clause");
+	@Override
+	public Literal getVariableAsNode(int index) {
+		final int indexAbs = Math.abs(index);
+		// Index 0 is not valid as variables began at index 1
+		if ((indexAbs > intToVariableNodePositive.length) || (index == 0)) {
+			return null;
 		}
-		final int getNextIndex = getNumberOfVariables() + 1;
-		clauseToInt.put(clause, getNextIndex);
-		intToClause.add(clause);
-		// TODO SOLVER Testen
-		return getNextIndex;
+		if (index > 0) {
+			// Return positive literal
+			return intToVariableNodePositive[indexAbs];
+		} else {
+			// Return negative literal
+			return intToVariableNodeNegative[indexAbs];
+		}
 	}
 }

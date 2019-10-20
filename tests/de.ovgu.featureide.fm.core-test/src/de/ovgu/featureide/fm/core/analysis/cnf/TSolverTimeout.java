@@ -29,7 +29,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator.CountSolutionsMethod;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
  * Tests the timeout for the solver to prevent wrong timeouts.
@@ -42,10 +43,10 @@ public class TSolverTimeout {
 	public void testSolverTimeout() {
 		final IFeatureModel fm = Commons.loadBenchmarkFeatureModelFromFile("berkeley_db_model.xml");
 		final FeatureModelFormula formula = new FeatureModelFormula(fm);
-		final ConfigurationPropagator propagator = new ConfigurationPropagator(formula, new Configuration(formula));
+		final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, new Configuration(formula));
 
 		// Set timeout to 10 ms, expecting timeout
-		final CountSolutionsMethod analysis = propagator.number(10);
+		final LongRunningMethod<Long> analysis = propagator.number(10);
 		long time = System.currentTimeMillis();
 		try {
 			analysis.execute(null);

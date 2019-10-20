@@ -142,11 +142,11 @@ public class SolverUtils {
 	}
 
 	/**
-	 * TODO SOLVER
+	 * Returns a list containing the string representation of all variables for the given array with variable indicies.
 	 *
-	 * @param problem
-	 * @param values
-	 * @return
+	 * @param problem The solving problem.
+	 * @param values The indicies of the variables.
+	 * @return String representation for all variables like "[var1, var2, ..., varN]", "[-]" if empty
 	 */
 	public static String getNamesOfIndexes(ISolverProblem problem, int[] values) {
 		if (values == null) {

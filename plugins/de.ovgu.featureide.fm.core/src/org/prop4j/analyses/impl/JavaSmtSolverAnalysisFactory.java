@@ -33,7 +33,7 @@ import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
- * TODO SOLVER: replace the declaration of the solvers with property entry
+ * TODO SOLVER: replace the declaration of the solvers for the analyses with property entry
  *
  * JavaSMT factory used to create analysis with JavaSMT appropriated solvers.
  *

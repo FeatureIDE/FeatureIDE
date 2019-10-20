@@ -37,7 +37,15 @@ import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.xplain.Xplain;
 
 /**
- * TODO ATTRIBUTES description
+ * Extends the {@link Sat4JSatSolver} by providing the functionality to calculate the minimal unsatisfiable subset for the given problem. The extracaction of
+ * the subset is only possible when the current problem is not satisfiable.
+ *
+ * <br><br> Sat4J only support the extraction of one minimal unsatisfiable subset, thus, {@link #getAllMinimalUnsatisfiableSubsetIndexes()} and
+ * {@link #getAllMinimalUnsatisfiableSubsets()} only return one solution.
+ *
+ * <br><br>Note: The usage of a solver to solve expression and to find minimal unsatisfiable subset should be divided into two task because the native solver
+ * for the MUS extractor are by far solver in solving satisfiability requests. If solving is focused the usage of the {@link Sat4JSatSolver} is recommended
+ * which uses a different native solver.
  *
  * @author Joshua Sprey
  */

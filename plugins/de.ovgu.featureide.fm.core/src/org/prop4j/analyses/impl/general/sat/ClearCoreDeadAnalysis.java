@@ -23,7 +23,6 @@ package org.prop4j.analyses.impl.general.sat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
@@ -34,8 +33,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features without using any optimizations. Was created and used for evaluation against the optimized version of the analysis. The
- * optimized version is implemented in {@link CoreDeadAnalysis}
+ * Finds core and dead features without using any optimizations. Was created and used for evaluation against the optimized version of the analysis. The general
+ * optimized version is implemented in {@link CoreDeadAnalysis}.
  *
  * @author Sebastian Krieter
  * @author Joshua Sprey
@@ -58,11 +57,11 @@ public class ClearCoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet>
 		for (int i = 1; i <= getSolver().getProblem().getNumberOfVariables(); i++) {
 			final int varX = i;
 			try {
-				getSolver().push(getLiteralFromIndex(-varX));
+				getSolver().push(getSolver().getProblem().getVariableAsNode(-varX));
 			} catch (final ContradictionException e1) {
 				// If contradiction then it is unsatisfiable => core feature
 				try {
-					getSolver().push(getLiteralFromIndex(varX));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
@@ -74,7 +73,7 @@ public class ClearCoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet>
 				// If unsatisfiable => core feature
 				getSolver().pop();
 				try {
-					getSolver().push(getLiteralFromIndex(varX));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
@@ -95,11 +94,11 @@ public class ClearCoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet>
 		for (int i = 1; i <= getSolver().getProblem().getNumberOfVariables(); i++) {
 			final int varX = -i;
 			try {
-				getSolver().push(getLiteralFromIndex(-varX));
+				getSolver().push(getSolver().getProblem().getVariableAsNode(-varX));
 			} catch (final ContradictionException e1) {
 				// If contradiction then it is unsatisfiable => dead feature
 				try {
-					getSolver().push(getLiteralFromIndex(varX));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
@@ -111,7 +110,7 @@ public class ClearCoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet>
 				// If unsatisfiable => dead feature
 				getSolver().pop();
 				try {
-					getSolver().push(getLiteralFromIndex(varX));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}

@@ -62,7 +62,7 @@ public abstract class AbstractConfigurationTest {
 		return new ConfigurationAnalyzer(formula, configuration);
 	}
 
-	public ConfigurationPropagator getConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
+	public IConfigurationPropagator getConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
 		return new ConfigurationPropagator(formula, configuration);
 	}
 

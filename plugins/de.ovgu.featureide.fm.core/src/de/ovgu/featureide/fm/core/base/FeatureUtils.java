@@ -458,7 +458,7 @@ public final class FeatureUtils {
 		return Functional.toList(FeatureUtils.extractOldFeatureNames(featureModel.getFeatures()));
 	}
 
-	public static final List<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
+	public static final Collection<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
 		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getStructure().getFeaturesPreorder()));

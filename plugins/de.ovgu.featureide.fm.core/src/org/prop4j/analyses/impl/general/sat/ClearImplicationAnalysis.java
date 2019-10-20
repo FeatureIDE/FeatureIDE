@@ -23,7 +23,6 @@ package org.prop4j.analyses.impl.general.sat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
@@ -74,7 +73,7 @@ public class ClearImplicationAnalysis extends AbstractSatSolverAnalysis<List<int
 			for (final int i : pair) {
 				try {
 					// Push the assumption (Parent & -FAFeature)
-					getSolver().push(getLiteralFromIndex(-i));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(-i));
 				} catch (final ContradictionException e) {
 					// If contradiction then it is unsatisfiable => false optional
 					resultList.add(pair);

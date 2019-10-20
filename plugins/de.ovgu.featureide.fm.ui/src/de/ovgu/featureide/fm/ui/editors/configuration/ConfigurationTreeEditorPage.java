@@ -103,6 +103,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
@@ -626,7 +627,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return null;
 	}
 
-	protected Void updateInfoLabel(final Display display, ConfigurationPropagator propagator) {
+	protected Void updateInfoLabel(final Display display, IConfigurationPropagator propagator) {
 		final boolean valid = LongRunningWrapper.runMethod(propagator.isValid());
 		final boolean conflicting = !valid && !LongRunningWrapper.runMethod(propagator.canBeValid());
 
@@ -744,7 +745,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	protected ConfigurationPropagator getPropagator() {
+	protected IConfigurationPropagator getPropagator() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		final FeatureModelManager featureModelManager = configurationEditor.getFeatureModelManager();
 		if ((configurationManager != null) && (featureModelManager != null)) {
@@ -1096,7 +1097,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private void update(UpdateStrategy updateStrategy, final Display currentDisplay, ConfigurationManager configurationManager,
 			final FeatureModelManager featureModelManager, final Configuration configuration) {
-		final ConfigurationPropagator propagator = new ConfigurationPropagator(featureModelManager.getPersistentFormula(), configuration);
+		final IConfigurationPropagator propagator = new ConfigurationPropagator(featureModelManager.getPersistentFormula(), configuration);
 
 		final Boolean canBeValid = LongRunningWrapper.runMethod(propagator.canBeValid());
 		final boolean conflicting;

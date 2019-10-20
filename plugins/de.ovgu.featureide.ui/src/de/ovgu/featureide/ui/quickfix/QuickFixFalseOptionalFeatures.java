@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
+import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -81,7 +82,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<>();
 		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
-		final ConfigurationPropagator propagator = new ConfigurationPropagator(featureModel, new Configuration(featureModel));
+		final IConfigurationPropagator propagator = new ConfigurationPropagator(featureModel, new Configuration(featureModel));
 		final List<List<String>> solutions = LongRunningWrapper.runMethod(propagator.coverFeatures(unusedFeatures, false), monitor);
 		for (final List<String> solution : solutions) {
 			final Configuration configuration = new Configuration(featureModel);

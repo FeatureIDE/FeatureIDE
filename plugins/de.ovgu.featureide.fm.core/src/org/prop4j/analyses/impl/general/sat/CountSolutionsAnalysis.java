@@ -22,7 +22,6 @@ package org.prop4j.analyses.impl.general.sat;
 
 import org.prop4j.Literal;
 import org.prop4j.Or;
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 /**
  * This analysis counts the solution of the solver by computing different assignments iteratively.
  *
- * TODO SOLVERS rewrite with clause and literal set implementation
+ * TODO SOLVERS rewrite with clause and literal set implementation. Currently not executable because it takes 8 gb ram within 4 seconds
  *
  * @author Sebastian Krieter
  * @author Joshua Sprey
@@ -81,8 +80,8 @@ public class CountSolutionsAnalysis extends AbstractSatSolverAnalysis<Long> {
 				for (int i = 0; i < solution.length; i++) {
 					if (solution[i] instanceof Integer) {
 						final int value = (int) solution[i];
-						final Literal lit = new Literal(solver.getProblem().getVariableOfIndex(value), value >= 0 ? true : false);
-						literals[i] = lit;
+						literals[i] = solver.getProblem().getVariableAsNode(value);
+						;
 					}
 				}
 				clause.setChildren(literals);

@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Literal;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -86,7 +86,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					default:
 						throw new IllegalStateException("Unknown feature selection state");
 					}
-					oracle.push(new Literal(var, value)); // Assumptions do not show up in the explanation. TODO ATTRIBUTES they do in the new solver rework :/
+					oracle.push(new Literal(var, value)); // Assumptions do not show up in the explanation.
 				} else {
 					switch (featureSelection.getSelection()) {
 					case SELECTED:

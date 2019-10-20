@@ -49,7 +49,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 	}
 
 	private void testConfigurationInvalid(Configuration c) {
-		final ConfigurationPropagator propagator = getConfigurationPropagator(formula, c);
+		final IConfigurationPropagator propagator = getConfigurationPropagator(formula, c);
 		LongRunningWrapper.runMethod(propagator.update());
 		assertFalse(LongRunningWrapper.runMethod(propagator.isValid()));
 		assertEquals(0L, LongRunningWrapper.runMethod(propagator.number(1000)).longValue());

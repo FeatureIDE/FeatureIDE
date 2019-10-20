@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;

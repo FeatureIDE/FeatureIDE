@@ -22,7 +22,6 @@ package org.prop4j.analyses;
 
 import java.util.Random;
 
-import org.prop4j.Literal;
 import org.prop4j.solver.ISolver;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -49,7 +48,7 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T> {
 	/** Indicate that a timeout exception should be thrown when the timeout was exceeded. */
 	private boolean throwTimeoutException = true;
 	/** The time in ms before the solver timeouts. */
-	private int timeout = 1000;
+	private int timeout = 10_000;
 
 	/** Indicate that a timeout occurred. */
 	private boolean timeoutOccured = false;
@@ -71,12 +70,11 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T> {
 		}
 		getSolver().setConfiguration(ISolver.CONFIG_TIMEOUT, timeout);
 		if (assumptions != null) {
-			// TODO SOLVERS Better handling of assumptions
 			for (final int literal : assumptions.getLiterals()) {
-				getSolver().push(new Literal(getSolver().getProblem().getVariableOfIndex(Math.abs(literal)), literal >= 0 ? true : false));
+				getSolver().push(getSolver().getProblem().getVariableAsNode(literal));
 			}
 		}
-		// TODO SOLVER Sebastian
+		// TODO SOLVER Sebastian Why set the assumption?
 		// assumptions = new LiteralSet(solver.getAssignmentArray());
 		timeoutOccured = false;
 
@@ -160,14 +158,5 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T> {
 	 */
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
-	}
-
-	// TODO SOLVERS remove later when switching to solvers with
-	public Literal getLiteralFromIndex(int index) {
-		final Object variable = getSolver().getProblem().getVariableOfIndex(index);
-		if (variable == null) {
-			return null;
-		}
-		return new Literal(variable, index > 0);
 	}
 }

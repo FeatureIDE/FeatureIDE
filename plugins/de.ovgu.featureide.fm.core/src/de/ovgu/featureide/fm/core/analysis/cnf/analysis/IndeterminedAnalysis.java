@@ -31,13 +31,15 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.EmptySatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ModifiableSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
+ * TODO SOLVER Sebastian What are indetermined features exactly and is the EmptySatSovler needed?
+ *
  * Finds indetermined features.
  *
  * @author Sebastian Krieter
@@ -114,6 +116,7 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 					if (newClause != null) {
 						relevantClauses.add(newClause);
 					}
+
 				}
 			}
 			try {
@@ -141,6 +144,8 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 
 			relevantClauses.clear();
 			monitor.step();
+
+			// TODO SOLVER Sebastian
 		}
 
 		return new LiteralSet(Arrays.copyOf(resultList.toArray(), resultList.size()));

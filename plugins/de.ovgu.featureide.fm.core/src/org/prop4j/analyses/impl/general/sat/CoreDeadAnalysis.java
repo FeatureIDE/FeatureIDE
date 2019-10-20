@@ -23,7 +23,6 @@ package org.prop4j.analyses.impl.general.sat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
@@ -59,11 +58,11 @@ public class CoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet> {
 			final int varX = model1[i];
 			if (varX != 0) {
 				try {
-					getSolver().push(getLiteralFromIndex(-varX));
+					getSolver().push(getSolver().getProblem().getVariableAsNode(-varX));
 				} catch (final ContradictionException e) {
 					// Unsatisfiable => dead or core feature
 					try {
-						getSolver().push(getLiteralFromIndex(varX));
+						getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 					} catch (final ContradictionException e1) {
 						// Should not be thrown
 					}
@@ -75,7 +74,7 @@ public class CoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet> {
 					// Unsatisfiable => dead or core feature
 					getSolver().pop();
 					try {
-						getSolver().push(getLiteralFromIndex(varX));
+						getSolver().push(getSolver().getProblem().getVariableAsNode(varX));
 					} catch (final ContradictionException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}

@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.prop4j.analyses.impl.general.sat.ClearCoreDeadAnalysis;
@@ -32,6 +33,7 @@ import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.sat.CountSolutionsAnalysis;
 import org.prop4j.analyses.impl.general.sat.HasSolutionAnalysis;
 import org.prop4j.analyses.impl.general.sat.ImplicationAnalysis;
+import org.prop4j.analyses.impl.general.sat.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.sat.RedundancyAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
@@ -54,6 +56,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -78,6 +81,7 @@ public class EvaluatedFeatureModelAnaysis {
 	public static List<EvaluationEntry> countSolutions = new ArrayList<>();
 	public static List<EvaluationEntry> tautologicalConstraints = new ArrayList<>();
 	public static List<EvaluationEntry> redundantConstraints = new ArrayList<>();
+	public static List<EvaluationEntry> indeterminedFeatures = new ArrayList<>();
 
 	public static void printResult() {
 		printResultHidden("Valid", validAnalysis);
@@ -86,8 +90,8 @@ public class EvaluatedFeatureModelAnaysis {
 		printResultHidden("CleanFalseOptional", cleanFalseOptionalAnalysis);
 		printResultHidden("OptiFalseOptional", optiFalseOptionalAnalysis);
 		printResultHidden("CountSolutions", countSolutions);
-//		printResultHidden("TautologicalConstraints", tautologicalConstraints);
 		printResultHidden("RedundantConstraints", redundantConstraints);
+		printResultHidden("IndeterminedFeatures", indeterminedFeatures);
 	}
 
 	private static void printResultHidden(String filename, List<EvaluationEntry> entryList) {
@@ -124,11 +128,11 @@ public class EvaluatedFeatureModelAnaysis {
 
 		// Only create the cnf one time for every mode
 		nodeCreator.setModelType(ModelType.All);
-		final ISatProblem allModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
+		final ISatProblem allModelProblem = new SatProblem(nodeCreator.createNodes(), new HashSet<Object>(FeatureUtils.getFeatureNamesPreorder(fm)));
 		nodeCreator.setModelType(ModelType.OnlyStructure);
-		final ISatProblem structureModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
+		final ISatProblem structureModelProblem = new SatProblem(nodeCreator.createNodes(), new HashSet<Object>(FeatureUtils.getFeatureNamesPreorder(fm)));
 		nodeCreator.setModelType(ModelType.OnlyConstraints);
-		final ISatProblem constraintModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
+		final ISatProblem constraintModelProblem = new SatProblem(nodeCreator.createNodes(), new HashSet<Object>(FeatureUtils.getFeatureNamesPreorder(fm)));
 
 		// Setup Sat4J Solvers
 		final Sat4JSatSolverFactory sat4JFactory = new Sat4JSatSolverFactory();
@@ -392,15 +396,18 @@ public class EvaluatedFeatureModelAnaysis {
 		final String modelName = fm.getSourceFile().getName(fm.getSourceFile().getNameCount() - 1).toString();
 
 		// Void Model
-		// evaluateVoidAnalysis(modelName);
+		evaluateVoidAnalysis(modelName);
 
 		// Core and Dead Features
-		// evaluateClearCoreDead(modelName);
-		// evaluateOptiCoreDead(modelName);
+		evaluateClearCoreDead(modelName);
+		evaluateOptiCoreDead(modelName);
 
 		// False-Optional Features
-		// evaluateClearFOFeatures(modelName);
-		// evaluateOptiFOFeatures(modelName);
+		evaluateClearFOFeatures(modelName);
+		evaluateOptiFOFeatures(modelName);
+
+		// Hidden Features (Indetermined)
+		evaluateIndeterminedFeatures(modelName);
 
 		// Redundant constraints
 		evaluateRedundantCostraints(modelName);
@@ -410,6 +417,98 @@ public class EvaluatedFeatureModelAnaysis {
 
 		// Save and write the results to a file
 		printResult();
+	}
+
+	/**
+	 * @param modelName
+	 */
+	private void evaluateIndeterminedFeatures(String modelName) {
+		final EvaluationEntry entry =
+			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
+
+		checkIndeterminedFeatures(entry, sat4jSolverStructure);
+		checkIndeterminedFeatures(entry, smtInterpolSolverStrucutre);
+		checkIndeterminedFeaturesNative(entry, sat4jNativeSolver);
+
+		indeterminedFeatures.add(entry);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jNativeSolver2
+	 */
+	private void checkIndeterminedFeaturesNative(EvaluationEntry entry,
+			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
+
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis analysis =
+			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis(sat4jNativeSolver2.getSatInstance());
+		final LiteralSet convertToVariables = sat4jNativeSolver2.getSatInstance().getVariables()
+				.convertToVariables(Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName));
+		analysis.setVariables(convertToVariables);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final LiteralSet result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		if (result != null) {
+			for (int i = 0; i < result.getLiterals().length; i++) {
+				final int feature = result.getLiterals()[i];
+				if (feature >= 0) {
+					// Is Fo Feature
+					resultList.add("" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature));
+				}
+			}
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jSolverStructure2
+	 */
+	private void checkIndeterminedFeatures(EvaluationEntry entry, ISatSolver solver) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final List<String> hiddenFeatures = Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName);
+		final int[] hiddenFeaturesIndicies = new int[hiddenFeatures.size()];
+		for (int i = 0; i < hiddenFeatures.size(); i++) {
+			hiddenFeaturesIndicies[i] = solver.getProblem().getIndexOfVariable(hiddenFeatures.get(i));
+		}
+		final IndeterminedAnalysis analysis = new IndeterminedAnalysis(solver, hiddenFeaturesIndicies);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<IFeature> result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		if (result != null) {
+			for (int i = 0; i < result.size(); i++) {
+				resultList.add(result.get(i).getName());
+			}
+		}
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
 	}
 
 	private void evaluateRedundantCostraints(String modelName) {

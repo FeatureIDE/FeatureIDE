@@ -62,6 +62,15 @@ public interface ISolverProblem {
 	Object getVariableOfIndex(int index);
 
 	/**
+	 * Returns the variable that is identified by the given index as Node. The Node can be used to push the variable to the solver with
+	 * {@link ISolver#push(Node)}.
+	 *
+	 * @param index Index of the variable
+	 * @return Node of the variable, otherwise null
+	 */
+	Literal getVariableAsNode(int index);
+
+	/**
 	 * Returns the number of variables used in this problem.
 	 *
 	 * @return Number of used variables as int.

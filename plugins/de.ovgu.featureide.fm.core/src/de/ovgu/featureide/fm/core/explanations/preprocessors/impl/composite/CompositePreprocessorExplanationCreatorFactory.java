@@ -48,7 +48,6 @@ public class CompositePreprocessorExplanationCreatorFactory extends Preprocessor
 
 	@Override
 	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
-		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.asList(ltms.getInvariantPresenceConditionExplanationCreator(),
-				musSat4j.getInvariantPresenceConditionExplanationCreator(), musJavaSMT.getInvariantPresenceConditionExplanationCreator()));
+		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.asList(musJavaSMT.getInvariantPresenceConditionExplanationCreator()));
 	}
 }

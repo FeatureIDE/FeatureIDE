@@ -18,27 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses;
+package org.prop4j.analyses.impl.smt;
 
+import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISmtProblem;
+import org.prop4j.solver.ISmtSolver;
 import org.prop4j.solver.ISolverProblem;
 
 /**
- * Special abstract class for analysis that are only fitted for sat solvers.
+ * Special abstract class for analysis that are only fitted for smt solvers.
  *
- * @author Joshua
+ * @author Joshua Sprey
  */
-public abstract class AbstractSatSolverAnalysis<T> extends GeneralSolverAnalysis<T> {
+public abstract class AbstractSmtSolverAnalysis<T> extends GeneralSolverAnalysis<T> {
 
-	protected ISatSolver solver;
+	protected ISmtSolver solver;
 
 	/**
 	 * Creates a new instance of an analysis with a given solver. It is no longer necessary to create a solver.
 	 *
 	 * @param solver The solver that should be used for this analysis.
 	 */
-	public AbstractSatSolverAnalysis(ISatSolver solver) {
+	public AbstractSmtSolverAnalysis(ISmtSolver solver) {
 		this.solver = solver;
 	}
 
@@ -48,7 +50,7 @@ public abstract class AbstractSatSolverAnalysis<T> extends GeneralSolverAnalysis
 	 *
 	 * @param problemInstance A valid {@link ISatProblem} that should be used for the creation of the solver.
 	 */
-	public AbstractSatSolverAnalysis(ISatProblem instance) {
+	public AbstractSmtSolverAnalysis(ISmtProblem instance) {
 		this.solver = initSolver(instance);
 	}
 
@@ -57,9 +59,9 @@ public abstract class AbstractSatSolverAnalysis<T> extends GeneralSolverAnalysis
 	 * @see org.prop4j.analyses.ISolverAnalysis#getSolver()
 	 */
 	@Override
-	public ISatSolver getSolver() {
+	public ISmtSolver getSolver() {
 		return solver;
 	}
 
-	public abstract ISatSolver initSolver(ISatProblem problem);
+	public abstract ISmtSolver initSolver(ISmtProblem problem);
 }

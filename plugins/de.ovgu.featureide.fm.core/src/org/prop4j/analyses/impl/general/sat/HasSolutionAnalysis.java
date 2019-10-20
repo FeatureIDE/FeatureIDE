@@ -20,7 +20,6 @@
  */
 package org.prop4j.analyses.impl.general.sat;
 
-import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.SatResult;

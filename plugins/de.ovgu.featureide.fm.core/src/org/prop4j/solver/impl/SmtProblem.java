@@ -40,22 +40,36 @@ public class SmtProblem implements ISmtProblem {
 	/** Root node for the problem. Needs to be a And node containing every clause. */
 	protected Node root;
 	/** Maps the variables to indexes. Variable index start by 1 */
-	protected HashMap<Object, Integer> varToInt = new HashMap<>();
+	protected HashMap<Object, Integer> varToInt;
 	/** Contains every variables that can be accessed by the index. Starts with 1 */
 	protected Object[] intToVar;
 	/** Maps clauses to integer */
-	protected HashMap<Node, Integer> clauseToInt = new HashMap<>();
+	protected HashMap<Node, Integer> clauseToInt;
 	/** Contains every clause that can be accessed by the index */
 	protected Node[] intToClause;
+	/**
+	 * Contains the positive Literal object for every variable. This prevents the creation of many Literal object from the index at the runtime of the solver.
+	 */
+	protected Literal[] intToVariableNodePositive;
+	/**
+	 * Contains the positive Literal object for every variable. This prevents the creation of many Literal object from the index at the runtime of the solver.
+	 */
+	protected Literal[] intToVariableNodeNegative;
 
 	/**
 	 * Initiates the problem with a root node and a given feature list that represent variables.
 	 *
-	 * @param rootNode
+	 * Note: For convienience you can get a distinctive set of variables of a {@link Node} by calling {@link #getDistinctVariableObjects(Node)}
+	 *
+	 * @param rootNode Represents the problem as {@link Node}
+	 * @param variables Contains the variables as string list
 	 */
-	public SmtProblem(Node rootNode, Collection<?> variables) {
+	public SmtProblem(Node rootNode, Collection<Object> variables) {
 		intToVar = new Object[variables.size() + 1];
+		intToVariableNodePositive = new Literal[variables.size() + 1];
+		intToVariableNodeNegative = new Literal[variables.size() + 1];
 		intToClause = new Node[rootNode.getChildren().length];
+
 		root = rootNode;
 
 		if (!(root instanceof And)) {
@@ -64,13 +78,17 @@ public class SmtProblem implements ISmtProblem {
 		}
 
 		// Create mapping from index to clauses starting from 0
-		int indexClauses = 0;
-		for (final Node node : rootNode.getChildren()) {
-			clauseToInt.put(node, indexClauses);
-			intToClause[indexClauses++] = node;
+		clauseToInt = new HashMap<>();
+		if (root != null) {
+			int indexClauses = 0;
+			for (final Node node : rootNode.getChildren()) {
+				clauseToInt.put(node, indexClauses);
+				intToClause[indexClauses++] = node;
+			}
 		}
 
 		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+		varToInt = new HashMap<>();
 		int indexVariables = 0;
 		for (final Object feature : variables) {
 			final String name = feature.toString();
@@ -78,7 +96,9 @@ public class SmtProblem implements ISmtProblem {
 				throw new RuntimeException();
 			}
 			varToInt.put(name, ++indexVariables);
-			intToVar[indexVariables] = name;
+			intToVar[indexVariables] = feature; // Contains the feature name
+			intToVariableNodePositive[indexVariables] = new Literal(feature, true);
+			intToVariableNodeNegative[indexVariables] = new Literal(feature, false);
 		}
 	}
 
@@ -87,22 +107,29 @@ public class SmtProblem implements ISmtProblem {
 	}
 
 	/**
-	 * Travels the complete cnf and searches for literals and variables of type {@link Variable<T>} to be used as variables.
+	 * Travels the complete {@link Node} structure and searches for Literals. The found {@link Literal} are returned.
 	 *
-	 * @param cnf
-	 * @return
+	 * @param node The given {@link Node} to search.
+	 * @return {@link Set} containing all found variable objects
 	 */
-	public static Set<Object> getDistinctVariableObjects(Node cnf) {
+	public static Set<Object> getDistinctVariableObjects(Node node) {
+		// Result set for our node
 		final HashSet<Object> result = new HashSet<>();
-		for (final Node clause : cnf.getChildren()) {
-			final Node[] literals = clause.getChildren();
-			for (int i = 0; i < literals.length; i++) {
-				if (!result.contains(((Literal) literals[i]).var)) {
-					result.add(((Literal) literals[i]).var);
-				}
+
+		// If null return empty set
+		if (node == null) {
+			return result;
+		} else {
+			for (final Node child : node.getChildren()) {
+				// Add all child node variables
+				result.addAll(getDistinctVariableObjects(child));
 			}
+			// If literal return the object for the literal
+			if (node instanceof Literal) {
+				result.add(((Literal) node).var);
+			}
+			return result;
 		}
-		return result;
 	}
 
 	/*
@@ -201,5 +228,25 @@ public class SmtProblem implements ISmtProblem {
 	@Override
 	public int getClauseCount() {
 		return intToClause.length;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getVariableAsNode(int)
+	 */
+	@Override
+	public Literal getVariableAsNode(int index) {
+		final int indexAbs = Math.abs(index);
+		// Index 0 is not valid as variables began at index 1
+		if ((indexAbs > intToVariableNodePositive.length) || (index == 0)) {
+			return null;
+		}
+		if (index > 0) {
+			// Return positive literal
+			return intToVariableNodePositive[indexAbs];
+		} else {
+			// Return negative literal
+			return intToVariableNodeNegative[indexAbs];
+		}
 	}
 }
