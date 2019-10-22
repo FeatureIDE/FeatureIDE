@@ -59,6 +59,8 @@ public interface IVariables extends Cloneable {
 
 	String[] getNames();
 
+	void renameVariable(String oldName, String newName);
+
 	IVariables clone();
 
 	LiteralSet getLiterals();

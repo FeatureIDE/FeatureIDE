@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
@@ -56,13 +57,21 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 		implements ITWiseConfigurationGenerator {
 
 	private final IFeatureModel featureModel;
+	private final Variables renamedVariables;
 	private final String algorithm;
 	private final int t;
 
 	public SPLCAToolConfigurationGenerator(CNF cnf, String algorithm, int t, int maxSampleSize) {
 		super(cnf, maxSampleSize);
 		featureModel = DefaultFeatureModelFactory.getInstance().create();
-		new DIMACSFormat().read(featureModel, new DIMACSFormatCNF().write(cnf));
+
+		renamedVariables = (Variables) cnf.getVariables().clone();
+		int index = 1;
+		for (final String originalName : cnf.getVariables().getNames()) {
+			renamedVariables.renameVariable(originalName, "F" + index++);
+		}
+		final String dimacsSource = new DIMACSFormatCNF().write(new CNF(renamedVariables, cnf.getClauses()));
+		new DIMACSFormat().read(featureModel, dimacsSource);
 		this.algorithm = algorithm;
 		this.t = t;
 	}
@@ -103,7 +112,8 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 				literals[i] = -(i + 1);
 			}
 			for (final String selection : solution) {
-				final int variable = solver.getSatInstance().getInternalVariables().convertToInternal(variables.getVariable(selection));
+				final int varIndex = renamedVariables.getVariable(selection);
+				final int variable = solver.getSatInstance().getInternalVariables().convertToInternal(varIndex);
 				if (variable != 0) {
 					literals[variable - 1] = variable;
 				}
