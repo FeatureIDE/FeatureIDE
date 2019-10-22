@@ -265,4 +265,13 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return new LiteralSet(literals, Order.NATURAL, false);
 	}
 
+	@Override
+	public void renameVariable(String oldName, String newName) {
+		final Integer index = varToInt.remove(oldName);
+		if (index != null) {
+			varToInt.put(newName, index);
+			intToVar[index] = newName;
+		}
+	}
+
 }
