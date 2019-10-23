@@ -358,7 +358,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			featureModelManager = new VirtualFeatureModelManager(errorFeatureModel);
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
-		featureModelManager.addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -406,6 +405,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		setComposerID(getComposerID());
 		setPaths(getProjectSourcePath(), getProjectBuildPath(), getProjectConfigurationPath());
 
+		initCurrentConfiguration();
+
 		final IComposerExtensionClass composer = getComposer();
 		// adds the compiler to the feature project if it is an older project
 		if (composer != null) {
@@ -423,6 +424,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				LOGGER.logError(e);
 			}
 		}
+
+		featureModelManager.addListener(new FeatureModelChangeListner());
 	}
 
 	@Override
@@ -647,6 +650,45 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return project.getName();
 	}
 
+	public Path initCurrentConfiguration() {
+		if ((currentConfiguration == null) || !Files.exists(currentConfiguration)) {
+			if (project.exists() && project.isOpen()) {
+				if ((configFolder != null) && Files.exists(configFolder)) {
+					String configuration = null;
+					try {
+						configuration = project.getPersistentProperty(configConfigID);
+					} catch (final CoreException e) {
+						LOGGER.logError(e);
+					}
+					if (configuration != null) {
+						final Path file = configFolder.resolve(configuration);
+						if (Files.exists(file)) {
+							currentConfiguration = file;
+						} else {
+							LOGGER.logWarning("Specified current configuration file " + file + " for project " + project.getName() + " does not exist.");
+						}
+					}
+					if (currentConfiguration == null) {
+						final List<Path> configs = getAllConfigurations();
+						if (!configs.isEmpty()) {
+							setCurrentConfiguration(configs.get(0));
+						} else {
+							LOGGER.logWarning("Failed to get a current configuration. No configuration files found for project " + project.getName() + ".");
+							return null;
+						}
+					}
+				} else {
+					LOGGER.logWarning("Failed to get a current configuration. No configuration folder found for project " + project.getName() + ".");
+					return null;
+				}
+			} else {
+				LOGGER.logWarning("Failed to get the current configuration. Project " + project.getName() + " is not available.");
+				return null;
+			}
+		}
+		return currentConfiguration;
+	}
+
 	@Override
 	public Path getCurrentConfiguration() {
 		if ((currentConfiguration == null) || !Files.exists(currentConfiguration)) {
@@ -675,7 +717,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							return null;
 						}
 					} else {
-						LOGGER.logWarning("Failed to get a current configuration. No configuration folder found for project " + project.getName() + ".");
+						LOGGER.logWarning(
+								"Failed to get a current configuration. No current configuration file specified for project " + project.getName() + ".");
 						return null;
 					}
 				} else {

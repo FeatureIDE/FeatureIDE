@@ -29,6 +29,7 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -72,13 +73,13 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		monitor.setRemainingWork(100);
 
 		monitor.checkCancel();
-		final CNF cnf = sliceFormula(monitor.subTask(80));
+		final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
 		monitor.checkCancel();
-		final IFeatureModel m = sliceTree(featureNames, formula.getFeatureModel(), factory, monitor.subTask(2));
+		final IFeatureModel featureTree = sliceTree(featureNames, formula.getFeatureModel(), factory, monitor.subTask(2));
 		monitor.checkCancel();
-		merge(factory, cnf, m, monitor.subTask(18));
+		merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
 
-		return m;
+		return featureTree;
 	}
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
@@ -263,13 +264,15 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		}
 	}
 
-	private void merge(IFeatureModelFactory factory, CNF cnf, IFeatureModel m, IMonitor<?> monitor) {
-		final List<LiteralSet> children = cnf.getClauses();
-
+	private void merge(IFeatureModelFactory factory, CNF slicedFeatureModelCNF, IFeatureModel featureTree, IMonitor<?> monitor) {
 		monitor.setTaskName("Adding Constraints");
+
+		final CNF featureTreeCNF = CNFCreator.createNodes(featureTree);
+		final IVariables variables = featureTreeCNF.getVariables();
+		final List<LiteralSet> children = slicedFeatureModelCNF.adaptClauseList(variables);
 		monitor.setRemainingWork(children.size() + 1);
 
-		final SimpleSatSolver s = new SimpleSatSolver(CNFCreator.createNodes(m));
+		final SimpleSatSolver s = new SimpleSatSolver(featureTreeCNF);
 		monitor.step();
 
 		for (final LiteralSet clause : children) {
@@ -278,7 +281,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				break;
 			case TIMEOUT:
 			case TRUE:
-				m.addConstraint(factory.createConstraint(m, Nodes.convert(cnf.getVariables(), clause)));
+				featureTree.addConstraint(factory.createConstraint(featureTree, Nodes.convert(variables, clause)));
 				break;
 			default:
 				assert false;
