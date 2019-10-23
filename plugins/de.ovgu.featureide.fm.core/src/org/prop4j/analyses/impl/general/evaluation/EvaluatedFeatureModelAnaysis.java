@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import org.prop4j.analyses.impl.general.sat.AtomicSetAnalysis;
 import org.prop4j.analyses.impl.general.sat.ClearCoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.sat.ClearImplicationAnalysis;
 import org.prop4j.analyses.impl.general.sat.CoreDeadAnalysis;
@@ -82,20 +83,10 @@ public class EvaluatedFeatureModelAnaysis {
 	public static List<EvaluationEntry> tautologicalConstraints = new ArrayList<>();
 	public static List<EvaluationEntry> redundantConstraints = new ArrayList<>();
 	public static List<EvaluationEntry> indeterminedFeatures = new ArrayList<>();
-
-	public static void printResult() {
-		printResultHidden("Valid", validAnalysis);
-		printResultHidden("CleanCoreDead", cleanCoreDeadAnalysis);
-		printResultHidden("OptiCoreDead", optiCoreDeadAnalysis);
-		printResultHidden("CleanFalseOptional", cleanFalseOptionalAnalysis);
-		printResultHidden("OptiFalseOptional", optiFalseOptionalAnalysis);
-		printResultHidden("CountSolutions", countSolutions);
-		printResultHidden("RedundantConstraints", redundantConstraints);
-		printResultHidden("IndeterminedFeatures", indeterminedFeatures);
-	}
+	public static List<EvaluationEntry> atomicSet = new ArrayList<>();
 
 	private static void printResultHidden(String filename, List<EvaluationEntry> entryList) {
-		final String filetowrite = "C:\\Users\\Joshua\\Desktop\\Uni\\SS 19\\Projektarbeit\\Data\\" + filename + ".txt";
+		final String filetowrite = "C:\\Users\\Joshua\\GIT\\Projektarbeit\\Data\\" + filename + ".txt";
 		try (FileWriter fw = new FileWriter(filetowrite)) {
 			fw.write(
 					"Model;AnzahlFeatures;AnzahlConstraints;AnzahlKlauseln;Sat4J - Init;Sat4J - SolverTime;Sat4J - GesamtAnalyse;SMTInterpol - Init;SMTInterpol - SolveTime;SMTInterpol - GesamtAnalyse;Native - Init;Native - SolverTime;Native - GesamtAnalyse;Result - Overview;Sat4J - Result;SMTInterpol - Result;Native - Result\n");
@@ -397,26 +388,131 @@ public class EvaluatedFeatureModelAnaysis {
 
 		// Void Model
 		evaluateVoidAnalysis(modelName);
+		printResultHidden("Valid", validAnalysis);
 
 		// Core and Dead Features
-		evaluateClearCoreDead(modelName);
+//		evaluateClearCoreDead(modelName);
+//		printResultHidden("CleanCoreDead", cleanCoreDeadAnalysis);
 		evaluateOptiCoreDead(modelName);
+		printResultHidden("OptiCoreDead", optiCoreDeadAnalysis);
 
 		// False-Optional Features
-		evaluateClearFOFeatures(modelName);
+//		evaluateClearFOFeatures(modelName);
+//		printResultHidden("CleanFalseOptional", cleanFalseOptionalAnalysis);
 		evaluateOptiFOFeatures(modelName);
+		printResultHidden("OptiFalseOptional", optiFalseOptionalAnalysis);
 
 		// Hidden Features (Indetermined)
 		evaluateIndeterminedFeatures(modelName);
+		printResultHidden("IndeterminedFeatures", indeterminedFeatures);
 
 		// Redundant constraints
 		evaluateRedundantCostraints(modelName);
+		printResultHidden("RedundantConstraints", redundantConstraints);
 
 		// Count Solutions
-		// evaluateCountSolutionsAnalysis(modelName);
+//		evaluateCountSolutionsAnalysis(modelName);
+//		printResultHidden("CountSolutions", countSolutions);
 
-		// Save and write the results to a file
-		printResult();
+		// Atomic Set Analysis
+		evaluateAtomicSets(modelName);
+		printResultHidden("AtomicSet", atomicSet);
+
+	}
+
+	private void evaluateAtomicSets(String modelName) {
+		final EvaluationEntry entry =
+			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
+
+		checkAtomicSets(entry, sat4jSolverStructure);
+		checkAtomicSets(entry, smtInterpolSolverStrucutre);
+		checkAtomicSetsNative(entry, sat4jNativeSolver);
+
+		atomicSet.add(entry);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jNativeSolver2
+	 */
+	private void checkAtomicSetsNative(EvaluationEntry entry, de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis analysis =
+			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis(sat4jNativeSolver2.getSatInstance());
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (final LiteralSet result : results) {
+			String atomicSet = "(";
+			if (result != null) {
+				for (int i = 0; i < result.getLiterals().length; i++) {
+					final int feature = result.getLiterals()[i];
+//					if (feature >= 0) {
+					// Is part of one atomic set
+					atomicSet += "" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature) + ",";
+//					}
+				}
+			}
+			atomicSet += ")";
+			resultList.add(atomicSet);
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jSolverStructure2
+	 */
+	private void checkAtomicSets(EvaluationEntry entry, ISatSolver sat4jSolverStructure2) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final AtomicSetAnalysis analysis = new AtomicSetAnalysis(sat4jSolverStructure2);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (final LiteralSet result : results) {
+			String atomicSet = "(";
+			if (result != null) {
+				for (int i = 0; i < result.getLiterals().length; i++) {
+					final int feature = result.getLiterals()[i];
+//					if (feature >= 0) {
+					// Is part of one atomic set
+					atomicSet += "" + sat4jSolverStructure2.getProblem().getVariableOfIndex(feature) + ",";
+//					}
+				}
+			}
+			atomicSet += ")";
+			resultList.add(atomicSet);
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
 	}
 
 	/**

@@ -27,4 +27,7 @@ package org.prop4j.solver;
  */
 public interface ISatSolver extends ISolver {
 
+	public static final String CONFIG_SELECTION_STRATEGY = "selection_strategy";
+
+	int[] getIndexOfAssumptions();
 }

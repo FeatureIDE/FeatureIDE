@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
@@ -94,8 +95,12 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 					expression = new Not(expression).toRegularCNF();
 				}
 				int expressionClauseCount = 0;
-				for (final Node clause : expression.getChildren()) {
-					expressionClauseCount += oracle.push(clause);
+				if (expression instanceof Literal) {
+					expressionClauseCount += oracle.push(expression);
+				} else {
+					for (final Node clause : expression.getChildren()) {
+						expressionClauseCount += oracle.push(clause);
+					}
 				}
 				for (int i = 0; i < expressionClauseCount; i++) {
 					expressionClauses.add(expression);

@@ -583,4 +583,13 @@ public class Ltms implements IMusExtractor, ISatSolver {
 		// No configuration options available
 		return false;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISatSolver#getIndexOfAssumptions()
+	 */
+	@Override
+	public int[] getIndexOfAssumptions() {
+		throw new UnsupportedOperationException("LTMS does not support this operation.");
+	}
 }

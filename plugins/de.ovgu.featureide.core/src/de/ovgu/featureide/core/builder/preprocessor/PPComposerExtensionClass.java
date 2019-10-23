@@ -48,10 +48,17 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.Not;
 import org.prop4j.SatSolver;
+import org.prop4j.analyses.impl.general.sat.HasSolutionAnalysis;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.impl.SatProblem;
+import org.prop4j.solver.impl.SolverManager;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -63,6 +70,8 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceCo
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Abstract class for FeatureIDE preprocessor composer extensions with predefined functions.
@@ -80,18 +89,18 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @author Timo G&uuml;nther
 	 */
 	public enum AnnotationStatus {
-		/** The presence condition is satisfiable but not a tautology. */
-		NORMAL,
-		/** The feature model is void. */
-		VOID,
-		/** The presence condition is a contradiction, causing a dead code block. */
-		DEAD,
-		/** The presence condition is a tautology, making the annotation superfluous. */
-		SUPERFLUOUS,
-		/** The expression in and of itself is a contradiction, causing a dead code block. */
-		CONTRADICTION,
-		/** The expression in and of itself is a tautology, making the annotation superfluous. */
-		TAUTOLOGY,
+	/** The presence condition is satisfiable but not a tautology. */
+	NORMAL,
+	/** The feature model is void. */
+	VOID,
+	/** The presence condition is a contradiction, causing a dead code block. */
+	DEAD,
+	/** The presence condition is a tautology, making the annotation superfluous. */
+	SUPERFLUOUS,
+	/** The expression in and of itself is a contradiction, causing a dead code block. */
+	CONTRADICTION,
+	/** The expression in and of itself is a tautology, making the annotation superfluous. */
+	TAUTOLOGY,
 	}
 
 	protected static final String MESSAGE_DEAD = "This annotation causes a dead code block.";
@@ -239,8 +248,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			nestedExpressions = new And(children);
 		}
 
+		final Node featureModelNode = FeatureModelManager.getInstance(featureModel).getPersistentFormula().getCNFNode();
 		try {
-			return isContradictionOrTautology(expression, AdvancedNodeCreator.createNodes(featureModel), nestedExpressions);
+			return isContradictionOrTautology(expression, featureModelNode, nestedExpressions);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 			return AnnotationStatus.NORMAL;
@@ -252,37 +262,81 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			return AnnotationStatus.VOID;
 		}
 
-		/*
-		 * -SAT(expression)
-		 */
-		if (!new SatSolver(expression, 1000).hasSolution()) {
-			return AnnotationStatus.CONTRADICTION;
+		// -------------------------------------------------------
+		// 1) check that the expression itself is not a contradiction
+		// -SAT(expression)
+		// -------------------------------------------------------
+		final ISatProblem expressionProblem = new SatProblem(expression);
+		HasSolutionAnalysis analysis = new HasSolutionAnalysis(expressionProblem);
+		try {
+			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
+			if (!hasSolution) {
+				return AnnotationStatus.CONTRADICTION;
+			}
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-
-		/*
-		 * -SAT(-expression)
-		 */
-		if (!new SatSolver(new Not(expression), 1000).hasSolution()) {
-			return AnnotationStatus.TAUTOLOGY;
+		// -------------------------------------------------------
+		// 2) check that the expression itself is not a tautology
+		// -SAT(-expression)
+		// -------------------------------------------------------
+		final ISatProblem expressionNegatedProblem = new SatProblem(new Not(expression).toRegularCNF());
+		analysis = new HasSolutionAnalysis(expressionNegatedProblem);
+		try {
+			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
+			if (!hasSolution) {
+				return AnnotationStatus.TAUTOLOGY;
+			}
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-
-		final Node context = (nestedExpressions != null) ? new And(featureModel, nestedExpressions) : featureModel;
-
-		/*
-		 * -SAT(FM & nestedExpressions & expression)
-		 */
-		if (!new SatSolver(new And(context, expression), 1000).hasSolution()) {
+		// -------------------------------------------------------
+		// 3) Setup solver with feature model problem for following analyses
+		// -------------------------------------------------------
+		final ISatProblem featureModelProblem = new SatProblem(featureModel, FeatureUtils.getFeatureNames(this.featureModel));
+		final ISatSolver solver = SolverManager.getSelectedFeatureAttributeSolverFactory().getAnalysisSolver(featureModelProblem);
+		// -------------------------------------------------------
+		// 4) Check if expression is not dead with nestes context
+		// -SAT(FM & nestedExpressions & expression)
+		// -------------------------------------------------------
+		try {
+			if (nestedExpressions != null) {
+				solver.push(nestedExpressions);
+			}
+			solver.push(expression);
+			analysis = new HasSolutionAnalysis(solver);
+			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
+			if (!hasSolution) {
+				return AnnotationStatus.DEAD;
+			}
+		} catch (final ContradictionException e) {
 			return AnnotationStatus.DEAD;
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
+		// -------------------------------------------------------
+		// 5) Check for superfluous
+		// TAUT(FM & nestedExpressions => expression) = -SAT(-(FM & nestedExpressions => expression)) = -SAT(-(-(FM & nestedExpressions) | expression)) =
+		// * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
+		// -------------------------------------------------------
 
-		/*
-		 * TAUT(FM & nestedExpressions => expression) = -SAT(-(FM & nestedExpressions => expression)) = -SAT(-(-(FM & nestedExpressions) | expression)) =
-		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
-		 */
-		if (!new SatSolver(new And(context, new Not(expression)), 1000).hasSolution()) {
+		try {
+			// After every analysis a solver is emptied from all previous push operations
+			if (nestedExpressions != null) {
+				solver.push(nestedExpressions);
+			}
+			// Add not expression
+			solver.push(new Not(expression).toRegularCNF());
+			analysis = new HasSolutionAnalysis(solver);
+			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
+			if (!hasSolution) {
+				return AnnotationStatus.SUPERFLUOUS;
+			}
+		} catch (final ContradictionException e) {
 			return AnnotationStatus.SUPERFLUOUS;
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-
 		return AnnotationStatus.NORMAL;
 	}
 

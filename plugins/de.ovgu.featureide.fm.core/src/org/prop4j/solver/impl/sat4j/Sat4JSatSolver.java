@@ -550,4 +550,17 @@ public class Sat4JSatSolver extends AbstractSatSolver {
 		}
 		return memory.getAllClauses();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISatSolver#getIndexOfAssumptions()
+	 */
+	@Override
+	public int[] getIndexOfAssumptions() {
+		final int[] test = new int[assignment.size()];
+		for (int i = 0; i < assignment.size(); i++) {
+			test[i] = assignment.get(i);
+		}
+		return test;
+	}
 }

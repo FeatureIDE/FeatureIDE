@@ -48,6 +48,7 @@
 //import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedSatSolver;
 //import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver.SelectionStrategy;
 //import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
+//import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 //import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 //import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 //import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -428,12 +429,12 @@
 //			workMonitor.invoke(updateFeatures);
 //
 //			if (redundantManual) {
-//				final AdvancedSatSolver solver = getSolver(true);
+//				final ISatSolver solver = getSolver(true);
 //				if (solver == null) {
 //					return result;
 //				}
 //				for (final int feature : intLiterals) {
-//					solver.assignmentPush(feature);
+//					solver.push(solver.getProblem().getVariableAsNode(feature));
 //				}
 //
 //				int literalCount = intLiterals.length;
@@ -555,11 +556,13 @@
 //	protected ISatSolver getSolver(boolean includeHiddenFeatures) {
 //		// TODO SOLVER Sebastian Generation of Node without Hidden/Abstract already possible?
 //		ISatProblem satInstance = null;
+//		final AdvancedNodeCreator creator = new AdvancedNodeCreator(formula.getFeatureModel());
 //		if (includeAbstractFeatures) {
 //			if (includeHiddenFeatures) {
-//				satInstance = new SatProblem(formula.getCNFNode());
+//				creator.setFeatureType(FeatureType.All);
+//				satInstance = new SatProblem(formula.getElement(formulaElement));
 //			} else {
-//				// satInstance = formula.getElement(new NoHiddenCNFCreator());
+//				satInstance = formula.getElement(new NoHiddenCNFCreator());
 //			}
 //		} else {
 //			if (includeHiddenFeatures) {

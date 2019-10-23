@@ -263,7 +263,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 			final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
 			pushstack.push(formula, formulaJavaSmt);
 			// Do not add directly to solver because assumptions are given as parameter to isSatisfiable
-
+			return 0;
 		}
 
 		// Handle Or Nodes
@@ -289,6 +289,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 				final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
 				pushstack.push(formula, formulaJavaSmt);
 				// Do not add directly to solver because assumptions are given as parameter to isSatisfiable
+				return 0;
 			} else {
 				// Add as formula
 				final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
@@ -391,6 +392,27 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 			return null;
 		}
 		return pushstack.getAllClauses();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISatSolver#getIndexOfAssumptions()
+	 */
+	@Override
+	public int[] getIndexOfAssumptions() {
+		final List<BooleanFormula> formulas = pushstack.getAssumtions();
+		final int[] result = new int[formulas.size()];
+		for (int i = 0; i < result.length; i++) {
+			final Node literal = pushstack.getNodeOfFormula(formulas.get(i));
+			if (literal instanceof Literal) {
+				final Literal lit = (Literal) literal;
+				result[i] = getProblem().getSignedIndexOfVariable(lit);
+			} else if ((literal instanceof Or) && (literal.getChildren()[0] instanceof Literal)) {
+				final Literal lit = (Literal) literal.getChildren()[0];
+				result[i] = getProblem().getSignedIndexOfVariable(lit);
+			}
+		}
+		return result;
 	}
 
 }

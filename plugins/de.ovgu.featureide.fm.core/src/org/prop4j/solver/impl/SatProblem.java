@@ -25,8 +25,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 
@@ -65,6 +67,53 @@ public class SatProblem implements ISatProblem {
 	 * @param variables Contains the variables as string list
 	 */
 	public SatProblem(Node rootNode, Collection<Object> variables) {
+		intToVar = new Object[variables.size() + 1];
+		intToVariableNodePositive = new Literal[variables.size() + 1];
+		intToVariableNodeNegative = new Literal[variables.size() + 1];
+
+		if (rootNode instanceof Literal) {
+			rootNode = new And(new Or(rootNode));
+		}
+		if (rootNode instanceof Or) {
+			rootNode = new And(rootNode);
+		}
+
+		// Its empty or only an assumption (Literal)
+		intToClause = new Node[rootNode.getChildren().length];
+
+		root = rootNode;
+		// Check for CNF
+		if (!root.isConjunctiveNormalForm()) {
+			throw new IllegalStateException("The given root node to create a smt problem need to be in conjunctive normal form like form.");
+
+		}
+
+		// Create mapping from index to clauses starting from 0
+		clauseToInt = new HashMap<>();
+		if ((root != null) && (root.getChildren() != null)) {
+			int indexClauses = 0;
+			for (final Node node : rootNode.getChildren()) {
+				clauseToInt.put(node, indexClauses);
+				intToClause[indexClauses++] = node;
+			}
+		}
+
+		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+		varToInt = new HashMap<>();
+		int indexVariables = 0;
+		for (final Object feature : variables) {
+			final String name = feature.toString();
+			if (name == null) {
+				throw new RuntimeException();
+			}
+			varToInt.put(name, ++indexVariables);
+			intToVar[indexVariables] = feature; // Contains the feature name
+			intToVariableNodePositive[indexVariables] = new Literal(feature, true);
+			intToVariableNodeNegative[indexVariables] = new Literal(feature, false);
+		}
+	}
+
+	public SatProblem(Node rootNode, Set<String> variables) {
 		intToVar = new Object[variables.size() + 1];
 		intToVariableNodePositive = new Literal[variables.size() + 1];
 		intToVariableNodeNegative = new Literal[variables.size() + 1];
