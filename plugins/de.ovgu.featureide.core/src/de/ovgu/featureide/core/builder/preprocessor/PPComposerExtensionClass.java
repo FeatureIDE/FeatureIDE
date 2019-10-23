@@ -24,6 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,12 +50,14 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.Not;
 import org.prop4j.SatSolver;
+import org.prop4j.analyses.impl.general.evaluation.EvaluationEntry;
 import org.prop4j.analyses.impl.general.sat.HasSolutionAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.impl.SatProblem;
-import org.prop4j.solver.impl.SolverManager;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -114,6 +118,46 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/** Creates explanations for expressions that are contradictions or tautologies. */
 	private final InvariantPresenceConditionExplanationCreator invariantExpressionExplanationCreator =
 		PreprocessorExplanationCreatorFactory.getDefault().getInvariantPresenceConditionExplanationCreator();
+
+	// TODO SOLVERS EVAL remove this
+	public void printResultHidden(String filename) {
+		printResultHidden(filename, sat4J, javaSmt);
+	}
+
+	public List<String> evalList = new ArrayList<>();
+
+	// TODO SOLVERS EVAL remove this
+	public void printResultHidden(String filename, EvaluationEntry sat4JGesamt, EvaluationEntry javaSmtGesamt) {
+		final String filetowrite = "C:\\Users\\Joshua\\GIT\\Projektarbeit\\Data\\" + filename + ".txt";
+
+		if ((sat4JGesamt.times.get(0) + sat4JGesamt.times.get(1) + sat4JGesamt.times.get(2) + sat4JGesamt.times.get(3)) == 0) {
+			if ((javaSmtGesamt.times.get(0) + javaSmtGesamt.times.get(1) + javaSmtGesamt.times.get(2) + javaSmtGesamt.times.get(3)) == 0) {
+				return;
+			}
+		}
+
+		final StringBuilder builder = new StringBuilder();
+		builder.append(sat4JGesamt.modelName + ";");
+		builder.append("" + sat4JGesamt.times.get(0) + ";");
+		builder.append("" + sat4JGesamt.times.get(1) + ";");
+		builder.append("" + sat4JGesamt.times.get(2) + ";");
+		builder.append("" + sat4JGesamt.times.get(3) + ";");
+		builder.append("" + javaSmtGesamt.times.get(0) + ";");
+		builder.append("" + javaSmtGesamt.times.get(1) + ";");
+		builder.append("" + javaSmtGesamt.times.get(2) + ";");
+		builder.append("" + javaSmtGesamt.times.get(3) + ";\n");
+
+		evalList.add(builder.toString());
+		try (FileWriter fw = new FileWriter(filetowrite)) {
+			fw.write(
+					"File;Sat4J - Constraint;Sat4J - Tautology;Sat4J - Dead;Sat4J - Superfluose;SMTInterpol - Constraint;SMTInterpol - Tautology;SMTInterpol - Dead;SMTInterpol - Superfluose;\n");
+			for (final String string : evalList) {
+				fw.write(string);
+			}
+		} catch (final IOException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(Path)} and used for expression checking.
@@ -250,51 +294,90 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 		final Node featureModelNode = FeatureModelManager.getInstance(featureModel).getPersistentFormula().getCNFNode();
 		try {
-			return isContradictionOrTautology(expression, featureModelNode, nestedExpressions);
+			isContradictionOrTautology(expression, featureModelNode, nestedExpressions, true);
+			return isContradictionOrTautology(expression, featureModelNode, nestedExpressions, false);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 			return AnnotationStatus.NORMAL;
 		}
 	}
 
-	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+	protected EvaluationEntry sat4J = new EvaluationEntry(0, 0, 0, "");
+	protected EvaluationEntry javaSmt = new EvaluationEntry(0, 0, 0, "");
+
+	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions, boolean isSat4J) throws TimeoutException {
 		if (voidFeatureModel) {
 			return AnnotationStatus.VOID;
 		}
+		expression = expression.toRegularCNF();
+		if (nestedExpressions != null) {
+			nestedExpressions = nestedExpressions.toRegularCNF();
+		}
 
+		long t1 = System.nanoTime();
 		// -------------------------------------------------------
 		// 1) check that the expression itself is not a contradiction
 		// -SAT(expression)
 		// -------------------------------------------------------
 		final ISatProblem expressionProblem = new SatProblem(expression);
-		HasSolutionAnalysis analysis = new HasSolutionAnalysis(expressionProblem);
+		ISatSolver solver = null;
+		if (isSat4J) {
+			solver = Sat4JSatSolverFactory.getDefault().getAnalysisSolver(expressionProblem);
+		} else {
+			solver = JavaSmtSatSolverFactory.getDefault().getAnalysisSolver(expressionProblem);
+		}
+		HasSolutionAnalysis analysis = new HasSolutionAnalysis(solver);
 		try {
 			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
 			if (!hasSolution) {
+				if (isSat4J) {
+					sat4J.times.set(0, sat4J.times.get(0) + (System.nanoTime() - t1));
+				} else {
+					javaSmt.times.set(0, sat4J.times.get(0) + (System.nanoTime() - t1));
+				}
 				return AnnotationStatus.CONTRADICTION;
 			}
 		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+
+		t1 = System.nanoTime();
 		// -------------------------------------------------------
 		// 2) check that the expression itself is not a tautology
 		// -SAT(-expression)
 		// -------------------------------------------------------
 		final ISatProblem expressionNegatedProblem = new SatProblem(new Not(expression).toRegularCNF());
-		analysis = new HasSolutionAnalysis(expressionNegatedProblem);
+		if (isSat4J) {
+			solver = Sat4JSatSolverFactory.getDefault().getAnalysisSolver(expressionNegatedProblem);
+		} else {
+			solver = JavaSmtSatSolverFactory.getDefault().getAnalysisSolver(expressionNegatedProblem);
+		}
+		analysis = new HasSolutionAnalysis(solver);
 		try {
 			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
 			if (!hasSolution) {
+				if (isSat4J) {
+					sat4J.times.set(1, sat4J.times.get(1) + (System.nanoTime() - t1));
+				} else {
+					javaSmt.times.set(1, sat4J.times.get(1) + (System.nanoTime() - t1));
+				}
 				return AnnotationStatus.TAUTOLOGY;
 			}
 		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+
 		// -------------------------------------------------------
 		// 3) Setup solver with feature model problem for following analyses
 		// -------------------------------------------------------
 		final ISatProblem featureModelProblem = new SatProblem(featureModel, FeatureUtils.getFeatureNames(this.featureModel));
-		final ISatSolver solver = SolverManager.getSelectedFeatureAttributeSolverFactory().getAnalysisSolver(featureModelProblem);
+		if (isSat4J) {
+			solver = Sat4JSatSolverFactory.getDefault().getAnalysisSolver(featureModelProblem);
+		} else {
+			solver = JavaSmtSatSolverFactory.getDefault().getAnalysisSolver(featureModelProblem);
+		}
+
+		t1 = System.nanoTime();
 		// -------------------------------------------------------
 		// 4) Check if expression is not dead with nestes context
 		// -SAT(FM & nestedExpressions & expression)
@@ -307,13 +390,25 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			analysis = new HasSolutionAnalysis(solver);
 			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
 			if (!hasSolution) {
+				if (isSat4J) {
+					sat4J.times.set(2, sat4J.times.get(2) + (System.nanoTime() - t1));
+				} else {
+					javaSmt.times.set(2, javaSmt.times.get(2) + (System.nanoTime() - t1));
+				}
 				return AnnotationStatus.DEAD;
 			}
 		} catch (final ContradictionException e) {
+			if (isSat4J) {
+				sat4J.times.set(2, sat4J.times.get(2) + (System.nanoTime() - t1));
+			} else {
+				javaSmt.times.set(2, javaSmt.times.get(2) + (System.nanoTime() - t1));
+			}
 			return AnnotationStatus.DEAD;
 		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+
+		t1 = System.nanoTime();
 		// -------------------------------------------------------
 		// 5) Check for superfluous
 		// TAUT(FM & nestedExpressions => expression) = -SAT(-(FM & nestedExpressions => expression)) = -SAT(-(-(FM & nestedExpressions) | expression)) =
@@ -330,9 +425,19 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			analysis = new HasSolutionAnalysis(solver);
 			final boolean hasSolution = analysis.execute(new NullMonitor<Boolean>());
 			if (!hasSolution) {
+				if (isSat4J) {
+					sat4J.times.set(3, sat4J.times.get(3) + (System.nanoTime() - t1));
+				} else {
+					javaSmt.times.set(3, javaSmt.times.get(3) + (System.nanoTime() - t1));
+				}
 				return AnnotationStatus.SUPERFLUOUS;
 			}
 		} catch (final ContradictionException e) {
+			if (isSat4J) {
+				sat4J.times.set(3, sat4J.times.get(3) + (System.nanoTime() - t1));
+			} else {
+				javaSmt.times.set(3, javaSmt.times.get(3) + (System.nanoTime() - t1));
+			}
 			return AnnotationStatus.SUPERFLUOUS;
 		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);

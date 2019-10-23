@@ -74,16 +74,16 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  */
 public class EvaluatedFeatureModelAnaysis {
 
-	public static List<EvaluationEntry> validAnalysis = new ArrayList<>();
-	public static List<EvaluationEntry> cleanCoreDeadAnalysis = new ArrayList<>();
-	public static List<EvaluationEntry> optiCoreDeadAnalysis = new ArrayList<>();
-	public static List<EvaluationEntry> cleanFalseOptionalAnalysis = new ArrayList<>();
-	public static List<EvaluationEntry> optiFalseOptionalAnalysis = new ArrayList<>();
-	public static List<EvaluationEntry> countSolutions = new ArrayList<>();
-	public static List<EvaluationEntry> tautologicalConstraints = new ArrayList<>();
-	public static List<EvaluationEntry> redundantConstraints = new ArrayList<>();
-	public static List<EvaluationEntry> indeterminedFeatures = new ArrayList<>();
 	public static List<EvaluationEntry> atomicSet = new ArrayList<>();
+	public static List<EvaluationEntry> cleanCoreDeadAnalysis = new ArrayList<>();
+	public static List<EvaluationEntry> cleanFalseOptionalAnalysis = new ArrayList<>();
+	public static List<EvaluationEntry> countSolutions = new ArrayList<>();
+	public static List<EvaluationEntry> indeterminedFeatures = new ArrayList<>();
+	public static List<EvaluationEntry> optiCoreDeadAnalysis = new ArrayList<>();
+	public static List<EvaluationEntry> optiFalseOptionalAnalysis = new ArrayList<>();
+	public static List<EvaluationEntry> redundantConstraints = new ArrayList<>();
+	public static List<EvaluationEntry> tautologicalConstraints = new ArrayList<>();
+	public static List<EvaluationEntry> validAnalysis = new ArrayList<>();
 
 	private static void printResultHidden(String filename, List<EvaluationEntry> entryList) {
 		final String filetowrite = "C:\\Users\\Joshua\\GIT\\Projektarbeit\\Data\\" + filename + ".txt";
@@ -101,12 +101,12 @@ public class EvaluatedFeatureModelAnaysis {
 	private final IFeatureModel fm;
 	private final AdvancedNodeCreator nodeCreator;
 	protected de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver;
+	protected ISatSolver sat4jSolverConstraints;
 	protected ISatSolver sat4jSolverFull;
 	protected ISatSolver sat4jSolverStructure;
-	protected ISatSolver sat4jSolverConstraints;
+	protected ISatSolver smtInterpolSolverConstraints;
 	protected ISatSolver smtInterpolSolverFull;
 	protected ISatSolver smtInterpolSolverStrucutre;
-	protected ISatSolver smtInterpolSolverConstraints;
 
 	public EvaluatedFeatureModelAnaysis(IFeatureModel fm) {
 		this.fm = fm;
@@ -143,6 +143,90 @@ public class EvaluatedFeatureModelAnaysis {
 		for (int i = 0; i < 1; i++) {
 			doMagic();
 		}
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jSolverStructure2
+	 */
+	private void checkAtomicSets(EvaluationEntry entry, ISatSolver sat4jSolverStructure2) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final AtomicSetAnalysis analysis = new AtomicSetAnalysis(sat4jSolverStructure2);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (final LiteralSet result : results) {
+			String atomicSet = "(";
+			if (result != null) {
+				for (int i = 0; i < result.getLiterals().length; i++) {
+					final int feature = result.getLiterals()[i];
+//					if (feature >= 0) {
+					// Is part of one atomic set
+					atomicSet += "" + sat4jSolverStructure2.getProblem().getVariableOfIndex(feature) + ",";
+//					}
+				}
+			}
+			atomicSet += ")";
+			resultList.add(atomicSet);
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jNativeSolver2
+	 */
+	private void checkAtomicSetsNative(EvaluationEntry entry, de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis analysis =
+			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis(sat4jNativeSolver2.getSatInstance());
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (final LiteralSet result : results) {
+			String atomicSet = "(";
+			if (result != null) {
+				for (int i = 0; i < result.getLiterals().length; i++) {
+					final int feature = result.getLiterals()[i];
+//					if (feature >= 0) {
+					// Is part of one atomic set
+					atomicSet += "" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature) + ",";
+//					}
+				}
+			}
+			atomicSet += ")";
+			resultList.add(atomicSet);
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+
 	}
 
 	private void checkCleanFeatureDead(EvaluationEntry entry, ISatSolver solver) {
@@ -202,6 +286,49 @@ public class EvaluatedFeatureModelAnaysis {
 
 		Collections.sort(featureNamesFO);
 		entry.results.add("False-Optional:" + featureNamesFO);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	private void checkCountSolutions(EvaluationEntry entry, ISatSolver solver) {
+		long t1 = System.currentTimeMillis();
+		final CountSolutionsAnalysis analysis = new CountSolutionsAnalysis(solver);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final Long result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		entry.results.add("[" + result + "]");
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jNativeSolver2
+	 */
+	private void checkCountSolutionsNative(EvaluationEntry entry,
+			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
+
+		long t1 = System.currentTimeMillis();
+		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis analysis =
+			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis(sat4jNativeSolver2);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final Long result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		entry.results.add("[" + result + "]");
 
 		// Save time for the complete analysis
 		entry.addTime(ges);
@@ -344,6 +471,143 @@ public class EvaluatedFeatureModelAnaysis {
 
 	}
 
+	/**
+	 * @param entry
+	 * @param sat4jSolverStructure2
+	 */
+	private void checkIndeterminedFeatures(EvaluationEntry entry, ISatSolver solver) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final List<String> hiddenFeatures = Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName);
+		final int[] hiddenFeaturesIndicies = new int[hiddenFeatures.size()];
+		for (int i = 0; i < hiddenFeatures.size(); i++) {
+			hiddenFeaturesIndicies[i] = solver.getProblem().getIndexOfVariable(hiddenFeatures.get(i));
+		}
+		final IndeterminedAnalysis analysis = new IndeterminedAnalysis(solver, hiddenFeaturesIndicies);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<IFeature> result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		if (result != null) {
+			for (int i = 0; i < result.size(); i++) {
+				resultList.add(result.get(i).getName());
+			}
+		}
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	/**
+	 * @param entry
+	 * @param sat4jNativeSolver2
+	 */
+	private void checkIndeterminedFeaturesNative(EvaluationEntry entry,
+			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
+
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		// Calculate the indicies for all hidden features
+		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis analysis =
+			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis(sat4jNativeSolver2.getSatInstance());
+		final LiteralSet convertToVariables = sat4jNativeSolver2.getSatInstance().getVariables()
+				.convertToVariables(Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName));
+		analysis.setVariables(convertToVariables);
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final LiteralSet result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		if (result != null) {
+			for (int i = 0; i < result.getLiterals().length; i++) {
+				final int feature = result.getLiterals()[i];
+				if (feature >= 0) {
+					// Is Fo Feature
+					resultList.add("" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature));
+				}
+			}
+		}
+
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	private void checkRedundantConstraints(EvaluationEntry entry, ISatSolver solver) {
+		// Save time to create analysis which involves the creation of the solver
+		long t1 = System.currentTimeMillis();
+		final RedundancyAnalysis analysis = new RedundancyAnalysis(solver, fm.getConstraints());
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<IConstraint> result = LongRunningWrapper.runMethod(analysis);
+		final long ges = System.currentTimeMillis() - t1;
+
+		final List<String> resultList = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			resultList.add(result.get(i).getDisplayName());
+		}
+		Collections.sort(resultList);
+		entry.results.add("" + resultList);
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
+	private void checkRedundantConstraintsNative(EvaluationEntry entry,
+			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver) {
+		// Add sebastians native approach
+		long t1 = System.currentTimeMillis();
+		final ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis> constraintRedundancyAnalysis =
+			new ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis>(
+					de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis.class, new FeatureTreeCNFCreator());
+		constraintRedundancyAnalysis.setFormula(FeatureModelManager.getInstance(fm).getPersistentFormula());
+		constraintRedundancyAnalysis.setConstraints(fm.getConstraints());
+		final long initTime = (System.currentTimeMillis() - t1);
+		entry.addTime(initTime);
+
+		// Save time run the complete analysis
+		t1 = System.currentTimeMillis();
+		final List<LiteralSet> result = constraintRedundancyAnalysis.getResult(new NullMonitor<>());
+		final long ges = System.currentTimeMillis() - t1;
+
+		if (result == null) {
+			entry.results.add("[EMPTY]");
+		} else {
+			final List<String> resultList = new ArrayList<>();
+			for (int i = 0; i < constraintRedundancyAnalysis.getClauseGroupSize().length; i++) {
+				if (result.get(i) != null) {
+					resultList.add(fm.getConstraints().get(i).getDisplayName());
+				}
+			}
+			Collections.sort(resultList);
+			entry.results.add("" + resultList);
+		}
+
+		// Save time for the complete analysis
+		entry.addTime(ges);
+		entry.addTime(ges + initTime);
+	}
+
 	private void checkVoid(EvaluationEntry entry, ISatSolver solver) {
 		// Add sebastian native approach
 		long t1 = System.currentTimeMillis();
@@ -417,7 +681,6 @@ public class EvaluatedFeatureModelAnaysis {
 		// Atomic Set Analysis
 		evaluateAtomicSets(modelName);
 		printResultHidden("AtomicSet", atomicSet);
-
 	}
 
 	private void evaluateAtomicSets(String modelName) {
@@ -429,252 +692,6 @@ public class EvaluatedFeatureModelAnaysis {
 		checkAtomicSetsNative(entry, sat4jNativeSolver);
 
 		atomicSet.add(entry);
-	}
-
-	/**
-	 * @param entry
-	 * @param sat4jNativeSolver2
-	 */
-	private void checkAtomicSetsNative(EvaluationEntry entry, de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		// Calculate the indicies for all hidden features
-		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis analysis =
-			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.AtomicSetAnalysis(sat4jNativeSolver2.getSatInstance());
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		final List<String> resultList = new ArrayList<>();
-		for (final LiteralSet result : results) {
-			String atomicSet = "(";
-			if (result != null) {
-				for (int i = 0; i < result.getLiterals().length; i++) {
-					final int feature = result.getLiterals()[i];
-//					if (feature >= 0) {
-					// Is part of one atomic set
-					atomicSet += "" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature) + ",";
-//					}
-				}
-			}
-			atomicSet += ")";
-			resultList.add(atomicSet);
-		}
-
-		Collections.sort(resultList);
-		entry.results.add("" + resultList);
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-
-	}
-
-	/**
-	 * @param entry
-	 * @param sat4jSolverStructure2
-	 */
-	private void checkAtomicSets(EvaluationEntry entry, ISatSolver sat4jSolverStructure2) {
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		// Calculate the indicies for all hidden features
-		final AtomicSetAnalysis analysis = new AtomicSetAnalysis(sat4jSolverStructure2);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final List<LiteralSet> results = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		final List<String> resultList = new ArrayList<>();
-		for (final LiteralSet result : results) {
-			String atomicSet = "(";
-			if (result != null) {
-				for (int i = 0; i < result.getLiterals().length; i++) {
-					final int feature = result.getLiterals()[i];
-//					if (feature >= 0) {
-					// Is part of one atomic set
-					atomicSet += "" + sat4jSolverStructure2.getProblem().getVariableOfIndex(feature) + ",";
-//					}
-				}
-			}
-			atomicSet += ")";
-			resultList.add(atomicSet);
-		}
-
-		Collections.sort(resultList);
-		entry.results.add("" + resultList);
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-	}
-
-	/**
-	 * @param modelName
-	 */
-	private void evaluateIndeterminedFeatures(String modelName) {
-		final EvaluationEntry entry =
-			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
-
-		checkIndeterminedFeatures(entry, sat4jSolverStructure);
-		checkIndeterminedFeatures(entry, smtInterpolSolverStrucutre);
-		checkIndeterminedFeaturesNative(entry, sat4jNativeSolver);
-
-		indeterminedFeatures.add(entry);
-	}
-
-	/**
-	 * @param entry
-	 * @param sat4jNativeSolver2
-	 */
-	private void checkIndeterminedFeaturesNative(EvaluationEntry entry,
-			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
-
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		// Calculate the indicies for all hidden features
-		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis analysis =
-			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis(sat4jNativeSolver2.getSatInstance());
-		final LiteralSet convertToVariables = sat4jNativeSolver2.getSatInstance().getVariables()
-				.convertToVariables(Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName));
-		analysis.setVariables(convertToVariables);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final LiteralSet result = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		final List<String> resultList = new ArrayList<>();
-		if (result != null) {
-			for (int i = 0; i < result.getLiterals().length; i++) {
-				final int feature = result.getLiterals()[i];
-				if (feature >= 0) {
-					// Is Fo Feature
-					resultList.add("" + sat4jNativeSolver2.getSatInstance().getVariables().getName(feature));
-				}
-			}
-		}
-
-		Collections.sort(resultList);
-		entry.results.add("" + resultList);
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-	}
-
-	/**
-	 * @param entry
-	 * @param sat4jSolverStructure2
-	 */
-	private void checkIndeterminedFeatures(EvaluationEntry entry, ISatSolver solver) {
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		// Calculate the indicies for all hidden features
-		final List<String> hiddenFeatures = Functional.mapToList(fm.getFeatures(), new HiddenFeatureFilter(), IFeature::getName);
-		final int[] hiddenFeaturesIndicies = new int[hiddenFeatures.size()];
-		for (int i = 0; i < hiddenFeatures.size(); i++) {
-			hiddenFeaturesIndicies[i] = solver.getProblem().getIndexOfVariable(hiddenFeatures.get(i));
-		}
-		final IndeterminedAnalysis analysis = new IndeterminedAnalysis(solver, hiddenFeaturesIndicies);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final List<IFeature> result = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		final List<String> resultList = new ArrayList<>();
-		if (result != null) {
-			for (int i = 0; i < result.size(); i++) {
-				resultList.add(result.get(i).getName());
-			}
-		}
-		Collections.sort(resultList);
-		entry.results.add("" + resultList);
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-	}
-
-	private void evaluateRedundantCostraints(String modelName) {
-		final EvaluationEntry entry =
-			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
-
-		checkRedundantConstraints(entry, sat4jSolverStructure);
-		checkRedundantConstraints(entry, smtInterpolSolverStrucutre);
-		checkRedundantConstraintsNative(entry, sat4jNativeSolver);
-
-		redundantConstraints.add(entry);
-	}
-
-	private void checkRedundantConstraints(EvaluationEntry entry, ISatSolver solver) {
-		// Save time to create analysis which involves the creation of the solver
-		long t1 = System.currentTimeMillis();
-		final RedundancyAnalysis analysis = new RedundancyAnalysis(solver, fm.getConstraints());
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final List<IConstraint> result = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		final List<String> resultList = new ArrayList<>();
-		for (int i = 0; i < result.size(); i++) {
-			resultList.add(result.get(i).getDisplayName());
-		}
-		Collections.sort(resultList);
-		entry.results.add("" + resultList);
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-	}
-
-	private void checkRedundantConstraintsNative(EvaluationEntry entry,
-			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver) {
-		// Add sebastians native approach
-		long t1 = System.currentTimeMillis();
-		final ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis> constraintRedundancyAnalysis =
-			new ConstraintAnalysisWrapper<de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis>(
-					de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis.class, new FeatureTreeCNFCreator());
-		constraintRedundancyAnalysis.setFormula(FeatureModelManager.getInstance(fm).getPersistentFormula());
-		constraintRedundancyAnalysis.setConstraints(fm.getConstraints());
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final List<LiteralSet> result = constraintRedundancyAnalysis.getResult(new NullMonitor<>());
-		final long ges = System.currentTimeMillis() - t1;
-
-		if (result == null) {
-			entry.results.add("[EMPTY]");
-		} else {
-			final List<String> resultList = new ArrayList<>();
-			for (int i = 0; i < constraintRedundancyAnalysis.getClauseGroupSize().length; i++) {
-				if (result.get(i) != null) {
-					resultList.add(fm.getConstraints().get(i).getDisplayName());
-				}
-			}
-			Collections.sort(resultList);
-			entry.results.add("" + resultList);
-		}
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
 	}
 
 	private void evaluateClearCoreDead(String modelName) {
@@ -720,6 +737,32 @@ public class EvaluatedFeatureModelAnaysis {
 		cleanFalseOptionalAnalysis.add(entry);
 	}
 
+	private void evaluateCountSolutionsAnalysis(String modelName) {
+		final EvaluationEntry entry =
+			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
+
+		// TODO SOLVERS both implementations kills the RAM :)
+		// checkCountSolutions(entry, sat4jSolverFull);
+		// checkCountSolutions(entry, smtInterpolSolverFull);
+		checkCountSolutionsNative(entry, sat4jNativeSolver);
+
+		countSolutions.add(entry);
+	}
+
+	/**
+	 * @param modelName
+	 */
+	private void evaluateIndeterminedFeatures(String modelName) {
+		final EvaluationEntry entry =
+			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
+
+		checkIndeterminedFeatures(entry, sat4jSolverStructure);
+		checkIndeterminedFeatures(entry, smtInterpolSolverStrucutre);
+		checkIndeterminedFeaturesNative(entry, sat4jNativeSolver);
+
+		indeterminedFeatures.add(entry);
+	}
+
 	private void evaluateOptiCoreDead(String modelName) {
 		final EvaluationEntry entry =
 			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
@@ -763,6 +806,17 @@ public class EvaluatedFeatureModelAnaysis {
 		optiFalseOptionalAnalysis.add(entry);
 	}
 
+	private void evaluateRedundantCostraints(String modelName) {
+		final EvaluationEntry entry =
+			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
+
+		checkRedundantConstraints(entry, sat4jSolverStructure);
+		checkRedundantConstraints(entry, smtInterpolSolverStrucutre);
+		checkRedundantConstraintsNative(entry, sat4jNativeSolver);
+
+		redundantConstraints.add(entry);
+	}
+
 	private void evaluateVoidAnalysis(String modelName) {
 		final EvaluationEntry entry =
 			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
@@ -772,61 +826,6 @@ public class EvaluatedFeatureModelAnaysis {
 		checkVoidNative(entry, sat4jNativeSolver);
 
 		validAnalysis.add(entry);
-	}
-
-	private void evaluateCountSolutionsAnalysis(String modelName) {
-		final EvaluationEntry entry =
-			new EvaluationEntry(fm.getNumberOfFeatures(), fm.getConstraintCount(), sat4jSolverFull.getProblem().getClauseCount(), modelName);
-
-		// TODO SOLVERS both implementations kills the RAM :)
-		// checkCountSolutions(entry, sat4jSolverFull);
-		// checkCountSolutions(entry, smtInterpolSolverFull);
-		checkCountSolutionsNative(entry, sat4jNativeSolver);
-
-		countSolutions.add(entry);
-	}
-
-	/**
-	 * @param entry
-	 * @param sat4jNativeSolver2
-	 */
-	private void checkCountSolutionsNative(EvaluationEntry entry,
-			de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver sat4jNativeSolver2) {
-
-		long t1 = System.currentTimeMillis();
-		final de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis analysis =
-			new de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis(sat4jNativeSolver2);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final Long result = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		entry.results.add("[" + result + "]");
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
-	}
-
-	private void checkCountSolutions(EvaluationEntry entry, ISatSolver solver) {
-		long t1 = System.currentTimeMillis();
-		final CountSolutionsAnalysis analysis = new CountSolutionsAnalysis(solver);
-		final long initTime = (System.currentTimeMillis() - t1);
-		entry.addTime(initTime);
-
-		// Save time run the complete analysis
-		t1 = System.currentTimeMillis();
-		final Long result = LongRunningWrapper.runMethod(analysis);
-		final long ges = System.currentTimeMillis() - t1;
-
-		entry.results.add("[" + result + "]");
-
-		// Save time for the complete analysis
-		entry.addTime(ges);
-		entry.addTime(ges + initTime);
 	}
 
 }
