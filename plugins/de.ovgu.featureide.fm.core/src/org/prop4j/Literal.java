@@ -163,4 +163,10 @@ public class Literal extends Node implements Cloneable {
 		variables.add(var);
 		return variables;
 	}
+
+	@Override
+	public int getMaxDepth() {
+		return 1;
+	}
+
 }

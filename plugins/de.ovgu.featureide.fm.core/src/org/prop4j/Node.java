@@ -597,6 +597,17 @@ public abstract class Node {
 		return containedFeatures;
 	}
 
+	public int getMaxDepth() {
+		int count = 1;
+		for (final Node child : children) {
+			final int childCount = child.getMaxDepth() + 1;
+			if (childCount > count) {
+				count = childCount;
+			}
+		}
+		return count;
+	}
+
 	/**
 	 * Returns all literals contained in this node and its children. Duplicates are kept.
 	 *
