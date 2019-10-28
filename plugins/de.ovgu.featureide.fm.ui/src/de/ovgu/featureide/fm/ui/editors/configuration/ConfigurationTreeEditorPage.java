@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -637,13 +638,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			sb.append(POSSIBLE_CONFIGURATIONS);
 			display.asyncExec(() -> setResolveButton(true));
 		} else {
-			final long number = conflicting ? 0 : LongRunningWrapper.runMethod(propagator.number(250));
+			final BigInteger number = conflicting ? new BigInteger("0") : LongRunningWrapper.runMethod(propagator.number(250));
 			sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
-			if (number < 0) {
+			if ((BigInteger.valueOf(0l).compareTo(number) < 0)) {
 				sb.append(MORE_THAN);
-				sb.append(-1 - number);
+				sb.append(BigInteger.valueOf(-1).subtract(number));
 			} else {
-				sb.append(number);
+				sb.append(number.toString());
 			}
 			sb.append(POSSIBLE_CONFIGURATIONS);
 			display.asyncExec(() -> setResolveButton(false));

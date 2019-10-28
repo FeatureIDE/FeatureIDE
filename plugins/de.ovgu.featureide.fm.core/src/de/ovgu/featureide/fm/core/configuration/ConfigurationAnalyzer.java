@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +94,7 @@ public class ConfigurationAnalyzer {
 
 	/**
 	 * Ignores hidden features. Use this, when propagate is disabled (hidden features are not updated).
-	 * 
+	 *
 	 * @return true, if configuration is valid
 	 */
 	public boolean isValidNoHidden() {
@@ -108,14 +109,14 @@ public class ConfigurationAnalyzer {
 	 * @return A positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
-	public long number(int timeout) {
-		final Long result = LongRunningWrapper.runMethod(propagator.number(timeout));
-		return (result != null) ? result : 0;
+	public BigInteger number(int timeout) {
+		final BigInteger result = LongRunningWrapper.runMethod(propagator.number(timeout));
+		return (result != null) ? result : new BigInteger("0");
 	}
 
-	public long number() {
-		final Long result = LongRunningWrapper.runMethod(propagator.number(1000));
-		return (result != null) ? result : 0;
+	public BigInteger number() {
+		final BigInteger result = LongRunningWrapper.runMethod(propagator.number(1000));
+		return (result != null) ? result : new BigInteger("0");
 	}
 
 	public Collection<SelectableFeature> update(boolean redundantManual, List<SelectableFeature> featureOrder) {

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface IConfigurationPropagator {
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
-	LongRunningMethod<Long> number(int timeout);
+	LongRunningMethod<BigInteger> number(int timeout);
 
 	LongRunningMethod<Collection<SelectableFeature>> update(boolean redundantManual, List<SelectableFeature> featureOrder);
 

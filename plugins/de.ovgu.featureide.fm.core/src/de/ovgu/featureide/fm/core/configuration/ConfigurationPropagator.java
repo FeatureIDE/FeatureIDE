@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -155,7 +156,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 	}
 
-	public class CountSolutionsMethod implements LongRunningMethod<Long> {
+	public class CountSolutionsMethod implements LongRunningMethod<BigInteger> {
 
 		private final int timeout;
 
@@ -164,13 +165,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Long execute(IMonitor<Long> monitor) throws Exception {
+		public BigInteger execute(IMonitor<BigInteger> monitor) throws Exception {
 			if (formula == null) {
-				return 0L;
+				return new BigInteger("0");
 			}
 			final AdvancedSatSolver solver = getSolverForCurrentConfiguration(false, false);
 			if (solver == null) {
-				return 0L;
+				return new BigInteger("0");
 			}
 			solver.setTimeout(timeout);
 			return new CountSolutionsAnalysis(solver).analyze(monitor);

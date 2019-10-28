@@ -38,6 +38,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASKS_TO_FINISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASK_TO_FINISH;
 
+import java.math.BigInteger;
 import java.util.ConcurrentModificationException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -464,12 +465,12 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		}
 		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(model, new Configuration(model));
 		analyzer.setIncludeAbstractFeatures(!ignoreAbstractFeatures);
-		final long number = analyzer.number(TIMEOUT_CONFIGURATION);
+		final BigInteger number = analyzer.number(TIMEOUT_CONFIGURATION);
 		String s = "";
-		if (number < 0) {
-			s += MORE_THAN + (-1 - number);
+		if (number.compareTo(BigInteger.valueOf(0)) == -1) {
+			s += MORE_THAN + (BigInteger.valueOf(-1).subtract(number)).toString();
 		} else {
-			s += number;
+			s += number.toString();
 		}
 		s += " " + variants;
 		p.addChild(s);

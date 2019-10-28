@@ -158,7 +158,7 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public Path getLib(Path path) {
-		URL url = FileLocator.find(FMCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("lib/cover.exe"), null);
+		URL url = FileLocator.find(FMCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path(path.toString()), null);
 		try {
 			url = FileLocator.toFileURL(url);
 			return Paths.get(url.getPath().substring(1)).normalize();

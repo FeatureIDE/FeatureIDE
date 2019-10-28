@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
+
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -40,7 +42,7 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		return null;
 	}
 
-	private long number(final IFeatureModel fm, boolean removeAbstract) {
+	private BigInteger number(final IFeatureModel fm, boolean removeAbstract) {
 		final FeatureModelFormula featureModel = new FeatureModelFormula(fm);
 		final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(featureModel, new Configuration(featureModel));
 		analyzer.setIncludeAbstractFeatures(!removeAbstract);

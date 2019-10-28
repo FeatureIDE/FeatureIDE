@@ -20,12 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.analysis;
 
+import java.math.BigInteger;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.CountAntomSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -33,7 +32,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class CountSolutionsAnalysis extends AbstractAnalysis<Long> {
+public class CountSolutionsAnalysis extends AbstractAnalysis<BigInteger> {
 
 	public CountSolutionsAnalysis(ISatSolver solver) {
 		super(solver);
@@ -44,21 +43,13 @@ public class CountSolutionsAnalysis extends AbstractAnalysis<Long> {
 	}
 
 	@Override
-	public Long analyze(IMonitor<Long> monitor) throws Exception {
+	public BigInteger analyze(IMonitor<BigInteger> monitor) throws Exception {
 		solver.setGlobalTimeout(true);
-		long solutionCount = 0;
-		SatResult hasSolution = solver.hasSolution();
-		while (hasSolution == SatResult.TRUE) {
-			solutionCount++;
-			final int[] solution = solver.getSolution();
-			try {
-				solver.addClause(new LiteralSet(solution, Order.INDEX, false).negate());
-			} catch (final RuntimeContradictionException e) {
-				break;
-			}
-			hasSolution = solver.hasSolution();
-		}
-		return hasSolution == SatResult.TIMEOUT ? -(solutionCount + 1) : solutionCount;
+		final CountAntomSolver caSolver = new CountAntomSolver(solver.getSatInstance(), 0, 4);
+		final BigInteger numberOfConfigurations = (BigInteger) caSolver.execute();
+
+		return numberOfConfigurations;
+
 	}
 
 }

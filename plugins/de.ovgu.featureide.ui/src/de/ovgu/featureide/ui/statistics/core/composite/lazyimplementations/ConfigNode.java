@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
+import java.math.BigInteger;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
@@ -64,9 +66,9 @@ public class ConfigNode extends Parent {
 
 				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(innerModel, new Configuration(innerModel));
 				analyzer.setIncludeAbstractFeatures(!removeAbstract);
-				final long number = analyzer.number(timeout);
+				final BigInteger number = analyzer.number(timeout);
 
-				return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
+				return ((number.compareTo(BigInteger.valueOf(0)) == -1) ? MORE_THAN + (BigInteger.valueOf(-1).subtract(number)) : String.valueOf(number));
 			}
 
 			@Override
