@@ -54,6 +54,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.NodeReader.ErrorHandling;
 import org.prop4j.Not;
 
 import antenna.preprocessor.v3.PPException;
@@ -92,8 +93,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	public AntennaPreprocessor() {
 		super(ANTENNA);
-		nodereader.setIgnoreMissingFeatures(true);
-		nodereader.setIgnoreUnparsableSubExpressions(true);
+		nodereader.setIgnoreMissingFeatures(ErrorHandling.KEEP);
+		nodereader.setIgnoreUnparsableSubExpressions(ErrorHandling.KEEP);
 	}
 
 	@Override
