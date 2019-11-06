@@ -29,24 +29,34 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 
 /**
- * TODO description
  *
  * @author Chico Sundermann
  */
 public class CountAntomSolver extends AExecutableSolver {
 
-	private final String binaryPath;
+	private final String binaryPathLinux;
+	private final String binaryPathWindows;
+	private final String binaryPathMac;
+
 	private final int timeout;
 	private final int numberOfThreads;
+	private final int maxMemory;
+	private final static String NUMBER_OF_THREADS_FLAG = "--noThreads=";
+	private final static String MEMORY_SIZE_FLAG = "--memSize=";
 
 	/**
 	 * @param cnf
 	 */
-	public CountAntomSolver(CNF cnf, int timeout, int numberOfThreads) {
+	public CountAntomSolver(CNF cnf, int timeout, int numberOfThreads, int maxMemory) {
 		super(cnf);
 		this.timeout = timeout;
 		this.numberOfThreads = numberOfThreads;
-		binaryPath = FileSystem.getLib(Paths.get("lib/countAntom")).toString();
+		this.maxMemory = maxMemory;
+		binaryPathLinux = FileSystem.getLib(Paths.get("lib/countAntom_linux")).toString();
+//		binaryPathWindows = FileSystem.getLib(Paths.get("lib/countAntom_windows")).toString();
+//		binaryPathMac = FileSystem.getLib(Paths.get("lib/countAntom_mac")).toString();
+		binaryPathWindows = "";
+		binaryPathMac = "";
 	}
 
 	/*
@@ -86,8 +96,26 @@ public class CountAntomSolver extends AExecutableSolver {
 	 */
 	@Override
 	protected String buildCommand() {
-		final String command = "/" + binaryPath + " " + DIMACS_TEMP_PATH;
+		// TODO: handle error at OS
+		final String command =
+			"/" + selectBinaryAccordingToOS() + " " + MEMORY_SIZE_FLAG + maxMemory + " " + NUMBER_OF_THREADS_FLAG + numberOfThreads + " " + DIMACS_TEMP_PATH;
 		return command;
+	}
+
+	private String selectBinaryAccordingToOS() {
+		final String osName = System.getProperty("os.name").toLowerCase();
+
+		if (osName.indexOf("win") >= 0) {
+			return binaryPathWindows;
+		}
+		if (osName.indexOf("mac") >= 0) {
+			return binaryPathMac;
+		}
+
+		if ((osName.indexOf("nix") >= 0) || (osName.indexOf("nux") >= 0) || (osName.indexOf("aix") > 0)) {
+			return binaryPathLinux;
+		}
+		return null;
 	}
 
 }

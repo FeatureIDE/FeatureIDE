@@ -45,7 +45,7 @@ public class CountSolutionsAnalysis extends AbstractAnalysis<BigInteger> {
 	@Override
 	public BigInteger analyze(IMonitor<BigInteger> monitor) throws Exception {
 		solver.setGlobalTimeout(true);
-		final CountAntomSolver caSolver = new CountAntomSolver(solver.getSatInstance(), 0, 4);
+		final CountAntomSolver caSolver = new CountAntomSolver(solver.getSatInstance(), getTimeout(), 4, 8000);
 		final BigInteger numberOfConfigurations = (BigInteger) caSolver.execute();
 
 		return numberOfConfigurations;
