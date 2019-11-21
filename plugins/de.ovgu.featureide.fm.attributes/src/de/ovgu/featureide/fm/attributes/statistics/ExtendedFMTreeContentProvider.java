@@ -64,8 +64,8 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFeatureAttribute) {
 			AttributeComputationBundle computationBundle = new AttributeComputationBundle();
-			computationBundle.initComputations(config, (IFeatureAttribute) parentElement);
-			return computationBundle.getComputationHeaders().toArray();
+			// computationBundle.initComputations(config, (IFeatureAttribute) parentElement);
+			// return computationBundle.getComputationHeaders().toArray();
 		}
 		if (parentElement instanceof ComputationHeader) {
 			IAttributeComputation[] computations = new IAttributeComputation[1];

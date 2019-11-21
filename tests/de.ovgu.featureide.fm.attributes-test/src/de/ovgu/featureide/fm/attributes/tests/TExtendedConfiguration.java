@@ -67,8 +67,7 @@ public class TExtendedConfiguration {
 			assertTrue(eFeatu.getConfigurableAttributes().size() == 1);
 			assertTrue(eFeatu.getConfigurableAttributes().get("price") == "10");
 
-			ExtendedSelectableFeature copyTest = new ExtendedSelectableFeature(feat.getFeature());
-			copyTest.cloneProperties(eFeatu);
+			ExtendedSelectableFeature copyTest = new ExtendedSelectableFeature(eFeatu);
 
 			assertTrue(copyTest.getConfigurableAttributes().size() == 1);
 			assertTrue(copyTest.getConfigurableAttributes().get("price") == "10");
@@ -99,7 +98,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMaximumComputation max = new EstimatedMaximumComputation(congf, attributePrice);
-		Object valueObject = max.getResult();
+		Object valueObject = max.getSelectionSum();
 
 		assertTrue(valueObject instanceof Double);
 		double value = (double) valueObject;
@@ -130,7 +129,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMinimumComputation max = new EstimatedMinimumComputation(congf, attributePrice);
-		Object valueObject = max.getResult();
+		Object valueObject = max.getSelectionSum();
 
 		assertTrue(valueObject instanceof Double);
 		double value = (double) valueObject;
@@ -164,7 +163,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMaximumComputation max = new EstimatedMaximumComputation(congf, attributePrice);
-		Object valueObject = max.getResult();
+		Object valueObject = max.getSelectionSum();
 
 		assertTrue(valueObject instanceof Double);
 		Double value = (Double) valueObject;
@@ -198,7 +197,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMinimumComputation max = new EstimatedMinimumComputation(congf, attributePrice);
-		Object valueObject = max.getResult();
+		Object valueObject = max.getSelectionSum();
 
 		assertTrue(valueObject instanceof Double);
 		Double value = (Double) valueObject;
