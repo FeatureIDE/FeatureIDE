@@ -46,7 +46,7 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 		this.config = config;
 		this.attribute = attribute;
 		estimatedMinimum = new EstimatedMinimumComputation(config, attribute);
-		result = (Double) estimatedMinimum.getEstimatedMinimum();
+		result = (Double) estimatedMinimum.getResult();
 		labelSuffix = EST;
 
 	}
