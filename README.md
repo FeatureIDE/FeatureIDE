@@ -47,7 +47,7 @@ Provides views and editors used for feature modeling. Also includes actions and 
 
 Provides support for extended feature models and feature attributes.
 
-### Composer
+### Composers
 
 [de.ovgu.featureide.core.runtime](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.runtime)
 
@@ -90,6 +90,7 @@ Provides feature-oriented programming (FOP) using the [AHEAD](http://www.cs.utex
 Provides a tool to convert AHEAD projects into FeatureHouse projects.
 
 [de.ovgu.featureide.core.featurecpp](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.featurecpp)
+
 Provides feature-oriented programming (FOP) in form of a C++ preprocessor that turns [FeatureC++](http://wwwiti.cs.uni-magdeburg.de/iti_db/forschung/fop/featurec/) code into C++ code. Also adopts language concepts of aspect-oriented programming (AOP).
 
 [de.ovgu.featureide.core.aspectj](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.aspectj)
@@ -106,6 +107,7 @@ Provides a tool to create migrated software product lines with support for featu
 
 [de.ovgu.featureide.core.mpl](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.mpl)
 
+WIP
 
 [de.ovgu.featureide.migration](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.migration)
 
