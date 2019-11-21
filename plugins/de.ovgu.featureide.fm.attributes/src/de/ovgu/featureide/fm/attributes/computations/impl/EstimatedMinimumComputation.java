@@ -26,8 +26,7 @@ public class EstimatedMinimumComputation implements IAttributeComputation {
 
 	@Override
 	public Object getResult() {
-		// TODO Auto-generated method stub
-		return null;
+		return getSelectionSum();
 	}
 
 	@Override
