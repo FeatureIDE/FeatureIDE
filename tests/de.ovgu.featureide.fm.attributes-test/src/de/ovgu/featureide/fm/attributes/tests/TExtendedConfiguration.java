@@ -99,7 +99,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMaximumComputation max = new EstimatedMaximumComputation(congf, attributePrice);
-		Object valueObject = max.getEstimatedMaximum();
+		Object valueObject = max.getResult();
 
 		assertTrue(valueObject instanceof Double);
 		double value = (double) valueObject;
@@ -130,7 +130,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMinimumComputation max = new EstimatedMinimumComputation(congf, attributePrice);
-		Object valueObject = max.getEstimatedMinimum();
+		Object valueObject = max.getResult();
 
 		assertTrue(valueObject instanceof Double);
 		double value = (double) valueObject;
@@ -164,7 +164,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMaximumComputation max = new EstimatedMaximumComputation(congf, attributePrice);
-		Object valueObject = max.getEstimatedMaximum();
+		Object valueObject = max.getResult();
 
 		assertTrue(valueObject instanceof Double);
 		Double value = (Double) valueObject;
@@ -198,7 +198,7 @@ public class TExtendedConfiguration {
 
 		// maximum
 		EstimatedMinimumComputation max = new EstimatedMinimumComputation(congf, attributePrice);
-		Object valueObject = max.getEstimatedMinimum();
+		Object valueObject = max.getResult();
 
 		assertTrue(valueObject instanceof Double);
 		Double value = (Double) valueObject;

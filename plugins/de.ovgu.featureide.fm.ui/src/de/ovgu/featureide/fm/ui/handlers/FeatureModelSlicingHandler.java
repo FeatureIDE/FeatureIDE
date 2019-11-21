@@ -30,14 +30,15 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.FeatureModelSlicingWizard;
@@ -51,6 +52,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 		final FeatureModelManager manager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file));
 		final IFeatureModel featureModel = manager.getObject();
 		if (featureModel != null) {
+			final IFeatureModelFormat format = manager.getFormat();
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
@@ -58,27 +60,27 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, selectedFeatures, true);
 
 				final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method, "Slicing Feature Model");
-				runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
-
-					@Override
-					public void jobFinished(IJob<IFeatureModel> finishedJob) {
-						final Path modelFile = EclipseFileSystem.getPath(file);
-						final Path filePath = modelFile.getFileName();
-						final Path root = modelFile.getRoot();
-						if ((filePath != null) && (root != null)) {
-							String fileName = filePath.toString();
-							final int extIndex = fileName.lastIndexOf('.');
-							final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
-							fileName = ((extIndex > 0) ? fileName.substring(0, extIndex) : fileName) + "_sliced_" + System.currentTimeMillis() + "."
-								+ format.getSuffix();
-							FeatureModelManager.save(featureModel, root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(fileName), format);
-						}
-					}
-				});
+				runner.addJobFinishedListener(finishedJob -> save(finishedJob, file, format));
 				runner.schedule();
 			}
 		}
 
+	}
+
+	private void save(IJob<IFeatureModel> finishedJob, IFile file, IPersistentFormat<IFeatureModel> format) {
+		if (finishedJob.getStatus() == JobStatus.OK) {
+			final Path modelFile = EclipseFileSystem.getPath(file);
+			final Path filePath = modelFile.getFileName();
+			final Path root = modelFile.getRoot();
+			if ((filePath != null) && (root != null)) {
+				String newFileName = filePath.toString();
+				final int extIndex = newFileName.lastIndexOf('.');
+				newFileName =
+					((extIndex > 0) ? newFileName.substring(0, extIndex) : newFileName) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
+				final Path newFilePath = root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(newFileName);
+				FeatureModelManager.save(finishedJob.getResults(), newFilePath, format);
+			}
+		}
 	}
 
 }

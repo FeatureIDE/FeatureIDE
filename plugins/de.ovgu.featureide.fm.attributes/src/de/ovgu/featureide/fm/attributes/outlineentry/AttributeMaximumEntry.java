@@ -45,7 +45,7 @@ public class AttributeMaximumEntry implements IOutlineEntry {
 		this.config = config;
 		this.attribute = attribute;
 		estimatedMax = new EstimatedMaximumComputation(config, attribute);
-		result = (Double) estimatedMax.getEstimatedMaximum();
+		result = (Double) estimatedMax.getResult();
 		labelSuffix = EST;
 	}
 
