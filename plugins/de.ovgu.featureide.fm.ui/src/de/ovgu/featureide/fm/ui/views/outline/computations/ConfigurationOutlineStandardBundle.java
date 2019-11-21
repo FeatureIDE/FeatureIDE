@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.computations.impl.ManuallySelectedFeatureCountComputation;
 import de.ovgu.featureide.fm.ui.views.outline.computations.impl.ManuallyUnselectedFeatureCountComputation;
@@ -116,7 +117,7 @@ public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 	@Override
 	public void handleDoubleClick() {
 		// TODO Auto-generated method stub
-
+		FMUIPlugin.getDefault().logInfo("DOUBLE CLICKED");
 	}
 
 }

@@ -15,6 +15,11 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 		super(feature);
 	}
 
+	public ExtendedSelectableFeature(ExtendedSelectableFeature copy) {
+		super(copy.getFeature());
+		configurableAttributes = new HashMap<String, String>(copy.configurableAttributes);
+	}
+
 	public ExtendedSelectableFeature(IFeature feature, Map<String, String> confAtt) {
 		super(feature);
 		this.configurableAttributes = confAtt;
