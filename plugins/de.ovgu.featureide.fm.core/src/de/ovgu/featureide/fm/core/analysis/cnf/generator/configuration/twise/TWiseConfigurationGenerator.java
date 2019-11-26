@@ -124,7 +124,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	// TODO Variation Point: Iterations of removing low-contributing Configurations
-	private static final int iterations = 5;
+	private int iterations = 5;
 
 	protected final TWiseConfigurationUtil util;
 	protected final TWiseCombiner combiner;
@@ -232,7 +232,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		coveredCount = 0;
 		invalidCount = 0;
 
-		samplingMonitor = new MonitorThread(new SamplingMonitor());
+		samplingMonitor = new MonitorThread(new SamplingMonitor(), 60_000);
 		try {
 			samplingMonitor.start();
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
@@ -306,6 +306,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	public TWiseConfigurationUtil getUtil() {
 		return util;
+	}
+
+	public int getIterations() {
+		return iterations;
+	}
+
+	public void setIterations(int iterations) {
+		this.iterations = iterations;
 	}
 
 }
