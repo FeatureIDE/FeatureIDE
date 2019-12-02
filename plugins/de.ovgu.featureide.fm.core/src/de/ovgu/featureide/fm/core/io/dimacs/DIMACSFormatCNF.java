@@ -20,9 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Reads and writes feature models in the DIMACS CNF format.
@@ -42,6 +52,25 @@ public class DIMACSFormatCNF extends APersistentFormat<CNF> {
 	}
 
 	@Override
+	public ProblemList read(CNF cnf, CharSequence source) {
+		final ProblemList problemList = new ProblemList();
+		final DimacsReader r = new DimacsReader();
+		r.setReadingVariableDirectory(true);
+		r.setFlattenCNF(false);
+		try {
+			final Node node = r.read(source.toString());
+			final Variables variables = new Variables(r.getVariables());
+			final ClauseList clauseList = Nodes.convertNF(variables, node, true, true);
+			cnf.setVariables(variables);
+			cnf.getClauses().clear();
+			cnf.getClauses().addAll(clauseList);
+		} catch (ParseException | IOException e) {
+			problemList.add(new Problem(e));
+		}
+		return problemList;
+	}
+
+	@Override
 	public String getSuffix() {
 		return "dimacs";
 	}
@@ -58,6 +87,11 @@ public class DIMACSFormatCNF extends APersistentFormat<CNF> {
 
 	@Override
 	public boolean supportsWrite() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsRead() {
 		return true;
 	}
 

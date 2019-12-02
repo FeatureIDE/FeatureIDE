@@ -40,6 +40,10 @@ public class CNF implements Serializable {
 	protected final ClauseList clauses;
 	protected Variables variables;
 
+	public CNF() {
+		clauses = new ClauseList();
+	}
+
 	public CNF(Variables mapping, List<LiteralSet> clauses) {
 		variables = mapping;
 		this.clauses = new ClauseList(clauses);
@@ -76,6 +80,10 @@ public class CNF implements Serializable {
 
 	public void addClauses(Collection<LiteralSet> clauses) {
 		this.clauses.addAll(clauses);
+	}
+
+	public void setVariables(Variables variables) {
+		this.variables = variables;
 	}
 
 	public IVariables getVariables() {
