@@ -71,7 +71,7 @@ public interface IFeatureStructure {
 
 	boolean isAlternative();
 
-	boolean isAncestorOf(IFeatureStructure next);
+	boolean isAncestor(IFeatureStructure next);
 
 	boolean isAnd();
 
