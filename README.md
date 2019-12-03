@@ -15,7 +15,7 @@ development branch:
 
 ### FeatureIDE Core Plugins
 
-[e.ovgu.featureide.core](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core)
+[de.ovgu.featureide.core](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core)
 
 Provides basic components for FeatureIDE projects and composer extensions.
 
