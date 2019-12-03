@@ -125,6 +125,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
 		subTreeAnalyzer.getAnalysesCollection().inheritSettings(FeatureModelManager.getAnalyzer(completeFm).getAnalysesCollection());
+		subTreeAnalyzer.analyzeFeatureModel(null);
 
 		explainImplicitConstraints(subTreeAnalyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
 		viewer.internRefresh(true);
