@@ -35,7 +35,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGDependenciesWriter;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
@@ -67,9 +69,12 @@ public class FeatureDependenciesHandler extends AFileHandler {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				final ModalImplicationGraph modalImplicationGraph = instance.getPersistentFormula().getElement(new ModalImplicationGraphCreator());
-				// TODO !!!
-				final String text = modalImplicationGraph.toString();
+				final ModalImplicationGraphCreator migCreator = new ModalImplicationGraphCreator();
+				migCreator.setComplete(true);
+				final ModalImplicationGraph mig = instance.getPersistentFormula().getElement(migCreator);
+				final CNF cnf = instance.getPersistentFormula().getCNF();
+
+				final String text = new MIGDependenciesWriter().write(mig, cnf.getVariables());
 				try {
 					FileSystem.write(Paths.get(outputFile), text);
 				} catch (final IOException e) {
@@ -77,7 +82,6 @@ public class FeatureDependenciesHandler extends AFileHandler {
 				}
 				return Status.OK_STATUS;
 			}
-
 		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();

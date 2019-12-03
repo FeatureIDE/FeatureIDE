@@ -29,11 +29,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -45,8 +49,13 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public class CommandLineConfigurator {
 
-	private static IFeatureModel featureModel;
+	static {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+	}
+
+	private static FeatureModelFormula featureModel;
 	private static Configuration configuration;
+	private static ConfigurationAnalyzer configurationAnalyzer;
 
 	private static ArrayList<Object> undefinedFeatures = new ArrayList<Object>();
 	private static ArrayList<Object> manuallySelectedFeatures = new ArrayList<Object>();
@@ -87,11 +96,11 @@ public class CommandLineConfigurator {
 	}
 
 	private static void createEmptyConfiguration(final Path path) throws IOException {
-		final FileHandler<IFeatureModel> fh = FeatureModelManager.load(path);
+		final FileHandler<IFeatureModel> fh = FeatureModelManager.getFileHandler(path);
 		if (!fh.getLastProblems().containsError()) {
-			featureModel = fh.getObject();
-			configuration = new Configuration(featureModel, Configuration.PARAM_PROPAGATE);
-			configuration.update(true, null);
+			featureModel = new FeatureModelFormula(fh.getObject());
+			configuration = new Configuration(featureModel);
+			configurationAnalyzer = new ConfigurationAnalyzer(featureModel, configuration);
 		} else {
 			throw new IOException("Feature model could not be loaded");
 		}
@@ -102,6 +111,8 @@ public class CommandLineConfigurator {
 		manuallySelectedFeatures.clear();
 		automaticallyDeselectedFeatures.clear();
 		automaticallySelectedFeatures.clear();
+		
+		configurationAnalyzer.update(true, null);
 		final List<SelectableFeature> features = getSelectableFeatures();
 
 		for (SelectableFeature feature : features) {

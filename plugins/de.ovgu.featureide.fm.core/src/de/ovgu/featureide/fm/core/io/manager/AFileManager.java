@@ -439,7 +439,9 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 			if (modifying) {
 				return;
 			}
-			format.getInstance().read(variableObject, persistentObjectSource);
+			if (persistentObjectSource != null) {
+				format.getInstance().read(variableObject, persistentObjectSource);
+			}
 		} finally {
 			fileOperationLock.unlock();
 		}

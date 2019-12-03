@@ -18,32 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.formula;
+package de.ovgu.featureide.fm.core.io.manager;
 
-import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
-import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
+
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 /**
- * Creates a {@link ModalImplicationGraph}.
+ * Disposes {@link AFileManager file managers} when a file is deleted.
  *
  * @author Sebastian Krieter
  */
-public class ModalImplicationGraphCreator extends ACreator<ModalImplicationGraph> {
-
-	private boolean complete = false;
+public class EclipseFileDeleteVisitor implements IResourceVisitor {
 
 	@Override
-	protected ModalImplicationGraph create() {
-		return LongRunningWrapper.runMethod(new MIGBuilder(formula.getElement(new CNFCreator()), complete));
-	}
-
-	public boolean isComplete() {
-		return complete;
-	}
-
-	public void setComplete(boolean complete) {
-		this.complete = complete;
+	public boolean visit(IResource resource) throws CoreException {
+		if (resource instanceof IFile) {
+			final IFileManager<?> instance = AFileManager.getInstance(EclipseFileSystem.getPath(resource));
+			if (instance != null) {
+				instance.dispose();
+			}
+		}
+		return true;
 	}
 
 }

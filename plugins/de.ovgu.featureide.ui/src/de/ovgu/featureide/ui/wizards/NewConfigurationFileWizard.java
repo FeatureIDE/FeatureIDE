@@ -26,15 +26,16 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURAT
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -70,7 +71,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	private NewConfigurationFilePage page;
 
-	private IFolder configFolder;
+	private IFeatureProject featureProject;
 
 	public NewConfigurationFileWizard() {
 		super();
@@ -83,7 +84,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		page = new NewConfigurationFilePage(configFolder);
+		page = new NewConfigurationFilePage(featureProject);
 		addPage(page);
 		setWindowTitle(NEW_CONFIGURATION);
 	}
@@ -93,7 +94,6 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		configFolder = page.getContainerObject();
 		final IFeatureProject featureProject = page.getFeatureProject();
 		final FeatureModelFormula featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
 		final IPersistentFormat<Configuration> format = page.getFormat();
@@ -107,7 +107,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(configFolder, fileName, featureModel, format, monitor);
+					doFinish(fileName, featureModel, format, monitor);
 				} catch (final CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -130,20 +130,22 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	/**
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
 	 */
-	private void doFinish(IContainer container, String fileName, FeatureModelFormula featureModel, IPersistentFormat<Configuration> format,
-			IProgressMonitor monitor) throws CoreException {
+	private void doFinish(String fileName, FeatureModelFormula featureModel, IPersistentFormat<Configuration> format, IProgressMonitor monitor)
+			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
-		if (!container.isAccessible()) {
-			if (container.getProject().isAccessible()) {
-				FMCorePlugin.createFolder(container.getProject(), container.getProjectRelativePath().toString());
+		final Path configPath = Paths.get(featureProject.getConfigPath());
+		final IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(EclipseFileSystem.getIPath(configPath));
+		if (!container.exists()) {
+			if (featureProject.getProject().isAccessible()) {
+				FMCorePlugin.createFolder(featureProject.getProject(), container.getProjectRelativePath().toString());
 			} else {
 				throwCoreException(CONTAINER_DOES_NOT_EXIST_);
 			}
 		}
 
-		final IFile file = container.getFile(new Path(fileName));
-		SimpleFileHandler.save(EclipseFileSystem.getPath(file), new Configuration(featureModel), format);
+		final Path file = configPath.resolve(fileName);
+		SimpleFileHandler.save(configPath.resolve(fileName), new Configuration(featureModel), format);
 
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
@@ -153,7 +155,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			public void run() {
 				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
-					IDE.openEditor(page, file, true);
+					IDE.openEditor(page, (IFile) EclipseFileSystem.getResource(file), true);
 				} catch (final PartInitException e) {}
 			}
 		});
@@ -172,7 +174,6 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		final IFeatureProject data = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-		configFolder = (data == null) ? null : data.getConfigFolder();
+		featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 	}
 }

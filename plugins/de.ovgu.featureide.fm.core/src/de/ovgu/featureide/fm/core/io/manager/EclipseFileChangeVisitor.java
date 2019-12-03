@@ -27,7 +27,12 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
-public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
+/**
+ * Informs {@link AFileManager file managers} about a file change.
+ *
+ * @author Sebastian Krieter
+ */
+public class EclipseFileChangeVisitor implements IResourceDeltaVisitor {
 
 	@Override
 	public boolean visit(IResourceDelta delta) {
