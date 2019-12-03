@@ -2,7 +2,7 @@
 
 ## Description
 This Plug-In enables users to import example projects into their workspace.
-It contains all example projects of FeatureIDE and features an GUI wizard for importing.
+It contains all example projects of FeatureIDE and an GUI wizard for importing.
 
 ## Developer Information
 
