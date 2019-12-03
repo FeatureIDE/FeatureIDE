@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.io.Problem;
 /**
  * File handling operations for an object of T.
  *
+ * @param <T> The type of the object.
+ *
  * @author Sebastian Krieter
  */
 public abstract class AbstractIO<T> {
@@ -88,7 +90,7 @@ public abstract class AbstractIO<T> {
 	@CheckForNull
 	public final T load(Path path) {
 		final FileHandler<T> fileHandler = getFileHandler(path);
-		return (fileHandler == null) ? null : fileHandler.getObject();
+		return ((fileHandler == null) || fileHandler.getLastProblems().containsError()) ? null : fileHandler.getObject();
 	}
 
 	@CheckForNull
