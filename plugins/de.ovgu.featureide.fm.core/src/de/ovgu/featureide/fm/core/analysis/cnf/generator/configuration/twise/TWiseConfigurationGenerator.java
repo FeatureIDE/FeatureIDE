@@ -126,11 +126,12 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	// TODO Variation Point: Iterations of removing low-contributing Configurations
 	private int iterations = 5;
 
-	protected final TWiseConfigurationUtil util;
-	protected final TWiseCombiner combiner;
+	protected TWiseConfigurationUtil util;
+	protected TWiseCombiner combiner;
 
 	protected final int t;
-	protected final PresenceConditionManager presenceConditionManager;
+	protected final List<List<ClauseList>> nodes;
+	protected PresenceConditionManager presenceConditionManager;
 
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
@@ -151,7 +152,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	public TWiseConfigurationGenerator(CNF cnf, List<List<ClauseList>> nodes, int t, int maxSampleSize) {
 		super(cnf, maxSampleSize);
 		this.t = t;
+		this.nodes = nodes;
+	}
 
+	private void init() {
+		final CNF cnf = solver.getSatInstance();
 		if (cnf.getClauses().isEmpty()) {
 			util = new TWiseConfigurationUtil(cnf, t, null);
 		} else {
@@ -171,6 +176,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	@Override
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
+		init();
+
 		phaseCount = 0;
 
 		for (int i = 0; i < iterations; i++) {
