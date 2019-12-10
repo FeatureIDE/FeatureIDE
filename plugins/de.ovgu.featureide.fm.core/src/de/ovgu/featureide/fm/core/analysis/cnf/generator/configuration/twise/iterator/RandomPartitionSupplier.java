@@ -24,6 +24,12 @@ import java.security.SecureRandom;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Presence condition combination supplier that uses the combinatorial number system to enumerate all combinations and then alternately iterates over certain
+ * randomized partitions of the combination space.
+ *
+ * @author Sebastian Krieter
+ */
 public class RandomPartitionSupplier implements ICombinationSupplier<int[]> {
 
 	private static final byte[] seed = new byte[32];

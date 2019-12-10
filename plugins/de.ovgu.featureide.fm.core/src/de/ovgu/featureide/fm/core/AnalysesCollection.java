@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentContradictionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentRedundancyAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RemoveRedundancyAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ACreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.EmptyCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -406,8 +406,8 @@ public class AnalysesCollection {
 	final AnalysisWrapper<LiteralSet, CoreDeadAnalysis> coreDeadAnalysis = new AnalysisWrapper<>(CoreDeadAnalysis.class);
 	final FalseOptionalAnalysisWrapper foAnalysis = new FalseOptionalAnalysisWrapper();
 	final AnalysisWrapper<LiteralSet, IndeterminedAnalysis> determinedAnalysis = new IndeterminesAnalzsisWrapper(IndeterminedAnalysis.class);
-	final ConstraintAnalysisWrapper<RedundancyAnalysis> constraintRedundancyAnalysis =
-		new ConstraintAnalysisWrapper<>(RedundancyAnalysis.class, new FeatureTreeCNFCreator());
+	final ConstraintAnalysisWrapper<RemoveRedundancyAnalysis> constraintRedundancyAnalysis =
+		new ConstraintAnalysisWrapper<>(RemoveRedundancyAnalysis.class, new FeatureTreeCNFCreator());
 	final ConstraintAnalysisWrapper<IndependentRedundancyAnalysis> constraintTautologyAnalysis =
 		new ConstraintAnalysisWrapper<>(IndependentRedundancyAnalysis.class, new EmptyCNFCreator());
 	final ConstraintAnalysisWrapper<IndependentContradictionAnalysis> constraintContradictionAnalysis =

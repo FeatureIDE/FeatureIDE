@@ -24,6 +24,11 @@ import java.util.Iterator;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * An iterator for combinations of {@link PresenceCondition presence conditions}.
+ *
+ * @author Sebastian Krieter
+ */
 public interface ICombinationIterator extends Iterator<PresenceCondition[]>, Iterable<PresenceCondition[]> {
 
 	long getIndex();

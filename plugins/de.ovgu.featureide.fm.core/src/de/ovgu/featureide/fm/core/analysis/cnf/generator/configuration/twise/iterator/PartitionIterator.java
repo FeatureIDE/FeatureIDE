@@ -24,6 +24,12 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Presence condition combination iterator that uses the combinatorial number system to enumerate all combinations and then alternately iterates over certain
+ * partitions of the combination space.
+ * 
+ * @author Sebastian Krieter
+ */
 public class PartitionIterator extends ACombinationIterator {
 
 	protected final int[][] dim;

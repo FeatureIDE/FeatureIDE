@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
- * Test whether a set of configurations achieves t-wise feature coverage.
+ * Calculates statistics regarding t-wise feature coverage of a set of solutions.
  *
  * @author Sebastian Krieter
  */

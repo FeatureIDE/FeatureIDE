@@ -24,6 +24,11 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Presence condition combination iterator that reverses the order of {@link DefaultIterator}.
+ *
+ * @author Sebastian Krieter
+ */
 public class InverseDefaultIterator extends ACombinationIterator {
 
 	public InverseDefaultIterator(int t, List<PresenceCondition> expressions) {

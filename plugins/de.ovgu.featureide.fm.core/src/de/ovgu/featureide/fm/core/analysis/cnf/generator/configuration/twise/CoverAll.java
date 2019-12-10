@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
+ * Covers a given {@link ClauseList expressions} within a list of {@link TWiseConfiguration solutions}.
  *
  * @author Sebastian Krieter
  */

@@ -29,6 +29,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseCon
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
+ * Covers a given {@link ClauseList expressions} within a list of {@link TWiseConfiguration solutions} if the expression only contains a single
+ * non-contradicting clause.
  *
  * @author Sebastian Krieter
  */

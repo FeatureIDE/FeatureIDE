@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Contains several intermediate results and functions for generating a t-wise sample.
  *
  * @author Sebastian Krieter
  */

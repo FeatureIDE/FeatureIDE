@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
+ * Combines multiple presence conditions into one.
  *
  * @author Sebastian Krieter
  */

@@ -33,6 +33,11 @@ import java.util.stream.Collectors;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
+/**
+ * Manages and manipulates a list of {@link PresenceCondition presence conditions}.
+ *
+ * @author Sebastian Krieter
+ */
 class PresenceConditionManager {
 
 	private final List<List<PresenceCondition>> dictonary = new ArrayList<>();

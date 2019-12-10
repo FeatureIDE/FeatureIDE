@@ -34,10 +34,11 @@ import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 
 /**
+ * Represent a solution within a covering array.
  *
  * @author Sebastian Krieter
  */
-class TWiseConfiguration extends LiteralSet {
+public class TWiseConfiguration extends LiteralSet {
 
 	private static final long serialVersionUID = 1L;
 

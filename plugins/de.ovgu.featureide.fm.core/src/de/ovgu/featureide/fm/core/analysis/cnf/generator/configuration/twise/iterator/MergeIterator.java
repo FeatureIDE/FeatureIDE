@@ -27,6 +27,11 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
 
+/**
+ * Combines multiple {@link ICombinationIterator iterators} and returns results from each iterator by turns.
+ *
+ * @author Sebastian Krieter
+ */
 public class MergeIterator implements ICombinationIterator {
 
 	protected final List<ICombinationIterator> setIterators;

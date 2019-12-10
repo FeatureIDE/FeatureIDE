@@ -28,7 +28,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
- *
+ * Represents a presence condition as an expression.
+ * 
  * @author Sebastian Krieter
  */
 public class PresenceCondition extends ClauseList {

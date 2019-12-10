@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionExcept
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Determines whether a sat instance is satisfiable and returns the found model.
+ * Attempts to count the number of possible solutions of a given {@link CNF}.
  *
  * @author Sebastian Krieter
  */

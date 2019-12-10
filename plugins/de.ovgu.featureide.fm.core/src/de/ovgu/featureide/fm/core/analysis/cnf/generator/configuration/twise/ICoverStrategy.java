@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 
 /**
+ * A strategy for covering a given {@link ClauseList expressions} within a list of {@link TWiseConfiguration solutions}.
  *
  * @author Sebastian Krieter
  */

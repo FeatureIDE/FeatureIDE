@@ -27,6 +27,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseCombiner;
 
+/**
+ * Combines multiple {@link ICombinationSupplier supplies} of {@link ClauseList} and returns results from each supplier by turns.
+ *
+ * @author Sebastian Krieter
+ */
 public class MergeIterator3 implements ICombinationSupplier<ClauseList> {
 
 	private final List<List<PresenceCondition>> expressionSets;

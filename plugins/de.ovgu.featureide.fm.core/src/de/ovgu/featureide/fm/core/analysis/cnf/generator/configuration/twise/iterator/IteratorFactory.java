@@ -24,6 +24,11 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Instantiates an implementation of {@link ICombinationIterator}.
+ *
+ * @author Sebastian Krieter
+ */
 public class IteratorFactory {
 
 	public static enum IteratorID {

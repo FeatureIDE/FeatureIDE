@@ -22,6 +22,13 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.it
 
 import java.util.function.Supplier;
 
+/**
+ * An abstract supplier for combinations of elements.
+ *
+ * @param <T> The type of the elements.
+ *
+ * @author Sebastian Krieter
+ */
 public interface ICombinationSupplier<T> extends Supplier<T> {
 
 	long size();

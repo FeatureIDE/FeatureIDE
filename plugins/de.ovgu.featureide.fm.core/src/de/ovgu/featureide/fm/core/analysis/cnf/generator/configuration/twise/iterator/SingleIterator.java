@@ -26,6 +26,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseCombiner;
 
+/**
+ * Uses a {@link RandomPartitionSupplier} to construct a combined presence condition for every combination.
+ *
+ * @author Sebastian Krieter
+ */
 public class SingleIterator implements ICombinationSupplier<ClauseList> {
 
 	private final List<PresenceCondition> expressionSet;

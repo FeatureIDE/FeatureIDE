@@ -32,28 +32,32 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds redundancies by incrementally adding constraints.<br> <b>Note:</b> This analysis might be faster than {@link RedundancyAnalysis}, which uses removal
- * of constraints. However, this analysis only checks the redundancy of each constraint at the time of adding it to the formula. Thus, it cannot detect
- * constraints that become redundant by the adding another constraint later on.
+ * Finds redundant clauses with respect to a given {@link CNF}. This analysis works by iteratively adding each clause group (see {@link AClauseAnalysis}) to the
+ * given {@link CNF}. If a clause group is redundant with respect to the current formula, it is marked as redundant and removed from the {@link CNF}. Otherwise
+ * it is kept as part of the {@link CNF} for the remaining analysis. Clauses are added in the same order a they appear in the given clauses list.<br> For an
+ * independent analysis of every clause group use {@link IndependentRedundancyAnalysis}.
  *
  * @author Sebastian Krieter
+ *
+ * @see RemoveRedundancyAnalysis
+ * @see IndependentRedundancyAnalysis
  */
-public class RedundancyAnalysis2 extends AClauseAnalysis<List<LiteralSet>> {
+public class AddRedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 
-	public RedundancyAnalysis2(CNF satInstance) {
+	public AddRedundancyAnalysis(CNF satInstance) {
 		super(satInstance);
 	}
 
-	public RedundancyAnalysis2(ISatSolver solver) {
+	public AddRedundancyAnalysis(ISatSolver solver) {
 		super(solver);
 	}
 
-	public RedundancyAnalysis2(CNF satInstance, List<LiteralSet> clauseList) {
+	public AddRedundancyAnalysis(CNF satInstance, List<LiteralSet> clauseList) {
 		super(satInstance);
 		this.clauseList = clauseList;
 	}
 
-	public RedundancyAnalysis2(ISatSolver solver, List<LiteralSet> clauseList) {
+	public AddRedundancyAnalysis(ISatSolver solver, List<LiteralSet> clauseList) {
 		super(solver);
 		this.clauseList = clauseList;
 	}

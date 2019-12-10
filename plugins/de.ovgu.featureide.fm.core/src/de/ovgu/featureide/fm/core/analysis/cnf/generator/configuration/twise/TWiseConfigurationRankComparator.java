@@ -22,6 +22,11 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.Comparator;
 
+/**
+ * Compares two solutions regarding their calculated rank and number of contained literals.
+ *
+ * @author Sebastian Krieter
+ */
 class TWiseConfigurationRankComparator implements Comparator<TWiseConfiguration> {
 
 	@Override
