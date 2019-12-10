@@ -240,17 +240,52 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getResource() == null) {
-			return;
-		}
-		if (event.getResource().getType() == IResource.PROJECT) {
-			closeEditor = true;
-		}
+		// Get editor input
 		final IEditorInput input = getEditorInput();
 		if (!(input instanceof IFileEditorInput)) {
 			return;
 		}
 		final IFile inputFile = ((IFileEditorInput) input).getFile();
+
+		// Check whether current editor input was deleted
+		if (event.getType() == IResource.FILE) {
+			IResourceDelta delta = event.getDelta();
+			if (delta == null) {
+				return;
+			}
+			while (delta.getAffectedChildren().length != 0) {
+				delta = delta.getAffectedChildren()[0];
+			}
+			if (((delta.getFlags() & IResourceDelta.REMOVED) == 0) && delta.getResource().equals(inputFile)) {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						if (getSite() == null) {
+							return;
+						}
+						if (getSite().getWorkbenchWindow() == null) {
+							return;
+						}
+						final IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
+						for (int i = 0; i < pages.length; i++) {
+							final IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				});
+			}
+		}
+
+		// Resource is only set when the project is affected. When only files are deleted the resource is null. Therefore, we start by checking the file before
+		// checking the resource.
+		if (event.getResource() == null) {
+			return;
+		}
+
+		if (event.getResource().getType() == IResource.PROJECT) {
+			closeEditor = true;
+		}
 
 		/*
 		 * Closes editor if resource is deleted
