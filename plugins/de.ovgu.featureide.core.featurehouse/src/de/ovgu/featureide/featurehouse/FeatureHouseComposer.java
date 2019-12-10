@@ -223,7 +223,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public boolean initialize(IFeatureProject project) {
+	public synchronized boolean initialize(IFeatureProject project) {
 		final boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 		createBuildStructure();
@@ -372,7 +372,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(Path config) {
+	public synchronized void performFullBuild(Path config) {
 		assert (featureProject != null) : "Invalid project given";
 
 		final Path temporaryConfigrationFile = createTemporaryConfigrationFile(config);
@@ -966,12 +966,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void postModelChanged() {
+	public synchronized void postModelChanged() {
 		checkContractComposition();
 	}
 
 	@Override
-	public void postCompile(IResourceDelta delta, final IFile file) {
+	public synchronized void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
 
 		try {
@@ -998,7 +998,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void buildFSTModel() {
+	public synchronized void buildFSTModel() {
 		if (featureProject == null) {
 			return;
 		}
@@ -1091,7 +1091,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void copyNotComposedFiles(Configuration config, IFolder destination) {
+	public synchronized void copyNotComposedFiles(Configuration config, IFolder destination) {
 		if (destination == null) {
 			super.copyNotComposedFiles(config, featureProject.getBuildFolder());
 		} else {
