@@ -149,7 +149,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	public void setName(String name) {
 		final String oldName = this.name;
 		super.setName(name);
-		fireEvent(new FeatureIDEEvent(this, EventType.FEATURE_NAME_CHANGED, oldName, name));
+		fireEvent(new FeatureIDEEvent(getFeatureModel(), EventType.FEATURE_NAME_CHANGED, oldName, name));
 	}
 
 	@Override

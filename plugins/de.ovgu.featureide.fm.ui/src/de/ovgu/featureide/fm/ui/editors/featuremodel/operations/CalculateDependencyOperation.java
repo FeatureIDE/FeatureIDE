@@ -25,10 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPE
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -37,8 +33,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
-import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
 /**
  * Option which uses feature model slicing to calculate dependencies of a sub feature model.
@@ -46,7 +40,7 @@ import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
  * @author Ananieva Sofia
  */
 // TODO Move to other package. (This is no operation anymore)
-public class CalculateDependencyOperation implements LongRunningMethod<IFeature> {
+public class CalculateDependencyOperation implements LongRunningMethod<IFeatureModel> {
 
 	public static final String LABEL = CALCULATE_DEPENDENCY;
 
@@ -97,7 +91,7 @@ public class CalculateDependencyOperation implements LongRunningMethod<IFeature>
 	 * and implicit constraints.
 	 */
 	@Override
-	public IFeature execute(IMonitor<IFeature> monitor) throws Exception {
+	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
 		final ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing
@@ -111,14 +105,7 @@ public class CalculateDependencyOperation implements LongRunningMethod<IFeature>
 		if (isCoreFeature) {
 			FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
 		}
-
-		// Instantiating a wizard page, removing the help button and opening a wizard dialog
-		final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, completeFm);
-		TrayDialog.setDialogHelpAvailable(false);
-		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		dialog.open();
-		FeatureModelManager.getInstance(completeFm).getPersistentFormula().getAnalyzer().analyzeFeatureModel(null);
-		return subtreeRoot;
+		return slicedModel;
 	}
 
 }

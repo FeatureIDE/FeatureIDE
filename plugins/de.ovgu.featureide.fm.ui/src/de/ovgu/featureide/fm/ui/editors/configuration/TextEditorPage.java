@@ -146,12 +146,6 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	@Override
-	protected void editorSaved() {
-		super.editorSaved();
-		checkSource();
-	}
-
-	@Override
 	public boolean allowPageChange(int newPageIndex) {
 		final ProblemList problems = checkSource();
 		return !(problems.containsError() || (isDirty() && problems.containsWarning()));

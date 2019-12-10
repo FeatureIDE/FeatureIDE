@@ -10,7 +10,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public interface IAttributeComputation {
 
-	public Object[] getResult();
+	public Object getResult();
 
 	public String getResultString();
 

@@ -94,13 +94,13 @@ public class FeatureModelProperties {
 
 	public boolean hasFalseOptionalFeatures() {
 		if (hasFalseOptionalFeatures == null) {
+			hasFalseOptionalFeatures = Boolean.FALSE;
 			for (final FeatureProperties f : featureProperties) {
 				if (f.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 					hasFalseOptionalFeatures = Boolean.TRUE;
 					break;
 				}
 			}
-			hasFalseOptionalFeatures = Boolean.FALSE;
 		}
 		return hasFalseOptionalFeatures;
 	}
@@ -109,13 +109,13 @@ public class FeatureModelProperties {
 
 	public boolean hasDeadFeatures() {
 		if (hasDeadFeatures == null) {
+			hasDeadFeatures = Boolean.FALSE;
 			for (final FeatureProperties f : featureProperties) {
 				if (f.hasStatus(FeatureStatus.DEAD)) {
 					hasDeadFeatures = Boolean.TRUE;
 					break;
 				}
 			}
-			hasDeadFeatures = Boolean.FALSE;
 		}
 		return hasDeadFeatures;
 	}
@@ -124,13 +124,13 @@ public class FeatureModelProperties {
 
 	public boolean hasIndeterminateHiddenFeatures() {
 		if (hasIndeterminateHiddenFeatures == null) {
+			hasIndeterminateHiddenFeatures = Boolean.FALSE;
 			for (final FeatureProperties f : featureProperties) {
 				if (f.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 					hasIndeterminateHiddenFeatures = Boolean.TRUE;
 					break;
 				}
 			}
-			hasIndeterminateHiddenFeatures = Boolean.FALSE;
 		}
 		return hasIndeterminateHiddenFeatures;
 	}
@@ -139,13 +139,13 @@ public class FeatureModelProperties {
 
 	public boolean hasUnsatisfiableConstraints() {
 		if (hasUnsatisfiableConstraints == null) {
+			hasUnsatisfiableConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (c.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
 					hasUnsatisfiableConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasUnsatisfiableConstraints = Boolean.FALSE;
 		}
 		return hasUnsatisfiableConstraints;
 	}
@@ -154,13 +154,13 @@ public class FeatureModelProperties {
 
 	public boolean hasTautologyConstraints() {
 		if (hasTautologyConstraints == null) {
+			hasTautologyConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (c.hasStatus(ConstraintStatus.TAUTOLOGY)) {
 					hasTautologyConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasTautologyConstraints = Boolean.FALSE;
 		}
 		return hasTautologyConstraints;
 	}
@@ -169,13 +169,13 @@ public class FeatureModelProperties {
 
 	public boolean hasDeadConstraints() {
 		if (hasDeadConstraints == null) {
+			hasDeadConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (!c.getDeadFeatures().isEmpty()) {
 					hasDeadConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasDeadConstraints = Boolean.FALSE;
 		}
 		return hasDeadConstraints;
 	}
@@ -184,13 +184,13 @@ public class FeatureModelProperties {
 
 	public boolean hasFalseOptionalConstraints() {
 		if (hasFalseOptionalConstraints == null) {
+			hasFalseOptionalConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (!c.getFalseOptionalFeatures().isEmpty()) {
 					hasFalseOptionalConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasFalseOptionalConstraints = Boolean.FALSE;
 		}
 		return hasFalseOptionalConstraints;
 	}
@@ -199,13 +199,13 @@ public class FeatureModelProperties {
 
 	public boolean hasVoidModelConstraints() {
 		if (hasVoidModelConstraints == null) {
+			hasVoidModelConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (c.hasStatus(ConstraintStatus.VOID) || c.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
 					hasVoidModelConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasVoidModelConstraints = Boolean.FALSE;
 		}
 		return hasVoidModelConstraints;
 	}
@@ -214,13 +214,13 @@ public class FeatureModelProperties {
 
 	public boolean hasRedundantConstraints() {
 		if (hasRedundantConstraints == null) {
+			hasRedundantConstraints = Boolean.FALSE;
 			for (final ConstraintProperties c : constraintProperties) {
 				if (c.hasStatus(ConstraintStatus.TAUTOLOGY) || c.hasStatus(ConstraintStatus.REDUNDANT)) {
 					hasRedundantConstraints = Boolean.TRUE;
 					break;
 				}
 			}
-			hasRedundantConstraints = Boolean.FALSE;
 		}
 		return hasRedundantConstraints;
 	}

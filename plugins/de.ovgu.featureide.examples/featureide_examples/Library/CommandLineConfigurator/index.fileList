@@ -1,7 +1,8 @@
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
-lib/de.ovgu.featureide.lib.fm-v3.5.0.jar
+lib/antlr-3.4.jar
+lib/de.ovgu.featureide.lib.fm.core.jar
 lib/org.sat4j.core.jar
 model.png
 model.xml

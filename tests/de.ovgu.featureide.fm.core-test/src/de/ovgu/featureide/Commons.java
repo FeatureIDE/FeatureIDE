@@ -24,12 +24,16 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * A class containing numerous methods that are needed for many tests, especially those assessing files.
@@ -44,8 +48,7 @@ public class Commons {
 	}
 
 	public static File getRemoteOrLocalFolder(String path) {
-		final File folder = new File("src/" + path);
-		return folder;
+		return new File("src/" + path);
 	}
 
 	private static final String BENCHMARK_FEATURE_MODEL_PATH = "benchmarkFeatureModels/";
@@ -150,6 +153,14 @@ public class Commons {
 		public boolean accept(final File pathname) {
 			return pathname.getName().endsWith("." + fileExtension);
 		}
+	}
+
+	public static ProblemList loadFeatureModel(Path modelFile, IFeatureModel model, IPersistentFormat<IFeatureModel> format) {
+		return SimpleFileHandler.load(modelFile, model, format);
+	};
+
+	public static ProblemList saveFeatureModel(Path modelFile, IFeatureModel model, IPersistentFormat<IFeatureModel> format) {
+		return SimpleFileHandler.save(modelFile, model, format);
 	};
 
 }

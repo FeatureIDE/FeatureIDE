@@ -1,27 +1,9 @@
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- *
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
 package de.ovgu.featureide.fm.attributes.computations.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
@@ -30,13 +12,14 @@ import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * Estimates maximum of a given numerical attribute
  * 
  * @author Chico Sundermann
  */
-public class EstimatedMaximumComputation {
+public class EstimatedMaximumComputation implements IOutlineEntry {
 
 	private static final String LABEL = "Maximal sum of attribute value (est.): ";
 
@@ -50,7 +33,40 @@ public class EstimatedMaximumComputation {
 		this.attribute = attribute;
 	}
 
-	private double getSubtreeMaximum(IFeature root) {
+	@Override
+	public String getLabel() {
+		if (attribute instanceof LongFeatureAttribute) {
+			return LABEL + String.valueOf(((Double) getSelectionSum()).longValue());
+		}
+		return LABEL + getSelectionSum().toString();
+	}
+
+	@Override
+	public Image getLabelImage() {
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return false;
+	}
+
+	@Override
+	public List<IOutlineEntry> getChildren() {
+		return null;
+	}
+
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
+	}
+
+	@Override
+	public boolean supportsType(Object element) {
+		return attribute instanceof LongFeatureAttribute || attribute instanceof DoubleFeatureAttribute;
+	}
+
+	private double getSubtreeValue(IFeature root) {
 		double value = 0;
 		ExtendedFeature ext = (ExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
@@ -76,11 +92,11 @@ public class EstimatedMaximumComputation {
 					if (isUnselected(struc.getFeature())) {
 						unselectedCount++;
 					} else {
-						double tempValue = getSubtreeMaximum(struc.getFeature());
+						double tempValue = getSubtreeValue(struc.getFeature());
 						if (tempValue >= 0 || isSelected(struc.getFeature())) {
 							value += tempValue;
 						} else {
-							negativeValues.add(getSubtreeMaximum(struc.getFeature()));
+							negativeValues.add(getSubtreeValue(struc.getFeature()));
 						}
 					}
 				}
@@ -96,7 +112,7 @@ public class EstimatedMaximumComputation {
 			} else if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struct : root.getStructure().getChildren()) {
 					if (!isUnselected(struct.getFeature())) {
-						double tempValue = getSubtreeMaximum(struct.getFeature());
+						double tempValue = getSubtreeValue(struct.getFeature());
 						if (struct.isMandatory() || tempValue >= 0 || isSelected(struct.getFeature())) {
 							value += tempValue;
 						}
@@ -107,9 +123,9 @@ public class EstimatedMaximumComputation {
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
 					if (!isUnselected(struc.getFeature())) {
 						if (isSelected(struc.getFeature())) {
-							return value + getSubtreeMaximum(struc.getFeature());
+							return value + getSubtreeValue(struc.getFeature());
 						}
-						values.add(getSubtreeMaximum(struc.getFeature()));
+						values.add(getSubtreeValue(struc.getFeature()));
 					}
 				}
 				return value + getMaxValue(values);
@@ -118,10 +134,10 @@ public class EstimatedMaximumComputation {
 		return value;
 	}
 
-	public Object getEstimatedMaximum() {
+	public Object getSelectionSum() {
 		selectedFeatures = config.getSelectedFeatures();
 		unselectedFeatures = config.getUnSelectedFeatures();
-		return getSubtreeMaximum(config.getFeatureModel().getStructure().getRoot().getFeature());
+		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
 	private boolean isSelected(IFeature feature) {
@@ -146,6 +162,12 @@ public class EstimatedMaximumComputation {
 			}
 		}
 		return max;
+	}
+
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

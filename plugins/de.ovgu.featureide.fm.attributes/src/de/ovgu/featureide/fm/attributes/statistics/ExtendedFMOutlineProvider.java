@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
@@ -37,48 +38,43 @@ public class ExtendedFMOutlineProvider extends OutlineProvider {
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void initContextMenuActions(IMenuManager manager) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected List<IOutlineFilter> getFilters() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
-		// TODO Auto-generated method stub
+	public boolean isSupported(IEditorPart part, IFile file) {
 		try {
-			return ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null;
-		} catch (ClassCastException e) {
-			return false;
-		}
+			if (ConfigurationManager.getInstance(Paths.get(file.getLocationURI())) != null) {
+				Configuration conf = ConfigurationManager.getInstance(Paths.get(file.getLocationURI())).getObject();
+				return conf instanceof ExtendedConfiguration;
+			}
+		} catch (ClassCastException e) {}
+		return false;
 	}
 
 	@Override
@@ -90,7 +86,7 @@ public class ExtendedFMOutlineProvider extends OutlineProvider {
 		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor instanceof ConfigurationEditor) {
 			final ConfigurationEditor confEditor = (ConfigurationEditor) activeEditor;
-			config = confEditor.getConfiguration();
+			config = confEditor.getConfigurationManager().getObject();
 
 			getTreeProvider().inputChanged(viewer, null, config);
 		}

@@ -275,7 +275,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public boolean isAncestorOf(IFeatureStructure parent) {
+	public boolean isAncestor(IFeatureStructure parent) {
 		IFeatureStructure currParent = getParent();
 		while (currParent != null) {
 			if (parent == currParent) {
