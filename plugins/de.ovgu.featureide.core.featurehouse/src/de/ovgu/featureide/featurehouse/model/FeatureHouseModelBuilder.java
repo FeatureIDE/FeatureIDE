@@ -99,7 +99,6 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 * @param nodes The fstNodes
 	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
 	 */
-	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
 		if (nodes == null) {
 			FeatureHouseCorePlugin.getDefault().logError("FST could not be build!", null);
@@ -107,29 +106,43 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		if (!completeModel) {
 			model.reset();
 		}
-		for (final FSTNode node : (ArrayList<FSTNode>) nodes.clone()) {
-			if (NODE_TYPE_FEATURE.equals(node.getType())) {
+		final ArrayList<FSTNode> nodesCopy = new ArrayList<>(nodes);
+		for (final FSTNode node : nodesCopy) {
+			if (node != null) {
+			switch (node.getType()) {
+			case NODE_TYPE_FEATURE:
 				caseAddFeature(node);
-			} else if (NODE_TYPE_CLASS.equals(node.getType())) {
+				break;
+			case NODE_TYPE_CLASS:
 				caseAddClass(node);
-			} else if (NODE_COMPILATIONUNIT.equals(node.getType())) {
+				break;
+			case NODE_COMPILATIONUNIT:
 				caseCompileUnit(node);
-			} else if (JAVA_NODE_CLASS_DECLARATION.equals(node.getType())) {
+				break;
+			case JAVA_NODE_CLASS_DECLARATION:
 				caseClassDeclaration(node);
-			} else if (C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL.equals(node.getType())) {
+				break;
+			case C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL:
 				caseClassDeclaration(node);
-			} else if (CSHARP_NODE_CLASS_MEMBER_DECLARATION.equals(node.getType())) {
+				break;
+			case CSHARP_NODE_CLASS_MEMBER_DECLARATION:
 				caseClassDeclaration(node);
-			} else if (HASKELL_NODE_DEFINITIONS.equals(node.getType())) {
+				break;
+			case HASKELL_NODE_DEFINITIONS:
 				caseClassDeclaration(node);
-			} else if (HASKELL_NODE_DATA_DECLARATION.equals(node.getType())) {
+				break;
+			case HASKELL_NODE_DATA_DECLARATION:
 				caseClassDeclaration(node);
-			} else if (ASMETAL_MODULE_DECLARATION.equals(node.getType())) {
+				break;
+			case ASMETAL_MODULE_DECLARATION:
 				caseClassDeclaration(node);
+				break;
+			default:
+				break;
 			}
-
-			addArbitraryFiles();
+			}
 		}
+		addArbitraryFiles();
 	}
 
 	private void addArbitraryFiles() {
@@ -159,6 +172,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private void caseCompileUnit(FSTNode node) {
+		if (!canCompose()) {
+			return;
+		}
 		node.accept(new FSTVisitor() {
 
 			@Override
