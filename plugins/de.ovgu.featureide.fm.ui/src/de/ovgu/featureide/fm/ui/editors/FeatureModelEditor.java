@@ -256,7 +256,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			while (delta.getAffectedChildren().length != 0) {
 				delta = delta.getAffectedChildren()[0];
 			}
-			if (((delta.getFlags() & IResourceDelta.REMOVED) == 0) && delta.getResource().equals(inputFile)) {
+			if ((delta.getKind() == IResourceDelta.REMOVED) && delta.getResource().equals(inputFile)) {
 				Display.getDefault().asyncExec(new Runnable() {
 
 					@Override
