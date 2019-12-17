@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
-import java.security.SecureRandom;
+import java.util.Random;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
@@ -31,11 +31,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.Pre
  * @author Sebastian Krieter
  */
 public class RandomPartitionSupplier implements ICombinationSupplier<int[]> {
-
-	private static final byte[] seed = new byte[32];
-	{
-		new SecureRandom(new byte[0]).nextBytes(seed);
-	}
 
 	protected final PresenceCondition[] nextCombination;
 
@@ -50,6 +45,10 @@ public class RandomPartitionSupplier implements ICombinationSupplier<int[]> {
 	private final int radix;
 
 	public RandomPartitionSupplier(int t, int n) {
+		this(t, n, new Random(42));
+	}
+
+	public RandomPartitionSupplier(int t, int n, Random random) {
 		this.t = t;
 		this.n = n;
 		binomialCalculator = new BinomialCalculator(t, n);
@@ -68,11 +67,10 @@ public class RandomPartitionSupplier implements ICombinationSupplier<int[]> {
 			}
 		}
 
-		final SecureRandom rand = new SecureRandom(seed);
 		for (int i = 0; i < dim.length; i++) {
 			final int[] dimArray = dim[i];
 			for (int j = dimArray.length - 1; j >= 0; j--) {
-				final int index = rand.nextInt(j + 1);
+				final int index = random.nextInt(j + 1);
 				final int a = dimArray[index];
 				dimArray[index] = dimArray[j];
 				dimArray[j] = a;

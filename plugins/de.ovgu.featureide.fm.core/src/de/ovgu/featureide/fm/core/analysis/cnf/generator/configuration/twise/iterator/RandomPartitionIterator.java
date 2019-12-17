@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
-import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
@@ -33,19 +33,17 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.Pre
  */
 public class RandomPartitionIterator extends PartitionIterator {
 
-	private static final byte[] seed = new byte[32];
-	{
-		new SecureRandom(new byte[0]).nextBytes(seed);
+	public RandomPartitionIterator(int t, List<PresenceCondition> expressions) {
+		this(t, expressions, new Random(42));
 	}
 
-	public RandomPartitionIterator(int t, List<PresenceCondition> expressions) {
+	public RandomPartitionIterator(int t, List<PresenceCondition> expressions, Random random) {
 		super(t, expressions, 4);
 
-		final SecureRandom rand = new SecureRandom(seed);
 		for (int i = 0; i < dim.length; i++) {
 			final int[] dimArray = dim[i];
 			for (int j = dimArray.length - 1; j >= 0; j--) {
-				final int index = rand.nextInt(j + 1);
+				final int index = random.nextInt(j + 1);
 				final int a = dimArray[index];
 				dimArray[index] = dimArray[j];
 				dimArray[j] = a;
