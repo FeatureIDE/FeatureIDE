@@ -39,7 +39,7 @@ public abstract class Reason<S> implements Cloneable {
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason the subject of this reason
+	 * @param subject the subject of this reason
 	 * @param explanation the containing explanation
 	 */
 	protected Reason(S subject, Explanation<?> explanation) {

@@ -63,7 +63,7 @@ public class TWiseConfigurationTester {
 
 	/**
 	 * Creates statistic values about covered combinations.<br>
-	 * To get a percentage value of covered combinations use:<br
+	 * To get a percentage value of covered combinations use:<br>
 	 * <pre>{@code
 	 * 	TWiseConfigurationStatistic coverage = getCoverage();
 	 * 	double covered = (double) coverage.getNumberOfCoveredConditions() / coverage.getNumberOfValidConditions();
@@ -71,12 +71,12 @@ public class TWiseConfigurationTester {
 	 *
 	 * @return a statistic object containing multiple values:<br>
 	 *         <ul>
-	 *         <li>number of valid combinations
-	 *         <li>number of invalid combinations
-	 *         <li>number of covered combinations
-	 *         <li>number of uncovered combinations
-	 *         <li>value of each configuration
-	 *         <ul/>
+	 *              <li>number of valid combinations
+	 *              <li>number of invalid combinations
+	 *              <li>number of covered combinations
+	 *              <li>number of uncovered combinations
+	 *              <li>value of each configuration
+	 *         </ul>
 	 */
 	public TWiseConfigurationStatistic getCoverage() {
 		final TWiseConfigurationStatistic statistic =

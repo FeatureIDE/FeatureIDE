@@ -81,7 +81,7 @@ public interface IConfigurationPropagator {
 	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
 	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}). Features that are undefined are considered deselected.
 	 *
-	 * @param featureList If not {@code null} only the features within the list will be marked.
+	 * param featureList If not {@code null} only the features within the list will be marked.
 	 * @return A list of unsatisfied clauses.
 	 */
 	LongRunningMethod<Collection<SelectableFeature>> findOpenClauses();

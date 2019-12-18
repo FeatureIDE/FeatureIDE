@@ -39,7 +39,7 @@ public final class FMFactoryManager extends FactoryManager<IFeatureModel> {
 
 	/**
 	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br> <br> <b>Important
-	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
+	 * Note:</b> If possible, use {@link #getFactory(Path, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
 	 * factory is used for the underlying feature model file.
 	 *
 	 * @return Returns the ID of the default feature model factory.
