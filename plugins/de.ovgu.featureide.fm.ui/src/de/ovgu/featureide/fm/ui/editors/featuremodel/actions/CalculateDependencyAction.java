@@ -26,10 +26,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -46,6 +49,8 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
 /**
  * Action to calculate implicit dependencies of a sub feature model after selecting a feature and choosing to "calculate implicit dependencies". This feature
@@ -71,6 +76,7 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 	 * The listener which remembers the selection and checks whether it is valid.
 	 */
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -104,11 +110,25 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 		}
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final CalculateDependencyOperation method = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
-		final IRunner<IFeature> runner = LongRunningWrapper.getRunner(method);
-		runner.addJobFinishedListener(new JobFinishListener<IFeature>() {
+		final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method);
+		final Display current = Display.getCurrent();
+		runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
+
 			@Override
-			public void jobFinished(IJob<IFeature> finishedJob) {
-				featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.DEPENDENCY_CALCULATED, null, finishedJob.getResults()));
+			public void jobFinished(IJob<IFeatureModel> finishedJob) {
+				final IFeatureModel slicedModel = finishedJob.getResults();
+				// Instantiating a wizard page, removing the help button and opening a wizard dialog
+				current.syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, featureModel);
+						TrayDialog.setDialogHelpAvailable(false);
+						final WizardDialog dialog = new WizardDialog(current.getActiveShell(), wizard);
+						dialog.open();
+					}
+				});
+				featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.DEPENDENCY_CALCULATED, null, slicedModel));
 			}
 		});
 		LongRunningWrapper.startJob(calculateDependencyToken, runner);

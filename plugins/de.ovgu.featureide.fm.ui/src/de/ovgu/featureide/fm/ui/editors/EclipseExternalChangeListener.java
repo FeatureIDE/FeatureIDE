@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
@@ -35,7 +36,8 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
-import de.ovgu.featureide.fm.core.io.manager.EclipseFileManagerVisitor;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileDeleteVisitor;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileChangeVisitor;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -83,9 +85,20 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if ((event.getDelta() != null) && (event.getType() == IResourceChangeEvent.POST_CHANGE)) {
+		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+			if (event.getDelta() != null) {
+				try {
+					event.getDelta().accept(new EclipseFileChangeVisitor());
+				} catch (final CoreException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
+		} else if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
 			try {
-				event.getDelta().accept(new EclipseFileManagerVisitor());
+				final IResource resource = event.getResource();
+				if (resource != null) {
+					resource.accept(new EclipseFileDeleteVisitor());
+				}
 			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}

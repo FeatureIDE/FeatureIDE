@@ -304,12 +304,12 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 					if (((FeatureModelElementTrace) r.getSubject()).getElement() instanceof Constraint) {
 						final Constraint c = (Constraint) ((FeatureModelElementTrace) r.getSubject()).getElement();
 						for (final IGraphicalConstraint constraint : constraints) {
-							if (constraint.getObject() == c) {
+							if (constraint.getObject().equals(c)) {
 								boolean additem = true;
 								final TreeItem[] treeitems = viewer.getViewer().getTree().getItems();
 								for (int i = 0; i < treeitems.length; i++) {
 									// check for duplicate constraints before adding
-									if (treeitems[i].getData() == c) {
+									if (treeitems[i].getData().equals(c)) {
 										additem = false;
 										break;
 									}

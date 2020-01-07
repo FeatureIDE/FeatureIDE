@@ -1,27 +1,9 @@
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- *
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
 package de.ovgu.featureide.fm.attributes.computations.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
@@ -30,14 +12,16 @@ import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * Estimates the minimum of a numerical attribute given a partial configuration Only supposed to be used on numerical attributes
  * 
  * @author Chico Sundermann
  */
-public class EstimatedMinimumComputation {
+public class EstimatedMinimumComputation implements IOutlineEntry {
 
+	private static final String LABEL = "Minimal sum of attribute value (est.): ";
 	Configuration config;
 	IFeatureAttribute attribute;
 	List<IFeature> selectedFeatures;
@@ -53,13 +37,46 @@ public class EstimatedMinimumComputation {
 	 * 
 	 * @return Minimum
 	 */
-	public Object getEstimatedMinimum() {
+	public Object getSelectionSum() {
 		selectedFeatures = config.getSelectedFeatures();
 		unselectedFeatures = config.getUnSelectedFeatures();
-		return getSubtreeMinimum(config.getFeatureModel().getStructure().getRoot().getFeature());
+		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
-	private double getSubtreeMinimum(IFeature root) {
+	@Override
+	public boolean supportsType(Object element) {
+		return attribute instanceof LongFeatureAttribute || attribute instanceof DoubleFeatureAttribute;
+	}
+
+	@Override
+	public String getLabel() {
+		if (attribute instanceof LongFeatureAttribute) {
+			return LABEL + String.valueOf(((Double) getSelectionSum()).longValue());
+		}
+		return LABEL + getSelectionSum().toString();
+	}
+
+	@Override
+	public Image getLabelImage() {
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return false;
+	}
+
+	@Override
+	public List<IOutlineEntry> getChildren() {
+		return null;
+	}
+
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
+	}
+
+	private double getSubtreeValue(IFeature root) {
 		double value = 0;
 		ExtendedFeature ext = (ExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
@@ -81,9 +98,9 @@ public class EstimatedMinimumComputation {
 		} else {
 			if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					double tempValue = getSubtreeMinimum(struc.getFeature());
+					double tempValue = getSubtreeValue(struc.getFeature());
 					if (struc.isMandatory() || isSelected(struc.getFeature()) || (tempValue < 0 && !isUnselected(struc.getFeature()))) {
-						value += getSubtreeMinimum(struc.getFeature());
+						value += getSubtreeValue(struc.getFeature());
 					}
 				}
 
@@ -91,10 +108,10 @@ public class EstimatedMinimumComputation {
 				List<Double> values = new ArrayList<>();
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
 					if (isSelected(struc.getFeature())) {
-						return value + getSubtreeMinimum(struc.getFeature());
+						return value + getSubtreeValue(struc.getFeature());
 					}
 					if (!isUnselected(struc.getFeature())) {
-						values.add(getSubtreeMinimum(struc.getFeature()));
+						values.add(getSubtreeValue(struc.getFeature()));
 					}
 				}
 				return value + getMinValue(values);
@@ -105,7 +122,7 @@ public class EstimatedMinimumComputation {
 					if (isUnselected(struc.getFeature())) {
 						unselectedCount++;
 					} else {
-						double tempValue = getSubtreeMinimum(struc.getFeature());
+						double tempValue = getSubtreeValue(struc.getFeature());
 						if (isSelected(struc.getFeature()) || tempValue < 0) {
 							value += tempValue;
 						} else {
@@ -137,6 +154,12 @@ public class EstimatedMinimumComputation {
 			}
 		}
 		return min;
+	}
+
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
+
 	}
 
 }
