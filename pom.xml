@@ -79,6 +79,7 @@
     </profiles>
 
 	<build>
+        <!--mvn clean javadoc:javadoc -->
 		<plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
