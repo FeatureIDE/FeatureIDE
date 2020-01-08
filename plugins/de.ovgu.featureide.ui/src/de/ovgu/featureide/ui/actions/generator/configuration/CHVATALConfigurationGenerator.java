@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -41,7 +40,7 @@ public class CHVATALConfigurationGenerator extends ACNFConfigurationGenerator {
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected SPLCAToolConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		return new SPLCAToolConfigurationGenerator(cnf, "Chvatal", t, numberOfConfigurations);
 	}
 

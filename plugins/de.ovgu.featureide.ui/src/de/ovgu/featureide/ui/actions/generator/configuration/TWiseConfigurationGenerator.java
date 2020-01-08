@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -47,12 +46,14 @@ public class TWiseConfigurationGenerator extends ACNFConfigurationGenerator {
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator getGenerator(CNF cnf,
+			int numberOfConfigurations) {
 		final Iterable<String> concreteFeatureNames = FeatureUtils.getConcreteFeatureNames(snapshot.getFeatureModel());
 		final LiteralSet literals = cnf.getVariables().convertToLiterals(Functional.toList(concreteFeatureNames), true, true);
 		final List<List<ClauseList>> expressions =
 			de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator.convertLiterals(literals);
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator(cnf, expressions, t, numberOfConfigurations);
+		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator(cnf, expressions, t,
+				numberOfConfigurations);
 	}
 
 }
