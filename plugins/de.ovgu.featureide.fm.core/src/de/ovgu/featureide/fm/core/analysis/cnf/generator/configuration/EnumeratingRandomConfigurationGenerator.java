@@ -47,12 +47,12 @@ public class EnumeratingRandomConfigurationGenerator extends ARandomConfiguratio
 		final AllConfigurationGenerator gen = new AllConfigurationGenerator(solver);
 		final List<LiteralSet> allConfigurations = new ArrayList<>(LongRunningWrapper.runMethod(gen));
 		if (!allowDuplicates) {
-			Collections.shuffle(allConfigurations, random);
+			Collections.shuffle(allConfigurations, getRandom());
 		}
 
 		for (int i = 0; i < maxSampleSize; i++) {
 			if (allowDuplicates) {
-				addResult(allConfigurations.get(random.nextInt(allConfigurations.size())));
+				addResult(allConfigurations.get(getRandom().nextInt(allConfigurations.size())));
 			} else {
 				if (i >= allConfigurations.size()) {
 					break;

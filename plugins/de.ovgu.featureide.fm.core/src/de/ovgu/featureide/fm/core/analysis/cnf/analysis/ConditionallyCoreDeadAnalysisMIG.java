@@ -173,7 +173,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 				case TRUE:
 					solver.assignmentPop();
 					updateModel(unkownValues, solver.getSolution());
-					solver.shuffleOrder(random);
+					solver.shuffleOrder(getRandom());
 					break;
 				}
 			}

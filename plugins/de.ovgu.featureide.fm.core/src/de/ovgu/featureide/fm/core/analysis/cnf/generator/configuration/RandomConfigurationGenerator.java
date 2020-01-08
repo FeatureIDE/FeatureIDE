@@ -46,7 +46,7 @@ public class RandomConfigurationGenerator extends ARandomConfigurationGenerator 
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
 		for (int i = 0; i < maxSampleSize; i++) {
-			solver.shuffleOrder(random);
+			solver.shuffleOrder(getRandom());
 			final int[] solution = solver.findSolution();
 			if (solution == null) {
 				break;

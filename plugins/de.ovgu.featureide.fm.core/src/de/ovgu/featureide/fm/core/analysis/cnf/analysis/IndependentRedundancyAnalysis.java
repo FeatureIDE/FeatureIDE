@@ -107,7 +107,7 @@ public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralS
 						break;
 					case TRUE:
 						solutionList.add(new LiteralSet(solver.getSolution(), Order.INDEX, false));
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						break;
 					default:
 						throw new AssertionError(hasSolution);

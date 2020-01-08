@@ -152,11 +152,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, t, null);
 		} else {
 			util = new TWiseConfigurationUtil(cnf, t, solver);
-			util.computeMIG();
 		}
-
-		util.setRandom(random);
 		util.setMaxSampleSize(maxSampleSize);
+
 		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		// TODO Variation Point: Building Combinations
@@ -168,6 +166,13 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	@Override
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
+		util.setRandom(getRandom());
+
+		util.computeRandomSample();
+		if (!util.getCnf().getClauses().isEmpty()) {
+			util.computeMIG();
+		}
+
 		phaseCount = 0;
 
 		for (int i = 0; i < 4; i++) {

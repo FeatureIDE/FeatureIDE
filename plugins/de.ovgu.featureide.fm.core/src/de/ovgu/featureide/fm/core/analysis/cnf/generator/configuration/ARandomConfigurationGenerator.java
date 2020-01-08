@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.Random;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 
 /**
@@ -33,6 +35,7 @@ public abstract class ARandomConfigurationGenerator extends AConfigurationGenera
 
 	public ARandomConfigurationGenerator(CNF cnf, int maxNumber) {
 		super(cnf, maxNumber);
+		setRandom(new Random());
 	}
 
 	public boolean isAllowDuplicates() {
