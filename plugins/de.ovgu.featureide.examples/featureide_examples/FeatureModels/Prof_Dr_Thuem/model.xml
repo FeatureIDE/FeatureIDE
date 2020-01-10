@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+    <struct>
+        <and abstract="true" mandatory="true" name="Prof_Dr_Thuem">
+         <alt mandatory="true" name="Arbeitsplatz">
+                <feature name="Home Urlaub"/>
+                <feature name="Dienstreise"/>
+                <and name="ISF">
+                    <and name="Kickern">
+                        <and mandatory="true" name="Schulter">
+                            <feature name="Tischanheben"/>
+                        </and>
+                        <feature name="Toreschießen"/>
+                    </and>
+                    <and name="Weihnachtsfeier">
+                        <feature mandatory="true" name="B52"/>
+                        <feature name="Der Berg ruft"/>
+                    </and>
+                </and>
+            </alt>
+            <and mandatory="true" name="Getränke">
+                <feature mandatory="true" name="Wasser"/>
+                <and name="Tee">
+                    <feature mandatory="true" name="Maßkrug"/>
+                </and>
+            </and>
+            <and name="Anreise">
+                <alt name="Zugfahren">
+                    <feature name="Warten am Bahnhof 80%"/>
+                    <feature name="Pünktliche Züge 20%"/>
+                </alt>
+                <feature mandatory="true" name="Klapprad"/>
+            </and>
+            <and name="Kalender bearbeiten">
+                <feature mandatory="true" name="Einträge löschen"/>
+                <feature name="Home Urlaub eintragen"/>
+            </and>
+        </and>
+    </struct>
+    <constraints/>
+    <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+    <comments/>
+    <featureOrder userDefined="false"/>
+</featureModel>
