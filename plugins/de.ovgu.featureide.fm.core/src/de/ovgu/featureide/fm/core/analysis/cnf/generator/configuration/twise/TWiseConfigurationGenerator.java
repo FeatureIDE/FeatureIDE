@@ -190,9 +190,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private void trimConfigurations() {
 		if (curResult != null) {
-			final TWiseConfigurationStatistic statistic =
-				new TWiseConfigurationStatistic(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
-			statistic.fastCalc();
+			final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
+			statistic.setFastCalc(true);
+			statistic.calculate(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
 
 			final double[] normConfigValues = statistic.getConfigValues2();
 			double mean = 0;

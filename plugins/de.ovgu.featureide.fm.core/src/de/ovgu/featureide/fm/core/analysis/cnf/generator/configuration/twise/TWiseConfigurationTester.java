@@ -57,10 +57,6 @@ public class TWiseConfigurationTester {
 		presenceConditionManager = new PresenceConditionManager(util, nodeArray);
 	}
 
-	public boolean test() {
-		return (hasInvalidSolutions() == null) && (hasUncoveredConditions() == null);
-	}
-
 	/**
 	 * Creates statistic values about covered combinations.<br> To get a percentage value of covered combinations use:<br <pre>{@code
 	 * 	TWiseConfigurationStatistic coverage = getCoverage();
@@ -71,13 +67,17 @@ public class TWiseConfigurationTester {
 	 *         combinations <li>number of uncovered combinations <li>value of each configuration <ul/>
 	 */
 	public TWiseConfigurationStatistic getCoverage() {
-		final TWiseConfigurationStatistic statistic =
-			new TWiseConfigurationStatistic(util, configurations, presenceConditionManager.getGroupedPresenceConditions());
-		statistic.calculate(true);
+		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
+		statistic.calculate(util, configurations, presenceConditionManager.getGroupedPresenceConditions());
 		return statistic;
 	}
 
-	public ClauseList hasUncoveredConditions() {
+	public boolean hasUncoveredConditions() {
+		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
+		return !uncoveredConditions.isEmpty();
+	}
+
+	public ClauseList getFirstUncoveredCondition() {
 		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
 		return uncoveredConditions.isEmpty() ? null : uncoveredConditions.get(0);
 	}
@@ -86,7 +86,7 @@ public class TWiseConfigurationTester {
 		return getUncoveredConditions(false);
 	}
 
-	public List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
+	private List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
 		final ArrayList<ClauseList> uncoveredConditions = new ArrayList<>();
 		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
 		ClauseList combinedCondition = new ClauseList();
@@ -113,7 +113,12 @@ public class TWiseConfigurationTester {
 		return uncoveredConditions;
 	}
 
-	public LiteralSet hasInvalidSolutions() {
+	public boolean hasInvalidSolutions() {
+		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
+		return !invalidSolutions.isEmpty();
+	}
+
+	public LiteralSet getFirstInvalidSolution() {
 		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
 		return invalidSolutions.isEmpty() ? null : invalidSolutions.get(0);
 	}
@@ -122,7 +127,7 @@ public class TWiseConfigurationTester {
 		return getInvalidSolutions(false);
 	}
 
-	public List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
+	private List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
 		final ArrayList<LiteralSet> invalidSolutions = new ArrayList<>();
 		configLoop: for (final LiteralSet solution : configurations) {
 			for (final LiteralSet clause : cnf.getClauses()) {

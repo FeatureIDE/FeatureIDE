@@ -39,24 +39,55 @@ public class TWiseConfigurationStatistic {
 	private long numberOfCoveredConditions;
 	private long numberOfUncoveredConditions;
 
-	private final double[] configValues;
-	private final double[] configValues2;
+	/**
+	 * For each configuration: Sum of every conditions covered divided by number of configurations that cover this condition.
+	 */
+	private double[] configValues;
 
-	private final TWiseConfigurationUtil util;
-	private final List<? extends LiteralSet> configurations;
-	private final List<List<PresenceCondition>> groupedPresenceConditions;
+	/**
+	 * Number of conditions only covered by one configurations.
+	 */
+	private double[] configValues2;
 
-	public TWiseConfigurationStatistic(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations,
-			List<List<PresenceCondition>> groupedPresenceConditions) {
-		this.util = util;
-		this.configurations = configurations;
-		this.groupedPresenceConditions = groupedPresenceConditions;
+	private boolean countValid = true;
+	private boolean fastCalc = false;
 
-		configValues = new double[configurations.size()];
-		configValues2 = new double[configurations.size()];
+	public boolean isCountValid() {
+		return countValid;
 	}
 
-	public void calculate(boolean countValid) {
+	public void setCountValid(boolean countValid) {
+		this.countValid = countValid;
+	}
+
+	public boolean isFastCalc() {
+		return fastCalc;
+	}
+
+	public void setFastCalc(boolean fastCalc) {
+		this.fastCalc = fastCalc;
+	}
+
+	public void calculate(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+		numberOfValidConditions = 0;
+		numberOfInvalidConditions = 0;
+		numberOfCoveredConditions = 0;
+		numberOfUncoveredConditions = 0;
+
+		configValues = null;
+		configValues2 = null;
+
+		if (fastCalc) {
+			fastCalc(util, configurations, groupedPresenceConditions);
+		} else {
+			completeCalc(util, configurations, groupedPresenceConditions);
+		}
+	}
+
+	private void completeCalc(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+		configValues = new double[configurations.size()];
+		configValues2 = new double[configurations.size()];
+
 		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
 		final ClauseList combinedCondition = new ClauseList();
 		final int t = util.getT();
@@ -156,7 +187,9 @@ public class TWiseConfigurationStatistic {
 		}
 	}
 
-	public void fastCalc() {
+	private void fastCalc(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+		configValues2 = new double[configurations.size()];
+
 		final int t = util.getT();
 
 		final ArrayList<List<Pair<Integer, LiteralSet>>> lists = new ArrayList<>(t);
@@ -282,6 +315,11 @@ public class TWiseConfigurationStatistic {
 		return numberOfUncoveredConditions;
 	}
 
+	/**
+	 * For each configuration: Sum of every conditions covered divided by number of configurations that cover this condition.
+	 *
+	 * @return A copy of the original array.
+	 */
 	public double[] getConfigValues() {
 		final double[] values = new double[configValues.length];
 		for (int i = 0; i < configValues.length; i++) {
@@ -298,6 +336,11 @@ public class TWiseConfigurationStatistic {
 		return values;
 	}
 
+	/**
+	 * Number of conditions only covered by one configurations.
+	 *
+	 * @return A copy of the original array.
+	 */
 	public double[] getConfigValues2() {
 		final double[] values = new double[configValues2.length];
 		for (int i = 0; i < configValues2.length; i++) {
