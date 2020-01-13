@@ -95,28 +95,36 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 			return;
 		}
 
+		super.setLocation(p.translate(-(getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+
 		if (graphicalFeature != null) {
 			final FeatureModelLayout layout = graphicalFeature.getGraphicalModel().getLayout();
 			// set Collapse position for abego treeLayout
 			if (layout.isUsesAbegoTreeLayout()) {
 				switch (layout.getAbegoRootposition()) {
 				case Left:
-					super.setLocation(p.translate((+getBounds().width / 2) + 4, (getBounds().height / 2) - 9));
+					super.setLocation(super.getLocation().translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
+							(-getBounds().height / 2) + 1));
+					break;
 				case Right:
-					super.setLocation(p.translate((-getBounds().width / 2) + 1, getBounds().height / 2));
+					super.setLocation(super.getLocation().translate((-getBounds().width / 2) - GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
+							(-getBounds().height / 2) + 1));
+					break;
 				case Bottom:
-					super.setLocation(p.translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height + 3));
+					super.setLocation(super.getLocation().translate(0, (-getBounds().height) + 1));
+					break;
 				default:
-					super.setLocation(p.translate(-(getBounds().width / 2) + 1, GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+					// Same as default
+					break;
+				}
+			} else {
+				if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+					// left to right layout
+					super.setLocation(super.getLocation().translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
+							(-getBounds().height / 2) + 1));
 				}
 			}
-
-			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
-				// left to right layout
-				super.setLocation(p.translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, (-getBounds().height / 2) + 1));
-			}
 		}
-		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
 
 	public int GetAllChildren(IFeatureStructure parent) {

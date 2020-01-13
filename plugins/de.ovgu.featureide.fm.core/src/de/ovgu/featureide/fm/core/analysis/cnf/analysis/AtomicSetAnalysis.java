@@ -80,7 +80,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 					case TRUE:
 						solver.assignmentPop();
 						LiteralSet.resetConflicts(model1Copy, solver.getSolution());
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						break;
 					}
 				}
@@ -124,8 +124,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 								break;
 							case TRUE:
 								LiteralSet.resetConflicts(xModel0, solver.getSolution());
-								// updateSolver(c++);
-								solver.shuffleOrder(random);
+								solver.shuffleOrder(getRandom());
 								break;
 							}
 							solver.assignmentPop();
@@ -168,8 +167,7 @@ public class AtomicSetAnalysis extends AVariableAnalysis<List<LiteralSet>> {
 								case TRUE:
 									done[j] = 0;
 									LiteralSet.resetConflicts(xModel0, solver.getSolution());
-									// updateSolver(c++);
-									solver.shuffleOrder(random);
+									solver.shuffleOrder(getRandom());
 									solver.assignmentPop();
 									break;
 								}

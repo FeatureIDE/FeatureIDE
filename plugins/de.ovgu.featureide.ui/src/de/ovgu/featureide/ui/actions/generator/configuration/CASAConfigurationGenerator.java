@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -47,7 +46,7 @@ public class CASAConfigurationGenerator extends ACNFConfigurationGenerator {
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected SPLCAToolConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		return new SPLCAToolConfigurationGenerator(cnf, "CASA", t, numberOfConfigurations);
 	}
 
@@ -55,6 +54,7 @@ public class CASAConfigurationGenerator extends ACNFConfigurationGenerator {
 	protected void handleException(final Exception e) {
 		final Display display = Display.getDefault();
 		display.syncExec(new Runnable() {
+
 			@Override
 			public void run() {
 				final String errorMessage = "CASA experienced an error during its execution.\nMessage: " + e.getMessage()

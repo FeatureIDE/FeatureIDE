@@ -161,17 +161,21 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, t, null);
 		} else {
 			util = new TWiseConfigurationUtil(cnf, t, solver);
-			util.computeMIG();
 		}
-
-		util.setRandom(random);
 		util.setMaxSampleSize(maxSampleSize);
+		util.setRandom(getRandom());
+
+		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		// TODO Variation Point: Building Combinations
 		combiner = new TWiseCombiner(cnf.getVariables().size());
 
 		solver.useSolutionList(0);
 		solver.setSelectionStrategy(SelectionStrategy.ORG);
+		util.computeRandomSample();
+		if (!util.getCnf().getClauses().isEmpty()) {
+			util.computeMIG();
+		}
 	}
 
 	@Override
@@ -227,7 +231,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		// TODO Variation Point: Combination order
 		final ICombinationSupplier<ClauseList> it;
-		presenceConditionManager.shuffleSort(random);
+		presenceConditionManager.shuffleSort(getRandom());
 		final List<List<PresenceCondition>> groupedPresenceConditions = presenceConditionManager.getGroupedPresenceConditions();
 		if (groupedPresenceConditions.size() == 1) {
 			it = new SingleIterator(t, util.getCnf().getVariables().size(), groupedPresenceConditions.get(0));

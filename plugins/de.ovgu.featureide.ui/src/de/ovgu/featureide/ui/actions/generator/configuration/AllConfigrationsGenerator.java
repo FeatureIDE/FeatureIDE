@@ -23,13 +23,13 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
  * Configuration generator that creates all configurations of the feature model.<br> Exploits the structure of the feature model.
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public class AllConfigrationsGenerator extends ACNFConfigurationGenerator {
 
@@ -38,7 +38,7 @@ public class AllConfigrationsGenerator extends ACNFConfigurationGenerator {
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected AllConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		return new AllConfigurationGenerator(cnf);
 	}
 
