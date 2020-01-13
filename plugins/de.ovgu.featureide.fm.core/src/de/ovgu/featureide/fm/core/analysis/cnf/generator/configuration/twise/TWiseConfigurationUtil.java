@@ -65,7 +65,7 @@ class TWiseConfigurationUtil {
 	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
 	protected Random random = new Random(42);
 
-	protected final List<LiteralSet> randomSample;
+	protected List<LiteralSet> randomSample;
 
 	private final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
 	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
@@ -84,6 +84,10 @@ class TWiseConfigurationUtil {
 		this.t = t;
 		this.localSolver = localSolver;
 
+		randomSample = Collections.emptyList();
+	}
+
+	public void computeRandomSample() {
 		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
 		randomGenerator.setAllowDuplicates(false);
 		randomGenerator.setSampleSize(1000);

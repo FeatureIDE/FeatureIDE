@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractNoHiddenCNFCrea
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoHiddenCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.OneWiseConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.OneWiseConfigurationGenerator.CoverStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
@@ -324,7 +325,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator =
 				new OneWiseConfigurationGenerator(getSolverForCurrentConfiguration(false, false));
-			oneWiseConfigurationGenerator.setCoverMode(selection ? 1 : 0);
+			oneWiseConfigurationGenerator.setCoverMode(selection ? CoverStrategy.POSITIVE : CoverStrategy.NEGATIVE);
 			final int[] featureArray = new int[features.size()];
 			int index = 0;
 			for (final String feature : features) {

@@ -446,6 +446,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public void loadConfigurations() {
 		if (featureProject == null) {
+			for (final TreeColumn column : configurationColumns) {
+				column.dispose();
+			}
+			configurationColumns.clear();
+			configPaths.clear();
+			header.setColumnStyles(null);
 			return;
 		}
 		featuresColumn.setWidth(featureColumnWidth);
@@ -501,6 +507,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		loadConfigurations();
 		updateGUI(true);
 		resize();
+	}
+
+	private void resetConfigurationMap() {
+		setEditor(null);
+		setFeatureProject(null);
+		refresh();
 	}
 
 	public void updateGUI() {
@@ -560,13 +572,20 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		if (this.featureProject != featureProject) {
 			if (this.featureProject != null) {
 				// Deregister old listener
-				this.featureProject.getFeatureModel().removeListener(this);
-				this.featureProject.getFeatureModelManager().removeListener(this);
+				if (this.featureProject.getFeatureModel() != null) {
+					this.featureProject.getFeatureModel().removeListener(this);
+				}
+				if (this.featureProject.getFeatureModelManager() != null) {
+					this.featureProject.getFeatureModelManager().removeListener(this);
+				}
 			}
 
 			this.featureProject = featureProject;
-			this.featureProject.getFeatureModel().addListener(this);
-			this.featureProject.getFeatureModelManager().addListener(this);
+
+			if (this.featureProject != null) {
+				this.featureProject.getFeatureModel().addListener(this);
+				this.featureProject.getFeatureModelManager().addListener(this);
+			}
 
 			if (isActive()) {
 				loadConfigurations();
@@ -688,6 +707,9 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			updateElements();
 			break;
 		default:
+			break;
+		case MODEL_DATA_OVERWRITTEN:
+			resetConfigurationMap();
 			break;
 		}
 

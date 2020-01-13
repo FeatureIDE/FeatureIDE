@@ -41,9 +41,9 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	protected ISatSolver solver;
 
-	protected Random random = new Random(112358);
-
 	protected LiteralSet assumptions = null;
+
+	private Random random = new Random(112358);
 
 	private boolean timeoutOccured = false;
 	private boolean throwTimeoutException = true;

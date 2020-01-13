@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.PairWiseConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -32,6 +31,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @see PairWiseConfigurationGenerator
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public class IncLingConfigurationGenerator extends ACNFConfigurationGenerator {
 
@@ -40,7 +40,7 @@ public class IncLingConfigurationGenerator extends ACNFConfigurationGenerator {
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected PairWiseConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		return new PairWiseConfigurationGenerator(cnf, numberOfConfigurations);
 	}
 
