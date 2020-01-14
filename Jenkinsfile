@@ -27,7 +27,7 @@ pipeline {
             
             steps {  
                 script {
-                    setBuildStatus("Compiling", "compile", "pending");
+                    setBuildStatus("Compiling", "Jenkins build", "pending");
                     def causes = currentBuild.getBuildCauses('com.cloudbees.jenkins.GitHubPushCause').shortDescription
                     if(!causes) {
                         causes = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause').shortDescription
@@ -66,12 +66,12 @@ pipeline {
     post {
         success{
             script{
-                setBuildStatus("Build complete", "compile", "success")
+                setBuildStatus("Build complete", "Jenkins build", "success")
             }
         }
         unsuccessful {
             script {
-                setBuildStatus("Failed", "pl-compile", "failure")
+                setBuildStatus("Failed", "Jenkins build", "failure")
                 def author = ""
                 if(currentBuild && !currentBuild.changeSets.isEmpty()) {
                     author += "Commit author: ${currentBuild.changeSets.getAt(0).getItems()[0].getAuthor()}"
