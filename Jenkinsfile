@@ -1,7 +1,7 @@
 script{
     setBuildStatus = {String message, String context, String state ->
         
-        withCredentials([string(credentialsId: 'github-commit-status-token', variable: 'TOKEN')]) {
+        withCredentials([string(credentialsId: 'githubToken', variable: 'TOKEN')]) {
             
             sh """
                 set -x
