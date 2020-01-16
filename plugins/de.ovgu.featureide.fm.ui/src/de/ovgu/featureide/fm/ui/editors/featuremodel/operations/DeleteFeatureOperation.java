@@ -105,7 +105,8 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				oldParent.getStructure().changeToAnd();
 			}
 		}
-		return new FeatureModelOperationEvent(ID, EventType.FEATURE_DELETE, featureModel, oldFeature, oldParent);
+
+		return new FeatureModelOperationEvent(ID, EventType.FEATURE_DELETE, oldFeature, oldParent, featureModel);
 	}
 
 	@Override
@@ -149,7 +150,8 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			} else if ((oldParent != null) && alternative) {
 				oldParent.getStructure().changeToAlternative();
 			}
-			return new FeatureModelOperationEvent(ID, EventType.FEATURE_ADD, featureModel, oldFeature, feature);
+			
+			return new FeatureModelOperationEvent(ID, EventType.FEATURE_ADD, featureModel, oldParent, feature);
 		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 			return null;

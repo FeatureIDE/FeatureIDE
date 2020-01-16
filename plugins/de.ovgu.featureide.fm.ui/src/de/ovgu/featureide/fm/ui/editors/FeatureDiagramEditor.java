@@ -90,6 +90,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -746,6 +747,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
+			if (source instanceof ArrayList) {
+				final ArrayList<?> sList = (ArrayList<?>) source;
+				for (final Object object : sList) {
+					if (object instanceof FeatureModelOperationEvent) {
+
+						propertyChange((FeatureModelOperationEvent) object);
+					}
+				}
+			}
+
 			viewer.reload();
 			analyzeFeatureModel();
 			viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
@@ -801,6 +812,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(root.getObject());
 			}
 			viewer.internRefresh(true);
+			viewer.deselectAll();
 			setDirty();
 			analyzeFeatureModel();
 			break;
