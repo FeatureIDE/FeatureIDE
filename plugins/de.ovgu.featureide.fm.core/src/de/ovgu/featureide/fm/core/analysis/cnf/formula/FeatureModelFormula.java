@@ -41,8 +41,8 @@ public class FeatureModelFormula {
 	private final HashMap<ACreator<?>, ACreator<?>> map = new HashMap<>();
 
 	/**
-	 * Get an arbitrary element that can be derived from the associated feature model.<br> This methods first checks whether there is a cached instance and
-	 * only computes the requested object otherwise.
+	 * Get an arbitrary element that can be derived from the associated feature model.<br> This methods first checks whether there is a cached instance and only
+	 * computes the requested object otherwise.
 	 *
 	 * @return a {@link Node} instance.
 	 */
@@ -57,6 +57,7 @@ public class FeatureModelFormula {
 				mappedFormulaElement = formulaElement;
 			}
 		}
+
 		return (T) mappedFormulaElement.get();
 	}
 
