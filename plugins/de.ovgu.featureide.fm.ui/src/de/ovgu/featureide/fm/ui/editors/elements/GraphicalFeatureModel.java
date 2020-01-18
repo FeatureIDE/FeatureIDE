@@ -394,7 +394,18 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 				}
 
 				final Boolean isCollapsed = FeatureModelProperty.getBooleanProperty(customProperties, TYPE_GRAPHICS, COLLAPSED);
-				graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
+				if (isCollapsed == null) {
+//					//Write default value
+					if (getAllFeatures().size() < FeatureModelProperty.BIG_MODEL_LIMIT) {
+						// Small model => no collapse
+						graphicalFeature.setCollapsed(false);
+					} else {
+						// big model => collapse but root
+						graphicalFeature.setCollapsed(!feature.getStructure().isRoot());
+					}
+				} else {
+					graphicalFeature.setCollapsed(isCollapsed);
+				}
 			}
 		}
 		for (final IGraphicalConstraint constr : getConstraints()) {
@@ -469,7 +480,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		writePosition(graphicalFeature, customProperties);
 		if (graphicalFeature.isCollapsed()) {
 			customProperties.set(COLLAPSED, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
-		} else if (customProperties.has(COLLAPSED, TYPE_GRAPHICS)) {
+		} else if (customProperties.has(COLLAPSED, TYPE_GRAPHICS) || (fm.getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT)) {
 			customProperties.set(COLLAPSED, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 	}
