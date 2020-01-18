@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONSTRAINT_ERRORS;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
@@ -42,28 +41,58 @@ public class ConstrainsCalculationsAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		final IFeatureModel featureModel;
-		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
-		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
-		featureModel = variableFormula.getFeatureModel();
-		if (analyzer.getAnalysesCollection().isCalculateConstraints()) {
-			analyzer.getAnalysesCollection().setCalculateConstraints(false);
-			analyzer.getAnalysesCollection().setCalculateRedundantConstraints(false);
-			analyzer.getAnalysesCollection().setCalculateTautologyConstraints(false);
-		} else {
-			analyzer.getAnalysesCollection().setCalculateConstraints(true);
-			analyzer.getAnalysesCollection().setCalculateFeatures(true);
-			analyzer.getAnalysesCollection().setCalculateRedundantConstraints(true);
-			analyzer.getAnalysesCollection().setCalculateTautologyConstraints(true);
-			analyzer.getAnalysesCollection().setCalculateDeadConstraints(true);
-			analyzer.getAnalysesCollection().setCalculateFOConstraints(true);
+		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(),
+				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isCalculatingConstraints == null) {
+			// Default value = always active
+			isCalculatingConstraints = Boolean.TRUE;
 		}
-		featureModel.handleModelDataChanged();
+
+		// Change model property
+		if (isCalculatingConstraints) {
+			featureModelManager.editObject(this::setPropertyToDeactive);
+		} else {
+			featureModelManager.editObject(this::setPropertyToActive);
+		}
+		// Model data changed => reanalyze the model in the editor if needed
+		featureModelManager.getVarObject().handleModelDataChanged();
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to true.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToActive(IFeatureModel model) {
+		// Calculation of constraints requires the calculation of features
+		String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to false.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToDeactive(IFeatureModel model) {
+		final String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		final String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 	}
 
 	@Override
 	public void update() {
-		setChecked(featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().isCalculateConstraints());
+		Boolean isChecked = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isChecked == null) {
+			// Default value = always active
+			isChecked = Boolean.TRUE;
+		}
+		setChecked(isChecked);
 	}
 
 }
