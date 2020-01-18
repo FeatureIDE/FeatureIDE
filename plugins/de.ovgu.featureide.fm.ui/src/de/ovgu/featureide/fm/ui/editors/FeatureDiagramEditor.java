@@ -111,6 +111,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -523,7 +524,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				final AnalysesCollection generalAnalysesCollection = persistentFormula.getAnalyzer().getAnalysesCollection();
 				final AnalysesCollection localAnalysesCollection = localAnalyzer.getAnalysesCollection();
 				localAnalysesCollection.inheritSettings(generalAnalysesCollection);
-				if (!localAnalysesCollection.isRunCalculationAutomatically() && localAnalysesCollection.isCalculateFeatures()) {
+				if (!localAnalysesCollection.isRunCalculationAutomatically() || !localAnalysesCollection.isCalculateFeatures()) {
 					return true;
 				}
 
@@ -1095,6 +1096,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				for (final Action action : calculationActions) {
+					if (action instanceof AFeatureModelAction) {
+						((AFeatureModelAction) action).update();
+					}
 					menuManager.add(action);
 				}
 				menuManager.insert(2, new Separator());

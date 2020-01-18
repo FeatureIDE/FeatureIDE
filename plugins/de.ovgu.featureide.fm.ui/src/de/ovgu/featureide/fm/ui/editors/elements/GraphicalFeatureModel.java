@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -337,8 +338,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	private static final String POSITION = "position";
 	private static final String COLLAPSED = "collapsed";
 
-	private static final String VALUE_TRUE = "true";
-	private static final String VALUE_FALSE = "false";
 	private static final String VALUE_VERTICAL = "vertical";
 	private static final String VALUE_HORIZONTAL = "horizontal";
 
@@ -358,19 +357,19 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			getLayout().setVerticalLayout(false);
 		}
 
-		final Boolean hiddenFeatures = getBooleanProperty(fm.getProperty(), SHOW_HIDDEN_FEATURES);
+		final Boolean hiddenFeatures = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_HIDDEN_FEATURES);
 		getLayout().showHiddenFeatures(hiddenFeatures != null ? hiddenFeatures : true);
 
-		final Boolean shortNames = getBooleanProperty(fm.getProperty(), SHOW_SHORT_NAMES);
+		final Boolean shortNames = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_SHORT_NAMES);
 		getLayout().setShowShortNames(shortNames != null ? shortNames : false);
 
-		final Boolean colapsedConstraints = getBooleanProperty(fm.getProperty(), SHOW_COLLAPSED_CONSTRAINTS);
+		final Boolean colapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
 		getLayout().showCollapsedConstraints(colapsedConstraints != null ? colapsedConstraints : true);
 
-		final Boolean legendHidden = getBooleanProperty(fm.getProperty(), LEGEND_HIDDEN);
+		final Boolean legendHidden = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_HIDDEN);
 		setLegendHidden(legendHidden != null ? legendHidden : false);
 
-		final Boolean legendAutoLayout = getBooleanProperty(fm.getProperty(), LEGEND_AUTO_LAYOUT);
+		final Boolean legendAutoLayout = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_AUTO_LAYOUT);
 		getLayout().setLegendAutoLayout(legendAutoLayout != null ? legendAutoLayout : true);
 
 		if (!getLayout().hasLegendAutoLayout()) {
@@ -394,7 +393,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 					graphicalFeature.setLocation(location);
 				}
 
-				final Boolean isCollapsed = getBooleanProperty(customProperties, COLLAPSED);
+				final Boolean isCollapsed = FeatureModelProperty.getBooleanProperty(customProperties, TYPE_GRAPHICS, COLLAPSED);
 				graphicalFeature.setCollapsed(isCollapsed != null ? isCollapsed : false);
 			}
 		}
@@ -423,23 +422,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			c[i] = Integer.parseInt(coordinates[i]);
 		}
 		return c;
-	}
-
-	private Boolean getBooleanProperty(IPropertyContainer properties, String name) {
-		final String value;
-		try {
-			value = properties.get(name, TYPE_GRAPHICS);
-		} catch (final IPropertyContainer.NoSuchPropertyException e) {
-			return null;
-		}
-		switch (value) {
-		case VALUE_FALSE:
-			return false;
-		case VALUE_TRUE:
-			return true;
-		default:
-			return null;
-		}
 	}
 
 	@Override
@@ -486,9 +468,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		final IPropertyContainer customProperties = fm.getFeature(graphicalFeature.getObject().getName()).getCustomProperties();
 		writePosition(graphicalFeature, customProperties);
 		if (graphicalFeature.isCollapsed()) {
-			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_TRUE);
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else if (customProperties.has(COLLAPSED, TYPE_GRAPHICS)) {
-			customProperties.set(COLLAPSED, TYPE_GRAPHICS, VALUE_FALSE);
+			customProperties.set(COLLAPSED, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 	}
 
@@ -503,32 +485,32 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	private void writeAttributes(final IFeatureModel fm) {
 		if (getLayout().showHiddenFeatures()) {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_TRUE);
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, VALUE_FALSE);
+			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 		if (getLayout().showShortNames()) {
-			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_TRUE);
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, VALUE_FALSE);
+			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 		if (getLayout().showCollapsedConstraints()) {
-			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_TRUE);
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
-			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, VALUE_FALSE);
+			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 	}
 
 	private void writeLegend(final IFeatureModel fm) {
 		if (isLegendHidden()) {
-			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_TRUE);
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
-			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, VALUE_FALSE);
+			fm.getProperty().set(LEGEND_HIDDEN, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 		if (getLayout().hasLegendAutoLayout()) {
-			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_TRUE);
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
-			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, VALUE_FALSE);
+			fm.getProperty().set(LEGEND_AUTO_LAYOUT, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 			final Point legendPos = getLegend().getPos();
 			fm.getProperty().set(LEGEND_POSITION, TYPE_GRAPHICS, legendPos.x + "," + legendPos.y);
 		}

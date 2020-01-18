@@ -45,6 +45,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	public static final int CHANGE_ATTRIBUTES = 2;
 	public static final int CHANGE_ORDER = 3;
 	public static final int CHANGE_GRAPHICS = 4;
+	public static final int CHANGE_MODEL_PROPERTY = 5;
 	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
 
 	private FeatureModelFormula persistentFormula = null;
@@ -130,6 +131,9 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		if (variableFormula != null) {
 			if (changeIndicator <= CHANGE_DEPENDENCIES) {
 				variableFormula = null;
+			} else if (changeIndicator == CHANGE_MODEL_PROPERTY) {
+				// Not nessessary to rebuild the variable formula, just copy the properties to the variable formula's model
+				variableFormula.getFeatureModel().getProperty().setProperties(variableObject.getProperty().getProperties());
 			}
 		}
 	}

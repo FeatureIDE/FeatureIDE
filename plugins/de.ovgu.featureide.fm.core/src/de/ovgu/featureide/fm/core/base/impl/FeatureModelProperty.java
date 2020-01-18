@@ -28,6 +28,7 @@ import java.util.Objects;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
 /**
  * All additional properties of one {@link IFeature} instance.
@@ -36,6 +37,18 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
  * @author Marcus Pinnecke
  */
 public class FeatureModelProperty extends MapPropertyContainer implements IFeatureModelProperty {
+
+	public static final String VALUE_BOOLEAN_TRUE = "true";
+	public static final String VALUE_BOOLEAN_FALSE = "false";
+	/** The big model size limit changes the behaviour of FeatureIDE (e.g., "analyses are no longer performed automatically as default") */
+	public static int BIG_MODEL_LIMIT = 1000;
+	public static String TYPE_CALCULATIONS = "calculations";
+	/** Property decides whether calculations are performed automatically. */
+	public static String PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY = "runcalculationsautomatically";
+	/** Property decides whether calculations for feature are performed. */
+	public static String PROPERTY_CALCULATIONS_CALCULATE_FEATURES = "calculatefeatures";
+	/** Property decides whether calculations for constraints are performed. */
+	public static String PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS = "calculateconstraints";
 
 	@Override
 	public int hashCode() {
@@ -133,6 +146,23 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 	@Override
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
+	}
+
+	public static Boolean getBooleanProperty(IPropertyContainer properties, String propertyType, String name) {
+		final String value;
+		try {
+			value = properties.get(name, propertyType);
+		} catch (final IPropertyContainer.NoSuchPropertyException e) {
+			return null;
+		}
+		switch (value) {
+		case VALUE_BOOLEAN_FALSE:
+			return false;
+		case VALUE_BOOLEAN_TRUE:
+			return true;
+		default:
+			return null;
+		}
 	}
 
 }

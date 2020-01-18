@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
@@ -46,27 +48,79 @@ public class AutomatedCalculationsAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		final IFeatureModel featureModel;
+
+		Boolean isAutomaticCalculation = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(),
+				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+		// No property value available => take default value
+		if (isAutomaticCalculation == null) {
+			if (featureModelManager.getSnapshot().getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT) {
+				// Is big model => no automatic analyses as default
+				isAutomaticCalculation = Boolean.FALSE;
+			} else {
+				// Is small model => automatic analyses as default
+				isAutomaticCalculation = Boolean.TRUE;
+			}
+		}
+
+		// Clear old results from the analyses collection
 		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
 		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
-		featureModel = variableFormula.getFeatureModel();
-		if (analyzer.getAnalysesCollection().isRunCalculationAutomatically()) {
+		final IFeatureModel featureModel = variableFormula.getFeatureModel();
+		if (isAutomaticCalculation) {
 			for (final IFeature f : featureModel.getFeatures()) {
 				analyzer.getFeatureProperties(f).resetStatus();
 			}
 			for (final IConstraint c : featureModel.getConstraints()) {
 				analyzer.getConstraintProperties(c).resetStatus();
 			}
-			analyzer.getAnalysesCollection().setRunCalculationAutomatically(false);
-		} else {
-			analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
 		}
-		featureModel.handleModelDataChanged();
+
+		// Change model property
+		if (isAutomaticCalculation) {
+			featureModelManager.editObject(this::setPropertyToDeactive, FeatureModelManager.CHANGE_MODEL_PROPERTY);
+		} else {
+			featureModelManager.editObject(this::setPropertyToActive, FeatureModelManager.CHANGE_MODEL_PROPERTY);
+		}
+		// Model data changed => reanalyze the model in the editor if needed
+		featureModelManager.getVarObject().handleModelDataChanged();
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to true.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToActive(IFeatureModel model) {
+		final String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		final String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to false.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToDeactive(IFeatureModel model) {
+		final String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		final String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 	}
 
 	@Override
 	public void update() {
-		setChecked(featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().isRunCalculationAutomatically());
+		Boolean isChecked = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+		if (isChecked == null) {
+			if (featureModelManager.getSnapshot().getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT) {
+				// Is big model => no automatic analyses as default
+				isChecked = Boolean.FALSE;
+			} else {
+				// Is small model => automatic analyses as default
+				isChecked = Boolean.TRUE;
+			}
+		}
+		setChecked(isChecked);
 	}
 
 }
