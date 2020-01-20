@@ -115,7 +115,6 @@ public class NNFConverter implements IConverterStrategy {
 	/**
 	 * Restructures root if needed.
 	 *
-	 * @param fm Feature model
 	 * @param name Name of new root
 	 */
 	protected void restructureRoot(String name) {
@@ -131,7 +130,6 @@ public class NNFConverter implements IConverterStrategy {
 	/**
 	 * Adds a new element under root.
 	 *
-	 * @param fm Feature model
 	 * @param name Name of element
 	 * @return The top element for further actions
 	 */

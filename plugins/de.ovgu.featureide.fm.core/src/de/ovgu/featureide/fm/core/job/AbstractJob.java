@@ -144,12 +144,12 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not. The default method is empty.
 	 *
-	 * @param success {@code true} if the execution of {@link #work()} was complete and successful, {@code false} otherwise
+	 * @param success {@code true} if the execution of {@link #work(IMonitor)} was complete and successful, {@code false} otherwise
 	 */
 	protected void finalWork() {}
 
 	/**
-	 * In this method all the work of the job is done.<br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.<br>
+	 * In this method all the work of the job is done.<br> Use the {@code workMonitor} field for progress monitoring and calling intermediate functions.<br>
 	 * <br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
 	 *
 	 * @return {@code true} if no error occurred during the process

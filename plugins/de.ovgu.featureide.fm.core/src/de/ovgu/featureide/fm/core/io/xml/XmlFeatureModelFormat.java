@@ -187,7 +187,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * Inserts the tags concerning propositional constraints into the DOM document representation
 	 *
 	 * @param doc
-	 * @param FeatMod Parent node for the propositional nodes
+	 * @param node Parent node for the propositional nodes
 	 */
 	protected void createPropositionalConstraints(Document doc, Element xmlNode, org.prop4j.Node node) {
 		if (node == null) {
