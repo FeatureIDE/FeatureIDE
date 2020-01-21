@@ -1,7 +1,7 @@
 script{
     setBuildStatus = {String message, String context, String state ->
         
-        withCredentials([string(credentialsId: 'github-commit-status-token', variable: 'TOKEN')]) {
+        withCredentials([string(credentialsId: 'githubToken', variable: 'TOKEN')]) {
             
             sh """
                 set -x
@@ -27,7 +27,7 @@ pipeline {
             
             steps {  
                 script {
-                    setBuildStatus("Compiling", "compile", "pending");
+                    setBuildStatus("Compiling", "Jenkins build", "pending");
                     def causes = currentBuild.getBuildCauses('com.cloudbees.jenkins.GitHubPushCause').shortDescription
                     if(!causes) {
                         causes = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause').shortDescription
@@ -66,12 +66,12 @@ pipeline {
     post {
         success{
             script{
-                setBuildStatus("Build complete", "compile", "success")
+                setBuildStatus("Build complete", "Jenkins build", "success")
             }
         }
         unsuccessful {
             script {
-                setBuildStatus("Failed", "pl-compile", "failure")
+                setBuildStatus("Failed", "Jenkins build", "failure")
                 def author = ""
                 if(currentBuild && !currentBuild.changeSets.isEmpty()) {
                     author += "Commit author: ${currentBuild.changeSets.getAt(0).getItems()[0].getAuthor()}"
@@ -80,7 +80,7 @@ pipeline {
                     author = author.substring(1, author.length()-1)
                 }
                 def gitBranch = currentBuild.displayName.substring(currentBuild.displayName.indexOf('/')+1, currentBuild.displayName.indexOf('['))
-                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  't.thuem@tu-braunschweig.de, c.orsinger@tu-bs.de, Sebastian.Krieter@ovgu.de, c.sundermann@tu-braunschweig.de, joshua.sprey@web.de, paul.westphal@tu-braunschweig.de'
+                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  't.thuem@tu-braunschweig.de, c.orsinger@tu-bs.de, Sebastian.Krieter@ovgu.de, c.sundermann@tu-braunschweig.de, joshua.sprey@web.de, paul.westphal@tu-braunschweig.de, tobias.hess@uni-ulm.de'
             }
         }
     }    

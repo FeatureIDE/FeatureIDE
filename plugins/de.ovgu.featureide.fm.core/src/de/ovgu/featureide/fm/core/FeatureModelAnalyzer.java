@@ -590,9 +590,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * <p> Returns whether the conjunction of A always implies the disjunction of B in the current feature model. </p>
 	 *
-	 * <p> In other words, the following satisfiability query is checked:
-	 *
-	 * <pre> TAUT(FM &rArr; ((&and;<sub>a&in;A</sub> a) &rArr; (&or;<sub>b&in;B</sub> b))) </pre> </p>
+	 * <p> In other words, the following satisfiability query is checked: </p>
 	 *
 	 * <p> Note that this formula is always true if B is empty. </p>
 	 *

@@ -42,7 +42,7 @@ abstract public class Restriction {
 	protected List<Term> terms;
 
 	/**
-	 * The operator of the restriction which is either EQ (=) rr GEQ (>=).
+	 * The operator of the restriction which is either EQ (=) or GEQ (>=).
 	 */
 	protected Op op;
 
