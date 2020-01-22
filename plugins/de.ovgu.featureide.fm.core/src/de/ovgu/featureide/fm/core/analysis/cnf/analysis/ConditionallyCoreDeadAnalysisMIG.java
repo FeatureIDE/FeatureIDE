@@ -114,7 +114,6 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 		}
 		monitor.checkCancel();
 
-		// TODO SOLVER Sebastian klappt das auch ohne verschiedene selektions strategien?
 		if (!valuesToCompute.isEmpty()) {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			final int[] unkownValues = solver.findSolution();

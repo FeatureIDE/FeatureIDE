@@ -30,7 +30,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.prop4j.analyses.impl.general.evaluation.EvaluatedFeatureModelAnaysis;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -83,11 +82,6 @@ public class SMTAttributeRange extends AFeatureModelAction {
 				continue;
 			}
 		}
-
-		for (final IFeatureModel iFeatureModel : modelleSmall) {
-			final EvaluatedFeatureModelAnaysis analysis = new EvaluatedFeatureModelAnaysis(FeatureModelManager.getInstance(iFeatureModel).getSnapshot());
-		}
-
 	}
 
 }

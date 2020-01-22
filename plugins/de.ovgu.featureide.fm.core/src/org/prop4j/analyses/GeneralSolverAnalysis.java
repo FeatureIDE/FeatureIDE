@@ -74,8 +74,6 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T> {
 				getSolver().push(getSolver().getProblem().getVariableAsNode(literal));
 			}
 		}
-		// TODO SOLVER Sebastian Why set the assumption?
-		// assumptions = new LiteralSet(solver.getAssignmentArray());
 		timeoutOccured = false;
 
 		monitor.checkCancel();

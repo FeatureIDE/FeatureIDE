@@ -22,9 +22,9 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.And;
 import org.prop4j.Node;
+import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.AbstractSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -82,7 +82,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	private int addConstraint(IConstraint constraint, boolean positive) {
 		final AdvancedNodeCreator nc = getNodeCreator();
-		final Node constraintNode = nc.createConstraintNode(constraint, negated).toRegularCNF();
+		final Node constraintNode = nc.createConstraintNode(constraint, positive).toRegularCNF();
 		int clausesAdded = 0;
 		if (constraintNode instanceof And) {
 			for (final Node clauses : constraintNode.getChildren()) {

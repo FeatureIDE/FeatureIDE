@@ -441,24 +441,4 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 
 	public long currentSolveTime = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISatSolver#getSolveTime()
-	 */
-	@Override
-	public long getSolveTime() {
-		final long currentT = currentSolveTime;
-		resetRuntime();
-		return currentT;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISatSolver#resetRuntime()
-	 */
-	@Override
-	public void resetRuntime() {
-		currentSolveTime = 0;
-	}
-
 }

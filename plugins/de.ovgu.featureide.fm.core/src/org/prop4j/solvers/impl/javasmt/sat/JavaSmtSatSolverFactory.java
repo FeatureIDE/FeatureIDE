@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
  */
 public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 
-	private final Solvers solver;
+	public Solvers solver;
 	public static final String ID = "org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory";
 
 	@Override

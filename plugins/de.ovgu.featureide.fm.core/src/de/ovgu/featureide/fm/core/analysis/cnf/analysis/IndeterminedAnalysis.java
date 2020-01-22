@@ -38,8 +38,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * TODO SOLVER Sebastian What are indetermined features exactly and is the EmptySatSovler needed?
- *
  * Finds indetermined features.
  *
  * @author Sebastian Krieter
@@ -144,8 +142,6 @@ public class IndeterminedAnalysis extends AVariableAnalysis<LiteralSet> {
 
 			relevantClauses.clear();
 			monitor.step();
-
-			// TODO SOLVER Sebastian
 		}
 
 		return new LiteralSet(Arrays.copyOf(resultList.toArray(), resultList.size()));

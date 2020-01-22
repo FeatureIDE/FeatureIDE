@@ -21,8 +21,6 @@
 package org.prop4j.solver;
 
 /**
- * TODO SOLVER Implement the node extension to return the right return value types.
- *
  * @author Joshua Sprey
  */
 public interface IOptimizationSolver extends ISmtSolver {

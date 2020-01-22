@@ -46,10 +46,11 @@ public abstract class AtomicFormula extends Node {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#isClausalNormalForm()
+	 * @see org.prop4j.Node#isRegularConjunctiveNormalForm()
 	 */
 	@Override
-	public boolean isClausalNormalForm() {
+	public boolean isRegularConjunctiveNormalForm() {
+		// TODO Auto-generated method stub
 		return false;
 	}
 

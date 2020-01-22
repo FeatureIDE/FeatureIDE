@@ -133,7 +133,6 @@ Export-Package: Jakarta.DRAttributes,
  org.antlr.tool,
  org.prop4j,
  org.prop4j.analyses,
- org.prop4j.analyses.impl.general.evaluation,
  org.prop4j.analyses.impl.general.sat,
  org.prop4j.analyses.impl.smt,
  org.prop4j.solver,
@@ -203,4 +202,5 @@ Export-Package: Jakarta.DRAttributes,
  splar.samples
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: de.ovgu.featureide.fm.core
-Import-Package: splar.core.fm
+Import-Package: de.ovgu.featureide.fm.core,
+ splar.core.fm

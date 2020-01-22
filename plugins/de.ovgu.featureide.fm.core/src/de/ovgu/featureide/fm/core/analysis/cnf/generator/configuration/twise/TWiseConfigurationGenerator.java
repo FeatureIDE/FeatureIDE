@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICo
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationSupplier;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator3;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.SingleIterator;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 

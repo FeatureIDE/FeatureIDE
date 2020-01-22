@@ -56,7 +56,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader.ErrorHandling;
 import org.prop4j.Not;
-import org.prop4j.analyses.impl.general.evaluation.EvaluationEntry;
 
 import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
@@ -276,39 +275,12 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	private void preprocessSourceFiles(IFolder sourceFolder, boolean performFullBuild) throws CoreException, FileNotFoundException, IOException {
 
-		final EvaluationEntry sat4JGesamt = new EvaluationEntry(0, 0, 0, "All Files");
-		final EvaluationEntry javaSmtGesamt = new EvaluationEntry(0, 0, 0, "All Files");
-		// Add four times
-		sat4JGesamt.addTime(0);
-		sat4JGesamt.addTime(0);
-		sat4JGesamt.addTime(0);
-		sat4JGesamt.addTime(0);
-		// Add four times
-		javaSmtGesamt.addTime(0);
-		javaSmtGesamt.addTime(0);
-		javaSmtGesamt.addTime(0);
-		javaSmtGesamt.addTime(0);
-
 		for (final IResource res : sourceFolder.members()) {
 
 			if (res instanceof IFolder) {
 				// for folders do recursively
 				preprocessSourceFiles((IFolder) res, performFullBuild);
 			} else if (res instanceof IFile) {
-				// TODO SOLVER EVAL remove
-				sat4J = new EvaluationEntry(0, 0, 0, "" + res.getName());
-				javaSmt = new EvaluationEntry(0, 0, 0, "" + res.getName());
-				// Add four times
-				javaSmt.addTime(0);
-				javaSmt.addTime(0);
-				javaSmt.addTime(0);
-				javaSmt.addTime(0);
-				// Add four times
-				sat4J.addTime(0);
-				sat4J.addTime(0);
-				sat4J.addTime(0);
-				sat4J.addTime(0);
-
 				// delete all existing builder markers
 				if (performFullBuild) {
 					featureProject.deleteBuilderMarkers(res, 0);
@@ -319,19 +291,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 				// do checking and some stuff
 				processLinesOfFile(lines, (IFile) res);
-
-				sat4JGesamt.times.set(0, sat4JGesamt.times.get(0) + sat4J.times.get(0));
-				sat4JGesamt.times.set(1, sat4JGesamt.times.get(1) + sat4J.times.get(1));
-				sat4JGesamt.times.set(2, sat4JGesamt.times.get(2) + sat4J.times.get(2));
-				sat4JGesamt.times.set(3, sat4JGesamt.times.get(3) + sat4J.times.get(3));
-
-				javaSmtGesamt.times.set(0, javaSmtGesamt.times.get(0) + javaSmt.times.get(0));
-				javaSmtGesamt.times.set(1, javaSmtGesamt.times.get(1) + javaSmt.times.get(1));
-				javaSmtGesamt.times.set(2, javaSmtGesamt.times.get(2) + javaSmt.times.get(2));
-				javaSmtGesamt.times.set(3, javaSmtGesamt.times.get(3) + javaSmt.times.get(3));
-
-				// Write the sat4j and smt interpol intermediate
-				printResultHidden("AntennaPreprocessor_" + sourceFolder.getProject().getName());
 
 				if (!performFullBuild) {
 					continue;
@@ -366,10 +325,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				}
 			}
 		}
-
-		// Write the sat4j and smt interpol intermediate
-		printResultHidden("AntennaPreprocessor_" + sourceFolder.getProject().getName(), sat4JGesamt, javaSmtGesamt);
-		evalList = new ArrayList<>();
 	}
 
 	/**
@@ -621,20 +576,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName, Node featureModelNode)
 			throws CoreException, FileNotFoundException, IOException {
-
-		// TODO SOLVER EVAL remove
-		sat4J = new EvaluationEntry(0, 0, 0, "" + sourceFolder.getName());
-		javaSmt = new EvaluationEntry(0, 0, 0, "" + sourceFolder.getName());
-		// Add four times
-		javaSmt.addTime(0);
-		javaSmt.addTime(0);
-		javaSmt.addTime(0);
-		javaSmt.addTime(0);
-		// Add four times
-		sat4J.addTime(0);
-		sat4J.addTime(0);
-		sat4J.addTime(0);
-		sat4J.addTime(0);
 
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {

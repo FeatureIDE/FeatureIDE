@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -65,7 +64,6 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 					} else if (element instanceof IFeatureAttribute && faView.selectedManualFeatures.contains(parentElement)) {
 						return true;
 					} else {
-						FMAttributesPlugin.getDefault().logInfo("Element: " + element);
 						return false;
 					}
 				}
