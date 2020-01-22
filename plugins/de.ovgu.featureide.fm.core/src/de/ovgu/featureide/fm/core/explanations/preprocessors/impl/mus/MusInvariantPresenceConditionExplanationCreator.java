@@ -86,11 +86,15 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 	@Override
 	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException {
 		final IMusExtractor oracle = getOracle();
+		if (getSubject() == null) {
+			return null;
+		}
 		InvariantPresenceConditionExplanation explanation = null;
 		try {
 			expressionClauses.clear();
 			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 			for (Node expression : getExpressionStack()) {
+				expression = expression.toRegularCNF();
 				if (first && isTautology()) {
 					expression = new Not(expression).toRegularCNF();
 				}

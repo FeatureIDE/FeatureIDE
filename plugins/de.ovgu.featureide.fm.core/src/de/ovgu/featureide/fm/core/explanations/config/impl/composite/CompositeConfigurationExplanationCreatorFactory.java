@@ -48,6 +48,6 @@ public class CompositeConfigurationExplanationCreatorFactory extends Configurati
 
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		return new CompositeAutomaticSelectionExplanationCreator(Arrays.asList(musJavaSmt.getAutomaticSelectionExplanationCreator()));
+		return new CompositeAutomaticSelectionExplanationCreator(Arrays.asList(musSat4J.getAutomaticSelectionExplanationCreator()));
 	}
 }

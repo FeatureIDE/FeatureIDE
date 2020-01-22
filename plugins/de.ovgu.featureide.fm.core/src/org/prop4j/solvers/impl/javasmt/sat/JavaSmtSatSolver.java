@@ -65,13 +65,13 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	/** Shutdown manager for the native solver. Can be used to interrupt and cancel a running operation. */
 	protected ShutdownManager shutdownManager;
 	/** The current contex of the solver. Used by the translator to translate prop4J nodes to JavaSMT formulas. */
-	protected SolverContext context;
+	public SolverContext context;
 	/** Memory for the solver. Holds information about the pushed and static formulas. For the JavaSMT and Prop4J nodes. */
 	protected SolverMemory<BooleanFormula> pushstack;
 	/** Translator used to transform prop4j nodes to JavaSMT formulas. */
 	protected Prop4JToJavaSmtTranslator translator;
 	/** Native Environment of JavaSMT used to solve the query's */
-	protected ProverEnvironment prover;
+	public ProverEnvironment prover;
 	/** Configuration option for JavaSMT solver to determine the solver used. @link Solvers */
 	public static final String SOLVER_TYPE = "solver_type";
 
@@ -121,13 +121,17 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public SatResult isSatisfiable() {
+		final List<BooleanFormula> formulas = pushstack.getAssumtions();
+		final long t1 = System.currentTimeMillis();
 		try {
-			final List<BooleanFormula> formulas = pushstack.getAssumtions();
 			final boolean isSat = !prover.isUnsatWithAssumptions(formulas);
+			currentSolveTime += (System.currentTimeMillis() - t1);
 			return isSat ? SatResult.TRUE : SatResult.FALSE;
 		} catch (final SolverException e) {
+			currentSolveTime += (System.currentTimeMillis() - t1);
 			return SatResult.TIMEOUT;
 		} catch (final InterruptedException e) {
+			currentSolveTime += (System.currentTimeMillis() - t1);
 			return SatResult.TIMEOUT;
 		}
 	}
@@ -171,7 +175,13 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 		final Node node = pushstack.pop();
 		// If Node is AND and is in CNF then pop all childs
 		if ((node instanceof And) && node.isConjunctiveNormalForm()) {
-			pop(node.getChildren().length);
+//			pop(node.getChildren().length);
+//			return node;
+
+			// Is clause so pop from context
+			final long time = System.currentTimeMillis();
+			prover.pop();
+			currentSolveTime += System.currentTimeMillis() - time;
 			return node;
 		}
 
@@ -202,7 +212,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 				// Do nothing the assumption is removed from the memory with pushstack.pop
 			} else {
 				// Is clause so pop from context
+				final long time = System.currentTimeMillis();
 				prover.pop();
+				currentSolveTime += System.currentTimeMillis() - time;
 			}
 		}
 
@@ -244,10 +256,18 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	public int push(Node formula) {
 		// If Node is AND and is in CNF then push every child seperately
 		if ((formula instanceof And) && formula.isConjunctiveNormalForm()) {
-			final int clauses = push(formula.getChildren());
-			// Put and node on stack
-			pushstack.push(formula, null);
-			return clauses;
+			final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
+			pushstack.push(formula, formulaJavaSmt);
+			final long time = System.currentTimeMillis();
+			try {
+				prover.push(formulaJavaSmt);
+				currentSolveTime += System.currentTimeMillis() - time;
+			} catch (final InterruptedException e) {}
+			return 1;
+//			final int clauses = push(formula.getChildren());
+//			// Put and node on stack
+//			pushstack.push(formula, null);
+//			return clauses;
 		} else if ((formula instanceof And) && !formula.isConjunctiveNormalForm()) {
 			throw new UnsupportedOperationException("The SAT solver can only handle And nodes in conjunctive normal form");
 		}
@@ -294,8 +314,10 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 				// Add as formula
 				final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
 				pushstack.push(formula, formulaJavaSmt);
+				final long time = System.currentTimeMillis();
 				try {
 					prover.push(formulaJavaSmt);
+					currentSolveTime += System.currentTimeMillis() - time;
 				} catch (final InterruptedException e) {}
 				return 1;
 			}
@@ -322,28 +344,30 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] getSolution() {
+		final long t10 = System.currentTimeMillis();
 		try {
 			if (!prover.isUnsatWithAssumptions(pushstack.getAssumtions())) {
-				final String ausgabe = "";
-				final long t1 = System.currentTimeMillis();
+				currentSolveTime += (System.currentTimeMillis() - t10);
 				final Model model = prover.getModel();
-				modelTime += (System.currentTimeMillis() - t1);
 				final Iterator<ValueAssignment> iterator = model.iterator();
 				final List<Integer> solution = new ArrayList<>();
 
 				while (iterator.hasNext()) {
-					final long start = System.currentTimeMillis();
 					final ValueAssignment value = iterator.next();
-					final long t2 = System.currentTimeMillis();
 					if (value.getValue().toString().equals("true")) {
 						solution.add(getProblem().getIndexOfVariable(value.getName()));
 					} else {
 						solution.add(-getProblem().getIndexOfVariable(value.getName()));
 					}
-					final long t3 = System.currentTimeMillis();
-					retrieveTime += t2 - start;
-					convertTime += t3 - t2;
 				}
+				if (solution.size() < getProblem().getNumberOfVariables()) {
+					for (int i = 1; i <= getProblem().getNumberOfVariables(); i++) {
+						if ((!solution.contains(i)) && (!solution.contains(-i))) {
+							solution.add(-i);
+						}
+					}
+				}
+
 				return solution.toArray();
 			} else {
 				return null;
@@ -413,6 +437,28 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 			}
 		}
 		return result;
+	}
+
+	public long currentSolveTime = 0;
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISatSolver#getSolveTime()
+	 */
+	@Override
+	public long getSolveTime() {
+		final long currentT = currentSolveTime;
+		resetRuntime();
+		return currentT;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISatSolver#resetRuntime()
+	 */
+	@Override
+	public void resetRuntime() {
+		currentSolveTime = 0;
 	}
 
 }

@@ -32,7 +32,8 @@ import org.prop4j.Node;
  * @author Timo G&uuml;nther
  *
  */
-public interface IMusExtractor extends ISolver {
+public interface IMusExtractor extends ISatSolver {
+
 	/**
 	 * <p> Returns any minimal unsatisfiable subset (MUS) of the problem. A MUS is any unsatisfiable subset of the formula which cannot be reduced any further
 	 * without becoming satisfiable. </p>

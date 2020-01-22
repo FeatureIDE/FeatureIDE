@@ -20,10 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
-import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.AbstractSolverFactory;
+import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.impl.SatProblem;
+import org.prop4j.solver.impl.SolverManager;
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatMusExtractor;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfigurationExplanationCreator;
@@ -64,7 +67,13 @@ public abstract class MusConfigurationExplanationCreator<S, E extends Configurat
 
 	@Override
 	protected IMusExtractor createOracle() {
-		final IMusExtractor oracle = getSatSolverFactory().getExplanationSolver(new SatProblem(getCnf()));
+		final IMusExtractor oracle = SolverManager.getSelectedFeatureModelDefectExplanatorSolverFactory().getExplanationSolver(new SatProblem(getCnf()));
+		if (oracle instanceof JavaSmtSatMusExtractor) {
+			final JavaSmtSatMusExtractor sol = (JavaSmtSatMusExtractor) oracle;
+			FMCorePlugin.getDefault().logInfo("created : (" + sol.prover.getClass().getName() + ")" + oracle.getClass().getName());
+		} else {
+			FMCorePlugin.getDefault().logInfo("created : " + oracle.getClass().getName());
+		}
 		return oracle;
 	}
 

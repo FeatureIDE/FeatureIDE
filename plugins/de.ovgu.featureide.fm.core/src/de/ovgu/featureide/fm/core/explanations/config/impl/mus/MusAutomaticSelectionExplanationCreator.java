@@ -67,6 +67,9 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
 		final IMusExtractor oracle = getOracle();
+		if (getSubject() == null) {
+			return null;
+		}
 		AutomaticSelectionExplanation explanation;
 		try {
 			selectedFeatures.clear();

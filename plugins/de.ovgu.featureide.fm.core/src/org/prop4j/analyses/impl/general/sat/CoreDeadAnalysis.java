@@ -28,6 +28,7 @@ import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.impl.SolverManager;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolver;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -52,8 +53,13 @@ public class CoreDeadAnalysis extends AbstractSatSolverAnalysis<LiteralSet> {
 	@Override
 	public LiteralSet analyze(IMonitor<LiteralSet> monitor) {
 		final List<Integer> features = new ArrayList<>();
+		getSolver().setConfiguration(Sat4JSatSolver.CONFIG_SELECTION_STRATEGY, Sat4JSatSolver.SelectionStrategy.POSITIVE);
 		getSolver().isSatisfiable();
 		final int[] model1 = SolverUtils.getIntModel(getSolver().getSolution());
+		getSolver().setConfiguration(Sat4JSatSolver.CONFIG_SELECTION_STRATEGY, Sat4JSatSolver.SelectionStrategy.NEGATIVE);
+		getSolver().isSatisfiable();
+		final int[] model2 = SolverUtils.getIntModel(getSolver().getSolution());
+		SolverUtils.updateModel(model1, model2);
 		for (int i = 0; i < model1.length; i++) {
 			final int varX = model1[i];
 			if (varX != 0) {

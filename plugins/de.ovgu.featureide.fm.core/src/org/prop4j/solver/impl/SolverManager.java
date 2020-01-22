@@ -25,6 +25,8 @@ import org.osgi.service.prefs.Preferences;
 import org.prop4j.solver.AbstractSolverFactory;
 import org.prop4j.solver.impl.Ltms.LtmsSatSolverFactory;
 import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 import de.ovgu.featureide.fm.core.ExtensionManager;
 
@@ -44,6 +46,8 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 
 	private static SolverManager instance = new SolverManager();
 
+	public static Solvers solver = Solvers.SMTINTERPOL;
+
 	public static SolverManager getInstance() {
 		return instance;
 	}
@@ -58,13 +62,32 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 		}
 	}
 
+	public static void setSelectedFeatureAttributeSolverFactory(String solverFactoryID) {
+		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
+		if ((solverFactoryID == Sat4JSatSolverFactory.ID) || (solverFactoryID == JavaSmtSatSolverFactory.ID)) {
+			preferences.put(FEATURE_MODEL_ANALYSIS_SOLVER, solverFactoryID);
+		}
+	}
+
 	public static AbstractSolverFactory getSelectedFeatureModelDefectExplanatorSolverFactory() {
 		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
 		final String solverID = preferences.get(FEATURE_MODEL_DEFECT_SOLVER, LtmsSatSolverFactory.ID);
 		try {
-			return getInstance().getExtension(solverID).getNewFactory();
+			final AbstractSolverFactory f = getInstance().getExtension(solverID).getNewFactory();
+			if (f instanceof JavaSmtSatSolverFactory) {
+				final JavaSmtSatSolverFactory factory = (JavaSmtSatSolverFactory) f;
+				factory.solver = solver;
+			}
+			return f;
 		} catch (final NoSuchExtensionException e) {
 			return new LtmsSatSolverFactory();
+		}
+	}
+
+	public static void setSelectedFeatureModelDefectExplanatorSolverFactory(String solverFactoryID) {
+		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
+		if ((solverFactoryID == Sat4JSatSolverFactory.ID) || (solverFactoryID == JavaSmtSatSolverFactory.ID)) {
+			preferences.put(FEATURE_MODEL_DEFECT_SOLVER, solverFactoryID);
 		}
 	}
 
@@ -72,7 +95,12 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
 		final String solverID = preferences.get(OTHER_ANALYSES_SOLVER, Sat4JSatSolverFactory.ID);
 		try {
-			return getInstance().getExtension(solverID).getNewFactory();
+			final AbstractSolverFactory f = getInstance().getExtension(solverID).getNewFactory();
+			if (f instanceof JavaSmtSatSolverFactory) {
+				final JavaSmtSatSolverFactory factory = (JavaSmtSatSolverFactory) f;
+				factory.solver = solver;
+			}
+			return f;
 		} catch (final NoSuchExtensionException e) {
 			return new Sat4JSatSolverFactory();
 		}
