@@ -26,6 +26,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 
+/**
+ * Compares the dependencies of the {@link LiteralSet LiteralSets} using a {@link ModalImplicationGraph}.
+ *
+ * @author Sebastian Krieter
+ */
 public class MIGComparator implements Comparator<LiteralSet> {
 
 	private static class VertexInfo {

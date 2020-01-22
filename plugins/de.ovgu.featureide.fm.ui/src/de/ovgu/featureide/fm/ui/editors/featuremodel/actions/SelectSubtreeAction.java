@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_SUBTREE;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -49,12 +47,6 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 
 	public SelectSubtreeAction(Object viewer, IFeatureModelManager featureModelManager) {
 		super(SELECT_SUBTREE, viewer, ID, featureModelManager);
-		URL url = null;
-		try {
-			url = new URL("platform:/plugin/org.eclipse.wst.xsdeditor.doc.user/images/XSDChoice.gif");
-		} catch (final MalformedURLException e) {}
-		createImage = ImageDescriptor.createFromURL(url);
-		setImageDescriptor(createImage);
 	}
 
 	@Override

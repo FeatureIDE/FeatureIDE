@@ -107,15 +107,17 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	}
 
 	public void setSelectedColumn(int index) {
-		if ((0 <= index) && (index < columnStyles.size())) {
-			if (!columnStyles.get(index).isSelectable()) {
-				index = -1;
+		if (columnStyles != null) {
+			if ((0 <= index) && (index < columnStyles.size())) {
+				if (!columnStyles.get(index).isSelectable()) {
+					index = -1;
+				}
 			}
-		}
-		selectedColumn = index;
-		redraw();
-		for (final ICustomTableHeaderSelectionListener listener : listeners) {
-			listener.onColumnSelectionChanged(index);
+			selectedColumn = index;
+			redraw();
+			for (final ICustomTableHeaderSelectionListener listener : listeners) {
+				listener.onColumnSelectionChanged(index);
+			}
 		}
 	}
 

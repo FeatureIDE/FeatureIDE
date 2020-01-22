@@ -34,10 +34,11 @@ import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 
 /**
+ * Represent a solution within a covering array.
  *
  * @author Sebastian Krieter
  */
-class TWiseConfiguration extends LiteralSet {
+public class TWiseConfiguration extends LiteralSet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -173,6 +174,36 @@ class TWiseConfiguration extends LiteralSet {
 		}
 	}
 
+	public TWiseConfiguration(TWiseConfiguration other) {
+		super(other);
+		util = other.util;
+
+		numberOfVariableLiterals = other.numberOfVariableLiterals;
+		solverSolutionIndex = other.solverSolutionIndex;
+		countLiterals = other.countLiterals;
+		rank = other.rank;
+
+		if (util.hasSolver()) {
+			if (other.solutionLiterals != null) {
+				solutionLiterals = new VecInt(numberOfVariableLiterals);
+				other.solutionLiterals.copyTo(solutionLiterals);
+			}
+			traverser = new Traverser(util.getMig());
+			traverser.setModel(literals);
+			visitor = new DefaultVisitor() {
+
+				@Override
+				public VisitResult visitStrong(int curLiteral) {
+					addLiteral(curLiteral);
+					return super.visitStrong(curLiteral);
+				}
+			};
+		} else {
+			traverser = null;
+			visitor = null;
+		}
+	}
+
 	private void addLiteral(int curLiteral) {
 		countLiterals++;
 		solutionLiterals.push(curLiteral);
@@ -227,6 +258,10 @@ class TWiseConfiguration extends LiteralSet {
 
 	public boolean isComplete() {
 		return countLiterals == numberOfVariableLiterals;
+	}
+
+	public int countLiterals() {
+		return countLiterals;
 	}
 
 	public void autoComplete() {
@@ -376,6 +411,11 @@ class TWiseConfiguration extends LiteralSet {
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(literals);
+	}
+
+	@Override
+	public TWiseConfiguration clone() {
+		return new TWiseConfiguration(this);
 	}
 
 }

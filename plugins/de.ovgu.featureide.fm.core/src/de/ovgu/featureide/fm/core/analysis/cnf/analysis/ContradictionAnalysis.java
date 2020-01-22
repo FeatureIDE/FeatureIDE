@@ -34,9 +34,14 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSa
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds contradictions.
+ * Finds contradicting clauses with respect to a given {@link CNF}. This analysis works by iteratively adding each clause group (see {@link AClauseAnalysis}) to
+ * the given {@link CNF}. If a clause group contradicts the current formula, it is marked as a contradiction and removed from the {@link CNF}. Otherwise it is
+ * kept as part of the {@link CNF} for the remaining analysis. Clauses are added in the same order a they appear in the given clauses list.<br> For an
+ * independent analysis of every clause group use {@link IndependentContradictionAnalysis}.
  *
  * @author Sebastian Krieter
+ *
+ * @see IndependentContradictionAnalysis
  */
 public class ContradictionAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 

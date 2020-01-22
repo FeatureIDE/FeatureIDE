@@ -77,10 +77,10 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 * Adds the given constraint to the oracle.
 	 *
 	 * @param constraint constraint to add
-	 * @param negated whether the constraint should be negated before being added
+	 * @param positive whether the constraint should be added as is ({@code true}) or in negated form ({@code false})
 	 * @return amount of clauses added
 	 */
-	private int addConstraint(IConstraint constraint, boolean negated) {
+	private int addConstraint(IConstraint constraint, boolean positive) {
 		final AdvancedNodeCreator nc = getNodeCreator();
 		final Node constraintNode = nc.createConstraintNode(constraint, negated).toRegularCNF();
 		int clausesAdded = 0;

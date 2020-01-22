@@ -419,7 +419,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 					case TRUE:
 						solver.assignmentPop();
 						LiteralSet.resetConflicts(model1Copy, solver.getSolution());
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						break;
 					}
 				}
@@ -762,7 +762,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 						solver.assignmentPop();
 						break;
 					case TRUE:
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						solver.assignmentPop();
 						break;
 					}
@@ -929,7 +929,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			if (handleNewConfig(solver.findSolution(), featuresUsedOrg)) {
 				break;
 			} else {
-				solver.shuffleOrder(random);
+				solver.shuffleOrder(getRandom());
 			}
 			solver.assignmentClear(numberOfFixedFeatures);
 		}

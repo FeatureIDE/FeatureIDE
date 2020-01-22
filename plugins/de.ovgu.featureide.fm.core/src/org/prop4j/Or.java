@@ -20,11 +20,12 @@
  */
 package org.prop4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * A constraint that is true iff at least one of its children is true.
@@ -52,54 +53,59 @@ public class Or extends Node implements Cloneable {
 	}
 
 	@Override
-	public boolean isClausalNormalForm() {
-		return false;
+	public boolean isDisjunctiveNormalForm() {
+		for (final Node child : children) {
+			if (!((child instanceof Literal) || ((child instanceof And) && child.isDisjunctiveNormalForm()))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
-	protected Node clausifyCNF() {
-		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausifyCNF();
+	public boolean isRegularDisjunctiveNormalForm() {
+		for (final Node child : children) {
+			if (!((child instanceof And) && child.isDisjunctiveNormalForm())) {
+				return false;
+			}
 		}
-		fuseWithSimilarChildren();
-		return createCNF(children);
+		return true;
 	}
 
 	@Override
-	protected Node clausifyDNF() {
+	protected Node clausifyCNF(boolean simplify) {
 		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausifyDNF();
+			children[i] = children[i].clausifyCNF(simplify);
 		}
-		fuseWithSimilarChildren();
 		return this;
 	}
 
-	private Node createCNF(Node[] children) {
-		LinkedList<LinkedList<Node>> clauses = new LinkedList<>();
-		clauses.add(new LinkedList<Node>());
-		for (final Node child : children) {
-			final LinkedList<Node[]> newClauses = new LinkedList<>();
-			if (child instanceof And) {
-				for (final Node or : child.children) {
-					if (or instanceof Or) {
-						newClauses.add(or.children);
-					} else {
-						newClauses.add(new Node[] { or });
+	@Override
+	protected Node clausifyDNF(boolean simplify) {
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].clausifyDNF(simplify);
+		}
+		final LinkedList<LinkedHashSet<Literal>> newClauseList = new LinkedList<>();
+		for (int i = 0; i < children.length; i++) {
+			createNF(children[i], newClauseList, simplify);
+			if (simplify) {
+				if (newClauseList.isEmpty()) {
+					return new Literal(NodeCreator.varFalse);
+				} else {
+					if (unitPropagation(newClauseList)) {
+						return new Literal(NodeCreator.varTrue);
 					}
 				}
-			} else {
-				newClauses.add(new Node[] { child });
 			}
 
-			clauses = updateClauses(clauses, newClauses);
 		}
-
-		final Node[] newChildren = new Node[clauses.size()];
-		int i = 0;
-		for (final LinkedList<Node> clause : clauses) {
-			newChildren[i++] = new Or(clause);
+		final Node[] newChildren = new Node[newClauseList.size()];
+		int index = 0;
+		for (final HashSet<Literal> clause : newClauseList) {
+			newChildren[index++] = new And(clause);
 		}
-		return new And(newChildren);
+		setChildren(newChildren);
+		return simplifyTree();
 	}
 
 	@Override
@@ -107,65 +113,33 @@ public class Or extends Node implements Cloneable {
 		return new Or(newChildren);
 	}
 
-	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses, LinkedList<Node[]> newClauses) {
-		final LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
-		for (final LinkedList<Node> clause : clauses) {
-			boolean intersection = false;
-			for (final Node[] list : newClauses) {
-				if (clause.containsAll(Arrays.asList(list))) {
-					intersection = true;
-					break;
-				}
-			}
-			if (intersection) {
-				add(updatedClauses, clause);
-			} else {
-				for (final Node[] list : newClauses) {
-					final LinkedList<Node> newClause = clone(clause);
-					for (final Node node : list) {
-						newClause.add(node.clone());
-					}
-					add(updatedClauses, newClause);
-				}
-			}
-		}
-		return updatedClauses;
-	}
-
-	private void add(LinkedList<LinkedList<Node>> clauses, LinkedList<Node> newClause) {
-		for (final LinkedList<Node> clause : clauses) {
-			if (newClause.containsAll(clause)) {
-				return;
-			}
-		}
-		clauses.add(newClause);
-	}
-
-	protected void collectChildren(Node node, List<Node> nodes) {
-		if (node instanceof Or) {
-			for (final Node childNode : node.getChildren()) {
-				collectChildren(childNode, nodes);
-			}
-		} else {
-			nodes.add(node);
-		}
-	}
-
 	@Override
-	public void simplify() {
-		final List<Node> nodes = new ArrayList<>();
+	public Node simplify() {
+		super.simplify();
 
-		for (int i = 0; i < children.length; i++) {
-			collectChildren(children[i], nodes);
+		int count = children.length;
+		boolean canBeSimplified = false;
+		for (final Node child : children) {
+			if (child instanceof Or) {
+				count += child.children.length - 1;
+				canBeSimplified = true;
+			}
 		}
 
-		final int size = nodes.size();
-		if (size != children.length) {
-			final Node[] newChildren = nodes.toArray(new Node[size]);
+		if (canBeSimplified) {
+			final Node[] newChildren = new Node[count];
+			int index = 0;
+			for (final Node child : children) {
+				if (child instanceof Or) {
+					System.arraycopy(child.children, 0, newChildren, index, child.children.length);
+					index += child.children.length;
+				} else {
+					newChildren[index++] = child;
+				}
+			}
 			setChildren(newChildren);
 		}
-
-		super.simplify();
+		return this;
 	}
 
 	@Override

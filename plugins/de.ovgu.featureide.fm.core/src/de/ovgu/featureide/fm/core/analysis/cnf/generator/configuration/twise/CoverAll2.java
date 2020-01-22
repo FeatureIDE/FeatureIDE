@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ite
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
+ * Covers a given {@link ClauseList expressions} within a list of {@link TWiseConfiguration solutions}. Uses subsumption to identify redundant expressions.
  *
  * @author Sebastian Krieter
  */

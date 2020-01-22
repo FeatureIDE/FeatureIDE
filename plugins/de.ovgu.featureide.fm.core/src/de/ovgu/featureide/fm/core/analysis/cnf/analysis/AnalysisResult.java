@@ -25,7 +25,9 @@ import java.util.Arrays;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
- * Result of an analysis.
+ * Wrapper class for an analysis result containing additional information about the performed analysis.
+ *
+ * @param <T> Type of the analysis result.
  *
  * @author Sebastian Krieter
  */

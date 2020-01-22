@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
 	<artifactId>de.ovgu.featureide.root</artifactId>
-	<version>3.6.0-SNAPSHOT</version>
+	<version>3.6.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -80,6 +80,19 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
+                    <destDir>${project.name}</destDir>
+                    <debug>true</debug>
+                    <doclint>none</doclint>
+                    <failOnWarnings>false</failOnWarnings>
+                </configuration>
+            </plugin>
+        
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>

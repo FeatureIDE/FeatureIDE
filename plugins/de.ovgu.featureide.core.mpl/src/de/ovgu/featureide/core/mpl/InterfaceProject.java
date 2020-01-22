@@ -89,7 +89,7 @@ public class InterfaceProject {
 			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
 
 			} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
-				featureNames[id] = ((IFeature) event.getSource()).getName();
+				featureNames[id] = ((IFeatureModel) event.getSource()).getFeature((CharSequence) event.getNewValue()).getName();
 			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 
 			}

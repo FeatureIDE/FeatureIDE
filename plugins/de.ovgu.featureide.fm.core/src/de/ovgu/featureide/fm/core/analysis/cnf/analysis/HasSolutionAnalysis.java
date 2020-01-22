@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSa
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Determines whether a sat instance is satisfiable and returns the found model.
+ * Determines whether a given {@link CNF} is satisfiable and returns the found solution.
  *
  * @author Sebastian Krieter
  */

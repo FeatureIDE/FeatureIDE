@@ -45,6 +45,10 @@ import org.prop4j.ErrorType.ErrorEnum;
  */
 public class NodeReader {
 
+	public static enum ErrorHandling {
+		ABORT, REMOVE, KEEP
+	}
+
 	public final static String[] textualSymbols = new String[] { " iff ", " implies ", " or ", " and ", " not " };
 	public final static String[] shortSymbols = new String[] { "<=>", "=>", "|", "&", "-" };
 	public final static String[] shortSymbols2 = new String[] { "<=>", "=>", "|", "&", "!" };
@@ -70,8 +74,8 @@ public class NodeReader {
 	public ErrorType errorType = new ErrorType(ErrorEnum.None);
 	private ParseException errorMessage = null;
 
-	private boolean ignoreMissingFeatures = false;
-	private boolean ignoreUnparsableSubExpressions = false;
+	private ErrorHandling ignoreMissingFeatures = ErrorHandling.ABORT;
+	private ErrorHandling ignoreUnparsableSubExpressions = ErrorHandling.ABORT;
 
 	public void activateShortSymbols() {
 		symbols = shortSymbols;
@@ -118,7 +122,15 @@ public class NodeReader {
 			return parseNode;
 		} catch (final ParseException e) {
 			errorMessage = e;
-			return ignoreUnparsableSubExpressions ? new ErrorLiteral(constraint) : null;
+			switch (ignoreUnparsableSubExpressions) {
+			case KEEP:
+				return new ErrorLiteral(constraint);
+			case REMOVE:
+				return null;
+			case ABORT:
+			default:
+				return null;
+			}
 		}
 	}
 
@@ -166,19 +178,19 @@ public class NodeReader {
 		return errorMessage;
 	}
 
-	public boolean ignoresMissingFeatures() {
+	public ErrorHandling ignoresMissingFeatures() {
 		return ignoreMissingFeatures;
 	}
 
-	public void setIgnoreMissingFeatures(boolean ignoreMissingFeatures) {
+	public void setIgnoreMissingFeatures(ErrorHandling ignoreMissingFeatures) {
 		this.ignoreMissingFeatures = ignoreMissingFeatures;
 	}
 
-	public boolean isIgnoreUnparsableSubExpressions() {
+	public ErrorHandling isIgnoreUnparsableSubExpressions() {
 		return ignoreUnparsableSubExpressions;
 	}
 
-	public void setIgnoreUnparsableSubExpressions(boolean ignoreUnparsableSubExpressions) {
+	public void setIgnoreUnparsableSubExpressions(ErrorHandling ignoreUnparsableSubExpressions) {
 		this.ignoreUnparsableSubExpressions = ignoreUnparsableSubExpressions;
 	}
 
@@ -205,11 +217,10 @@ public class NodeReader {
 				final int index = matcher.start(1);
 
 				// recursion for children nodes
-				final String leftSide = constraint.substring(0, index).trim();
-				final String rightSide = constraint.substring(index + symbols[i].length(), constraint.length()).trim();
 
 				final Node node1, node2;
 				if (i == 4) {
+					final String rightSide = constraint.substring(index + symbols[i].length(), constraint.length()).trim();
 					node1 = null;
 					if (rightSide.isEmpty()) {
 						errorType.setError(ErrorEnum.Default);
@@ -217,18 +228,29 @@ public class NodeReader {
 					} else {
 						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
 					}
+					if (node2 == null) {
+						return null;
+					}
 				} else {
+					final String leftSide = constraint.substring(0, index).trim();
 					if (leftSide.isEmpty()) {
 						errorType = new ErrorType(ErrorEnum.InvalidExpressionLeft, matcher.start(), matcher.end());
 						node1 = handleInvalidExpression("Missing feature name or expression on left side", constraint);
 					} else {
 						node1 = checkExpression(leftSide, quotedFeatureNames, subExpressions);
 					}
+					if (node1 == null) {
+						return null;
+					}
+					final String rightSide = constraint.substring(index + symbols[i].length(), constraint.length()).trim();
 					if (rightSide.isEmpty()) {
 						errorType = new ErrorType(ErrorEnum.InvalidExpressionRight, matcher.start(), matcher.end());
 						node2 = handleInvalidExpression("Missing feature name or expression on right side", constraint);
 					} else {
 						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					}
+					if (node2 == null) {
+						return null;
 					}
 				}
 
@@ -295,10 +317,14 @@ public class NodeReader {
 		return getInvalidLiteral(message, constraint, ignoreUnparsableSubExpressions);
 	}
 
-	private Node getInvalidLiteral(String message, String element, boolean ignoreError) throws ParseException {
-		if (ignoreError) {
+	private Node getInvalidLiteral(String message, String element, ErrorHandling handleError) throws ParseException {
+		switch (handleError) {
+		case KEEP:
 			return new ErrorLiteral(element);
-		} else {
+		case REMOVE:
+			return null;
+		case ABORT:
+		default:
 			throw new ParseException(message, 0);
 		}
 	}

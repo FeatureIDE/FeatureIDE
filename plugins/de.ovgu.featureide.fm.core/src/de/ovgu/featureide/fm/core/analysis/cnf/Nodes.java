@@ -48,21 +48,33 @@ public final class Nodes {
 
 	private Nodes() {}
 
+	public static CNF convert(Node node) {
+		if (node == null) {
+			return null;
+		}
+		return convertNF(node.toRegularCNF(), true, true);
+	}
+
 	public static ClauseList convert(IVariables satInstance, Node node) {
 		return convert(satInstance, node, true);
 	}
 
 	public static ClauseList convert(IVariables satInstance, Node node, boolean keepLiteralOrder) {
-		final ClauseList clauses = new ClauseList();
-		getClauseFromNode(satInstance, clauses, node, keepLiteralOrder);
-		return clauses;
+		if (node == null) {
+			return null;
+		}
+		return convertNF(satInstance, node.toRegularCNF(), keepLiteralOrder, true);
 	}
 
-	public static CNF convert(Node node) {
-		return convert(node, true);
+	public static CNF convertDNF(Node node) {
+		return convertNF(node, true, true);
 	}
 
-	public static CNF convert(Node node, boolean keepLiteralOrder) {
+	public static CNF convertCNF(Node node) {
+		return convertNF(node, true, false);
+	}
+
+	public static CNF convertNF(Node node, boolean keepLiteralOrder, boolean cnf) {
 		if (node == null) {
 			return null;
 		}
@@ -74,8 +86,22 @@ public final class Nodes {
 			}
 		}
 		final Variables mapping = new Variables(variableList);
-		final List<LiteralSet> clauses = convert(mapping, node, keepLiteralOrder);
+		final List<LiteralSet> clauses = convertNF(mapping, node, keepLiteralOrder, cnf);
 		return new CNF(mapping, clauses);
+	}
+
+	public static ClauseList convertNF(IVariables satInstance, Node node, boolean keepLiteralOrder, boolean cnf) {
+		final ClauseList clauses = new ClauseList();
+		getClauseFromNode(satInstance, clauses, node, keepLiteralOrder, cnf);
+		return clauses;
+	}
+
+	public static CNF slice(CNF cnf, Collection<String> errorNames) {
+		try {
+			return LongRunningWrapper.runMethod(new CNFSlicer(cnf, errorNames));
+		} catch (final Exception e) {
+			return null;
+		}
 	}
 
 	public static CNF convertSlicingErrorLiterals(IVariables satInstance, Node cnfNode, boolean keepLiteralOrder) {
@@ -92,7 +118,7 @@ public final class Nodes {
 		variableList.addAll(errorNames);
 		final Variables mappingWithErrors = new Variables(variableList);
 
-		final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode, keepLiteralOrder);
+		final List<LiteralSet> clauses = convertNF(mappingWithErrors, cnfNode, keepLiteralOrder, true);
 		try {
 			final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
 			final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
@@ -118,6 +144,46 @@ public final class Nodes {
 				}
 			}
 		}
+	}
+
+	public static void collectVariables(Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
+		for (final Node clause : cnfNode.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				final Literal literal = (Literal) literals[i];
+				final Object varObject = literal.var;
+				if (varObject != null) {
+					final String varName = varObject.toString();
+					if ((literal instanceof ErrorLiteral)) {
+						errorNames.add(varName);
+					} else {
+						varNames.add(varName);
+					}
+				}
+			}
+		}
+	}
+
+	public static Set<String> collectVariables(Node cnfNode, final Collection<String> errorNames) {
+		final Set<String> varNames = new HashSet<>();
+		for (final Node clause : cnfNode.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				final Literal literal = (Literal) literals[i];
+				final Object varObject = literal.var;
+				if (varObject instanceof String) {
+					final String varName = (String) varObject;
+					if ((literal instanceof ErrorLiteral)) {
+						if (errorNames != null) {
+							errorNames.add(varName);
+						}
+					} else {
+						varNames.add(varName);
+					}
+				}
+			}
+		}
+		return varNames;
 	}
 
 	public static Node convert(CNF satInstance) {
@@ -156,50 +222,71 @@ public final class Nodes {
 		}
 	}
 
-	static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node, boolean keepLiteralOrder) {
-		final Node cnfNode = Node.buildCNF(node);
-		// final Node cnfNode = node.toCNF();
-		if (cnfNode instanceof And) {
-			for (final Node andChild : cnfNode.getChildren()) {
-				clauses.add(getClause(s, andChild, keepLiteralOrder));
+	static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node, boolean keepLiteralOrder, boolean cnf) {
+		for (final Node children : node.getChildren()) {
+			final LiteralSet clause = getClause(s, children, keepLiteralOrder, cnf);
+			if (clause != null) {
+				if (clause.isEmpty()) {
+					clauses.clear();
+					clauses.add(new LiteralSet(0));
+					return;
+				} else {
+					clauses.add(clause);
+				}
 			}
-		} else {
-			clauses.add(getClause(s, cnfNode, keepLiteralOrder));
 		}
 	}
 
-	private static LiteralSet getClause(IVariables s, Node andChild, boolean keepLiteralOrder) {
+	private static LiteralSet getClause(IVariables s, Node clauseNode, boolean keepLiteralOrder, boolean cnf) {
 		int absoluteValueCount = 0;
-		boolean valid = true;
+		boolean irrelevant = false;
 
-		final Literal[] children = (andChild instanceof Or) ? Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class)
-			: new Literal[] { (Literal) andChild };
+		final Literal[] children = (clauseNode instanceof Literal) ? new Literal[] { (Literal) clauseNode }
+			: Arrays.copyOf(clauseNode.getChildren(), clauseNode.getChildren().length, Literal[].class);
 
 		for (int j = 0; j < children.length; j++) {
 			final Literal literal = children[j];
 
 			// sort out obvious tautologies
-			if (literal.var.equals(NodeCreator.varTrue)) {
-				if (literal.positive) {
-					valid = false;
-				} else {
-					absoluteValueCount++;
-					children[j] = null;
+			// TODO simplify
+			if (cnf) {
+				if (literal.var.equals(NodeCreator.varTrue)) {
+					if (literal.positive) {
+						irrelevant = true;
+					} else {
+						absoluteValueCount++;
+						children[j] = null;
+					}
+				} else if (literal.var.equals(NodeCreator.varFalse)) {
+					if (literal.positive) {
+						absoluteValueCount++;
+						children[j] = null;
+					} else {
+						irrelevant = true;
+					}
 				}
-			} else if (literal.var.equals(NodeCreator.varFalse)) {
-				if (literal.positive) {
-					absoluteValueCount++;
-					children[j] = null;
-				} else {
-					valid = false;
+			} else {
+				if (literal.var.equals(NodeCreator.varTrue)) {
+					if (!literal.positive) {
+						irrelevant = true;
+					} else {
+						absoluteValueCount++;
+						children[j] = null;
+					}
+				} else if (literal.var.equals(NodeCreator.varFalse)) {
+					if (!literal.positive) {
+						absoluteValueCount++;
+						children[j] = null;
+					} else {
+						irrelevant = true;
+					}
 				}
 			}
 		}
 
-		if (valid) {
-			if (children.length == absoluteValueCount) {
-				throw new RuntimeException("Model is void!");
-			}
+		if (irrelevant) {
+			return null;
+		} else {
 			final int[] newChildren = new int[children.length - absoluteValueCount];
 			int k = 0;
 			for (int j = 0; j < children.length; j++) {
@@ -210,8 +297,6 @@ public final class Nodes {
 				}
 			}
 			return new LiteralSet(newChildren, keepLiteralOrder ? Order.UNORDERED : Order.NATURAL);
-		} else {
-			return null;
 		}
 	}
 

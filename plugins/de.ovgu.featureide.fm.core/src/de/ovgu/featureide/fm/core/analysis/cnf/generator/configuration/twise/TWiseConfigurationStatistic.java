@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
- * Test whether a set of configurations achieves t-wise feature coverage.
+ * Calculates statistics regarding t-wise feature coverage of a set of solutions.
  *
  * @author Sebastian Krieter
  */
@@ -40,7 +40,7 @@ public class TWiseConfigurationStatistic {
 	private long numberOfUncoveredConditions;
 
 	private final double[] configValues;
-	private final long[] configValues2;
+	private final double[] configValues2;
 
 	private final TWiseConfigurationUtil util;
 	private final List<? extends LiteralSet> configurations;
@@ -53,7 +53,7 @@ public class TWiseConfigurationStatistic {
 		this.groupedPresenceConditions = groupedPresenceConditions;
 
 		configValues = new double[configurations.size()];
-		configValues2 = new long[configurations.size()];
+		configValues2 = new double[configurations.size()];
 	}
 
 	public void calculate(boolean countValid) {
@@ -78,10 +78,11 @@ public class TWiseConfigurationStatistic {
 		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
 			final int n = expressions.size();
 			final int[] c = new int[t + 1];
-			for (int i = 0; i <= t; i++) {
-				c[i] = i - 1;
+			c[0] = -1;
+			for (int i = 1; i <= t; i++) {
+				c[i] = n - (t - i);
 			}
-			c[t]--;
+			boolean first = true;
 
 			combinationLoop: while (true) {
 				int i = t;
@@ -93,7 +94,11 @@ public class TWiseConfigurationStatistic {
 				}
 
 				if (i == 0) {
-					break combinationLoop;
+					if (first) {
+						first = false;
+					} else {
+						break combinationLoop;
+					}
 				}
 
 				for (int j = i + 1; j <= t; j++) {
@@ -101,15 +106,17 @@ public class TWiseConfigurationStatistic {
 				}
 
 				for (int j = i; j <= t; j++) {
-					final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
-					final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
-					curList.clear();
-					final PresenceCondition presenceCondition = expressions.get(c[j]);
-					entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
-						for (final LiteralSet literals : presenceCondition) {
-							if (entry.getValue().containsAll(literals)) {
-								curList.add(entry);
-								continue entryLoop;
+					if (j > 0) {
+						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
+						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
+						curList.clear();
+						final PresenceCondition presenceCondition = expressions.get(c[j]);
+						entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
+							for (final LiteralSet literals : presenceCondition) {
+								if (entry.getValue().containsAll(literals)) {
+									curList.add(entry);
+									continue entryLoop;
+								}
 							}
 						}
 					}
@@ -164,13 +171,25 @@ public class TWiseConfigurationStatistic {
 			}
 		}
 
-		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
+		for (List<PresenceCondition> expressions : groupedPresenceConditions) {
+			if (expressions.size() < t) {
+				if (expressions.size() == 0) {
+					continue;
+				}
+				final ArrayList<PresenceCondition> paddedExpressions = new ArrayList<>(t);
+				paddedExpressions.addAll(expressions);
+				for (int i = expressions.size(); i < t; i++) {
+					paddedExpressions.add(expressions.get(0));
+				}
+				expressions = paddedExpressions;
+			}
 			final int n = expressions.size();
 			final int[] c = new int[t + 1];
-			for (int i = 0; i <= t; i++) {
-				c[i] = i - 1;
+			c[0] = -1;
+			for (int i = 1; i <= t; i++) {
+				c[i] = n - (t - i);
 			}
-			c[t]--;
+			boolean first = true;
 
 			combinationLoop: while (true) {
 				int i = t;
@@ -182,7 +201,11 @@ public class TWiseConfigurationStatistic {
 				}
 
 				if (i == 0) {
-					break combinationLoop;
+					if (first) {
+						first = false;
+					} else {
+						break combinationLoop;
+					}
 				}
 
 				for (int j = i + 1; j <= t; j++) {
@@ -190,15 +213,17 @@ public class TWiseConfigurationStatistic {
 				}
 
 				for (int j = i; j < t; j++) {
-					final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
-					final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
-					curList.clear();
-					final PresenceCondition presenceCondition = expressions.get(c[j]);
-					entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
-						for (final LiteralSet literals : presenceCondition) {
-							if (entry.getValue().containsAll(literals)) {
-								curList.add(entry);
-								continue entryLoop;
+					if (j > 0) {
+						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
+						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
+						curList.clear();
+						final PresenceCondition presenceCondition = expressions.get(c[j]);
+						entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
+							for (final LiteralSet literals : presenceCondition) {
+								if (entry.getValue().containsAll(literals)) {
+									curList.add(entry);
+									continue entryLoop;
+								}
 							}
 						}
 					}
@@ -226,6 +251,18 @@ public class TWiseConfigurationStatistic {
 					numberOfUncoveredConditions++;
 				}
 			}
+		}
+		int confIndex = 0;
+		for (final LiteralSet configuration : configurations) {
+			int count = 0;
+			for (final int literal : configuration.getLiterals()) {
+				if (literal == 0) {
+					count++;
+				}
+			}
+			final double d = (double) count / configuration.size();
+			final double factor = (2 - (d * d));
+			configValues2[confIndex++] *= factor;
 		}
 	}
 

@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -101,5 +102,11 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		return createFeatureOperation != null ? createFeatureOperation.inverseOperation(featureModel) : null;
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		// The operation creates features internally => change indicator to CHANGE_DEPENDENCIES
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 }

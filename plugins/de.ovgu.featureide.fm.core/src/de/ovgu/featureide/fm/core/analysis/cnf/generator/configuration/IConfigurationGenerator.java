@@ -25,7 +25,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IAnalysis;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Generates certain configurations for a given propositional formulas.
@@ -33,8 +32,6 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  */
 public interface IConfigurationGenerator extends IAnalysis<List<LiteralSet>> {
-
-	List<LiteralSet> analyze(IMonitor<List<LiteralSet>> monitor) throws Exception;
 
 	LinkedBlockingQueue<LiteralSet> getResultQueue();
 

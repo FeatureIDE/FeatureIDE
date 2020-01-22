@@ -115,14 +115,12 @@ import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -431,26 +429,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	@Override
 	public void dispose() {
 		removeModelListener();
-		try {
-			if ((configFolder != null) && Files.exists(configFolder)) {
-				Files.walk(configFolder).forEach(this::disposeFileManager);
-			}
-			final Path fmPath = EclipseFileSystem.getPath(modelFile.getModelFile());
-			if (fmPath != null) {
-				disposeFileManager(fmPath);
-			}
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void disposeFileManager(Path path) {
-		if (Files.isRegularFile(path) && Files.isWritable(path)) {
-			final IFileManager<?> instance = AFileManager.getInstance(path);
-			if (instance != null) {
-				instance.dispose();
-			}
-		}
 	}
 
 	/**

@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds core and dead features under certain assumptions. Regularly returns intermediate results to a given monitor.
  *
  * @author Sebastian Krieter
  */

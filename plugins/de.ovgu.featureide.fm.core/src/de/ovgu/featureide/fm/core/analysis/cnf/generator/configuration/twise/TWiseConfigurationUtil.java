@@ -40,17 +40,18 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseCon
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.mig.CollectingStrongVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
+import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Contains several intermediate results and functions for generating a t-wise sample.
  *
  * @author Sebastian Krieter
  */
@@ -64,7 +65,7 @@ class TWiseConfigurationUtil {
 	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
 	protected Random random = new Random(42);
 
-	protected final List<LiteralSet> randomSample;
+	protected List<LiteralSet> randomSample;
 
 	private final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
 	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
@@ -83,6 +84,10 @@ class TWiseConfigurationUtil {
 		this.t = t;
 		this.localSolver = localSolver;
 
+		randomSample = Collections.emptyList();
+	}
+
+	public void computeRandomSample() {
 		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
 		randomGenerator.setAllowDuplicates(false);
 		randomGenerator.setSampleSize(1000);
@@ -105,7 +110,7 @@ class TWiseConfigurationUtil {
 			final int literalSet = vertex.getVar();
 			final Traverser traverser = new Traverser(mig);
 			traverser.setModel(new int[mig.getAdjList().size()]);
-			final CollectingVisitor visitor = new CollectingVisitor();
+			final Visitor<VecInt[]> visitor = new CollectingStrongVisitor();
 			traverser.setVisitor(visitor);
 			traverser.traverse(literalSet);
 			final VecInt strong = visitor.getResult()[0];
@@ -203,7 +208,7 @@ class TWiseConfigurationUtil {
 			}
 			return false;
 		}
-		return true;
+		return !clauses.isEmpty();
 	}
 
 	public boolean isCombinationInvalidMIG(LiteralSet literals) {
@@ -385,7 +390,7 @@ class TWiseConfigurationUtil {
 				completeSolutionList.add(configuration);
 			} else {
 				incompleteSolutionList.add(configuration);
-//				Collections.sort(incompleteSolutionList, configurationLengthComparator);
+				Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
 			}
 		}
 	}

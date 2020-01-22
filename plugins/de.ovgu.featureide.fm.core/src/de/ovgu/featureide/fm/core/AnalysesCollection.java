@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentContradictionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentRedundancyAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndeterminedAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RedundancyAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RemoveRedundancyAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ACreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.EmptyCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
@@ -388,27 +389,14 @@ public class AnalysesCollection {
 		}
 	}
 
-	/**
-	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints a also NOT analyzed.
-	 */
-	boolean calculateFeatures = true;
-	/**
-	 * Defines whether constraints should be included into calculations.
-	 */
-	boolean calculateConstraints = true;
-
-	/**
-	 * Defines whether analysis should be performed automatically.
-	 */
-	boolean runCalculationAutomatically = true;
-
+	private FeatureModelFormula formula;
 	final AnalysisWrapper<Boolean, HasSolutionAnalysis> validAnalysis = new AnalysisWrapper<>(HasSolutionAnalysis.class);
 	final AnalysisWrapper<List<LiteralSet>, AtomicSetAnalysis> atomicSetAnalysis = new AnalysisWrapper<>(AtomicSetAnalysis.class);
 	final AnalysisWrapper<LiteralSet, CoreDeadAnalysis> coreDeadAnalysis = new AnalysisWrapper<>(CoreDeadAnalysis.class);
 	final FalseOptionalAnalysisWrapper foAnalysis = new FalseOptionalAnalysisWrapper();
 	final AnalysisWrapper<LiteralSet, IndeterminedAnalysis> determinedAnalysis = new IndeterminesAnalzsisWrapper(IndeterminedAnalysis.class);
-	final ConstraintAnalysisWrapper<RedundancyAnalysis> constraintRedundancyAnalysis =
-		new ConstraintAnalysisWrapper<>(RedundancyAnalysis.class, new FeatureTreeCNFCreator());
+	final ConstraintAnalysisWrapper<RemoveRedundancyAnalysis> constraintRedundancyAnalysis =
+		new ConstraintAnalysisWrapper<>(RemoveRedundancyAnalysis.class, new FeatureTreeCNFCreator());
 	final ConstraintAnalysisWrapper<IndependentRedundancyAnalysis> constraintTautologyAnalysis =
 		new ConstraintAnalysisWrapper<>(IndependentRedundancyAnalysis.class, new EmptyCNFCreator());
 	final ConstraintAnalysisWrapper<IndependentContradictionAnalysis> constraintContradictionAnalysis =
@@ -427,6 +415,7 @@ public class AnalysesCollection {
 	}
 
 	void reset(FeatureModelFormula formula) {
+		this.formula = formula;
 		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
 			analysisWrapper.reset();
 			analysisWrapper.setFormula(formula);
@@ -453,18 +442,17 @@ public class AnalysesCollection {
 	}
 
 	void init(FeatureModelFormula formula) {
+		this.formula = formula;
 		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
 			analysisWrapper.setFormula(formula);
 		}
+
 		deadFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		falseOptionalFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		redundantConstraintExplanationCreator.setFeatureModel(formula.getFeatureModel());
 	}
 
 	public void inheritSettings(AnalysesCollection otherCollection) {
-		calculateFeatures = otherCollection.calculateFeatures;
-		calculateConstraints = otherCollection.calculateConstraints;
-		runCalculationAutomatically = otherCollection.runCalculationAutomatically;
 		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> thisAnalysesIterator = list.iterator();
 		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> otherAnalysesIterator = otherCollection.list.iterator();
 		while (thisAnalysesIterator.hasNext()) {
@@ -472,20 +460,30 @@ public class AnalysesCollection {
 		}
 	}
 
+	/**
+	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints a also NOT analyzed.
+	 */
 	public boolean isCalculateFeatures() {
-		return calculateFeatures;
+		Boolean isCalculatingFeatures = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES);
+		if (isCalculatingFeatures == null) {
+			// default value == true
+			isCalculatingFeatures = Boolean.TRUE;
+		}
+		return isCalculatingFeatures;
 	}
 
-	public void setCalculateFeatures(boolean calculateFeatures) {
-		this.calculateFeatures = calculateFeatures;
-	}
-
+	/**
+	 * Defines whether constraints should be included into calculations.
+	 */
 	public boolean isCalculateConstraints() {
-		return calculateConstraints;
-	}
-
-	public void setCalculateConstraints(boolean calculateConstraints) {
-		this.calculateConstraints = calculateConstraints;
+		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(),
+				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isCalculatingConstraints == null) {
+			// default value == true
+			isCalculatingConstraints = Boolean.TRUE;
+		}
+		return isCalculatingConstraints;
 	}
 
 	public boolean isCalculateRedundantConstraints() {
@@ -529,12 +527,22 @@ public class AnalysesCollection {
 		constraintAnomaliesAnalysis.setEnabled(calculateDeadConstraints);
 	}
 
+	/**
+	 * Defines whether analysis should be performed automatically.
+	 */
 	public boolean isRunCalculationAutomatically() {
-		return runCalculationAutomatically;
-	}
-
-	public void setRunCalculationAutomatically(boolean runCalculationAutomatically) {
-		this.runCalculationAutomatically = runCalculationAutomatically;
+		Boolean isRunAutomatically = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+		if (isRunAutomatically == null) {
+			if (formula.getFeatureModel().getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT) {
+				// Is big model => no automatic analyses as default
+				isRunAutomatically = Boolean.FALSE;
+			} else {
+				// Is small model => automatic analyses as default
+				isRunAutomatically = Boolean.TRUE;
+			}
+		}
+		return isRunAutomatically;
 	}
 
 	public FeatureModelProperties getFeatureModelProperties() {

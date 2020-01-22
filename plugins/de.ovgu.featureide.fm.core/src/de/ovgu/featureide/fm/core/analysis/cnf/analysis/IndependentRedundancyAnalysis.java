@@ -35,9 +35,13 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds redundancies.
+ * Finds redundant clauses with respect to a given {@link CNF}. This analysis works by adding and removing each clause group (see {@link AClauseAnalysis}) to
+ * the given {@link CNF} individually. All clause groups are analyzed separately without considering their interdependencies.<br> For a dependent analysis of
+ * all clause groups use {@link RemoveRedundancyAnalysis}.
  *
  * @author Sebastian Krieter
+ *
+ * @see RemoveRedundancyAnalysis
  */
 public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 
@@ -107,7 +111,7 @@ public class IndependentRedundancyAnalysis extends AClauseAnalysis<List<LiteralS
 						break;
 					case TRUE:
 						solutionList.add(new LiteralSet(solver.getSolution(), Order.INDEX, false));
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						break;
 					default:
 						throw new AssertionError(hasSolution);

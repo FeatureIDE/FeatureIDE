@@ -26,6 +26,8 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 /**
  * Basic analysis interface.
  *
+ * @param <T> Type of the analysis result.
+ *
  * @author Sebastian Krieter
  */
 public interface IAnalysis<T> extends LongRunningMethod<T> {

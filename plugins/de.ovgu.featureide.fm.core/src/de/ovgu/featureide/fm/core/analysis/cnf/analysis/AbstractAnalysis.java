@@ -31,7 +31,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeTi
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Abstract analysis.
+ * Base class for an analysis using a {@link ISatSolver sat solver}.
+ *
+ * @param <T> Type of the analysis result.
  *
  * @author Sebastian Krieter
  */
@@ -39,9 +41,9 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	protected ISatSolver solver;
 
-	protected Random random = new Random(112358);
-
 	protected LiteralSet assumptions = null;
+
+	private Random random = new Random(112358);
 
 	private boolean timeoutOccured = false;
 	private boolean throwTimeoutException = true;

@@ -178,7 +178,6 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				return SatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
-			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}

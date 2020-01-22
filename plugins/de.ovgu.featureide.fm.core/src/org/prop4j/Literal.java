@@ -71,8 +71,8 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	public boolean isClausalNormalForm() {
-		return false;
+	public boolean isDisjunctiveNormalForm() {
+		return true;
 	}
 
 	@Override
@@ -82,29 +82,31 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
-		// nothing to do with children
 		return this;
 	}
 
 	@Override
-	protected Node clausifyCNF() {
-		// nothing to do
+	protected Node clausifyCNF(boolean simplify) {
 		return this;
 	}
 
 	@Override
-	protected Node clausifyDNF() {
-		// nothing to do
+	protected Node clausifyDNF(boolean simplify) {
 		return this;
 	}
 
 	@Override
-	public void simplify() {
-		// nothing to do (recursive calls reached lowest node)
+	public Node simplify() {
+		return this;
 	}
 
 	@Override
 	public Node flatten() {
+		return this;
+	}
+
+	@Override
+	public Node deMorgan() {
 		return this;
 	}
 
@@ -161,4 +163,10 @@ public class Literal extends Node implements Cloneable {
 		variables.add(var);
 		return variables;
 	}
+
+	@Override
+	public int getMaxDepth() {
+		return 1;
+	}
+
 }

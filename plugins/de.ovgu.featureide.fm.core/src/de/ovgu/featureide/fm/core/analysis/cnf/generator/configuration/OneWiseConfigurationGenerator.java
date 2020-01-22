@@ -39,9 +39,13 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class OneWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
+	public static enum CoverStrategy {
+		POSITIVE, NEGATIVE
+	}
+
+	private CoverStrategy coverStrategy = CoverStrategy.NEGATIVE;
+
 	private int[] variables;
-	// TODO make enum
-	private int coverMode = 0;
 
 	public OneWiseConfigurationGenerator(ISatSolver solver) {
 		this(solver, null);
@@ -69,21 +73,27 @@ public class OneWiseConfigurationGenerator extends AConfigurationGenerator imple
 		variables = features;
 	}
 
-	public int getCoverMode() {
-		return coverMode;
+	public CoverStrategy getCoverMode() {
+		return coverStrategy;
 	}
 
-	public void setCoverMode(int coverMode) {
-		this.coverMode = coverMode;
+	public void setCoverMode(CoverStrategy coverStrategy) {
+		this.coverStrategy = coverStrategy;
 	}
 
 	@Override
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final int initialAssignmentLength = solver.getAssignmentSize();
-		if (coverMode == 1) {
-			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		} else {
+
+		switch (coverStrategy) {
+		case NEGATIVE:
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			break;
+		case POSITIVE:
+			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+			break;
+		default:
+			throw new RuntimeException("Unknown " + CoverStrategy.class.getName() + ": " + coverStrategy);
 		}
 
 		if (solver.hasSolution() == SatResult.TRUE) {
@@ -107,8 +117,15 @@ public class OneWiseConfigurationGenerator extends AConfigurationGenerator imple
 					if (var == 0) {
 						continue;
 					}
-					if (coverMode == 0) {
+
+					switch (coverStrategy) {
+					case NEGATIVE:
 						var = -var;
+						break;
+					case POSITIVE:
+						break;
+					default:
+						throw new RuntimeException("Unknown " + CoverStrategy.class.getName() + ": " + coverStrategy);
 					}
 
 					solver.assignmentPush(var);
@@ -125,18 +142,23 @@ public class OneWiseConfigurationGenerator extends AConfigurationGenerator imple
 						break;
 					case TRUE:
 						lastSolution = solver.getSolution();
-						if (coverMode == 0) {
+						switch (coverStrategy) {
+						case NEGATIVE:
 							for (int j = i; j < variablesToCover.size(); j++) {
 								if (lastSolution[internalVariables.convertToInternal(Math.abs(var)) - 1] < 0) {
 									variablesToCover.set(i, 0);
 								}
 							}
-						} else {
+							break;
+						case POSITIVE:
 							for (int j = i; j < variablesToCover.size(); j++) {
 								if (lastSolution[internalVariables.convertToInternal(Math.abs(var)) - 1] > 0) {
 									variablesToCover.set(i, 0);
 								}
 							}
+							break;
+						default:
+							throw new RuntimeException("Unknown " + CoverStrategy.class.getName() + ": " + coverStrategy);
 						}
 						firstVar = false;
 						break;

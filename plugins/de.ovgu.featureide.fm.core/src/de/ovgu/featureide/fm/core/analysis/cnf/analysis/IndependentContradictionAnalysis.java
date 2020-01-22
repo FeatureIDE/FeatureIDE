@@ -34,11 +34,14 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeCo
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * TODO SOLVER Sebastian Duplicate for the {@link ContradictionAnalysis} when passing empty {@link CNF}
- *
- * Finds contradictions.
+
+ * Finds contradicting clauses with respect to a given {@link CNF}. This analysis works by adding and removing each clause group (see {@link AClauseAnalysis})
+ * to the given {@link CNF} individually. All clause groups are analyzed separately without considering their interdependencies.<br> For a dependent analysis of
+ * all clause groups use {@link ContradictionAnalysis}.
  *
  * @author Sebastian Krieter
+ *
+ * @see ContradictionAnalysis
  */
 public class IndependentContradictionAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 

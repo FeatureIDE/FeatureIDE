@@ -141,7 +141,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 					break;
 				case TRUE:
 					LiteralSet.resetConflicts(model, solver.getSolution());
-					solver.shuffleOrder(random);
+					solver.shuffleOrder(getRandom());
 
 					final int halfLength = (end - start) / 2;
 					if (halfLength > 0) {
@@ -173,7 +173,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 		case TRUE:
 			solver.assignmentPop();
 			LiteralSet.resetConflicts(model, solver.getSolution());
-			solver.shuffleOrder(random);
+			solver.shuffleOrder(getRandom());
 			break;
 		}
 	}
@@ -230,7 +230,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 					case TRUE:
 						solver.assignmentPop();
 						LiteralSet.resetConflicts(model1, solver.getSolution());
-						solver.shuffleOrder(random);
+						solver.shuffleOrder(getRandom());
 						break;
 					}
 				}

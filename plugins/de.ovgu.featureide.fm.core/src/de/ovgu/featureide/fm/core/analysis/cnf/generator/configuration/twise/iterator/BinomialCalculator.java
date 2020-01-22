@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator;
 
+/**
+ * Computes binomial coefficients and factorial.
+ *
+ * @author Sebastian Krieter
+ */
 public class BinomialCalculator {
 
 	private final long[][] binomial;
@@ -30,14 +35,14 @@ public class BinomialCalculator {
 		factorial = new long[t + 1];
 	}
 
-	public long factorial(int j) {
-		long f = factorial[j];
+	public long factorial(int k) {
+		long f = factorial[k];
 		if (f == 0) {
 			f = 1;
-			for (int i = 2; i <= j; i++) {
+			for (int i = 2; i <= k; i++) {
 				f *= i;
 			}
-			factorial[j] = f;
+			factorial[k] = f;
 		}
 		return f;
 	}

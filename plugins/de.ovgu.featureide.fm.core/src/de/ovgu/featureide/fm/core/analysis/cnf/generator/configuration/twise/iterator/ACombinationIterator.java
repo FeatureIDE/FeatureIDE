@@ -25,6 +25,11 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Abstract iterator that implements parts of {@link ICombinationIterator}.
+ *
+ * @author Sebastian Krieter
+ */
 public abstract class ACombinationIterator implements ICombinationIterator {
 
 	protected final List<PresenceCondition> expressions;

@@ -255,7 +255,7 @@ public class DimacsReaderTests {
 
 	@Test
 	public void testClausesMissing() throws ParseException, IOException {
-		testException("" + "p cnf 0 0");
+		new DimacsReader().read("p cnf 0 0");
 	}
 
 	@Test

@@ -163,7 +163,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 	 * Throws an error that will be used for error markers
 	 *
 	 * @param message The error message
-	 * @param tempNode The node that causes the error. this node is used for positioning.
+	 * @param node The node that causes the error. this node is used for positioning.
 	 */
 	protected static void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		final Object userData = node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);

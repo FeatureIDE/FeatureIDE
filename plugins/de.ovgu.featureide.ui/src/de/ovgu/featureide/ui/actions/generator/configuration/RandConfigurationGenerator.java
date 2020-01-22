@@ -20,11 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.Random;
-
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
@@ -34,24 +31,17 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @see RandomConfigurationGenerator
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public class RandConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	private final Random random;
-
 	public RandConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
-		this(builder, formula, new Random());
-	}
-
-	public RandConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, Random random) {
 		super(builder, formula);
-		this.random = random;
 	}
 
 	@Override
-	protected IConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+	protected RandomConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
 		final RandomConfigurationGenerator gen = new RandomConfigurationGenerator(cnf, numberOfConfigurations);
-		gen.setRandom(random);
 		gen.setAllowDuplicates(true);
 		return gen;
 	}

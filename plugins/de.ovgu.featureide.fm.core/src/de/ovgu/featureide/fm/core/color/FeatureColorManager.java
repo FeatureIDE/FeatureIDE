@@ -433,7 +433,7 @@ public class FeatureColorManager implements IEventListener {
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.FEATURE_NAME_CHANGED) {
-			renameFeature(((IFeature) event.getSource()).getFeatureModel(), (String) event.getOldValue(), (String) event.getNewValue());
+			renameFeature((IFeatureModel) event.getSource(), (String) event.getOldValue(), (String) event.getNewValue());
 		}
 	}
 

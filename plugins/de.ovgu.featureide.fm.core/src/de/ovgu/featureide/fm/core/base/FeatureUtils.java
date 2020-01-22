@@ -751,7 +751,7 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 		requireNonNull(next);
 
-		return feature.getStructure().isAncestorOf(next.getStructure());
+		return feature.getStructure().isAncestor(next.getStructure());
 	}
 
 	public static final boolean isAnd(IFeature feature) {

@@ -27,6 +27,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver;
 
 /**
+ * Base class for an analysis that works on a list of clauses. Clauses can be grouped together, for instance if they belong to the same constraint. Grouped
+ * clauses should be handled as a unit by the implementing analysis.
+ *
+ * @param <T> Type of the analysis result.
  *
  * @author Sebastian Krieter
  */

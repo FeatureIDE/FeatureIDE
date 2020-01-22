@@ -44,6 +44,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.AdvancedS
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.impl.nativesat4j.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.OneWiseConfigurationGenerator.CoverStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -324,7 +329,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator =
 				new OneWiseConfigurationGenerator(getSolverForCurrentConfiguration(false, false));
-			oneWiseConfigurationGenerator.setCoverMode(selection ? 1 : 0);
+			oneWiseConfigurationGenerator.setCoverMode(selection ? CoverStrategy.POSITIVE : CoverStrategy.NEGATIVE);
 			final int[] featureArray = new int[features.size()];
 			int index = 0;
 			for (final String feature : features) {

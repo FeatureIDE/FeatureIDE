@@ -46,7 +46,7 @@ public class UniformRandomConfigurationGenerator extends ARandomConfigurationGen
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
 		final ARandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver.getSatInstance(), sampleSize);
 		gen.setAllowDuplicates(false);
-		gen.setRandom(random);
+		gen.setRandom(getRandom());
 		final List<LiteralSet> sample = LongRunningWrapper.runMethod(gen);
 		if (sample.size() < maxSampleSize) {
 			for (final LiteralSet solution : sample) {

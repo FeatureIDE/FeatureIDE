@@ -158,7 +158,9 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		final List<LiteralSet> clauses = new ArrayList<>(featureModel.getConstraints().size());
 		for (final IConstraint constraint : featureModel.getConstraints()) {
 			final Node node = constraint.getNode();
-			Nodes.getClauseFromNode(s, clauses, node, keepLiteralOrder);
+			if (node != null) {
+				Nodes.getClauseFromNode(s, clauses, node.toRegularCNF(), keepLiteralOrder, true);
+			}
 		}
 		return clauses;
 	}

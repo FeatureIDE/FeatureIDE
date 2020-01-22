@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -57,9 +58,12 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 				featureModelManager = ((FeatureModelManager) newInput);
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
-					final FeatureModelManager fmm = FeatureModelManager.getInstance(EclipseFileSystem.getPath(((IFile) newInput)));
-					if (fmm != null) {
-						featureModelManager = fmm;
+					final Path path = EclipseFileSystem.getPath(((IFile) newInput));
+					if (FeatureModelManager.isFileSupported(path)) {
+						final FeatureModelManager fmm = FeatureModelManager.getInstance(path);
+						if (fmm != null) {
+							featureModelManager = fmm;
+						}
 					}
 				}
 			}

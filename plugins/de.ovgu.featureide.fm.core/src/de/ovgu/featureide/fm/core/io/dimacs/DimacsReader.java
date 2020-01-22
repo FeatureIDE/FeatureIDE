@@ -44,7 +44,7 @@ import org.prop4j.Or;
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
  *
- * @author Timo G&uuml;nther
+ * @author Timo Günther
  * @author Sebastian Krieter
  */
 public class DimacsReader {
@@ -120,7 +120,7 @@ public class DimacsReader {
 			}
 			Node node = new And(clauses);
 			if (flattenCNF) {
-				node = node.flatten();
+				node = node.simplifyTree();
 			}
 			return node;
 		}
@@ -215,7 +215,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Variable count is not an integer", lineIterator.getLineCount());
 		}
-		if (variableCount <= 0) {
+		if (variableCount < 0) {
 			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
 
@@ -224,7 +224,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Clause count is not an integer", lineIterator.getLineCount());
 		}
-		if (clauseCount <= 0) {
+		if (clauseCount < 0) {
 			throw new ParseException("Clause count is not positive", lineIterator.getLineCount());
 		}
 	}
