@@ -118,7 +118,7 @@ public class JavaSmtSatSolverFactory extends AbstractSolverFactory {
 	 */
 	@Override
 	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
-		return new JavaSmtSolver(problem, solver, null);
+		return new JavaSmtSolver(problem, Solvers.Z3, null);
 	}
 
 	@Override

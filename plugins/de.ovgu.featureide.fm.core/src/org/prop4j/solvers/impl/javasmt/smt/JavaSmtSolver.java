@@ -31,8 +31,8 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSmtSolver;
 import org.prop4j.solver.IOptimizationSolver;
-import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISmtProblem;
+import org.prop4j.solver.SatResult;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
 import org.prop4j.solvers.impl.javasmt.SolverMemory;
 import org.sosy_lab.common.ShutdownManager;
@@ -69,7 +69,7 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	/** Shutdown manager for the native solver. Can be used to interrupt and cancel a running operation. */
 	protected ShutdownManager shutdownManager;
 	/** The current contex of the solver. Used by the translator to translate prop4J nodes to JavaSMT formulas. */
-	protected SolverContext context;
+	public SolverContext context;
 	/** Memory for the solver. Holds information about the pushed and static formulas. For the JavaSMT and Prop4J nodes. */
 	protected SolverMemory<BooleanFormula> pushstack;
 	/** Translator used to transform prop4j nodes to JavaSMT formulas. */
@@ -81,7 +81,7 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	/** Ordering for objectives in the optimization context. [lex, pareto, box] */
 	public static final String OPTIMIZATION_OBJECTIVE_ORDERING = "OptimizationObjectiveOrdering";
 	/** Native environment for JavaSMT to solve optimization query's */
-	protected OptimizationProverEnvironment prover;
+	public OptimizationProverEnvironment prover;
 
 	/**
 	 * @param node

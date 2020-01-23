@@ -60,7 +60,6 @@ public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Obj
 	 */
 	@Override
 	protected Object[] analyze(IMonitor<Object[]> monitor) throws Exception {
-
 		if ((variable == null) || !(getSolver() instanceof IOptimizationSolver)) {
 			return null;
 		}
@@ -69,7 +68,6 @@ public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Obj
 		getSolver().findSolution();
 		result[0] = solver.minimum(variable);
 		result[1] = solver.maximum(variable);
-
 		return result;
 	}
 

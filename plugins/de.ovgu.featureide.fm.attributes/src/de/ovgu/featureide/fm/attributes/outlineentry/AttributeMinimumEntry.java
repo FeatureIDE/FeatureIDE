@@ -20,15 +20,35 @@
  */
 package de.ovgu.featureide.fm.attributes.outlineentry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
+import org.prop4j.solver.IOptimizationSolver;
+import org.prop4j.solver.ISmtProblem;
+import org.prop4j.solver.impl.SmtProblem;
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.computations.impl.EstimatedMinimumComputation;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 public class AttributeMinimumEntry implements IOutlineEntry {
@@ -36,8 +56,9 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 	IFeatureAttribute attribute;
 	Configuration config;
 	EstimatedMinimumComputation estimatedMinimum;
-	Double result;
+	Object result;
 	private String labelSuffix;
+	private boolean hasOptimaFound = false;
 
 	private static final String EST = " (est)";
 	private static final String LABEL = "Minimal sum of value: ";
@@ -51,33 +72,34 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 
 	}
 
-	public Double getResult() {
+	public Object getResult() {
 		return result;
 	}
 
 	@Override
 	public String getLabel() {
-		if (attribute instanceof LongFeatureAttribute) {
-			return LABEL + String.valueOf(result.longValue()) + labelSuffix;
+		if (result instanceof Long) {
+			long resultLong = (Long) result;
+			return LABEL + String.format("%d", resultLong) + labelSuffix;
+		} else if (result instanceof Double) {
+			double resultDouble = (Double) result;
+			return LABEL + String.format("%.2f", resultDouble) + labelSuffix;
 		}
-		return LABEL + result.toString() + labelSuffix;
+		return LABEL + String.format("%.2f", result) + labelSuffix;
 	}
 
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public List<IOutlineEntry> getChildren() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -93,6 +115,87 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 	}
 
 	@Override
-	public void handleDoubleClick() {}
+	public void handleDoubleClick() {
+		if (hasOptimaFound) {
+			return;
+		}
+		Object minimum = getOptimaMinimum();
+		if (minimum instanceof Long) {
+			result = (Double) minimum;
+			hasOptimaFound = true;
+		} else if (minimum instanceof Double) {
+			result = (Double) minimum;
+			hasOptimaFound = true;
+		}
+	}
+
+	public Object getOptimaMinimum() {
+		// Calculate optima
+		// 1). Get Problem
+		IFeatureModelManager fmManager = FeatureModelManager.getInstance(config.getFeatureModel());
+		ISmtProblem problem =
+			new SmtProblem(fmManager.getVariableFormula().getCNFNode(), FeatureUtils.getFeatureNamesList(fmManager.getVariableFormula().getFeatureModel()));
+
+		// 2). Create optima solver with problem
+		IOptimizationSolver solver = new JavaSmtSatSolverFactory().getOptimizationSolver(problem);
+		if (solver instanceof JavaSmtSolver) {
+			JavaSmtSolver z3Solver = (JavaSmtSolver) solver;
+			FormulaManager fManager = z3Solver.context.getFormulaManager();
+			BooleanFormulaManager bfm = fManager.getBooleanFormulaManager();
+			RationalFormulaManager rfm = fManager.getRationalFormulaManager();
+
+			try {
+				for (SelectableFeature feature : config.getFeatures()) {
+					if (feature.getSelection() == Selection.SELECTED) {
+						z3Solver.prover.push(bfm.makeVariable(feature.getName()));
+					} else if (feature.getSelection() == Selection.UNSELECTED) {
+						z3Solver.prover.push(bfm.not(bfm.makeVariable(feature.getName())));
+					}
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			}
+
+			List<NumeralFormula> formulas = new ArrayList<>();
+			for (IFeature feature : fmManager.getVariableFormula().getFeatureModel().getFeatures()) {
+				if (feature instanceof ExtendedFeature) {
+					ExtendedFeature eFeature = (ExtendedFeature) feature;
+					for (IFeatureAttribute att : eFeature.getAttributes()) {
+						if (att.getName().equals(attribute.getName())) {
+							if (att instanceof LongFeatureAttribute) {
+								Long value = ((LongFeatureAttribute) att).getValue();
+								if (value != null) {
+									formulas.add(bfm.ifThenElse(bfm.makeVariable(att.getFeature().getName()), rfm.makeNumber(value), rfm.makeNumber(0L)));
+								}
+							} else if (att instanceof DoubleFeatureAttribute) {
+								Double value = ((DoubleFeatureAttribute) att).getValue();
+								if (value != null) {
+									formulas.add(bfm.ifThenElse(bfm.makeVariable(att.getFeature().getName()), rfm.makeNumber(value), rfm.makeNumber(0D)));
+								}
+							}
+						}
+					}
+				}
+			}
+			final int handle = z3Solver.prover.minimize(rfm.sum(formulas));
+
+			OptStatus response;
+			try {
+				response = z3Solver.prover.check();
+				assert response == OptStatus.OPT;
+				labelSuffix = "";
+				Object min = z3Solver.prover.lower(handle, Rational.ZERO).get().doubleValue();
+				return min;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			} catch (SolverException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return null;
+	}
 
 }

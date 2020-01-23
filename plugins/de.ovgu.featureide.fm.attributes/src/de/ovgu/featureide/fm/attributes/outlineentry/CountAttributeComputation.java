@@ -66,13 +66,11 @@ public class CountAttributeComputation implements IOutlineEntry {
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return LABEL + Integer.toString(calculateCount());
 	}
 
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -102,8 +100,7 @@ public class CountAttributeComputation implements IOutlineEntry {
 
 	@Override
 	public void handleDoubleClick() {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
 }

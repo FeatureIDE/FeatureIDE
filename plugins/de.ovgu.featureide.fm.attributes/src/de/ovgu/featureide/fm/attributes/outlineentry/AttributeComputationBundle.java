@@ -45,19 +45,16 @@ public class AttributeComputationBundle implements IOutlineEntry {
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return "Attribute statistics";
 	}
 
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
@@ -111,7 +108,6 @@ public class AttributeComputationBundle implements IOutlineEntry {
 
 	@Override
 	public void handleDoubleClick() {
-		// TODO Auto-generated method stub
 
 	}
 

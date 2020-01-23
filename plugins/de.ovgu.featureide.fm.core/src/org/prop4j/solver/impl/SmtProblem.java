@@ -23,6 +23,7 @@ package org.prop4j.solver.impl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.prop4j.And;
@@ -99,6 +100,43 @@ public class SmtProblem implements ISmtProblem {
 			intToVar[indexVariables] = feature; // Contains the feature name
 			intToVariableNodePositive[indexVariables] = new Literal(feature, true);
 			intToVariableNodeNegative[indexVariables] = new Literal(feature, false);
+		}
+	}
+
+	public SmtProblem(Node rootNode, List<String> variables) {
+		intToVar = new Object[variables.size() + 1];
+		intToVariableNodePositive = new Literal[variables.size() + 1];
+		intToVariableNodeNegative = new Literal[variables.size() + 1];
+		intToClause = new Node[rootNode.getChildren().length];
+
+		root = rootNode;
+
+		if (!(root instanceof And)) {
+			throw new IllegalStateException(
+					"The given root node to create a smt problem need to be in conjunctive normal form like form. It can containt the Node @link AtomicFormula but every \"clause\" need to be children of a @link And node");
+		}
+
+		// Create mapping from index to clauses starting from 0
+		clauseToInt = new HashMap<>();
+		if (root != null) {
+			int indexClauses = 0;
+			for (final Node node : rootNode.getChildren()) {
+				clauseToInt.put(node, indexClauses);
+				intToClause[indexClauses++] = node;
+			}
+		}
+
+		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+		varToInt = new HashMap<>();
+		int indexVariables = 0;
+		for (final String name : variables) {
+			if (name == null) {
+				throw new RuntimeException();
+			}
+			varToInt.put(name, ++indexVariables);
+			intToVar[indexVariables] = name; // Contains the feature name
+			intToVariableNodePositive[indexVariables] = new Literal(name, true);
+			intToVariableNodeNegative[indexVariables] = new Literal(name, false);
 		}
 	}
 
