@@ -164,18 +164,16 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 		util.setMaxSampleSize(maxSampleSize);
 		util.setRandom(getRandom());
-
+		if (!util.getCnf().getClauses().isEmpty()) {
+			util.computeMIG();
+		}
 		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		// TODO Variation Point: Building Combinations
 		combiner = new TWiseCombiner(cnf.getVariables().size());
-
 		solver.useSolutionList(0);
 		solver.setSelectionStrategy(SelectionStrategy.ORG);
 		util.computeRandomSample();
-		if (!util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
-		}
 	}
 
 	@Override
