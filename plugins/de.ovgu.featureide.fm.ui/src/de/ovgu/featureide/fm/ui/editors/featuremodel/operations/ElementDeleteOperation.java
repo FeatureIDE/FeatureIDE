@@ -133,11 +133,6 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 		Arrays.sort(elements, new Comparator<Object>() {
 
-			// Orders Constraints descending by there appearance in featureModel.getConstraints();
-			// TODO: check if there is a better way to do this, e.g. determine the index of the constraint not
-			// when creating an DeleteConstraintOperation (the index might change till deletion), but remove the final
-			// from the attribute and set it @operation time. I would consider this more pure and can currently see no benefits
-			// of the current solution
 			@Override
 			public int compare(Object o1, Object o2) {
 				if ((o1 instanceof IConstraint) && (o2 instanceof IConstraint)) {
