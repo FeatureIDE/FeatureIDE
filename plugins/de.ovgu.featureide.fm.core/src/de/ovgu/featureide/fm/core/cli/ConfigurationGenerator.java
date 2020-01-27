@@ -22,10 +22,12 @@ package de.ovgu.featureide.fm.core.cli;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SolutionList;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
@@ -37,6 +39,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWi
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.csv.ConfigurationListFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
+import de.ovgu.featureide.fm.core.io.expression.ExpressionGroupFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
@@ -51,6 +54,7 @@ public class ConfigurationGenerator implements ICLIFunction {
 	private String algorithm;
 	private Path outputFile;
 	private Path fmFile;
+	private Path expressionFile;
 	private int t;
 	private int m;
 	private int limit;
@@ -64,52 +68,68 @@ public class ConfigurationGenerator implements ICLIFunction {
 	public void run(List<String> args) {
 		parseArguments(args);
 		final CNF cnf = new CNF();
-		final ProblemList lastProblems = FileHandler.load(fmFile, cnf, new DIMACSFormatCNF());
+		ProblemList lastProblems = FileHandler.load(fmFile, cnf, new DIMACSFormatCNF());
 		if (lastProblems.containsError()) {
 			throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
-		} else {
-			IConfigurationGenerator generator = null;
-			if (algorithm == null) {
-				throw new IllegalArgumentException("No algorithm specified!");
-			}
-			switch (algorithm.toLowerCase()) {
-			case "icpl": {
-				generator = new SPLCAToolConfigurationGenerator(cnf, "ICPL", t, limit);
-				break;
-			}
-			case "chvatal": {
-				generator = new SPLCAToolConfigurationGenerator(cnf, "Chvatal", t, limit);
-				break;
-			}
-			case "incling": {
-				generator = new PairWiseConfigurationGenerator(cnf, limit);
-				break;
-			}
-			case "yasa": {
-				generator = new TWiseConfigurationGenerator(cnf, t);
-				((TWiseConfigurationGenerator) generator).setIterations(m);
-				break;
-			}
-			case "random": {
-				generator = new RandomConfigurationGenerator(cnf, limit);
-				break;
-			}
-			case "all": {
-				generator = new AllConfigurationGenerator(cnf, limit);
-				break;
-			}
-			default:
-				throw new IllegalArgumentException("No algorithm specified!");
-			}
-			final List<LiteralSet> result = LongRunningWrapper.runMethod(generator, new ConsoleMonitor<>());
-			FileHandler.save(outputFile, new SolutionList(cnf.getVariables(), result), new ConfigurationListFormat());
 		}
+
+		final ArrayList<List<ClauseList>> expressionGroups;
+		if (expressionFile != null) {
+			expressionGroups = new ArrayList<>();
+			lastProblems = FileHandler.load(expressionFile, expressionGroups, new ExpressionGroupFormat());
+			if (lastProblems.containsError()) {
+				throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
+			}
+		} else {
+			expressionGroups = null;
+		}
+
+		IConfigurationGenerator generator = null;
+		if (algorithm == null) {
+			throw new IllegalArgumentException("No algorithm specified!");
+		}
+		switch (algorithm.toLowerCase()) {
+		case "icpl": {
+			generator = new SPLCAToolConfigurationGenerator(cnf, "ICPL", t, limit);
+			break;
+		}
+		case "chvatal": {
+			generator = new SPLCAToolConfigurationGenerator(cnf, "Chvatal", t, limit);
+			break;
+		}
+		case "incling": {
+			generator = new PairWiseConfigurationGenerator(cnf, limit);
+			break;
+		}
+		case "yasa": {
+			if (expressionGroups == null) {
+				generator = new TWiseConfigurationGenerator(cnf, t, limit);
+			} else {
+				generator = new TWiseConfigurationGenerator(cnf, expressionGroups, t, limit);
+			}
+			((TWiseConfigurationGenerator) generator).setIterations(m);
+			break;
+		}
+		case "random": {
+			generator = new RandomConfigurationGenerator(cnf, limit);
+			break;
+		}
+		case "all": {
+			generator = new AllConfigurationGenerator(cnf, limit);
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("No algorithm specified!");
+		}
+		final List<LiteralSet> result = LongRunningWrapper.runMethod(generator, new ConsoleMonitor<>());
+		FileHandler.save(outputFile, new SolutionList(cnf.getVariables(), result), new ConfigurationListFormat());
 	}
 
 	private void resetArguments() {
 		algorithm = null;
 		outputFile = null;
 		fmFile = null;
+		expressionFile = null;
 		t = 0;
 		m = 1;
 		limit = Integer.MAX_VALUE;
@@ -143,6 +163,10 @@ public class ConfigurationGenerator implements ICLIFunction {
 				}
 				case "l": {
 					limit = Integer.parseInt(getArgValue(iterator, arg));
+					break;
+				}
+				case "e": {
+					expressionFile = Paths.get(getArgValue(iterator, arg));
 					break;
 				}
 				default: {

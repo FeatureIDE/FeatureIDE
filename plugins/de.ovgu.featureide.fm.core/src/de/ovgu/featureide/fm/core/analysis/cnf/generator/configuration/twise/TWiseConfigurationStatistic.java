@@ -51,6 +51,8 @@ public class TWiseConfigurationStatistic {
 
 	private boolean countValid = true;
 	private boolean fastCalc = false;
+	private boolean onlyCoverage = false;
+	private int t;
 
 	public boolean isCountValid() {
 		return countValid;
@@ -68,6 +70,22 @@ public class TWiseConfigurationStatistic {
 		this.fastCalc = fastCalc;
 	}
 
+	public int getT() {
+		return t;
+	}
+
+	public void setT(int t) {
+		this.t = t;
+	}
+
+	public boolean isOnlyCoverage() {
+		return onlyCoverage;
+	}
+
+	public void setOnlyCoverage(boolean onlyCoverage) {
+		this.onlyCoverage = onlyCoverage;
+	}
+
 	public void calculate(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
 		numberOfValidConditions = 0;
 		numberOfInvalidConditions = 0;
@@ -77,10 +95,14 @@ public class TWiseConfigurationStatistic {
 		configValues = null;
 		configValues2 = null;
 
-		if (fastCalc) {
-			fastCalc(util, configurations, groupedPresenceConditions);
+		if (onlyCoverage) {
+			completeCalc2(util, configurations, groupedPresenceConditions);
 		} else {
-			completeCalc(util, configurations, groupedPresenceConditions);
+			if (fastCalc) {
+				fastCalc(util, configurations, groupedPresenceConditions);
+			} else {
+				completeCalc(util, configurations, groupedPresenceConditions);
+			}
 		}
 	}
 
@@ -90,7 +112,6 @@ public class TWiseConfigurationStatistic {
 
 		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
 		final ClauseList combinedCondition = new ClauseList();
-		final int t = util.getT();
 		final PresenceCondition[] clauseListArray = new PresenceCondition[t];
 
 		final ArrayList<List<Pair<Integer, LiteralSet>>> lists = new ArrayList<>(t);
@@ -108,18 +129,22 @@ public class TWiseConfigurationStatistic {
 
 		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
 			final int n = expressions.size();
-			final int[] c = new int[t + 1];
+			if (n == 0) {
+				continue;
+			}
+			final int t2 = (n < t) ? n : t;
+			final int[] c = new int[t2 + 1];
 			c[0] = -1;
-			for (int i = 1; i <= t; i++) {
-				c[i] = n - (t - i);
+			for (int i = 1; i <= t2; i++) {
+				c[i] = n - (t2 - i);
 			}
 			boolean first = true;
 
 			combinationLoop: while (true) {
-				int i = t;
+				int i = t2;
 				for (; i > 0; i--) {
 					final int ci = ++c[i];
-					if (ci < ((n - t) + i)) {
+					if (ci < ((n - t2) + i)) {
 						break;
 					}
 				}
@@ -132,11 +157,11 @@ public class TWiseConfigurationStatistic {
 					}
 				}
 
-				for (int j = i + 1; j <= t; j++) {
+				for (int j = i + 1; j <= t2; j++) {
 					c[j] = c[j - 1] + 1;
 				}
 
-				for (int j = i; j <= t; j++) {
+				for (int j = i; j <= t2; j++) {
 					if (j > 0) {
 						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
 						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
@@ -187,10 +212,107 @@ public class TWiseConfigurationStatistic {
 		}
 	}
 
-	private void fastCalc(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+	private void completeCalc2(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+		configValues = new double[configurations.size()];
 		configValues2 = new double[configurations.size()];
 
-		final int t = util.getT();
+		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
+		final ClauseList combinedCondition = new ClauseList();
+		final PresenceCondition[] clauseListArray = new PresenceCondition[t];
+
+		final ArrayList<List<Pair<Integer, LiteralSet>>> lists = new ArrayList<>(t);
+		{
+			for (int i = 0; i <= t; i++) {
+				lists.add(new ArrayList<Pair<Integer, LiteralSet>>());
+			}
+			final List<Pair<Integer, LiteralSet>> list = lists.get(0);
+			int confIndex = 0;
+			for (final LiteralSet configuration : configurations) {
+				list.add(new Pair<>(confIndex++, configuration));
+			}
+		}
+		final List<Pair<Integer, LiteralSet>> curConfigurationList = lists.get(t);
+
+		for (final List<PresenceCondition> expressions : groupedPresenceConditions) {
+			final int n = expressions.size();
+			if (n == 0) {
+				continue;
+			}
+			final int t2 = (n < t) ? n : t;
+			final int[] c = new int[t2 + 1];
+			c[0] = -1;
+			for (int i = 1; i <= t2; i++) {
+				c[i] = n - (t2 - i);
+			}
+			boolean first = true;
+
+			combinationLoop: while (true) {
+				int i = t2;
+				for (; i > 0; i--) {
+					final int ci = ++c[i];
+					if (ci < ((n - t2) + i)) {
+						break;
+					}
+				}
+
+				if (i == 0) {
+					if (first) {
+						first = false;
+					} else {
+						break combinationLoop;
+					}
+				}
+
+				for (int j = i + 1; j <= t2; j++) {
+					c[j] = c[j - 1] + 1;
+				}
+
+				for (int j = i; j <= t2; j++) {
+					if (j > 0) {
+						final List<Pair<Integer, LiteralSet>> prevList = lists.get(j - 1);
+						final List<Pair<Integer, LiteralSet>> curList = lists.get(j);
+						curList.clear();
+						final PresenceCondition presenceCondition = expressions.get(c[j]);
+						entryLoop: for (final Pair<Integer, LiteralSet> entry : prevList) {
+							for (final LiteralSet literals : presenceCondition) {
+								if (entry.getValue().containsAll(literals)) {
+									curList.add(entry);
+									continue entryLoop;
+								}
+							}
+						}
+					}
+				}
+
+				final int count = curConfigurationList.size();
+				if (count > 0) {
+					numberOfCoveredConditions++;
+					if (countValid) {
+						numberOfValidConditions++;
+					}
+				} else {
+					if (countValid) {
+						for (int j = 1; j < c.length; j++) {
+							clauseListArray[j - 1] = expressions.get(c[j]);
+						}
+						combinedCondition.clear();
+						combiner.combineConditions(clauseListArray, combinedCondition);
+						if (util.isCombinationValid(combinedCondition)) {
+							numberOfValidConditions++;
+							numberOfUncoveredConditions++;
+						} else {
+							numberOfInvalidConditions++;
+						}
+					} else {
+						numberOfUncoveredConditions++;
+					}
+				}
+			}
+		}
+	}
+
+	private void fastCalc(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+		configValues2 = new double[configurations.size()];
 
 		final ArrayList<List<Pair<Integer, LiteralSet>>> lists = new ArrayList<>(t);
 		{
@@ -344,7 +466,7 @@ public class TWiseConfigurationStatistic {
 	public double[] getConfigValues2() {
 		final double[] values = new double[configValues2.length];
 		for (int i = 0; i < configValues2.length; i++) {
-			values[i] = (double) configValues2[i];
+			values[i] = configValues2[i];
 		}
 		return values;
 	}
