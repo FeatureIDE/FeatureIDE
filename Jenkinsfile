@@ -85,4 +85,3 @@ pipeline {
         }
     }    
 }
->>>>>>> release3.6
