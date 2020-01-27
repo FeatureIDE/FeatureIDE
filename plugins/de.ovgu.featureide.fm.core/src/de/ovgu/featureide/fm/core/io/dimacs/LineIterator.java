@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,21 +20,51 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.function.Supplier;
+
 /**
- * Constants for the DIMACS format.
+ * Reads a source line by line, skipping empty lines.
  *
  * @author Sebastian Krieter
  */
-public class DIMACSConstants {
+public class LineIterator implements Supplier<String> {
 
-	/** Token leading a (single-line) comment. */
-	public static final String COMMENT = "c";
-	public static final String COMMENT_START = COMMENT + " ";
-	/** Token leading the problem definition. */
-	public static final String PROBLEM = "p";
-	/** Token identifying the problem type as CNF. */
-	public static final String CNF = "cnf";
-	/** Token denoting the end of a clause. */
-	public static final String CLAUSE_END = "0";
+	private final BufferedReader reader;
+	private String line = null;
+	private int lineCount = 0;
+
+	public LineIterator(BufferedReader reader) {
+		this.reader = reader;
+	}
+
+	@Override
+	public String get() {
+		try {
+			do {
+				line = reader.readLine();
+				if (line == null) {
+					return null;
+				}
+				lineCount++;
+			} while (line.trim().isEmpty());
+			return line;
+		} catch (final IOException e) {
+			return null;
+		}
+	}
+
+	public String currentLine() {
+		return line;
+	}
+
+	public void setCurrentLine(String line) {
+		this.line = line;
+	}
+
+	public int getLineCount() {
+		return lineCount;
+	}
 
 }
