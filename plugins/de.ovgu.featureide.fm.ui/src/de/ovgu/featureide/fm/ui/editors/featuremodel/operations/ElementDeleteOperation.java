@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -129,6 +130,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 				continue;
 			}
 			final IFeature parent = createFeatureDeleteOperation(featureModel, element, removalMap, alreadyDeleted);
+
 			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
 		}
 
@@ -201,7 +203,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 				final IVariables variables = formula.getVariables();
 				final int variable = variables.getVariable(feature.getName());
 
+				FMUIPlugin.getDefault().logError(formula + "<---", null);
+
 				final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
+
+				FMUIPlugin.getDefault().logError(modalImplicationGraph + "<---", null);
 
 				final List<IFeature> equivalent = new ArrayList<>();
 				for (final int strongylConnectedVar : MIGUtils.getStronglyConnected(modalImplicationGraph, variable)) {

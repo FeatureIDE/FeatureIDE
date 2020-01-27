@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -234,8 +235,20 @@ public class ComplexConstraintConverter {
 	protected boolean prepare() {
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(fm);
 
-		analyzer.getAnalysesCollection().setCalculateFeatures(true);
-		analyzer.getAnalysesCollection().setCalculateConstraints(true);
+		final String runAutoTemp = fm.getProperty().get(FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY, FeatureModelProperty.TYPE_CALCULATIONS);
+		final String calcFeaturesTemp =
+			fm.getProperty().get(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES, FeatureModelProperty.TYPE_CALCULATIONS);
+		final String calcConstraintsTemp =
+			fm.getProperty().get(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS, FeatureModelProperty.TYPE_CALCULATIONS);
+
+		// Temporaly override properties to enable analysis of all analyses
+		fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY, FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES, FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS, FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+
 		analyzer.getAnalysesCollection().setCalculateRedundantConstraints(true);
 		analyzer.getAnalysesCollection().setCalculateTautologyConstraints(true);
 
@@ -251,6 +264,23 @@ public class ComplexConstraintConverter {
 
 		for (final IConstraint c : toRemove) {
 			fm.removeConstraint(c);
+		}
+
+		// Reset properties for the model
+		if (runAutoTemp == null) {
+			fm.getProperty().remove(FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY, FeatureModelProperty.TYPE_CALCULATIONS);
+		} else {
+			fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY, FeatureModelProperty.TYPE_CALCULATIONS, runAutoTemp);
+		}
+		if (calcFeaturesTemp == null) {
+			fm.getProperty().remove(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES, FeatureModelProperty.TYPE_CALCULATIONS);
+		} else {
+			fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES, FeatureModelProperty.TYPE_CALCULATIONS, calcFeaturesTemp);
+		}
+		if (calcConstraintsTemp == null) {
+			fm.getProperty().remove(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS, FeatureModelProperty.TYPE_CALCULATIONS);
+		} else {
+			fm.getProperty().set(FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS, FeatureModelProperty.TYPE_CALCULATIONS, calcConstraintsTemp);
 		}
 		return true;
 	}

@@ -90,6 +90,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -110,6 +111,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -522,7 +524,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				final AnalysesCollection generalAnalysesCollection = persistentFormula.getAnalyzer().getAnalysesCollection();
 				final AnalysesCollection localAnalysesCollection = localAnalyzer.getAnalysesCollection();
 				localAnalysesCollection.inheritSettings(generalAnalysesCollection);
-				if (!localAnalysesCollection.isRunCalculationAutomatically() && localAnalysesCollection.isCalculateFeatures()) {
+				if (!localAnalysesCollection.isRunCalculationAutomatically() || !localAnalysesCollection.isCalculateFeatures()) {
 					return true;
 				}
 
@@ -746,6 +748,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
+			if (source instanceof ArrayList) {
+				final ArrayList<?> sList = (ArrayList<?>) source;
+				for (final Object object : sList) {
+					if (object instanceof FeatureModelOperationEvent) {
+
+						propertyChange((FeatureModelOperationEvent) object);
+					}
+				}
+			}
+
 			viewer.reload();
 			analyzeFeatureModel();
 			viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
@@ -801,6 +813,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(root.getObject());
 			}
 			viewer.internRefresh(true);
+			viewer.deselectAll();
 			setDirty();
 			analyzeFeatureModel();
 			break;
@@ -1083,6 +1096,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				for (final Action action : calculationActions) {
+					if (action instanceof AFeatureModelAction) {
+						((AFeatureModelAction) action).update();
+					}
 					menuManager.add(action);
 				}
 				menuManager.insert(2, new Separator());

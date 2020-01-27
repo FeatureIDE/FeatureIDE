@@ -87,9 +87,22 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
+
+		final ArrayList<AbstractFeatureModelOperation> copiedList = new ArrayList<>();
+
 		for (final AbstractFeatureModelOperation operation : operations) {
+			copiedList.add(operation);
+		}
+
+		for (int i = copiedList.size() - 1; i >= 0; i--) {
+
+			final AbstractFeatureModelOperation operation = copiedList.get(i);
 			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
 		}
+
+//		for (final AbstractFeatureModelOperation operation : operations) {
+//			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
+//		}
 		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
 	}
 
