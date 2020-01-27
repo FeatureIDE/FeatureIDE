@@ -71,7 +71,6 @@ class TWiseConfigurationUtil {
 	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
 
 	protected final CNF cnf;
-	protected final int t;
 	protected final ISatSolver localSolver;
 
 	protected ModalImplicationGraph mig;
@@ -79,9 +78,8 @@ class TWiseConfigurationUtil {
 
 	protected int maxSampleSize = Integer.MAX_VALUE;
 
-	public TWiseConfigurationUtil(CNF cnf, int t, ISatSolver localSolver) {
+	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver) {
 		this.cnf = cnf;
-		this.t = t;
 		this.localSolver = localSolver;
 
 		randomSample = Collections.emptyList();
@@ -141,10 +139,6 @@ class TWiseConfigurationUtil {
 
 	public CNF getCnf() {
 		return cnf;
-	}
-
-	public int getT() {
-		return t;
 	}
 
 	public ISatSolver getSolver() {

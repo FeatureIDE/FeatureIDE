@@ -37,28 +37,35 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
  */
 public class TWiseConfigurationTester {
 
-	private final CNF cnf;
-	private final int t;
-	private final List<LiteralSet> configurations;
-	private final PresenceConditionManager presenceConditionManager;
-
 	private final TWiseConfigurationUtil util;
 
-	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<LiteralSet> configurations) {
-		this.cnf = cnf;
-		this.t = t;
-		this.configurations = configurations;
-		if (!this.cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, t, new AdvancedSatSolver(this.cnf));
-			util.computeMIG();
+	private List<LiteralSet> sample;
+	private PresenceConditionManager presenceConditionManager;
+	private int t;
+
+	public TWiseConfigurationTester(CNF cnf) {
+		if (!cnf.getClauses().isEmpty()) {
+			util = new TWiseConfigurationUtil(cnf, new AdvancedSatSolver(cnf));
 		} else {
-			util = new TWiseConfigurationUtil(cnf, t, null);
+			util = new TWiseConfigurationUtil(cnf, null);
 		}
-		presenceConditionManager = new PresenceConditionManager(util, nodeArray);
+
+		util.computeRandomSample();
+		if (!cnf.getClauses().isEmpty()) {
+			util.computeMIG();
+		}
 	}
 
-	public boolean test() {
-		return (hasInvalidSolutions() == null) && (hasUncoveredConditions() == null);
+	public void setNodes(List<List<ClauseList>> expressions) {
+		presenceConditionManager = new PresenceConditionManager(util, expressions);
+	}
+
+	public void setT(int t) {
+		this.t = t;
+	}
+
+	public void setSample(List<LiteralSet> sample) {
+		this.sample = sample;
 	}
 
 	/**
@@ -80,13 +87,19 @@ public class TWiseConfigurationTester {
 	 *         </ul>
 	 */
 	public TWiseConfigurationStatistic getCoverage() {
-		final TWiseConfigurationStatistic statistic =
-			new TWiseConfigurationStatistic(util, configurations, presenceConditionManager.getGroupedPresenceConditions());
-		statistic.calculate(true);
+		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
+		statistic.setT(t);
+		statistic.setOnlyCoverage(true);
+		statistic.calculate(util, sample, presenceConditionManager.getGroupedPresenceConditions());
 		return statistic;
 	}
 
-	public ClauseList hasUncoveredConditions() {
+	public boolean hasUncoveredConditions() {
+		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
+		return !uncoveredConditions.isEmpty();
+	}
+
+	public ClauseList getFirstUncoveredCondition() {
 		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
 		return uncoveredConditions.isEmpty() ? null : uncoveredConditions.get(0);
 	}
@@ -95,9 +108,9 @@ public class TWiseConfigurationTester {
 		return getUncoveredConditions(false);
 	}
 
-	public List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
+	private List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
 		final ArrayList<ClauseList> uncoveredConditions = new ArrayList<>();
-		final TWiseCombiner combiner = new TWiseCombiner(cnf.getVariables().size());
+		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
 		ClauseList combinedCondition = new ClauseList();
 
 		groupLoop: for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
@@ -109,7 +122,7 @@ public class TWiseConfigurationTester {
 
 				combinedCondition.clear();
 				combiner.combineConditions(clauseListArray, combinedCondition);
-				if (!TWiseConfigurationUtil.isCovered(combinedCondition, configurations) && util.isCombinationValid(combinedCondition)) {
+				if (!TWiseConfigurationUtil.isCovered(combinedCondition, sample) && util.isCombinationValid(combinedCondition)) {
 					uncoveredConditions.add(combinedCondition);
 					combinedCondition = new ClauseList();
 					if (cancelAfterFirst) {
@@ -122,7 +135,12 @@ public class TWiseConfigurationTester {
 		return uncoveredConditions;
 	}
 
-	public LiteralSet hasInvalidSolutions() {
+	public boolean hasInvalidSolutions() {
+		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
+		return !invalidSolutions.isEmpty();
+	}
+
+	public LiteralSet getFirstInvalidSolution() {
 		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
 		return invalidSolutions.isEmpty() ? null : invalidSolutions.get(0);
 	}
@@ -131,10 +149,10 @@ public class TWiseConfigurationTester {
 		return getInvalidSolutions(false);
 	}
 
-	public List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
+	private List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
 		final ArrayList<LiteralSet> invalidSolutions = new ArrayList<>();
-		configLoop: for (final LiteralSet solution : configurations) {
-			for (final LiteralSet clause : cnf.getClauses()) {
+		configLoop: for (final LiteralSet solution : sample) {
+			for (final LiteralSet clause : util.getCnf().getClauses()) {
 				if (!solution.hasDuplicates(clause)) {
 					invalidSolutions.add(solution);
 					if (cancelAfterFirst) {

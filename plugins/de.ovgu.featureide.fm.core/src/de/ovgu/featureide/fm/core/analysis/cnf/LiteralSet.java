@@ -43,7 +43,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	private int hashCode;
 
-	private Order order;
+	private Order order = null;
 
 	/**
 	 * Constructs a new clause from the given literals. Negates the given literals. <br> <b>Does not modify the given literal array.</b>
@@ -94,7 +94,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 
 	public LiteralSet(LiteralSet clause, Order literalOrder) {
 		literals = Arrays.copyOf(clause.literals, clause.literals.length);
-		sortLiterals(literalOrder);
+		setOrder(literalOrder);
 	}
 
 	/**
@@ -113,14 +113,25 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	public LiteralSet(int[] literals, Order literalOrder, boolean sort) {
 		this.literals = literals;
 		if (sort) {
-			sortLiterals(literalOrder);
+			setOrder(literalOrder);
 		} else {
 			hashCode = Arrays.hashCode(literals);
 			order = literalOrder;
 		}
 	}
 
-	public void sortLiterals(Order newOrder) {
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		if (this.order != order) {
+			sortLiterals(order);
+			this.order = order;
+		}
+	}
+
+	private void sortLiterals(Order newOrder) {
 		switch (newOrder) {
 		case INDEX:
 			final int[] sortedLiterals = new int[literals.length];
@@ -141,7 +152,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 			break;
 		}
 		hashCode = Arrays.hashCode(literals);
-		order = newOrder;
 	}
 
 	public int[] getLiterals() {
@@ -494,7 +504,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 			final int l = oldLiterals[i];
 			newLiterals[i] = newVariables.getVariable(oldVariables.getName(l), l > 0);
 		}
-		return new LiteralSet(newLiterals);
+		return new LiteralSet(newLiterals, order, true);
 	}
 
 	public String toBinaryString() {
