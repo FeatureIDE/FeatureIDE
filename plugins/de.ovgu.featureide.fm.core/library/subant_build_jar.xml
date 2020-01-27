@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
 
-	<!-- Path to Java Compiler (must be Java 1.7) -->
-	<property name="bin.javac.path" value="C:/Program Files/Java/jdk1.7.0_80/bin/javac.exe" />
+	<!-- Path to Java Compiler (Can be adated in file build_jar.properties) -->
+	<property name="bin.javac.path.default" value="C:/Program Files/Java/openjdk-8u212-b04/bin/javac.exe" />
 
 	<!-- Set JAR name -->
-	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
-	<property name="build.jar.version" value="3.5.5" />
+	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.core" />
+	<property name="build.jar.version" value="3.6.1" />
 
 	<!-- Constants -->
 	<property name="src.dir" value="../src" />
 	<property name="lib.dir" value="../lib" />
+	<property name="lib.jar.dir" value="jar/lib" />
 	<property name="license.path" value="../license.txt" />
 
 	<property name="build.dir" value="." />
@@ -21,37 +22,42 @@
 	<property name="build.version.name" value="version.txt" />
 	<property name="build.version.path" value="${build.bin.dir}/${build.version.name}" />
 
-	<target name="clean" description="Delete the Build Folder">
+	<condition property="exist-custom-properties">
+		<available file="build_jar.properties" />
+	</condition>
 
-		<!-- Delete temp build folder -->
-		<delete dir="${build.bin.dir}" />
-		<delete dir="${build.jar.dir}" />
-
+	<target name="load-custom-properties" if="exist-custom-properties">
+		<property file="build_jar.properties" />
 	</target>
 
-	<target name="compile" description="Compile Sources">
+	<!-- Delete temp build folder -->
+	<target name="clean" description="Delete the Build Folder">
+		<delete dir="${build.bin.dir}" />
+		<delete dir="${build.jar.dir}" />
+	</target>
 
-		<!-- Get all libraries in lib folder -->
-		<path id="classpath">
-			<fileset dir="${lib.dir}" includes="**/*.jar" />
-		</path>
+	<target name="compile" description="Compile Sources" depends="load-custom-properties">
+
+		<property name="bin.javac.path" value="${bin.javac.path.default}" />
 
 		<!-- Create folders, if they do not exist yet -->
 		<mkdir dir="${build.bin.dir}" />
 		<mkdir dir="${build.jar.dir}" />
+		<mkdir dir="${lib.jar.dir}" />
+		
+		<copy todir="${lib.jar.dir}">
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
+		</copy>
+
+		<!-- Get all libraries in lib folder -->
+		<path id="classpath">
+			<fileset dir="${lib.jar.dir}" includes="**/*.jar" />
+		</path>
 
 		<!-- Compile the src folder -->
-		<javac srcdir="${src.dir}"
-		       destdir="${build.bin.dir}"
-		       classpathref="classpath"
-		       excludesfile="${build.excludes.path}"
-		       debug="on"
-		       includeantruntime="false"
-		       source="1.7"
-		       target="1.7"
-	           fork="yes"
-	           executable="${bin.javac.path}"
-		/>
+		<javac srcdir="${src.dir}" destdir="${build.bin.dir}" classpathref="classpath" excludesfile="${build.excludes.path}" debug="on" includeantruntime="false" source="1.8" target="1.8" fork="yes" executable="${bin.javac.path}">
+			<compilerarg value="-Xlint" />
+		</javac>
 
 		<!-- Calculate checksum for .class files -->
 		<checksum algorithm="SHA-256" totalproperty="build.checksum" forceoverwrite="yes">
@@ -72,18 +78,16 @@
 
 	</target>
 
+	<!-- Build jar file, including source files and license file -->
 	<target name="build" description="Compile and Build JAR" depends="compile">
-
-		<!-- Build jar file, including source files and license file -->
 		<jar destfile="${build.jar.path}.jar" basedir="${build.bin.dir}" excludes="**/*.SHA-256" compress="true">
 			<fileset dir="${src.dir}" includes="**/*.java" excludesfile="${build.excludes.path}" />
 			<fileset file="${license.path}" />
 		</jar>
-
 	</target>
 
-	<target name="deleteFiles" description="Delete all files with eclipse dependencies (For test purposes only!)">
-		<!-- Alternative: Remove files from classpath -->
+	<!-- Alternative: Remove files from classpath -->
+	<target name="deleteFiles" description="Delete all files with eclipse dependencies (For testing purposes only!)">
 		<delete>
 			<fileset dir="${src.dir}" includesfile="${build.excludes.path}" />
 		</delete>

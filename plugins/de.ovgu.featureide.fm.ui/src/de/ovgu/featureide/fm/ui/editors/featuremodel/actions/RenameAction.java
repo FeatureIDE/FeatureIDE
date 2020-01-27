@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.swt.SWT;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Renames a particular feature at the feature diagram.
@@ -37,8 +36,8 @@ public class RenameAction extends SingleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.rename";
 	private final Object diagramEditor;
 
-	public RenameAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
-		super("Rename (F2)", viewer, ID);
+	public RenameAction(Object viewer, IFeatureModelManager featureModelManager, Object graphicalViewer) {
+		super("Rename (F2)", viewer, ID, featureModelManager);
 		setAccelerator(SWT.F2);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/wordassist_co.gif"));
 		diagramEditor = graphicalViewer;
@@ -46,14 +45,9 @@ public class RenameAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		final FeatureEditPart part = getSelectedFeatureEditPart(diagramEditor);
-		part.showRenameManager();
+		getSelectedFeatureEditPart(diagramEditor).showRenameManager();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction #updateProperties()
-	 */
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);

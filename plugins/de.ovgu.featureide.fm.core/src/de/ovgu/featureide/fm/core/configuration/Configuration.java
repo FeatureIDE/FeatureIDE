@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,43 +21,31 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.sat4j.specs.TimeoutException;
-
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.Renaming;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultConfigurationFactory;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
  */
 public class Configuration implements Cloneable {
 
-	public final static int PARAM_NONE = 0x00;
-	public final static int PARAM_IGNOREABSTRACT = 0x02;
-	public final static int PARAM_PROPAGATE = 0x04;
-	public final static int PARAM_LAZY = 0x08;
-
-	final ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
-	final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
-
-	final boolean ignoreAbstractFeatures;
-
-	protected final IFeatureModel featureModel;
-	private final SelectableFeature root;
-	private final ConfigurationPropagator propagator;
-	private boolean propagate = true;
+	protected final LinkedHashMap<String, SelectableFeature> selectableFeatures = new LinkedHashMap<>();
+	protected FeatureModelFormula featureModel;
+	protected SelectableFeature root;
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -65,110 +53,109 @@ public class Configuration implements Cloneable {
 	 * @param configuration The configuration to clone
 	 */
 	protected Configuration(Configuration configuration) {
-		featureModel = configuration.featureModel;
-		ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
-		propagator = configuration.propagator.clone(this);
-		propagate = false;
-		root = initRoot();
-
-		for (final SelectableFeature f : configuration.features) {
-			setManual(f.getName(), f.getManual());
-			setAutomatic(f.getName(), f.getAutomatic());
+		updateFeatures(configuration.featureModel);
+		for (final SelectableFeature f : configuration.selectableFeatures.values()) {
+			final SelectableFeature newFeature = getSelectableFeature(f.getName(), featureModel == null);
+			if (newFeature != null) {
+				setManual(newFeature, f.getManual());
+				setAutomatic(newFeature, f.getAutomatic());
+				newFeature.cloneProperties(f);
+			}
 		}
-		propagate = configuration.propagate;
 	}
 
 	/**
 	 * Copy constructor. Copies the status of a given configuration.
 	 *
-	 * @param configuration
-	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
+	 * @param configuration the old configuration.
+	 * @param featureModel the underlying feature model. The model can be different from the model of the old configuration.
 	 */
-	public Configuration(Configuration configuration, IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-		ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
-		propagator = new ConfigurationPropagator(this);
-		propagate = false;
-		root = initRoot();
-
-		for (final SelectableFeature oldFeature : configuration.features) {
-			final SelectableFeature newFeature = table.get(oldFeature.getName());
+	public Configuration(Configuration configuration, FeatureModelFormula featureModel) {
+		updateFeatures(featureModel);
+		for (final SelectableFeature oldFeature : configuration.selectableFeatures.values()) {
+			final SelectableFeature newFeature = selectableFeatures.get(oldFeature.getName());
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
+				newFeature.setAutomatic(oldFeature.getAutomatic());
+				newFeature.cloneProperties(oldFeature);
 			}
 		}
 	}
 
-	public Configuration(IFeatureModel featureModel) {
-		this(featureModel, PARAM_PROPAGATE | PARAM_IGNOREABSTRACT);
+	public Configuration() {}
+
+	public Configuration(FeatureModelFormula featureModel) {
+		updateFeatures(featureModel);
 	}
 
-	public Configuration(IFeatureModel featureModel, boolean propagate) {
-		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | PARAM_IGNOREABSTRACT);
+	public boolean updateFeatures(FeatureModelFormula featureModelFormula) {
+		return updateFeatures(featureModelFormula, null);
 	}
 
-	public Configuration(IFeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
-		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | (ignoreAbstractFeatures ? PARAM_IGNOREABSTRACT : 0));
-	}
-
-	/**
-	 * Creates a new configuration object.
-	 *
-	 * @param featureModel the corresponding feature model.
-	 * @param options one or more of:<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},<br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},<br>
-	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
-	 */
-	public Configuration(IFeatureModel featureModel, int options) {
-		this.featureModel = featureModel;
-		ignoreAbstractFeatures = (options & PARAM_IGNOREABSTRACT) != 0;
-		propagate = (options & PARAM_PROPAGATE) != 0;
-		propagator = new ConfigurationPropagator(this);
-		root = initRoot();
-
-		if ((options & PARAM_LAZY) == 0) {
-			loadPropagator();
+	public boolean updateFeatures(FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
+		if ((featureModelFormula != null) && (featureModel != featureModelFormula)) {
+			initFeatures(featureModelFormula, renamings);
+			return true;
 		}
+		return false;
 	}
 
-	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
-		if ((sFeature != null) && (sFeature.getName() != null)) {
-			features.add(sFeature);
-			table.put(sFeature.getName(), sFeature);
-
-			for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-				final SelectableFeature sChild = new SelectableFeature(child.getFeature());
-				sFeature.addChild(sChild);
-				initFeatures(sChild, child.getFeature());
-			}
-		}
-	}
-
-	private SelectableFeature initRoot() {
-
-		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
-		final SelectableFeature root = new SelectableFeature(featureRoot);
-
+	private void initFeatures(FeatureModelFormula featureModelFormula, List<Renaming> renamings) {
+		final IFeature featureRoot = FeatureUtils.getRoot(featureModelFormula.getFeatureModel());
 		if (featureRoot != null) {
-			initFeatures(root, featureRoot);
-		} else {
-			features.add(root);
-			table.put(root.getName(), root);
+			featureModel = featureModelFormula;
+			root = initFeatures(null, featureRoot, renamings);
+			selectableFeatures.clear();
+			readdFeatures(root);
+		}
+	}
+
+	private SelectableFeature initFeatures(SelectableFeature parent, IFeature feature, List<Renaming> renamings) {
+		final String curName = feature.getName();
+		String oldName = curName;
+		if (renamings != null) {
+			for (final Renaming renaming : renamings) {
+				if (renaming.newName.equals(curName)) {
+					oldName = renaming.oldName;
+					break;
+				}
+			}
+		}
+		SelectableFeature sFeature = selectableFeatures.get(oldName);
+		if (sFeature == null) {
+			sFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(feature);
+			selectableFeatures.put(curName, sFeature);
+		} else if (!curName.equals(oldName)) {
+			selectableFeatures.remove(oldName);
+			sFeature = sFeature.clone();
+			sFeature.setFeature(feature);
+			sFeature.setName(null);
+			selectableFeatures.put(curName, sFeature);
+		} else if (sFeature.getFeature() == null) {
+			sFeature.setFeature(feature);
+			sFeature.setName(null);
 		}
 
-		return root;
+		sFeature.removeChildren();
+		for (final IFeatureStructure child : feature.getStructure().getChildren()) {
+			initFeatures(sFeature, child.getFeature(), renamings);
+		}
+
+		if (parent != null) {
+			parent.addChild(sFeature);
+		}
+		return sFeature;
 	}
 
-	public void loadPropagator() {
-		LongRunningWrapper.runMethod(propagator.load());
-		update(true, null);
+	private void readdFeatures(SelectableFeature root) {
+		selectableFeatures.put(root.getName(), root);
+		for (final TreeElement child : root.getChildren()) {
+			readdFeatures((SelectableFeature) child);
+		}
 	}
 
-	public IConfigurationPropagator getPropagator() {
-		return propagator;
-	}
-
-	void resetAutomaticValues() {
-		for (final SelectableFeature feature : features) {
+	public void resetAutomaticValues() {
+		for (final SelectableFeature feature : selectableFeatures.values()) {
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
 	}
@@ -178,29 +165,43 @@ public class Configuration implements Cloneable {
 	}
 
 	public void setAutomatic(String name, Selection selection) {
-		final SelectableFeature feature = table.get(name);
+		final SelectableFeature feature = getSelectableFeature(name, featureModel == null);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
 		setAutomatic(feature, selection);
 	}
 
-	public boolean canBeValid() {
-		return LongRunningWrapper.runMethod(propagator.canBeValid());
+	public IFeatureModel getFeatureModel() {
+		return featureModel == null ? null : featureModel.getFeatureModel();
 	}
 
-	public IFeatureModel getFeatureModel() {
+	public FeatureModelFormula getFeatureModelFormula() {
 		return featureModel;
 	}
 
-	public List<SelectableFeature> getFeatures() {
-		return Collections.unmodifiableList(features);
+	public boolean hasFeatureModel() {
+		return featureModel != null;
+	}
+
+	public Collection<SelectableFeature> getFeatures() {
+		return Collections.unmodifiableCollection(selectableFeatures.values());
 	}
 
 	public List<SelectableFeature> getManualFeatures() {
 		final List<SelectableFeature> featureList = new ArrayList<>();
-		for (final SelectableFeature selectableFeature : features) {
+		for (final SelectableFeature selectableFeature : selectableFeatures.values()) {
 			if ((selectableFeature.getAutomatic() == Selection.UNDEFINED) && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
+				featureList.add(selectableFeature);
+			}
+		}
+		return featureList;
+	}
+
+	public List<SelectableFeature> getAutomaticFeatures() {
+		final List<SelectableFeature> featureList = new ArrayList<>();
+		for (final SelectableFeature selectableFeature : selectableFeatures.values()) {
+			if ((selectableFeature.getAutomatic() != Selection.UNDEFINED) && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
 			}
 		}
@@ -211,13 +212,27 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
-	public SelectableFeature getSelectablefeature(String name) {
-		return table.get(name);
+	public SelectableFeature getSelectableFeature(String name) {
+		return getSelectableFeature(name, false);
+	}
+
+	public SelectableFeature getSelectableFeature(IFeature feature) {
+		return selectableFeatures.get(feature.getName());
+	}
+
+	public SelectableFeature getSelectableFeature(String name, boolean create) {
+		SelectableFeature selectableFeature = selectableFeatures.get(name);
+		if (create && (selectableFeature == null)) {
+			selectableFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(null);
+			selectableFeature.setName(name);
+			selectableFeatures.put(name, selectableFeature);
+		}
+		return selectableFeature;
 	}
 
 	public Set<String> getSelectedFeatureNames() {
 		final Set<String> result = new HashSet<String>();
-		for (final SelectableFeature feature : features) {
+		for (final SelectableFeature feature : selectableFeatures.values()) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getName());
 			}
@@ -226,67 +241,25 @@ public class Configuration implements Cloneable {
 	}
 
 	public List<IFeature> getSelectedFeatures() {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (final SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED) {
-				result.add(feature.getFeature());
-			}
-		}
-		return result;
-	}
-
-	public List<List<String>> getSolutions(int max) throws TimeoutException {
-		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
+		return getFeatures(Selection.SELECTED);
 	}
 
 	public List<IFeature> getUnSelectedFeatures() {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (final SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.UNSELECTED) {
-				result.add(feature.getFeature());
-			}
-		}
-
-		return result;
+		return getFeatures(Selection.UNSELECTED);
 	}
 
 	public List<IFeature> getUndefinedSelectedFeatures() {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (final SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.UNDEFINED) {
+		return getFeatures(Selection.UNDEFINED);
+	}
+
+	private List<IFeature> getFeatures(final Selection selection) {
+		final List<IFeature> result = new ArrayList<>();
+		for (final SelectableFeature feature : selectableFeatures.values()) {
+			if (feature.getSelection() == selection) {
 				result.add(feature.getFeature());
 			}
 		}
-
 		return result;
-	}
-
-	public boolean isPropagate() {
-		return propagate;
-	}
-
-	/**
-	 * Checks that all manual and automatic selections are valid.<br> Abstract features will <b>not</b> be ignored.
-	 *
-	 * @return {@code true} if the current selection is a valid configuration
-	 */
-	public boolean isValid() {
-		return LongRunningWrapper.runMethod(propagator.isValid());
-	}
-
-	/**
-	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
-	 */
-	public boolean isValidNoHidden() {
-		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
-	}
-
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {
-		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList));
-	}
-
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
-		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList, mode));
 	}
 
 	/**
@@ -295,7 +268,7 @@ public class Configuration implements Cloneable {
 	 * @param discardDeselected if {@code true} all automatic deselected features get undefined instead of manual deselected
 	 */
 	public void makeManual(boolean discardDeselected) {
-		for (final SelectableFeature feature : features) {
+		for (final SelectableFeature feature : selectableFeatures.values()) {
 			final Selection autoSelection = feature.getAutomatic();
 			if (autoSelection != Selection.UNDEFINED) {
 				feature.setAutomatic(Selection.UNDEFINED);
@@ -306,86 +279,42 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	/**
-	 * Convenience method, fully equivalent to {@link #number(long, boolean) number(250, false)}.
-	 *
-	 * @return number of possible solutions
-	 *
-	 * @see #number(boolean)
-	 * @see #number(long, boolean)
-	 */
-	public long number() {
-		return number(250, false);
-	}
-
-	/**
-	 * Convenience method, fully equivalent to {@link #number(long, boolean) number(250, includeHiddenFeatures)}.
-	 *
-	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
-	 *
-	 * @return number of possible solutions
-	 *
-	 * @see #number()
-	 * @see #number(long, boolean)
-	 */
-	public long number(boolean includeHiddenFeatures) {
-		return number(250, includeHiddenFeatures);
-	}
-
-	/**
-	 * Counts the number of possible solutions.
-	 *
-	 * @param timeout Timeout in milliseconds.
-	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
-	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occured) that
-	 *         indicates that there are more solutions than the absolute value
-	 */
-	public long number(long timeout, boolean includeHiddenFeatures) {
-		return LongRunningWrapper.runMethod(propagator.number(timeout, includeHiddenFeatures));
-	}
-
 	public void resetValues() {
-		for (final SelectableFeature feature : features) {
+		for (final SelectableFeature feature : selectableFeatures.values()) {
 			feature.setManual(Selection.UNDEFINED);
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
-		update(false, null);
+	}
+
+	public void reset() {
+		selectableFeatures.clear();
+		if (featureModel != null) {
+			initFeatures(featureModel, null);
+		}
 	}
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		update(true, Arrays.asList(feature));
 	}
 
 	public void setManual(String name, Selection selection) {
-		final SelectableFeature feature = table.get(name);
+		final SelectableFeature feature = getSelectableFeature(name, featureModel == null);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
 		setManual(feature, selection);
 	}
 
-	public void setPropagate(boolean propagate) {
-		this.propagate = propagate;
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		for (final SelectableFeature feature : features) {
+		for (final SelectableFeature feature : selectableFeatures.values()) {
 			if ((feature.getSelection() == Selection.SELECTED) && feature.getFeature().getStructure().isConcrete()) {
 				builder.append(feature.getFeature().getName());
 				builder.append("\n");
 			}
 		}
 		return builder.toString();
-	}
-
-	public void update(boolean redundantManual, List<SelectableFeature> featureOrder) {
-		if (propagate) {
-			LongRunningWrapper.runMethod(propagator.update(redundantManual, featureOrder));
-		}
 	}
 
 	@Override
@@ -401,19 +330,8 @@ public class Configuration implements Cloneable {
 		return new Configuration(this);
 	}
 
-	/**
-	 * Creates solutions to cover the given features.
-	 *
-	 * @param features The features that should be covered.
-	 * @param selection true is the features should be selected, false otherwise.
-	 */
-	public List<List<String>> coverFeatures(Collection<String> features, IMonitor monitor, boolean selection) throws TimeoutException {
-		return LongRunningWrapper.runMethod(propagator.coverFeatures(features, selection), monitor);
-
-	}
-
-	public boolean isIgnoreAbstractFeatures() {
-		return ignoreAbstractFeatures;
+	public String getFactoryID() {
+		return DefaultConfigurationFactory.ID;
 	}
 
 }

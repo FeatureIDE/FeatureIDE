@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,19 +20,19 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent.ExecutionType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
  * This operation should be used as superclass for all operations on the feature model. It provides standard handling and refreshing of the model.
@@ -40,87 +40,75 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public abstract class AbstractFeatureModelOperation extends AbstractOperation {
+public abstract class AbstractFeatureModelOperation {
 
-	protected final IFeatureModel featureModel;
+	protected static final String ID_PREFIX = PluginID.PLUGIN_ID + ".operation.";
 
-	protected Object editor = null;
+	protected final IFeatureModelManager featureModelManager;
+	protected final String title;
 
-	protected boolean executed = false;
-
-	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
-		super(label);
-		this.featureModel = featureModel;
-		addContext((IUndoContext) featureModel.getUndoContext());
+	public AbstractFeatureModelOperation(IFeatureModelManager featureModelManager, String title) {
+		this.featureModelManager = featureModelManager;
+		this.title = title;
 	}
 
-	@Override
-	public boolean canRedo() {
-		return !executed;
+	protected abstract FeatureIDEEvent operation(IFeatureModel featureModel);
+
+	protected abstract FeatureIDEEvent inverseOperation(IFeatureModel featureModel);
+
+	protected FeatureIDEEvent firstOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
-	@Override
-	public boolean canUndo() {
-		return executed;
-	}
-
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		return redo(monitor, info);
-	}
-
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		try {
-			redo();
-		} catch (final Exception e) {
-			e.printStackTrace();
-			FMCorePlugin.getDefault().logError(e);
-			throw new ExecutionException(e.getMessage());
+	public final void execute() {
+		final FeatureIDEEvent event = featureModelManager.processObject(this::firstOperation, getChangeIndicator());
+		if (event instanceof FeatureModelOperationEvent) {
+			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.EXECUTE);
 		}
-		return Status.OK_STATUS;
+		fireEvent(event);
 	}
 
-	@Nonnull
-	protected abstract FeatureIDEEvent operation();
-
-	public void redo() {
-		fireEvent(operation());
-		executed = true;
-	}
-
-	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		try {
-			undo();
-		} catch (final Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-			throw new ExecutionException(e.getMessage());
+	public final void redo() {
+		final FeatureIDEEvent event = featureModelManager.processObject(this::operation, getChangeIndicator());
+		if (event instanceof FeatureModelOperationEvent) {
+			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.REDO);
 		}
-		return Status.OK_STATUS;
+		fireEvent(event);
 	}
 
-	protected abstract FeatureIDEEvent inverseOperation();
-
-	public void undo() {
-		fireEvent(inverseOperation());
-		executed = false;
+	public final void undo() {
+		final FeatureIDEEvent event = featureModelManager.processObject(this::inverseOperation, getChangeIndicator());
+		if (event instanceof FeatureModelOperationEvent) {
+			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.UNDO);
+		}
+		fireEvent(event);
 	}
 
-	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ALL;
+	}
+
+	protected final void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
-			System.out.println(getClass() + " operation() must return a FeatureIDEEvent");
-			event = new FeatureIDEEvent(featureModel, null, null, null);
+			Logger.logWarning(getClass() + " operation() must return a FeatureIDEEvent");
+			event = new FeatureIDEEvent(featureModelManager, null, null, null);
 		}
-		featureModel.fireEvent(event);
+		featureModelManager.fireEvent(event);
 	}
 
-	public Object getEditor() {
-		return editor;
+	IFeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
 	}
 
-	public void setEditor(Object editor) {
-		this.editor = editor;
+	public String getTitle() {
+		return title;
+	}
+
+	protected final static String getFeatureName(final IFeatureModel featureModel, String prefix) {
+		final Set<String> existingFeatureNames = FeatureUtils.getFeatureNames(featureModel);
+		int number = 0;
+		while (existingFeatureNames.contains(prefix + ++number)) {}
+		return prefix + number;
 	}
 
 }

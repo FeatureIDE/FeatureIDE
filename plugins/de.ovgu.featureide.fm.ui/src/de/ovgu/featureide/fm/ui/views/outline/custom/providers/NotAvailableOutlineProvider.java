@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,6 +28,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IEditorPart;
 
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
@@ -44,14 +45,12 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public boolean isSupported(IFile file) {
+	public boolean isSupported(IEditorPart part, IFile file) {
 		return true;
 	}
 
 	@Override
-	public void handleUpdate(TreeViewer viewer, IFile iFile) {
-
-	}
+	public void handleUpdate(TreeViewer viewer, IFile iFile) {}
 
 	@Override
 	public String getProviderName() {

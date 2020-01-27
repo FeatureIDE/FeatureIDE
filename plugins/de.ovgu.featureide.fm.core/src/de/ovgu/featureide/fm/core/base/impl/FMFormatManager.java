@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,15 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.cnf.CNFFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
-import de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
-import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
@@ -36,12 +30,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  *
  * @author Sebastian Krieter
  */
-public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
-
-	private FMFormatManager() {
-		super(XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class,
-				ConquererFMWriter.class, CNFFormat.class);
-	}
+public final class FMFormatManager extends FormatManager<IFeatureModel> {
 
 	private static FMFormatManager instance = new FMFormatManager();
 
@@ -49,12 +38,13 @@ public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 		return instance;
 	}
 
-	public static void setExtensionLoader(IExtensionLoader<IFeatureModelFormat> extensionLoader) {
-		instance.setExtensionLoaderInternal(extensionLoader);
-	}
-
 	public static IFeatureModelFormat getDefaultFormat() {
 		return new XmlFeatureModelFormat();
+	}
+
+	@Override
+	public boolean addExtension(IPersistentFormat<IFeatureModel> extension) {
+		return (extension instanceof IPersistentFormat) ? super.addExtension(extension) : false;
 	}
 
 }

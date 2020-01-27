@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+    <properties/>
+    <struct>
+        <and abstract="true" mandatory="true" name="BikeConfigurator">
+            <attribute configurable="true" name="Price" recursive="true" type="double" unit="€"/>
+            <alt mandatory="true" name="Frame">
+                <feature name="Steel">
+                    <attribute name="Price" value="1089.0"/>
+                </feature>
+                <feature name="Steel/Titanimum">
+                    <attribute name="Price" value="1914.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Handlebar">
+                <feature name="S Type"/>
+                <feature name="M Type"/>
+                <feature name="P Type"/>
+                <feature name="H Type"/>
+            </alt>
+            <alt mandatory="true" name="Frame Color">
+                <feature name="Black"/>
+                <feature name="Grey"/>
+                <feature name="Raw Lacquer">
+                    <attribute name="Price" value="174.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Mudguards">
+                <feature name="Version E"/>
+                <feature name="Version L">
+                    <attribute name="Price" value="85.0"/>
+                </feature>
+                <feature name="Version R">
+                    <attribute name="Price" value="197.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Number of Gears">
+                <feature name="1"/>
+                <feature name="2">
+                    <attribute name="Price" value="77.0"/>
+                </feature>
+                <feature name="3">
+                    <attribute name="Price" value="148.0"/>
+                </feature>
+                <feature name="6">
+                    <attribute name="Price" value="281.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Gear Ratio">
+                <feature name="Standard"/>
+                <feature name="+8%">
+                    <attribute name="Price" value="20.0"/>
+                </feature>
+                <feature name="-12%">
+                    <attribute name="Price" value="20.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Tyres">
+                <feature name="Marathon Racer"/>
+                <feature name="Kojak">
+                    <attribute name="Price" value="32.0"/>
+                </feature>
+                <feature name="Marathon">
+                    <attribute name="Price" value="32.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Lightning">
+                <feature name="Reflectors Only"/>
+                <feature name="Battery Lightning">
+                    <attribute name="Price" value="92.0"/>
+                </feature>
+                <feature name="Shimano Hub Dynamo">
+                    <attribute name="Price" value="140.0"/>
+                </feature>
+                <feature name="SON Hub Dynamo">
+                    <attribute name="Price" value="430.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Saddle Height">
+                <feature name="Standard Height"/>
+                <feature name="Extended"/>
+                <feature name="Telescopic">
+                    <attribute name="Price" value="72.0"/>
+                </feature>
+            </alt>
+            <alt mandatory="true" name="Saddle Type">
+                <feature name="Brompton"/>
+                <feature name="Brompton with Light">
+                    <attribute name="Price" value="25.0"/>
+                </feature>
+                <feature name="Special Men">
+                    <attribute name="Price" value="96.0"/>
+                </feature>
+                <feature name="Special Ladies">
+                    <attribute name="Price" value="96.0"/>
+                </feature>
+                <feature name="Brompton Wide"/>
+                <feature name="Brompton Wide with Light">
+                    <attribute name="Price" value="25.0"/>
+                </feature>
+            </alt>
+            <feature name="Toolkit">
+                <attribute name="Price" value="64.9"/>
+            </feature>
+            <alt name="Front Luggage">
+                <feature name="Carrier Block only">
+                    <attribute name="Price" value="39.0"/>
+                </feature>
+                <feature name="Tote Bag">
+                    <attribute name="Price" value="124.0"/>
+                </feature>
+                <feature name="Roll Top Bag">
+                    <attribute name="Price" value="154.0"/>
+                </feature>
+                <feature name="O Bag">
+                    <attribute name="Price" value="314.0"/>
+                </feature>
+            </alt>
+            <feature name="B Bag"/>
+            <feature name="Saddle Bag">
+                <attribute name="Price" value="59.0"/>
+            </feature>
+            <feature name="Rack Sack"/>
+        </and>
+    </struct>
+    <constraints/>
+    <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+    <comments/>
+    <featureOrder userDefined="false"/>
+</extendedFeatureModel>

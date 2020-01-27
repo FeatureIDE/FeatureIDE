@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -39,7 +39,7 @@ public abstract class Reason<S> implements Cloneable {
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason the subject of this reason
+	 * @param subject the subject of this reason
 	 * @param explanation the containing explanation
 	 */
 	protected Reason(S subject, Explanation<?> explanation) {

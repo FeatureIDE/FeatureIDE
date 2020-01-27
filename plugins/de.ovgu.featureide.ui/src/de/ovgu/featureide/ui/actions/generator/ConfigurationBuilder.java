@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -47,7 +47,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -57,11 +58,13 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.actions.generator.configuration.AConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.AllConfigrationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.CASAConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.CHVATALConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.CurrentConfigurationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.ICPLConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.IncLingConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.ModuleConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.RandConfigurationGenerator;
-import de.ovgu.featureide.ui.actions.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.sorter.AbstractConfigurationSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.InteractionSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.PriorizationSorter;
@@ -77,7 +80,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
 	public IFeatureProject featureProject;
-	private IFeatureModel featureModel;
+	private FeatureModelFormula featureModel;
 
 	/**
 	 * This is the place where all configurations should be generated if no new projects should be generated.
@@ -145,7 +148,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 	TestResults testResults;
 
-	private AConfigurationGenerator configurationBuilder;
+	private AConfigurationGenerator configurationGenerator;
 
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is none.
@@ -224,49 +227,55 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		this.createNewProjects = createNewProjects;
 		this.buildType = buildType;
 
-		featureModel = featureProject.getFeatureModel();
+		featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
 
 		switch (buildOrder) {
 		case DEFAULT:
-			sorter = new AbstractConfigurationSorter(featureModel);
+			sorter = new AbstractConfigurationSorter(featureModel.getFeatureModel());
 			break;
 		case DISSIMILARITY:
 			sorter = new PriorizationSorter(featureModel);
 			break;
 		case INTERACTION:
-			sorter = new InteractionSorter(tOrder, featureModel, buildType == BuildType.T_WISE);
+			sorter = new InteractionSorter(tOrder, featureModel.getFeatureModel(), buildType == BuildType.T_WISE);
 			break;
 		default:
 			LOGGER.logWarning("Case statement missing for: " + buildOrder);
-			sorter = new AbstractConfigurationSorter(featureModel);
+			sorter = new AbstractConfigurationSorter(featureModel.getFeatureModel());
 			break;
 		}
 
 		String jobName = "";
 		switch (buildType) {
 		case ALL_CURRENT:
-			configurationBuilder = new CurrentConfigurationsGenerator(this, featureModel, featureProject);
+			configurationGenerator = new CurrentConfigurationsGenerator(this, featureProject);
 			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
-			configurationBuilder = new AllConfigrationsGenerator(this, featureModel, featureProject);
+			configurationGenerator = new AllConfigrationsGenerator(this, featureModel);
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
 			if (algorithm.equals(INCLING)) {
-				configurationBuilder = new IncLingConfigurationGenerator(this, featureModel, featureProject);
+				configurationGenerator = new IncLingConfigurationGenerator(this, featureModel);
+			} else if (algorithm.equals("ICPL")) {
+				configurationGenerator = new ICPLConfigurationGenerator(this, featureModel, t);
+			} else if (algorithm.equals("Chvatal")) {
+				configurationGenerator = new CHVATALConfigurationGenerator(this, featureModel, t);
+			} else if (algorithm.equals("CASA")) {
+				configurationGenerator = new CASAConfigurationGenerator(this, featureModel, t);
 			} else {
-				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureModel, featureProject, algorithm, t);
+				throw new RuntimeException(buildType + " not supported");
 			}
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		case RANDOM:
-			configurationBuilder = new RandConfigurationGenerator(this, featureModel, featureProject);
+			configurationGenerator = new RandConfigurationGenerator(this, featureModel);
 			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
 			configurationNumber = 2;
-			configurationBuilder = new ModuleConfigurationGenerator(this, featureModel, featureProject, featureName);
+			configurationGenerator = new ModuleConfigurationGenerator(this, featureModel, featureName);
 			break;
 		default:
 			throw new RuntimeException(buildType + " not supported");
@@ -275,7 +284,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		RemoveBaseMarkerFromSourceFolderFiles();
 		final Job job = new Job(jobName) {
 
-			private IRunner<Void> configurationBuilderJob;
+			private IRunner<List<LiteralSet>> configurationBuilderJob;
 
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
@@ -301,7 +310,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						newgeneratorJobs(1);
 					}
-					configurationBuilderJob = LongRunningWrapper.getRunner(configurationBuilder, "Create Configurations " + id++);
+					configurationBuilderJob = LongRunningWrapper.getRunner(configurationGenerator, "Create Configurations " + id++);
 					configurationBuilderJob.schedule();
 					showStatistics(monitor);
 					if (!createNewProjects) {
@@ -347,7 +356,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					System.err.println(configurationBuilderJob.getStatus());
 
 					if (!sorter.isSorted()) {
-						final IMonitor workMonitor = new ProgressMonitor(getTaskName(), monitor);
+						final IMonitor<?> workMonitor = new ProgressMonitor<>(getTaskName(), monitor);
 						configurationNumber = Math.min(configurationNumber, sorter.sortConfigurations(workMonitor));
 					}
 					finish();

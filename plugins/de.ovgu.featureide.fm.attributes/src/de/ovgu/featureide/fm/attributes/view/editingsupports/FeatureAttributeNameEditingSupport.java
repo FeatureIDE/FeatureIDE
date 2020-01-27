@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
@@ -44,32 +45,29 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 		super(view, viewer, enabled);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getCellEditor(java.lang.Object)
-	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		return new TextCellEditor((Composite) getViewer().getControl());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#getValue(java.lang.Object)
-	 */
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
 		return attribute.getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#setValue(java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	protected void setValue(Object element, Object value) {
 		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
+		for (IFeature f : feat.getFeatureModel().getFeatures()) {
+			ExtendedFeature ext = (ExtendedFeature) f;
+			for (IFeatureAttribute att : ext.getAttributes()) {
+				if (att.getName().equals(value.toString()) && !((IFeatureAttribute) element).getType().equals(att.getType())) {
+					MessageDialog.openError(null, "Invalid input", "The inserted attribute name is used on a different attribute type");
+					return;
+				}
+			}
+		}
 		for (IFeatureAttribute att : feat.getAttributes()) {
 			if (att.getName().equals(value.toString()) && att != (IFeatureAttribute) element) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");

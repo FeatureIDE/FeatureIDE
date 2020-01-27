@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,13 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectionOperation;
 
 /**
@@ -52,12 +50,7 @@ public class NameTypeSelectionAction extends Action {
 
 	@Override
 	public void run() {
-		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new NameTypeSelectionOperation(featureModel, newNameType, oldNameType));
 	}
 
 }

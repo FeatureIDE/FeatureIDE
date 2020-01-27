@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Test case to verify that the analyzer recognizes false optional feature in 'and', 'or' and 'alternative' groups.
@@ -35,7 +36,6 @@ public class FalseOptionalAndOrAlternativeAnalyserTest {
 	@Test
 	public void checkFalseOptionals() {
 		final IFeatureModel model = Commons.loadTestFeatureModelFromFile("false_optional_test.xml");
-		model.getAnalyser().analyzeFeatureModel(null);
-		Assert.assertEquals(model.getAnalyser().getCachedFalseOptionalFeatures().size(), 3);
+		Assert.assertEquals(3, FeatureModelManager.getAnalyzer(model).getFalseOptionalFeatures(null).size());
 	}
 }

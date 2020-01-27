@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -44,7 +44,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -58,7 +57,7 @@ import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.MethodFilter;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -88,26 +87,7 @@ public class FeatureStubsGenerator {
 			featureProject.getComposer().buildFSTModel();
 		}
 
-//		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
-//		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
-//				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
-		final IFeatureModel fm = featureProject.getFeatureModel();
-		fm.getAnalyser().setDependencies();
-
-//		try {
-//			fuji.Main fuji = new fuji.Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
-//			Composition composition = fuji.getComposition(fuji);
-//			Program ast = composition.composeAST();
-//			// run type check
-//			fuji.typecheckAST(ast);
-//
-//			if (!fuji.getWarnings().isEmpty()) {
-//				FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is aborted.", null);
-//			}
-//		} catch (IllegalArgumentException | ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
-//				| SemanticErrorException | CompilerWarningException | UnsupportedModelException e1) {
-//			FeatureHouseCorePlugin.getDefault().logError(e1);
-//		}
+		// ProjectManager.getAnalyzer(featureProject.getFeatureModel()).setDependencies();
 
 		final IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
 		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
@@ -132,7 +112,7 @@ public class FeatureStubsGenerator {
 					File file = null;
 					String fileText = "";
 					final int featureID = signatures.getFeatureID(feat.getName());
-					CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath() + File.separator + feat.getName());
+					FMCorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath() + File.separator + feat.getName());
 					final HashSet<String> alreadyUsedSigs = new HashSet<String>();
 					copyRolesToFeatureStubsFolder(feat);
 
@@ -218,7 +198,7 @@ public class FeatureStubsGenerator {
 
 	private void getFeatures(final ProjectSignatures signatures) {
 		final LinkedList<FSTFeature> features = new LinkedList<FSTFeature>(featureProject.getFSTModel().getFeatures());
-		featureStubFolder = CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath());
+		featureStubFolder = FMCorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath());
 		for (final FSTFeature fstfeat : features) {
 			try {
 				featureStubFolder.getFolder(fstfeat.getName()).delete(true, null);
@@ -322,17 +302,17 @@ public class FeatureStubsGenerator {
 		}
 	}
 
-//	private StringBuilder checkForOriginalInContract(StringBuilder fileTextSB, AbstractSignature curSig) {
-//		final int indexOfBody = fileTextSB.indexOf(curSig.toString().trim());
-//		String tmpText = fileTextSB.substring(0, indexOfBody);
-//		final int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
-//		final String contractBody = fileTextSB.substring(tmpText.length() - 1);
-//		String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract)
-//				+ "\n\n\t/*@\n\t@ requires_abs   " + curSig.getName() + "R;\n\t@ ensures_abs    "
-//				+ curSig.getName() + "E;\n\t@ assignable_abs " + curSig.getName() + "A;\n\t@*/\n"
-//				+ contractBody;
-//		return new StringBuilder(tmpFileText);
-//	}
+	// private StringBuilder checkForOriginalInContract(StringBuilder fileTextSB, AbstractSignature curSig) {
+	// final int indexOfBody = fileTextSB.indexOf(curSig.toString().trim());
+	// String tmpText = fileTextSB.substring(0, indexOfBody);
+	// final int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
+	// final String contractBody = fileTextSB.substring(tmpText.length() - 1);
+	// String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract)
+	// + "\n\n\t/*@\n\t@ requires_abs " + curSig.getName() + "R;\n\t@ ensures_abs "
+	// + curSig.getName() + "E;\n\t@ assignable_abs " + curSig.getName() + "A;\n\t@*/\n"
+	// + contractBody;
+	// return new StringBuilder(tmpFileText);
+	// }
 
 	private StringBuilder transformIntoAbstractContract(StringBuilder fileTextSB, AbstractSignature curSig) {
 		int indexOfBody = fileTextSB.toString().lastIndexOf(curSig.toString().trim());

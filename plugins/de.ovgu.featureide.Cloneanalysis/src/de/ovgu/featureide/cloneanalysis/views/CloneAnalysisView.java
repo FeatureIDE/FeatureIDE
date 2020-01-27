@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.views;
 
 import java.util.HashSet;
@@ -17,8 +37,8 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 //import org.eclipse.jface.text.IMarkSelection;
 import org.eclipse.swt.widgets.Composite;
@@ -60,40 +80,32 @@ public class CloneAnalysisView extends ViewPart {
 
 	private Action action1;
 	private Action action2;
-	private Action doubleClickAction;
 
 	private HashSet<Action> filterActions;
 
-	class NameSorter extends ViewerSorter {
-	}
+	class NameSorter extends ViewerComparator {}
 
 	/**
 	 * The constructor.
 	 */
-	public CloneAnalysisView() {
-	}
+	public CloneAnalysisView() {}
 
-	public void updateAnalysis(IStructuredSelection selection) {
-	}
+	public void updateAnalysis(IStructuredSelection selection) {}
 
 	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
+	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
-	@SuppressWarnings("deprecation")
 	public void createPartControl(Composite parent) {
-
 		cloneTree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		cloneViewer = new TreeViewer(cloneTree);
 		cloneViewer.setContentProvider(new CloneAnalysisContentProvider(this));
 		cloneViewer.setLabelProvider(new CloneAnalysisLabelProvider());
-		cloneViewer.setSorter(new NameSorter());
+		cloneViewer.setComparator(new NameSorter());
 		cloneViewer.setInput(getViewSite());
 		cloneViewer.setComparator(new SizeComparator());
 
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(cloneViewer.getControl(),
-				"de.ovgu.featureide.code.Cloneanalysis.viewer");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(cloneViewer.getControl(), "de.ovgu.featureide.code.Cloneanalysis.viewer");
 		addColumns();
 
 		makeActions();
@@ -161,6 +173,7 @@ public class CloneAnalysisView extends ViewPart {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+
 			public void menuAboutToShow(IMenuManager manager) {
 				CloneAnalysisView.this.fillContextMenu(manager);
 			}
@@ -196,24 +209,24 @@ public class CloneAnalysisView extends ViewPart {
 
 	private void makeActions() {
 		action1 = new Action() {
+
 			public void run() {
 				showMessage("Action 1 executed");
 			}
 		};
 		action1.setText("Action 1");
 		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
 		action2 = new Action() {
+
 			public void run() {
 				showMessage("Action 2 executed");
 			}
 		};
 		action2.setText("Action 2");
 		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		// doubleClickAction = new Action()
 		// {
 		// public void run()
@@ -231,6 +244,7 @@ public class CloneAnalysisView extends ViewPart {
 
 	private void hookDoubleClickAction() {
 		cloneViewer.addDoubleClickListener(new IDoubleClickListener() {
+
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 				Object obj = selection.getFirstElement();
@@ -303,20 +317,18 @@ public class CloneAnalysisView extends ViewPart {
 		final String name = feature.getLocation().lastSegment();
 		final String tooltipText = "Filter by Feature: " + name;
 		Action newAction = new Action() {
+
 			public void run() {
 				hiddenEntries = 0;
 				totalEntries = 0;
-				if (toggleFeatureFilter(feature))
-					showMessage("Only showing clones including feature " + name + " now");
-				else
-					showMessage("No longer filtering by feature " + name);
+				if (toggleFeatureFilter(feature)) showMessage("Only showing clones including feature " + name + " now");
+				else showMessage("No longer filtering by feature " + name);
 				System.out.println("total: " + totalEntries + " hidden: " + hiddenEntries);
 			}
 		};
 		newAction.setText(name);
 		newAction.setToolTipText(tooltipText);
-		newAction.setImageDescriptor(
-				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		newAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
 		return newAction;
 	}
@@ -345,8 +357,7 @@ public class CloneAnalysisView extends ViewPart {
 	}
 
 	private void updateActionBars() {
-		if (filterActions == null)
-			return;
+		if (filterActions == null) return;
 
 		IActionBars bars = getViewSite().getActionBars();
 

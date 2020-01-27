@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,7 +26,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
@@ -36,11 +36,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
  * @author "Rosiak Kamil"
  */
 public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
+
 	public static final String ID = "de.ovgu.featureide.editconstraintinview";
+
 	private IConstraint constraint;
 
-	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
-		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
+	public EditConstraintInViewAction(Object viewer, FeatureModelManager fmManager) {
+		super(viewer, fmManager, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 
 		if (viewer instanceof TreeViewer) {
@@ -62,7 +64,7 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection.getFirstElement() instanceof IConstraint) && (selection.size() == 1)) {
+		if ((selection != null) && (selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
 			constraint = (IConstraint) selection.getFirstElement();
 			return true;
 		}

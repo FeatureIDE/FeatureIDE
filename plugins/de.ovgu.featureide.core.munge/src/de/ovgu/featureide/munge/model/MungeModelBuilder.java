@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
 import org.prop4j.Node;
@@ -41,7 +42,6 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.munge.MungePreprocessor;
 import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
@@ -77,7 +77,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 
 		if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
 			mungePreprocessor = (MungePreprocessor) composer;
-			if ((mungePreprocessor != null) && mungePreprocessor.getCreateSignature()) {
+			if (mungePreprocessor.getCreateSignature()) {
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
 				model.setProjectSignatures(signatures);
@@ -155,17 +155,17 @@ public class MungeModelBuilder extends PPModelBuilder {
 		refreshSignature(featureProject);
 		SignatureIterator sigIt = null;
 		ArrayList<Integer> sigLineNumber = null;
-		if ((mungePreprocessor != null) && mungePreprocessor.getCreateSignature()) {
+		if (mungePreprocessor.getCreateSignature()) {
 			if (signatures == null) {
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
 				model.setProjectSignatures(signatures);
 			}
 			sigIt = signatures.iterator();
-			sigIt.addFilter(new IFilter<AbstractSignature>() {
+			sigIt.addFilter(new Predicate<AbstractSignature>() {
 
 				@Override
-				public boolean isValid(AbstractSignature object) {
+				public boolean test(AbstractSignature object) {
 					String sigName = object.getFullName();
 					if (sigName.startsWith(".")) {
 						sigName = sigName.substring(1);
@@ -215,12 +215,12 @@ public class MungeModelBuilder extends PPModelBuilder {
 							command = FSTDirectiveCommand.IF_NOT;
 						} else if (singleElement.equals("else")) {
 							command = (directivesStack.peek().getCommand() == FSTDirectiveCommand.IF) ? FSTDirectiveCommand.ELSE : FSTDirectiveCommand.ELSE_NOT;
-							if ((mungePreprocessor != null) && mungePreprocessor.getCreateSignature()) {
+							if (mungePreprocessor.getCreateSignature()) {
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							if ((mungePreprocessor != null) && mungePreprocessor.getCreateSignature()) {
+							if (mungePreprocessor.getCreateSignature()) {
 								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							}
 							directivesStack.pop().setEndLine(lineCount, m.end(0) + MungePreprocessor.COMMENT_END.length());
@@ -254,7 +254,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 			lineCount++;
 		}
-		if ((mungePreprocessor != null) && mungePreprocessor.getCreateSignature()) {
+		if (mungePreprocessor.getCreateSignature()) {
 			sigIt.reset();
 			updateDirectives(directivesList, sigIt);
 		}

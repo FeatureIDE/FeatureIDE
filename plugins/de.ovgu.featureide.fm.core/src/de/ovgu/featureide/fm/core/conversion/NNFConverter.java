@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -57,7 +57,7 @@ public class NNFConverter implements IConverterStrategy {
 	/** Running number for naming */
 	private int suffix = 0;
 	/** Naming scheme */
-	protected Map<Class<?>, String> naming = new HashMap<Class<?>, String>();
+	protected Map<Class<?>, String> naming = new HashMap<>();
 	protected String topName = "Subtree";
 	protected String newRootName = "NewRoot";
 
@@ -104,7 +104,7 @@ public class NNFConverter implements IConverterStrategy {
 	 * @return
 	 */
 	private String getName(Node node, int level) {
-		final List<Object> args = new ArrayList<Object>();
+		final List<Object> args = new ArrayList<>();
 		if ((node instanceof Literal) || (node instanceof Not)) {
 			args.add(node.getContainedFeatures().get(0));
 		}
@@ -115,7 +115,6 @@ public class NNFConverter implements IConverterStrategy {
 	/**
 	 * Restructures root if needed.
 	 *
-	 * @param fm Feature model
 	 * @param name Name of new root
 	 */
 	protected void restructureRoot(String name) {
@@ -131,7 +130,6 @@ public class NNFConverter implements IConverterStrategy {
 	/**
 	 * Adds a new element under root.
 	 *
-	 * @param fm Feature model
 	 * @param name Name of element
 	 * @return The top element for further actions
 	 */
@@ -235,7 +233,7 @@ public class NNFConverter implements IConverterStrategy {
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
 		this.fm = fm.clone();
-		factory = FMFactoryManager.getFactory(fm);
+		factory = FMFactoryManager.getInstance().getFactory(fm);
 		this.preserve = preserve;
 
 		if (nodes.isEmpty()) {
@@ -253,7 +251,7 @@ public class NNFConverter implements IConverterStrategy {
 
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		final List<Node> elements = new LinkedList<Node>();
+		final List<Node> elements = new LinkedList<>();
 		Node node = constraint.getNode().clone();
 
 		final String[] supported = new String[] { "!", " && ", " || ", NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol,
@@ -288,7 +286,7 @@ public class NNFConverter implements IConverterStrategy {
 			negated = !negated;
 			return propagateNegation(node.getChildren()[0], negated);
 		} else if ((node instanceof And) || (node instanceof Or)) {
-			final List<Node> nodelist = new ArrayList<Node>();
+			final List<Node> nodelist = new ArrayList<>();
 			for (final Node tmp : node.getChildren()) {
 				nodelist.add(propagateNegation(tmp, negated));
 			}

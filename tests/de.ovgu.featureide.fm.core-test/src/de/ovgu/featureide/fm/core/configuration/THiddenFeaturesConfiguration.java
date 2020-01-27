@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,11 +23,11 @@ package de.ovgu.featureide.fm.core.configuration;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -37,10 +37,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.configuration.AbstractConfigurationTest#loadModel()
-	 */
 	@Override
 	IFeatureModel loadModel() {
 		return null;
@@ -49,51 +45,53 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	@Test
 	public void testMandatoryHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(fm);
-		assertEquals(1, c.number());
-		final List<IFeature> list = new ArrayList<IFeature>();
-		list.add(fm.getFeature("S"));
-		list.add(fm.getFeature("B"));
-		assertEquals(c.getSelectedFeatures(), list);
+		final FeatureModelFormula formula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(formula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(formula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
+		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("B"))), c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testOptionalHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(fm);
-		assertEquals(1, c.number());
-		final List<IFeature> list = new ArrayList<IFeature>();
-		list.add(fm.getFeature("S"));
-		assertEquals(list, c.getSelectedFeatures());
+		final FeatureModelFormula formula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(formula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(formula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
+		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testAlternativeHidden() {
 		final IFeatureModel fm = loadXML(
 				"<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
-		final Configuration c = new Configuration(fm);
-		assertEquals(2, c.number());
-		c.setManual("A", Selection.UNSELECTED);
-		final List<IFeature> list = new ArrayList<IFeature>();
-		list.add(fm.getFeature("S"));
-		list.add(fm.getFeature("B"));
+		final FeatureModelFormula fmFormula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(fmFormula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(fmFormula, c);
+		assertEquals(2L, analyzer.number(1000));
+
 		// set={S,B}
-		assertEquals(list, c.getSelectedFeatures());
-		c.setManual("A", Selection.SELECTED);
-		list.clear();
-		list.add(fm.getFeature("S"));
-		list.add(fm.getFeature("A"));
+		c.setManual("A", Selection.UNSELECTED);
+		analyzer.update();
+		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("B"))), c.getSelectedFeatures());
+
 		// set={S,A}
-		assertEquals(list, c.getSelectedFeatures());
+		c.setManual("A", Selection.SELECTED);
+		analyzer.update();
+		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"), fm.getFeature("A"))), c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testHidden() {
 		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c = new Configuration(fm);
-		assertEquals(1, c.number());
-		final List<IFeature> list = new ArrayList<IFeature>();
-		list.add(fm.getFeature("S"));
-		assertEquals(list, c.getSelectedFeatures());
+		final FeatureModelFormula fmFormula = new FeatureModelFormula(fm);
+		final Configuration c = new Configuration(fmFormula);
+		final ConfigurationAnalyzer analyzer = getConfigurationAnalyzer(fmFormula, c);
+		assertEquals(1L, analyzer.number(1000));
+		analyzer.update();
+		assertEquals(new ArrayList<>(Arrays.asList(fm.getFeature("S"))), c.getSelectedFeatures());
 	}
 }

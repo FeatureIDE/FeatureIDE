@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,22 +25,32 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPE
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
 
 /**
  * Action to calculate implicit dependencies of a sub feature model after selecting a feature and choosing to "calculate implicit dependencies". This feature
@@ -48,17 +58,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDepende
  *
  * @author Ananieva Sofia
  */
-public class CalculateDependencyAction extends Action {
+public class CalculateDependencyAction extends AFeatureModelAction {
+
+	private static final JobToken calculateDependencyToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	/**
 	 * The ID which is used to return the respective action after a context menu selection.
 	 */
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
-
-	/**
-	 * The complete feature model.
-	 */
-	private final IFeatureModel featureModel;
 
 	/**
 	 * The selected feature which will be used as new root.
@@ -69,6 +76,7 @@ public class CalculateDependencyAction extends Action {
 	 * The listener which remembers the selection and checks whether it is valid.
 	 */
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -82,10 +90,8 @@ public class CalculateDependencyAction extends Action {
 	 * @param viewer viewer
 	 * @param featureModel The complete feature model
 	 */
-	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
-		super(CALCULATE_DEPENDENCY);
-		this.featureModel = featureModel;
-		setId(ID);
+	public CalculateDependencyAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(CALCULATE_DEPENDENCY, ID, featureModelManager);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -102,13 +108,30 @@ public class CalculateDependencyAction extends Action {
 		if (selectedFeatures.size() != 1) {
 			throw new RuntimeException("Calculate dependencies for multiple selected features is not supported.");
 		}
-		final CalculateDependencyOperation op = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
+		final CalculateDependencyOperation method = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
+		final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method);
+		final Display current = Display.getCurrent();
+		runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
 
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+			@Override
+			public void jobFinished(IJob<IFeatureModel> finishedJob) {
+				final IFeatureModel slicedModel = finishedJob.getResults();
+				// Instantiating a wizard page, removing the help button and opening a wizard dialog
+				current.syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, featureModel);
+						TrayDialog.setDialogHelpAvailable(false);
+						final WizardDialog dialog = new WizardDialog(current.getActiveShell(), wizard);
+						dialog.open();
+					}
+				});
+				featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.DEPENDENCY_CALCULATED, null, slicedModel));
+			}
+		});
+		LongRunningWrapper.startJob(calculateDependencyToken, runner);
 	}
 
 	/**
@@ -145,8 +168,9 @@ public class CalculateDependencyAction extends Action {
 
 		// permit selection to be root of the origin feature model
 		if (res) {
-			final String s = selectedFeatures.getFirst().toString();
-			if (s.equals(FeatureUtils.getRoot(featureModel).toString())) {
+			final IFeature first = selectedFeatures.getFirst();
+			final String s = first.toString();
+			if (s.equals(FeatureUtils.getRoot(first.getFeatureModel()).toString())) {
 				return false;
 			}
 		}

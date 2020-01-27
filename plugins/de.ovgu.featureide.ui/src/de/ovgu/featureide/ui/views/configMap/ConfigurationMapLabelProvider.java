@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -33,6 +33,8 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -87,12 +89,9 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 				final Configuration config = configurationMap.getConfigurationOfColumn(columnIndex);
 
 				if (!feature.getStructure().isAbstract()) {
-					String imgPath = imgUnselectedPath;
-					if (config.getSelectedFeatures().contains(feature)) {
-						imgPath = imgSelectedPath;
-					}
-
-					return cachedImages.get(imgPath);
+					final SelectableFeature selectableFeature = config.getSelectableFeature(feature);
+					return cachedImages.get(
+							((selectableFeature != null) && (selectableFeature.getSelection() == Selection.SELECTED)) ? imgSelectedPath : imgUnselectedPath);
 				}
 			}
 		}

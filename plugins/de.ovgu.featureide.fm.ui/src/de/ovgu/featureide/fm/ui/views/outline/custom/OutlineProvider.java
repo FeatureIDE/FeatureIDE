@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,7 +29,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IEditorPart;
 
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
@@ -44,6 +46,10 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 
 	private OutlineTreeContentProvider treeProvider = null;
 	private OutlineLabelProvider labelProvider = null;
+
+	protected TreeViewer viewer;
+	protected IFile file;
+	protected FeatureModelManager featureModelManager;
 
 	public OutlineProvider() {}
 
@@ -90,12 +96,13 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 
 	/**
-	 * Checks whether the provider supports the file that is opened in the editor.
+	 * Checks whether the provider supports the file that is opened in the editor. Additionally, we must check that the given editor supports the provider.
 	 *
+	 * @param part editor part to check
 	 * @param file file to check
 	 * @return true if the file is supported, false otherwise
 	 */
-	public abstract boolean isSupported(IFile file);
+	public abstract boolean isSupported(IEditorPart part, IFile file);
 
 	/**
 	 * @return the label provider name

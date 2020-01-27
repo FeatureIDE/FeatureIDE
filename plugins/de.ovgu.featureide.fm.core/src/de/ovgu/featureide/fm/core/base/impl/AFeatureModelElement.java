@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -19,6 +19,8 @@
  * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.core.base.impl;
+
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
@@ -50,7 +52,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
 		if (featureModel == null) {
-			throw new RuntimeException();
+			throw new NullPointerException("Feature model must not be null!");
 		}
 		id = featureModel.getNextElementId();
 		this.featureModel = featureModel;
@@ -80,6 +82,11 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	@Override
 	public final void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
+	}
+
+	@Override
+	public List<IEventListener> getListeners() {
+		return eventManager.getListeners();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -52,6 +52,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 /**
  * Composes source jak files into merged jak files.
@@ -88,11 +89,11 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(java.nio.file.Path config) {
 		assert (ahead != null) : AHEAD_INSTANCE_NOT_INITIALIZED;
 		try {
 			correctSourceFiles(featureProject.getSourceFolder());
-			ahead.setConfiguration(config);
+			ahead.setConfiguration((IFile) EclipseFileSystem.getResource(config));
 			ahead.buildAll();
 		} catch (final Exception e) {
 			AheadCorePlugin.getDefault().logError(e);

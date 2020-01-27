@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -29,10 +29,16 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.FeatureModelSlicingWizard;
@@ -42,18 +48,39 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
+	protected void singleAction(final IFile file) {
+		final FeatureModelManager manager = FeatureModelManager.getInstance(EclipseFileSystem.getPath(file));
+		final IFeatureModel featureModel = manager.getObject();
 		if (featureModel != null) {
+			final IFeatureModelFormat format = manager.getFormat();
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
-				final JobArguments arguments = new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
-						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
-				LongRunningWrapper.getRunner(arguments.createJob()).schedule();
+				final Collection<String> selectedFeatures = (Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES);
+				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, selectedFeatures, true);
+
+				final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method, "Slicing Feature Model");
+				runner.addJobFinishedListener(finishedJob -> save(finishedJob, file, format));
+				runner.schedule();
 			}
 		}
 
+	}
+
+	private void save(IJob<IFeatureModel> finishedJob, IFile file, IPersistentFormat<IFeatureModel> format) {
+		if (finishedJob.getStatus() == JobStatus.OK) {
+			final Path modelFile = EclipseFileSystem.getPath(file);
+			final Path filePath = modelFile.getFileName();
+			final Path root = modelFile.getRoot();
+			if ((filePath != null) && (root != null)) {
+				String newFileName = filePath.toString();
+				final int extIndex = newFileName.lastIndexOf('.');
+				newFileName =
+					((extIndex > 0) ? newFileName.substring(0, extIndex) : newFileName) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
+				final Path newFilePath = root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(newFileName);
+				FeatureModelManager.save(finishedJob.getResults(), newFilePath, format);
+			}
+		}
 	}
 
 }

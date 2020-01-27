@@ -48,7 +48,6 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		final IFolder sourceFolder = featureProject.getSourceFolder();
-		System.out.println(sourceFolder.getFullPath().toOSString());
 		if (!sourceFolder.exists()) {
 			return true;
 		}

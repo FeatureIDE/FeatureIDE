@@ -1,3 +1,24 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of Featu License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License f
+IDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Publicor more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.cloneanalysis.pmd;
 
 import java.io.FilenameFilter;
@@ -21,6 +42,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
 public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyzerAdapter<Tool> {
+
 	protected Tool analysisTool;
 
 	private final FilenameFilter filter;
@@ -30,13 +52,10 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	}
 
 	/**
-	 * Gets the {@link IResource}s from the {@link IStructuredSelection} and
-	 * registers them with the {@link #analysisTool} using
+	 * Gets the {@link IResource}s from the {@link IStructuredSelection} and registers them with the {@link #analysisTool} using
 	 * {@link #registerWithAnalysisTool(Set)}.
 	 * 
-	 * @param currentSelection
-	 *            An {@link IStructuredSelection} which contains a number of
-	 *            folders or files to be analyzed.
+	 * @param currentSelection An {@link IStructuredSelection} which contains a number of folders or files to be analyzed.
 	 * @see #registerWithAnalysisTool(Set)
 	 */
 	public void addResourcesFromSelection(IStructuredSelection currentSelection) {
@@ -46,66 +65,51 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 			Object selectedObject = iterator.next();
 			IResource file = null;
 
-			if (selectedObject instanceof IResource)
-				file = (IResource) selectedObject;
-			else if (selectedObject instanceof IAdaptable)
-				file = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+			if (selectedObject instanceof IResource) file = (IResource) selectedObject;
+			else if (selectedObject instanceof IAdaptable) file = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
 
-			if (files != null)
-				files.add(file);
+			if (files != null) files.add(file);
 		}
 		registerWithAnalysisTool(files);
 	}
 
 	/**
-	 * Adds a projects resources to the {@link #analysisTool}. For
-	 * {@link IFeatureProject}s, only files in their feature folders will be
-	 * added to the {@link #analysisTool}
+	 * Adds a projects resources to the {@link #analysisTool}. For {@link IFeatureProject}s, only files in their feature folders will be added to the
+	 * {@link #analysisTool}
 	 * 
-	 * @param project
-	 *            an {@link IFeatureProject}.
+	 * @param project an {@link IFeatureProject}.
 	 */
 	public void addProjectToAnalysis(IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject != null) {
 			registerContainerRecursively(featureProject.getSourceFolder());
-		} else
-			registerContainerRecursively(project);
+		} else registerContainerRecursively(project);
 
 	}
 
 	/**
-	 * Adds all {@link IResource}s in the set to the {@link CPD} tool, by using
-	 * its {@link CPD#addRecursively(String)} method.
+	 * Adds all {@link IResource}s in the set to the {@link CPD} tool, by using its {@link CPD#addRecursively(String)} method.
 	 * 
-	 * @param resources
-	 *            A set of {@link IResource}s.
-	 * @throws IOException
-	 *             if the folder does not exist.
+	 * @param resources A set of {@link IResource}s.
+	 * @throws IOException if the folder does not exist.
 	 */
 	protected void registerWithAnalysisTool(Set<IResource> resources) {
 		for (IResource resource : resources) {
-			if (resource instanceof IFolder)
-				registerContainerRecursively(((IFolder) resource));
-			if (resource instanceof IProject)
-				addProjectToAnalysis((IProject) resource);
+			if (resource instanceof IFolder) registerContainerRecursively(((IFolder) resource));
+			if (resource instanceof IProject) addProjectToAnalysis((IProject) resource);
 		}
 	}
 
 	protected abstract void registerContainerRecursively(IContainer container);
 
 	/**
-	 * Returns a {@link CPDConfiguration} with <br>
-	 * <br>
-	 * language = java <br>
-	 * debug = false <br>
-	 * minTileSize = 10 <br>
-	 * renderer = xml
+	 * Returns a {@link CPDConfiguration} with <br> <br> language = java <br> debug = false <br> minTileSize = 10 <br> renderer = xml
 	 * 
 	 * @return a default {@link CPDConfiguration}
 	 */
 	protected CPDConfiguration createDefaultConfiguration() {
 		CPDConfiguration config = new CPDConfiguration() {
+
 			@Override
 			public FilenameFilter filenameFilter() {
 				return filter;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -39,21 +40,20 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Maximilian Kühl
  * @author Christopher Sontag
  */
-public class CollapseAllOperation extends AbstractFeatureModelOperation {
+public class CollapseAllOperation extends AbstractGraphicalFeatureModelOperation {
 
-	Iterable<IGraphicalFeature> features;
 	boolean collapse;
 
-	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
+	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<>();
 
 	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
-		super(graphicalFeatureModel.getFeatureModel(), COLLAPSE_ALL);
-		features = graphicalFeatureModel.getFeatures();
+		super(graphicalFeatureModel, COLLAPSE_ALL);
 		this.collapse = collapse;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final Iterable<IGraphicalFeature> features = graphicalFeatureModel.getFeatures();
 		final Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
 		while (feautureModelIterator.hasNext()) {
 			final IGraphicalFeature gFeature = feautureModelIterator.next();
@@ -67,16 +67,16 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, null);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		final Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final Iterator<IGraphicalFeature> feautureModelIterator = graphicalFeatureModel.getFeatures().iterator();
 		for (final IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
 		}
-		return new FeatureIDEEvent(feautureModelIterator, EventType.COLLAPSED_ALL_CHANGED, null, null);
+		return new FeatureIDEEvent(feautureModelIterator, EventType.FEATURE_COLLAPSED_ALL_CHANGED, null, null);
 
 	}
 

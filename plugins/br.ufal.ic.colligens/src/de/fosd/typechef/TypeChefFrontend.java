@@ -113,7 +113,8 @@ public final class TypeChefFrontend {
 	// if (opt.recordTiming)
 	// System.out
 	// .println(new StringBuilder()
-	// .append("timing (lexer, parser, type system, interface inference, conditional control flow, data flow)\n")
+	// .append("timing (lexer, parser, type system, interface inference,
+	// conditional control flow, data flow)\n")
 	// .append(BoxesRunTime.boxToLong(stopWatch
 	// .get("lexing")))
 	// .append(";")

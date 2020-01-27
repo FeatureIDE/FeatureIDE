@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import java.util.Collection;
+
 /**
  * Manages all additional properties of a feature model.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelProperty {
+public interface IFeatureModelProperty extends IPropertyContainer {
 
 	void addAnnotation(CharSequence annotation);
 
@@ -33,9 +35,9 @@ public interface IFeatureModelProperty {
 
 	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
 
-	Iterable<String> getAnnotations();
+	Collection<String> getAnnotations();
 
-	Iterable<String> getComments();
+	Collection<String> getComments();
 
 	IFeatureModel getFeatureModel();
 

@@ -2,9 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureHouse Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse-test;singleton:=true
-Bundle-Version: 3.5.5.qualifier
+Bundle-Version: 3.6.1.qualifier
 Fragment-Host: de.ovgu.featureide.core.featurehouse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
 Import-Package: com.sun.tools.classfile
+Automatic-Module-Name: de.ovgu.featureide.core.featurehouse-test

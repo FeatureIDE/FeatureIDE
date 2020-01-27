@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,7 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_B
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -64,9 +63,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
@@ -112,7 +111,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public void performFullBuild(java.nio.file.Path config) {
 		if (config == null) {
 			return;
 		}
@@ -131,11 +130,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		final Configuration configuration = featureProject.loadConfiguration(config);
+		if (configuration == null) {
+			return;
+		}
 
-		final LinkedList<String> selectedFeatures = new LinkedList<String>();
-		unSelectedFeatures = new LinkedList<String>();
+		final LinkedList<String> selectedFeatures = new LinkedList<>();
+		unSelectedFeatures = new LinkedList<>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
@@ -145,7 +146,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			}
 		}
 
-		final IProject project = config.getProject();
+		final IProject project = featureProject.getProject();
 		setBuildpaths(project);
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -250,7 +251,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		featureModel = project.getFeatureModel();
-		fmFactory = FMFactoryManager.getFactory(featureModel);
+		fmFactory = FMFactoryManager.getInstance().getFactory(featureModel);
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
 				featureModel.getStructure().getRoot().removeChild(featureModel.getFeature("Base").getStructure());
@@ -259,7 +260,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				featureModel.getStructure().setRoot(root.getStructure());
 				featureModel.getStructure().getRoot().setAbstract(false);
 				final ProblemList problems =
-					SimpleFileHandler.save(Paths.get(project.getProject().getFile("model.xml").getLocationURI()), featureModel, new XmlFeatureModelFormat());
+					SimpleFileHandler.save(EclipseFileSystem.getPath(project.getProject().getFile("model.xml")), featureModel, new XmlFeatureModelFormat());
 				if (problems.containsError()) {
 					CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL + "\n" + problems.getErrors().toString(), new Exception());
 				}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -69,18 +68,28 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
-		public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
+		public Constraint createConstraint(IFeatureModel featureModel, Node propNode) {
 			return new Constraint(featureModel, propNode);
 		}
 
 		@Override
-		public IFeature createFeature(IFeatureModel featureModel, String name) {
+		public MyFeatureImplementation createFeature(IFeatureModel featureModel, String name) {
 			return new MyFeatureImplementation(featureModel, name);
 		}
 
 		@Override
-		public IFeatureModel createFeatureModel() {
+		public FeatureModel create() {
 			return new FeatureModel(ID);
+		}
+
+		@Override
+		public MyFeatureImplementation copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
+			return (MyFeatureImplementation) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		}
+
+		@Override
+		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
+			return (Constraint) oldConstraint.clone(featureModel);
 		}
 
 	}
@@ -99,7 +108,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 		FMFactoryManager.getInstance().addExtension(factory);
 
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 
 		final IFeature f1 = factory.createFeature(model, "A");
 		final IFeature f2 = factory.createFeature(model, "B");
@@ -115,11 +124,11 @@ public class CustomFeaturesCustomPropertiesTest {
 		model.addFeature(f3);
 		model.addFeature(f4);
 
-		model.getFeature("A").getCustomProperties().set("key1", Type.STRING, "value1");
-		model.getFeature("B").getCustomProperties().set("key1", Type.STRING, "value1");
+		model.getFeature("A").getCustomProperties().set("key1", XmlFeatureModelFormat.TYPE_CUSTOM, "value1");
+		model.getFeature("B").getCustomProperties().set("key1", XmlFeatureModelFormat.TYPE_CUSTOM, "value1");
 
-		model.getFeature("C").getCustomProperties().set("key2", Type.INT, 23);
-		model.getFeature("C").getCustomProperties().set("key3", Type.INT, 23);
+		model.getFeature("C").getCustomProperties().set("key2", XmlFeatureModelFormat.TYPE_CUSTOM, "23");
+		model.getFeature("C").getCustomProperties().set("key3", XmlFeatureModelFormat.TYPE_CUSTOM, "23");
 
 		model.getStructure().setRoot(f1.getStructure());
 
@@ -134,7 +143,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model = factory.createFeatureModel();
+		final IFeatureModel model = factory.create();
 		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 
@@ -145,32 +154,27 @@ public class CustomFeaturesCustomPropertiesTest {
 		Assert.assertTrue(model.getFeature("C") instanceof MyFeatureImplementation);
 		Assert.assertTrue(model.getFeature("D") instanceof MyFeatureImplementation);
 
-		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1"));
-		Assert.assertTrue(model.getFeature("B").getCustomProperties().has("key1"));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key2"));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key3"));
+		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("B").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key2", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertTrue(model.getFeature("C").getCustomProperties().has("key3", XmlFeatureModelFormat.TYPE_CUSTOM));
 
-		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key2"));
-		Assert.assertFalse(model.getFeature("B").getCustomProperties().has("key3"));
-		Assert.assertFalse(model.getFeature("C").getCustomProperties().has("key1"));
+		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key2", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertFalse(model.getFeature("B").getCustomProperties().has("key3", XmlFeatureModelFormat.TYPE_CUSTOM));
+		Assert.assertFalse(model.getFeature("C").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
-		Assert.assertTrue(model.getFeature("A").getCustomProperties().getDataType("key1").equals(Type.STRING));
-		Assert.assertTrue(model.getFeature("B").getCustomProperties().getDataType("key1").equals(Type.STRING));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().getDataType("key2").equals(Type.INT));
-		Assert.assertTrue(model.getFeature("C").getCustomProperties().getDataType("key3").equals(Type.INT));
+		Assert.assertTrue((model.getFeature("A").getCustomProperties().get("key1", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("value1"));
+		Assert.assertTrue((model.getFeature("B").getCustomProperties().get("key1", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("value1"));
+		Assert.assertTrue((model.getFeature("C").getCustomProperties().get("key2", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("23"));
+		Assert.assertTrue((model.getFeature("C").getCustomProperties().get("key3", XmlFeatureModelFormat.TYPE_CUSTOM)).equals("23"));
 
-		Assert.assertTrue(((String) model.getFeature("A").getCustomProperties().get("key1")).equals("value1"));
-		Assert.assertTrue(((String) model.getFeature("B").getCustomProperties().get("key1")).equals("value1"));
-		Assert.assertTrue(((Integer) model.getFeature("C").getCustomProperties().get("key2")).equals(23));
-		Assert.assertTrue(((Integer) model.getFeature("C").getCustomProperties().get("key3")).equals(23));
-
-		model.getFeature("A").getCustomProperties().remove("key1");
-		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1"));
+		model.getFeature("A").getCustomProperties().remove("key1", XmlFeatureModelFormat.TYPE_CUSTOM);
+		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 
 		modelFile.delete();
 		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 
-		final IFeatureModel model2 = factory.createFeatureModel();
+		final IFeatureModel model2 = factory.create();
 		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {
@@ -179,7 +183,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 		Assert.assertFalse(problems2.containsError());
 
-		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1"));
+		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1", XmlFeatureModelFormat.TYPE_CUSTOM));
 	}
 
 	@After

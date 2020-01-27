@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -378,6 +378,7 @@ public class StringTable {
 	public static final String AUTOSELECT_FEATURES = "Autoselect Features";
 	public static final String CALCULATING____ = "Calculating ...";
 	public static final String VALID_COMMA_ = "valid, ";
+	public static final String CONFLICTING_COMMA_ = "conflicting, ";
 	public static final String MORE_THAN = "more than ";
 	public static final String POSSIBLE_CONFIGURATIONS = " possible configurations";
 	public static final String THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_ =
@@ -487,6 +488,9 @@ public class StringTable {
 	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = "Constraint is a tautology and should be removed. ";
 	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = "Constraint is redundant and could be removed. ";
 	public static final String CONCRETE = " Concrete";
+	public static final String TOOLTIP_ABSTRACT = " Abstract";
+	public static final String TOOLTIP_HIDDEN = " hidden";
+	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
@@ -559,9 +563,11 @@ public class StringTable {
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
-	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
-	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP =
-		"If this option is not selected, upon opening a feature diagram FeatureIDE will ask you if you want to open the ConstraintView. Uncheck this if you want to change the default behaviour.";
+	public static final String CONFIGURATION_DIALOGS_REMEMBER_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
+	public static final String CONFIGURATION_DIALOGS_DECISION_CONSTRAINT_TEXT = "Open Constraint View when starting FeatureIDE.";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP =
+		"Don't show tooltip asking if you want to open the constraint view when starting FeatureIDE.";
+	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP = "Open Constraint View when starting FeatureIDE.";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ =
 		"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ =
@@ -575,12 +581,12 @@ public class StringTable {
 	public static final String IMPORTED = "Imported";
 	public static final String INHERITED = "Inherited";
 	public static final String FROM_INTERFACE = "from Interface";
-	public static final String FALSE_OPTIONAL_FEATURE = "False-optional feature";
-	public static final String INDETERMINATE_HIDDEN = "Indeterminate hidden";
-	public static final String REDUNDANT_CONSTRAINT = "Redundant constraint";
-	public static final String UNSATISFIABLE_CONSTRAINT = "Unsatisfiable constraint";
-	public static final String CONSTRAINT_IS_TAUTOLOGY = "Constraint is tautology";
-	public static final String FEATURE_MODELIS_VOID = "Feature model is void";
+	public static final String FALSE_OPTIONAL_FEATURE = "False-Optional Feature";
+	public static final String INDETERMINATE_HIDDEN = "Indeterminate Hidden";
+	public static final String REDUNDANT_CONSTRAINT = "Redundant Constraint";
+	public static final String UNSATISFIABLE_CONSTRAINT = "Unsatisfiable Constraint";
+	public static final String CONSTRAINT_IS_TAUTOLOGY = "Constraint is a Tautology";
+	public static final String FEATURE_MODELIS_VOID = "Feature Model is Void";
 	public static final String GERMAN = "German";
 	public static final String OBLIGATORISCH = "Obligatorisch";
 	public static final String ABSTRAKT = "Abstrakt";

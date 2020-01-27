@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
 	<artifactId>de.ovgu.featureide.root</artifactId>
-	<version>3.5.5-SNAPSHOT</version>
+	<version>3.6.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
 		<tycho-version>1.1.0</tycho-version>
 		<tycho-extras-version>1.1.0</tycho-extras-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<tycho.testArgLine></tycho.testArgLine>
 	</properties>
 
@@ -80,12 +80,16 @@
 
 	<build>
 		<plugins>
-             <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                ...
+                    <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
+                    <destDir>${project.name}</destDir>
+                    <debug>true</debug>
+                    <doclint>none</doclint>
+                    <failOnWarnings>false</failOnWarnings>
                 </configuration>
             </plugin>
         
@@ -106,7 +110,7 @@
 						<environment>
 							<os>win32</os>
 							<ws>win32</ws>
-							<arch>x86</arch>
+							<arch>x86_64</arch>
 						</environment>
 						<environment>
 							<os>linux</os>
@@ -150,7 +154,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.4</version>
 				<executions>
 					<execution>
 						<id>jacoco-initialize</id>
@@ -252,7 +256,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.4</version>
 				<reportSets>
 					<reportSet>
 						<reports>

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -107,15 +107,17 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	}
 
 	public void setSelectedColumn(int index) {
-		if ((0 <= index) && (index < columnStyles.size())) {
-			if (!columnStyles.get(index).isSelectable()) {
-				index = -1;
+		if (columnStyles != null) {
+			if ((0 <= index) && (index < columnStyles.size())) {
+				if (!columnStyles.get(index).isSelectable()) {
+					index = -1;
+				}
 			}
-		}
-		selectedColumn = index;
-		redraw();
-		for (final ICustomTableHeaderSelectionListener listener : listeners) {
-			listener.onColumnSelectionChanged(index);
+			selectedColumn = index;
+			redraw();
+			for (final ICustomTableHeaderSelectionListener listener : listeners) {
+				listener.onColumnSelectionChanged(index);
+			}
 		}
 	}
 

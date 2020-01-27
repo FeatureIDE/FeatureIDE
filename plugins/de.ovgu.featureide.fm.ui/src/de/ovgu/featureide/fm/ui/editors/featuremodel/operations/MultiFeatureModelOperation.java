@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,55 +20,90 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.ArrayList;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-
+import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
 	protected final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
 
-	public MultiFeatureModelOperation(IFeatureModel featureModel, String name) {
-		super(featureModel, name);
+	protected final List<String> featureNames;
+	private String commonAncestor;
+
+	public MultiFeatureModelOperation(IFeatureModelManager featureModelManager, String name, List<String> featureNames) {
+		super(featureModelManager, name);
+		this.featureNames = featureNames;
 	}
 
-	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		createSingleOperations();
-		return super.execute(monitor, info);
-	}
+	protected abstract void createSingleOperations(IFeatureModel featureModel);
 
-	protected abstract void createSingleOperations();
+	protected abstract String getID();
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		for (final Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation = it.next();
-			if (operation.canRedo()) {
-				operation.redo();
+	protected FeatureIDEEvent firstOperation(IFeatureModel featureModel) {
+		createSingleOperations(featureModel);
+		List<IFeature> commonAncestorList = null;
+		for (final String name : featureNames) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (feature != null) {
+				commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 			}
 		}
-		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
+		if ((commonAncestorList != null) && !commonAncestorList.isEmpty()) {
+			commonAncestor = commonAncestorList.get(commonAncestorList.size() - 1).getName();
+		}
+
+		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
+		for (final AbstractFeatureModelOperation operation : operations) {
+			events.add((FeatureModelOperationEvent) operation.firstOperation(featureModel));
+		}
+		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
+	}
+
+	private IFeature getFeature(IFeatureModel featureModel) {
+		return commonAncestor == null ? null : featureModel.getFeature(commonAncestor);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		for (final Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation = it.next();
-			if (operation.canUndo()) {
-				operation.undo();
-			}
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
+		for (final AbstractFeatureModelOperation operation : operations) {
+			events.add((FeatureModelOperationEvent) operation.operation(featureModel));
 		}
-		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
+		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
+	}
+
+	@Override
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
+
+		final ArrayList<AbstractFeatureModelOperation> copiedList = new ArrayList<>();
+
+		for (final AbstractFeatureModelOperation operation : operations) {
+			copiedList.add(operation);
+		}
+
+		for (int i = copiedList.size() - 1; i >= 0; i--) {
+
+			final AbstractFeatureModelOperation operation = copiedList.get(i);
+			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
+		}
+
+//		for (final AbstractFeatureModelOperation operation : operations) {
+//			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
+//		}
+		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
 	}
 
 	public void addOperation(AbstractFeatureModelOperation operation) {

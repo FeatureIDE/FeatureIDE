@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,16 +29,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_CORRUPT__NO
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -58,12 +56,9 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		final RenamingsManager renamingsManager = featureModel == null ? null : featureModel.getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
-
-		final boolean orgPropagate = configuration.isPropagate();
-		configuration.setPropagate(false);
-		configuration.resetValues();
 
 		String line = null;
 		int lineNumber = 1;
@@ -75,7 +70,7 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 				// the string tokenizer is used to also support the expression
 				// format used by FeatureHouse
 				final StringTokenizer tokenizer = new StringTokenizer(line);
-				final LinkedList<String> hiddenFeatures = new LinkedList<>();
+				final List<String> hiddenFeatures = new ArrayList<>();
 				while (tokenizer.hasMoreTokens()) {
 					String name = tokenizer.nextToken(" ");
 					if (name.startsWith("\"")) {
@@ -89,8 +84,8 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
-					name = renamingsManager.getNewName(name);
-					final IFeature feature = configuration.getFeatureModel().getFeature(name);
+					name = renamingsManager == null ? name : renamingsManager.getNewName(name);
+					final IFeature feature = featureModel != null ? featureModel.getFeature(name) : null;
 					if ((feature != null) && feature.getStructure().hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
@@ -117,11 +112,8 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 		} catch (final IOException e) {
 			warnings.clear();
 			warnings.add(new Problem(e));
-			configuration.setPropagate(orgPropagate);
 			return warnings;
 		}
-		configuration.setPropagate(orgPropagate);
-		configuration.update(true, null);
 		return warnings;
 	}
 
@@ -133,35 +125,46 @@ public class DefaultFormat extends APersistentFormat<Configuration> implements I
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
 		final IFeatureModel featureModel = configuration.getFeatureModel();
-		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list = Functional.toList(featureModel.getFeatureOrderList());
-			final Set<String> featureSet = configuration.getSelectedFeatureNames();
-			for (final String s : list) {
-				if (featureSet.contains(s)) {
-					if (s.contains(" ")) {
-						buffer.append("\"" + s + "\"" + NEWLINE);
-					} else {
-						buffer.append(s + NEWLINE);
-					}
-				}
-			}
-			return buffer.toString();
+		if ((featureModel != null) && featureModel.isFeatureOrderUserDefined()) {
+			writeFeatureOrder(configuration, buffer, featureModel);
+		} else if (configuration.getRoot() != null) {
+			writeFeatureTree(configuration.getRoot(), buffer, featureModel);
+		} else {
+			writeFeatureList(configuration, buffer, featureModel);
 		}
-
-		writeSelectedFeatures(configuration.getRoot(), buffer);
 		return buffer.toString();
 	}
 
-	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
-		if (feature.getFeature().getStructure().isConcrete() && (feature.getSelection() == Selection.SELECTED)) {
+	private void writeFeatureOrder(Configuration configuration, final StringBuilder buffer, final IFeatureModel featureModel) {
+		final List<String> list = featureModel.getFeatureOrderList();
+		for (final String name : list) {
+			final SelectableFeature selectableFeature = configuration.getSelectableFeature(name, false);
+			if (selectableFeature != null) {
+				writeSelectedFeature(buffer, selectableFeature, featureModel);
+			}
+		}
+	}
+
+	private void writeFeatureList(Configuration configuration, final StringBuilder buffer, IFeatureModel featureModel) {
+		for (final SelectableFeature feature : configuration.getFeatures()) {
+			writeSelectedFeature(buffer, feature, featureModel);
+		}
+	}
+
+	private void writeFeatureTree(SelectableFeature feature, StringBuilder buffer, IFeatureModel featureModel) {
+		writeSelectedFeature(buffer, feature, featureModel);
+		for (final TreeElement child : feature.getChildren()) {
+			writeFeatureTree((SelectableFeature) child, buffer, featureModel);
+		}
+	}
+
+	private void writeSelectedFeature(final StringBuilder buffer, final SelectableFeature feature, IFeatureModel featureModel) {
+		if (((featureModel == null) || feature.getFeature().getStructure().isConcrete()) && (feature.getSelection() == Selection.SELECTED)) {
 			if (feature.getName().contains(" ")) {
 				buffer.append("\"" + feature.getName() + "\"" + NEWLINE);
 			} else {
 				buffer.append(feature.getName() + NEWLINE);
 			}
-		}
-		for (final TreeElement child : feature.getChildren()) {
-			writeSelectedFeatures((SelectableFeature) child, buffer);
 		}
 	}
 

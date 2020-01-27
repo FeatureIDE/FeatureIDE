@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -96,7 +96,7 @@ class StoppableExecuter<T> extends Executer<T> {
 	}
 
 	@Override
-	public T execute(IMonitor monitor) throws Exception {
+	public T execute(IMonitor<T> monitor) throws Exception {
 		synchronized (this) {
 			// in case job was started and canceled at the same time
 			this.monitor = monitor;

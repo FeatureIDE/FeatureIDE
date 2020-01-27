@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -64,7 +64,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 * @return number of configurations
 	 */
 	@Override
-	public int sort(final IMonitor monitor) {
+	public int sort(final IMonitor<?> monitor) {
 		for (final BuilderConfiguration c : configurations) {
 			try {
 				monitor.checkCancel();
@@ -77,7 +77,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			monitor.worked();
 		}
 
-		final LinkedList<BuilderConfiguration> sorted = new LinkedList<BuilderConfiguration>();
+		final LinkedList<BuilderConfiguration> sorted = new LinkedList<>();
 		while (!interactions.isEmpty()) {
 			try {
 				monitor.checkCancel();

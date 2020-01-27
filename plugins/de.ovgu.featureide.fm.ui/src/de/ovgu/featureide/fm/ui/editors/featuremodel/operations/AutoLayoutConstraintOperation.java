@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,9 +27,12 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -45,18 +48,18 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final int counter;
-	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
+	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<>();
 
 	public AutoLayoutConstraintOperation(IGraphicalFeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
 		super(featureModel, AUTO_LAYOUT_CONSTRAINTS);
 		this.counter = counter;
-		if (!(oldPos == null) && !oldPos.isEmpty()) {
+		if (oldPos != null) {
 			this.oldPos.addAll(oldPos);
 		}
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -69,7 +72,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 
 			// Get root because the constraints will be auto layouted depending on the root
 			final IGraphicalFeature root =
-				graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				FeatureUIHelper.getGraphicalFeature(FeatureUtils.getRoot(graphicalFeatureModel.getFeatureModelManager().getSnapshot()), graphicalFeatureModel);
 			minX = root.getLocation().x;
 			maxX = root.getLocation().x + root.getSize().width;
 			// +20 because of the collapsed decorator
@@ -96,7 +99,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			constraintList.get(0).setLocation(oldPos.get(counter).get(0));

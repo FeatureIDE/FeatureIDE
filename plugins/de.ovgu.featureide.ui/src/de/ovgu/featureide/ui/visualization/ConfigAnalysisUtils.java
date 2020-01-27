@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.ui.visualization;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -32,11 +32,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 
 /**
  * Configurations Analysis utils
@@ -51,9 +53,8 @@ public class ConfigAnalysisUtils {
 		final IFolder configsFolder = featureProject.getConfigFolder();
 		for (final IResource res : configsFolder.members()) {
 			if ((res instanceof IFile) && res.isAccessible()) {
-				final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-				final ProblemList problems = SimpleFileHandler.load(Paths.get(res.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-				if (!problems.containsError()) {
+				final Configuration configuration = featureProject.loadConfiguration(EclipseFileSystem.getPath(res));
+				if (configuration != null) {
 					configs.add(configuration);
 				}
 			}
@@ -81,18 +82,11 @@ public class ConfigAnalysisUtils {
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
-		// make a copy because it is unmodifiable
-		final List<String> featureList1 = featureProject.getFeatureModel().getFeatureOrderList();
-		final List<String> featureList = new ArrayList<String>();
-		featureList.addAll(featureList1);
-		final List<IFeature> coreFeatures = featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
-		final Collection<IFeature> hiddenFeatures = featureProject.getFeatureModel().getAnalyser().getHiddenFeatures();
-		for (final IFeature coref : coreFeatures) {
-			featureList.remove(coref.getName());
-		}
-		for (final IFeature hiddenf : hiddenFeatures) {
-			featureList.remove(hiddenf.getName());
-		}
-		return featureList;
+		final FeatureModelFormula snapshot = featureProject.getFeatureModelManager().getPersistentFormula();
+		final Predicate<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures(null));
+		final Predicate<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
+
+		final Predicate<IFeature> noCoreNoHiddenFilter = hiddenFeatureFilter.or(coreFeatureFilter).negate();
+		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, IFeature::getName);
 	}
 }

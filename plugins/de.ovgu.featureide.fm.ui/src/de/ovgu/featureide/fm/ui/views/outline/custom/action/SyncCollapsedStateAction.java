@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -32,12 +31,9 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class SyncCollapsedStateAction extends Action {
 
-	private final TreeViewer viewer;
-
-	public SyncCollapsedStateAction(TreeViewer viewer) {
+	public SyncCollapsedStateAction() {
 		super("", AS_CHECK_BOX);
 		setChecked(FMUIPlugin.getDefault().getPreferenceStore().getBoolean("outlineSyncCollapsedState"));
-		this.viewer = viewer;
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif"));
 	}
 

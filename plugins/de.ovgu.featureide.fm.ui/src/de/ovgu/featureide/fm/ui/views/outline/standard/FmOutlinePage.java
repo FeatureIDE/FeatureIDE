@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -35,9 +35,9 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMLabelProvider;
@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMTreeContentProv
  */
 public class FmOutlinePage extends ContentOutlinePage implements IEventListener {
 
-	protected IFeatureModel fInput;
+	protected FeatureModelManager fmManager;
 
 	protected FeatureModelEditor fTextEditor;
 
@@ -76,9 +76,9 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 	 *
 	 * @param input the input of this outline page
 	 */
-	public void setInput(IFeatureModel input) {
-		fInput = input;
-		fInput.addListener(this);
+	public void setInput(FeatureModelManager fmManager) {
+		this.fmManager = fmManager;
+		fmManager.addListener(this);
 		update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 	}
 
@@ -105,12 +105,13 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 									viewer.setLabelProvider(labelProvider);
 									if (iFile != null) {
 										viewer.setInput(iFile);
-										viewer.getContentProvider().inputChanged(viewer, null, fInput);
+										viewer.getContentProvider().inputChanged(viewer, null, fmManager);
 										if (fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
 											if ((contextMenu == null)
-												|| (contextMenu.getFeatureModel() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel())) {
+												|| (contextMenu.getFeatureModelManager() != ((FeatureModelEditor) fTextEditor.getEditorInput())
+														.getFeatureModelManager())) {
 												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
-														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel(), false);
+														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModelManager(), false);
 											}
 										}
 									}
@@ -141,22 +142,18 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 			viewer.setLabelProvider(labelProvider);
 		}
 
-		if (fInput != null) {
-			setInput(fInput);
+		if (fmManager != null) {
+			update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 		}
 
 		viewer.expandToLevel(2);
-		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fTextEditor.diagramEditor.getGraphicalFeatureModel());
+		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fmManager);
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		setInput(fInput);
+		update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 	}
 
 }

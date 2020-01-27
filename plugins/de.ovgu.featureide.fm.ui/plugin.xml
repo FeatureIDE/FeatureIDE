@@ -8,6 +8,7 @@
 	<extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline" schema="schema/de.ovgu.featureide.fm.ui.Outline.exsd"/>
+ <extension-point id="de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry" name="configurationoutlineentry" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry.exsd"/>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
@@ -158,6 +159,9 @@
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.contenttype.confXML">
 			</contentTypeBinding>
+   <contentTypeBinding
+         contentTypeId="de.ovgu.featureide.contenttype.extendedConfiguration">
+   </contentTypeBinding>
 		</editor>
 	</extension>
 
@@ -424,10 +428,6 @@
 				commandId="de.ovgu.featureide.fm.ui.commands.Convert">
 		</handler>
 		<handler
-				class="de.ovgu.featureide.fm.ui.handlers.AnalyzeVelvetHandler"
-				commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet">
-		</handler>
-		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.FeatureDependenciesHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies">
 		</handler>
@@ -625,5 +625,8 @@
 		<Outline
 				OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
 		</Outline>
+  <Outline
+        OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.ConfigurationOutlineProvider">
+  </Outline>
 	</extension>
 </plugin>

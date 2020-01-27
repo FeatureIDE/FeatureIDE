@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -29,6 +29,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
@@ -37,7 +38,7 @@ public abstract class AExportHandler<T> extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile modelFile) {
-		final Path modelFilePath = Paths.get(modelFile.getLocationURI());
+		final Path modelFilePath = EclipseFileSystem.getPath(modelFile);
 		final List<? extends IPersistentFormat<T>> formatExtensions = getFormats();
 
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);

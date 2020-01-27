@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.PlatformUI;
-
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -31,6 +28,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEditorSizeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * TODO description
@@ -38,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEdi
  * @author Maximilian Kühl
  * @author Joshua Sprey
  */
-public class AdjustModelToEditorSizeAction extends Action {
+public class AdjustModelToEditorSizeAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.adjustmodeltoeditor";
 
@@ -46,8 +44,7 @@ public class AdjustModelToEditorSizeAction extends Action {
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
-		super(title);
-		setId(ID);
+		super(title, ID, graphicalFeatureModel.getFeatureModelManager());
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		if (viewer instanceof FeatureDiagramEditor) {
 			editor = (FeatureDiagramEditor) viewer;
@@ -57,16 +54,11 @@ public class AdjustModelToEditorSizeAction extends Action {
 
 	@Override
 	public void run() {
-		final IFeature root = graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
+		final IFeature root = FeatureUtils.getRoot(featureModelManager.getSnapshot());
 		if (root == null) {
 			return;
 		}
-		final AdjustModelToEditorSizeOperation op = new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
+		FeatureModelOperationWrapper.run(new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor));
 		if (editor != null) {
 			final IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
 			editor.getViewer().centerPointOnScreen(graphicalRoot.getObject());

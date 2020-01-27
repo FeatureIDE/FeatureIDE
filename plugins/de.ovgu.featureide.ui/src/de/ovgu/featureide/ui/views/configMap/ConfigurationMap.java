@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -74,6 +74,8 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapRefreshAction;
 import de.ovgu.featureide.ui.views.configMap.actions.OpenFileAction;
+import de.ovgu.featureide.ui.views.configMap.filters.AllDeselectedFeatureFilter;
+import de.ovgu.featureide.ui.views.configMap.filters.AllSelectedFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.CoreFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.DeadFeatureFilter;
 import de.ovgu.featureide.ui.views.configMap.filters.FeatureIsFalseOptionalFilter;
@@ -209,6 +211,8 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new DeadFeatureFilter(true));
 		getFilters().add(new FeatureUnusedFilter(true));
+		getFilters().add(new AllSelectedFeatureFilter(false));
+		getFilters().add(new AllDeselectedFeatureFilter(false));
 
 		final List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(getFilters());
 
@@ -359,7 +363,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			tree.setInput(new Object());
 			updateGUI(true);
 		} else {
-			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModelManager());
 		}
 
 		// Set the child as the scrolled content of the ScrolledComposite
@@ -442,12 +446,18 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public void loadConfigurations() {
 		if (featureProject == null) {
+			for (final TreeColumn column : configurationColumns) {
+				column.dispose();
+			}
+			configurationColumns.clear();
+			configPaths.clear();
+			header.setColumnStyles(null);
 			return;
 		}
 		featuresColumn.setWidth(featureColumnWidth);
 
 		// Callback will handle creating columns
-		configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		configurations = loader.loadConfigurations(featureProject.getFeatureModelManager().getPersistentFormula(), featureProject.getConfigPath());
 		// update header
 		final TreeColumn[] columns = tableTree.getColumns();
 		final List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
@@ -497,6 +507,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		loadConfigurations();
 		updateGUI(true);
 		resize();
+	}
+
+	private void resetConfigurationMap() {
+		setEditor(null);
+		setFeatureProject(null);
+		refresh();
 	}
 
 	public void updateGUI() {
@@ -556,13 +572,20 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		if (this.featureProject != featureProject) {
 			if (this.featureProject != null) {
 				// Deregister old listener
-				this.featureProject.getFeatureModel().removeListener(this);
-				this.featureProject.getFeatureModelManager().removeListener(this);
+				if (this.featureProject.getFeatureModel() != null) {
+					this.featureProject.getFeatureModel().removeListener(this);
+				}
+				if (this.featureProject.getFeatureModelManager() != null) {
+					this.featureProject.getFeatureModelManager().removeListener(this);
+				}
 			}
 
 			this.featureProject = featureProject;
-			this.featureProject.getFeatureModel().addListener(this);
-			this.featureProject.getFeatureModelManager().addListener(this);
+
+			if (this.featureProject != null) {
+				this.featureProject.getFeatureModel().addListener(this);
+				this.featureProject.getFeatureModelManager().addListener(this);
+			}
 
 			if (isActive()) {
 				loadConfigurations();
@@ -674,7 +697,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
-		case COLOR_CHANGED:
+		case FEATURE_COLOR_CHANGED:
 			updateTree();
 			break;
 		case MODEL_DATA_SAVED:
@@ -684,6 +707,9 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			updateElements();
 			break;
 		default:
+			break;
+		case MODEL_DATA_OVERWRITTEN:
+			resetConfigurationMap();
 			break;
 		}
 

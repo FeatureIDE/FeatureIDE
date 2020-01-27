@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -30,7 +32,6 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.job.monitor.ProgressMonitor;
@@ -44,12 +45,12 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  */
 public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
+	@SuppressWarnings("rawtypes")
 	private class JobFL extends JobChangeAdapter {
 
-		@SuppressWarnings("rawtypes")
 		private final JobFinishListener listener;
 
-		public JobFL(@SuppressWarnings("rawtypes") JobFinishListener listener) {
+		public JobFL(JobFinishListener listener) {
 			this.listener = listener;
 		}
 
@@ -77,7 +78,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		}
 	}
 
-	private IConsumer<Object> intermediateFunction;
+	private Consumer<T> intermediateFunction;
 
 	protected T methodResult = null;
 
@@ -115,7 +116,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		status = JobStatus.RUNNING;
 
 		// run job and catch possible runtime exceptions
-		final ProgressMonitor workMonitor = new ProgressMonitor(getName(), monitor);
+		final ProgressMonitor<T> workMonitor = new ProgressMonitor<>(getName(), monitor);
 		workMonitor.setIntermediateFunction(intermediateFunction);
 		try {
 			methodResult = work(workMonitor);
@@ -136,24 +137,24 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 	}
 
 	@Override
-	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
+	public final void setIntermediateFunction(Consumer<T> intermediateFunction) {
 		this.intermediateFunction = intermediateFunction;
 	}
 
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not. The default method is empty.
 	 *
-	 * @param success {@code true} if the execution of {@link #work()} was complete and successful, {@code false} otherwise
+	 * @param success {@code true} if the execution of {@link #work(IMonitor)} was complete and successful, {@code false} otherwise
 	 */
 	protected void finalWork() {}
 
 	/**
-	 * In this method all the work of the job is done.<br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.<br>
+	 * In this method all the work of the job is done.<br> Use the {@code workMonitor} field for progress monitoring and calling intermediate functions.<br>
 	 * <br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
 	 *
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)
 	 */
-	protected abstract T work(IMonitor workMonitor) throws Exception;
+	protected abstract T work(IMonitor<T> workMonitor) throws Exception;
 
 }

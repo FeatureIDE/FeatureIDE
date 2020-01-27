@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,43 +22,77 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONSTRAINT_ERRORS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 
 /**
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class ConstrainsCalculationsAction extends Action {
+public class ConstrainsCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.constraintscalculations";
 
-	private final IFeatureModel featureModel;
-
-	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
-		super(CALCULATE_CONSTRAINT_ERRORS);
-		this.featureModel = featureModel;
-		setChecked(featureModel.getAnalyser().calculateConstraints);
-		setId(ID);
+	public ConstrainsCalculationsAction(IFeatureModelManager featureModelManager) {
+		super(CALCULATE_CONSTRAINT_ERRORS, ID, featureModelManager);
 	}
 
 	@Override
 	public void run() {
-		if (featureModel.getAnalyser().calculateConstraints) {
-			featureModel.getAnalyser().calculateConstraints = false;
-			featureModel.getAnalyser().calculateRedundantConstraints = false;
-			featureModel.getAnalyser().calculateTautologyConstraints = false;
-		} else {
-			featureModel.getAnalyser().calculateConstraints = true;
-			featureModel.getAnalyser().calculateFeatures = true;
-			featureModel.getAnalyser().calculateRedundantConstraints = true;
-			featureModel.getAnalyser().calculateTautologyConstraints = true;
-			featureModel.getAnalyser().calculateDeadConstraints = true;
-			featureModel.getAnalyser().calculateFOConstraints = true;
+		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(),
+				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isCalculatingConstraints == null) {
+			// Default value = always active
+			isCalculatingConstraints = Boolean.TRUE;
 		}
-		featureModel.handleModelDataChanged();
+
+		// Change model property
+		if (isCalculatingConstraints) {
+			featureModelManager.editObject(this::setPropertyToDeactive);
+		} else {
+			featureModelManager.editObject(this::setPropertyToActive);
+		}
+		// Model data changed => reanalyze the model in the editor if needed
+		featureModelManager.getVarObject().handleModelDataChanged();
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to true.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToActive(IFeatureModel model) {
+		// Calculation of constraints requires the calculation of features
+		String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+	}
+
+	/***
+	 * Consumer function used to edit the current models property for automated calculation setting it to false.
+	 *
+	 * @param model Model that should be changed.
+	 */
+	private void setPropertyToDeactive(IFeatureModel model) {
+		final String propertyType = FeatureModelProperty.TYPE_CALCULATIONS;
+		final String propertyName = FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS;
+		model.getProperty().set(propertyName, propertyType, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
+	}
+
+	@Override
+	public void update() {
+		Boolean isChecked = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isChecked == null) {
+			// Default value = always active
+			isChecked = Boolean.TRUE;
+		}
+		setChecked(isChecked);
 	}
 
 }

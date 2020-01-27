@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,7 +27,7 @@ import java.util.Iterator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -45,21 +45,20 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	private IConstraint constraint;
 
-	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
-		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
+	public EditConstraintAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(viewer, featureModelManager, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 		setEnabled(false);
 	}
 
 	@Override
 	public void run() {
-		super.run();
 		openEditor(constraint);
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection == null) || ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart))) {
 			return false;
 		}
 

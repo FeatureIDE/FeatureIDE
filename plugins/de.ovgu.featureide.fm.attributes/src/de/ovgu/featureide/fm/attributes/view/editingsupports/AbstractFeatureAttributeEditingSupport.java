@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.EditingSupport;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * Abstract class for the Editingsupports for the different columns of the {@link FeatureAttributeView}.
@@ -62,7 +63,7 @@ public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupp
 	 */
 	@Override
 	protected boolean canEdit(Object element) {
-		if (enabled) {
+		if (enabled && view.getCurrentEditor() instanceof FeatureModelEditor) {
 			if (element instanceof IFeatureAttribute) {
 				IFeatureAttribute att = (IFeatureAttribute) element;
 				if (att.isRecursive() && !att.isHeadOfRecursiveAttribute()) {

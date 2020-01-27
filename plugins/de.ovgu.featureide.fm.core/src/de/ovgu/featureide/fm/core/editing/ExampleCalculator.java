@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -30,6 +30,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
@@ -77,7 +78,7 @@ public class ExampleCalculator {
 			b = new And(b);
 		}
 		bChildren = b.getChildren();
-		bSatisfiable = new LinkedList<Integer>();
+		bSatisfiable = new LinkedList<>();
 		bIndex = -1;
 	}
 
@@ -113,7 +114,7 @@ public class ExampleCalculator {
 			exampleSolver = null;
 			return nextExample();
 		}
-		final Configuration configuration = new Configuration(fm, false);
+		final Configuration configuration = new Configuration(new FeatureModelFormula(fm));
 		final DefaultFormat format = new DefaultFormat();
 
 		format.read(configuration, solution);

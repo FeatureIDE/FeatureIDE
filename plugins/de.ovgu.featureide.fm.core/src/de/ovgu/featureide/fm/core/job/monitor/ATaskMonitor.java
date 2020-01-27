@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,7 +24,7 @@ package de.ovgu.featureide.fm.core.job.monitor;
  *
  * @author Sebastian Krieter
  */
-abstract class ATaskMonitor extends AMonitor {
+abstract class ATaskMonitor<T> extends AMonitor<T> {
 
 	protected String name = null;
 
@@ -32,12 +32,7 @@ abstract class ATaskMonitor extends AMonitor {
 		super();
 	}
 
-	public ATaskMonitor(String name) {
-		super();
-		this.name = name;
-	}
-
-	protected ATaskMonitor(AMonitor parent) {
+	protected ATaskMonitor(AMonitor<?> parent) {
 		super(parent);
 	}
 
@@ -53,7 +48,7 @@ abstract class ATaskMonitor extends AMonitor {
 
 	protected String constructTaskName() {
 		final StringBuilder sb = new StringBuilder();
-		AMonitor p = parent;
+		AMonitor<?> p = parent;
 		while (p != null) {
 			sb.append(p.getTaskName());
 			sb.append(" - ");

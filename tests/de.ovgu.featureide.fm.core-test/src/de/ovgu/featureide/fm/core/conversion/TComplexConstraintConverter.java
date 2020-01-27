@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -44,12 +44,12 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class TComplexConstraintConverter {
 
-	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+	private static final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 	private static IFeatureModel fm;
 
 	static {
 		// setup a test model
-		fm = factory.createFeatureModel();
+		fm = factory.create();
 		final IFeature root = factory.createFeature(fm, "root");
 
 		fm.addFeature(root);

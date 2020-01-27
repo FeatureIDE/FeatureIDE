@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,9 +33,48 @@ import java.util.NoSuchElementException;
  */
 public class RingList<T> implements Iterable<T> {
 
-	private final List<T> ring;
+	private static final RingList<Object> emptyRingList = new RingList<Object>() {
+
+		@Override
+		public void add(Object element) {}
+
+		@Override
+		public Iterator<Object> iterator() {
+			return ring.iterator();
+		}
+
+		@Override
+		public Object get(int k) {
+			return null;
+		}
+
+		@Override
+		public Object getLast() {
+			return null;
+		}
+
+		@Override
+		public Object getFirst() {
+			return null;
+		}
+
+	};
+
+	@SuppressWarnings("unchecked")
+	public static <T> RingList<T> empytRingList() {
+		return (RingList<T>) emptyRingList;
+	}
+
+	protected final List<T> ring;
+
 	private int firstPointer;
 	private final int size;
+
+	private RingList() {
+		this.ring = Collections.emptyList();
+		this.size = 0;
+		this.firstPointer = 0;
+	}
 
 	public RingList(int size) {
 		this.ring = new ArrayList<>();
@@ -55,33 +95,34 @@ public class RingList<T> implements Iterable<T> {
 	public Iterator<T> iterator() {
 		if (ring.size() < size) {
 			return ring.iterator();
-		}
-		return new Iterator<T>() {
+		} else {
+			return new Iterator<T>() {
 
-			int index = firstPointer;
-			int count = 0;
+				int index = firstPointer;
+				int count = 0;
 
-			@Override
-			public boolean hasNext() {
-				return count < ring.size();
-			}
-
-			@Override
-			public T next() {
-				if (!hasNext()) {
-					throw new NoSuchElementException();
+				@Override
+				public boolean hasNext() {
+					return count < ring.size();
 				}
-				final T t = ring.get(index);
-				index = (index + 1) % size;
-				count++;
-				return t;
-			}
 
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-		};
+				@Override
+				public T next() {
+					if (!hasNext()) {
+						throw new NoSuchElementException();
+					}
+					final T t = ring.get(index);
+					index = (index + 1) % size;
+					count++;
+					return t;
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
 	}
 
 	public int size() {

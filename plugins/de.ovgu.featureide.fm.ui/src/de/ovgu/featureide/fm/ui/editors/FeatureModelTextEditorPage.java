@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,20 +22,27 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
+import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOperation;
 
 /**
@@ -78,15 +85,12 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(getFeatureModel());
+		final FeatureModelManager manager = featureModelEditor.getFeatureModelManager();
+		final String text = manager.processObject(manager.getFormat().getInstance()::write, FeatureModelManager.CHANGE_NOTHING);
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
 		}
-	}
-
-	private IFeatureModel getFeatureModel() {
-		return featureModelEditor.getFeatureModel();
 	}
 
 	/**
@@ -111,9 +115,21 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	@Override
 	public void doSave(IProgressMonitor progressMonitor) {
-		super.doSave(progressMonitor);
-		if (featureModelEditor.checkModel(getCurrentContent())) {
+		try {
+			internalSave(progressMonitor);
+		} catch (final Exception e) {}
+	}
+
+	public void internalSave(IProgressMonitor progressMonitor) {
+		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
+		if (problems.containsError()) {
+			createMarkers(problems);
+			throw new RuntimeException();
+		} else {
+			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
+			super.doSave(progressMonitor);
 			executeSaveOperation();
+			featureModelEditor.setPageModified(false);
 		}
 	}
 
@@ -132,8 +148,51 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	@Override
 	public boolean allowPageChange(int newPage) {
-		final String newText = getCurrentContent();
-		return (newPage == getIndex()) || featureModelEditor.checkModel(newText);
+		if (newPage == getIndex()) {
+			return true;
+		}
+		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
+		final boolean containsError = problems.containsError();
+		if (containsError) {
+			createMarkers(problems);
+		} else {
+			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
+		}
+		return !containsError;
+	}
+
+	private void createMarkers(ProblemList problems) {
+		final IDocumentProvider documentProvider = getDocumentProvider();
+		final IEditorInput editorInput = getEditorInput();
+		final IDocument document = documentProvider.getDocument(editorInput);
+		final IAnnotationModel annotationModel = documentProvider.getAnnotationModel(editorInput);
+		deleteMarkers(annotationModel);
+		for (final Problem problem : problems) {
+			final Annotation annotation = new Annotation(false);
+			annotation.setText(problem.getMessage());
+			switch (problem.getSeverity()) {
+			case ERROR:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.error");
+				break;
+			case INFO:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.info");
+				break;
+			case WARNING:
+				annotation.setType("org.eclipse.ui.workbench.texteditor.warning");
+				break;
+			}
+			int lineOffset = 0;
+			try {
+				lineOffset = document.getLineOffset(problem.getLine());
+			} catch (final BadLocationException e) {}
+			annotationModel.addAnnotation(annotation, new Position(lineOffset));
+		}
+	}
+
+	private void deleteMarkers(final IAnnotationModel annotationModel) {
+		for (final Iterator<Annotation> iterator = annotationModel.getAnnotationIterator(); iterator.hasNext();) {
+			annotationModel.removeAnnotation(iterator.next());
+		}
 	}
 
 	@Override
@@ -143,20 +202,15 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		}
 	}
 
+	@Override
+	protected void createUndoRedoActions() {}
+
 	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final IFeatureModel fm = getFeatureModel();
-
 			// TODO _interfaces replace text with DocumentEvent (delta)
-			final SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
-
-			op.addContext((IUndoContext) fm.getUndoContext());
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			if (FeatureModelOperationWrapper.run(new SourceChangedOperation(featureModelEditor.fmManager, newText, oldText))) {
 				oldText = newText;
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
 			}
 		}
 	}

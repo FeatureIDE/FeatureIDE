@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.quickfix;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGURATIONS_FOR;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,9 +33,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 
 /**
@@ -67,59 +67,31 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
 		monitor.beginTask(CREATE_CONFIGURATIONS_FOR, unusedFeatures.size());
-		final List<Configuration> confs = new LinkedList<Configuration>();
-		while (!unusedFeatures.isEmpty()) {
+		final List<Configuration> confs = new LinkedList<>();
+		int lastSize = -1;
+		while (!unusedFeatures.isEmpty() && (lastSize != unusedFeatures.size())) {
+			lastSize = unusedFeatures.size();
 			monitor.subTask(createShortMessage(unusedFeatures));
 			if (monitor.isCanceled()) {
 				break;
 			}
-			final Configuration configuration = new Configuration(featureModel, true);
-			for (final String feature : unusedFeatures) {
-				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
-					configuration.setManual(feature, Selection.SELECTED);
+			final Configuration configuration = new Configuration(featureModel);
+			final ConfigurationAnalyzer c = new ConfigurationAnalyzer(featureModel, configuration);
 
+			for (final Iterator<String> iterator = unusedFeatures.iterator(); iterator.hasNext();) {
+				final String feature = iterator.next();
+				if (configuration.getSelectableFeature(feature).getSelection() == Selection.UNDEFINED) {
+					configuration.setManual(feature, Selection.SELECTED);
+					c.update();
+					iterator.remove();
 				}
+				monitor.worked(1);
 			}
+
 			if (monitor.isCanceled()) {
 				break;
 			}
-			for (final IFeature feature : configuration.getSelectedFeatures()) {
-				if (unusedFeatures.remove(feature.getName())) {
-					monitor.worked(1);
-				}
-			}
-
-			// select further features to get a valid configuration
-			final List<SelectableFeature> features = new LinkedList<SelectableFeature>();
-			for (final SelectableFeature feature : configuration.getFeatures()) {
-				if (configuration.isValid()) {
-					break;
-				}
-				if (feature.getSelection() == Selection.UNDEFINED) {
-					configuration.setManual(feature, Selection.SELECTED);
-					features.add(feature);
-				}
-			}
-
-			// deselect unneccessary features
-			boolean unselected = true;
-			final List<SelectableFeature> unselectedFeatures = new LinkedList<SelectableFeature>();
-			while (unselected) {
-				unselected = false;
-				unselectedFeatures.clear();
-				for (final SelectableFeature feature : features) {
-					if (feature.getAutomatic() == Selection.UNDEFINED) {
-						configuration.setManual(feature, Selection.UNSELECTED);
-						if (!configuration.isValid()) {
-							configuration.setManual(feature, Selection.SELECTED);
-							break;
-						}
-						unselectedFeatures.add(feature);
-						unselected = true;
-					}
-				}
-				features.removeAll(unselectedFeatures);
-			}
+			c.completeMin();
 
 			confs.add(configuration);
 		}

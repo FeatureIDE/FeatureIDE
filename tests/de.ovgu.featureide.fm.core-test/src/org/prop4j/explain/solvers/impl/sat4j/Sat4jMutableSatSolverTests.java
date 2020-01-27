@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import org.prop4j.explain.solvers.MutableSatSolver;
 import org.prop4j.explain.solvers.MutableSatSolverTests;
 
 /**
@@ -31,7 +30,7 @@ import org.prop4j.explain.solvers.MutableSatSolverTests;
 public class Sat4jMutableSatSolverTests extends MutableSatSolverTests {
 
 	@Override
-	protected MutableSatSolver getInstance() {
+	protected Sat4jMutableSatSolver getInstance() {
 		return new Sat4jSatSolverFactory().getMutableSatSolver();
 	}
 }

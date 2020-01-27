@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.editing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,11 +38,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
@@ -79,33 +74,21 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel).createNodes();
 	}
 
-	public static Node createNodes(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		return new AdvancedNodeCreator(featureModel, excludedFeatureNames, cnfType, modelType, includeBooleanValues).createNodes();
-	}
-
-	public static Node createNodes(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
-	}
-
 	private CNFType cnfType = CNFType.None;
 
 	private ModelType modelType = ModelType.All;
 
 	/**
-	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.<br> Default values is {@code true} (values will
-	 * be included).
+	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.<br> Default values is {@code true} (values will be
+	 * included).
 	 */
 	private boolean includeBooleanValues = true;
 
-	private boolean useOldNames = true;
+	private boolean useOldNames = false;
 
 	private boolean optionalRoot = false;
 
 	private IFeatureModel featureModel = null;
-
-	private Collection<String> excludedFeatureNames = null;
 
 	/** The trace model. */
 	private FeatureModelToNodeTraceModel traceModel;
@@ -118,28 +101,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel);
 	}
 
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		setFeatureModel(featureModel, featureFilter);
-	}
-
-	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		setFeatureModel(featureModel, excludedFeatureNames);
-	}
-
-	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
-		setFeatureModel(featureModel, excludedFeatureNames);
-	}
-
-	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
-			boolean includeBooleanValues) {
-		this.cnfType = cnfType;
-		this.modelType = modelType;
-		this.includeBooleanValues = includeBooleanValues;
-		setFeatureModel(featureModel, featureFilter);
+		setFeatureModel(featureModel);
 	}
 
 	/**
@@ -231,10 +197,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public Node createNodes() {
-		return createNodes(new NullMonitor());
+		return createNodes(new NullMonitor<>());
 	}
 
-	public Node createNodes(IMonitor monitor) {
+	public Node createNodes(IMonitor<Node> monitor) {
 		if (featureModel == null) {
 			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
 			switch (cnfType) {
@@ -248,13 +214,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 
 		monitor.setRemainingWork(10);
-		final Node[] basicFormula = createFormula(monitor.subTask(1));
-		final Node newFormula = removeFeatures(basicFormula, monitor.subTask(9));
-
-		return newFormula;
+		return new And(createFormula(monitor.subTask(1)));
 	}
 
-	private Node[] createFormula(IMonitor monitor) {
+	private Node[] createFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Creating Formula");
 		monitor.setRemainingWork(2);
 		final Node[] andChildren1;
@@ -305,15 +268,6 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		monitor.step();
 
 		return nodeArray;
-	}
-
-	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
-		if ((excludedFeatureNames != null) && !excludedFeatureNames.isEmpty()) {
-			final FeatureRemover remover = new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
-			return remover.createNewClauseList(LongRunningWrapper.runMethod(remover, monitor));
-		} else {
-			return new And(nodeArray);
-		}
 	}
 
 	private And createStructuralNodes() {
@@ -416,24 +370,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private Literal getLiteral(IFeature feature, boolean positive) {
-		return new Literal(getVariable(feature), positive);
-	}
-
-	private Object getVariable(IFeature feature) {
-		return useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
+		return new Literal(useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName(), positive);
 	}
 
 	@Override
-	public Node execute(IMonitor monitor) throws Exception {
+	public Node execute(IMonitor<Node> monitor) throws Exception {
 		return createNodes(monitor);
 	}
 
 	public CNFType getCnfType() {
 		return cnfType;
-	}
-
-	public Collection<String> getExcludedFeatureNames() {
-		return excludedFeatureNames;
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -445,7 +391,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	/**
-	 * {@link #includeBooleanValues}
+	 * Returns whether the boolean primitives true and false should be included in the formula.
 	 *
 	 * @return the currently set value
 	 */
@@ -462,21 +408,12 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
-		setFeatureModel(featureModel, (Collection<String>) null);
-	}
-
-	public void setFeatureModel(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
-		setFeatureModel(featureModel, Functional.mapToStringList(Functional.filter(featureModel.getFeatures(), featureFilter)));
-	}
-
-	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
 		this.featureModel = featureModel;
-		this.excludedFeatureNames = excludedFeatureNames;
 		traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; // Reset the trace model.
 	}
 
 	/**
-	 * {@link #includeBooleanValues}
+	 * Sets whether the boolean primitives true and false should be included in the formula.
 	 *
 	 * @param includeBooleanValues the value to set
 	 */

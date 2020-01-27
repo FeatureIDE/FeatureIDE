@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public final class NullMonitor extends AMonitor {
+public final class NullMonitor<T> extends AMonitor<T> {
 
 	private boolean cancel = false;
 
@@ -41,18 +41,18 @@ public final class NullMonitor extends AMonitor {
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
-		if (cancel || Thread.currentThread().isInterrupted()) {
+		if (cancel || Thread.interrupted()) {
 			throw new MethodCancelException();
 		}
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		return this;
+	public <R> IMonitor<R> subTask(int size) {
+		return new NullMonitor<>();
 	}
 
 	@Override
-	public void worked() {}
+	public void worked(int work) {}
 
 	@Override
 	public void setRemainingWork(int work) {}
@@ -63,6 +63,11 @@ public final class NullMonitor extends AMonitor {
 	@Override
 	public String getTaskName() {
 		return "";
+	}
+
+	@Override
+	public int getRemainingWork() {
+		return 0;
 	}
 
 }

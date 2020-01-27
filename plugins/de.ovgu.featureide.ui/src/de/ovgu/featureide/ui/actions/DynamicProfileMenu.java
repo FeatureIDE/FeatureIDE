@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -44,7 +44,6 @@ import org.eclipse.ui.internal.Workbench;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -98,7 +97,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	private boolean initFeatureModel() {
 		try {
 			final IFeatureProject curFeatureProject = getCurrentFeatureProject();
-			featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
+			featureModel = curFeatureProject == null ? null : curFeatureProject.getFeatureModel();
 			return featureModel != null;
 		} catch (final Exception e) {
 			return false;
@@ -173,6 +172,9 @@ public class DynamicProfileMenu extends ContributionItem {
 
 	}
 
+	/**
+	 * Returns selected FeatureProject
+	 */
 	private static IFeatureProject getCurrentFeatureProject() throws Exception {
 		if (getIStructuredCurrentSelection() != null) {
 			final Object element = getIStructuredCurrentSelection().getFirstElement();
@@ -185,7 +187,7 @@ public class DynamicProfileMenu extends ContributionItem {
 				} else if (element instanceof IJavaElement) {
 					return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
 				} else if (element instanceof IAdaptable) {
-					// Cast is necessary, don't remove
+					// Cast is necessary for backward compatibility, don't remove
 					final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 					if (project != null) {
 						return CorePlugin.getFeatureProject(project);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,22 +20,9 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import java.util.List;
-
-import org.prop4j.Node;
-import org.prop4j.analyses.PairWiseConfigurationGenerator;
-import org.prop4j.solver.SatInstance;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
-import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
-import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.PairWiseConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -44,66 +31,17 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @see PairWiseConfigurationGenerator
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-public class IncLingConfigurationGenerator extends AConfigurationGenerator {
+public class IncLingConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	public IncLingConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public IncLingConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
+		super(builder, formula);
 	}
 
 	@Override
-	public Void execute(IMonitor monitor) throws Exception {
-		callConfigurationGenerator(featureModel, (int) builder.configurationNumber, monitor);
-		return null;
-	}
-
-	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IMonitor monitor) {
-		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm, new AbstractFeatureFilter());
-		advancedNodeCreator.setCnfType(CNFType.Regular);
-		advancedNodeCreator.setIncludeBooleanValues(false);
-
-		final Node createNodes = advancedNodeCreator.createNodes();
-		final SatInstance satInstance = new SatInstance(createNodes, Functional.toList(FeatureUtils.getConcreteFeatureNames(fm)));
-		final PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
-		exec(satInstance, gen, monitor);
-	}
-
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance solver, int solutionCount) {
-		return new PairWiseConfigurationGenerator(solver, solutionCount);
-	}
-
-	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, IMonitor monitor) {
-		final Thread consumer = new Thread() {
-
-			@Override
-			public void run() {
-				int foundConfigurations = 0;
-				while (true) {
-					try {
-						generateConfiguration(satInstance.convertToString(as.q.take().getModel()));
-						foundConfigurations++;
-					} catch (final InterruptedException e) {
-						break;
-					}
-				}
-				foundConfigurations += as.q.size();
-				builder.configurationNumber = foundConfigurations;
-				for (final org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
-					generateConfiguration(satInstance.convertToString(c.getModel()));
-				}
-			}
-
-			private void generateConfiguration(List<String> solution) {
-				configuration.resetValues();
-				for (final String selection : solution) {
-					configuration.setManual(selection, Selection.SELECTED);
-				}
-				addConfiguration(configuration);
-			}
-		};
-		consumer.start();
-		LongRunningWrapper.runMethod(as, monitor);
-		consumer.interrupt();
+	protected PairWiseConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+		return new PairWiseConfigurationGenerator(cnf, numberOfConfigurations);
 	}
 
 }

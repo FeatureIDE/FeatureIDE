@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 
@@ -34,6 +35,12 @@ import de.ovgu.featureide.fm.core.io.Problem.Severity;
 public class ProblemList extends ArrayList<Problem> {
 
 	private static final long serialVersionUID = -8296890463897407370L;
+
+	public ProblemList() {}
+
+	public ProblemList(Collection<Problem> problems) {
+		super(problems);
+	}
 
 	/**
 	 * Checks whether a given list of problems contains at least one problem with the specified or a greater severity level.

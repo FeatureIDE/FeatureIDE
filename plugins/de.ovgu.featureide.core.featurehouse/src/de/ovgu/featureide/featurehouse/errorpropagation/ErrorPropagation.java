@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,8 +23,9 @@ package de.ovgu.featureide.featurehouse.errorpropagation;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_MARKERS_FOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +53,9 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 
 /**
  * Propagates error markers for composed files to sources files.
@@ -319,16 +322,14 @@ public abstract class ErrorPropagation {
 			return null;
 		}
 
-		final IFile iFile;
-		final LinkedList<String> list = new LinkedList<String>();
-		iFile = featureProject.getCurrentConfiguration();
+		final LinkedList<String> list = new LinkedList<>();
+		final Path file = featureProject.getCurrentConfiguration();
 
-		if ((iFile == null) || !iFile.exists()) {
+		if ((file == null) || !Files.exists(file)) {
 			return null;
 		}
 
-		final File file = iFile.getRawLocation().toFile();
-		final LinkedList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
+		final Collection<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
 		if (configurationFeatures == null) {
 			return null;
 		}
@@ -344,28 +345,11 @@ public abstract class ErrorPropagation {
 		return list;
 	}
 
-	private LinkedList<String> readFeaturesfromConfigurationFile(File file) {
-		LinkedList<String> list;
-		Scanner scanner = null;
-		if (!file.exists()) {
-			return null;
-		}
-
-		try {
-			scanner = new Scanner(file, "UTF-8");
-		} catch (final FileNotFoundException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-		}
-
-		if (scanner.hasNext()) {
-			list = new LinkedList<String>();
-			while (scanner.hasNext()) {
-				list.add(scanner.next());
-			}
-			scanner.close();
-			return list;
+	private Collection<String> readFeaturesfromConfigurationFile(Path file) {
+		final Configuration configuration = ConfigurationIO.getInstance().load(file);
+		if (configuration != null) {
+			return configuration.getSelectedFeatureNames();
 		} else {
-			scanner.close();
 			return null;
 		}
 	}

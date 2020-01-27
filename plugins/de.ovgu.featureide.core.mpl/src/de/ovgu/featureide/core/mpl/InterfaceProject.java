@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,10 +20,8 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -34,10 +32,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Holds all relevant information about the interface project.
@@ -60,7 +57,7 @@ public class InterfaceProject {
 	private ViewTag filterViewTag = null;
 	private int configLimit = 1000;
 
-	private Configuration configuration;
+//	private Configuration configuration;
 
 	private final IFeatureModel featureModel;
 	private String[] featureNames;
@@ -92,7 +89,7 @@ public class InterfaceProject {
 			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
 
 			} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
-				featureNames[id] = ((IFeature) event.getSource()).getName();
+				featureNames[id] = ((IFeatureModel) event.getSource()).getFeature((CharSequence) event.getNewValue()).getName();
 			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 
 			}
@@ -108,7 +105,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI())).getObject();
+			featureModel = FeatureModelManager.load(EclipseFileSystem.getPath(projectReference.getFile("model.xml")));
 		} else {
 			featureModel = null;
 		}
@@ -195,12 +192,7 @@ public class InterfaceProject {
 	}
 
 	public Configuration getConfiguration() {
-		if (configuration == null) {
-			final IFile configFile = featureProject.getCurrentConfiguration();
-			configuration = new Configuration(featureModel);
-			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-		}
-		return configuration;
+		return featureProject.loadCurrentConfiguration();
 	}
 
 	public ViewTag getFilterViewTag() {
@@ -214,10 +206,6 @@ public class InterfaceProject {
 	// public AbstractStringProvider getStringProvider() {
 	// return stringProvider;
 	// }
-
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 
 	public void setProjectSignatures(ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;

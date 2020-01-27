@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -35,14 +35,15 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -92,10 +93,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * Space between abstract/hidden/false Optional/dead features (needs some more space for the symbols)
 	 */
 	private static final int LIFT_2 = 12;
-	/**
-	 * Width that the two color gradient needs to display itself
-	 */
-	private static final int GRADIENT_WIDTH = 250;
 
 	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 	private static final String ALTERNATIVE_TOOLTIP =
@@ -178,10 +175,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
 
 		// Set the properties that should be drawn
-		refreshProperties(featureModel);
+		refreshProperties(graphicalFeatureModel.getFeatureModelManager());
 
 		setLocation(pos);
 		setLayoutManager(layout);
@@ -193,9 +189,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setOpaque(true);
 	}
 
-	private void refreshProperties(IFeatureModel featureModel) {
-		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
+	private void refreshProperties(IFeatureModelManager featureModelManager) {
+		// TODO get variable analyzer
+		final AnalysesCollection analysisResults = featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection();
 
+		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final IFeatureModelStructure fmStructure = featureModel.getStructure();
 		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		fmStructure.setShowHiddenFeatures(showHidden);
@@ -216,31 +214,32 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = Functional.toList(Functional.filter(graphicalVisibleFeatures, new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
-		if (analyser.calculateDeadConstraints) {
-			final List<IFeature> deadFeatures = new ArrayList<>(analyser.getCachedDeadFeatures());
-			deadFeatures.retainAll(visibleFeatures);
-			dead = deadFeatures.size() > 0;
+		if (analysisResults.isCalculateDeadConstraints()) {
+			dead = analysisResults.getFeatureModelProperties().hasDeadFeatures();
 		}
-		if (analyser.calculateFOConstraints) {
-			final List<IFeature> falseOptionalFeatures = new ArrayList<>(analyser.getCachedFalseOptionalFeatures());
-			falseOptionalFeatures.retainAll(visibleFeatures);
-			falseoptional = falseOptionalFeatures.size() > 0;
+		if (analysisResults.isCalculateFOConstraints()) {
+			falseoptional = analysisResults.getFeatureModelProperties().hasFalseOptionalFeatures();
 		}
-		indetHidden = fmStructure.hasIndetHidden();
+		indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
 
-		void_model = !analyser.valid();
+		void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
 		if (void_model) {
 			dead = false;
 		}
 
-		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
-		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
+		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
+		dead = analysisResults.isCalculateDeadConstraints() && analysisResults.getFeatureModelProperties().hasDeadFeatures();
+		falseoptional = analysisResults.isCalculateFOConstraints() && analysisResults.getFeatureModelProperties().hasFalseOptionalFeatures();
+		indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
+
+		tautologyConst = analysisResults.isCalculateTautologyConstraints() && analysisResults.getFeatureModelProperties().hasTautologyConstraints();
+		redundantConst = analysisResults.isCalculateRedundantConstraints() && analysisResults.getFeatureModelProperties().hasRedundantConstraints();
 		implicitConst = isImplicit(graphicalFeatureModel);
 
 		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 
-		if (featureModel instanceof ExtendedFeatureModel) {
-			final ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
+		if (featureModel instanceof MultiFeatureModel) {
+			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
 			interfaced = extendedFeatureModel.hasInterface();
 			// interfaces hide other features
 			imported = !interfaced && extendedFeatureModel.hasInstance();
@@ -431,7 +430,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowRedundantConst(int row) {
-		createSymbol(row, REDUNDANT, false, REDUNDANT_TOOLTIP);
+		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
 		final Label labelIndetHidden = createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}
@@ -740,8 +739,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	public void recreateLegend() {
 		removeAll();
-		setLocation(graphicalFeatureModel.getLayout().getLegendPos());
-		refreshProperties(graphicalFeatureModel.getFeatureModel());
+		setLocation(graphicalFeatureModel.getLegend().getPos());
+		refreshProperties(graphicalFeatureModel.getFeatureModelManager());
 		setLegendSize();
 		createRows();
 	}

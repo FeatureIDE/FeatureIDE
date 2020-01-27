@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * {@link AbstractFeatureModelReader} are needed
  *
  * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br> {@link IFile} can be converted via
- *             {@code Paths.getPath(ifile.getLocationURI())}.
+ *             {@code EclipseFileSystem.getPath(ifile)}.
  *
  * @author Sönke Holthusen
  * @author Marcus Pinnecke (Feature Interface)

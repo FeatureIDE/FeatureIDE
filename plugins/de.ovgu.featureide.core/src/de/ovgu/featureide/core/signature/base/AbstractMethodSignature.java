@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -51,38 +51,4 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 		return isConstructor;
 	}
 
-//	@Override
-//	protected void computeHashCode() {
-//		super.computeHashCode();
-//		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
-//		for (String parameter : parameterTypes) {
-//			hashCode = hashCodePrime * hashCode + parameter.hashCode();
-//		}
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (obj == null || getClass() != obj.getClass())
-//			return false;
-//
-//		AbstractMethodSignature otherSig = (AbstractMethodSignature) obj;
-//
-//		if (!super.sigEquals(otherSig))
-//			return false;
-//		if (isConstructor != otherSig.isConstructor
-//				|| parameterTypes.size() != otherSig.parameterTypes.size()) {
-//			return false;
-//		}
-//
-//		Iterator<String> otherParameterIt = otherSig.parameterTypes.iterator();
-//		Iterator<String> thisParameterIt = parameterTypes.iterator();
-//		while (thisParameterIt.hasNext()) {
-//			if (!thisParameterIt.next().equals(otherParameterIt.next())) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
 }

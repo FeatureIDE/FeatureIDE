@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,6 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 
@@ -36,26 +38,29 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
  */
 public class SourceChangedOperation extends AbstractFeatureModelOperation {
 
-	private final FeatureModelEditor featureModelEditor;
 	private final String newText, oldText;
 
-	public SourceChangedOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
-		super(featureModel, SOURCE_CHANGE);
-		this.featureModelEditor = featureModelEditor;
+	public SourceChangedOperation(IFeatureModelManager featureModelManager, String newText, String oldText) {
+		super(featureModelManager, SOURCE_CHANGE);
 		this.newText = newText;
 		this.oldText = oldText;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		featureModelEditor.readModel(newText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		featureModelManager.readFromSource(newText);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModelEditor.readModel(oldText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		featureModelManager.readFromSource(oldText);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ALL;
 	}
 
 }

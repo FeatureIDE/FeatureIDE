@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -91,18 +91,18 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		// determine wizard extension and next page (basic new project page) when composer has been selected
 		if (page == this.page) {
-//			this.wizardExtension = null;
-//			IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
-//			for (IConfigurationElement c : conf) {
-//				try {
-//					if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
-//						wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
-//						wizardExtension.setWizard(this);
-//					}
-//				} catch (CoreException e) {
-//					UIPlugin.getDefault().logError(e);
-//				}
-//			}
+			// this.wizardExtension = null;
+			// IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
+			// for (IConfigurationElement c : conf) {
+			// try {
+			// if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
+			// wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
+			// wizardExtension.setWizard(this);
+			// }
+			// } catch (CoreException e) {
+			// UIPlugin.getDefault().logError(e);
+			// }
+			// }
 			return super.getNextPage(page);
 		} else if (page instanceof WizardNewProjectCreationPage) {
 			// determine next page (reference page) after project has been named
@@ -124,7 +124,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return false;
 		}
 
-//		this.wizardExtension = null;
+		// this.wizardExtension = null;
 		final IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
 		for (final IConfigurationElement c : conf) {
 			try {

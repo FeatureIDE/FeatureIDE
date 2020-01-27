@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -34,5 +34,15 @@ public interface IFeatureModelElement extends IEventManager {
 	String getName();
 
 	void setName(String name);
+
+	/**
+	 * Returns the element's custom-defined properties. These properties can be get and set without changes to the code base.
+	 * Custom-Properties consist of a key-value pair and can stored to the file system.
+	 *
+	 * @since 3.0
+	 *
+	 * @return Implementation-independent custom feature properties.
+	 */
+	IPropertyContainer getCustomProperties();
 
 }

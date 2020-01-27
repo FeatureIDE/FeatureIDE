@@ -20,7 +20,7 @@ import org.junit.Assert;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
@@ -89,7 +89,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
 		//
 		// read the same SPLOT file using the FeatureiDE reader
-		final IFeatureModel fm_original = FMFactoryManager.getDefaultFactory().createFeatureModel();
+		final IFeatureModel fm_original = DefaultFeatureModelFactory.getInstance().create();
 		final SXFMFormat format = new SXFMFormat();
 		final ProblemList problems = SimpleFileHandler.load(modelFileOrigin.toPath(), fm_original, format);
 		if (problems.containsError()) {

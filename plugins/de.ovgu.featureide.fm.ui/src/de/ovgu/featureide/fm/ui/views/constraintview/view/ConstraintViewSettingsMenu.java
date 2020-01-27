@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,8 +25,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.CreateConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshConstraintViewAction;
@@ -50,7 +50,7 @@ public class ConstraintViewSettingsMenu {
 		// create actions:
 		collapseAction = new ShowCollapsedConstraintsInViewAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
 		refreshAction = new RefreshConstraintViewAction(controller); // Action that lets the user refresh the view manually
-		createAction = new CreateConstraintInViewAction(controller.getCurrentModel()); // Action that lets user create a new constraint
+		createAction = new CreateConstraintInViewAction(null, controller.getFeatureModelManager()); // Action that lets user create a new constraint
 		// create layout:
 		update(controller);
 		createToolBarLayout();
@@ -62,10 +62,10 @@ public class ConstraintViewSettingsMenu {
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
 		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
-			if (FeatureModelUtil.getActiveFMEditor() != null) {
+			final FeatureModelEditor featureModelEditor = controller.getFeatureModelEditor();
+			if (featureModelEditor != null) {
 				setStateOfActions(true);
-				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-				createAction.update(controller.getCurrentModel());
+				graphicalModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
 				refreshAction.update(controller);
 				collapseAction.update(graphicalModel);
 				if (graphicalModel.getLayout().showCollapsedConstraints()) {

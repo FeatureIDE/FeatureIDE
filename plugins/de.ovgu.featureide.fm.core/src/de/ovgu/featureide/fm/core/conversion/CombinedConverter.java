@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class CombinedConverter implements IConverterStrategy {
 
-	private final List<IConverterStrategy> strategies = new LinkedList<IConverterStrategy>();
+	private final List<IConverterStrategy> strategies = new LinkedList<>();
 	private final IConverterStrategy bestStrategy = new NNFConverter();
 
 	private final double w_f = 1.0; // weight for features
@@ -76,7 +76,6 @@ public class CombinedConverter implements IConverterStrategy {
 			}
 			costs += estimatedCosts(node);
 		}
-		// System.out.println(costs);
 		return costs;
 	}
 
@@ -87,7 +86,7 @@ public class CombinedConverter implements IConverterStrategy {
 
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		List<Node> result = new LinkedList<Node>();
+		List<Node> result = new LinkedList<>();
 
 		double costs = Double.MAX_VALUE;
 		for (final IConverterStrategy strat : strategies) {

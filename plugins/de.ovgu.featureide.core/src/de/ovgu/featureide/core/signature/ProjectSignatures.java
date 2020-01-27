@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
@@ -35,7 +36,6 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Holds the signature information for a whole java project.
@@ -49,7 +49,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 
 		private final AbstractSignature[] signatureArray;
 
-		private final LinkedList<IFilter<?>> filter = new LinkedList<>();
+		private final LinkedList<Predicate<?>> filter = new LinkedList<>();
 		private int count = 0;
 		private boolean nextAvailable = false;
 
@@ -61,7 +61,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			this.signatureArray = signatureArray;
 		}
 
-		public void addFilter(IFilter<?> filter) {
+		public void addFilter(Predicate<?> filter) {
 			this.filter.add(filter);
 		}
 
@@ -91,8 +91,8 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private boolean isValid(AbstractSignature sig) {
-			for (final IFilter curFilter : filter) {
-				if (!curFilter.isValid(sig)) {
+			for (final Predicate curFilter : filter) {
+				if (!curFilter.test(sig)) {
 					return false;
 				}
 			}
@@ -145,9 +145,9 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return new SignatureIterator(signatureArray);
 	}
 
-	public SignatureIterator iterator(Collection<IFilter<?>> filters) {
+	public SignatureIterator iterator(Collection<Predicate<?>> filters) {
 		final SignatureIterator it = new SignatureIterator(signatureArray);
-		for (final IFilter<?> filter : filters) {
+		for (final Predicate<?> filter : filters) {
 			it.addFilter(filter);
 		}
 		return it;
@@ -294,7 +294,6 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 					count(signature, allCounters[1], fs, 1);
 				} else {
 					count(signature, allCounters[0], fs, 0);
-					System.out.println(signature.getFullName());
 				}
 			}
 		}

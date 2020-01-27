@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
@@ -47,9 +46,9 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 	static final int CURRENT = 0;
 	static final int LAST = 1;
-	private final Set<String> features;
+	private final Collection<String> features;
 
-	public ConstraintContentProposalProvider(Set<String> featureNames) {
+	public ConstraintContentProposalProvider(Collection<String> featureNames) {
 		super();
 		features = featureNames;
 	}
@@ -166,7 +165,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 * @param features set of features
 	 * @return List of proposals, either operators or feature names
 	 */
-	private static List<ContentProposal> getProposalList(String wordBefore, Set<String> features) {
+	private static List<ContentProposal> getProposalList(String wordBefore, Collection<String> features) {
 
 		final ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		final ArrayList<String> featureList = new ArrayList<String>(features);

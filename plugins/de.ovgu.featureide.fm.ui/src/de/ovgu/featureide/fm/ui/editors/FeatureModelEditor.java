@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,7 +28,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +57,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -77,29 +75,26 @@ import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
@@ -122,10 +117,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	private ModelMarkerHandler<IFile> markerHandler;
 	boolean isPageModified = false;
 	FeatureModelManager fmManager;
-	IFileManager<IGraphicalFeatureModel> gfmManager;
+	IGraphicalFeatureModel gfm;
 
-	// indicates if layout information had to be created
-	private boolean createdLayoutInformation;
 	private boolean closeEditor;
 
 	private int currentPageIndex;
@@ -147,9 +140,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		FMPropertyManager.unregisterEditor(this);
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
-			getFeatureModel().removeListener(diagramEditor);
 			fmManager.removeListener(diagramEditor);
-			fmManager.override();
+			fmManager.overwrite();
 		}
 		super.dispose();
 	}
@@ -162,34 +154,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		diagramEditor.doSave(monitor);
 		featureOrderEditor.doSave(monitor);
-		final IFeatureModel featureModel = getFeatureModel();
-		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
 		for (final IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
 
+		gfm.writeValues();
 		// write the model to the file
 		if (getActivePage() == textEditor.getIndex()) {
-			textEditor.executeSaveOperation();
-			// textEditor.updateDiagram();
-			fmManager.externalSave(new Runnable() {
-
-				@Override
-				public void run() {
-					textEditor.doSave(monitor);
-				}
-			});
+			fmManager.externalSave(() -> textEditor.internalSave(monitor));
 		} else {
 			fmManager.save();
-			gfmManager.save();
+			textEditor.resetTextEditor();
+			setPageModified(false);
 		}
-
-		setPageModified(false);
 	}
 
 	@Override
 	public void doSaveAs() {
-		GraphicsExporter.exportAs(getFeatureModel(), diagramEditor.getViewer());
+		GraphicsExporter.exportAs(fmManager, diagramEditor.getViewer());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -198,7 +180,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (IContentOutlinePage.class.equals(adapter)) {
 			if (outlinePage == null) {
 				outlinePage = new FmOutlinePage(null, this);
-				outlinePage.setInput(getFeatureModel());
+				outlinePage.setInput(fmManager);
 			}
 			return outlinePage;
 		}
@@ -230,8 +212,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return null;
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return fmManager.editObject();
+	public FeatureModelManager getFeatureModelManager() {
+		return fmManager;
 	}
 
 	public IFile getModelFile() {
@@ -258,17 +240,52 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getResource() == null) {
-			return;
-		}
-		if (event.getResource().getType() == IResource.PROJECT) {
-			closeEditor = true;
-		}
+		// Get editor input
 		final IEditorInput input = getEditorInput();
 		if (!(input instanceof IFileEditorInput)) {
 			return;
 		}
 		final IFile inputFile = ((IFileEditorInput) input).getFile();
+
+		// Check whether current editor input was deleted
+		if (event.getType() == IResource.FILE) {
+			IResourceDelta delta = event.getDelta();
+			if (delta == null) {
+				return;
+			}
+			while (delta.getAffectedChildren().length != 0) {
+				delta = delta.getAffectedChildren()[0];
+			}
+			if ((delta.getKind() == IResourceDelta.REMOVED) && delta.getResource().equals(inputFile)) {
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						if (getSite() == null) {
+							return;
+						}
+						if (getSite().getWorkbenchWindow() == null) {
+							return;
+						}
+						final IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
+						for (int i = 0; i < pages.length; i++) {
+							final IEditorPart editorPart = pages[i].findEditor(input);
+							pages[i].closeEditor(editorPart, true);
+						}
+					}
+				});
+			}
+		}
+
+		// Resource is only set when the project is affected. When only files are deleted the resource is null. Therefore, we start by checking the file before
+		// checking the resource.
+		if (event.getResource() == null) {
+			return;
+		}
+
+		if (event.getResource().getType() == IResource.PROJECT) {
+			closeEditor = true;
+		}
 
 		/*
 		 * Closes editor if resource is deleted
@@ -402,28 +419,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			createActions();
 
 			pages.clear();
-			addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfmManager, true));
-			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager, gfmManager));
+			addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfm, true));
+			addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
 			createExtensionPages();
 			addPage(textEditor = new FeatureModelTextEditorPage(this));
-
-			fmManager.addListener(diagramEditor);
-			getFeatureModel().addListener(diagramEditor);
 
 			extensionPages = pages.subList(2, pages.size() - 1);
 
 			currentPageIndex = 0;
 			// if there are errors in the model file, go to source page
-			if (!checkModel(textEditor.getCurrentContent())) {
+			final ProblemList problems = checkModel(textEditor.getCurrentContent());
+			if (problems.containsError()) {
+				createModelFileMarkers(problems);
 				setActivePage(textEditor.getIndex());
 			} else {
 				diagramEditor.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
 
 					@Override
 					public void run() {
-						if (createdLayoutInformation) {
-							diagramEditor.setAdjustModelToEditorSize();
-						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();
@@ -464,38 +477,19 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 			@Override
 			public void historyNotification(OperationHistoryEvent event) {
-				if (!hasFMUndoContext(event)) {
-					return;
-				}
-				if ((event.getEventType() == OperationHistoryEvent.DONE) || (event.getEventType() == OperationHistoryEvent.REDONE)) {
-					operationCounter++;
-				}
-				if (event.getEventType() == OperationHistoryEvent.UNDONE) {
-					operationCounter--;
-				}
-				if (operationCounter == 0) {
-					setPageModified(false);
-				}
-			}
-
-			/**
-			 * returns true if the event matches the FMUndoContext
-			 *
-			 * @param event
-			 * @param hasFMContext
-			 */
-			private boolean hasFMUndoContext(OperationHistoryEvent event) {
-				for (final IUndoContext c : event.getOperation().getContexts()) {
-					if (c.matches((IUndoContext) getFeatureModel().getUndoContext())) {
-						return true;
+				if (event.getOperation().hasContext((IUndoContext) fmManager.getUndoContext())) {
+					if ((event.getEventType() == OperationHistoryEvent.DONE) || (event.getEventType() == OperationHistoryEvent.REDONE)) {
+						operationCounter++;
+					} else if (event.getEventType() == OperationHistoryEvent.UNDONE) {
+						operationCounter--;
+					} else if (operationCounter == 0) {
+						setPageModified(false);
 					}
 				}
-				return false;
 			}
-
 		});
 		final ObjectUndoContext undoContext = new ObjectUndoContext(this);
-		getFeatureModel().setUndoContext(undoContext);
+		fmManager.setUndoContext(undoContext);
 
 		actions.add(new FMPrintAction(this));
 
@@ -517,7 +511,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void handlePropertyChange(int propertyId) {
 		if (propertyId == PROP_DIRTY) {
-			isPageModified = isPageModified || fmManager.hasChanged() || gfmManager.hasChanged();
+			isPageModified = fmManager.hasChanged();
+			if (isPageModified) {
+				gfm.writeValues();
+			}
 		}
 		super.handlePropertyChange(propertyId);
 	}
@@ -526,10 +523,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	protected void pageChange(int newPageIndex) {
 		final IFeatureModelEditorPage currentPage = getPage(currentPageIndex);
 		if (currentPage.allowPageChange(newPageIndex)) {
-			final IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
-			if (contributor instanceof FeatureModelEditorContributor) {
-				((FeatureModelEditorContributor) contributor).setActivePage(this, currentPage.getID());
-			}
 			currentPage.pageChangeFrom(newPageIndex);
 			getPage(newPageIndex).pageChangeTo(currentPageIndex);
 			currentPageIndex = newPageIndex;
@@ -543,14 +536,25 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	protected void setInput(IEditorInput input) {
 		// Cast is necessary, don't remove
 		markerHandler = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
-		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		super.setInput(input);
 
+		final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
 		fmManager = FeatureModelManager.getInstance(path);
 		if (fmManager != null) {
 			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
 			createModelFileMarkers(fmManager.getLastProblems());
-			createLayoutInformation();
+			gfm = new GraphicalFeatureModel(fmManager);
+			gfm.init();
+			FMPropertyManager.registerEditor(this);
+
+			final IFile modelFile = getModelFile();
+			final String modelFileName = modelFile.getName();
+			// XXX: There could be a more elegant solution here
+			if ("model.xml".equals(modelFileName) && (modelFile.getParent() instanceof IProject)) {
+				setPartName(modelFile.getProject().getName() + MODEL);
+			} else {
+				setPartName(modelFileName + " (" + modelFile.getProject().getName() + ")");
+			}
 		} else {
 			setPartName(input.getName());
 		}
@@ -569,18 +573,14 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		if (!warnings.containsError()) {
-			try {
-				if (!getFeatureModel().getAnalyser().isValid()) {
-					markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
-				}
-			} catch (final TimeoutException e) {
-				// do nothing, assume the model is correct
+			if (!fmManager.getVariableFormula().getAnalyzer().isValid(null)) {
+				markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		}
 	}
 
 	private int getDiagramEditorIndex() {
-		return diagramEditor.getIndex();
+		return diagramEditor != null ? diagramEditor.getIndex() : 0;
 	}
 
 	/**
@@ -599,12 +599,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	public void readModel(String newSource) {
-		final ProblemList warnings = fmManager.getFormat().getInstance().read(getFeatureModel(), newSource);
-		createModelFileMarkers(warnings);
+		fmManager.readFromSource(newSource);
+		gfm.readValues();
+		createModelFileMarkers(fmManager.getLastProblems());
 	}
 
 	private boolean saveEditors() {
-		if (getFeatureModel().getRenamingsManager().isRenamed()) {
+		if (fmManager.getSnapshot().getRenamingsManager().isRenamed()) {
 			final IProject project = getModelFile().getProject();
 			final ArrayList<String> dirtyEditorFileNames = new ArrayList<>();
 			final ArrayList<IEditorPart> dirtyEditors = new ArrayList<>();
@@ -661,17 +662,19 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 	}
 
-	public boolean checkModel(String source) {
-		final IFeatureModel model = FMFactoryManager.getFactory(getFeatureModel()).createFeatureModel();
-
-		final IEditorInput input = getEditorInput();
-		if (input instanceof IFileEditorInput) {
-			model.setSourceFile(Paths.get(((IFileEditorInput) input).getFile().getLocationURI()));
+	public ProblemList checkModel(String source) {
+		final ProblemList problemList = new ProblemList();
+		final Path fileName = fmManager.getPath().getFileName();
+		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName.toString());
+		if (format != null) {
+			try {
+				problemList.addAll(format.getInstance().read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source));
+			} catch (final NoSuchExtensionException e) {
+				problemList.add(new Problem(e));
+				Logger.logError(e);
+			}
 		}
-		final ProblemList warnings = fmManager.getFormat().getInstance().read(model, source);
-		createModelFileMarkers(warnings);
-
-		return !warnings.containsError();
+		return problemList;
 	}
 
 	public void addEventListener(IEventListener listener) {
@@ -686,18 +689,5 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 		fmManager.removeListener(listener);
-	}
-
-	private void createLayoutInformation() {
-		createdLayoutInformation = false;
-		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
-		if ((extraPath != null) && !extraPath.toFile().exists()) {
-			FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
-			createdLayoutInformation = true;
-		}
-		gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
-		FMPropertyManager.registerEditor(this);
-
-		setPartName(getModelFile().getProject().getName() + MODEL);
 	}
 }

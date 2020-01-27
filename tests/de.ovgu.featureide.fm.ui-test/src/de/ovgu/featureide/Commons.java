@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -36,6 +38,10 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class Commons {
 
+	static {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+	}
+
 	public static File getRemoteOrLocalFolder(String path) {
 		final File folder = new File("src/" + path);
 		return folder;
@@ -45,11 +51,11 @@ public class Commons {
 
 	private static final String TEST_FEATURE_MODEL_PATH = "testFeatureModels/";
 
-	public final static IFeatureModel loadBenchmarkFeatureModelFromFile(final String filename) {
+	public final static FeatureModelManager loadBenchmarkFeatureModelFromFile(final String filename) {
 		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(BENCHMARK_FEATURE_MODEL_PATH));
 	}
 
-	public final static IFeatureModel loadTestFeatureModelFromFile(final String filename) {
+	public final static FeatureModelManager loadTestFeatureModelFromFile(final String filename) {
 		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(TEST_FEATURE_MODEL_PATH));
 	}
 
@@ -64,7 +70,7 @@ public class Commons {
 	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static IFeatureModel loadFeatureModelFromFile(final String filename, final File modelFolder) {
+	public final static FeatureModelManager loadFeatureModelFromFile(final String filename, final File modelFolder) {
 		return loadFeatureModelFromFile(filename, new FileFilterByExtension(extractFileExtension(filename)), modelFolder);
 	}
 
@@ -96,13 +102,14 @@ public class Commons {
 	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
+	public final static FeatureModelManager loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
 		for (final File f : modelFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.load(f.toPath()).getObject();
+				return FeatureModelManager.getInstance(f.toPath());
 			}
 		}
-		return FMFactoryManager.getEmptyFeatureModel();
+		fail();
+		return null;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

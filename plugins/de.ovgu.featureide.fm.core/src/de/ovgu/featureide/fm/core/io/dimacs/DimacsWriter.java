@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,31 +20,36 @@
  */
 package de.ovgu.featureide.fm.core.io.dimacs;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.prop4j.And;
-import org.prop4j.Literal;
 import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * Transforms instances of {@link Node} into DIMACS CNF file format.
  *
- * @author Timo G&uuml;nther
+ * @author Timo Günther
+ * @author Sebastian Krieter
  */
 public class DimacsWriter {
 
-	/** The clauses of the CNF to transform. */
-	private List<Node> clauses;
-	/** Maps variables to indexes. */
-	private final Map<Object, Integer> variableIndexes = new LinkedHashMap<>();
-
 	/** Whether the writer should write a variable directory listing the names of the variables. */
-	private boolean writeVariableDirectory = false;
+	private boolean writingVariableDirectory = true;
+
+	private final CNF cnf;
+
+	/**
+	 * Constructs a new instance of this class with the given CNF.
+	 *
+	 * @param cnf the CNF to transform; not null
+	 * @throws IllegalArgumentException if the input is null or not in CNF
+	 */
+	public DimacsWriter(CNF cnf) throws IllegalArgumentException {
+		if (cnf == null) {
+			throw new IllegalArgumentException();
+		}
+		this.cnf = cnf;
+	}
 
 	/**
 	 * <p> Sets the writing variable directory flag. If true, the writer will write a variable directory at the start of the output. This is a set of comments
@@ -52,104 +57,97 @@ public class DimacsWriter {
 	 *
 	 * <p> Defaults to false. </p>
 	 *
-	 * @param writeVariableDirectory whether to write the variable directory
+	 * @param writingVariableDirectory whether to write the variable directory
 	 */
-	public void setWritingVariableDirectory(boolean writeVariableDirectory) {
-		this.writeVariableDirectory = writeVariableDirectory;
+	public void setWritingVariableDirectory(boolean writingVariableDirectory) {
+		this.writingVariableDirectory = writingVariableDirectory;
+	}
+
+	public boolean isWritingVariableDirectory() {
+		return writingVariableDirectory;
 	}
 
 	/**
 	 * Writes the DIMACS CNF file format.
 	 *
-	 * @param cnf the CNF to transform; not null
 	 * @return the transformed CNF; not null
-	 * @throws IllegalArgumentException if the input is null or not in CNF
 	 */
-	public String write(Node cnf) throws IllegalArgumentException {
-		if (cnf == null) {
-			throw new IllegalArgumentException("CNF is null");
-		}
-		if (!cnf.isConjunctiveNormalForm()) {
-			throw new IllegalArgumentException("Input is not in CNF");
-		}
-
-		try {
-			clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
-			addVariables(cnf);
-
-			final StringBuilder sb = new StringBuilder();
+	public String write() {
+		final StringBuilder sb = new StringBuilder();
+		if (writingVariableDirectory) {
 			writeVariableDirectory(sb);
-			writeProblem(sb);
-			writeClauses(sb);
-
-			return sb.toString();
-		} finally {
-			variableIndexes.clear();
-			clauses = null;
 		}
-	}
-
-	/**
-	 * Adds the given variable. This means assigning an index to it.
-	 *
-	 * @param l variable to add; not null
-	 */
-	private void addVariables(Node cnf) {
-		// TODO make sure that variables are in same order as read
-		for (final Object variable : cnf.getUniqueVariables()) {
-			if (!variableIndexes.containsKey(variable)) {
-				variableIndexes.put(variable, variableIndexes.size() + 1);
-			}
-		}
+		writeProblem(sb);
+		writeClauses(sb);
+		return sb.toString();
 	}
 
 	/**
 	 * Writes the variable directory.
 	 *
-	 * @return the variable directory; not null
+	 * @param sb the string builder that builds the document
 	 */
 	private void writeVariableDirectory(StringBuilder sb) {
-		if (writeVariableDirectory) {
-			for (final Entry<Object, Integer> e : variableIndexes.entrySet()) {
-				sb.append(DIMACSFormat.COMMENT_START);
-				sb.append(e.getValue());
-				sb.append(' ');
-				sb.append(e.getKey());
-				sb.append(System.lineSeparator());
-			}
+		final String[] names = cnf.getVariables().getNames();
+		for (int i = 1; i < names.length; i++) {
+			writeVariableDirectoryEntry(sb, i, names[i]);
 		}
+	}
+
+	/**
+	 * Writes an entry of the variable directory.
+	 *
+	 * @param sb the string builder that builds the document
+	 * @param variable variable to list in the entry
+	 * @param index index of the variable
+	 */
+	private void writeVariableDirectoryEntry(StringBuilder sb, int index, String name) {
+		sb.append(DIMACSConstants.COMMENT_START);
+		sb.append(index);
+		sb.append(' ');
+		sb.append(String.valueOf(name));
+		sb.append(System.lineSeparator());
 	}
 
 	/**
 	 * Writes the problem description.
 	 *
-	 * @return the problem description; not null
+	 * @param sb the string builder that builds the document
 	 */
 	private void writeProblem(StringBuilder sb) {
-		sb.append(DIMACSFormat.PROBLEM);
+		sb.append(DIMACSConstants.PROBLEM);
 		sb.append(' ');
-		sb.append(DIMACSFormat.CNF);
+		sb.append(DIMACSConstants.CNF);
 		sb.append(' ');
-		sb.append(variableIndexes.size());
+		sb.append(cnf.getVariables().size());
 		sb.append(' ');
-		sb.append(clauses.size());
+		sb.append(cnf.getClauses().size());
+		sb.append(System.lineSeparator());
+	}
+
+	/**
+	 * Writes the given clause.
+	 *
+	 * @param sb the string builder that builds the document
+	 * @param clause clause to transform; not null
+	 */
+	private void writeClause(StringBuilder sb, LiteralSet clause) {
+		for (final int l : clause.getLiterals()) {
+			sb.append(l);
+			sb.append(' ');
+		}
+		sb.append(DIMACSConstants.CLAUSE_END);
 		sb.append(System.lineSeparator());
 	}
 
 	/**
 	 * Writes all clauses.
 	 *
-	 * @return all transformed clauses; not null
+	 * @param sb the string builder that builds the document
 	 */
 	private void writeClauses(StringBuilder sb) {
-		for (final Node clause : clauses) {
-			for (final Literal l : clause.getUniqueLiterals()) {
-				final int index = variableIndexes.get(l.var);
-				sb.append(l.positive ? index : -index);
-				sb.append(' ');
-			}
-			sb.append(DIMACSFormat.CLAUSE_END);
-			sb.append(System.lineSeparator());
+		for (final LiteralSet clause : cnf.getClauses()) {
+			writeClause(sb, cnf.getInternalVariables().convertToInternal(clause));
 		}
 	}
 

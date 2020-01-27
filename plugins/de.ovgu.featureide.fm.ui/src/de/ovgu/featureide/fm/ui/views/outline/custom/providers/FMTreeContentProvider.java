@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -33,7 +33,9 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
@@ -47,18 +49,21 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
  */
 public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
-	private IFeatureModel fModel;
+	private IManager<IFeatureModel> featureModelManager;
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
-			if (newInput instanceof IFeatureModel) {
-				fModel = ((IFeatureModel) newInput);
+			if (newInput instanceof FeatureModelManager) {
+				featureModelManager = ((FeatureModelManager) newInput);
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
-					final FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
-					if (fmm != null) {
-						fModel = fmm.getObject();
+					final Path path = EclipseFileSystem.getPath(((IFile) newInput));
+					if (FeatureModelManager.isFileSupported(path)) {
+						final FeatureModelManager fmm = FeatureModelManager.getInstance(path);
+						if (fmm != null) {
+							featureModelManager = fmm;
+						}
 					}
 				}
 			}
@@ -66,18 +71,17 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return fModel;
-	}
-
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
-			elements = new Object[2];
-			elements[0] = fModel.getStructure().getRoot().getFeature();
-			elements[1] = CONSTRAINTS;
-			return elements;
+		if (featureModelManager != null) {
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
+			if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
+				elements = new Object[2];
+				elements[0] = fModel.getStructure().getRoot().getFeature();
+				elements[1] = CONSTRAINTS;
+				return elements;
+			}
 		}
 
 		return new String[] { NO_DATA_TO_DISPLAY_AVAILABLE_ };
@@ -91,6 +95,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 		// we have a String as parent of constraints
 		if ((parentElement instanceof String) && CONSTRAINTS.equals(parentElement)) {
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
 			final Object[] elements = new Object[fModel.getConstraintCount()];
 			final List<IConstraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
@@ -152,7 +157,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return true;
 		} else if (element instanceof String) {
 			if (CONSTRAINTS.equals(element)) {
-				return fModel.getConstraintCount() > 0;
+				return featureModelManager.getSnapshot().getConstraintCount() > 0;
 			}
 		}
 

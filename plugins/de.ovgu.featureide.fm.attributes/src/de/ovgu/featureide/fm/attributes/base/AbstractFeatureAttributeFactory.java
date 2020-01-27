@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -39,7 +41,8 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @return The instance of the feature attribute. Can return null when information contain invalid values. Like the value of an extended feature attribute
 	 *         of type double is set to "test".
 	 */
-	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature);
+	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature)
+			throws FeatureAttributeParseException, UnknownFeatureAttributeTypeException;
 
 	/**
 	 * Create an extended feature attribute of type string with the given parameters

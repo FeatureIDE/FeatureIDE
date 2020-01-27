@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Takes a feature model as input and returns a propositional formula representing the valid feature combinations.
@@ -200,7 +201,7 @@ public class NodeCreator {
 				}
 			}
 		}
-		final Node[] concreteFeatures = new Node[featureModel.getAnalyser().countConcreteFeatures() + 1];
+		final Node[] concreteFeatures = new Node[FeatureModelManager.getAnalyzer(featureModel).countConcreteFeatures() + 1];
 		int i = 0;
 		for (final IFeature feature : featureModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
@@ -525,7 +526,7 @@ public class NodeCreator {
 	 */
 	private static void updateMap(Map<Object, Node> map, Object var, Node replacing) {
 		for (final Entry<Object, Node> entry : map.entrySet()) {
-			final Map<Object, Node> tempMap = new HashMap<Object, Node>();
+			final Map<Object, Node> tempMap = new HashMap<>();
 			tempMap.put(var, replacing);
 			entry.setValue(NodeCreator.replaceAbstractVariables(entry.getValue(), tempMap, true));
 		}

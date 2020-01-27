@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_SUBTREE;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +29,7 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -46,14 +45,8 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.selectSubtree";
 	private static ImageDescriptor createImage;
 
-	public SelectSubtreeAction(Object viewer) {
-		super(SELECT_SUBTREE, viewer, ID);
-		URL url = null;
-		try {
-			url = new URL("platform:/plugin/org.eclipse.wst.xsdeditor.doc.user/images/XSDChoice.gif");
-		} catch (final MalformedURLException e) {}
-		createImage = ImageDescriptor.createFromURL(url);
-		setImageDescriptor(createImage);
+	public SelectSubtreeAction(Object viewer, IFeatureModelManager featureModelManager) {
+		super(SELECT_SUBTREE, viewer, ID, featureModelManager);
 	}
 
 	@Override

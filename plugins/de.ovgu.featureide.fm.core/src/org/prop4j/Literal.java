@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,8 +23,6 @@ package org.prop4j;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A variable or negated variable.
@@ -106,9 +104,14 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
-		if (var.equals(feature.getName())) {
-			var = replaceWithFeature.getName();
+	public Node flatten() {
+		return this;
+	}
+
+	@Override
+	protected List<Node> replaceFeature(String feature, String replaceWithFeature, List<Node> list) {
+		if (var.equals(feature)) {
+			var = replaceWithFeature;
 			list.add(this);
 		}
 		return list;

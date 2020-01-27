@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -48,14 +48,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import net.miginfocom.swing.MigLayout;
@@ -67,6 +71,10 @@ import net.miginfocom.swing.MigLayout;
  * @author Thomas Thuem
  */
 public class GraphicalConfigurator {
+
+	static {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -112,8 +120,9 @@ public class GraphicalConfigurator {
 
 	private JFrame frame;
 
-	private IFeatureModel featureModel;
+	private FeatureModelFormula featureModel;
 	private Configuration configuration;
+	private ConfigurationAnalyzer configurationAnalyzer;
 
 	private DefaultListModel<Object> undefinedListModel;
 	private JList<?> undefinedList;
@@ -290,13 +299,14 @@ public class GraphicalConfigurator {
 	}
 
 	private void updateLabel() {
-		configurationStatusLabel.setText(configuration.isValid() ? "Valid" : "Invalid");
+		configurationStatusLabel.setText(configurationAnalyzer.isValid() ? "Valid" : "Invalid");
 	}
 
 	private void updateLists() {
 		undefinedListModel.clear();
 		selectedListModel.clear();
 		deselectedListModel.clear();
+		configurationAnalyzer.update(true, null);
 		final List<SelectableFeature> features = getSelectableFeatures();
 		boolean manualFeatures = true;
 		for (SelectableFeature feature : features) {
@@ -344,16 +354,16 @@ public class GraphicalConfigurator {
 	}
 
 	private void createEmptyConfiguration(final Path path) throws IOException {
-		final FileHandler<IFeatureModel> fh = FeatureModelManager.load(path);
+		final FileHandler<IFeatureModel> fh = FeatureModelManager.getFileHandler(path);
 		if (!fh.getLastProblems().containsError()) {
-			featureModel = fh.getObject();
-			final IFeature root = FeatureUtils.getRoot(featureModel);
+			featureModel = new FeatureModelFormula(fh.getObject());
+			final IFeature root = FeatureUtils.getRoot(featureModel.getFeatureModel());
 			if (root != null) {
 				featureModelNameLabel.setText(root.getName());
 			}
 
-			configuration = new Configuration(featureModel, Configuration.PARAM_PROPAGATE);
-			configuration.update(true, null);
+			configuration = new Configuration(featureModel);
+			configurationAnalyzer = new ConfigurationAnalyzer(featureModel, configuration);
 		} else {
 			throw new IOException();
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.MusExtractorTests;
 
 /**
@@ -31,7 +30,7 @@ import org.prop4j.explain.solvers.MusExtractorTests;
 public class Sat4jMusExtractorTests extends MusExtractorTests {
 
 	@Override
-	protected MusExtractor getInstance() {
+	protected Sat4jMusExtractor getInstance() {
 		return new Sat4jSatSolverFactory().getMusExtractor();
 	}
 }

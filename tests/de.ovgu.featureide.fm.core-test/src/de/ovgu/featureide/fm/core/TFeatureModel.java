@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 
 /**
  * Tests for the {@link IFeatureModel}.
@@ -47,11 +47,11 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class TFeatureModel {
 
-	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+	private static final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 
 	@Test
 	public void recordGetFeatureName() {
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IFeature feature = factory.createFeature(fm, "test_root");
 		fm.addFeature(feature);
 		fm.getStructure().setRoot(feature.getStructure());
@@ -66,7 +66,7 @@ public class TFeatureModel {
 
 	@Test
 	public void getFeatureOrderListTest() {
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final Collection<String> expectedOrder = new LinkedList<String>();
 		Collection<String> actualOrder = fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
@@ -102,7 +102,7 @@ public class TFeatureModel {
 	 */
 	@Test
 	public void cloneFeatureModelTestDescription() {
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm = factory.create();
 		final IFeature feature = factory.createFeature(fm, "test_root_original");
 		final IFeature feature2 = factory.createFeature(fm, "test_root_original2");
 		fm.addFeature(feature);
@@ -111,16 +111,16 @@ public class TFeatureModel {
 		final IFeature root = fm.getFeature("test_root_original");
 		assertSame(root.getStructure(), fm.getStructure().getRoot());
 
-		Node constraintNode = new Implies(new Literal("test_root_original"), new Literal("test_root_original2"));
-		IConstraint constraint = factory.createConstraint(fm, constraintNode);
-		String originalDescription = "Constraint Description Test";
+		final Node constraintNode = new Implies(new Literal("test_root_original"), new Literal("test_root_original2"));
+		final IConstraint constraint = factory.createConstraint(fm, constraintNode);
+		final String originalDescription = "Constraint Description Test";
 		constraint.setDescription(originalDescription);
 		fm.addConstraint(constraint);
 
 		final IFeatureModel clonedModel = fm.clone(null);
 
-		for (IConstraint constraintClone : clonedModel.getConstraints()) {
-			String descriptionCopy = constraintClone.getDescription();
+		for (final IConstraint constraintClone : clonedModel.getConstraints()) {
+			final String descriptionCopy = constraintClone.getDescription();
 			assertEquals(originalDescription, descriptionCopy);
 		}
 	}

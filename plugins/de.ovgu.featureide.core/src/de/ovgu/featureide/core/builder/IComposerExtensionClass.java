@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	boolean isInitialized();
 
-	void performFullBuild(IFile config);
+	void performFullBuild(Path config);
 
 	/**
 	 * Builds a configuration to the given folder<br> To call a method before the building process of all configurations is started see:

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -30,21 +30,22 @@ import de.ovgu.featureide.fm.core.job.IJob;
  *
  * @author Sebastian Krieter
  */
-public class ProgressMonitor extends ATaskMonitor {
+public class ProgressMonitor<T> extends ATaskMonitor<T> {
 
 	private final SubMonitor monitor;
 	private final IProgressMonitor orgMonitor;
 
-	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
+	private ProgressMonitor(SubMonitor monitor, AMonitor<?> parent) {
 		super(parent);
+		orgMonitor = monitor;
 		this.monitor = SubMonitor.convert(monitor, 1);
-		orgMonitor = null;
 	}
 
 	public ProgressMonitor(String taskName, IProgressMonitor monitor) {
-		super(taskName);
-		this.monitor = SubMonitor.convert(monitor, taskName, 1);
+		super();
 		orgMonitor = monitor;
+		this.monitor = SubMonitor.convert(monitor, taskName, 1);
+		setTaskName(name);
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class ProgressMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public void done() {
+	public synchronized void done() {
 		monitor.done();
 		if (orgMonitor != null) {
 			orgMonitor.done();
@@ -72,22 +73,27 @@ public class ProgressMonitor extends ATaskMonitor {
 	}
 
 	@Override
-	public final void setRemainingWork(int work) {
+	public synchronized final void setRemainingWork(int work) {
 		monitor.setWorkRemaining(work);
 	}
 
 	@Override
-	public IMonitor subTask(int size) {
-		return new ProgressMonitor(monitor.newChild(size), this);
+	public synchronized int getRemainingWork() {
+		return 0;
 	}
 
 	@Override
-	public void worked() {
-		monitor.worked(1);
+	public synchronized <R> IMonitor<R> subTask(int size) {
+		return new ProgressMonitor<>(monitor.newChild(size), this);
 	}
 
 	@Override
-	public void setTaskName(String name) {
+	public synchronized void worked(int work) {
+		monitor.worked(work);
+	}
+
+	@Override
+	public synchronized void setTaskName(String name) {
 		super.setTaskName(name);
 		monitor.setTaskName(getTaskName());
 	}

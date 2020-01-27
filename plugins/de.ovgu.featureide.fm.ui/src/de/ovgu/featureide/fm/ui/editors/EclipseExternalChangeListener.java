@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
@@ -35,8 +36,9 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.EclipseFileManagerVisitor;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileDeleteVisitor;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileChangeVisitor;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -48,7 +50,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class EclipseExternalChangeListener extends ExternalChangeListener implements IResourceChangeListener {
 
 	@Override
-	protected void doUpdate(final AFileManager<?> fileManager) {
+	protected void doUpdate(final IFileManager<?> fileManager) {
 		final FileEditorInput input = new FileEditorInput((IFile) EclipseFileSystem.getResource(fileManager.getPath()));
 		Display.getDefault().syncExec(new Runnable() {
 
@@ -72,10 +74,10 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 							"The feature model file was modified in another editor. Do you like to load the new file and override your local changes?",
 							MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0);
 					if (dialog.open() == 0) {
-						fileManager.override();
+						fileManager.overwrite();
 					}
 				} else {
-					fileManager.override();
+					fileManager.overwrite();
 				}
 			}
 		});
@@ -83,9 +85,20 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if ((event.getDelta() != null) && (event.getType() == IResourceChangeEvent.POST_CHANGE)) {
+		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+			if (event.getDelta() != null) {
+				try {
+					event.getDelta().accept(new EclipseFileChangeVisitor());
+				} catch (final CoreException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
+		} else if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
 			try {
-				event.getDelta().accept(new EclipseFileManagerVisitor());
+				final IResource resource = event.getResource();
+				if (resource != null) {
+					resource.accept(new EclipseFileDeleteVisitor());
+				}
 			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}

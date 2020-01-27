@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -118,6 +118,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	@Override
 	protected void writeDocument(Document doc) {
 		createXmlDoc(doc);
+	}
+
+	@Override
+	protected String prettyPrint(String text) {
+		return text;
 	}
 
 	/**
@@ -281,7 +286,6 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		line = 0;
 		object.reset();
 		buildFModelRec(doc);
-		object.handleModelDataLoaded();
 		warnings.addAll(localProblems);
 	}
 
@@ -373,10 +377,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			final IFeatureModelFactory factory = FMFactoryManager.getFactory(object);
+			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(object);
 			FeatureIndent lastFeat = new FeatureIndent(null, -1, null);
 			// List of Features with arbitrary cardinalities
-			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
+			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<>();
 			String lineText = reader.readLine();
 			line++;
 			FeatureIndent feat;
@@ -613,8 +617,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @return
 	 */
 	private org.prop4j.Node buildMinConstr(List<IFeature> list, int length, String parentName) {
-		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> result = new LinkedList<>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<>();
 		final int listLength = list.size();
 		final int[] indexes = new int[length];
 		final int[] resIndexes = new int[length];
@@ -655,8 +659,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @return
 	 */
 	private org.prop4j.Node buildMaxConstr(List<IFeature> list, int length) {
-		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> result = new LinkedList<>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<>();
 		final int listLength = list.size();
 		final int[] indexes = new int[length];
 		final int[] resIndexes = new int[length];
@@ -732,7 +736,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		newLine = newLine.replace("~", " ~ ");
 		final Scanner scan = new Scanner(newLine);
 		scan.skip(".*:");
-		final LinkedList<String> elements = new LinkedList<String>();
+		final LinkedList<String> elements = new LinkedList<>();
 		while (scan.hasNext()) {
 			elements.add(scan.next());
 		}
@@ -749,7 +753,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @throws UnsupportedModelException
 	 */
 	private org.prop4j.Node buildPropNode(LinkedList<String> list) throws UnsupportedModelException {
-		final LinkedList<String> left = new LinkedList<String>();
+		final LinkedList<String> left = new LinkedList<>();
 		org.prop4j.Node leftResult, rightResult;
 		int bracketCount = 0;
 		String element;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,15 +24,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +52,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -106,9 +107,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		PreprocessorExplanationCreatorFactory.getDefault().getInvariantPresenceConditionExplanationCreator();
 
 	/**
-	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
+	 * Feature model node generated in {@link #performFullBuild(Path)} and used for expression checking.
 	 */
-	protected Node featureModel;
+	protected IFeatureModel featureModel;
 
 	/**
 	 * {@code true}, if the feature model is void, {@code false} otherwise
@@ -148,12 +149,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/**
 	 * Stack for preprocessor directives (for nested expressions). Have to be initialized in subclass.
 	 */
-	protected Stack<Node> expressionStack;
+	protected Deque<Node> expressionStack;
 
 	/**
 	 * Stack for count of "if" and "else" instructions for each level. Have to be initialized in subclass.
 	 */
-	protected Stack<Integer> ifelseCountStack;
+	protected Deque<Integer> ifelseCountStack;
 
 	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 	private static final String FEATURE_MODULE_MARKER = CorePlugin.PLUGIN_ID + ".featureModuleMarker";
@@ -171,33 +172,27 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Initializes class fields. Should called at start of {@link #performFullBuild(IFile)}.
+	 * Initializes class fields. Should called at start of {@link #performFullBuild(Path)}.
 	 *
 	 * @param config Path to the activated configuration file.
 	 * @return Return <code>false</code> if configuration file does not exists or its feature list is empty.
 	 */
-	public boolean prepareFullBuild(IFile config) {
+	public boolean prepareFullBuild(Path config) {
 		usedFeatures.clear();
 		assert (featureProject != null) : "Invalid project given";
+		final FeatureModelFormula persistentFormula = featureProject.getFeatureModelManager().getPersistentFormula();
 		if (config != null) {
-			final String configPath = config.getRawLocation().toOSString();
-
-			if (configPath == null) {
-				return false;
-			}
-
 			// Fix for #625: Antenna has currently no implementation for .xml config files.
-			final Configuration configurationFile = new Configuration(featureProject.getFeatureModel());
-			ConfigurationManager.load(Paths.get(config.getRawLocationURI()), configurationFile);
+			final Configuration configuration = ConfigurationManager.load(config);
+			configuration.updateFeatures(persistentFormula);
 			// // read activated features from configuration
-			activatedFeatures = new ArrayList<String>(configurationFile.getSelectedFeatureNames());
-
+			activatedFeatures = new ArrayList<>(configuration.getSelectedFeatureNames());
 		}
 		// get all concrete and abstract features and generate pattern
 		final StringBuilder concreteFeatures = new StringBuilder();
 		final StringBuilder abstractFeatures = new StringBuilder();
-		final IFeatureModel fm = featureProject.getFeatureModel();
-		for (final IFeature feature : fm.getFeatures()) {
+		featureModel = persistentFormula.getFeatureModel();
+		for (final IFeature feature : featureModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
 				concreteFeatures.append(feature.getName());
 				concreteFeatures.append("|");
@@ -215,20 +210,22 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 
 		// create expression of feature model
-		featureModel = AdvancedNodeCreator.createNodes(fm);
 		try {
-			voidFeatureModel = !new SatSolver(featureModel, 1000).isSatisfiable();
+			voidFeatureModel = !new SatSolver(AdvancedNodeCreator.createNodes(featureModel), 1000).hasSolution();
 		} catch (final TimeoutException e) {
 			voidFeatureModel = false;
 		}
 
-		featureList = Functional.toList(FeatureUtils.extractFeatureNames(fm.getFeatures()));
+		featureList = Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()));
 
 		return true;
 	}
 
 	/**
 	 * Checks the expression on top of the expression stack for a contradiction or a tautology. Does not set any markers.
+	 *
+	 * @param node the expression to prove
+	 * @param withModel Checking with model if is <code>true</code>.
 	 *
 	 * @return the status of the annotation
 	 */
@@ -238,12 +235,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		Node nestedExpressions = null;
 		if (expressionStack.size() > 1) {
 			Node[] children = expressionStack.toArray(new Node[expressionStack.size()]);
-			children = Arrays.copyOfRange(children, 0, children.length - 1); // Exclude the topmost expression because it is examined separately.
+			children = Arrays.copyOfRange(children, 1, children.length); // Exclude the topmost expression because it is examined separately.
 			nestedExpressions = new And(children);
 		}
 
 		try {
-			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
+			return isContradictionOrTautology(expression, AdvancedNodeCreator.createNodes(featureModel), nestedExpressions);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 			return AnnotationStatus.NORMAL;
@@ -258,26 +255,23 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		/*
 		 * -SAT(expression)
 		 */
-		if (!new SatSolver(expression, 1000).isSatisfiable()) {
+		if (!new SatSolver(expression, 1000).hasSolution()) {
 			return AnnotationStatus.CONTRADICTION;
 		}
 
 		/*
 		 * -SAT(-expression)
 		 */
-		if (!new SatSolver(new Not(expression), 1000).isSatisfiable()) {
+		if (!new SatSolver(new Not(expression), 1000).hasSolution()) {
 			return AnnotationStatus.TAUTOLOGY;
 		}
 
-		Node context = featureModel;
-		if (nestedExpressions != null) {
-			context = new And(context, nestedExpressions);
-		}
+		final Node context = (nestedExpressions != null) ? new And(featureModel, nestedExpressions) : featureModel;
 
 		/*
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
-		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
+		if (!new SatSolver(new And(context, expression), 1000).hasSolution()) {
 			return AnnotationStatus.DEAD;
 		}
 
@@ -285,7 +279,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * TAUT(FM & nestedExpressions => expression) = -SAT(-(FM & nestedExpressions => expression)) = -SAT(-(-(FM & nestedExpressions) | expression)) =
 		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
-		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
+		if (!new SatSolver(new And(context, new Not(expression)), 1000).hasSolution()) {
 			return AnnotationStatus.SUPERFLUOUS;
 		}
 
@@ -346,7 +340,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @return an explanation
 	 */
 	private InvariantPresenceConditionExplanation getInvariantExpressionExplanation(boolean tautology) {
-		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
+		invariantExpressionExplanationCreator.setFeatureModel(featureModel);
 		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
 		Collections.reverse(reverseExpressionStack); // Iteration order of Stack is from bottom to top instead of top to bottom.
 		invariantExpressionExplanationCreator.setExpressionStack(reverseExpressionStack);
@@ -437,9 +431,6 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		return lines;
 	}
 
-	/**
-	 *
-	 */
 	public void deleteAllPreprocessorAnotationMarkers() {
 		try {
 			final IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() : featureProject.getBuildFolder();
@@ -454,6 +445,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 	}
 
+	// TODO this should be implemented with instanceof or similar
 	/**
 	 * @param marker
 	 * @return
@@ -476,7 +468,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		removeModelMarkers();
 		final ArrayList<String> unusedConcrete = new ArrayList<>();
 		final ArrayList<String> usedAbstract = new ArrayList<>();
-		for (final IFeature f : featureProject.getFeatureModel().getFeatures()) {
+		for (final IFeature f : featureModel.getFeatures()) {
 			final String featureName = f.getName();
 			if (f.getStructure().isConcrete()) {
 				if (!usedFeatures.contains(featureName)) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -44,10 +44,6 @@ public interface IConfigurationPropagator {
 	 */
 	LongRunningMethod<Boolean> isValid();
 
-	boolean isLoaded();
-
-	LongRunningMethod<Void> resolve();
-
 	/**
 	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
 	 */
@@ -55,26 +51,43 @@ public interface IConfigurationPropagator {
 
 	LongRunningMethod<Boolean> canBeValid();
 
-	LongRunningMethod<Void> load();
-
-	LongRunningMethod<Void> leadToValidConfiguration(List<SelectableFeature> featureList);
-
-	LongRunningMethod<Void> leadToValidConfiguration(List<SelectableFeature> featureList, int mode);
-
 	/**
 	 * Counts the number of possible solutions.
 	 *
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)<br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
-	LongRunningMethod<Long> number(long timeout, boolean includeHiddenFeatures);
+	LongRunningMethod<Long> number(int timeout);
 
-	LongRunningMethod<Void> update(boolean redundantManual, List<SelectableFeature> featureOrder);
+	LongRunningMethod<Collection<SelectableFeature>> update(boolean redundantManual, List<SelectableFeature> featureOrder);
 
-	LongRunningMethod<Void> update(boolean redundantManual);
+	LongRunningMethod<Collection<SelectableFeature>> update(boolean redundantManual);
 
-	LongRunningMethod<Void> update();
+	LongRunningMethod<Collection<SelectableFeature>> update();
 
-	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
+	LongRunningMethod<Collection<SelectableFeature>> resetAutomatic();
+
+	LongRunningMethod<Boolean> completeRandomly();
+
+	LongRunningMethod<Boolean> completeMin();
+
+	LongRunningMethod<Boolean> completeMax();
+
+	LongRunningMethod<Collection<SelectableFeature>> resolve();
+
+	LongRunningMethod<List<List<String>>> coverFeatures(Collection<String> features, boolean selection);
+
+	/**
+	 * Returns a subset of clauses from the feature model that are currently unsatisfied and marks all contained {@link SelectableFeature features} (see
+	 * {@link SelectableFeature#getRecommended()} and {@link SelectableFeature#getOpenClauses()}). Features that are undefined are considered deselected.
+	 *
+	 *
+	 * @return A list of unsatisfied clauses.
+	 */
+	LongRunningMethod<Collection<SelectableFeature>> findOpenClauses();
+
+	boolean isIncludeAbstractFeatures();
+
+	void setIncludeAbstractFeatures(boolean includeAbstractFeatures);
 
 }

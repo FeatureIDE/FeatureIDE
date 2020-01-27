@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,9 +25,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -42,9 +43,9 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 
 	private static final double precision = 1000.0;
 
-	private final IFeatureModel model;
+	private final FeatureModelFormula model;
 
-	public StatisticsSyntacticalFeatureModel(String description, IFeatureModel model) {
+	public StatisticsSyntacticalFeatureModel(String description, FeatureModelFormula model) {
 		super(description, null);
 		this.model = model;
 	}
@@ -53,9 +54,9 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 	protected void initChildren() {
 		if (model != null) {
 
-			final int constraints = model.getConstraintCount();
+			final int constraints = model.getFeatureModel().getConstraintCount();
 
-			final Collection<IFeature> listOfFeatures = Functional.toList(model.getFeatures());
+			final Collection<IFeature> listOfFeatures = Functional.toList(model.getFeatureModel().getFeatures());
 
 			final List<IFeature> listOfCompoundFeatures = new ArrayList<IFeature>();
 			final List<IFeature> listOfPrimitiveFeatures = new ArrayList<IFeature>();
@@ -75,28 +76,29 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 				}
 			}
 
-			final HashSet<IFeature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
-			for (final IConstraint constraint : model.getConstraints()) {
+			final HashSet<IFeature> constraintFeatures = new HashSet<>(model.getFeatureModel().getNumberOfFeatures() << 1);
+			for (final IConstraint constraint : model.getFeatureModel().getConstraints()) {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
 
-			addChild(new FeatureListNode(NUMBER_FEATURES, listOfFeatures));
+			addChild(new FeatureListNode(model, NUMBER_FEATURES, listOfFeatures));
 
-			addChild(new FeatureListNode(NUMBER_CONCRETE, listOfConcreteFeatures));
+			addChild(new FeatureListNode(model, NUMBER_CONCRETE, listOfConcreteFeatures));
 
-			addChild(new FeatureListNode(NUMBER_ABSTRACT, listOfAbstractFeatures));
+			addChild(new FeatureListNode(model, NUMBER_ABSTRACT, listOfAbstractFeatures));
 
-			addChild(new FeatureListNode(NUMBER_COMPOUND, listOfCompoundFeatures));
+			addChild(new FeatureListNode(model, NUMBER_COMPOUND, listOfCompoundFeatures));
 
-			addChild(new FeatureListNode(NUMBER_TERMINAL, listOfPrimitiveFeatures));
+			addChild(new FeatureListNode(model, NUMBER_TERMINAL, listOfPrimitiveFeatures));
 
-			addChild(new FeatureListNode(NUMBER_HIDDEN, model.getAnalyser().getHiddenFeatures()));
+			addChild(new FeatureListNode(model, NUMBER_HIDDEN, FeatureUtils.getHiddenFeatures(model.getFeatureModel())));
 
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
 
 			addChild(new Parent(NUMBER_CONSTRAINT_FEATURES, constraintFeatures.size()));
 
-			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision * constraintFeatures.size()) / model.getNumberOfFeatures()) / precision));
+			addChild(new Parent(CONSTRAINT_RATIO,
+					Math.floor((precision * constraintFeatures.size()) / model.getFeatureModel().getNumberOfFeatures()) / precision));
 
 		}
 	}

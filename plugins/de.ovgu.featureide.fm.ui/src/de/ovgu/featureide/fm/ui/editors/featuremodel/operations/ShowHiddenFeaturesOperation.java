@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -40,15 +41,15 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	}
 
 	@Override
-	public FeatureIDEEvent operation() {
+	public FeatureIDEEvent operation(IFeatureModel featureModel) {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
-		// TODO add specific handling in FeatureDiagram editor so not everything needs to be reloaded
+		// TODO !!? add specific handling in FeatureDiagram editor so not everything needs to be reloaded
 		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
 	}
 
 	@Override
-	public FeatureIDEEvent inverseOperation() {
-		return operation();
+	public FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		return operation(featureModel);
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -32,24 +33,22 @@ public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOpe
 
 	private final int newNameType;
 	private final int oldNameType;
-	private final IGraphicalFeatureModel featureModel;
 
-	public NameTypeSelectionOperation(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
-		super(featureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
+	public NameTypeSelectionOperation(IGraphicalFeatureModel graphicalFeatureModel, int newNameType, int oldNameType) {
+		super(graphicalFeatureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
 		this.newNameType = newNameType;
 		this.oldNameType = oldNameType;
-		this.featureModel = featureModel;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		featureModel.getLayout().setShowShortNames(newNameType == 1);
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		graphicalFeatureModel.getLayout().setShowShortNames(newNameType == 1);
 		return FeatureIDEEvent.getDefault(EventType.ALL_FEATURES_CHANGED_NAME_TYPE);
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		featureModel.getLayout().setShowShortNames(oldNameType == 1);
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		graphicalFeatureModel.getLayout().setShowShortNames(oldNameType == 1);
 		return FeatureIDEEvent.getDefault(EventType.ALL_FEATURES_CHANGED_NAME_TYPE);
 	}
 

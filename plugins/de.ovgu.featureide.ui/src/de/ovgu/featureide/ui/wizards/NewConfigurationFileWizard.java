@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,16 +26,16 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURAT
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -51,9 +51,11 @@ import org.eclipse.ui.ide.IDE;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -69,7 +71,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	private NewConfigurationFilePage page;
 
-	private IFolder configFolder;
+	private IFeatureProject featureProject;
 
 	public NewConfigurationFileWizard() {
 		super();
@@ -82,7 +84,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		page = new NewConfigurationFilePage(configFolder);
+		page = new NewConfigurationFilePage(featureProject);
 		addPage(page);
 		setWindowTitle(NEW_CONFIGURATION);
 	}
@@ -92,10 +94,9 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		configFolder = page.getContainerObject();
 		final IFeatureProject featureProject = page.getFeatureProject();
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
-		final IConfigurationFormat format = page.getFormat();
+		final FeatureModelFormula featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IPersistentFormat<Configuration> format = page.getFormat();
 
 		final String suffix = "." + format.getSuffix();
 		final String name = page.getFileName();
@@ -106,7 +107,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(configFolder, fileName, featureModel, format, monitor);
+					doFinish(fileName, featureModel, format, monitor);
 				} catch (final CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -129,20 +130,22 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	/**
 	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
 	 */
-	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
+	private void doFinish(String fileName, FeatureModelFormula featureModel, IPersistentFormat<Configuration> format, IProgressMonitor monitor)
 			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
-		if (!container.isAccessible()) {
-			if (container.getProject().isAccessible()) {
-				CorePlugin.createFolder(container.getProject(), container.getProjectRelativePath().toString());
+		final Path configPath = Paths.get(featureProject.getConfigPath());
+		final IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(EclipseFileSystem.getIPath(configPath));
+		if (!container.exists()) {
+			if (featureProject.getProject().isAccessible()) {
+				FMCorePlugin.createFolder(featureProject.getProject(), container.getProjectRelativePath().toString());
 			} else {
 				throwCoreException(CONTAINER_DOES_NOT_EXIST_);
 			}
 		}
 
-		final IFile file = container.getFile(new Path(fileName));
-		SimpleFileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
+		final Path file = configPath.resolve(fileName);
+		SimpleFileHandler.save(configPath.resolve(fileName), new Configuration(featureModel), format);
 
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
@@ -152,7 +155,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			public void run() {
 				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
-					IDE.openEditor(page, file, true);
+					IDE.openEditor(page, (IFile) EclipseFileSystem.getResource(file), true);
 				} catch (final PartInitException e) {}
 			}
 		});
@@ -171,7 +174,6 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		final IFeatureProject data = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-		configFolder = (data == null) ? null : data.getConfigFolder();
+		featureProject = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 	}
 }

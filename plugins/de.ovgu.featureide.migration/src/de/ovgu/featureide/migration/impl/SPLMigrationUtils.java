@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -44,13 +43,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
@@ -172,12 +171,11 @@ public class SPLMigrationUtils {
 	 * @throws CoreException exception
 	 * @throws UnsupportedEncodingException exception
 	 */
-	public static void createConfigFile(IFeatureModel featureModel, IProject project, String configPath, String projectName)
+	public static void createConfigFile(FeatureModelFormula featureModel, IProject project, String configPath, String projectName)
 			throws CoreException, UnsupportedEncodingException {
 		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
 		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
-		FileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel, Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT),
-				defaultFormat);
+		SimpleFileHandler.save(EclipseFileSystem.getPath(configFile), new Configuration(featureModel), defaultFormat);
 	}
 
 	/**
@@ -186,9 +184,10 @@ public class SPLMigrationUtils {
 	 * @param featureProject FeatureIDE project
 	 * @param featureModel feature model to write
 	 */
-	public static void writeFeatureModelToDefaultFile(IProject featureProject, IFeatureModel featureModel) {
+	public static void writeFeatureModelToDefaultFile(IProject featureProject, FeatureModelFormula featureModel) {
 		final IFeatureModelFormat format = new XmlFeatureModelFormat();
-		final ProblemList problems = SimpleFileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()), featureModel, format);
+		final ProblemList problems =
+			SimpleFileHandler.save(EclipseFileSystem.getPath(featureProject.getFile("model.xml")), featureModel.getFeatureModel(), format);
 		if (problems.containsError()) {
 			final ProblemList errors = problems.getErrors();
 			SPLMigrationPlugin.getDefault().logError(errors.toString(), new Exception());

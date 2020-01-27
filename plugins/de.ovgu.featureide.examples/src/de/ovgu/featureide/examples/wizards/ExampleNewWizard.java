@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -125,14 +124,14 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			@Override
 			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-					monitor.beginTask("", selected.length); //$NON-NLS-1$
-					if (monitor.isCanceled()) {
+					final SubMonitor subMonitor = SubMonitor.convert(monitor, "", selected.length);
+					if (subMonitor.isCanceled()) {
 						throw new OperationCanceledException();
 					}
 					for (final Object selectedObject : selected) {
 						if (selectedObject instanceof ProjectRecord) {
 							final ProjectRecord projectRecord = (ProjectRecord) selectedObject;
-							createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
+							createExistingProject(projectRecord, subMonitor.split(1));
 						} else if (selectedObject instanceof String) {
 							// do nothing
 						}

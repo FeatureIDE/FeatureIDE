@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -93,7 +93,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		try {
 			// Add each constraint but the redundant one.
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-				if (constraint == getSubject()) {
+				if (constraint.equals(getSubject())) {
 					continue;
 				}
 				constraintClauseCount += addConstraint(constraint, true);
@@ -124,4 +124,5 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 		}
 		return super.getReason(clauseIndex);
 	}
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -83,7 +84,7 @@ public class Commons {
 	 * available, from <code>localClassPath</code>. The search for the file excludes files that have the extension specified with <b>filter</b>.
 	 * <code>featureModelXmlFilename</code>.
 	 *
-	 * @see {@link #loadFeatureModelFromFile(String, String, String) load model with extension equal to featureModelXmlFilename}
+	 * @see {@link #loadFeatureModelFromFile(String, File) load model with extension equal to featureModelXmlFilename}
 	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
 	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
 	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
@@ -93,10 +94,11 @@ public class Commons {
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
 		for (final File f : modelFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
-				return FeatureModelManager.load(f.toPath()).getObject();
+				return FeatureModelManager.load(f.toPath());
 			}
 		}
-		return FMFactoryManager.getEmptyFeatureModel();
+		fail();
+		return null;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

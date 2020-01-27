@@ -1,13 +1,13 @@
 package br.ufal.ic.colligens.controllers.semanticbugs;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 
 import br.ufal.ic.colligens.models.FileProxy;
 import br.ufal.ic.colligens.util.Log;
 
-class ViewSorter extends ViewerSorter {
+class ViewSorter extends ViewerComparator {
 
 	private int propertyIndex;
 	private static final int DESCENDING = 1;

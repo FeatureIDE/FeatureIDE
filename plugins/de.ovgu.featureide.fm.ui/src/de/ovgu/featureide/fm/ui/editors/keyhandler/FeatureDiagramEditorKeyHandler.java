@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -33,9 +35,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -53,7 +55,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEventListener {
 
 	private static final long timeoutThreshold = 750;
-	private final IGraphicalFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final ScrollingGraphicalViewer viewer;
@@ -70,10 +72,10 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	 * @param view view
 	 * @param featureModel feature model
 	 */
-	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel featureModel) {
+	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel graphicalFeatureModel) {
 		super();
 
-		this.featureModel = featureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		viewer = view;
 
 		alternativeKeyHandler = new KeyHandler();
@@ -83,7 +85,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		lastTime = 0;
 
 		resetFeatureList();
-		featureModel.getFeatureModel().addListener(this);
+		graphicalFeatureModel.getFeatureModelManager().addListener(this);
 	}
 
 	@Override
@@ -97,7 +99,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	@Override
 	public boolean keyPressed(KeyEvent e) {
 		if (Character.isISOControl(e.character)) {
-			if (featureModel.getLayout().hasFeaturesAutoLayout()) {
+			if (graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
 				return gvKeyHandler.keyPressed(e);
 			} else {
 				return super.keyPressed(e);
@@ -120,11 +122,12 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
+			final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().getSnapshot();
 			// select the new feature
-			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
+			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
 				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
-				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
+				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(graphicalFeatureModel.getGraphicalFeature(curFeature));
 				if (part != null) {
 					viewer.setSelection(new StructuredSelection(part));
 					viewer.reveal(part);
@@ -152,13 +155,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 	private void resetFeatureList() {
 		featureList.clear();
-		featureList.addAll(Functional.toList(Functional.map(featureModel.getFeatureModel().getFeatures(), new Functional.IFunction<IFeature, String>() {
-
-			@Override
-			public String invoke(IFeature t) {
-				return t.getName();
-			}
-		})));
+		final Stream<IFeature> features = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeatures().stream();
+		featureList.addAll(features.map(IFeature::getName).collect(Collectors.toList()));
 		curSearchString = "";
 		curIndex = 0;
 	}

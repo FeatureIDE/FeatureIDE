@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,8 +23,9 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -37,9 +38,9 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 public class ConfigNode extends Parent {
 
-	private final IFeatureModel innerModel;
+	protected final FeatureModelFormula innerModel;
 
-	public ConfigNode(String description, IFeatureModel innerModel) {
+	public ConfigNode(String description, FeatureModelFormula innerModel) {
 		super(description, "(double-click to calculate)");
 		this.innerModel = innerModel;
 	}
@@ -50,24 +51,26 @@ public class ConfigNode extends Parent {
 	 * @param timeout defines how long the SAT-Solver may take to accomplish the task.
 	 * @param priority for the job.
 	 */
-	public void calculate(final long timeout, final int priority) {
+	public void calculate(final int timeout, final int priority) {
 		final LongRunningMethod<Boolean> job = new TreeJob(this) {
 
 			private String calculateConfigs() {
-				final boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-				if (!ignoreAbstract && (innerModel.getAnalyser().countConcreteFeatures() == 0)) {
+				final boolean removeAbstract = !description.equals(DESC_CONFIGS);
+				if (removeAbstract && (innerModel.getAnalyzer().countConcreteFeatures() == 0)) {
 					// case: there is no concrete feature so there is only one program variant,
 					// without this the calculation least much to long
 					return "1";
 				}
 
-				final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout, !ignoreAbstract);
+				final ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer(innerModel, new Configuration(innerModel));
+				analyzer.setIncludeAbstractFeatures(!removeAbstract);
+				final long number = analyzer.number(timeout);
 
 				return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 			}
 
 			@Override
-			public Boolean execute(IMonitor workMonitor) throws Exception {
+			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
 				setValue(calculateConfigs());
 				return true;
 			}

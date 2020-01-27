@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,27 +25,24 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPE
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
-import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob.Arguments;
-import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
-import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
-import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Option which uses feature model slicing to calculate dependencies of a sub feature model.
  *
  * @author Ananieva Sofia
  */
-public class CalculateDependencyOperation extends AbstractFeatureModelOperation {
+// TODO Move to other package. (This is no operation anymore)
+public class CalculateDependencyOperation implements LongRunningMethod<IFeatureModel> {
+
+	public static final String LABEL = CALCULATE_DEPENDENCY;
 
 	/**
 	 * The selected root of the sub feature model.
@@ -57,8 +54,6 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 */
 	private final IFeatureModel completeFm;
 
-	private static final String LABEL = CALCULATE_DEPENDENCY;
-
 	/**
 	 * Constructor.
 	 *
@@ -66,7 +61,6 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * @param selectedFeature The selected feature which is root of the sub feature model
 	 */
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {
-		super(featureModel, LABEL);
 		subtreeRoot = selectedFeature;
 		completeFm = featureModel;
 	}
@@ -74,7 +68,7 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	/**
 	 * Collects all features of the sub feature model.
 	 *
-	 * @param featureModel the origin feature model to collect the features from
+	 * @param featureModelManager the origin feature model to collect the features from
 	 * @param root the root of the sub feature model
 	 * @return res A list of all features from the sub feature model
 	 */
@@ -97,37 +91,21 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * and implicit constraints.
 	 */
 	@Override
-	protected FeatureIDEEvent operation() {
+	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
 		final ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
 		boolean isCoreFeature = false;
 		// feature model slicing
-		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
-		final SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		final IFeatureModel slicedModel = slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
+		final IFeatureModel slicedModel = LongRunningWrapper.runMethod(new SliceFeatureModel(completeFm, subtreeFeatures, true));
 
 		// only replace root with selected feature if feature is core-feature
-		final List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();
+		final List<IFeature> coreFeatures = FeatureModelManager.getAnalyzer(completeFm).getCoreFeatures(null);
 		if (coreFeatures.contains(subtreeRoot)) {
 			isCoreFeature = true;
 		}
 		if (isCoreFeature) {
 			FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
 		}
-
-		// Instantiating a wizard page, removing the help button and opening a wizard dialog
-		final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, completeFm);
-		TrayDialog.setDialogHelpAvailable(false);
-		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		dialog.open();
-		completeFm.getAnalyser().clearExplanations();
-		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);
+		return slicedModel;
 	}
 
-	/**
-	 * Enables redo/undo operation.
-	 */
-	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
-	}
 }

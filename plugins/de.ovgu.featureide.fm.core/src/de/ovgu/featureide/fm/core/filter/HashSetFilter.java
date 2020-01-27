@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -22,18 +22,16 @@ package de.ovgu.featureide.fm.core.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
-
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import java.util.function.Predicate;
 
 /**
  * Filters all features that are contained in a given collection.
  *
  * @author Sebastian Krieter
  *
- * @see Filter
+ * 
  */
-public class HashSetFilter<T> extends HashSet<T> implements IFilter<T> {
+public class HashSetFilter<T> extends HashSet<T> implements Predicate<T> {
 
 	private static final long serialVersionUID = -2813705402751330237L;
 
@@ -54,7 +52,7 @@ public class HashSetFilter<T> extends HashSet<T> implements IFilter<T> {
 	}
 
 	@Override
-	public boolean isValid(T object) {
+	public boolean test(T object) {
 		return contains(object);
 	}
 

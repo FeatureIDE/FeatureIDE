@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -24,11 +24,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to move features. Provides redo/undo support.
@@ -36,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class MoveFeatureOperation extends AbstractFeatureModelOperation {
+public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final FeatureOperationData data;
 	private final Point newPos;
@@ -44,12 +46,11 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	private boolean or = false;
 	private boolean alternative = false;
 
-	public MoveFeatureOperation(FeatureOperationData data, Object editor, Point newPos, Point oldPos, IFeature feature) {
-		super(feature.getFeatureModel(), MOVE_FEATURE);
+	public MoveFeatureOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureOperationData data, Point newPos, Point oldPos) {
+		super(graphicalFeatureModel, MOVE_FEATURE);
 		this.data = data;
 		this.newPos = newPos;
 		this.oldPos = oldPos;
-		setEditor(editor);
 	}
 
 	public void newInnerOrder(Point newPos) {
@@ -57,7 +58,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
+	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IGraphicalFeature feature = data.getFeature();
 		final IGraphicalFeature oldParent = data.getOldParent();
 		if (!feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
@@ -91,7 +92,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 			if (newParent.isCollapsed()) {
 				newParent.setCollapsed(false);
-				feature.getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.COLLAPSED_CHANGED, null, null));
+				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 			}
 		}
 		// If there is only one child left, set the old parent group type to and
@@ -104,7 +105,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 		} else {
@@ -123,6 +124,11 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 			data.getOldParent().getObject().getStructure().changeToAlternative();
 		}
 		return new FeatureIDEEvent(data.getFeature(), EventType.STRUCTURE_CHANGED);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
 
 }

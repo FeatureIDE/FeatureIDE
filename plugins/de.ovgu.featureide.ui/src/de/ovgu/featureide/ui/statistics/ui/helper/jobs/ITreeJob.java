@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.statistics.ui.helper.jobs;
 
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**

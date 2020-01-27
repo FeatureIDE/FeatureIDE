@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -47,7 +48,8 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		final IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
+		final IGraphicalFeature root =
+			FeatureUIHelper.getGraphicalFeature(FeatureUtils.getRoot(featureModel.getFeatureModelManager().getSnapshot()), featureModel);
 		layout(root);
 
 		final Rectangle rootBounds = getBounds(root);

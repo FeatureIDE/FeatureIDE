@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -93,13 +93,19 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	protected final void refresh() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
-		if ((configurationManager != null) && (configurationEditor.getConfiguration() != null) && !configurationEditor.containsError()) {
-			final String source = configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-			if (!source.equals(document.get())) {
-				document.set(source);
-			}
+		if ((configurationManager != null) && !configurationEditor.isIOError()) {
+			configurationManager.processObject(config -> updateSource(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
 		}
+	}
+
+	private boolean updateSource(final ConfigurationManager configurationManager, Configuration configuration) {
+		final String source = configurationManager.getFormat().getInstance().write(configuration);
+		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+		if (!source.equals(document.get())) {
+			document.set(source);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -108,12 +114,25 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	public void updateConfiguration() {
-		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
-		final IPersistentFormat<Configuration> confFormat = configurationEditor.getConfigurationManager().getFormat();
-		if (!confFormat.getInstance().write(configurationEditor.getConfiguration()).equals(text)) {
-			confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null) {
+			final boolean changed =
+				configurationManager.processObject(config -> updateConfiguration(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
+			if (changed) {
+				configurationManager.resetSnapshot();
+			}
 		}
-		configurationEditor.loadPropagator();
+	}
+
+	private boolean updateConfiguration(final ConfigurationManager configurationManager, final Configuration configuration) {
+		final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
+		final String currentConfiguration = confFormat.getInstance().write(configuration);
+		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
+		if (!currentConfiguration.equals(text)) {
+			confFormat.getInstance().read(configuration, text);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -127,12 +146,6 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	@Override
-	protected void editorSaved() {
-		super.editorSaved();
-		checkSource();
-	}
-
-	@Override
 	public boolean allowPageChange(int newPageIndex) {
 		final ProblemList problems = checkSource();
 		return !(problems.containsError() || (isDirty() && problems.containsWarning()));
@@ -141,16 +154,17 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	protected ProblemList checkSource() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			final Configuration configuration = configurationEditor.getConfiguration();
 			final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
-
-			final ProblemList problems = confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
+			final ProblemList problems = configurationManager.processObject(config -> parseSource(config, confFormat), ConfigurationManager.CHANGE_ALL);
 			configurationEditor.createModelFileMarkers(problems);
-			configurationEditor.setContainsError(problems.containsError());
-
+			configurationEditor.setReadConfigurationError(problems.containsError());
 			return problems;
 		}
 		return null;
+	}
+
+	private ProblemList parseSource(final Configuration configuration, final IPersistentFormat<Configuration> confFormat) {
+		return confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
 	}
 
 }

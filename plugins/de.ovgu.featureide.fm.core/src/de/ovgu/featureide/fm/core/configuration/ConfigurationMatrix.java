@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,9 +25,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
 
@@ -42,16 +43,16 @@ public class ConfigurationMatrix {
 
 	private final List<Config> configurationMatrix;
 	private final ConfigurationLoader loader;
-	private final IFeatureModel featureModel;
+	private final FeatureModelFormula featureModel;
 	private final Path path;
 
 	private double[] rec = null;
 
-	public ConfigurationMatrix(IFeatureModel featureModel, String path) {
+	public ConfigurationMatrix(FeatureModelFormula featureModel, String path) {
 		this(featureModel, Paths.get(path));
 	}
 
-	public ConfigurationMatrix(IFeatureModel featureModel, Path path) {
+	public ConfigurationMatrix(FeatureModelFormula featureModel, Path path) {
 		this.featureModel = featureModel;
 		this.path = path;
 		configurationMatrix = new ArrayList<>();
@@ -87,7 +88,7 @@ public class ConfigurationMatrix {
 	}
 
 	private Config createConfig(Configuration configuration) {
-		final List<SelectableFeature> features = configuration.getFeatures();
+		final Collection<SelectableFeature> features = configuration.getFeatures();
 		final byte[] configArray = new byte[features.size()];
 		int i = 0;
 		for (final SelectableFeature feature : features) {

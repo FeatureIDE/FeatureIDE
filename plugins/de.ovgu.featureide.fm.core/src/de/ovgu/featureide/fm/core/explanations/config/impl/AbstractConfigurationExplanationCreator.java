@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
  * @param <S> subject
  * @param <E> explanation
  * @param <O> oracle
- * @author Timo G&uuml;nther
+ * @author Timo Günther
  */
 public abstract class AbstractConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>, O>
 		extends AbstractFeatureModelExplanationCreator<S, E, O> implements ConfigurationExplanationCreator<S, E> {
@@ -56,4 +56,5 @@ public abstract class AbstractConfigurationExplanationCreator<S, E extends Confi
 	protected void setFeatureModel() {
 		setFeatureModel(getConfiguration() == null ? null : getConfiguration().getFeatureModel());
 	}
+
 }

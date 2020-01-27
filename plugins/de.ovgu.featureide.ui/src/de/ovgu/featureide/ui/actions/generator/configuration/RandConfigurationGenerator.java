@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,12 +20,9 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
-import org.prop4j.analyses.PairWiseConfigurationGenerator;
-import org.prop4j.analyses.RandomConfigurationGenerator;
-import org.prop4j.solver.SatInstance;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
@@ -34,16 +31,19 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @see RandomConfigurationGenerator
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public class RandConfigurationGenerator extends ACNFConfigurationGenerator {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public RandConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
+		super(builder, formula);
 	}
 
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	protected RandomConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+		final RandomConfigurationGenerator gen = new RandomConfigurationGenerator(cnf, numberOfConfigurations);
+		gen.setAllowDuplicates(true);
+		return gen;
 	}
 
 }

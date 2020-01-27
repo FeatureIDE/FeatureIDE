@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Manages colors assigned to features.
@@ -146,7 +147,7 @@ public class FeatureColorManager implements IEventListener {
 	 *
 	 * @param featureModel the feature model
 	 * @param schmeName name of the scheme to check
-	 * @return
+	 * @return true if active
 	 */
 	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
 		final IProject project = getProject(featureModel);
@@ -155,7 +156,10 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	/**
-	 * Returns the current color scheme.
+	 * Returns the active color scheme for a feature model.
+	 *
+	 * @param feature feature of the feature model
+	 * @return the active color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeature feature) {
 		if (feature == null) {
@@ -165,7 +169,10 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	/**
-	 * Returns the current color scheme.
+	 * Returns the active color scheme for a feature model.
+	 *
+	 * @param featureModel feature model
+	 * @return the active color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
 		IProject project;
@@ -212,7 +219,7 @@ public class FeatureColorManager implements IEventListener {
 		final Map<String, ColorScheme> newEntry = new HashMap<>();
 		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
 		colorSchemes.put(project, newEntry);
-		featureModel.getRenamingsManager().addListener(INSTANCE);
+		FeatureModelManager.getInstance(featureModel).addListener(INSTANCE);
 
 		final IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
@@ -426,7 +433,7 @@ public class FeatureColorManager implements IEventListener {
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.FEATURE_NAME_CHANGED) {
-			renameFeature(((IFeature) event.getSource()).getFeatureModel(), (String) event.getOldValue(), (String) event.getNewValue());
+			renameFeature((IFeatureModel) event.getSource(), (String) event.getOldValue(), (String) event.getNewValue());
 		}
 	}
 
@@ -449,7 +456,7 @@ public class FeatureColorManager implements IEventListener {
 	public static void notifyColorChange(ArrayList<IFeature> features) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(features, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(features, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}
@@ -464,7 +471,7 @@ public class FeatureColorManager implements IEventListener {
 	public static void notifyColorChange(IFeature feature) {
 		for (final IEventListener listener : colorListener) {
 			try {
-				listener.propertyChange(new FeatureIDEEvent(feature, EventType.COLOR_CHANGED));
+				listener.propertyChange(new FeatureIDEEvent(feature, EventType.FEATURE_COLOR_CHANGED));
 			} catch (final Throwable e) {
 				Logger.logError(e);
 			}

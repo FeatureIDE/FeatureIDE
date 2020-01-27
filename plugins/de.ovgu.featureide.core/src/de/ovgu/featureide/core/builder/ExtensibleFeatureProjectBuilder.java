@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,10 +23,9 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_TOOL_FOUND_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_PROJECT_;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -38,10 +37,9 @@ import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * A general builder used to build every <code>FeatureProject</code>. Using an extension point the real composition algorithm is given, that builds the compiled
@@ -120,7 +118,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 
 		if (cleanBuild) {
-			final IFile configFile = featureProject.getCurrentConfiguration();
+			final Path configFile = featureProject.getCurrentConfiguration();
 			if (configFile == null) {
 				return;
 			}
@@ -155,10 +153,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 
 		cleaned = false;
-		final IFile configFile = featureProject.getCurrentConfiguration();
+		final Path configFile = featureProject.getCurrentConfiguration();
+		final Configuration configuration = featureProject.loadConfiguration(configFile);
 		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
 
-		if (configFile == null) {
+		if (configuration == null) {
 			return null;
 		}
 
@@ -173,7 +172,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 
-		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final FeatureModelFormula persistentFormula = featureProject.getFeatureModelManager().getPersistentFormula();
+		final IFeatureModel featureModel = persistentFormula.getFeatureModel();
 		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null)) {
 			return null;
 		}
@@ -187,9 +187,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		final Configuration c = new Configuration(featureModel);
-		SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
-		composerExtension.copyNotComposedFiles(c, null);
+		composerExtension.copyNotComposedFiles(configuration, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		} catch (final CoreException e) {

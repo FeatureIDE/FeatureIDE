@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -34,9 +34,9 @@ public class FormatConversionWizard<T> extends AbstractWizard implements INewWiz
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizzard.FeatureModelConversionWizzard";
 
-	protected final FormatManager<? extends IPersistentFormat<T>> formatManager;
+	protected final FormatManager<T> formatManager;
 
-	public FormatConversionWizard(FormatManager<? extends IPersistentFormat<T>> formatManager) {
+	public FormatConversionWizard(FormatManager<T> formatManager) {
 		super("Convert Feature Models");
 		this.formatManager = formatManager;
 	}

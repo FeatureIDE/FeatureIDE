@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -28,8 +28,9 @@ import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 
-import org.prop4j.Node;
-
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  *
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class SelectableFeature extends TreeElement {
+public class SelectableFeature extends TreeElement implements Cloneable {
 
 	private Selection manual = Selection.UNDEFINED;
 
@@ -45,15 +46,28 @@ public class SelectableFeature extends TreeElement {
 
 	private Selection recommended = Selection.UNDEFINED;
 
-	private final IFeature feature;
+	private IFeature feature;
 
 	private int recommendationValue = -1;
-	private Map<Integer, Node> openClauses = null;
+	private Map<Integer, LiteralSet> openClauses = null;
+	private IVariables variables = null;
 
 	private String name;
 
+	public SelectableFeature(String name) {
+		this.name = name;
+	}
+
 	public SelectableFeature(IFeature feature) {
 		this.feature = feature;
+	}
+
+	public SelectableFeature(SelectableFeature oldSelectableFeature) {
+		feature = oldSelectableFeature.feature;
+		name = oldSelectableFeature.name;
+		manual = oldSelectableFeature.manual;
+		automatic = oldSelectableFeature.automatic;
+		recommended = oldSelectableFeature.recommended;
 	}
 
 	public Selection getSelection() {
@@ -80,7 +94,7 @@ public class SelectableFeature extends TreeElement {
 		if ((automatic == Selection.UNDEFINED) || (manual == Selection.UNDEFINED) || (manual == automatic)) {
 			this.automatic = automatic;
 		} else {
-			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
+			throw new AutomaticalSelectionNotPossibleException(getName(), automatic);
 		}
 	}
 
@@ -89,6 +103,10 @@ public class SelectableFeature extends TreeElement {
 			return name;
 		}
 		return feature == null ? "" : feature.getName();
+	}
+
+	public void setFeature(IFeature feature) {
+		this.feature = feature;
 	}
 
 	public IFeature getFeature() {
@@ -121,14 +139,14 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	@Nonnull
-	public Collection<Node> getOpenClauses() {
+	public Collection<LiteralSet> getOpenClauses() {
 		if (openClauses == null) {
 			return Collections.emptyList();
 		}
 		return openClauses.values();
 	}
 
-	public void addOpenClause(int index, Node openClause) {
+	public void addOpenClause(int index, LiteralSet openClause) {
 		if (openClauses == null) {
 			openClauses = new TreeMap<>();
 		}
@@ -141,10 +159,33 @@ public class SelectableFeature extends TreeElement {
 
 	@Nonnull
 	public Set<Integer> getOpenClauseIndexes() {
-		if (openClauses != null) {
-			return openClauses.keySet();
+		if (openClauses == null) {
+			return Collections.emptySet();
 		}
-		return Collections.emptySet();
+		return openClauses.keySet();
 	}
+
+	public IVariables getVariables() {
+		return variables;
+	}
+
+	public void setVariables(IVariables variables) {
+		this.variables = variables;
+	}
+
+	@Override
+	public SelectableFeature clone() {
+		if (!this.getClass().equals(SelectableFeature.class)) {
+			try {
+				return (SelectableFeature) super.clone();
+			} catch (final CloneNotSupportedException e) {
+				Logger.logError(e);
+				throw new RuntimeException("Cloning is not supported for " + this.getClass());
+			}
+		}
+		return new SelectableFeature(this);
+	}
+
+	public void cloneProperties(SelectableFeature feat) {}
 
 }

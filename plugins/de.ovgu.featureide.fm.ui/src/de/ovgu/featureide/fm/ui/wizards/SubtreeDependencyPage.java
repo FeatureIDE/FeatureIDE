@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -25,16 +25,20 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -59,6 +63,8 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 */
 	private final IFeatureModel completeFm;
 
+	private final FeatureModelAnalyzer subTreeAnalyzer;
+
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation. Used as tool tip for redundant constraint.
 	 */
@@ -77,6 +83,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 			+ "they are presented below the feature model in a red border.");
 		subtreeModel = fm;
 		completeFm = completeModel;
+		subTreeAnalyzer = FeatureModelManager.getAnalyzer(subtreeModel);
 	}
 
 	/**
@@ -97,7 +104,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		gridLayout.marginWidth = 0;
 		parent.setLayout(gridLayout);
 
-		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(subtreeModel);
+		final VirtualFeatureModelManager featureModelManager = new VirtualFeatureModelManager(subtreeModel);
+		featureModelManager.setUndoContext(new UndoContext());
+		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModelManager);
 		graphicalFeatureModel.init();
 		final FeatureDiagramViewer viewer = new FeatureDiagramViewer(graphicalFeatureModel);
 
@@ -115,17 +124,10 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().addControlListener(viewer.createControlListener());
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
-		final FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
-		final FeatureModelAnalyzer completeAnalyzer = completeFm.getAnalyser();
-		analyzer.calculateFeatures = completeAnalyzer.calculateFeatures;
-		analyzer.calculateConstraints = completeAnalyzer.calculateConstraints;
-		analyzer.calculateRedundantConstraints = completeAnalyzer.calculateRedundantConstraints;
-		analyzer.calculateTautologyConstraints = completeAnalyzer.calculateTautologyConstraints;
-		analyzer.calculateDeadConstraints = completeAnalyzer.calculateDeadConstraints;
-		analyzer.calculateFOConstraints = completeAnalyzer.calculateFOConstraints;
-		analyzer.analyzeFeatureModel(null); // analyze the subtree model
+		subTreeAnalyzer.getAnalysesCollection().inheritSettings(FeatureModelManager.getAnalyzer(completeFm).getAnalysesCollection());
+		subTreeAnalyzer.analyzeFeatureModel(null);
 
-		explainImplicitConstraints(analyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
+		explainImplicitConstraints(subTreeAnalyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
 		viewer.internRefresh(true);
 		graphicalFeatureModel.redrawDiagram();
 
@@ -142,8 +144,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
 		// iterate implicit constraints and generate explanations
 		for (final IConstraint redundantC : getImplicitConstraints()) {
-			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
-			subtreeModel.getAnalyser().getRedundantConstraintExplanation(completeFm, redundantC);
+			final ConstraintProperties constraintProperties = subTreeAnalyzer.getConstraintProperties(redundantC);
+			constraintProperties.setStatus(ConstraintStatus.IMPLICIT);
+			subTreeAnalyzer.getExplanation(redundantC, FeatureModelManager.getInstance(completeFm).getPersistentFormula());
 
 			// remember if an implicit constraint exists to adapt legend
 			for (final IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {

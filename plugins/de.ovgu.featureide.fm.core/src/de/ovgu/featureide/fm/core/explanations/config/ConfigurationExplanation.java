@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
  * An explanation for a circumstance involving a {@link Configuration configuration}.
  *
  * @param <S> subject
- * @author Timo G&uuml;nther
+ * @author Timo Günther
  */
 public abstract class ConfigurationExplanation<S> extends FeatureModelExplanation<S> {
 
@@ -53,4 +53,5 @@ public abstract class ConfigurationExplanation<S> extends FeatureModelExplanatio
 	public Configuration getConfiguration() {
 		return config;
 	}
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -26,12 +26,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import java.util.function.Predicate;
 
 /**
  * Abstract merger for modul-comment.
@@ -45,7 +42,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int RULE_MERGE = 0, RULE_OVERRIDE = 1, RULE_DISCARD = 2;
 
-	private final List<IFilter<?>> filterList = new LinkedList<>();
+	private Predicate<BlockTag> filter = null;
 
 	protected int[] featureIDRanks = null;
 
@@ -63,8 +60,8 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	}
 
 	public String merge(List<BlockTag> generalTags, List<BlockTag> featureTags) {
-//		Filter.filter(generalTags, filterList);
-		Filter.filter(featureTags, filterList);
+		// Filter.filter(generalTags, filterList);
+		featureTags.removeIf(filter.negate());
 
 		sortFeatureList(featureTags);
 
@@ -103,7 +100,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 						itf.previous();
 					} else if (comp == 0) {
 						sb.append(g);
-						sb.append("</br>");
+						sb.append("<br>");
 						sb.append(f.getDesc());
 					} else {
 						sb.append(f);
@@ -150,7 +147,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 						switch (getRuleForCommentPart(newTag)) {
 						case RULE_MERGE:
 							if (!oldTag.getDesc().isEmpty()) {
-								oldTag.setDesc(oldTag.getDesc() + ("</br>" + newTag.getDesc()));
+								oldTag.setDesc(oldTag.getDesc() + ("<br>" + newTag.getDesc()));
 							} else {
 								oldTag.setDesc(newTag.getDesc());
 							}
@@ -208,8 +205,8 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		return featureIDRanks[tag1.getFeatureID()] - featureIDRanks[tag2.getFeatureID()];
 	}
 
-	public void addFilter(IFilter<?> filter) {
-		filterList.add(filter);
+	public void addFilter(Predicate<BlockTag> filter) {
+		this.filter = this.filter == null ? filter : this.filter.and(filter);
 	}
 
 }

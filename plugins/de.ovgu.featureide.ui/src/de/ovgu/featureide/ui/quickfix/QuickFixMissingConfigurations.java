@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -23,7 +23,6 @@ package de.ovgu.featureide.ui.quickfix;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_MISSING_CONFIGURATIONS_;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -37,10 +36,11 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
@@ -54,10 +54,10 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	private static final AbstractCorePlugin LOGGER = FMCorePlugin.getDefault();
 
 	protected final IFeatureProject project;
-	protected IFeatureModel featureModel;
+	protected FeatureModelFormula featureModel;
 	private int configurationNr = 0;
 
-	protected final IPersistentFormat<Configuration> configFormat = ConfigurationManager.getDefaultFormat();
+	protected final IPersistentFormat<Configuration> configFormat = ConfigFormatManager.getDefaultFormat();
 
 	@Override
 	public String getLabel() {
@@ -70,7 +70,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 			if (project == null) {
 				featureModel = null;
 			} else {
-				featureModel = project.getFeatureModel();
+				featureModel = project.getFeatureModelManager().getPersistentFormula();
 			}
 		} else {
 			featureModel = null;
@@ -78,7 +78,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 		}
 	}
 
-	public QuickFixMissingConfigurations(IFeatureModel model) {
+	public QuickFixMissingConfigurations(FeatureModelFormula model) {
 		featureModel = model;
 		project = null;
 	}
@@ -98,7 +98,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 			configurationNr = 0;
 			for (final Configuration c : confs) {
 				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-				writer.write(Paths.get(configurationFile.getLocationURI()), c);
+				writer.write(EclipseFileSystem.getPath(configurationFile), c);
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (final CoreException e) {

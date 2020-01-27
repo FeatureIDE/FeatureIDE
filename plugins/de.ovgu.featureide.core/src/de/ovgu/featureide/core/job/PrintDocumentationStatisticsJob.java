@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATUREMODUL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.KONTEXT;
@@ -31,7 +30,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -40,49 +38,42 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * @author Sebastian Krieter
  */
-public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentationStatisticsJob.Arguments, Boolean> {
+public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolean> {
 
-	public static class Arguments extends JobArguments {
+	private final String foldername;
+	private final IProject project;
 
-		private final String foldername;
-		private final IProject project;
-
-		public Arguments(String foldername, IProject project) {
-			super(Arguments.class);
-			this.foldername = foldername;
-			this.project = project;
-		}
-	}
-
-	protected PrintDocumentationStatisticsJob(Arguments arguments) {
-		super(BUILD_DOCUMENTATION_STATISTICS, arguments);
+	protected PrintDocumentationStatisticsJob(String foldername, IProject project) {
+		this.foldername = foldername;
+		this.project = project;
+		// super(BUILD_DOCUMENTATION_STATISTICS, arguments);
 	}
 
 	@Override
-	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
+	public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(project.getName() + " is no FeatureIDE Project!");
 			return false;
 		}
 
-		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
+		final IFolder folder = FMCorePlugin.createFolder(project, foldername);
 		try {
 			folder.delete(true, null);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
-		CorePlugin.createFolder(arguments.project, arguments.foldername);
+		FMCorePlugin.createFolder(project, foldername);
 
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
@@ -102,60 +93,60 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		final int[] statisticDataTags = new int[5];
 
 		// ----------------------------------- SPL ---------------------------------------------
-//		AJavaDocCommentMerger.reset();
-//		pseudoMerge(interfaceProject.getProjectSignatures().createIterator(),
-//			new SPLMerger(interfaceProject, featureIDs));
-//		statisticDataChars[0] = AJavaDocCommentMerger.STAT_BEFORE_CHARS;
-//		statisticDataChars[2] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
-//		statisticDataTags[0] = AJavaDocCommentMerger.STAT_BEFORE_TAGS;
-//		statisticDataTags[2] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
+		// AJavaDocCommentMerger.reset();
+		// pseudoMerge(interfaceProject.getProjectSignatures().createIterator(),
+		// new SPLMerger(interfaceProject, featureIDs));
+		// statisticDataChars[0] = AJavaDocCommentMerger.STAT_BEFORE_CHARS;
+		// statisticDataChars[2] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
+		// statisticDataTags[0] = AJavaDocCommentMerger.STAT_BEFORE_TAGS;
+		// statisticDataTags[2] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
 
-//		int[] statisticNumComments = new int[]{
-//			AJavaDocCommentMerger.STAT_NUM_FEATURE0,
-//			AJavaDocCommentMerger.STAT_NUM_FEATURE1,
-//			AJavaDocCommentMerger.STAT_NUM_NEW,
-//			AJavaDocCommentMerger.STAT_NUM_FEATURE0 + AJavaDocCommentMerger.STAT_NUM_FEATURE1,
-//			AJavaDocCommentMerger.STAT_NUM_GENERAL0,
-//			AJavaDocCommentMerger.STAT_NUM_GENERAL1,
-//			AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
-//			AJavaDocCommentMerger.STAT_NUM_FEATURE0 + AJavaDocCommentMerger.STAT_NUM_FEATURE1 +
-//			AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
-//		};
+		// int[] statisticNumComments = new int[]{
+		// AJavaDocCommentMerger.STAT_NUM_FEATURE0,
+		// AJavaDocCommentMerger.STAT_NUM_FEATURE1,
+		// AJavaDocCommentMerger.STAT_NUM_NEW,
+		// AJavaDocCommentMerger.STAT_NUM_FEATURE0 + AJavaDocCommentMerger.STAT_NUM_FEATURE1,
+		// AJavaDocCommentMerger.STAT_NUM_GENERAL0,
+		// AJavaDocCommentMerger.STAT_NUM_GENERAL1,
+		// AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
+		// AJavaDocCommentMerger.STAT_NUM_FEATURE0 + AJavaDocCommentMerger.STAT_NUM_FEATURE1 +
+		// AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
+		// };
 		workMonitor.worked();
 
 		// ------------------------------- Featuremodule ------------------------------------------
 
-//		AJavaDocCommentMerger.reset();
-//		for (int j = 0; j < featureIDs.length; j++) {
-//			int[] shortFeatureIDs = new int[j + 1];
-//			System.arraycopy(featureIDs, 0, shortFeatureIDs, 0, j + 1);
-//
-//			SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
-//			it.addFilter(new FeatureFilter(new int[]{j}));
-//			pseudoMerge(it, new FeatureModuleMerger(interfaceProject, shortFeatureIDs, j));
-//			workMonitor.worked();
-//		}
-//		statisticDataChars[4] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
-//		statisticDataTags[4] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
+		// AJavaDocCommentMerger.reset();
+		// for (int j = 0; j < featureIDs.length; j++) {
+		// int[] shortFeatureIDs = new int[j + 1];
+		// System.arraycopy(featureIDs, 0, shortFeatureIDs, 0, j + 1);
+		//
+		// SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
+		// it.addFilter(new FeatureFilter(new int[]{j}));
+		// pseudoMerge(it, new FeatureModuleMerger(interfaceProject, shortFeatureIDs, j));
+		// workMonitor.worked();
+		// }
+		// statisticDataChars[4] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
+		// statisticDataTags[4] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
 
 		// --------------------------------- Context ---------------------------------------------
-//		AJavaDocCommentMerger.reset();
-//		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
-//		it.addFilter(new ContextFilter(new Node[]{}, interfaceProject));
-//		pseudoMerge(it, new ContextMerger(interfaceProject, featureIDs));
-//		statisticDataChars[3] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
-//		statisticDataTags[3] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
-//		for (int j = 0; j < featureIDs.length; j++) {
-//			it = interfaceProject.getProjectSignatures().createIterator();
-//			it.addFilter(new ContextFilter(interfaceProject.getFeatureName(j), interfaceProject));
-//			pseudoMerge(it, new ContextMerger(interfaceProject, featureIDs));
-//
-//			AJavaDocCommentMerger.STAT_AFTER_CHARS -= statisticDataChars[3];
-//			AJavaDocCommentMerger.STAT_AFTER_TAGS -= statisticDataTags[3];
-//			workMonitor.worked();
-//		}
-//		statisticDataChars[3] += AJavaDocCommentMerger.STAT_AFTER_CHARS;
-//		statisticDataTags[3] += AJavaDocCommentMerger.STAT_AFTER_TAGS;
+		// AJavaDocCommentMerger.reset();
+		// SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
+		// it.addFilter(new ContextFilter(new Node[]{}, interfaceProject));
+		// pseudoMerge(it, new ContextMerger(interfaceProject, featureIDs));
+		// statisticDataChars[3] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
+		// statisticDataTags[3] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
+		// for (int j = 0; j < featureIDs.length; j++) {
+		// it = interfaceProject.getProjectSignatures().createIterator();
+		// it.addFilter(new ContextFilter(interfaceProject.getFeatureName(j), interfaceProject));
+		// pseudoMerge(it, new ContextMerger(interfaceProject, featureIDs));
+		//
+		// AJavaDocCommentMerger.STAT_AFTER_CHARS -= statisticDataChars[3];
+		// AJavaDocCommentMerger.STAT_AFTER_TAGS -= statisticDataTags[3];
+		// workMonitor.worked();
+		// }
+		// statisticDataChars[3] += AJavaDocCommentMerger.STAT_AFTER_CHARS;
+		// statisticDataTags[3] += AJavaDocCommentMerger.STAT_AFTER_TAGS;
 
 		// -------------------------------- Variante ---------------------------------------------
 
@@ -185,7 +176,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		sb.append(sum2);
 		sb.append('\n');
 		try {
-			FileSystem.write(Paths.get(folder.getFile("statistics.csv").getLocationURI()), sb.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("statistics.csv")), sb.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -218,7 +209,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		sb2.append("\\% \\\\\n");
 
 		try {
-			FileSystem.write(Paths.get(folder.getFile("latexTab.txt").getLocationURI()), sb2.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("latexTab.txt")), sb2.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -231,7 +222,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //		}
 		sb3.setCharAt(sb3.length() - 1, '\n');
 		try {
-			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
+			FileSystem.write(EclipseFileSystem.getPath(folder.getFile("numComments.txt")), sb3.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}

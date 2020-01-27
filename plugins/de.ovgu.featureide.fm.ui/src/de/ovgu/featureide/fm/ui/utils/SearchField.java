@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -171,7 +172,7 @@ public class SearchField<T> {
 		featureDiagramEditor.getViewer().getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 		featureDiagramEditor.getViewer().reload();
 		featureDiagramEditor.refreshGraphics(null);
-		featureDiagramEditor.getViewer().refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+		featureDiagramEditor.getViewer().refreshChildAll(FeatureUtils.getRoot(graphicalFeatureModel.getFeatureModelManager().getObject()));
 		featureDiagramEditor.analyzeFeatureModel();
 	}
 
