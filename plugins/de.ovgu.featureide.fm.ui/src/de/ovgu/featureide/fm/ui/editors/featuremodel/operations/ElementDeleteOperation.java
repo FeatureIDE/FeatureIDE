@@ -26,7 +26,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IT_CAN_NOT_BE_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,7 +127,25 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		final List<IFeature> alreadyDeleted = new LinkedList<>();
 		List<IFeature> commonAncestorList = null;
 
-		for (final Object element : getSelection().toArray()) {
+		// workaround for issue #957
+		final Object[] elements = getSelection().toArray();
+		final List<IConstraint> constraints = featureModel.getConstraints();
+
+		Arrays.sort(elements, new Comparator<Object>() {
+
+			@Override
+			public int compare(Object o1, Object o2) {
+				if ((o1 instanceof IConstraint) && (o2 instanceof IConstraint)) {
+					return constraints.indexOf(o2) - constraints.indexOf(o1);
+				}
+
+				return 0;
+			}
+
+		});
+		// End of workaround
+
+		for (final Object element : elements) {
 			if (removeConstraint(element)) {
 				continue;
 			}
@@ -169,6 +189,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			return true;
 		} else if (element instanceof IConstraint) {
 			final IConstraint constraint = ((IConstraint) element);
+
 			operations.add(new DeleteConstraintOperation(constraint, featureModelManager));
 			return true;
 		}
