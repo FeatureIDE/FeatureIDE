@@ -3,6 +3,7 @@
 .settings/de.ovgu.featureide.core.prefs
 configs/Base.xml
 configs/ConsBase.xml
+configs/full.xml
 configs/SnocBase.xml
 configs/SnocConsBase.xml
 configs/SortedBase.xml
@@ -14,7 +15,6 @@ configs/StackBase.xml
 configs/StackConsBase.xml
 configs/StackSnocBase.xml
 configs/StackSnocConsBase.xml
-configs/full.xml
 configs/voidSortedSnocBase.xml
 configs/voidSortedSnocConsBase.xml
 configs/voidSortedStackSnocBase.xml

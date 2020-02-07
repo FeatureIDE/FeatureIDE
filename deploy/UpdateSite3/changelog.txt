@@ -7,6 +7,22 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.6.2 (January 2020)
+* Hotfix containing only stability improvements over v3.6.1
+* Analysis of feature models only performed if automatic analysis is enabled in the menu (#942, #944)
+* Migrated FeatureIDE library examples to the API of v3.6.x (#918)
+* Stability of feature model editor improved (#896, #929, #924, #937, #948, #945, #927, #925, #940)
+* Automated collapsing of feature models depending on the viewer size is fixed (#938)
+* Deletion of multiple features or constraints simultaneously is fixed (#935, #957)
+* Fixed problem with missing default configuration when loading FeatureIDE examples (#911)
+* Compatibility problems with Eclipse 2019-09 or newer fixed (#908)
+* Usability of creation wizard for configurations improved (#926)
+* Export of feature dependency information fixed (#931)
+* Computation of implicit constraints for submodels fixed (#920)
+* Sampling algorithms now support also feature names with special chars (#880)
+* Usage of random seeds for certain analyses (#915)
+* JavaDoc problems fixed and now checked in CI (#952)
+
 Release 3.6.1 (October 2019)
 * Hotfix containing only stability improvements over v3.6.0
 * Configuration editor required minutes after every click (#907)
@@ -69,6 +85,7 @@ Release 3.6.1 (October 2019)
   * Configuration editor requires minutes after every click (#907)
   * Wrong explanations for feature-model defects (#905, #906)
   * No default configuration selected when loading FeatureIDE example (#911)
+  * Export of feature dependency information does not work anymore (#931)
 
 Release 3.5.5 (June 2019)
 * Hotfix containing only stability improvements over v3.5.4
