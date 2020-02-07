@@ -8,7 +8,7 @@
 `cd FeatureIDE`  
 `git checkout release3.6`  
 
-- For experimental functions, you might want to checkout a different branch
+- For experimental functions, you might want to checkout *develop* or a different branch
 
 ### Build
 - Go to the folder `library` of the fm.core plug-in  
@@ -71,8 +71,8 @@
     - Following lines: Configuration ID, feature selections (0 deselected, 1 selected)
 
 ### Supported Input Formats
-* FeatureIDE XML
-* SXFM
-* Dimacs
-* GUIDSL
-* Velvet
+- FeatureIDE XML
+- SXFM
+- Dimacs
+- GUIDSL
+- Velvet
