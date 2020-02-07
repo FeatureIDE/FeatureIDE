@@ -20,19 +20,21 @@
  */
 package de.ovgu.featureide.fm.core.cli;
 
-import java.util.List;
-
-import de.ovgu.featureide.fm.core.IExtension;
-
 /**
- * A function of FeatureIDE that can be accessed via the {@link FeatureIDECLI CLI}.
+ * Command line interface for several functions of FeatureIDE.
  *
  * @author Sebastian Krieter
  */
-public interface ICLIFunction extends IExtension {
+public abstract class ACLIFunction implements ICLIFunction {
 
-	String getName();
+	@Override
+	public String getName() {
+		return getId();
+	}
 
-	void run(List<String> args);
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
 
 }
