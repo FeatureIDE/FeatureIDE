@@ -23,7 +23,7 @@
     - For a clean build (deleting old build folder before compiling) execute `fm.core.lib-Clean_Build.launch`.
 
 - Ant creates two folders
-  - `build` contains all generated class files
+  - `bin` contains all generated class files
   - `jar` contains the executable jar file and a folder `lib` containing all required libraries
 	
  - Please pay attention to the console output.
@@ -60,13 +60,15 @@
   - Supported algorithms:
     - YASA
     - IncLing
-    - CASA (experimental, windows only)
     - Chvatal
     - ICPL
+	- Random
+	- All
 
   - Output format
-    - First line: Feature names
-    - Following lines: comma-separated feature selections (0 deselected, 1 selected)
+  	- semicolon-separated values
+    - First line (header): "Configuration", Feature names
+    - Following lines: Configuration ID, feature selections (0 deselected, 1 selected)
 
 ### Supported Input Formats
 * FeatureIDE XML
