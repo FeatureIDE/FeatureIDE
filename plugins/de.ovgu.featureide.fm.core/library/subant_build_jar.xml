@@ -3,7 +3,7 @@
 
 	<!-- Set JAR name -->
 	<property name="build.jar.version" value="3.6.2" />
-	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm-v${build.jar.version}" />
+	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm-v${build.jar.version}.jar" />
 
 	<!-- Constants -->
 	<property name="base.dir" value=".." />
@@ -83,7 +83,6 @@
 		<!-- Get current timestamp -->
 		<tstamp>
 			<format property="timeStamp" pattern="yyyy/MM/dd HH-mm-ss" />
-			<format property="file.timeStamp" pattern="yyyyMMdd-HH-mm-ss" />
 		</tstamp>
 
 		<!-- Create version file -->
@@ -93,7 +92,7 @@
 
 	<!-- Build jar file, including source files and license file -->
 	<target name="build" description="Compile and Build JAR" depends="compile">
-		<jar destfile="${build.jar.path}.jar" basedir="${build.bin.dir}" excludes="**/*.SHA-256" compress="true">
+		<jar destfile="${build.jar.path}" basedir="${build.bin.dir}" excludes="**/*.SHA-256" compress="true">
 			<fileset dir="${src.dir}" includes="**/*.java" excludesfile="${build.excludes.path}" />
 			<fileset file="${license.path}" />
 			<manifest>
