@@ -497,7 +497,7 @@ public class StringTable {
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
 	public static final String FEATURE_MODEL_IS_VOID = " Feature model is void ";
 	public static final String ROOT = " Root ";
-	public static final String VOID_FEATURE_MODEL = "Void feature model";
+	public static final String VOID_FEATURE_MODEL = "Void Feature Model";
 	public static final String SAVE_IMAGE = "Save image";
 	public static final String UNKNOWN_IMAGE_FILE_FORMAT = "Unknown image file format ";
 	public static final String MANUAL_LAYOUT = "Manual Layout";

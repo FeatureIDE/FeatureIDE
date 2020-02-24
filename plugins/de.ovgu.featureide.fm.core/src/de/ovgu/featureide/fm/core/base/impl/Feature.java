@@ -151,15 +151,15 @@ public class Feature extends AFeature {
 				toolTip.setLength(0);
 				toolTip.trimToSize();
 				toolTip.append(FEATURE_MODEL_IS_VOID);
-			}
-
-			final FeatureProperties featureProperties = collection.getFeatureProperty(this);
-			if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
-				toolTip.append(IS_DEAD);
-			} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-				toolTip.append(IS_FALSE_OPTIONAL);
-			} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
-				toolTip.append(IS_HIDDEN_AND_INDETERMINATE);
+			} else {
+				final FeatureProperties featureProperties = collection.getFeatureProperty(this);
+				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+					toolTip.append(IS_DEAD);
+				} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+					toolTip.append(IS_FALSE_OPTIONAL);
+				} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+					toolTip.append(IS_HIDDEN_AND_INDETERMINATE);
+				}
 			}
 		}
 
