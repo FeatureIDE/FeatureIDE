@@ -1221,26 +1221,6 @@
 				</visibleWhen>
 			</command>
 		</menuContribution>
-		<menuContribution
-				allPopups="false"
-				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
-			<menu
-					icon="icons/FeatureIconSmall.ico"
-					id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualizations"
-					label="Visualization">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
-					</reference>
-				</visibleWhen>
-				<command
-						commandId="de.ovgu.featureide.ui.visualization.command.featurerelations"
-						label="Feature Relations Graph"
-						style="push">
-				</command>
-			</menu>
-		</menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -1298,11 +1278,6 @@
 				defaultHandler="de.ovgu.featureide.ui.handlers.ColorSchemeHandler"
 				id="de.ovgu.featureide.fm.ui.colorscheme"
 				name="Colorscheme">
-		</command>
-		<command
-				defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
-				id="de.ovgu.featureide.ui.visualization.command.featurerelations"
-				name="Feature Relations Graph">
 		</command>
 	</extension>
 	<extension

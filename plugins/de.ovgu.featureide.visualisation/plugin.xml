@@ -27,7 +27,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
+            defaultHandler="de.ovgu.featureide.visualisation.ShowFeatureRelationsGraphCommandHandler"
             id="de.ovgu.featureide.visualisation.command.featurerelations"
             name="Feature Relations Graph">
       </command>
