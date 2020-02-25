@@ -210,7 +210,12 @@ public class NodeReader {
 
 				final Node node1, node2;
 				if (i == 4) {
-					node1 = null;
+					if (!leftSide.isEmpty()) {
+						errorType.setError(ErrorEnum.InvalidExpressionLeft);
+						node1 = handleInvalidExpression("Missing operator", constraint);
+					} else {
+						node1 = null;
+					}
 					if (rightSide.isEmpty()) {
 						errorType.setError(ErrorEnum.Default);
 						node2 = handleInvalidExpression("Missing feature name or expression", constraint);
