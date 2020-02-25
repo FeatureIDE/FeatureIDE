@@ -45,11 +45,11 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
 
 /**
- * Command line interface for several functions of FeatureIDE.
+ * Command line interface for sampling algorithms.
  *
  * @author Sebastian Krieter
  */
-public class ConfigurationGenerator implements ICLIFunction {
+public class ConfigurationGenerator extends ACLIFunction {
 
 	private String algorithm;
 	private Path outputFile;
@@ -60,13 +60,24 @@ public class ConfigurationGenerator implements ICLIFunction {
 	private int limit;
 
 	@Override
-	public String getName() {
+	public String getId() {
 		return "genconfig";
 	}
 
 	@Override
 	public void run(List<String> args) {
 		parseArguments(args);
+
+		if (fmFile == null) {
+			throw new IllegalArgumentException("No feature model specified!");
+		}
+		if (outputFile == null) {
+			throw new IllegalArgumentException("No output file specified!");
+		}
+		if (algorithm == null) {
+			throw new IllegalArgumentException("No algorithm specified!");
+		}
+
 		final CNF cnf = new CNF();
 		ProblemList lastProblems = FileHandler.load(fmFile, cnf, new DIMACSFormatCNF());
 		if (lastProblems.containsError()) {
@@ -85,9 +96,6 @@ public class ConfigurationGenerator implements ICLIFunction {
 		}
 
 		IConfigurationGenerator generator = null;
-		if (algorithm == null) {
-			throw new IllegalArgumentException("No algorithm specified!");
-		}
 		switch (algorithm.toLowerCase()) {
 		case "icpl": {
 			generator = new SPLCAToolConfigurationGenerator(cnf, "ICPL", t, limit);
