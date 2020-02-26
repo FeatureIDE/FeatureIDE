@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -45,27 +44,26 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (faView.selectedAutomaticFeatures == null || faView.selectedManualFeatures == null) {
+		if (faView.getSelectedFeatures() == null || faView.getSelectedFeaturesOfInterest() == null) {
 			if (faView.getFeatureModel() != null) {
-				return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
+				return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 			} else {
 				return true;
 			}
 		} else {
-			if (faView.selectedAutomaticFeatures.size() == 0 || faView.selectedManualFeatures.size() == 0) {
+			if (faView.getSelectedFeatures().size() == 0 || faView.getSelectedFeaturesOfInterest().size() == 0) {
 				if (faView.getFeatureModel() != null) {
-					return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
+					return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 				} else {
 					return true;
 				}
 			} else {
 				if (viewer instanceof TreeViewer) {
-					if (element instanceof IFeature && faView.selectedAutomaticFeatures.contains(element)) {
+					if (element instanceof IFeature && faView.getSelectedFeatures().contains(element)) {
 						return true;
-					} else if (element instanceof IFeatureAttribute && faView.selectedManualFeatures.contains(parentElement)) {
+					} else if (element instanceof IFeatureAttribute && faView.getSelectedFeaturesOfInterest().contains(parentElement)) {
 						return true;
 					} else {
-						FMAttributesPlugin.getDefault().logInfo("Element: " + element);
 						return false;
 					}
 				}
