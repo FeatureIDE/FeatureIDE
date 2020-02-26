@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 /**
- * Utils for visualizations
+ * Utils for visualisations
  * 
  * @author Jabier Martinez
  */
