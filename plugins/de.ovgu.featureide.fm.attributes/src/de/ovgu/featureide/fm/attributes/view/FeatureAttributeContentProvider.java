@@ -21,9 +21,9 @@
 package de.ovgu.featureide.fm.attributes.view;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
@@ -32,7 +32,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
@@ -44,19 +43,12 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
-	public static final Object[] EMPTY_ROOT_FM = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
-	public static final Object[] EMPTY_ROOT_CONF = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
-	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
-	public static final Object[] FALSE_CONFIG_FORMAT = new Object[] { StringTable.CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG };
-	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
-
 	private ExtendedFeatureModel featureModel;
 	private Configuration config;
-	private Object[] features = EMPTY_ROOT_FM;
-	private TreeViewer viewer;
+	private FeatureAttributeView view;
 
-	public FeatureAttributeContentProvider(TreeViewer viewer) {
-		this.viewer = viewer;
+	public FeatureAttributeContentProvider(FeatureAttributeView view) {
+		this.view = view;
 	}
 
 	/*
@@ -65,26 +57,29 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof ExtendedFeatureModel) {
-			config = null;
-			featureModel = (ExtendedFeatureModel) inputElement;
-			refreshElements();
-			return features;
-		} else if (inputElement instanceof Object[]) {
-			config = null;
-			featureModel = null;
-			refreshElements();
-			return (Object[]) inputElement;
-		} else if (inputElement instanceof Configuration) {
-			config = (Configuration) inputElement;
-			featureModel = (ExtendedFeatureModel) config.getFeatureModel();
-			refreshElements();
-			return features;
-		} else {
-			featureModel = null;
-			refreshElements();
-			return null;
+		switch (view.getMode()) {
+		case FEATURE_DIAGRAM:
+			if (inputElement instanceof ExtendedFeatureModel) {
+				config = null;
+				featureModel = (ExtendedFeatureModel) inputElement;
+				List<Object> elements = new ArrayList<Object>(featureModel.getFeatures());
+				elements.add(0, view.getMode().getMessage());
+				return elements.toArray();
+			}
+			break;
+		case CONFIGURATION_EDITOR:
+			if (inputElement instanceof Configuration) {
+				config = (Configuration) inputElement;
+				featureModel = (ExtendedFeatureModel) config.getFeatureModel();
+				List<Object> elements = new ArrayList<Object>(featureModel.getFeatures());
+				elements.add(0, view.getMode().getMessage());
+				return elements.toArray();
+			}
+			break;
+		default:
+			return new Object[] { view.getMode().getMessage() };
 		}
+		return null;
 	}
 
 	/*
@@ -153,17 +148,6 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			return feature.getStructure().hasChildren() || (!feature.getAttributes().isEmpty());
 		}
 		return false;
-	}
-
-	private void refreshElements() {
-		if (featureModel == null) {
-			features = EMPTY_ROOT_FM;
-		} else {
-			final ArrayList<Object> featureList = new ArrayList<>();
-			featureList.add(SELECT_FEATURES_IN_FEATURE_DIAGRAM);
-			featureList.add(featureModel.getStructure().getRoot().getFeature());
-			features = featureList.toArray();
-		}
 	}
 
 }

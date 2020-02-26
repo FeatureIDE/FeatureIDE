@@ -36,7 +36,7 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
-		if (view.getFeatureModel() == null) {
+		if (view.getManager() == null) {
 			return;
 		}
 
@@ -84,7 +84,7 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 	/**
 	 * Returns all {@link IFeature} which should be displayed in the {@link FeatureAttributeView}.
 	 * 
-	 * @return Set of all filtered {@link IFeature}, null if empty
+	 * @return Set of all filtered {@link IFeature}
 	 */
 	public List<IFeature> getSelectedFeatures() {
 		return selectedAutomaticFeatures;
@@ -93,7 +93,7 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 	/**
 	 * Returns all {@link IFeature} whose {@link FeatureAttribute} should be displayed in the {@link FeatureAttributeView}.
 	 * 
-	 * @return Set of all filtered {@link IFeature}, null if empty
+	 * @return Set of all filtered {@link IFeature}
 	 */
 	public List<IFeature> getSelectedFeaturesOfInterest() {
 		return selectedManualFeatures;
@@ -103,8 +103,8 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 	 * Removes all {@link IFeature} from the selection.
 	 */
 	public void clearSelection() {
-		selectedManualFeatures = null;
-		selectedAutomaticFeatures = null;
+		selectedManualFeatures = new ArrayList<>();
+		selectedAutomaticFeatures = new ArrayList<>();
 		treeViewer.refresh();
 	}
 }

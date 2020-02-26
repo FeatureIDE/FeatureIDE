@@ -20,12 +20,15 @@
  */
 package de.ovgu.featureide.fm.attributes.view;
 
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView.FeatureAttributeOperationMode;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
@@ -44,32 +47,50 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (faView.getSelectedFeatures() == null || faView.getSelectedFeaturesOfInterest() == null) {
-			if (faView.getFeatureModel() != null) {
-				return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
-			} else {
-				return true;
-			}
+		if (faView.getMode() == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
+			return filterFeatureModel(viewer, parentElement, element);
+		} else if (faView.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+			return filterConfiguration(viewer, parentElement, element);
+		}
+		return true;
+	}
+
+	private boolean filterFeatureModel(Viewer viewer, Object parentElement, Object element) {
+		if (element.equals(faView.getMode().getMessage())) {
+			return faView.getSelectedFeatures().isEmpty();
+		} else if (element instanceof IFeature && faView.getSelectedFeatures().contains(element)) {
+			return true;
+		} else if (element instanceof IFeatureAttribute && faView.getSelectedFeaturesOfInterest().contains(parentElement)) {
+			return true;
 		} else {
-			if (faView.getSelectedFeatures().size() == 0 || faView.getSelectedFeaturesOfInterest().size() == 0) {
-				if (faView.getFeatureModel() != null) {
-					return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
-				} else {
-					return true;
-				}
+			return false;
+		}
+	}
+
+	private boolean filterConfiguration(Viewer viewer, Object parentElement, Object element) {
+		ConfigurationManager manager = (ConfigurationManager) faView.getManager();
+		if (element.equals(faView.getMode().getMessage())) {
+			return manager.getVarObject().getFeatureModel().getFeatures().stream().filter(this::isConfigurableFeature).count() > 0;
+		} else if (element instanceof IFeature) {
+			ExtendedFeature feat = (ExtendedFeature) element;
+			if (manager.getVarObject().getSelectableFeature(feat).getSelection() == Selection.SELECTED) {
+				return feat.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
 			} else {
-				if (viewer instanceof TreeViewer) {
-					if (element instanceof IFeature && faView.getSelectedFeatures().contains(element)) {
-						return true;
-					} else if (element instanceof IFeatureAttribute && faView.getSelectedFeaturesOfInterest().contains(parentElement)) {
-						return true;
-					} else {
-						return false;
-					}
-				}
+				return false;
 			}
+		} else if (element instanceof IFeatureAttribute) {
+			return ((IFeatureAttribute) element).isConfigurable();
 		}
 		return false;
+	}
+
+	private boolean isConfigurableAttribute(IFeatureAttribute att) {
+		return att.isConfigurable();
+	}
+
+	private boolean isConfigurableFeature(IFeature feat) {
+		ExtendedFeature ext = (ExtendedFeature) feat;
+		return ext.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
 	}
 
 }
