@@ -82,7 +82,6 @@ Export-Package:
  de.ovgu.featureide.ui.views.configMap.actions,
  de.ovgu.featureide.ui.views.configMap.filters,
  de.ovgu.featureide.ui.views.configMap.header,
- de.ovgu.featureide.ui.visualization,
  de.ovgu.featureide.ui.wizards;
   uses:="org.eclipse.jface.wizard,
    de.ovgu.featureide.core,

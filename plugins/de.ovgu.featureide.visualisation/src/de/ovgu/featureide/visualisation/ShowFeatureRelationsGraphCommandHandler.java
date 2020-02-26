@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.visualization;
+package de.ovgu.featureide.visualisation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -45,7 +46,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.visualisation.activator.VisualPlugin;
 
 /**
  * Show Feature Relations Graph
@@ -66,34 +67,42 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 			project = (IProject) element;
 		}
 
-		final Shell shell = new Shell(Display.getCurrent());
-		shell.setText("Select feature");
-		shell.setSize(400, 200);
-		shell.setLayout(new FillLayout(SWT.VERTICAL));
-		final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(shell, SWT.BORDER | SWT.V_SCROLL);
-
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+
 		if (featureProject != null) {
-			final List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
-			for (final String f : featureList) {
-				list.add(f);
+			// Check whether configurations are avaialble to create the relation graph. They are nesseccary
+			if (featureProject.getConfigFolder() == null) {
+				final Shell shell = new Shell(Display.getCurrent());
+				MessageDialog.openInformation(shell, "Info",
+						"A configuration is required to create a feature relation graph. Create at least one configuration and try again.");
+			} else {
+				final Shell shell = new Shell(Display.getCurrent());
+				shell.setText("Select feature");
+				shell.setSize(400, 200);
+				shell.setLayout(new FillLayout(SWT.VERTICAL));
+				final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(shell, SWT.BORDER | SWT.V_SCROLL);
+
+				final List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+				for (final String f : featureList) {
+					list.add(f);
+				}
+
+				list.addSelectionListener(new SelectionListener() {
+
+					@Override
+					public void widgetSelected(SelectionEvent event) {
+						final int[] selections = list.getSelectionIndices();
+						showFrog(featureProject, list.getItem(selections[0]));
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent event) {
+
+					}
+				});
+				shell.open();
 			}
-
-			list.addSelectionListener(new SelectionListener() {
-
-				@Override
-				public void widgetSelected(SelectionEvent event) {
-					final int[] selections = list.getSelectionIndices();
-					showFrog(featureProject, list.getItem(selections[0]));
-				}
-
-				@Override
-				public void widgetDefaultSelected(SelectionEvent event) {
-
-				}
-			});
 		}
-		shell.open();
 
 	}
 
@@ -203,7 +212,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 		data.append("];\n");
 
-		final File fi = Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
+		final File fi = Utils.getFileFromPlugin(VisualPlugin.PLUGIN_ID, "template/featureRelations/page.html");
 		String html = Utils.getStringOfFile(fi);
 		html = html.replaceFirst("// DATA_HERE", data.toString());
 
