@@ -44,13 +44,15 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
-	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
+	public static final Object[] EMPTY_ROOT_FM = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
+	public static final Object[] EMPTY_ROOT_CONF = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
+	public static final Object[] FALSE_CONFIG_FORMAT = new Object[] { StringTable.CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG };
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM;
 
 	private ExtendedFeatureModel featureModel;
 	private Configuration config;
-	private Object[] features = EMPTY_ROOT;
+	private Object[] features = EMPTY_ROOT_FM;
 	private TreeViewer viewer;
 
 	public FeatureAttributeContentProvider(TreeViewer viewer) {
@@ -155,7 +157,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	private void refreshElements() {
 		if (featureModel == null) {
-			features = EMPTY_ROOT;
+			features = EMPTY_ROOT_FM;
 		} else {
 			final ArrayList<Object> featureList = new ArrayList<>();
 			featureList.add(SELECT_FEATURES_IN_FEATURE_DIAGRAM);
