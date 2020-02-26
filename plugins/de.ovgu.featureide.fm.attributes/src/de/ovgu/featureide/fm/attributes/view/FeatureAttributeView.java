@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -106,7 +107,24 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	public enum FeatureAttributeOperationMode {
-		NONE, NON_EXTENDED_FEATURE_MODEL, INVALID_FM_PAGE, FEATURE_DIAGRAM, NON_EXTENDED_CONFIGURATION, INVALID_CONFIG_PAGE, CONFIGURATION_EDITOR
+
+		NONE(StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR), NON_EXTENDED_FEATURE_MODEL(
+				StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL), INVALID_FM_PAGE(
+						StringTable.PAGE_NOT_SUPPORTED_EXTENDED_FEATURE_MODEL), FEATURE_DIAGRAM(
+								StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM), NON_EXTENDED_CONFIGURATION(
+										StringTable.CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG), INVALID_CONFIG_PAGE(
+												StringTable.PAGE_NOT_SUPPORTED_EXTENDED_CONFIGURATION), CONFIGURATION_EDITOR(
+														StringTable.NO_CONFIGURABLE_ATTRIBUTES);
+
+		private Object message;
+
+		private FeatureAttributeOperationMode(Object message) {
+			this.message = message;
+		}
+
+		public Object getMessage() {
+			return message;
+		}
 	}
 
 	public final static String imgFeature = "FeatureIconSmall.ico";
@@ -146,7 +164,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private AFileManager<?> manager;
 
 	// Feature attribute view states
-	public FeatureAttributeOperationMode mode;
+	private FeatureAttributeOperationMode mode;
 
 	public FeatureAttributeView() {
 		super();
@@ -163,11 +181,17 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		FeatureColorManager.addListener(this);
 	}
 
+	public FeatureAttributeOperationMode getMode() {
+		return mode;
+	}
+
 	private final IPageChangedListener pageListener = new IPageChangedListener() {
 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
-			setEditorContentByPage(event.getSelectedPage());
+			if (event.getSource() instanceof IEditorPart) {
+				setEditorContentByEditor((IEditorPart) event.getSource());
+			}
 		}
 
 	};
@@ -192,14 +216,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (getSite().getPart() != part) {
+			if (getSite().getPart() != part && currentEditor != part) {
 				setEditorContent(part);
 			}
 		}
 
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (getSite().getPart() != part) {
+			if (getSite().getPart() != part && currentEditor != part) {
 				setEditorContent(part);
 			}
 		}
@@ -229,7 +253,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		selectionListener = new FeatureAttributeSelectionListener(this, treeViewer);
 		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
-		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
+		treeViewer.setContentProvider(new FeatureAttributeContentProvider(this));
 		treeViewer.setUseHashlookup(true);
 
 		// make lines and header visible and set layout
@@ -417,34 +441,31 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void setEditorContent(IWorkbenchPart activeWorkbenchPart) {
-		if (activeWorkbenchPart == null) {
+		if (activeWorkbenchPart instanceof IEditorPart) {
+			setEditorContentByEditor((IEditorPart) activeWorkbenchPart);
+		} else {
+			setEditorContentByEditor(null);
+		}
+	}
+
+	private void setEditorContentByEditor(IEditorPart editor) {
+		if (editor != null && (editor instanceof FeatureModelEditor)) {
+			final FeatureModelEditor fmEditor = (FeatureModelEditor) editor;
+			setEmptyEditorContent();
+			setFMEditorContent(fmEditor);
+		} else if (editor != null && (editor instanceof ConfigurationEditor)) {
+			final ConfigurationEditor confEditor = (ConfigurationEditor) editor;
+			setEmptyEditorContent();
+			setConfEditorContent(confEditor);
+		} else {
 			setEmptyEditorContent();
 			// Set mode
 			mode = FeatureAttributeOperationMode.NONE;
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(null);
+				treeViewer.setInput("");
 			}
-			treeViewer.refresh();
 			repackAllColumns();
-		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)) {
-			final FeatureModelEditor editor = (FeatureModelEditor) activeWorkbenchPart;
-			setEmptyEditorContent();
-			setFMEditorContent(editor);
-		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
-			setEmptyEditorContent();
-			setConfEditorContent(editor);
 		}
-
-//		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-//			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
-//			currentEditor = activeWorkbenchPart;
-//			editor.addPageChangedListener(pageListener);
-//			setEditorContentByPage(editor.getSelectedPage());
-//		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
-//			&& !(activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
-//			setEditorContent(null);
-//		}
 	}
 
 	private void setEmptyEditorContent() {
@@ -484,23 +505,23 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				// Valid
 				manager = featureModelManager;
 				manager.addListener(this);
+				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(curFeatureModel);
 				}
-				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
 			} else {
 				// Wrong format
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.setInput(null);
-				}
 				mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput("");
+				}
 			}
 		} else {
 			// Wrong page
-			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(null);
-			}
 			mode = FeatureAttributeOperationMode.INVALID_FM_PAGE;
+			if (!treeViewer.getControl().isDisposed()) {
+				treeViewer.setInput("");
+			}
 		}
 		repackAllColumns();
 	}
@@ -516,30 +537,26 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				// Valid
 				manager = configurationManager;
 				manager.addListener(this);
+				mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(currentConfiguration);
 				}
-				mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
 			} else {
 				// Invalid format
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.setInput(null);
-				}
 				mode = FeatureAttributeOperationMode.NON_EXTENDED_CONFIGURATION;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput("");
+				}
 			}
 		} else {
 			// Wrong page
-			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(null);
-			}
 			mode = FeatureAttributeOperationMode.INVALID_CONFIG_PAGE;
+			if (!treeViewer.getControl().isDisposed()) {
+				treeViewer.setInput("");
+			}
 		}
-
+		treeViewer.expandAll();
 		repackAllColumns();
-	}
-
-	private void setEditorContentByPage(Object page) {
-
 	}
 
 	@Override
@@ -592,19 +609,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	@Override
 	public void dispose() {
-		getSite().getPage().removePartListener(editorListener);
-		if (currentEditor instanceof FeatureModelEditor) {
-			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
-			editor.removeEventListener(this);
-			editor.removePageChangedListener(pageListener);
-			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
-		}
+		setEditorContent(null);
 		FeatureColorManager.removeListener(this);
 		// Dispose all cached images to prevent leaks
 		for (Image image : cachedImages.values()) {
 			image.dispose();
 		}
-		currentEditor = null;
 		super.dispose();
 	}
 
@@ -617,7 +627,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		return currentEditor;
 	}
 
-	public AFileManager<?> getFeatureModel() {
+	public AFileManager<?> getManager() {
 		return manager;
 	}
 }
