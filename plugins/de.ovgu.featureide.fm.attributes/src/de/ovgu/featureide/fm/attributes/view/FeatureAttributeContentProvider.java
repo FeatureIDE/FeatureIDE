@@ -30,8 +30,6 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
@@ -62,8 +60,9 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			if (inputElement instanceof ExtendedFeatureModel) {
 				config = null;
 				featureModel = (ExtendedFeatureModel) inputElement;
-				List<Object> elements = new ArrayList<Object>(featureModel.getFeatures());
-				elements.add(0, view.getMode().getMessage());
+				List<Object> elements = new ArrayList<Object>();
+				elements.add(view.getMode().getMessage());
+				elements.add(featureModel.getStructure().getRoot().getFeature());
 				return elements.toArray();
 			}
 			break;
@@ -71,8 +70,9 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			if (inputElement instanceof Configuration) {
 				config = (Configuration) inputElement;
 				featureModel = (ExtendedFeatureModel) config.getFeatureModel();
-				List<Object> elements = new ArrayList<Object>(featureModel.getFeatures());
-				elements.add(0, view.getMode().getMessage());
+				List<Object> elements = new ArrayList<Object>();
+				elements.add(view.getMode().getMessage());
+				elements.add(featureModel.getStructure().getRoot().getFeature());
 				return elements.toArray();
 			}
 			break;
@@ -94,25 +94,10 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (parentElement instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
-			if (config != null) {
-				for (IFeatureAttribute att : feature.getAttributes()) {
-					if (att.isConfigurable()) {
-						featureList.add(att);
-					}
-				}
-			} else {
-				featureList.addAll(feature.getAttributes());
-			}
+			// Add all attributes
+			featureList.addAll(feature.getAttributes());
 			for (final IFeatureStructure structure : feature.getStructure().getChildren()) {
-				if (config == null) {
-					featureList.add(structure.getFeature());
-				} else {
-					SelectableFeature selectableF = config.getSelectableFeature(structure.getFeature().getName());
-					if (selectableF.getSelection() == Selection.SELECTED) {
-						featureList.add(structure.getFeature());
-					}
-				}
-
+				featureList.add(structure.getFeature());
 			}
 			return featureList.toArray();
 		}

@@ -70,7 +70,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	private boolean filterConfiguration(Viewer viewer, Object parentElement, Object element) {
 		ConfigurationManager manager = (ConfigurationManager) faView.getManager();
 		if (element.equals(faView.getMode().getMessage())) {
-			return manager.getVarObject().getFeatureModel().getFeatures().stream().filter(this::isConfigurableFeature).count() > 0;
+			return manager.getVarObject().getFeatureModel().getFeatures().stream().filter(this::isConfigurableFeature).count() <= 0;
 		} else if (element instanceof IFeature) {
 			ExtendedFeature feat = (ExtendedFeature) element;
 			if (manager.getVarObject().getSelectableFeature(feat).getSelection() == Selection.SELECTED) {
