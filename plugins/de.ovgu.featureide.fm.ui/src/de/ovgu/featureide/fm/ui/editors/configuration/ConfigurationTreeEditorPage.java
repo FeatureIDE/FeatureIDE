@@ -97,6 +97,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -263,6 +264,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					break;
 				default:
 					break;
+				}
+			} else {
+				if (evt.getEventType() == EventType.CONFIGURABLE_ATTRIBUTE_CHANGED) {
+					refreshPage();
+					setDirty();
 				}
 			}
 		}

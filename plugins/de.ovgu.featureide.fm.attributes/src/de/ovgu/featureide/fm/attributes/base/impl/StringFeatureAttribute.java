@@ -86,4 +86,9 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	public IFeatureAttribute cloneRecursive(IFeature feature) {
 		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
+
+	@Override
+	public boolean isValidValue(String value) {
+		return true;
+	}
 }

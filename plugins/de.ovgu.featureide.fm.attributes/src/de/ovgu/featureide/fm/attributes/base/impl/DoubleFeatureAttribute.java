@@ -88,4 +88,14 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	public IFeatureAttribute cloneRecursive(IFeature feature) {
 		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
+
+	@Override
+	public boolean isValidValue(String value) {
+		try {
+			Double.parseDouble(value.toString());
+			return true;
+		} catch (final NumberFormatException e) {
+			return false;
+		}
+	}
 }

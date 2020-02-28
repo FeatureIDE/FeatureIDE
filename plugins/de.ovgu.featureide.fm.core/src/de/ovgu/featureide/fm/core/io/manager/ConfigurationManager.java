@@ -42,6 +42,7 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	public static final int CHANGE_FEATURES = 1;
 	public static final int CHANGE_MANUAL = 2;
 	public static final int CHANGE_AUTOMATIC = 3;
+	public static final int CHANGE_CONFIGURABLE_ATTRIBUTE = 4;
 	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
 
 	@CheckForNull
