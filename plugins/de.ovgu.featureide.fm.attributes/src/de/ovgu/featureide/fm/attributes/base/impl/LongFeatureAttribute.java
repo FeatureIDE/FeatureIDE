@@ -88,4 +88,14 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	public IFeatureAttribute cloneRecursive(IFeature feature) {
 		return new LongFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
+
+	@Override
+	public boolean isValidValue(String value) {
+		try {
+			Long.parseLong(value.toString());
+			return true;
+		} catch (final NumberFormatException e) {
+			return false;
+		}
+	}
 }
