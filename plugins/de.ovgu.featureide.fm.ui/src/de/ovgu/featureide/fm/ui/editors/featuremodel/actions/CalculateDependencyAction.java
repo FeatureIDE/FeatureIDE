@@ -22,20 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_DEPENDENCY;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -46,8 +36,6 @@ import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
@@ -58,7 +46,7 @@ import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
  *
  * @author Ananieva Sofia
  */
-public class CalculateDependencyAction extends AFeatureModelAction {
+public class CalculateDependencyAction extends SingleSelectionAction {
 
 	private static final JobToken calculateDependencyToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
@@ -68,36 +56,15 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 	public static final String ID = "de.ovgu.featureide.calculatedependency";
 
 	/**
-	 * The selected feature which will be used as new root.
-	 */
-	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
-
-	/**
-	 * The listener which remembers the selection and checks whether it is valid.
-	 */
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-		}
-	};
-
-	/**
-	 * Constructor.
+	 *
+	 * /** Constructor.
 	 *
 	 * @param viewer viewer
 	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModelManager featureModelManager) {
-		super(CALCULATE_DEPENDENCY, ID, featureModelManager);
+		super(CALCULATE_DEPENDENCY, viewer, ID, featureModelManager);
 		setEnabled(false);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		} else {
-			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		}
 	}
 
 	/**
@@ -105,11 +72,9 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 	 */
 	@Override
 	public void run() {
-		if (selectedFeatures.size() != 1) {
-			throw new RuntimeException("Calculate dependencies for multiple selected features is not supported.");
-		}
+
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
-		final CalculateDependencyOperation method = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
+		final CalculateDependencyOperation method = new CalculateDependencyOperation(featureModel, feature);
 		final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method);
 		final Display current = Display.getCurrent();
 		runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
@@ -134,46 +99,9 @@ public class CalculateDependencyAction extends AFeatureModelAction {
 		LongRunningWrapper.startJob(calculateDependencyToken, runner);
 	}
 
-	/**
-	 * Checks if selection is valid, i.e. selection is not empty, not root and a feature from the feature model tree.
-	 *
-	 * @param selection the selected feature from the feature model tree
-	 * @return true if valid selection, else false
-	 */
-	private boolean isValidSelection(IStructuredSelection selection) {
-		// check empty selection (i.e. ModelEditPart is selected)
-		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
-			return false;
-		}
+	@Override
+	protected void updateProperties() {
+		setEnabled(true);
 
-		selectedFeatures.clear();
-		final Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			final Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
-				continue;
-			}
-			IFeature feature;
-
-			if (editPart instanceof FeatureEditPart) {
-				feature = ((FeatureEditPart) editPart).getModel().getObject();
-			} else {
-				feature = (IFeature) editPart;
-			}
-
-			selectedFeatures.add(feature);
-		}
-
-		final boolean res = !selectedFeatures.isEmpty();
-
-		// permit selection to be root of the origin feature model
-		if (res) {
-			final IFeature first = selectedFeatures.getFirst();
-			final String s = first.toString();
-			if (s.equals(FeatureUtils.getRoot(first.getFeatureModel()).toString())) {
-				return false;
-			}
-		}
-		return res;
 	}
 }
