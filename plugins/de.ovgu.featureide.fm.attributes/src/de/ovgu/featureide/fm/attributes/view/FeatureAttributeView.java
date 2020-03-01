@@ -463,8 +463,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			mode = FeatureAttributeOperationMode.NONE;
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.setInput("");
+				repackAllColumns();
 			}
-			repackAllColumns();
+
 		}
 	}
 
@@ -497,7 +498,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		editor.addEventListener(this);
 		editor.addPageChangedListener(pageListener);
 		editor.diagramEditor.addSelectionChangedListener(selectionListener);
-
 		if (editor.getSelectedPage() instanceof FeatureDiagramEditor) {
 			final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
 			IFeatureModel curFeatureModel = featureModelManager.getVarObject();
@@ -529,7 +529,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private void setConfEditorContent(ConfigurationEditor editor) {
 		currentEditor = editor;
 		editor.addPageChangedListener(pageListener);
-
 		if (editor.getSelectedPage() instanceof ConfigurationTreeEditorPage) {
 			final ConfigurationManager configurationManager = editor.getConfigurationManager();
 			Configuration currentConfiguration = configurationManager.getVarObject();
@@ -610,6 +609,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	@Override
 	public void dispose() {
 		setEditorContent(null);
+		getSite().getPage().removePartListener(editorListener);
 		FeatureColorManager.removeListener(this);
 		// Dispose all cached images to prevent leaks
 		for (Image image : cachedImages.values()) {

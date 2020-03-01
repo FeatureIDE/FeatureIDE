@@ -105,6 +105,8 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 	public void clearSelection() {
 		selectedManualFeatures = new ArrayList<>();
 		selectedAutomaticFeatures = new ArrayList<>();
-		treeViewer.refresh();
+		if (!treeViewer.getControl().isDisposed()) {
+			treeViewer.refresh();
+		}
 	}
 }
