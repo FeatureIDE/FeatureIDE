@@ -366,7 +366,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			public void menuAboutToShow(IMenuManager manager) {
 				final IStructuredSelection selection = treeViewer.getStructuredSelection();
 				if (!selection.isEmpty() && mode == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
-					FeatureModelManager fmManager = (FeatureModelManager) manager;
+					FeatureModelManager fmManager = (FeatureModelManager) FeatureAttributeView.this.manager;
 					if ((selection.size() == 1) && (selection.getFirstElement() instanceof ExtendedFeature)) {
 						final String featureName = selection.getFirstElement().toString();
 						// Add actions to create new attributes
