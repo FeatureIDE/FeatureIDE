@@ -51,13 +51,16 @@ public class FeatureAttributeValueColumnLabelProvider extends FeatureAttributeCo
 		} else if (element instanceof IFeatureAttribute) {
 			final IFeatureAttribute attribute = (IFeatureAttribute) element;
 			if (view.getCurrentEditor() instanceof ConfigurationEditor) {
-				Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getSnapshot();
+				Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getVarObject();
 				for (SelectableFeature feat : config.getFeatures()) {
 					if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
 						if (feat instanceof ExtendedSelectableFeature) {
 							ExtendedSelectableFeature extSelectable = (ExtendedSelectableFeature) feat;
-							if (extSelectable.getConfigurableAttributes().containsKey(attribute.getName())) {
-								return extSelectable.getConfigurableAttributes().get(attribute.getName()).toString();
+							Object value = extSelectable.getAttributeValue(attribute);
+							if (value != null) {
+								return extSelectable.getAttributeValue(attribute).toString();
+							} else {
+								return "";
 							}
 						}
 					}

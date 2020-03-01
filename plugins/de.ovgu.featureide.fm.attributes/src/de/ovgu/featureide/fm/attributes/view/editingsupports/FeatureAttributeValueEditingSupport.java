@@ -80,10 +80,12 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 				if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
 					if (feat instanceof ExtendedSelectableFeature) {
 						ExtendedSelectableFeature extSelectable = (ExtendedSelectableFeature) feat;
-						if (extSelectable.getConfigurableAttributes().containsKey(attribute.getName())) {
-							return extSelectable.getConfigurableAttributes().get(attribute.getName()).toString();
+						Object value = extSelectable.getAttributeValue(attribute);
+						if (value != null) {
+							return value.toString();
+						} else {
+							return "";
 						}
-						break;
 					}
 				}
 			}
