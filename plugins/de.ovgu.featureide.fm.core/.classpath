@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/native/x86_64-linux/"/>
-	<classpathentry exported="true" kind="lib" path="lib/native/x86_64-macosx/"/>
-	<classpathentry exported="true" kind="lib" path="lib/native/x86_64-windows/"/>
-	<classpathentry exported="true" kind="lib" path="lib/native/x86-windows/"/>
+	<classpathentry exported="true" kind="lib" path="lib/javaSmt/com.microsoft.z3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/checker-qual-2.5.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaSmt/common-0.3000-323-ge8e29f7.jar"/>
