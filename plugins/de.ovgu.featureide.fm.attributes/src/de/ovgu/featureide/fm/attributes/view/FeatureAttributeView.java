@@ -158,7 +158,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	// Selection and filtering
 	public boolean synchToFeatureDiagram = true;
 	private FeatureAttributeSelectionListener selectionListener;
-
 	// Dynamic data objects
 	private IWorkbenchPart currentEditor;
 	private AFileManager<?> manager;
@@ -465,7 +464,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				treeViewer.setInput("");
 				repackAllColumns();
 			}
-
 		}
 	}
 
@@ -564,6 +562,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.refresh(manager.getVarObject());
 			}
+			if (getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+				treeViewer.expandAll();
+				repackAllColumns();
+			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getOldValue() != null && event.getOldValue() instanceof Boolean && event.getNewValue() != null
 				&& event.getNewValue() instanceof IFeature) {
@@ -603,6 +605,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			}
 		} else if (event.getEventType() == EventType.FEATURE_COLOR_CHANGED) {
 			treeViewer.refresh();
+		} else if (event.getEventType() == EventType.FEATURE_SELECTION_CHANGED) {
+			if (getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+				treeViewer.refresh();
+				treeViewer.expandAll();
+				repackAllColumns();
+			}
 		}
 	}
 

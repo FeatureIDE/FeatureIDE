@@ -20,13 +20,20 @@
  */
 package de.ovgu.featureide.fm.attributes.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView.FeatureAttributeOperationMode;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -40,9 +47,44 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 
 	private FeatureAttributeView faView;
+	private List<String> configurableFilterList;
 
 	FeatureAttributeViewSelectionFilter(FeatureAttributeView faView) {
 		this.faView = faView;
+	}
+
+	@Override
+	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+		createConfigurableDependencyMap();
+		return super.filter(viewer, parent, elements);
+	}
+
+	private void createConfigurableDependencyMap() {
+		configurableFilterList = new ArrayList<>();
+		if (faView.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+			ConfigurationManager confManager = (ConfigurationManager) faView.getManager();
+			createConfigurableDependencyMap(confManager.getVarObject(), confManager.getVarObject().getRoot());
+		}
+	}
+
+	private long createConfigurableDependencyMap(Configuration config, SelectableFeature feature) {
+		if (!(feature.getFeature().getFeatureModel() instanceof ExtendedFeatureModel)) {
+			return 0;
+		}
+		int numberOfConfigurableAttributes = 0;
+		for (IFeatureStructure child : feature.getFeature().getStructure().getChildren()) {
+			numberOfConfigurableAttributes += createConfigurableDependencyMap(config, config.getSelectableFeature(child.getFeature()));
+		}
+
+		if (feature.getSelection() == Selection.SELECTED) {
+			ExtendedFeature extFeature = (ExtendedFeature) feature.getFeature();
+			numberOfConfigurableAttributes += extFeature.getAttributes().stream().filter(att -> att.isConfigurable()).count();
+
+			if (numberOfConfigurableAttributes > 0) {
+				configurableFilterList.add(feature.getFeature().getName());
+			}
+		}
+		return numberOfConfigurableAttributes;
 	}
 
 	@Override
@@ -74,7 +116,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 		} else if (element instanceof IFeature) {
 			ExtendedFeature feat = (ExtendedFeature) element;
 			if (manager.getVarObject().getSelectableFeature(feat).getSelection() == Selection.SELECTED) {
-				return feat.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
+				return hasConfigurableDependency(feat);
 			} else {
 				return false;
 			}
@@ -91,6 +133,10 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	private boolean isConfigurableFeature(IFeature feat) {
 		ExtendedFeature ext = (ExtendedFeature) feat;
 		return ext.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
+	}
+
+	private boolean hasConfigurableDependency(IFeature feature) {
+		return configurableFilterList.contains(feature.getName());
 	}
 
 }
