@@ -1,2 +1,0 @@
-FeatureIDE Version:	${project.version}
-Build Time:			${timestamp}

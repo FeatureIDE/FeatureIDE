@@ -23,9 +23,9 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 import java.util.Comparator;
 
 /**
- * TODO description
+ * Compares two solutions regarding their number of contained literals.
  *
- * @author skrieter
+ * @author Sebastian Krieter
  */
 class TWiseConfigurationLengthComparator implements Comparator<TWiseConfiguration> {
 

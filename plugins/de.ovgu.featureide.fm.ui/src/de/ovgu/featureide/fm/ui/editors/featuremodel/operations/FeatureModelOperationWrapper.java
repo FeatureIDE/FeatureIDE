@@ -87,7 +87,7 @@ public class FeatureModelOperationWrapper extends AbstractOperation {
 			executed = true;
 		} catch (final Exception e) {
 			Logger.logError(e);
-			throw new ExecutionException(e.getMessage());
+			throw new ExecutionException(e.getMessage(), e);
 		}
 		return Status.OK_STATUS;
 	}

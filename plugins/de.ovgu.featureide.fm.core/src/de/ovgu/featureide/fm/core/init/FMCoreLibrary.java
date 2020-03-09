@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
+import de.ovgu.featureide.fm.core.cli.CLIFunctionManager;
+import de.ovgu.featureide.fm.core.cli.ConfigurationGenerator;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.configuration.EquationFormat;
 import de.ovgu.featureide.fm.core.configuration.ExpressionFormat;
@@ -91,6 +93,8 @@ public final class FMCoreLibrary implements ILibrary {
 		ConfigFormatManager.getInstance().addExtension(new FeatureIDEFormat());
 		ConfigFormatManager.getInstance().addExtension(new EquationFormat());
 		ConfigFormatManager.getInstance().addExtension(new ExpressionFormat());
+
+		CLIFunctionManager.getInstance().addExtension(new ConfigurationGenerator());
 	}
 
 	@Override

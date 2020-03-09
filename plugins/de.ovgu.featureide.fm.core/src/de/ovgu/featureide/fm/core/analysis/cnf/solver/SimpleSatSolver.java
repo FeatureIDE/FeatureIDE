@@ -85,6 +85,9 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	}
 
 	protected IConstr addClause(Solver<?> solver, int[] literals) throws RuntimeContradictionException {
+		if ((literals.length == 1) && (literals[0] == 0)) {
+			throw new RuntimeContradictionException();
+		}
 		try {
 			assert checkClauseValidity(literals);
 			return solver.addClause(new VecInt(Arrays.copyOfRange(literals, 0, literals.length)));

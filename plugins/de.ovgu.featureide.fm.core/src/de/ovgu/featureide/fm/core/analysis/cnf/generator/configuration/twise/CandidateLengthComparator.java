@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 
 /**
- * Compares two candidates for covering consisting of a partial configuration and a literal set. Considers number of literals in the partial configuration and
+ * Compares two candidates for covering, consisting of a partial configuration and a literal set. Considers number of literals in the partial configuration and
  * in the literal set.
  *
  * @author Sebastian Krieter

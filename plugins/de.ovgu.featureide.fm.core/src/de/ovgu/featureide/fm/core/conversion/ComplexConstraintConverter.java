@@ -66,7 +66,7 @@ public class ComplexConstraintConverter {
 			return false;
 		}
 
-		final Node cnf = node.toCNF();
+		final Node cnf = node.toRegularCNF();
 		if ((cnf.getChildren().length == 1) && (cnf.getContainedFeatures().size() == 2)) {
 			final Node clause = cnf.getChildren()[0];
 			if (clause instanceof Or) {

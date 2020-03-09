@@ -25,6 +25,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 /**
+ * Presence condition combination iterator that reverses the order of {@link LexicographicIterator}.
  *
  * @author Sebastian Krieter
  */

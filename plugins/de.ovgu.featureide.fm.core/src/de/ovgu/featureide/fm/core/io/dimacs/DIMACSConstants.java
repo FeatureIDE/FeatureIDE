@@ -28,13 +28,13 @@ package de.ovgu.featureide.fm.core.io.dimacs;
 public class DIMACSConstants {
 
 	/** Token leading a (single-line) comment. */
-	static final String COMMENT = "c";
-	static final String COMMENT_START = COMMENT + " ";
+	public static final String COMMENT = "c";
+	public static final String COMMENT_START = COMMENT + " ";
 	/** Token leading the problem definition. */
-	static final String PROBLEM = "p";
+	public static final String PROBLEM = "p";
 	/** Token identifying the problem type as CNF. */
-	static final String CNF = "cnf";
+	public static final String CNF = "cnf";
 	/** Token denoting the end of a clause. */
-	static final String CLAUSE_END = "0";
+	public static final String CLAUSE_END = "0";
 
 }

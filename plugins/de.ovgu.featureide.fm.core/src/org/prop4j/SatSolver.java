@@ -50,6 +50,7 @@ import org.sat4j.tools.ModelIterator;
 import org.sat4j.tools.SolutionCounter;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -80,38 +81,46 @@ public class SatSolver {
 	protected ISolver solver;
 
 	public SatSolver(Node node, long timeout) {
-		this(node, timeout, true);
-	}
-
-	public SatSolver(Node node, long timeout, boolean createCNF) {
 		varToInt = new HashMap<>();
 		intToVar = new HashMap<>();
 		readVars(node);
 
-		initSolver(node, timeout, createCNF);
+		initSolver(node, timeout);
 	}
 
 	protected void readVars(Node node) {
 		if (node instanceof Literal) {
-			final Object var = ((Literal) node).var;
-			if (!varToInt.containsKey(var)) {
-				final int index = varToInt.size() + 1;
-				varToInt.put(var, index);
-				intToVar.put(index, var);
-			}
+			addVar(((Literal) node).var);
 		} else {
 			for (final Node child : node.getChildren()) {
 				readVars(child);
 			}
 		}
+		addVar(NodeCreator.varTrue);
+		addVar(NodeCreator.varFalse);
 	}
 
-	protected void initSolver(Node node, long timeout, boolean createCNF) {
+	private void addVar(final Object var) {
+		if (!varToInt.containsKey(var)) {
+			final int index = varToInt.size() + 1;
+			varToInt.put(var, index);
+			intToVar.put(index, var);
+		}
+	}
+
+	protected void initSolver(Node node, long timeout) {
 		solver = SolverFactory.newDefault();
 		solver.setTimeoutMs(timeout);
 		solver.newVar(varToInt.size());
 
-		addClauses(createCNF ? node.toCNF() : node.clone());
+		addClauses(node.toCNF());
+		addClauses(new Literal(NodeCreator.varTrue));
+		addClauses(new Literal(NodeCreator.varFalse, false));
+		final Node[] pseudoClause = new Node[varToInt.size()];
+		for (int i = 0; i < pseudoClause.length; i++) {
+			pseudoClause[i] = new Literal(intToVar.get(i + 1));
+		}
+		addClauses(new Or(pseudoClause));
 	}
 
 	public void setTimeout(long timeout) {

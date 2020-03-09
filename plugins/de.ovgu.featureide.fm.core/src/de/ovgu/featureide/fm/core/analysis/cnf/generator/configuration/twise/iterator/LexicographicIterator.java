@@ -25,6 +25,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
 /**
+ * Presence condition combination iterator that iterates of the combinations in lexicographical order.
  *
  * @author Sebastian Krieter
  */

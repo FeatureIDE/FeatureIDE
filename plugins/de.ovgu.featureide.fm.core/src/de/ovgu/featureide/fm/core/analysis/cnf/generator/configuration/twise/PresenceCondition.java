@@ -28,14 +28,15 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
+ * Represents a presence condition as an expression.
  *
  * @author Sebastian Krieter
  */
 public class PresenceCondition extends ClauseList {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -292364320078721008L;
 
-	private final TreeSet<Integer> groups = new TreeSet<>();
+	private transient final TreeSet<Integer> groups = new TreeSet<>();
 
 	public PresenceCondition() {
 		super();
@@ -63,7 +64,7 @@ public class PresenceCondition extends ClauseList {
 
 	@Override
 	public String toString() {
-		return "PresenceCondition [" + super.toString() + "]";
+		return "Expression [" + super.toString() + "]";
 	}
 
 }

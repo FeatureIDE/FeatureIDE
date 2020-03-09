@@ -24,6 +24,12 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.PresenceCondition;
 
+/**
+ * Presence condition combination iterator that uses the combinatorial number system to enumerate all combinations and then iterates from first to last
+ * combination.
+ *
+ * @author Sebastian Krieter
+ */
 public class DefaultIterator extends ACombinationIterator {
 
 	public DefaultIterator(int t, List<PresenceCondition> expressions) {

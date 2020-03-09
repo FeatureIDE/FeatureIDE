@@ -67,16 +67,13 @@ public class ExampleCalculator {
 	}
 
 	public void setLeft(Node a) {
-		a = a.clone().toCNF();
+		a = a.toRegularCNF();
 		this.a = a;
 		solver = new SatSolver(a, timeout);
 	}
 
 	public void setRight(Node b) {
-		b = b.clone().toCNF();
-		if (b instanceof Or) {
-			b = new And(b);
-		}
+		b = b.toRegularCNF();
 		bChildren = b.getChildren();
 		bSatisfiable = new LinkedList<>();
 		bIndex = -1;

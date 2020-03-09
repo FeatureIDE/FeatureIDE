@@ -44,7 +44,7 @@ import org.prop4j.Or;
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
  *
- * @author Timo G&uuml;nther
+ * @author Timo Günther
  * @author Sebastian Krieter
  */
 public class DimacsReader {
@@ -106,7 +106,7 @@ public class DimacsReader {
 		readingVariables = readVariableDirectory;
 		try (final BufferedReader reader = new BufferedReader(in)) {
 			final LineIterator lineIterator = new LineIterator(reader);
-			lineIterator.nextLine();
+			lineIterator.get();
 
 			readComments(lineIterator);
 			readProblem(lineIterator);
@@ -120,14 +120,14 @@ public class DimacsReader {
 			}
 			Node node = new And(clauses);
 			if (flattenCNF) {
-				node = node.flatten();
+				node = node.simplifyTree();
 			}
 			return node;
 		}
 	}
 
 	private void readComments(final LineIterator lineIterator) {
-		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.get()) {
 			final Matcher matcher = commentPattern.matcher(line);
 			if (matcher.matches()) {
 				readComment(matcher.group(1)); // read comments ...
@@ -136,45 +136,6 @@ public class DimacsReader {
 			}
 		}
 	}
-
-	private static class LineIterator {
-
-		private final BufferedReader reader;
-		private String line = null;
-		private int lineCount = 0;
-
-		public LineIterator(BufferedReader reader) {
-			this.reader = reader;
-		}
-
-		public String nextLine() {
-			try {
-				do {
-					line = reader.readLine();
-					if (line == null) {
-						return null;
-					}
-					lineCount++;
-				} while (line.trim().isEmpty());
-				return line;
-			} catch (final IOException e) {
-				return null;
-			}
-		}
-
-		public String currentLine() {
-			return line;
-		}
-
-		public void setCurrentLine(String line) {
-			this.line = line;
-		}
-
-		public int getLineCount() {
-			return lineCount;
-		}
-
-	};
 
 	/**
 	 * Reads the input. Calls {@link #read(Reader)}.
@@ -205,7 +166,7 @@ public class DimacsReader {
 		}
 		final String trail = line.substring(matcher.end());
 		if (trail.trim().isEmpty()) {
-			lineIterator.nextLine();
+			lineIterator.get();
 		} else {
 			lineIterator.setCurrentLine(trail);
 		}
@@ -215,7 +176,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Variable count is not an integer", lineIterator.getLineCount());
 		}
-		if (variableCount <= 0) {
+		if (variableCount < 0) {
 			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
 
@@ -224,7 +185,7 @@ public class DimacsReader {
 		} catch (final NumberFormatException e) {
 			throw new ParseException("Clause count is not an integer", lineIterator.getLineCount());
 		}
-		if (clauseCount <= 0) {
+		if (clauseCount < 0) {
 			throw new ParseException("Clause count is not positive", lineIterator.getLineCount());
 		}
 	}
@@ -240,7 +201,7 @@ public class DimacsReader {
 		final LinkedList<String> literalQueue = new LinkedList<>();
 		final Node[] clauses = new Node[clauseCount];
 		int readClausesCount = 0;
-		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.get()) {
 			if (commentPattern.matcher(line).matches()) {
 				continue;
 			}

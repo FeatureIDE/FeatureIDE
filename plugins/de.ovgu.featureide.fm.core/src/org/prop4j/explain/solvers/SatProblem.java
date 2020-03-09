@@ -37,7 +37,7 @@ import org.prop4j.Node;
 public interface SatProblem {
 
 	/**
-	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
+	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
@@ -51,7 +51,7 @@ public interface SatProblem {
 	public int addFormulas(Node... formulas);
 
 	/**
-	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
+	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
@@ -65,7 +65,7 @@ public interface SatProblem {
 	public int addFormulas(Collection<? extends Node> formulas);
 
 	/**
-	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
+	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula

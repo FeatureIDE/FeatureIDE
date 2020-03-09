@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
 /**
+ * Variables used for mapping after slicing a {@link CNF}.
  *
  * @author Sebastian Krieter
  */

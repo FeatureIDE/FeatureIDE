@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds core and dead features using a {@link ModalImplicationGraph model implication graph}.
  *
  * @author Sebastian Krieter
  */

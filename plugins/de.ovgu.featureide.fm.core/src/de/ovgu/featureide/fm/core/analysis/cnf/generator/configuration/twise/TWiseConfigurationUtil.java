@@ -42,15 +42,16 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRa
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
-import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
+import de.ovgu.featureide.fm.core.analysis.mig.CollectingStrongVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
 import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
+import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * Finds certain solutions of propositional formulas.
+ * Contains several intermediate results and functions for generating a t-wise sample.
  *
  * @author Sebastian Krieter
  */
@@ -70,7 +71,6 @@ class TWiseConfigurationUtil {
 	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
 
 	protected final CNF cnf;
-	protected final int t;
 	protected final ISatSolver localSolver;
 
 	protected ModalImplicationGraph mig;
@@ -78,9 +78,8 @@ class TWiseConfigurationUtil {
 
 	protected int maxSampleSize = Integer.MAX_VALUE;
 
-	public TWiseConfigurationUtil(CNF cnf, int t, ISatSolver localSolver) {
+	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver) {
 		this.cnf = cnf;
-		this.t = t;
 		this.localSolver = localSolver;
 
 		randomSample = Collections.emptyList();
@@ -109,7 +108,7 @@ class TWiseConfigurationUtil {
 			final int literalSet = vertex.getVar();
 			final Traverser traverser = new Traverser(mig);
 			traverser.setModel(new int[mig.getAdjList().size()]);
-			final CollectingVisitor visitor = new CollectingVisitor();
+			final Visitor<VecInt[]> visitor = new CollectingStrongVisitor();
 			traverser.setVisitor(visitor);
 			traverser.traverse(literalSet);
 			final VecInt strong = visitor.getResult()[0];
@@ -140,10 +139,6 @@ class TWiseConfigurationUtil {
 
 	public CNF getCnf() {
 		return cnf;
-	}
-
-	public int getT() {
-		return t;
 	}
 
 	public ISatSolver getSolver() {
@@ -207,7 +202,7 @@ class TWiseConfigurationUtil {
 			}
 			return false;
 		}
-		return true;
+		return !clauses.isEmpty();
 	}
 
 	public boolean isCombinationInvalidMIG(LiteralSet literals) {
@@ -389,7 +384,7 @@ class TWiseConfigurationUtil {
 				completeSolutionList.add(configuration);
 			} else {
 				incompleteSolutionList.add(configuration);
-//				Collections.sort(incompleteSolutionList, configurationLengthComparator);
+				Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
 			}
 		}
 	}

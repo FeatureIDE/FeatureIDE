@@ -24,6 +24,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Abstract creator to derive an element from a {@link FeatureModelFormula feature model}.
+ *
+ * @param <T> The type of the element.
  *
  * @author Sebastian Krieter
  */

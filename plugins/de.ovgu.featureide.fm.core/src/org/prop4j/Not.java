@@ -38,16 +38,6 @@ public class Not extends Node implements Cloneable {
 	}
 
 	@Override
-	public boolean isConjunctiveNormalForm() {
-		return false;
-	}
-
-	@Override
-	public boolean isClausalNormalForm() {
-		return false;
-	}
-
-	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		final Node node = children[0];
 		if (!list.contains(getClass())) {
@@ -106,7 +96,39 @@ public class Not extends Node implements Cloneable {
 
 	@Override
 	public Node flatten() {
-		children[0] = children[0].flatten();
+		final Node child = children[0];
+		if (child instanceof Not) {
+			return child.children[0].flatten();
+		} else {
+			children[0] = child.flatten();
+			return this;
+		}
+	}
+
+	@Override
+	public Node deMorgan() {
+		final Node notChild = children[0];
+		if (notChild instanceof Literal) {
+			final Literal clone = (Literal) notChild.clone();
+			clone.flip();
+			return clone;
+		} else if (notChild instanceof Not) {
+			return notChild.children[0].deMorgan();
+		} else if (notChild instanceof Or) {
+			final Node[] children = notChild.getChildren();
+			final Node[] newChildren = new Node[children.length];
+			for (int i = 0; i < children.length; i++) {
+				newChildren[i] = new Not(children[i]).deMorgan();
+			}
+			return new And(newChildren);
+		} else if (notChild instanceof And) {
+			final Node[] children = notChild.getChildren();
+			final Node[] newChildren = new Node[children.length];
+			for (int i = 0; i < children.length; i++) {
+				newChildren[i] = new Not(children[i]).deMorgan();
+			}
+			return new Or(newChildren);
+		}
 		return this;
 	}
 

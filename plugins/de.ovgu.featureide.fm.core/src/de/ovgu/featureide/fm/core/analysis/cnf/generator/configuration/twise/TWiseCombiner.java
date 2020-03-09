@@ -31,10 +31,11 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
+ * Combines multiple presence conditions into one.
  *
  * @author Sebastian Krieter
  */
-class TWiseCombiner {
+public class TWiseCombiner {
 
 	/**
 	 * Converts a set of single literals into a grouped expression list.

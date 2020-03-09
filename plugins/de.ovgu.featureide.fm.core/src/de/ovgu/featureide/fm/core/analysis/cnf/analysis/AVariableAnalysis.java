@@ -25,7 +25,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 
 /**
+ * Base class for an analysis that works on a list of variables.
  *
+ * @param <T> Type of the analysis result.
  *
  * @author Sebastian Krieter
  */

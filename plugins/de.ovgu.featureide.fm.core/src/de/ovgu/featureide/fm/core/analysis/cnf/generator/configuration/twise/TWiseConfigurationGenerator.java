@@ -32,8 +32,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICoverStrategy.CombinationStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.IteratorFactory.IteratorID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationSupplier;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator3;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.SingleIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
@@ -122,22 +123,30 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return TWiseCombiner.convertExpressions(expressions);
 	}
 
-	protected final TWiseConfigurationUtil util;
-	protected final TWiseCombiner combiner;
+	// TODO Variation Point: Iterations of removing low-contributing Configurations
+	private int iterations = 5;
+
+	protected TWiseConfigurationUtil util;
+	protected TWiseCombiner combiner;
 
 	protected final int t;
-	protected final PresenceConditionManager presenceConditionManager;
+	protected final List<List<ClauseList>> nodes;
+	protected PresenceConditionManager presenceConditionManager;
 
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
 
-	private ArrayList<LiteralSet> curResult = null;
-	private ArrayList<LiteralSet> bestResult = null;
+	private List<TWiseConfiguration> curResult = null;
+	private ArrayList<TWiseConfiguration> bestResult = null;
 
 	protected MonitorThread samplingMonitor;
 
 	public TWiseConfigurationGenerator(CNF cnf, int t) {
 		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, Integer.MAX_VALUE);
+	}
+
+	public TWiseConfigurationGenerator(CNF cnf, int t, int maxSampleSize) {
+		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, maxSampleSize);
 	}
 
 	public TWiseConfigurationGenerator(CNF cnf, List<List<ClauseList>> nodes, int t) {
@@ -147,13 +156,23 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	public TWiseConfigurationGenerator(CNF cnf, List<List<ClauseList>> nodes, int t, int maxSampleSize) {
 		super(cnf, maxSampleSize);
 		this.t = t;
+		this.nodes = nodes;
+	}
 
+	private void init() {
+		final CNF cnf = solver.getSatInstance();
 		if (cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, t, null);
+			util = new TWiseConfigurationUtil(cnf, null);
 		} else {
-			util = new TWiseConfigurationUtil(cnf, t, solver);
+			util = new TWiseConfigurationUtil(cnf, solver);
 		}
 		util.setMaxSampleSize(maxSampleSize);
+		util.setRandom(getRandom());
+
+		util.computeRandomSample();
+		if (!util.getCnf().getClauses().isEmpty()) {
+			util.computeMIG();
+		}
 
 		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
@@ -166,37 +185,32 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	@Override
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
-		util.setRandom(getRandom());
-
-		util.computeRandomSample();
-		if (!util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
-		}
+		init();
 
 		phaseCount = 0;
 
-		for (int i = 0; i < 4; i++) {
-			// TODO Variation Point: Removing low-contributing Configurations
+		for (int i = 0; i < iterations; i++) {
 			trimConfigurations();
 			buildCombinations();
 		}
 
-		for (final LiteralSet configuration : bestResult) {
-			addResult(configuration);
-		}
+		bestResult.forEach(configuration -> addResult(configuration.getCompleteSolution()));
 	}
 
 	private void trimConfigurations() {
 		if (curResult != null) {
-			final TWiseConfigurationStatistic statistic =
-				new TWiseConfigurationStatistic(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
-			statistic.fastCalc();
+			final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
+			statistic.setT(t);
+			statistic.setFastCalc(true);
+			statistic.calculate(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
 
 			final double[] normConfigValues = statistic.getConfigValues2();
 			double mean = 0;
 			for (final double d : normConfigValues) {
-				mean += d / normConfigValues.length;
+				mean += d;
 			}
+			mean /= normConfigValues.length;
+
 			final double reference = mean;
 
 			int index = 0;
@@ -216,27 +230,37 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void buildCombinations() {
-		// TODO Variation Point: Combination Order
-		final MergeIterator it = new MergeIterator(t, presenceConditionManager.getGroupedPresenceConditions(), IteratorID.Lexicographic);
-
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
-				new CoverAll(util));
+				new CoverAll(util) //
+		);
+
+		// TODO Variation Point: Combination order
+		final ICombinationSupplier<ClauseList> it;
+		presenceConditionManager.shuffleSort(getRandom());
+		final List<List<PresenceCondition>> groupedPresenceConditions = presenceConditionManager.getGroupedPresenceConditions();
+		if (groupedPresenceConditions.size() == 1) {
+			it = new SingleIterator(t, util.getCnf().getVariables().size(), groupedPresenceConditions.get(0));
+		} else {
+			it = new MergeIterator3(t, util.getCnf().getVariables().size(), groupedPresenceConditions);
+		}
 		numberOfCombinations = it.size();
 
 		coveredCount = 0;
 		invalidCount = 0;
 
-		samplingMonitor = new MonitorThread(new SamplingMonitor());
+		samplingMonitor = new MonitorThread(new SamplingMonitor(), 60_000);
 		try {
 			samplingMonitor.start();
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
-			ClauseList combinedCondition = new ClauseList();
 			count = coveredCount;
 			phaseCount++;
 			ICoverStrategy phase = phaseList.get(0);
-			while (it.hasNext()) {
-				combiner.combineConditions(it.next(), combinedCondition);
+			while (true) {
+				final ClauseList combinedCondition = it.get();
+				if (combinedCondition == null) {
+					break;
+				}
 				if (combinedCondition.isEmpty()) {
 					invalidCount++;
 				} else {
@@ -244,7 +268,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 					switch (covered) {
 					case NOT_COVERED:
 						combinationListUncovered.add(combinedCondition);
-						combinedCondition = new ClauseList();
 						break;
 					case COVERED:
 						coveredCount++;
@@ -291,17 +314,23 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			samplingMonitor.finish();
 		}
 
-		curResult = new ArrayList<>();
-		for (final TWiseConfiguration configuration : util.getResultList()) {
-			curResult.add(configuration.getCompleteSolution());
-		}
+		curResult = util.getResultList();
 		if ((bestResult == null) || (bestResult.size() > curResult.size())) {
-			bestResult = curResult;
+			bestResult = new ArrayList<>(curResult.size());
+			curResult.stream().map(TWiseConfiguration::clone).forEach(bestResult::add);
 		}
 	}
 
 	public TWiseConfigurationUtil getUtil() {
 		return util;
+	}
+
+	public int getIterations() {
+		return iterations;
+	}
+
+	public void setIterations(int iterations) {
+		this.iterations = iterations;
 	}
 
 }

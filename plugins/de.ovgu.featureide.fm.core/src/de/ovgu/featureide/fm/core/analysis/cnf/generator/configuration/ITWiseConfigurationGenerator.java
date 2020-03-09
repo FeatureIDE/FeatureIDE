@@ -27,7 +27,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
  */
 public interface ITWiseConfigurationGenerator extends IConfigurationGenerator {
 
-	public static final boolean VERBOSE = true;
+	public static final boolean VERBOSE = false;
 
 	static enum Deduce {
 		DP, AC, NONE
