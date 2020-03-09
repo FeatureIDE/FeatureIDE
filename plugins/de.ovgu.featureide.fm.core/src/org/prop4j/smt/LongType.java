@@ -18,23 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 /**
  * Represent the type integer in query's for first-order-logic expressions.
  *
  * @author Joshua Sprey
  */
-public class IntegerType extends Datatype {
+public class LongType extends Datatype {
+	private final long value;
 
-	private final int value;
-
-	public IntegerType(int value) {
+	public LongType(long value) {
 		this.value = value;
 	}
 
 	@Override
-	public Integer getValue() {
+	public Long getValue() {
 		return value;
 	}
 

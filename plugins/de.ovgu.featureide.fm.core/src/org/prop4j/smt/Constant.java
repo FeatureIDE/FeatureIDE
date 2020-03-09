@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 /**
  * Represents a constant type of the given generic {@link Datatype}

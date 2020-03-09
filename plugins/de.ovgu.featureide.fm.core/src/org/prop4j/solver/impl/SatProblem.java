@@ -79,11 +79,12 @@ public class SatProblem implements ISatProblem {
 		}
 
 		// Its empty or only an assumption (Literal)
-		intToClause = new Node[rootNode.getChildren().length];
+		intToClause = new Node[rootNode == null ? 0 : rootNode.getChildren().length];
 
 		root = rootNode;
+
 		// Check for CNF
-		if (!root.isConjunctiveNormalForm()) {
+		if ((root != null) && !root.isConjunctiveNormalForm()) {
 			throw new IllegalStateException("The given root node to create a smt problem need to be in conjunctive normal form like form.");
 
 		}

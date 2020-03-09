@@ -18,22 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 import java.util.Map;
 
+import org.prop4j.Node;
+
 /**
- * Constraint that is true if the left term and the right term have the same value
+ * Constraint that is true if the left term is less than the right term
  *
  * @author Joshua Sprey
  */
-public class Equal extends AtomicFormula implements Cloneable {
+public class LessThan extends AtomicFormula implements Cloneable {
 
 	/**
 	 * @param leftTerm
 	 * @param rightTerm
 	 */
-	public Equal(Term leftTerm, Term rightTerm) {
+	public LessThan(Term leftTerm, Term rightTerm) {
 		super(leftTerm, rightTerm);
 	}
 
@@ -52,7 +54,7 @@ public class Equal extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public Node clone() {
-		return new Equal(leftTerm, rightTerm);
+		return new LessThan(leftTerm, rightTerm);
 	}
 
 	/*
@@ -61,6 +63,7 @@ public class Equal extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " = " + rightTerm.toString();
+		return leftTerm.toString() + " < " + rightTerm.toString();
 	}
+
 }

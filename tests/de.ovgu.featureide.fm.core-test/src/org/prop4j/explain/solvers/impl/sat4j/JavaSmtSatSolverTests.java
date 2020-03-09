@@ -36,6 +36,9 @@ public class JavaSmtSatSolverTests extends ISolverTests {
 
 	@Override
 	protected ISolver getInstance(Node cnf) {
+		if (cnf != null) {
+			cnf = cnf.toRegularCNF();
+		}
 		return new JavaSmtSatSolverFactory().getAnalysisSolver(new SatProblem(cnf));
 	}
 }

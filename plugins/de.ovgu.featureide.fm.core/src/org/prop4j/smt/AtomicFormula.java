@@ -18,30 +18,59 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.explain.solvers.impl.sat4j;
+package org.prop4j.smt;
 
 import org.prop4j.Node;
-import org.prop4j.explain.solvers.MutableSatSolverTests;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.impl.SatProblem;
-import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
 
 /**
- * Tests for {@link Sat4jMutableSatSolver}.
+ * A constraint representing atomic formulas
  *
- * @author Timo G&uuml;nther
+ * @author Joshua Sprey
  */
-public class JavaSmtMutableSatSolverTests extends MutableSatSolverTests {
+public abstract class AtomicFormula extends Node {
+
+	public Term leftTerm;
+	public Term rightTerm;
+
+	public AtomicFormula(Term leftTerm, Term rightTerm) {
+		this.leftTerm = leftTerm;
+		this.rightTerm = rightTerm;
+	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.explain.solvers.MutableSatSolverTests#getInstance()
+	 * @see org.prop4j.Node#isConjunctiveNormalForm()
 	 */
 	@Override
-	protected ISatSolver getInstance(Node cnf) {
-		if (cnf != null) {
-			cnf = cnf.toRegularCNF();
-		}
-		return new JavaSmtSatSolverFactory().getAnalysisSolver(new SatProblem(cnf));
+	public boolean isConjunctiveNormalForm() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#isRegularConjunctiveNormalForm()
+	 */
+	@Override
+	public boolean isRegularConjunctiveNormalForm() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#eliminateNonCNFOperators(org.prop4j.Node[])
+	 */
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return leftTerm.hashCode() * rightTerm.hashCode();
 	}
 }

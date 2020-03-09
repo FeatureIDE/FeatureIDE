@@ -20,6 +20,8 @@
  */
 package org.prop4j;
 
+import org.prop4j.smt.AtomicFormula;
+
 /**
  * Converts a propositional node to a String object.
  *

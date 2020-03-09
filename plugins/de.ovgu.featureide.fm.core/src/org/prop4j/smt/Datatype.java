@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 /**
  * Call representing the type of variables or constants that can be used to create query's for first-order-logic expressions.

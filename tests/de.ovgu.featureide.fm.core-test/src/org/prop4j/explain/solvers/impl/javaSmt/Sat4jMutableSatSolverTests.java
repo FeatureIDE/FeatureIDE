@@ -20,6 +20,8 @@
  */
 package org.prop4j.explain.solvers.impl.javaSmt;
 
+import static org.junit.Assert.assertTrue;
+
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MutableSatSolverTests;
 import org.prop4j.solver.ISatSolver;
@@ -39,6 +41,54 @@ public class Sat4jMutableSatSolverTests extends MutableSatSolverTests {
 	 */
 	@Override
 	protected ISatSolver getInstance(Node cnf) {
+		if (cnf != null) {
+			cnf = cnf.toRegularCNF();
+		}
 		return new Sat4JSatSolverFactory().getAnalysisSolver(new SatProblem(cnf));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.explain.solvers.ISolverTests#testSatisfiableContradiction()
+	 */
+	@Override
+	public void testSatisfiableContradiction() {
+		boolean thrown = false;
+		try {
+			super.testSatisfiableContradiction();
+		} catch (final RuntimeException re) {
+			thrown = true;
+		}
+		assertTrue(thrown);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.explain.solvers.ISolverTests#testSatisfiableUnsatisfiable()
+	 */
+	@Override
+	public void testSatisfiableUnsatisfiable() {
+		boolean thrown = false;
+		try {
+			super.testSatisfiableUnsatisfiable();
+		} catch (final RuntimeException re) {
+			thrown = true;
+		}
+		assertTrue(thrown);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.explain.solvers.ISolverTests#testModelContradiction()
+	 */
+	@Override
+	public void testModelContradiction() {
+		boolean thrown = false;
+		try {
+			super.testModelContradiction();
+		} catch (final RuntimeException re) {
+			thrown = true;
+		}
+		assertTrue(thrown);
 	}
 }

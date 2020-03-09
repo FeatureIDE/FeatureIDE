@@ -18,49 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
-
-import java.util.Map;
+package org.prop4j.smt;
 
 /**
- * Constraint that is true if the left term is less or equal to the right term
+ * Represent the type double in query's for first-order-logic expressions.
  *
  * @author Joshua Sprey
  */
-public class LessEqual extends AtomicFormula implements Cloneable {
+public class DoubleType extends Datatype {
 
-	/**
-	 * @param leftTerm
-	 * @param rightTerm
-	 */
-	public LessEqual(Term leftTerm, Term rightTerm) {
-		super(leftTerm, rightTerm);
+	private final double value;
+
+	public DoubleType(double value) {
+		this.value = value;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#getValue(java.util.Map)
-	 */
 	@Override
-	public boolean getValue(Map<Object, Boolean> assignment) {
-		return false;
+	public Double getValue() {
+		return value;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#clone()
-	 */
-	@Override
-	public Node clone() {
-		return new LessEqual(leftTerm, rightTerm);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#toString()
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " <= " + rightTerm.toString();
+		return "" + value;
 	}
 }

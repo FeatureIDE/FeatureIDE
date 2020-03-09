@@ -35,6 +35,9 @@ public class Sat4jMusExtractorTests extends MusExtractorTests {
 
 	@Override
 	protected IMusExtractor getInstance(Node cnf) {
+		if (cnf != null) {
+			cnf = cnf.toRegularCNF();
+		}
 		return new Sat4JSatSolverFactory().getExplanationSolver(new SatProblem(cnf));
 	}
 

@@ -18,32 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 /**
- * Represent the type double in query's for first-order-logic expressions.
+ * Term represent a variable, constant or function
  *
  * @author Joshua Sprey
  */
-public class DoubleType extends Datatype {
+public abstract class Term {
 
-	private final double value;
-
-	public DoubleType(double value) {
-		this.value = value;
+	protected Term(Object var) {
+		this.var = var;
 	}
 
-	@Override
-	public Double getValue() {
-		return value;
+	protected Object var;
+
+	public Object getValue() {
+		return var;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-	public String toString() {
-		return "" + value;
+	public int hashCode() {
+		final int hashCode = "terminus".hashCode() * 24;
+		return hashCode;
 	}
 }

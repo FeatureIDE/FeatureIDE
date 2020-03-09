@@ -18,54 +18,52 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
+
+import java.util.Map;
+
+import org.prop4j.Node;
 
 /**
- * Represents a variable of type {@link Datatype} used to express first-order-logic expressions.
+ * Constraint that is true if the left term is greater than the right term
  *
  * @author Joshua Sprey
  */
-public class Variable<T extends Datatype> extends Term {
-
-	private final T type;
+public class GreaterThan extends AtomicFormula implements Cloneable {
 
 	/**
-	 * @param var
+	 * @param leftTerm
+	 * @param rightTerm
 	 */
-	public Variable(String varName, T type) {
-		super(varName);
-		this.type = type;
+	public GreaterThan(Term leftTerm, Term rightTerm) {
+		super(leftTerm, rightTerm);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Term#getVar()
+	 * @see org.prop4j.Node#getValue(java.util.Map)
 	 */
 	@Override
-	public String getValue() {
-		return var.toString();
-	}
-
-	public Datatype getType() {
-		return type;
+	public boolean getValue(Map<Object, Boolean> assignment) {
+		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see org.prop4j.Node#clone()
+	 */
+	@Override
+	public Node clone() {
+		return new GreaterThan(leftTerm, rightTerm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#toString()
 	 */
 	@Override
 	public String toString() {
-		return var.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Term#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return super.hashCode() + (var.hashCode() * 7);
+		return leftTerm.toString() + " > " + rightTerm.toString();
 	}
 
 }

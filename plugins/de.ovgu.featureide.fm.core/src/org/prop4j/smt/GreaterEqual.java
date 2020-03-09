@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,57 +18,52 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
+
+import java.util.Map;
+
+import org.prop4j.Node;
 
 /**
- * A constraint representing atomic formulas
+ * Constraint that is true if the left term is greater or equal to the right term
  *
  * @author Joshua Sprey
  */
-public abstract class AtomicFormula extends Node {
+public class GreaterEqual extends AtomicFormula implements Cloneable {
 
-	public Term leftTerm;
-	public Term rightTerm;
-
-	public AtomicFormula(Term leftTerm, Term rightTerm) {
-		this.leftTerm = leftTerm;
-		this.rightTerm = rightTerm;
+	/**
+	 * @param leftTerm
+	 * @param rightTerm
+	 */
+	public GreaterEqual(Term leftTerm, Term rightTerm) {
+		super(leftTerm, rightTerm);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#isConjunctiveNormalForm()
+	 * @see org.prop4j.Node#getValue(java.util.Map)
 	 */
 	@Override
-	public boolean isConjunctiveNormalForm() {
+	public boolean getValue(Map<Object, Boolean> assignment) {
 		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#isRegularConjunctiveNormalForm()
+	 * @see org.prop4j.Node#clone()
 	 */
 	@Override
-	public boolean isRegularConjunctiveNormalForm() {
-		// TODO Auto-generated method stub
-		return false;
+	public Node clone() {
+		return new GreaterEqual(leftTerm, rightTerm);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#eliminateNonCNFOperators(org.prop4j.Node[])
+	 * @see org.prop4j.Node#toString()
 	 */
 	@Override
-	protected Node eliminateNonCNFOperators(Node[] newChildren) {
-		return null;
+	public String toString() {
+		return leftTerm.toString() + " >= " + rightTerm.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return leftTerm.hashCode() * rightTerm.hashCode();
-	}
 }

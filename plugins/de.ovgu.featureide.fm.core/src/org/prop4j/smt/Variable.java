@@ -18,50 +18,54 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
-
-import java.util.Map;
+package org.prop4j.smt;
 
 /**
- * Constraint that is true if the left term is less than the right term
+ * Represents a variable of type {@link Datatype} used to express first-order-logic expressions.
  *
  * @author Joshua Sprey
  */
-public class LessThan extends AtomicFormula implements Cloneable {
+public class Variable<T extends Datatype> extends Term {
+
+	private final T type;
 
 	/**
-	 * @param leftTerm
-	 * @param rightTerm
+	 * @param var
 	 */
-	public LessThan(Term leftTerm, Term rightTerm) {
-		super(leftTerm, rightTerm);
+	public Variable(String varName, T type) {
+		super(varName);
+		this.type = type;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#getValue(java.util.Map)
-	 */
-	@Override
-	public boolean getValue(Map<Object, Boolean> assignment) {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#clone()
+	 * @see org.prop4j.Term#getVar()
 	 */
 	@Override
-	public Node clone() {
-		return new LessThan(leftTerm, rightTerm);
+	public String getValue() {
+		return var.toString();
+	}
+
+	public Datatype getType() {
+		return type;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#toString()
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " < " + rightTerm.toString();
+		return var.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Term#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode() + (var.hashCode() * 7);
 	}
 
 }

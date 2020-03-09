@@ -18,32 +18,51 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
+
+import java.util.Map;
+
+import org.prop4j.Node;
 
 /**
- * Term represent a variable, constant or function
+ * Constraint that is true if the left term is less or equal to the right term
  *
  * @author Joshua Sprey
  */
-public abstract class Term {
+public class LessEqual extends AtomicFormula implements Cloneable {
 
-	protected Term(Object var) {
-		this.var = var;
-	}
-
-	protected Object var;
-
-	public Object getValue() {
-		return var;
+	/**
+	 * @param leftTerm
+	 * @param rightTerm
+	 */
+	public LessEqual(Term leftTerm, Term rightTerm) {
+		super(leftTerm, rightTerm);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	 * @see org.prop4j.Node#getValue(java.util.Map)
 	 */
 	@Override
-	public int hashCode() {
-		final int hashCode = "terminus".hashCode() * 24;
-		return hashCode;
+	public boolean getValue(Map<Object, Boolean> assignment) {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#clone()
+	 */
+	@Override
+	public Node clone() {
+		return new LessEqual(leftTerm, rightTerm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#toString()
+	 */
+	@Override
+	public String toString() {
+		return leftTerm.toString() + " <= " + rightTerm.toString();
 	}
 }

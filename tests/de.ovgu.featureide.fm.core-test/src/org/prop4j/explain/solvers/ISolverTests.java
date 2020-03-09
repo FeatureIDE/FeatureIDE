@@ -20,7 +20,6 @@
  */
 package org.prop4j.explain.solvers;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -82,14 +81,14 @@ public abstract class ISolverTests {
 	public void testSatisfiableIncremental() throws ContradictionException {
 		final ISolver solver = getInstance(new And(new Or("A", "B")));
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
-		solver.push(new Or("A", new Not("A")).toRegularCNF().getChildren());
+		solver.push(new Or("A", new Not("A")).toRegularCNF());
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
 		solver.push(new Equals("A", "B").toRegularCNF().getChildren());
 		assertTrue(solver.isSatisfiable() == SatResult.TRUE);
-		solver.push(new Or(new Not("A"), new Not("B")).toRegularCNF().getChildren());
-		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
-		solver.push(new Or("B", new Not("B")).toRegularCNF().getChildren());
-		assertFalse(solver.isSatisfiable() == SatResult.FALSE);
+		solver.push(new Or(new Not("A"), new Not("B")).toRegularCNF());
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
+		solver.push(new Or("B", new Not("B")).toRegularCNF());
+		assertTrue(solver.isSatisfiable() == SatResult.FALSE);
 	}
 
 	@Test
@@ -152,14 +151,14 @@ public abstract class ISolverTests {
 
 	@Test
 	public void testModelAssumptions() throws ContradictionException {
-		final ISolver solver = getInstance(new Implies("A", "B"));
+		final ISolver solver = getInstance(new Implies("A", "B").toRegularCNF());
 		solver.push(new Literal("B", false));
 		final Object[] result = solver.findSolution();
 		assertTrue((int) result[0] == -1);
 		assertTrue((int) result[1] == -2);
 
 		solver.pop();
-		solver.push(new Not("B"));
+		solver.push(new Not("B").toRegularCNF());
 		final Object[] result2 = solver.findSolution();
 		assertTrue((int) result2[0] == -1);
 		assertTrue((int) result2[1] == -2);

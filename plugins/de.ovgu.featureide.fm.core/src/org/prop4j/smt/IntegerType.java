@@ -18,50 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
-
-import java.util.Map;
+package org.prop4j.smt;
 
 /**
- * Constraint that is true if the left term is greater than the right term
+ * Represent the type integer in query's for first-order-logic expressions.
  *
  * @author Joshua Sprey
  */
-public class GreaterThan extends AtomicFormula implements Cloneable {
+public class IntegerType extends Datatype {
 
-	/**
-	 * @param leftTerm
-	 * @param rightTerm
-	 */
-	public GreaterThan(Term leftTerm, Term rightTerm) {
-		super(leftTerm, rightTerm);
+	private final int value;
+
+	public IntegerType(int value) {
+		this.value = value;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#getValue(java.util.Map)
-	 */
 	@Override
-	public boolean getValue(Map<Object, Boolean> assignment) {
-		return false;
+	public Integer getValue() {
+		return value;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.Node#clone()
-	 */
-	@Override
-	public Node clone() {
-		return new GreaterThan(leftTerm, rightTerm);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Node#toString()
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " > " + rightTerm.toString();
+		return "" + value;
 	}
-
 }

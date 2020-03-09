@@ -34,8 +34,8 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.SatResult;
 import org.prop4j.solver.ISolver;
+import org.prop4j.solver.SatResult;
 
 /**
  * Tests for {@link MutableSatSolver}.
@@ -110,7 +110,7 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 			assertTrue(expected.contains(clause));
 		}
 		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
-		instance.push(new Implies("C", "B"));
+		instance.push(new Implies("C", "B").toRegularCNF());
 		expected.add(new Or(new Literal("C", false), "B"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));
@@ -194,7 +194,7 @@ public abstract class MutableSatSolverTests extends ISolverTests {
 			assertTrue(expected.contains(clause));
 		}
 		assertTrue(instance.isSatisfiable() == SatResult.TRUE);
-		instance.push(new Implies("C", "B"));
+		instance.push(new Implies("C", "B").toRegularCNF());
 		expected.add(new Or(new Literal("C", false), "B"));
 		for (final Node clause : instance.getClauses()) {
 			assertTrue(expected.contains(clause));

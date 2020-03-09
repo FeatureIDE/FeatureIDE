@@ -18,22 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.smt;
 
 import java.util.Map;
 
+import org.prop4j.Node;
+
 /**
- * Constraint that is true if the left term is greater or equal to the right term
+ * Constraint that is true if the left term and the right term have the same value
  *
  * @author Joshua Sprey
  */
-public class GreaterEqual extends AtomicFormula implements Cloneable {
+public class Equal extends AtomicFormula implements Cloneable {
 
 	/**
 	 * @param leftTerm
 	 * @param rightTerm
 	 */
-	public GreaterEqual(Term leftTerm, Term rightTerm) {
+	public Equal(Term leftTerm, Term rightTerm) {
 		super(leftTerm, rightTerm);
 	}
 
@@ -52,7 +54,7 @@ public class GreaterEqual extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public Node clone() {
-		return new GreaterEqual(leftTerm, rightTerm);
+		return new Equal(leftTerm, rightTerm);
 	}
 
 	/*
@@ -61,7 +63,6 @@ public class GreaterEqual extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " >= " + rightTerm.toString();
+		return leftTerm.toString() + " = " + rightTerm.toString();
 	}
-
 }

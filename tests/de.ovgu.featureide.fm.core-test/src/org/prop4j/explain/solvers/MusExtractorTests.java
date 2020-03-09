@@ -51,13 +51,6 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 		final Set<Node> actual = solver.getMinimalUnsatisfiableSubset();
 		assertEquals(expected, actual);
 	}
-//
-//	@Test
-//	public void testMusEmpty() {
-//		final IMusExtractor solver = getInstance(null);
-//		exception.expect(IllegalStateException.class);
-//		solver.getMinimalUnsatisfiableSubset();
-//	}
 
 	@Test
 	public void testMusContradiction() {
