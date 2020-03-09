@@ -17,7 +17,7 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	private Object oldValue;
 
 	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute att, D value) {
-		super(fmManager, EventType.ATTRIBUTE_CHANGED.toString());
+		super(fmManager, EventType.FEATURE_ATTRIBUTE_CHANGED.toString());
 		this.att = att;
 		this.value = value;
 	}
@@ -26,13 +26,13 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	protected FeatureIDEEvent operation(IFeatureModel model) {
 		oldValue = att.getValue();
 		att.setValue(value);
-		return new FeatureIDEEvent(att, EventType.ATTRIBUTE_CHANGED, false, att.getFeature());
+		return new FeatureIDEEvent(att, EventType.FEATURE_ATTRIBUTE_CHANGED, false, att.getFeature());
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel model) {
 		att.setValue(oldValue);
-		return new FeatureIDEEvent(att, EventType.ATTRIBUTE_CHANGED, false, att.getFeature());
+		return new FeatureIDEEvent(att, EventType.FEATURE_ATTRIBUTE_CHANGED, false, att.getFeature());
 	}
 
 	@Override

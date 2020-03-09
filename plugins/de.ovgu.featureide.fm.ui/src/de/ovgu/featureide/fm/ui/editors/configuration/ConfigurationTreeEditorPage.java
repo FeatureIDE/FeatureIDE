@@ -1173,7 +1173,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> resetSnapshot(configurationManager)));
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> updateInfoLabel(currentDisplay, propagator)));
-		LongRunningWrapper.startJob(updateToken, LongRunningWrapper.getRunner(sequence));
+		final IRunner<Boolean> runner = LongRunningWrapper.getRunner(sequence);
+		runner.addJobFinishedListener((finishedJob) -> {
+			currentDisplay.syncExec(() -> configurationManager.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_SELECTION_CHANGED)));
+		});
+		LongRunningWrapper.startJob(updateToken, runner);
 	}
 
 	@Override
