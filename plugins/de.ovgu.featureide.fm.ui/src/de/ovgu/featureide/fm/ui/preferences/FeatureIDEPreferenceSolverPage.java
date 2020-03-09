@@ -48,7 +48,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 
 	private ComboFieldEditor fASolver;
 	private ComboFieldEditor fDSolver;
-	private ComboFieldEditor oASolver;
 
 	public FeatureIDEPreferenceSolverPage() {}
 
@@ -65,7 +64,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, SolverManager.PREFERENCE_STORE_PATH));
 		getPreferenceStore().setDefault(SolverManager.FEATURE_MODEL_ANALYSIS_SOLVER, Sat4JSatSolverFactory.ID);
 		getPreferenceStore().setDefault(SolverManager.FEATURE_MODEL_DEFECT_SOLVER, LtmsSatSolverFactory.ID);
-		getPreferenceStore().setDefault(SolverManager.OTHER_ANALYSES_SOLVER, Sat4JSatSolverFactory.ID);
 	}
 
 	@Override
@@ -74,7 +72,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 		createFeatureAnalysisSolverSettings(container);
 		createFeatureDefectExplanationSolverSettings(container);
-		createOtherAnalysesSolverSettings(container);
 		return container;
 	}
 
@@ -100,18 +97,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 		fDSolver.load();
 	}
 
-	private void createOtherAnalysesSolverSettings(Composite parent) {
-		final Group featureModelAnalysisGroup = new Group(parent, SWT.SHADOW_IN);
-		featureModelAnalysisGroup.setText(StringTable.CONFIGURATION_OTHER_ANALYSIS_SETTINGS);
-		featureModelAnalysisGroup.setLayout(new RowLayout(SWT.VERTICAL));
-		featureModelAnalysisGroup.setToolTipText(StringTable.CONFIGURATION_OTHER_ANALYSIS_SETTINGS_TOOLTIP);
-		oASolver = new ComboFieldEditor(SolverManager.OTHER_ANALYSES_SOLVER, "Solver: ", getSolverNamesAndValues(), featureModelAnalysisGroup);
-		oASolver.setPage(this);
-		oASolver.setPreferenceStore(getPreferenceStore());
-		oASolver.load();
-
-	}
-
 	private String[][] getSolverNamesAndValues() {
 		final String[][] solverNamesAndValues = new String[registeredFactories.size()][2];
 		for (int i = 0; i < registeredFactories.size(); i++) {
@@ -125,7 +110,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 	protected void performDefaults() {
 		fASolver.loadDefault();
 		fDSolver.loadDefault();
-		oASolver.loadDefault();
 		super.performDefaults();
 	}
 
@@ -133,7 +117,6 @@ public class FeatureIDEPreferenceSolverPage extends PreferencePage implements IW
 	public boolean performOk() {
 		fASolver.store();
 		fDSolver.store();
-		oASolver.store();
 		return super.performOk();
 	}
 }

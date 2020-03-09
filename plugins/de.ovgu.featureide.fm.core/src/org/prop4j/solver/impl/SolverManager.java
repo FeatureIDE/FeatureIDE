@@ -40,7 +40,6 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 	public final static String PREFERENCE_STORE_PATH = "de.ovgu.featureide.fm.ui.preferences.solver";
 	public final static String FEATURE_MODEL_ANALYSIS_SOLVER = "featureModelAnalysisSolver";
 	public final static String FEATURE_MODEL_DEFECT_SOLVER = "featureModelDefectSolver";
-	public final static String OTHER_ANALYSES_SOLVER = "otherAnalysesSolver";
 
 	private SolverManager() {}
 
@@ -88,21 +87,6 @@ public class SolverManager extends ExtensionManager<AbstractSolverFactory> {
 		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
 		if ((solverFactoryID == Sat4JSatSolverFactory.ID) || (solverFactoryID == JavaSmtSatSolverFactory.ID)) {
 			preferences.put(FEATURE_MODEL_DEFECT_SOLVER, solverFactoryID);
-		}
-	}
-
-	public static AbstractSolverFactory getSelectedOtherAnalysesSolverFactory() {
-		final Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCE_STORE_PATH);
-		final String solverID = preferences.get(OTHER_ANALYSES_SOLVER, Sat4JSatSolverFactory.ID);
-		try {
-			final AbstractSolverFactory f = getInstance().getExtension(solverID).getNewFactory();
-			if (f instanceof JavaSmtSatSolverFactory) {
-				final JavaSmtSatSolverFactory factory = (JavaSmtSatSolverFactory) f;
-				factory.solver = solver;
-			}
-			return f;
-		} catch (final NoSuchExtensionException e) {
-			return new Sat4JSatSolverFactory();
 		}
 	}
 }
