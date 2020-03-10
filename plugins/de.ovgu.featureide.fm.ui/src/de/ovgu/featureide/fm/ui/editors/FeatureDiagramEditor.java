@@ -721,7 +721,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
 			setDirty();
-			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
 		case LOCATION_CHANGED:
@@ -836,12 +835,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
-			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			graphicalFeatureModel.writeFeatureModel();
 			setDirty();
-			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
 		case FEATURE_HIDDEN_CHANGED:
@@ -853,7 +850,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 							 // that
 			// leads to errors.
 			viewer.refreshChildAll((IFeature) source);
-			legendLayoutAction.refresh();
 			setDirty();
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
