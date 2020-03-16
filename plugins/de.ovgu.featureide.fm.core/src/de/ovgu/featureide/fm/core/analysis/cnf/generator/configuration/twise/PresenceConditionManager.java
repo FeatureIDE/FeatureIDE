@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
  *
  * @author Sebastian Krieter
  */
-class PresenceConditionManager {
+public class PresenceConditionManager {
 
 	private final List<List<PresenceCondition>> dictonary = new ArrayList<>();
 	private final List<List<PresenceCondition>> groupedPresenceConditions = new ArrayList<>();

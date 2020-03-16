@@ -303,12 +303,26 @@ public class TWiseConfiguration extends LiteralSet {
 					final ISatSolver solver = util.getSolver();
 					final int orgAssignmentSize = setUpSolver(solver);
 					try {
-						s = solver.findSolution();
+						final SatResult satResult = solver.hasSolution();
+						switch (satResult) {
+						case FALSE:
+							throw new RuntimeException("Solution Invalid!");
+						case TIMEOUT:
+							throw new RuntimeException("SatSolver Timeout!");
+						case TRUE:
+							s = solver.getSolution();
+							break;
+						default:
+							throw new RuntimeException(satResult.toString());
+						}
 					} finally {
 						solver.assignmentClear(orgAssignmentSize);
 					}
 				} else {
 					s = util.getSolverSolution(solverSolutionIndex.last()).getLiterals();
+					if (s == null) {
+						throw new RuntimeException();
+					}
 				}
 			} else {
 				s = Arrays.copyOf(literals, literals.length);
@@ -354,9 +368,15 @@ public class TWiseConfiguration extends LiteralSet {
 
 	public int setUpSolver(final ISatSolver solver) {
 		final int orgAssignmentSize = solver.getAssignmentSize();
-		final int[] array = solutionLiterals.toArray();
-		for (int i = 0, length = solutionLiterals.size(); i < length; i++) {
-			solver.assignmentPush(array[i]);
+		if (isComplete()) {
+			for (int i = 0; i < literals.length; i++) {
+				solver.assignmentPush(literals[i]);
+			}
+		} else {
+			final int[] array = solutionLiterals.toArray();
+			for (int i = 0, length = solutionLiterals.size(); i < length; i++) {
+				solver.assignmentPush(array[i]);
+			}
 		}
 		return orgAssignmentSize;
 	}
@@ -366,7 +386,7 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public void updateSolverSolutions() {
-		if (util.hasSolver()) {
+		if (util.hasSolver() && (solutionLiterals != null)) {
 			solverSolutionIndex.clear();
 			final int[] array = solutionLiterals.toArray();
 			final LiteralSet[] solverSolutions = util.getSolverSolutions();
@@ -388,20 +408,22 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public void updateSolverSolutions(int[] solverSolution, int index) {
-		for (int i = 0; i < solverSolutionIndex.size(); i++) {
-			if (solverSolutionIndex.get(i) == index) {
-				solverSolutionIndex.delete(i);
-				break;
+		if (solverSolutionIndex != null) {
+			for (int i = 0; i < solverSolutionIndex.size(); i++) {
+				if (solverSolutionIndex.get(i) == index) {
+					solverSolutionIndex.delete(i);
+					break;
+				}
 			}
-		}
-		final int[] array = solutionLiterals.toArray();
-		for (int i = 0, length = solutionLiterals.size(); i < length; i++) {
-			final int k = Math.abs(array[i]) - 1;
-			if (solverSolution[k] == -literals[k]) {
-				return;
+			final int[] array = solutionLiterals.toArray();
+			for (int i = 0, length = solutionLiterals.size(); i < length; i++) {
+				final int k = Math.abs(array[i]) - 1;
+				if (solverSolution[k] == -literals[k]) {
+					return;
+				}
 			}
+			solverSolutionIndex.push(index);
 		}
-		solverSolutionIndex.push(index);
 	}
 
 	public VecInt getSolverSolutionIndex() {

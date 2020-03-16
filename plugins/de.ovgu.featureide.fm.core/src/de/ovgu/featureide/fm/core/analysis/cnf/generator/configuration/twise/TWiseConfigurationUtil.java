@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-class TWiseConfigurationUtil {
+public class TWiseConfigurationUtil {
 
 	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
 
@@ -247,19 +247,19 @@ class TWiseConfigurationUtil {
 	}
 
 	public boolean removeInvalidClauses(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		int validCount = nextCondition.size();
-		for (final LiteralSet literals : nextCondition) {
+		for (final Iterator<LiteralSet> conditionIterator = nextCondition.iterator(); conditionIterator.hasNext();) {
+			final LiteralSet literals = conditionIterator.next();
 			if (!isCombinationValid(literals)) {
-				validCount--;
-				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
+				conditionIterator.remove();
+				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> candidateIterator = candidatesList.iterator(); candidateIterator.hasNext();) {
+					final Pair<LiteralSet, TWiseConfiguration> pair = candidateIterator.next();
 					if (pair.getKey().equals(literals)) {
-						iterator.remove();
+						candidateIterator.remove();
 					}
 				}
 			}
 		}
-		return validCount == 0;
+		return nextCondition.size() == 0;
 	}
 
 	public boolean isSelectionPossible(final LiteralSet literals, final TWiseConfiguration configuration, boolean useSolver) {
@@ -368,6 +368,7 @@ class TWiseConfigurationUtil {
 		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
 			if (isSelectionPossible(pair.getKey(), pair.getValue(), useSolver)) {
 				select(pair.getValue(), Deduce.NONE, pair.getKey());
+				assert pair.getValue().isValid();
 				return true;
 			}
 		}
@@ -378,6 +379,7 @@ class TWiseConfigurationUtil {
 		if (completeSolutionList.size() < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(this);
 			selectLiterals(configuration, Deduce.DP, literals);
+			assert configuration.isValid();
 			configuration.updateSolverSolutions();
 			if (configuration.isComplete()) {
 				configuration.clear();

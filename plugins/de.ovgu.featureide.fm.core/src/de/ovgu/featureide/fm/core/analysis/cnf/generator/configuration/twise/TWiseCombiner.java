@@ -84,11 +84,11 @@ public class TWiseCombiner {
 		features = new int[numberOfVariables + 1];
 	}
 
-	public boolean combineConditions(PresenceCondition[] conditionArray, ClauseList combinedCondition) {
+	public boolean combineConditions(ClauseList[] conditionArray, ClauseList combinedCondition) {
 		return combineConditions(conditionArray, 0, combinedCondition);
 	}
 
-	private boolean combineConditions(PresenceCondition[] conditionArray, int t, ClauseList combinedCondition) {
+	private boolean combineConditions(ClauseList[] conditionArray, int t, ClauseList combinedCondition) {
 		if (t == conditionArray.length) {
 			final int[] combinedLiteralsArray = Arrays.copyOfRange(lits.toArray(), 0, lits.size());
 			combinedCondition.add(new LiteralSet(combinedLiteralsArray));

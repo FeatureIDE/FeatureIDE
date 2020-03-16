@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -28,6 +29,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.LexicographicIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.CoverageStatistic;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.TWiseStatisticGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.TWiseStatisticGenerator.ConfigurationScore;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 
 /**
@@ -50,14 +54,18 @@ public class TWiseConfigurationTester {
 			util = new TWiseConfigurationUtil(cnf, null);
 		}
 
-		util.computeRandomSample();
+		getUtil().computeRandomSample();
 		if (!cnf.getClauses().isEmpty()) {
-			util.computeMIG();
+			getUtil().computeMIG();
 		}
 	}
 
 	public void setNodes(List<List<ClauseList>> expressions) {
-		presenceConditionManager = new PresenceConditionManager(util, expressions);
+		presenceConditionManager = new PresenceConditionManager(getUtil(), expressions);
+	}
+
+	public void setNodes(PresenceConditionManager expressions) {
+		presenceConditionManager = expressions;
 	}
 
 	public void setT(int t) {
@@ -68,30 +76,24 @@ public class TWiseConfigurationTester {
 		this.sample = sample;
 	}
 
+	public List<LiteralSet> getSample() {
+		return sample;
+	}
+
 	/**
-	 * Creates statistic values about covered combinations.<br>
-	 * To get a percentage value of covered combinations use:<br>
-	 * <pre>{@code
-	 * 	TWiseConfigurationStatistic coverage = getCoverage();
+	 * Creates statistic values about covered combinations.<br> To get a percentage value of covered combinations use:<br> <pre>{@code
+	 * 	CoverageStatistic coverage = getCoverage();
 	 * 	double covered = (double) coverage.getNumberOfCoveredConditions() / coverage.getNumberOfValidConditions();
 	 * }</pre>
 	 *
-
-	 * @return a statistic object containing multiple values:<br>
-	 *         <ul>
-	 *              <li>number of valid combinations
-	 *              <li>number of invalid combinations
-	 *              <li>number of covered combinations
-	 *              <li>number of uncovered combinations
-	 *              <li>value of each configuration
-	 *         </ul>
+	 *
+	 * @return a statistic object containing multiple values:<br> <ul> <li>number of valid combinations <li>number of invalid combinations <li>number of covered
+	 *         combinations <li>number of uncovered combinations <li>value of each configuration </ul>
 	 */
-	public TWiseConfigurationStatistic getCoverage() {
-		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
-		statistic.setT(t);
-		statistic.setOnlyCoverage(true);
-		statistic.calculate(util, sample, presenceConditionManager.getGroupedPresenceConditions());
-		return statistic;
+	public CoverageStatistic getCoverage() {
+		final List<CoverageStatistic> coveragePerSample = new TWiseStatisticGenerator(util).getCoverage(Arrays.asList(sample),
+				presenceConditionManager.getGroupedPresenceConditions(), t, ConfigurationScore.NONE, true);
+		return coveragePerSample.get(0);
 	}
 
 	public boolean hasUncoveredConditions() {
@@ -110,7 +112,7 @@ public class TWiseConfigurationTester {
 
 	private List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
 		final ArrayList<ClauseList> uncoveredConditions = new ArrayList<>();
-		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
+		final TWiseCombiner combiner = new TWiseCombiner(getUtil().getCnf().getVariables().size());
 		ClauseList combinedCondition = new ClauseList();
 
 		groupLoop: for (final List<PresenceCondition> expressions : presenceConditionManager.getGroupedPresenceConditions()) {
@@ -122,7 +124,7 @@ public class TWiseConfigurationTester {
 
 				combinedCondition.clear();
 				combiner.combineConditions(clauseListArray, combinedCondition);
-				if (!TWiseConfigurationUtil.isCovered(combinedCondition, sample) && util.isCombinationValid(combinedCondition)) {
+				if (!TWiseConfigurationUtil.isCovered(combinedCondition, sample) && getUtil().isCombinationValid(combinedCondition)) {
 					uncoveredConditions.add(combinedCondition);
 					combinedCondition = new ClauseList();
 					if (cancelAfterFirst) {
@@ -152,7 +154,7 @@ public class TWiseConfigurationTester {
 	private List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
 		final ArrayList<LiteralSet> invalidSolutions = new ArrayList<>();
 		configLoop: for (final LiteralSet solution : sample) {
-			for (final LiteralSet clause : util.getCnf().getClauses()) {
+			for (final LiteralSet clause : getUtil().getCnf().getClauses()) {
 				if (!solution.hasDuplicates(clause)) {
 					invalidSolutions.add(solution);
 					if (cancelAfterFirst) {
@@ -162,6 +164,10 @@ public class TWiseConfigurationTester {
 			}
 		}
 		return invalidSolutions;
+	}
+
+	public TWiseConfigurationUtil getUtil() {
+		return util;
 	}
 
 }

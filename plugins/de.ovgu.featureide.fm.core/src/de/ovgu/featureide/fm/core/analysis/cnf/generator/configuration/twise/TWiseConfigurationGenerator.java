@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICo
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationSupplier;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator3;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.SingleIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.CoverageStatistic;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.TWiseStatisticFastGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
@@ -123,8 +125,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return TWiseCombiner.convertExpressions(expressions);
 	}
 
+	public static final int DEFAULT_ITERATIONS = 5;
+
 	// TODO Variation Point: Iterations of removing low-contributing Configurations
-	private int iterations = 5;
+	private int iterations = DEFAULT_ITERATIONS;
 
 	protected TWiseConfigurationUtil util;
 	protected TWiseCombiner combiner;
@@ -199,12 +203,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private void trimConfigurations() {
 		if (curResult != null) {
-			final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
-			statistic.setT(t);
-			statistic.setFastCalc(true);
-			statistic.calculate(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
+			final CoverageStatistic statistic =
+				new TWiseStatisticFastGenerator(util).getCoverage(curResult, presenceConditionManager.getGroupedPresenceConditions(), t);
 
-			final double[] normConfigValues = statistic.getConfigValues2();
+			final double[] normConfigValues = statistic.getConfigScores();
 			double mean = 0;
 			for (final double d : normConfigValues) {
 				mean += d;
