@@ -35,4 +35,6 @@ public interface ICLIFunction extends IExtension {
 
 	void run(List<String> args);
 
+	String getHelp();
+
 }

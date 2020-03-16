@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.cli;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
@@ -36,9 +37,10 @@ public class FeatureIDECLI {
 	public static void main(String[] args) {
 		if (args.length == 0) {
 			System.err.println("No operation specified!");
+			printHelp(System.err);
 			return;
 		}
-		System.err.println(Arrays.asList(args));
+		System.out.println(Arrays.asList(args));
 
 		final String functionName = args[0];
 
@@ -49,10 +51,7 @@ public class FeatureIDECLI {
 			function = CLIFunctionManager.getInstance().getFactory(functionName);
 		} catch (final NoSuchExtensionException e) {
 			System.err.println("No function found with the name " + functionName);
-			System.err.println("Following functions are available:");
-			for (final ICLIFunction availableFunction : CLIFunctionManager.getInstance().getExtensions()) {
-				System.err.println("\t" + availableFunction.getName());
-			}
+			printHelp(System.err);
 			return;
 		}
 
@@ -60,7 +59,15 @@ public class FeatureIDECLI {
 			function.run(Arrays.asList(args).subList(1, args.length));
 		} catch (final IllegalArgumentException e) {
 			System.err.println(e.getMessage());
+			System.err.println(function.getHelp());
 			return;
+		}
+	}
+
+	private static void printHelp(PrintStream printStream) {
+		printStream.println("Following functions are available:");
+		for (final ICLIFunction availableFunction : CLIFunctionManager.getInstance().getExtensions()) {
+			printStream.println("\t" + availableFunction.getName());
 		}
 	}
 
