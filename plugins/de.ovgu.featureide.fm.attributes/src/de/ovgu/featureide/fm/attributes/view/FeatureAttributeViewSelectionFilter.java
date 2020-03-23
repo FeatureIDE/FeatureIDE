@@ -59,6 +59,10 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 		return super.filter(viewer, parent, elements);
 	}
 
+	/**
+	 * Marks the features that should be displayed in the feature attribute view when an extended configuration is opened. The marked features are stored in
+	 * configurableFilterList
+	 */
 	private void createConfigurableDependencyMap() {
 		configurableFilterList = new ArrayList<>();
 		if (faView.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
@@ -67,7 +71,15 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 		}
 	}
 
-	private long createConfigurableDependencyMap(Configuration config, SelectableFeature feature) {
+	/**
+	 * Recurively traverses the feature model and adds every feature that contains a configurable attribute or has children with configurable attributes to the
+	 * configurableFilterList
+	 * 
+	 * @param config
+	 * @param feature currently recursed feature
+	 * @return
+	 */
+	private int createConfigurableDependencyMap(Configuration config, SelectableFeature feature) {
 		if (!(feature.getFeature().getFeatureModel() instanceof ExtendedFeatureModel)) {
 			return 0;
 		}

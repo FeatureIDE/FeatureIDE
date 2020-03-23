@@ -37,159 +37,159 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
-	FEATURE_MODEL_OPERATION,
-	/**
-	 * The constraint was moved.
-	 */
-	CONSTRAINT_MOVE,
-	/**
-	 * A constraint's graphical position was modified.
-	 */
-	CONSTRAINT_MOVE_LOCATION,
-	/**
-	 * A constraint was modified.
-	 */
-	CONSTRAINT_MODIFY,
-	/**
-	 * A constraint was deleted.
-	 */
-	CONSTRAINT_DELETE,
-	/**
-	 * A constraint was added.
-	 */
-	CONSTRAINT_ADD,
-	/**
-	 * A feature was deleted.
-	 */
-	FEATURE_DELETE,
-	/**
-	 * A feature was added above another feature.
-	 */
-	FEATURE_ADD_ABOVE,
-	/**
-	 * A feature was added.
-	 */
-	FEATURE_ADD,
-	/**
-	 * A sibling was added.
-	 */
-	FEATURE_ADD_SIBLING,
-	/**
-	 * A feature's name was changed.
-	 */
-	FEATURE_NAME_CHANGED,
-	/**
-	 * A feature's name was changed and persistently saved.
-	 */
-	FEATURE_NAME_PERSISTENTLY_CHANGED,
-	/**
-	 * All features changed their name representation.
-	 */
-	ALL_FEATURES_CHANGED_NAME_TYPE,
-	/**
-	 * A color was changed.
-	 */
-	FEATURE_COLOR_CHANGED,
-	/**
-	 * A hidden feature was changed.
-	 */
-	FEATURE_HIDDEN_CHANGED,
-	/**
-	 * A collapsed feature was changed.
-	 */
-	FEATURE_COLLAPSED_CHANGED,
-	/**
-	 * A collapsed feature was changed.
-	 */
-	FEATURE_COLLAPSED_ALL_CHANGED,
-	/**
-	 * The location of an object was changed.
-	 */
-	LOCATION_CHANGED,
-	/**
-	 * A feature attributed (e.g., the "is dead" flag) changed.
-	 */
-	ATTRIBUTE_CHANGED,
-	/**
-	 * A group type changed (e.g., from "or" to "xor").
-	 */
-	GROUP_TYPE_CHANGED,
-	/**
-	 * A feature parent changed.
-	 */
-	PARENT_CHANGED,
-	/**
-	 * The mandatory state changed.
-	 */
-	MANDATORY_CHANGED,
-	/**
-	 * The feature structure changed.
-	 */
-	STRUCTURE_CHANGED,
-	/**
-	 * The legend layout was changed.
-	 */
-	LEGEND_LAYOUT_CHANGED,
-	/**
-	 * The model layout was changed (e.g., from vertical to horizontal).
-	 */
-	MODEL_LAYOUT_CHANGED,
-	/**
-	 * The model data changed (i.e., the underlying model file was changed).
-	 */
-	MODEL_DATA_CHANGED,
-	/**
-	 * The model data was saved to file.
-	 */
-	MODEL_DATA_SAVED,
-	/**
-	 * The model data loaded from a file has overridden the internal model instance.
-	 */
-	MODEL_DATA_OVERWRITTEN,
-	/**
-	 * The diagram was redrawn.
-	 */
-	REDRAW_DIAGRAM,
-	/**
-	 * The refresh action command was triggered.
-	 */
-	REFRESH_ACTIONS,
-	/**
-	 * The children of a feature changed.
-	 */
-	CHILDREN_CHANGED,
-	/**
-	 * The dependency for a subtree was calculated.
-	 */
-	DEPENDENCY_CALCULATED,
-	/**
-	 * Selection state of a feature in the configuration editor was changed.
-	 */
-	FEATURE_SELECTION_CHANGED,
-	/**
-	 * The active explanation changed.
-	 */
-	ACTIVE_EXPLANATION_CHANGED,
-	/**
-	 * Any feature attribute was added or altered.
-	 */
-	FEATURE_ATTRIBUTE_CHANGED,
-	/**
-	 * Value of configurable attribute was overwritten for a configuration
-	 */
-	CONFIGURABLE_ATTRIBUTE_CHANGED,
-	/**
-	 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
-	 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as
-	 * each feature model would have to search the explanation for the relevant reason again. As such, each event of this type carries the respective reason so
-	 * the feature model element does not have to look for it itself.
-	 */
-	ACTIVE_REASON_CHANGED,
-	/**
-	 * Default. Do nothing.
-	 */
-	// TODO !!! implement feature order event
-	DEFAULT, FEATURE_ORDER_CHANGED,
+		FEATURE_MODEL_OPERATION,
+		/**
+		 * The constraint was moved.
+		 */
+		CONSTRAINT_MOVE,
+		/**
+		 * A constraint's graphical position was modified.
+		 */
+		CONSTRAINT_MOVE_LOCATION,
+		/**
+		 * A constraint was modified.
+		 */
+		CONSTRAINT_MODIFY,
+		/**
+		 * A constraint was deleted.
+		 */
+		CONSTRAINT_DELETE,
+		/**
+		 * A constraint was added.
+		 */
+		CONSTRAINT_ADD,
+		/**
+		 * A feature was deleted.
+		 */
+		FEATURE_DELETE,
+		/**
+		 * A feature was added above another feature.
+		 */
+		FEATURE_ADD_ABOVE,
+		/**
+		 * A feature was added.
+		 */
+		FEATURE_ADD,
+		/**
+		 * A sibling was added.
+		 */
+		FEATURE_ADD_SIBLING,
+		/**
+		 * A feature's name was changed.
+		 */
+		FEATURE_NAME_CHANGED,
+		/**
+		 * A feature's name was changed and persistently saved.
+		 */
+		FEATURE_NAME_PERSISTENTLY_CHANGED,
+		/**
+		 * All features changed their name representation.
+		 */
+		ALL_FEATURES_CHANGED_NAME_TYPE,
+		/**
+		 * A color was changed.
+		 */
+		FEATURE_COLOR_CHANGED,
+		/**
+		 * A hidden feature was changed.
+		 */
+		FEATURE_HIDDEN_CHANGED,
+		/**
+		 * A collapsed feature was changed.
+		 */
+		FEATURE_COLLAPSED_CHANGED,
+		/**
+		 * A collapsed feature was changed.
+		 */
+		FEATURE_COLLAPSED_ALL_CHANGED,
+		/**
+		 * The location of an object was changed.
+		 */
+		LOCATION_CHANGED,
+		/**
+		 * A feature attributed (e.g., the "is dead" flag) changed.
+		 */
+		ATTRIBUTE_CHANGED,
+		/**
+		 * A group type changed (e.g., from "or" to "xor").
+		 */
+		GROUP_TYPE_CHANGED,
+		/**
+		 * A feature parent changed.
+		 */
+		PARENT_CHANGED,
+		/**
+		 * The mandatory state changed.
+		 */
+		MANDATORY_CHANGED,
+		/**
+		 * The feature structure changed.
+		 */
+		STRUCTURE_CHANGED,
+		/**
+		 * The legend layout was changed.
+		 */
+		LEGEND_LAYOUT_CHANGED,
+		/**
+		 * The model layout was changed (e.g., from vertical to horizontal).
+		 */
+		MODEL_LAYOUT_CHANGED,
+		/**
+		 * The model data changed (i.e., the underlying model file was changed).
+		 */
+		MODEL_DATA_CHANGED,
+		/**
+		 * The model data was saved to file.
+		 */
+		MODEL_DATA_SAVED,
+		/**
+		 * The model data loaded from a file has overridden the internal model instance.
+		 */
+		MODEL_DATA_OVERWRITTEN,
+		/**
+		 * The diagram was redrawn.
+		 */
+		REDRAW_DIAGRAM,
+		/**
+		 * The refresh action command was triggered.
+		 */
+		REFRESH_ACTIONS,
+		/**
+		 * The children of a feature changed.
+		 */
+		CHILDREN_CHANGED,
+		/**
+		 * The dependency for a subtree was calculated.
+		 */
+		DEPENDENCY_CALCULATED,
+		/**
+		 * Selection state of a feature in the configuration editor was changed.
+		 */
+		FEATURE_SELECTION_CHANGED,
+		/**
+		 * The active explanation changed.
+		 */
+		ACTIVE_EXPLANATION_CHANGED,
+		/**
+		 * Any feature attribute was added or altered.
+		 */
+		FEATURE_ATTRIBUTE_CHANGED,
+		/**
+		 * Value of configurable attribute was overwritten for a configuration
+		 */
+		CONFIGURABLE_ATTRIBUTE_CHANGED,
+		/**
+		 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
+		 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as
+		 * each feature model would have to search the explanation for the relevant reason again. As such, each event of this type carries the respective reason
+		 * so the feature model element does not have to look for it itself.
+		 */
+		ACTIVE_REASON_CHANGED,
+		/**
+		 * Default. Do nothing.
+		 */
+		// TODO !!! implement feature order event
+		DEFAULT, FEATURE_ORDER_CHANGED,
 	}
 
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];

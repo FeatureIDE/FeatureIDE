@@ -14,7 +14,7 @@ import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
-/***
+/**
  * Listener used to define the set of features to show in the {@link FeatureAttributeView}. Is only active when {@link FeatureAttributeView} is in operation
  * mode {@link FeatureAttributeView.FeatureAttributeOperationMode} == FEATURE_DIAGRAM
  * 
