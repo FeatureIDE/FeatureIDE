@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ite
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.CoverageStatistic;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.TWiseStatisticGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.TWiseStatisticGenerator.ConfigurationScore;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.test.ValidityStatistic;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 
 /**
@@ -94,6 +95,11 @@ public class TWiseConfigurationTester {
 		final List<CoverageStatistic> coveragePerSample = new TWiseStatisticGenerator(util).getCoverage(Arrays.asList(sample),
 				presenceConditionManager.getGroupedPresenceConditions(), t, ConfigurationScore.NONE, true);
 		return coveragePerSample.get(0);
+	}
+
+	public ValidityStatistic getValidity() {
+		final List<ValidityStatistic> validityPerSample = new TWiseStatisticGenerator(util).getValidity(Arrays.asList(sample));
+		return validityPerSample.get(0);
 	}
 
 	public boolean hasUncoveredConditions() {
