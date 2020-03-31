@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -45,6 +46,11 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
+		// skip when automated analyses are deactivated
+		if (!FeatureModelProperty.isRunCalculationAutomatically(configurationMap.getFeatureProject().getFeatureModelManager().getObject())
+			|| !FeatureModelProperty.isCalculateFeatures(configurationMap.getFeatureProject().getFeatureModelManager().getObject())) {
+			return;
+		}
 		final FeatureModelFormula featureModel = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
 		if (featureModel.getFeatureModel() != featureModelFilterIsInitializedFor) {
 			final FeatureModelAnalyzer analyser = featureModel.getAnalyzer();
@@ -55,6 +61,6 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		return foFeatures.contains(feature);
+		return foFeatures != null ? foFeatures.contains(feature) : false;
 	}
 }

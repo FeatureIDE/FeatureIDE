@@ -463,26 +463,14 @@ public class AnalysesCollection {
 	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints a also NOT analyzed.
 	 */
 	public boolean isCalculateFeatures() {
-		Boolean isCalculatingFeatures = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
-				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES);
-		if (isCalculatingFeatures == null) {
-			// default value == true
-			isCalculatingFeatures = Boolean.TRUE;
-		}
-		return isCalculatingFeatures;
+		return FeatureModelProperty.isCalculateFeatures(formula.getFeatureModel());
 	}
 
 	/**
 	 * Defines whether constraints should be included into calculations.
 	 */
 	public boolean isCalculateConstraints() {
-		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(),
-				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
-		if (isCalculatingConstraints == null) {
-			// default value == true
-			isCalculatingConstraints = Boolean.TRUE;
-		}
-		return isCalculatingConstraints;
+		return FeatureModelProperty.isCalculateConstraints(formula.getFeatureModel());
 	}
 
 	public boolean isCalculateRedundantConstraints() {
@@ -526,22 +514,8 @@ public class AnalysesCollection {
 		constraintAnomaliesAnalysis.setEnabled(calculateDeadConstraints);
 	}
 
-	/**
-	 * Defines whether analysis should be performed automatically.
-	 */
 	public boolean isRunCalculationAutomatically() {
-		Boolean isRunAutomatically = FeatureModelProperty.getBooleanProperty(formula.getFeatureModel().getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
-				FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
-		if (isRunAutomatically == null) {
-			if (formula.getFeatureModel().getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT) {
-				// Is big model => no automatic analyses as default
-				isRunAutomatically = Boolean.FALSE;
-			} else {
-				// Is small model => automatic analyses as default
-				isRunAutomatically = Boolean.TRUE;
-			}
-		}
-		return isRunAutomatically;
+		return FeatureModelProperty.isRunCalculationAutomatically(formula.getFeatureModel());
 	}
 
 	public FeatureModelProperties getFeatureModelProperties() {

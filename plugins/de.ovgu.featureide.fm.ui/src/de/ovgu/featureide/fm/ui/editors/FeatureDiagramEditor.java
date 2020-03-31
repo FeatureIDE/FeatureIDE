@@ -92,6 +92,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -447,6 +448,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * Sets the active explanation depending on the current selection.
 	 */
 	protected void setActiveExplanation() {
+		// skip when automated analyses are deactivated
+		if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+			|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+			return;
+		}
+
 		ModelElementEditPart primary = null;
 		for (final Object selected : viewer.getSelectedEditParts()) {
 			if (!(selected instanceof ModelElementEditPart)) {
@@ -507,6 +514,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public void analyzeFeatureModel() {
+		// Check if automatic calculations are nessecary
+		if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+			|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+			return;
+		}
+
 		final FeatureModelFormula variableFormula = fmManager.getVariableFormula();
 		final FeatureModelFormula persistentFormula = fmManager.getPersistentFormula();
 		final IFeatureModel featureModel = variableFormula.getFeatureModel();

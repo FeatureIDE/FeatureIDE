@@ -89,9 +89,9 @@ import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Operator;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -356,6 +356,9 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String CONSTRAINT_CONNOT_BE_SAVED = "Constraint is invalid and can not be saved:\n%s";
 
+		static final String CONSTRAINT_IS_NOT_VALIDATED =
+			"Constraint is not validated as automated analyses are disabled. Enable automated analyses in the feature diagram editor to activate interactive constraint validation.";
+
 	}
 
 	/**
@@ -406,7 +409,7 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * An object which contains several validation functionalities used in this dialog to check if a given constraint text is valid.
 	 */
-	private final ConstraintTextValidator validator = new ConstraintTextValidator();
+	private ConstraintTextValidator validator;
 	private final IFeatureModelManager featureModelManager;
 	private final List<String> featureNamesList;
 
@@ -474,7 +477,6 @@ public class ConstraintDialog implements GUIDefaults {
 	public ConstraintDialog(final IFeatureModelManager featureModelManager, final IConstraint constraint) {
 		this.featureModelManager = featureModelManager;
 		featureNamesList = FeatureUtils.getFeatureNamesList(featureModelManager.getSnapshot());
-		final FeatureModelFormula formula = featureModelManager.getVariableFormula();
 		this.constraint = constraint;
 
 		final String constraintDescriptionText;
@@ -514,7 +516,13 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.open();
 
 		update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
-		validator.init(formula, constraint, onUpdate);
+		// Only create validator when autmated analyses are enabled
+		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
+			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())
+			&& FeatureModelProperty.isCalculateConstraints(featureModelManager.getVarObject())) {
+			validator = new ConstraintTextValidator();
+			validator.init(featureModelManager.getVariableFormula(), constraint, onUpdate);
+		}
 
 		if (constraint != null) {
 			validate();
@@ -532,7 +540,9 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Logic for pressing cancel-button. This method is called when pressing ESC or hit the cancel button.
 	 */
 	private void cancelButtonPressEvent() {
-		validator.cancelValidation();
+		if (validator != null) {
+			validator.cancelValidation();
+		}
 		shell.dispose();
 	}
 
@@ -918,7 +928,9 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void okButtonPressEvent() {
 		if (okButton.isEnabled()) {
-			validator.cancelValidation();
+			if (validator != null) {
+				validator.cancelValidation();
+			}
 			closeShell();
 		}
 	}
@@ -968,8 +980,13 @@ public class ConstraintDialog implements GUIDefaults {
 				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
 						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
 			} else {
-				if (!validator.validateAsync(constraintNode, onUpdate)) {
-					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
+				if (validator != null) {
+					if (!validator.validateAsync(constraintNode, onUpdate)) {
+						update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
+					}
+				} else {
+					// Show the user that constraints are not checked for validity as automated analyses are disabled
+					update(StringTable.CONSTRAINT_IS_NOT_VALIDATED, HeaderPanel.HeaderDescriptionImage.WARNING, DialogState.SAVE_CHANGES_DONT_MIND);
 				}
 			}
 			constraintText.updateHighlight(nodeReader.errorType);
