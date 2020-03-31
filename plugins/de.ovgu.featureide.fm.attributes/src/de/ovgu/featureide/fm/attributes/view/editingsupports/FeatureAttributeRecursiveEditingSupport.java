@@ -87,7 +87,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		} else {
 			attribute.deleteRecursiveAttributes(feat);
 		}
-		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
 	}
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {

@@ -815,6 +815,13 @@ public class StringTable {
 	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
 	public static final String MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL =
 		"The open feature model does not support attributes. To use attributes convert your feature model to an extended feature model.";
+	public static final String CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG =
+		"The open configuration does not support attributes. To use attributes create an extended configuration.";
+	public static final String PAGE_NOT_SUPPORTED_EXTENDED_FEATURE_MODEL =
+		"Source and feature order tab of the feature model editor are not supported. To use attributes switch to feature diagram tab.";
+	public static final String PAGE_NOT_SUPPORTED_EXTENDED_CONFIGURATION =
+		"Source tab of the feature model editor is not supported. To use attributes switch to (advanced) configuration tab.";
+
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Semantical statistics";
@@ -1115,4 +1122,6 @@ public class StringTable {
 	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
+	public static final String NO_CONFIGURABLE_ATTRIBUTES = "The feature model does not contain configurable attributes.";
+
 }

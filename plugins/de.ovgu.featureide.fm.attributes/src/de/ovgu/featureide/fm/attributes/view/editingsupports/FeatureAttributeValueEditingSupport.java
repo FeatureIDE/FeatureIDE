@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -34,10 +33,13 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView.FeatureAttributeOperationMode;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeValueOperation;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeConfigurableAttributeValueOperation;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
@@ -73,13 +75,16 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
 		if (view.getCurrentEditor() instanceof ConfigurationEditor) {
-			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getSnapshot();
+			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getVarObject();
 			for (SelectableFeature feat : config.getFeatures()) {
 				if (feat.getFeature().getName().equals(attribute.getFeature().getName())) {
 					if (feat instanceof ExtendedSelectableFeature) {
 						ExtendedSelectableFeature extSelectable = (ExtendedSelectableFeature) feat;
-						if (extSelectable.getConfigurableAttributes().containsKey(attribute.getName())) {
-							return extSelectable.getConfigurableAttributes().get(attribute.getName()).toString();
+						Object value = extSelectable.getAttributeValue(attribute);
+						if (value != null) {
+							return value.toString();
+						} else {
+							return "";
 						}
 					}
 				}
@@ -99,44 +104,77 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			getViewer().update(element, null);
 			return;
 		}
-		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
-			if (value.toString().toLowerCase().equals("")) {
-				((IFeatureAttribute) element).setValue(null);
-				view.getFeatureModel()
-						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-			} else if (value.toString().toLowerCase().equals(TRUE_STRING)) {
-				((IFeatureAttribute) element).setValue(new Boolean(true));
-				view.getFeatureModel()
-						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-			} else {
-				((IFeatureAttribute) element).setValue(new Boolean(false));
-				view.getFeatureModel()
-						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-			}
-		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
-			((IFeatureAttribute) element).setValue(value.toString());
-			view.getFeatureModel()
-					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
-			try {
-				final long temp = Long.parseLong(value.toString());
-				((IFeatureAttribute) element).setValue(new Long(temp));
-				view.getFeatureModel()
-						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-			} catch (final NumberFormatException e) {
-				MessageDialog.openError(null, "Invalid input", "Please insert a valid integer number.");
-			}
-		} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
-			try {
-				final double temp = Double.parseDouble(value.toString());
-				((IFeatureAttribute) element).setValue(new Double(temp));
-				view.getFeatureModel()
-						.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-			} catch (final NumberFormatException e) {
-				MessageDialog.openError(null, "Invalid input", "Please insert a valid float number.");
-			}
+		String type = attribute.getType();
+		if (view.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+			setValueInConfig(attribute, type, value);
+		} else if (view.getMode() == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
+			setValueInFeatureDiagram(attribute, type, value);
 		}
 		getViewer().update(element, null);
+	}
+
+	private void setValueInConfig(IFeatureAttribute attribute, String type, Object value) {
+		ConfigurationManager manager = (ConfigurationManager) view.getManager();
+
+		switch (type) {
+		case FeatureAttribute.BOOLEAN:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeConfigurableAttributeValueOperation<Boolean> op =
+					new ChangeConfigurableAttributeValueOperation<Boolean>(manager, attribute, value.toString().toLowerCase().equals(TRUE_STRING));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.DOUBLE:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeConfigurableAttributeValueOperation<Double> op =
+					new ChangeConfigurableAttributeValueOperation<Double>(manager, attribute, Double.parseDouble(value.toString()));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.LONG:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeConfigurableAttributeValueOperation<Long> op =
+					new ChangeConfigurableAttributeValueOperation<Long>(manager, attribute, Long.parseLong(value.toString()));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.STRING:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeConfigurableAttributeValueOperation<String> op =
+					new ChangeConfigurableAttributeValueOperation<String>(manager, attribute, value.toString());
+				op.execute();
+			}
+		}
+	}
+
+	private void setValueInFeatureDiagram(IFeatureAttribute attribute, String type, Object value) {
+		IFeatureModelManager manager = (IFeatureModelManager) view.getManager();
+		switch (type) {
+		case FeatureAttribute.BOOLEAN:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeAttributeValueOperation<Boolean> op =
+					new ChangeAttributeValueOperation<Boolean>(manager, attribute, value.toString().toLowerCase().equals(TRUE_STRING));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.DOUBLE:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeAttributeValueOperation<Double> op = new ChangeAttributeValueOperation<Double>(manager, attribute, Double.parseDouble(value.toString()));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.LONG:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeAttributeValueOperation<Long> op = new ChangeAttributeValueOperation<Long>(manager, attribute, Long.parseLong(value.toString()));
+				op.execute();
+			}
+			break;
+		case FeatureAttribute.STRING:
+			if (attribute.isValidValue(value.toString())) {
+				ChangeAttributeValueOperation<String> op = new ChangeAttributeValueOperation<String>(manager, attribute, value.toString());
+				op.execute();
+			}
+		}
 	}
 
 	@Override

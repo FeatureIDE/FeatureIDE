@@ -361,6 +361,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			}
 			break;
+		case CONFIGURABLE_ATTRIBUTE_CHANGED:
+			if (!evt.getNewValue().equals(evt.getOldValue())) {
+				final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
+				if (currentPage != null) {
+					currentPage.propertyChange(evt);
+				}
+			}
+
 		default:
 			break;
 		}

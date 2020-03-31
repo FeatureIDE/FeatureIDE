@@ -20,13 +20,22 @@
  */
 package de.ovgu.featureide.fm.attributes.view;
 
-import org.eclipse.jface.viewers.TreeViewer;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView.FeatureAttributeOperationMode;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
@@ -38,40 +47,108 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 
 	private FeatureAttributeView faView;
+	private List<String> configurableFilterList;
 
 	FeatureAttributeViewSelectionFilter(FeatureAttributeView faView) {
 		this.faView = faView;
 	}
 
 	@Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (faView.selectedAutomaticFeatures == null || faView.selectedManualFeatures == null) {
-			if (faView.getFeatureModel() != null) {
-				return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
-			} else {
-				return true;
-			}
-		} else {
-			if (faView.selectedAutomaticFeatures.size() == 0 || faView.selectedManualFeatures.size() == 0) {
-				if (faView.getFeatureModel() != null) {
-					return element == FeatureAttributeContentProvider.SELECT_FEATURES_IN_FEATURE_DIAGRAM ? true : false;
-				} else {
-					return true;
-				}
-			} else {
-				if (viewer instanceof TreeViewer) {
-					if (element instanceof IFeature && faView.selectedAutomaticFeatures.contains(element)) {
-						return true;
-					} else if (element instanceof IFeatureAttribute && faView.selectedManualFeatures.contains(parentElement)) {
-						return true;
-					} else {
-						FMAttributesPlugin.getDefault().logInfo("Element: " + element);
-						return false;
-					}
-				}
+	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+		createConfigurableDependencyMap();
+		return super.filter(viewer, parent, elements);
+	}
+
+	/**
+	 * Marks the features that should be displayed in the feature attribute view when an extended configuration is opened. The marked features are stored in
+	 * configurableFilterList
+	 */
+	private void createConfigurableDependencyMap() {
+		configurableFilterList = new ArrayList<>();
+		if (faView.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+			ConfigurationManager confManager = (ConfigurationManager) faView.getManager();
+			createConfigurableDependencyMap(confManager.getVarObject(), confManager.getVarObject().getRoot());
+		}
+	}
+
+	/**
+	 * Recurively traverses the feature model and adds every feature that contains a configurable attribute or has children with configurable attributes to the
+	 * configurableFilterList
+	 * 
+	 * @param config
+	 * @param feature currently recursed feature
+	 * @return
+	 */
+	private int createConfigurableDependencyMap(Configuration config, SelectableFeature feature) {
+		if (!(feature.getFeature().getFeatureModel() instanceof ExtendedFeatureModel)) {
+			return 0;
+		}
+		int numberOfConfigurableAttributes = 0;
+		for (IFeatureStructure child : feature.getFeature().getStructure().getChildren()) {
+			numberOfConfigurableAttributes += createConfigurableDependencyMap(config, config.getSelectableFeature(child.getFeature()));
+		}
+
+		if (feature.getSelection() == Selection.SELECTED) {
+			ExtendedFeature extFeature = (ExtendedFeature) feature.getFeature();
+			numberOfConfigurableAttributes += extFeature.getAttributes().stream().filter(att -> att.isConfigurable()).count();
+
+			if (numberOfConfigurableAttributes > 0) {
+				configurableFilterList.add(feature.getFeature().getName());
 			}
 		}
+		return numberOfConfigurableAttributes;
+	}
+
+	@Override
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
+		if (faView.getMode() == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
+			return filterFeatureModel(viewer, parentElement, element);
+		} else if (faView.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+			return filterConfiguration(viewer, parentElement, element);
+		}
+		return true;
+	}
+
+	private boolean filterFeatureModel(Viewer viewer, Object parentElement, Object element) {
+		if (element.equals(faView.getMode().getMessage())) {
+			return faView.getSelectedFeatures().isEmpty();
+		} else if (element instanceof IFeature && faView.getSelectedFeatures().contains(element)) {
+			return true;
+		} else if (element instanceof IFeatureAttribute && faView.getSelectedFeaturesOfInterest().contains(parentElement)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean filterConfiguration(Viewer viewer, Object parentElement, Object element) {
+		ConfigurationManager manager = (ConfigurationManager) faView.getManager();
+		if (element.equals(faView.getMode().getMessage())) {
+			return manager.getVarObject().getFeatureModel().getFeatures().stream().filter(this::isConfigurableFeature).count() <= 0;
+		} else if (element instanceof IFeature) {
+			ExtendedFeature feat = (ExtendedFeature) element;
+			if (manager.getVarObject().getSelectableFeature(feat).getSelection() == Selection.SELECTED) {
+				return hasConfigurableDependency(feat);
+			} else {
+				return false;
+			}
+		} else if (element instanceof IFeatureAttribute) {
+			return ((IFeatureAttribute) element).isConfigurable();
+		}
 		return false;
+	}
+
+	private boolean isConfigurableAttribute(IFeatureAttribute att) {
+		return att.isConfigurable();
+	}
+
+	private boolean isConfigurableFeature(IFeature feat) {
+		ExtendedFeature ext = (ExtendedFeature) feat;
+		return ext.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
+	}
+
+	private boolean hasConfigurableDependency(IFeature feature) {
+		return configurableFilterList.contains(feature.getName());
 	}
 
 }
