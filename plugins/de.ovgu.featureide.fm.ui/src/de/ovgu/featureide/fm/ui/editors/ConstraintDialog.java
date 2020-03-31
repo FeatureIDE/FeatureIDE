@@ -181,7 +181,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-			ERROR, WARNING, INFO, NONE
+		ERROR, WARNING, INFO, NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -201,7 +201,7 @@ public class ConstraintDialog implements GUIDefaults {
 		private final Label headerDescriptionImageLabel;
 
 		/**
-		 * Brief text what's the current mode for the dialog. This is more or less a visualization of EDITING or "creating" mode of this dialog.
+		 * Brief text what's the current mode for the dialog. This is more or less a visualisation of EDITING or "creating" mode of this dialog.
 		 */
 		private final Label headerLabel;
 

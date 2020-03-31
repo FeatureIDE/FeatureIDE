@@ -37,10 +37,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
@@ -55,6 +52,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -66,6 +64,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
 import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
 import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
@@ -81,22 +80,23 @@ import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeRecur
 import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeTypeColumnLabelProvider;
 import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeUnitColumnLabelProvider;
 import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeValueColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.listener.FeatureAttributeSelectionListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTreeEditorPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * A view to help the user of managing attributes of {@link ExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
@@ -106,20 +106,25 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class FeatureAttributeView extends ViewPart implements IEventListener {
 
-	public FeatureAttributeView() {
-		super();
+	public enum FeatureAttributeOperationMode {
 
-		cachedImages = new HashMap<String, Image>();
-		cachedImages.put(imgFeature, FMAttributesPlugin.getImage(imgFeature));
-		cachedImages.put(imgAttribute, FMAttributesPlugin.getImage(imgAttribute));
-		cachedImages.put(imgAttributeRecurisve, FMAttributesPlugin.getImage(imgAttributeRecurisve));
-		cachedImages.put(checkboxEnabled, FMAttributesPlugin.getImage(checkboxEnabled));
-		cachedImages.put(checkboxDisabled, FMAttributesPlugin.getImage(checkboxDisabled));
-		cachedImages.put(expandAll, FMAttributesPlugin.getImage(expandAll));
-		cachedImages.put(collapseAll, FMAttributesPlugin.getImage(collapseAll));
-		cachedImages.put(synch_tree, FMAttributesPlugin.getImage(synch_tree));
+		NONE(StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR), NON_EXTENDED_FEATURE_MODEL(
+				StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL), INVALID_FM_PAGE(
+						StringTable.PAGE_NOT_SUPPORTED_EXTENDED_FEATURE_MODEL), FEATURE_DIAGRAM(
+								StringTable.SELECT_FEATURES_IN_FEATURE_DIAGRAM), NON_EXTENDED_CONFIGURATION(
+										StringTable.CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG), INVALID_CONFIG_PAGE(
+												StringTable.PAGE_NOT_SUPPORTED_EXTENDED_CONFIGURATION), CONFIGURATION_EDITOR(
+														StringTable.NO_CONFIGURABLE_ATTRIBUTES);
 
-		FeatureColorManager.addListener(this);
+		private Object message;
+
+		private FeatureAttributeOperationMode(Object message) {
+			this.message = message;
+		}
+
+		public Object getMessage() {
+			return message;
+		}
 	}
 
 	public final static String imgFeature = "FeatureIconSmall.ico";
@@ -143,9 +148,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_RECURSIVE = "Recursive";
 	private final String COLUMN_CONFIGURABLE = "Configureable";
 
-	private IWorkbenchPart currentEditor;
-	private FeatureModelManager fmManager;
-
 	// EditingSupports
 	private FeatureAttributeNameEditingSupport nameEditingSupport;
 	private FeatureAttributeUnitEditingSupport unitEditingSupport;
@@ -153,80 +155,42 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
+	// Selection and filtering
 	public boolean synchToFeatureDiagram = true;
-	public ArrayList<IFeature> selectedManualFeatures;
-	public ArrayList<IFeature> selectedAutomaticFeatures;
-	public ArrayList<IFeature> selection;
-	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+	private FeatureAttributeSelectionListener selectionListener;
+	// Dynamic data objects
+	private IWorkbenchPart currentEditor;
+	private AFileManager<?> manager;
 
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			if (getFeatureModel() == null) {
-				return;
-			}
-			if (!synchToFeatureDiagram) {
-				// Prevent the feature attributes view from synching to the feature diagram for (Object obj : event.getStructuredSelection().toList()) {
-				selection = new ArrayList<>();
-				selectedManualFeatures = null;
-				selectedAutomaticFeatures = null;
-				treeViewer.refresh();
-				return;
-			}
-			selectedManualFeatures = new ArrayList<>();
-			ISelection selection = event.getSelection();
-			if (selection instanceof IStructuredSelection) {
-				for (Object obj : ((IStructuredSelection) selection).toList()) {
-					if (!(obj instanceof FeatureEditPart)) {
-						continue;
-						/*
-						 * selectedManualFeatures = null; treeViewer.refresh(); treeViewer.expandToLevel(2); return;
-						 */
-					} else {
-						FeatureEditPart editPart = (FeatureEditPart) obj;
-						selectedManualFeatures.add(editPart.getModel().getObject());
-					}
-				}
-			}
+	// Feature attribute view states
+	private FeatureAttributeOperationMode mode;
 
-			selectedAutomaticFeatures = new ArrayList<>();
-			for (IFeature iFeature : selectedManualFeatures) {
-				// addChildsToFullList(iFeature);
-				addParentsToFullList(iFeature);
-			}
+	public FeatureAttributeView() {
+		super();
+		cachedImages = new HashMap<String, Image>();
+		cachedImages.put(imgFeature, FMAttributesPlugin.getImage(imgFeature));
+		cachedImages.put(imgAttribute, FMAttributesPlugin.getImage(imgAttribute));
+		cachedImages.put(imgAttributeRecurisve, FMAttributesPlugin.getImage(imgAttributeRecurisve));
+		cachedImages.put(checkboxEnabled, FMAttributesPlugin.getImage(checkboxEnabled));
+		cachedImages.put(checkboxDisabled, FMAttributesPlugin.getImage(checkboxDisabled));
+		cachedImages.put(expandAll, FMAttributesPlugin.getImage(expandAll));
+		cachedImages.put(collapseAll, FMAttributesPlugin.getImage(collapseAll));
+		cachedImages.put(synch_tree, FMAttributesPlugin.getImage(synch_tree));
+		mode = FeatureAttributeOperationMode.NONE;
+		FeatureColorManager.addListener(this);
+	}
 
-			treeViewer.refresh();
-
-			for (IFeature iFeature : selectedAutomaticFeatures) {
-				treeViewer.setExpandedState(iFeature, true);
-			}
-
-		}
-
-		private void addChildsToFullList(IFeature feature) {
-			if (!selectedAutomaticFeatures.contains(feature)) {
-				selectedAutomaticFeatures.add(feature);
-			}
-			for (IFeatureStructure iFeature : feature.getStructure().getChildren()) {
-				addChildsToFullList(iFeature.getFeature());
-			}
-		}
-
-		private void addParentsToFullList(IFeature feature) {
-			if (!selectedAutomaticFeatures.contains(feature)) {
-				selectedAutomaticFeatures.add(feature);
-			}
-			if (!feature.getStructure().isRoot()) {
-				addParentsToFullList(feature.getStructure().getParent().getFeature());
-			}
-		}
-
-	};
+	public FeatureAttributeOperationMode getMode() {
+		return mode;
+	}
 
 	private final IPageChangedListener pageListener = new IPageChangedListener() {
 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
-			setEditorContentByPage(event.getSelectedPage());
+			if (event.getSource() instanceof IEditorPart) {
+				setEditorContentByEditor((IEditorPart) event.getSource());
+			}
 		}
 
 	};
@@ -245,22 +209,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (currentEditor == part) {
-				// Close if current editor is closed
 				setEditorContent(null);
 			}
 		}
 
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (getSite().getPart() != part) {
-				clearSelection();
+			if (getSite().getPart() != part && currentEditor != part) {
 				setEditorContent(part);
 			}
 		}
 
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (getSite().getPart() != part) {
+			if (getSite().getPart() != part && currentEditor != part) {
 				setEditorContent(part);
 			}
 		}
@@ -288,8 +250,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// create the columns
 		createColumns();
 
+		selectionListener = new FeatureAttributeSelectionListener(this, treeViewer);
 		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
-		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
+		treeViewer.setContentProvider(new FeatureAttributeContentProvider(this));
 		treeViewer.setUseHashlookup(true);
 
 		// make lines and header visible and set layout
@@ -320,10 +283,31 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 	}
 
-	private void clearSelection() {
-		selectedManualFeatures = new ArrayList<IFeature>();
-		selectedAutomaticFeatures = new ArrayList<IFeature>();
-		selection = new ArrayList<IFeature>();
+	/**
+	 * Returns all {@link IFeature} which should be displayed in the {@link FeatureAttributeView}.
+	 * 
+	 * @return Set of all filtered {@link IFeature}, null if empty
+	 */
+	public List<IFeature> getSelectedFeatures() {
+		return selectionListener != null ? selectionListener.getSelectedFeatures() : null;
+	}
+
+	/**
+	 * Returns all {@link IFeature} whose {@link FeatureAttribute} should be displayed in the {@link FeatureAttributeView}.
+	 * 
+	 * @return Set of all filtered {@link IFeature}, null if empty
+	 */
+	public List<IFeature> getSelectedFeaturesOfInterest() {
+		return selectionListener != null ? selectionListener.getSelectedFeaturesOfInterest() : null;
+	}
+
+	/**
+	 * Removes all {@link IFeature} from the selection.
+	 */
+	public void clearSelection() {
+		if (selectionListener != null) {
+			selectionListener.clearSelection();
+		}
 	}
 
 	private void createTreeViewerEditor() {
@@ -367,15 +351,11 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createContexMenu() {
-		// Test toolbar
-		// menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
-
+		// Toolbar
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
-		// Removed because the sync feature should always be active
-		// toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
@@ -384,7 +364,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				final IStructuredSelection selection = treeViewer.getStructuredSelection();
-				if (!selection.isEmpty() && currentEditor instanceof FeatureModelEditor) {
+				if (!selection.isEmpty() && mode == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
+					FeatureModelManager fmManager = (FeatureModelManager) FeatureAttributeView.this.manager;
 					if ((selection.size() == 1) && (selection.getFirstElement() instanceof ExtendedFeature)) {
 						final String featureName = selection.getFirstElement().toString();
 						// Add actions to create new attributes
@@ -411,7 +392,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createColumns() {
-
 		ColumnViewerToolTipSupport.enableFor(treeViewer);
 		// Feature
 		final TreeViewerColumn colFeature = new TreeViewerColumn(treeViewer, SWT.NONE);
@@ -454,127 +434,137 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		colConfigureable.setLabelProvider(new FeatureAttributeConfigureableColumnLabelProvider(cachedImages, this));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
 		treeViewer.getControl().setFocus();
 	}
 
 	private void setEditorContent(IWorkbenchPart activeWorkbenchPart) {
-		if (activeWorkbenchPart == null) {
-			clear();
+		if (activeWorkbenchPart instanceof IEditorPart) {
+			setEditorContentByEditor((IEditorPart) activeWorkbenchPart);
+		} else {
+			setEditorContentByEditor(null);
+		}
+	}
+
+	private void setEditorContentByEditor(IEditorPart editor) {
+		if (editor != null && (editor instanceof FeatureModelEditor)) {
+			final FeatureModelEditor fmEditor = (FeatureModelEditor) editor;
+			setEmptyEditorContent();
+			setFMEditorContent(fmEditor);
+		} else if (editor != null && (editor instanceof ConfigurationEditor)) {
+			final ConfigurationEditor confEditor = (ConfigurationEditor) editor;
+			setEmptyEditorContent();
+			setConfEditorContent(confEditor);
+		} else {
+			setEmptyEditorContent();
+			// Set mode
+			mode = FeatureAttributeOperationMode.NONE;
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(FeatureAttributeContentProvider.EMPTY_ROOT);
+				treeViewer.setInput("");
+				repackAllColumns();
 			}
-			if (currentEditor instanceof FeatureModelEditor) {
-				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
-				editor.removeEventListener(this);
-				editor.removePageChangedListener(pageListener);
-				editor.diagramEditor.removeSelectionChangedListener(selectionListener);
-			}
-			currentEditor = null;
-			repackAllColumns();
-			return;
-		}
-		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)) {
-			final FeatureModelEditor editor = (FeatureModelEditor) activeWorkbenchPart;
-			currentEditor = activeWorkbenchPart;
-			editor.addEventListener(this);
-			editor.addPageChangedListener(pageListener);
-			editor.diagramEditor.addSelectionChangedListener(selectionListener);
-			setEditorContentByPage(editor.getSelectedPage());
-		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
-			currentEditor = activeWorkbenchPart;
-			editor.addPageChangedListener(pageListener);
-			setEditorContentByPage(editor.getSelectedPage());
-		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
-			&& !(activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
-			setEditorContent(null);
 		}
 	}
 
-	private void setEditorContentByPage(Object page) {
+	private void setEmptyEditorContent() {
+		// Clear selection
+		clearSelection();
+
+		// Clear editors
 		if (currentEditor instanceof FeatureModelEditor) {
-			if (page instanceof FeatureDiagramEditor) {
-				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
-				final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
-				IFeatureModel curFeatureModel = featureModelManager.getVarObject();
-				if (curFeatureModel instanceof ExtendedFeatureModel) {
-					setManager(featureModelManager);
-					fmManager.addListener(this);
-					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(curFeatureModel);
-					}
-					treeViewer.collapseAll();
-					treeViewer.expandToLevel(2);
-					repackAllColumns();
-				} else {
-					clear();
-					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
-					}
-					repackAllColumns();
-					return;
-				}
-			} else {
-				clear();
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.setInput(FeatureAttributeContentProvider.EMPTY_ROOT);
-				}
-				repackAllColumns();
-				return;
-			}
+			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
+			editor.removeEventListener(this);
+			editor.removePageChangedListener(pageListener);
+			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
+		} else if (currentEditor instanceof ConfigurationEditor) {
+			final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
+			editor.removePageChangedListener(pageListener);
 		}
-		if (currentEditor instanceof ConfigurationEditor) {
-			if (page instanceof ConfigurationPage) {
-				final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
-				if (editor.getFeatureModelManager().getVarObject() instanceof ExtendedFeatureModel) {
-					clear();
-					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(editor.getConfigurationManager().getVarObject());
-					}
-					treeViewer.expandAll();
-					repackAllColumns();
-				} else {
-					clear();
-					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
-					}
-					repackAllColumns();
-					return;
-				}
-			} else {
-				clear();
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
-				}
-				repackAllColumns();
-				return;
-			}
+		currentEditor = null;
+
+		// Clear dynamic data objects
+		if (manager != null) {
+			manager.removeListener(this);
+			manager = null;
 		}
+		return;
 	}
 
-	private void setManager(FeatureModelManager featureModelManager) {
-		fmManager = featureModelManager;
-		fmManager.addListener(this);
+	private void setFMEditorContent(FeatureModelEditor editor) {
+		currentEditor = editor;
+		editor.addEventListener(this);
+		editor.addPageChangedListener(pageListener);
+		editor.diagramEditor.addSelectionChangedListener(selectionListener);
+		if (editor.getSelectedPage() instanceof FeatureDiagramEditor) {
+			final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
+			IFeatureModel curFeatureModel = featureModelManager.getVarObject();
+			if (curFeatureModel instanceof ExtendedFeatureModel) {
+				// Valid
+				manager = featureModelManager;
+				manager.addListener(this);
+				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(curFeatureModel);
+				}
+			} else {
+				// Wrong format
+				mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput("");
+				}
+			}
+		} else {
+			// Wrong page
+			mode = FeatureAttributeOperationMode.INVALID_FM_PAGE;
+			if (!treeViewer.getControl().isDisposed()) {
+				treeViewer.setInput("");
+			}
+		}
+		repackAllColumns();
 	}
 
-	private void clear() {
-		if (fmManager == null) {
-			return;
+	private void setConfEditorContent(ConfigurationEditor editor) {
+		currentEditor = editor;
+		editor.addPageChangedListener(pageListener);
+		if (editor.getSelectedPage() instanceof ConfigurationTreeEditorPage) {
+			final ConfigurationManager configurationManager = editor.getConfigurationManager();
+			Configuration currentConfiguration = configurationManager.getVarObject();
+			if (currentConfiguration instanceof ExtendedConfiguration) {
+				// Valid
+				manager = configurationManager;
+				manager.addListener(this);
+				mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(currentConfiguration);
+				}
+			} else {
+				// Invalid format
+				mode = FeatureAttributeOperationMode.NON_EXTENDED_CONFIGURATION;
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput("");
+				}
+			}
+		} else {
+			// Wrong page
+			mode = FeatureAttributeOperationMode.INVALID_CONFIG_PAGE;
+			if (!treeViewer.getControl().isDisposed()) {
+				treeViewer.setInput("");
+			}
 		}
-		fmManager.removeListener(this);
+		treeViewer.expandAll();
+		repackAllColumns();
 	}
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.refresh(fmManager.getVarObject());
+				treeViewer.refresh(manager.getVarObject());
+			}
+			if (getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+				treeViewer.expandAll();
+				repackAllColumns();
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getOldValue() != null && event.getOldValue() instanceof Boolean && event.getNewValue() != null
@@ -615,25 +605,24 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			}
 		} else if (event.getEventType() == EventType.FEATURE_COLOR_CHANGED) {
 			treeViewer.refresh();
+		} else if (event.getEventType() == EventType.FEATURE_SELECTION_CHANGED) {
+			if (getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
+				treeViewer.refresh();
+				treeViewer.expandAll();
+				repackAllColumns();
+			}
 		}
 	}
 
 	@Override
 	public void dispose() {
-		clear();
+		setEditorContent(null);
 		getSite().getPage().removePartListener(editorListener);
-		if (currentEditor instanceof FeatureModelEditor) {
-			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
-			editor.removeEventListener(this);
-			editor.removePageChangedListener(pageListener);
-			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
-		}
 		FeatureColorManager.removeListener(this);
 		// Dispose all cached images to prevent leaks
 		for (Image image : cachedImages.values()) {
 			image.dispose();
 		}
-		currentEditor = null;
 		super.dispose();
 	}
 
@@ -646,7 +635,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		return currentEditor;
 	}
 
-	public IFeatureModelManager getFeatureModel() {
-		return fmManager;
+	public AFileManager<?> getManager() {
+		return manager;
 	}
 }

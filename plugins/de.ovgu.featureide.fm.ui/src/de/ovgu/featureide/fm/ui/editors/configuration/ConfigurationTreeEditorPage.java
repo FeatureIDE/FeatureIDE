@@ -97,6 +97,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -263,6 +264,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					break;
 				default:
 					break;
+				}
+			} else {
+				if (evt.getEventType() == EventType.CONFIGURABLE_ATTRIBUTE_CHANGED) {
+					refreshPage();
+					setDirty();
 				}
 			}
 		}
@@ -1167,7 +1173,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> resetSnapshot(configurationManager)));
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> updateInfoLabel(currentDisplay, propagator)));
-		LongRunningWrapper.startJob(updateToken, LongRunningWrapper.getRunner(sequence));
+		final IRunner<Boolean> runner = LongRunningWrapper.getRunner(sequence);
+		runner.addJobFinishedListener((finishedJob) -> {
+			currentDisplay.syncExec(() -> configurationManager.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_SELECTION_CHANGED)));
+		});
+		LongRunningWrapper.startJob(updateToken, runner);
 	}
 
 	@Override

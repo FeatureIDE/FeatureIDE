@@ -28,10 +28,10 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetLegendToAutoLayoutOperation;
 
 /**
  * Switches auto-layout function for the feature model legend.
@@ -51,6 +51,7 @@ public class LegendLayoutAction extends Action {
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
+			setChecked(featureModel.getLayout().hasLegendAutoLayout());
 		}
 	};
 
@@ -58,8 +59,7 @@ public class LegendLayoutAction extends Action {
 		super(AUTO_LAYOUT_LEGEND);
 		featureModel = featuremodel;
 		setId(ID);
-		setEnabled(false);
-		setChecked(true);
+		setEnabled(true);
 		viewer.addSelectionChangedListener(listener);
 	}
 
@@ -76,24 +76,6 @@ public class LegendLayoutAction extends Action {
 
 	@Override
 	public void run() {
-		super.run();
-		if (featureModel.getLayout().hasLegendAutoLayout()) {
-			featureModel.getLayout().setLegendAutoLayout(false);
-			setChecked(false);
-		} else {
-			featureModel.getLayout().setLegendAutoLayout(true);
-			setChecked(true);
-			featureModel.getFeatureModelManager().fireEvent(new FeatureIDEEvent(this, EventType.MODEL_DATA_CHANGED, Boolean.FALSE, Boolean.TRUE));
-		}
-
-	}
-
-	public void refresh() {
-		if (featureModel.getLayout().hasLegendAutoLayout()) {
-			setChecked(true);
-		} else {
-			setChecked(false);
-
-		}
+		FeatureModelOperationWrapper.run(new SetLegendToAutoLayoutOperation(featureModel));
 	}
 }

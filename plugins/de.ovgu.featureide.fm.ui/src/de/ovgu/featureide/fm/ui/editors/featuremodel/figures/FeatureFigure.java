@@ -181,7 +181,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	 * Resets the current tooltip. Should be called when the properties of a feature are changed and the old generated tooltip is obsolete.
 	 */
 	public void ResetTooltip() {
-
 		toolTipFigure = null;
 	}
 

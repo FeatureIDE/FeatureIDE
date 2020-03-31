@@ -141,4 +141,11 @@ public interface IFeatureAttribute {
 	 * @return true, if attribute is head recursive attribute.
 	 */
 	public boolean isHeadOfRecursiveAttribute();
+
+	/**
+	 * 
+	 * @param value
+	 * @return true, if given value string is valid for the type
+	 */
+	public boolean isValidValue(String value);
 }
