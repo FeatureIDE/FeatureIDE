@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_NEW_FEATURE_NAME;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -50,7 +50,7 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		newFeatureName = getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		newFeatureName = getFeatureName(featureModel, DEFAULT_NEW_FEATURE_NAME);
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, newFeatureName);
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
