@@ -519,6 +519,7 @@ public class StringTable {
 	public static final String ABSTRACT_OPERATION = "Abstract Operation";
 	public static final String COLLAPSE_OPERATION = "Collapse Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
+	public static final String DEFAULT_SLICING_ROOT_NAME = "NewRootFeature";
 	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
