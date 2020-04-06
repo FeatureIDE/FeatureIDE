@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _MyILcKoPEeeF3P5ISwke7w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/9/17 9:31 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 4/6/20 1:33 PM
 Testcase-Type: ecl
 Verifications: _2o2TwKjoEeeuipbK_M3LHA,_EVrRoKoREeeF3P5ISwke7w
 
@@ -45,7 +45,7 @@ with [get-editor "Elevator-FeatureModeling Model"] {
         mouse-press 242 241 button1 -height 689 -width 1094
         commit-direct-edit
         mouse-release 242 241 button1 524288 -height 689 -width 1094
-        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature] {
             mouse-hover 62 11 -height 21 -width 78
             mouse-move 62 11 button3 -height 21 -width 78
             mouse-press 62 11 button3 -height 21 -width 78
@@ -79,7 +79,7 @@ with [get-editor "Elevator-FeatureModeling Model"] {
         get-menu "Create Feature Above" | click
     }
     with [get-diagram] {
-        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature] {
             mouse-move 60 9 button1 -height 21 -width 78
             mouse-press 60 9 button1 -height 21 -width 78
             mouse-release 60 9 button1 524288 -height 21 -width 78
