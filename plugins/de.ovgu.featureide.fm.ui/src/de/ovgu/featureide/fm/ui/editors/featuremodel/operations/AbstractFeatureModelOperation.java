@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import java.util.Set;
-
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
@@ -102,13 +99,6 @@ public abstract class AbstractFeatureModelOperation {
 
 	public String getTitle() {
 		return title;
-	}
-
-	protected final static String getFeatureName(final IFeatureModel featureModel, String prefix) {
-		final Set<String> existingFeatureNames = FeatureUtils.getFeatureNames(featureModel);
-		int number = 0;
-		while (existingFeatureNames.contains(prefix + ++number)) {}
-		return prefix + number;
 	}
 
 }

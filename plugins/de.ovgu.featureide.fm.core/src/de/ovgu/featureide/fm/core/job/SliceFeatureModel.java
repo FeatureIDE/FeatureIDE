@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Create mpl interfaces.
@@ -106,7 +107,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		m.reset();
 
 		// set new abstract root
-		final IFeature nroot = factory.createFeature(m, "__root__");
+		final IFeature nroot = factory.createFeature(m, FeatureUtils.getFeatureName(orgFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());

@@ -1188,4 +1188,20 @@ public final class FeatureUtils {
 		return stringBuilder.toString();
 	}
 
+	/**
+	 * Makes sure that a feature name is unique by appending a number
+	 *
+	 * @param featureModel feature mode that the new feature name will be inserted into
+	 * @param prefix chosen feature name
+	 * @return chosen feature name with a number attached to it
+	 */
+	public static String getFeatureName(final IFeatureModel featureModel, String prefix) {
+		final Set<String> existingFeatureNames = FeatureUtils.getFeatureNames(featureModel);
+		int number = 1;
+		if (!existingFeatureNames.contains(prefix)) {
+			return prefix;
+		}
+		while (existingFeatureNames.contains(prefix + ++number)) {}
+		return prefix + number;
+	}
 }
