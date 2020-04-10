@@ -25,6 +25,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -44,6 +45,11 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
+		// skip when automated analyses are deactivated
+		if (!FeatureModelProperty.isRunCalculationAutomatically(configurationMap.getFeatureProject().getFeatureModelManager().getObject())
+			|| !FeatureModelProperty.isCalculateFeatures(configurationMap.getFeatureProject().getFeatureModelManager().getObject())) {
+			return;
+		}
 		final FeatureModelFormula snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getPersistentFormula();
 		final IFeatureModel featureModel = snapshot.getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
@@ -54,7 +60,7 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		return deadFeatures.contains(feature);
+		return deadFeatures != null ? deadFeatures.contains(feature) : false;
 	}
 
 }

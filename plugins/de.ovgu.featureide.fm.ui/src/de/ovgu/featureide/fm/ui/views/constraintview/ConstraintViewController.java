@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -211,9 +212,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 				} else {
 					addVisibleConstraints();
 				}
-				// Selection has explanation or Model is void
-				if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
-					changeIntoDecoratedConstraints();
+				//
+
+				// Check if automatic calculations are enabled and selection has explanation or Model is void
+				if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+					&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+					if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
+						changeIntoDecoratedConstraints();
+					}
 				}
 			} else {
 				// when searchText is entered, search through all constraints
@@ -402,6 +408,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	public List<ConstraintColorPair> getExplanationConstraints() {
 		if (featureModelEditor != null) {
 			final FeatureModelEditor fmEditor = featureModelEditor;
+
+			// Check if automatic calculations are nessecary (explanations are only present after analysing)
+			if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+				|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+				return null;
+			}
+
 			if (fmEditor != null) {
 				final FeatureModelAnalyzer analyser = fmEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
 				if (analyser.getAnalysesCollection().getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
@@ -523,8 +536,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 				final IGraphicalFeatureModel graphicalFeatureModel = diagramEditor.getGraphicalFeatureModel();
 				setRefreshWithDelete(false);
 				if (constraint != null) {
-					final FeatureModelAnalyzer anlyzer = activeFMEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
-					diagramEditor.setActiveExplanation(anlyzer.getExplanation(constraint));
+					// Check if automatic calculations are activated (explanation are only available when anaylses are activated)
+					if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+						&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())
+						&& FeatureModelProperty.isCalculateConstraints(fmManager.getVarObject())) {
+						final FeatureModelAnalyzer anlyzer = activeFMEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
+						diagramEditor.setActiveExplanation(anlyzer.getExplanation(constraint));
+					}
 				}
 				for (final IGraphicalFeature graphFeature : graphicalFeatureModel.getAllFeatures()) {
 					if ((constraint != null) && constraint.getContainedFeatures().contains(graphFeature.getObject())) {
@@ -547,7 +565,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	}
 
 	public ConstraintProperties getConstraintProperty(IConstraint element) {
-		return fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element);
+		// Check if automatic calculations are nessecary (propetries are only available when anaylses are activated)
+		if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject()) && FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())
+			&& FeatureModelProperty.isCalculateConstraints(fmManager.getVarObject())) {
+			return fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element);
+		} else {
+			return new ConstraintProperties(element);
+		}
 	}
 
 }
