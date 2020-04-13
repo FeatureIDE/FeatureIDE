@@ -148,7 +148,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
@@ -211,7 +210,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private MoveAction moveDownAction;
 	private MoveAction moveLeftAction;
 
-	private ShowHiddenFeaturesAction showHiddenFeaturesAction;
 	private ShowCollapsedConstraintsAction showCollapsedConstraintsAction;
 
 	private ZoomInAction zoomIn;
@@ -306,7 +304,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// View actions
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
 		legendAction = addAction(new LegendAction(viewer, graphicalFeatureModel));
-		showHiddenFeaturesAction = addAction(new ShowHiddenFeaturesAction(viewer, graphicalFeatureModel));
 		setNameTypeActions = new ArrayList<>(2);
 		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1)));
 		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0)));
@@ -1233,7 +1230,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createCalculationsMenuManager(true));
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
-			menuManager.add(showHiddenFeaturesAction);
 			menuManager.add(showCollapsedConstraintsAction);
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
@@ -1241,7 +1237,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(exportFeatureModelAction);
 			menuManager.add(convertGraphicalFileAction);
 		}
-		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 	}
 
