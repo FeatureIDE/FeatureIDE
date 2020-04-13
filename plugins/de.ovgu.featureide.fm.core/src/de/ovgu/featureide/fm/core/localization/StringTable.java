@@ -475,7 +475,6 @@ public class StringTable {
 	public static final String MOVING = "Moving";
 	public static final String REVERSE_FEATURE_ORDER = "Reverse Feature Order";
 	public static final String SELECTION = "Selection";
-	public static final String SHOW_HIDDEN_FEATURES = "Show Hidden Features";
 	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME =
