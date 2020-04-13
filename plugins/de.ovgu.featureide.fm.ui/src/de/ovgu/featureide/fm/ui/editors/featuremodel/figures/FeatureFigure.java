@@ -117,10 +117,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setLocation(feature.getLocation());
 		}
 
-		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
-			setSize(new Dimension(0, 0));
-		}
-
 		if (feature.hasCollapsedParent()) {
 			setSize(new Dimension(0, 0));
 		}

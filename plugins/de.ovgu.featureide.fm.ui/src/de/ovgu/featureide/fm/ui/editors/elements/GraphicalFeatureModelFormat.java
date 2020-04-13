@@ -67,12 +67,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		} else if (layout.equals(FALSE)) {
 			object.getLayout().setVerticalLayout(true);
 		}
-		final String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
-		if (showHidden.equals(TRUE)) {
-			object.getLayout().showHiddenFeatures(true);
-		} else if (showHidden.equals(FALSE)) {
-			object.getLayout().showHiddenFeatures(false);
-		}
+
 		final String showCollapsedConstraints = eElement.getAttribute(SHOW_COLLAPSED_CONSTRAINTS);
 		if (showCollapsedConstraints.equals(TRUE)) {
 			object.getLayout().showCollapsedConstraints(true);
@@ -243,9 +238,6 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 			root.setAttribute(HORIZONTAL_LAYOUT, FALSE);
 		} else {
 			root.setAttribute(HORIZONTAL_LAYOUT, TRUE);
-		}
-		if (!object.getLayout().showHiddenFeatures()) {
-			root.setAttribute(SHOW_HIDDEN_FEATURES, FALSE);
 		}
 		if (object.getLayout().showShortNames()) {
 			root.setAttribute(SHOW_SHORT_NAMES, TRUE);

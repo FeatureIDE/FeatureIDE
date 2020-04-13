@@ -618,8 +618,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			IFeature newCompound = null;
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
 				newCompound = (IFeature) event.getNewValue();
-				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound)
-						.getGraphicalChildren(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getAllGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				final IFeature oldParent = (IFeature) event.getOldValue();
@@ -811,8 +810,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			if (oldParent != null) {
 				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 				// and update the children that their parent changed
-				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent)
-						.getGraphicalChildren(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(oldParent).getAllGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
 				viewer.refreshChildAll(oldParent);
