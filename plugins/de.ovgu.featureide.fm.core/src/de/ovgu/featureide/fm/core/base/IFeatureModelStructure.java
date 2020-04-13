@@ -60,7 +60,4 @@ public interface IFeatureModelStructure {
 	void replaceRoot(IFeatureStructure feature);
 
 	void setRoot(IFeatureStructure root);
-
-	void setShowHiddenFeatures(boolean showHiddenFeatures);
-
 }
