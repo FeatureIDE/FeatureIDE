@@ -258,11 +258,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
-	public List<IGraphicalFeature> getGraphicalChildren(boolean showHidden) {
+	public List<IGraphicalFeature> getGraphicalChildren() {
 		final List<IGraphicalFeature> features = new ArrayList<>();
 		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
-			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
+			if (!gf.hasCollapsedParent()) {
 				features.add(gf);
 			}
 		}

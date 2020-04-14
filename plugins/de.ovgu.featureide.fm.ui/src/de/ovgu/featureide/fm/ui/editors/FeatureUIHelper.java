@@ -120,7 +120,7 @@ public class FeatureUIHelper {
 		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
 			final IGraphicalFeature graphicChild = getGraphicalFeature(child, model);
-			if (!graphicChild.hasCollapsedParent() && (!child.hasHiddenParent())) {
+			if (!graphicChild.hasCollapsedParent()) {
 				graphicalChildren.add(graphicChild);
 			}
 		}
