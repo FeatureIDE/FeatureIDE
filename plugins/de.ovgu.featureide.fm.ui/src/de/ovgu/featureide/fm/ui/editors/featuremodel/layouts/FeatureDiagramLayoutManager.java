@@ -348,6 +348,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		return Functional.toList(feature.getAllGraphicalChildren());
+		return Functional.toList(feature.getGraphicalChildren());
 	}
 }
