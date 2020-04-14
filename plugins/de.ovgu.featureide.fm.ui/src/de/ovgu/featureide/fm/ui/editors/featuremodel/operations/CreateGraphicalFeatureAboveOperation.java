@@ -57,7 +57,7 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 	 * adjusts position of the new feature and its children in manual layout
 	 */
 	private void adjustPositions(IGraphicalFeature newGraphicalFeature) {
-		final List<IGraphicalFeature> graphicalChildren = newGraphicalFeature.getGraphicalChildren(true);
+		final List<IGraphicalFeature> graphicalChildren = newGraphicalFeature.getGraphicalChildren();
 		int minX = graphicalChildren.get(0).getLocation().x;
 		int minY = graphicalChildren.get(0).getLocation().y;
 		int yLocation = graphicalChildren.get(0).getLocation().y;
@@ -100,7 +100,7 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 	 */
 	private void shiftChildren(List<IGraphicalFeature> graphicalChildren, int distance, boolean topDown) {
 		for (int i = 0; i < graphicalChildren.size(); i++) {
-			shiftChildren(graphicalChildren.get(i).getGraphicalChildren(true), distance, topDown);
+			shiftChildren(graphicalChildren.get(i).getGraphicalChildren(), distance, topDown);
 			// if there are more layouts to come, there has to be more cases added here
 			if (topDown) {
 				graphicalChildren.get(i).setLocation(new Point(graphicalChildren.get(i).getLocation().x, graphicalChildren.get(i).getLocation().y + distance));
@@ -133,7 +133,7 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 		if (newFeatureName != null) {
 			if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 				final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureModel.getFeature(newFeatureName));
-				shiftChildren(newGraphicalFeature.getGraphicalChildren(true), (-distance), !graphicalFeatureModel.getLayout().hasVerticalLayout());
+				shiftChildren(newGraphicalFeature.getGraphicalChildren(), (-distance), !graphicalFeatureModel.getLayout().hasVerticalLayout());
 			}
 			return createFeatureOperation.inverseOperation(featureModel);
 		}

@@ -41,7 +41,7 @@ public class GFTreeForTreeLayout extends AbstractTreeForTreeLayout<IGraphicalFea
 
 	@Override
 	public List<IGraphicalFeature> getChildrenList(IGraphicalFeature parent) {
-		return parent.getGraphicalChildren(false);
+		return parent.getGraphicalChildren();
 	}
 
 	@Override
