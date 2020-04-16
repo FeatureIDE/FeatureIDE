@@ -99,6 +99,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			parseConstraints(getElement(e, CONSTRAINTS, true));
 			parseComments(getElement(e, COMMENTS, true));
 			parseFeatureOrder(getElement(e, FEATURE_ORDER, true));
+			parseCalculations(getElement(e, CALCULATIONS, true));
 			parseFeatureModelProperties(getElement(e, PROPERTIES, true));
 		}
 
@@ -604,7 +605,30 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				}
 			}
 		}
+	}
 
+	/**
+	 * Parses the calculations section.
+	 */
+	protected void parseCalculations(List<Element> elements) throws UnsupportedModelException {
+		for (final Element e : elements) {
+			parseAttribute(e, CALCULATE_AUTO, CALCULATIONS);
+			parseAttribute(e, CALCULATE_CONSTRAINTS, CALCULATIONS);
+			parseAttribute(e, CALCULATE_FEATURES, CALCULATIONS);
+			parseAttribute(e, CALCULATE_REDUNDANT, CALCULATIONS);
+			parseAttribute(e, CALCULATE_TAUTOLOGY, CALCULATIONS);
+		}
+	}
+
+	private void parseAttribute(final Element e, final String key, final String type) {
+		if (e.hasAttribute(key)) {
+			final String value = e.getAttribute(key);
+			if (object.getProperty().has(key, type)) {
+				throwWarning("Redundant property definition for key: " + key, e);
+			} else {
+				object.getProperty().set(key, type, value);
+			}
+		}
 	}
 
 	@Override
