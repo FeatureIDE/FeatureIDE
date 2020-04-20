@@ -108,6 +108,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
+			// TODO: Filter this
 			updateAnnotations(true);
 		}
 	};
