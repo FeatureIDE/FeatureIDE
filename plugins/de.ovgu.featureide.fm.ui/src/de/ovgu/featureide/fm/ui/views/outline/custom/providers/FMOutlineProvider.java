@@ -163,17 +163,12 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		final IContentProvider contentProvider = viewer.getContentProvider();
 		if (contentProvider != null) {
 			switch (event.getEventType()) {
-			case CHILDREN_CHANGED:
 			case MODEL_DATA_OVERWRITTEN:
 			case MODEL_DATA_CHANGED:
-			case STRUCTURE_CHANGED:
+			case MODEL_DATA_SAVED:
 			case MANDATORY_CHANGED:
-			case PARENT_CHANGED:
 			case GROUP_TYPE_CHANGED:
-			case ATTRIBUTE_CHANGED:
-			case LOCATION_CHANGED:
 			case FEATURE_NAME_CHANGED:
-			case FEATURE_NAME_PERSISTENTLY_CHANGED:
 			case FEATURE_ADD_SIBLING:
 			case FEATURE_ADD:
 			case FEATURE_ADD_ABOVE:

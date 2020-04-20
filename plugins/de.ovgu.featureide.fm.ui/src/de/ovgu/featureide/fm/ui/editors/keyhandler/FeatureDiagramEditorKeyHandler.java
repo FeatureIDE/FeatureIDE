@@ -142,7 +142,6 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		switch (event.getEventType()) {
-		case CHILDREN_CHANGED:
 		case MODEL_DATA_OVERWRITTEN:
 		case MODEL_DATA_CHANGED:
 		case PARENT_CHANGED:

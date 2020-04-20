@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
@@ -92,12 +93,26 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	private ConstraintViewSettingsMenu settingsMenu;
 	private Explanation<?> explanation;
 
-	boolean refreshWithDelete = true;
 	boolean constraintsHidden = false;
 
 	private String searchText = "";
 
 	private FeatureModelEditor featureModelEditor;
+
+	private ISelection lastSelection;
+
+	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			if ((lastSelection == null) || !lastSelection.equals(event.getSelection())) {
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					checkForRefresh();
+				}
+			}
+			lastSelection = event.getSelection();
+		}
+	};
 
 	private final IEventListener eventListener = new IEventListener() {
 
@@ -107,14 +122,25 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
 			switch (event.getEventType()) {
+			case MODEL_DATA_OVERWRITTEN:
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_SAVED:
+			case MANDATORY_CHANGED:
+			case GROUP_TYPE_CHANGED:
+			case FEATURE_NAME_CHANGED:
+			case FEATURE_ADD_SIBLING:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case CONSTRAINT_MODIFY:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_ADD:
+			case FEATURE_COLLAPSED_CHANGED:
+			case FEATURE_COLLAPSED_ALL_CHANGED:
+			case ATTRIBUTE_CHANGED:
 			case ACTIVE_EXPLANATION_CHANGED:
 				if (FeatureModelUtil.getActiveFMEditor() != null) {
-					if (!isRefreshWithDelete()) {
-						checkForRefresh();
-						setRefreshWithDelete(true);
-					} else {
-						checkForRefresh();
-					}
+					checkForRefresh();
 				}
 				break;
 			default:
@@ -201,40 +227,30 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 */
 	private void refreshConstraints(FeatureModelManager currentModel) {
 		// Refresh entire List
-		if (refreshWithDelete) {
-			viewer.removeAll();
-			// no search text is entered:
-			if (searchText.isEmpty()) {
-				final List<ConstraintColorPair> explanationList = getExplanationConstraints();
-				// If one or more Feature were selected
-				if (!featureModelEditor.diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
-					addFeatureConstraints();
-				} else {
-					addVisibleConstraints();
-				}
-				//
-
-				// Check if automatic calculations are enabled and selection has explanation or Model is void
-				if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
-					&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
-					if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
-						changeIntoDecoratedConstraints();
-					}
-				}
+		viewer.removeAll();
+		// no search text is entered:
+		if (searchText.isEmpty()) {
+			final List<ConstraintColorPair> explanationList = getExplanationConstraints();
+			// If one or more Feature were selected
+			if (!featureModelEditor.diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+				addFeatureConstraints();
 			} else {
-				// when searchText is entered, search through all constraints
-				findConstraints(currentModel.getSnapshot());
+				addVisibleConstraints();
 			}
-			// Only update explanations
-		} else {
+			//
 
-			for (final TreeItem constraint : viewer.getViewer().getTree().getItems()) {
-				viewer.undecorateItem((IConstraint) constraint.getData());
+			// Check if automatic calculations are enabled and selection has explanation or Model is void
+			if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+				&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+				if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
+					changeIntoDecoratedConstraints();
+				}
 			}
-			if (searchText.isEmpty()) {
-				changeIntoDecoratedConstraints();
-			}
+		} else {
+			// when searchText is entered, search through all constraints
+			findConstraints(currentModel.getSnapshot());
 		}
+		// Only update explanations
 	}
 
 	/**
@@ -463,11 +479,22 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		getSite().getPage().addPartListener(partListener);
 	}
 
+	public void addSelectionListener() {
+		featureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
+	}
+
+	public void removeSelectionListener() {
+		featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+	}
+
 	@Override
 	public void dispose() {
 		// remove eventListener from current FeatureModel
 		if (fmManager != null) {
 			fmManager.removeListener(eventListener);
+		}
+		if (featureModelEditor.diagramEditor != null) {
+			featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
 		}
 		// remove all PageListener from open FeatureModelEditors
 		final IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
@@ -517,14 +544,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		return settingsMenu;
 	}
 
-	public boolean isRefreshWithDelete() {
-		return refreshWithDelete;
-	}
-
-	public void setRefreshWithDelete(Boolean refreshWithDelete) {
-		this.refreshWithDelete = refreshWithDelete;
-	}
-
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		final TreeSelection treeSelection = (TreeSelection) event.getSelection();
@@ -534,7 +553,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final FeatureDiagramEditor diagramEditor = activeFMEditor.diagramEditor;
 			if (diagramEditor != null) {
 				final IGraphicalFeatureModel graphicalFeatureModel = diagramEditor.getGraphicalFeatureModel();
-				setRefreshWithDelete(false);
 				if (constraint != null) {
 					// Check if automatic calculations are activated (explanation are only available when anaylses are activated)
 					if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
