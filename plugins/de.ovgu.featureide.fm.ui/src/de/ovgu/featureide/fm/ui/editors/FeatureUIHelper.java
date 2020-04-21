@@ -120,7 +120,7 @@ public class FeatureUIHelper {
 		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
 			final IGraphicalFeature graphicChild = getGraphicalFeature(child, model);
-			if (!graphicChild.hasCollapsedParent() && (!child.hasHiddenParent() || model.getLayout().showHiddenFeatures())) {
+			if (!graphicChild.hasCollapsedParent()) {
 				graphicalChildren.add(graphicChild);
 			}
 		}
@@ -196,14 +196,6 @@ public class FeatureUIHelper {
 		return zoomManager;
 	}
 
-	public static boolean showHiddenFeatures(IGraphicalFeatureModel featureModel) {
-		return featureModel.getLayout().showHiddenFeatures();
-	}
-
-	public static void showHiddenFeatures(boolean show, IGraphicalFeatureModel featureModel) {
-		featureModel.getLayout().showHiddenFeatures(show);
-	}
-
 	public static void showCollapsedConstraints(boolean show, IGraphicalFeatureModel featureModel) {
 		featureModel.getLayout().showCollapsedConstraints(show);
 	}
@@ -248,11 +240,9 @@ public class FeatureUIHelper {
 
 	public static Point getSourceLocation(IGraphicalFeature feature) {
 		/*
-		 * Checks if the feature is hidden or has a hidden parent and hidden features should not be shown or if the feature has a collapsed parent and should
-		 * therefore not be shown.
+		 * Checks if the feature has a collapsed parent and should therefore not be shown.
 		 */
-		if ((feature.getObject().getStructure().hasHiddenParent() && !feature.getGraphicalModel().getLayout().showHiddenFeatures())
-			|| feature.hasCollapsedParent()) {
+		if (feature.hasCollapsedParent()) {
 			return getTargetLocation(getGraphicalParent(feature));
 		}
 

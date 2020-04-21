@@ -120,8 +120,8 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 	private void handleLeftRightLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature, final IGraphicalFeature parent,
 			final int dex) {
 		// checks if the right arrow key is pressed and if the selected feature has visible children
-		if ((event.keyCode == SWT.ARROW_RIGHT) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
-			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+		if ((event.keyCode == SWT.ARROW_RIGHT) && (feature.getGraphicalChildren() != null) && !feature.getGraphicalChildren().isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren().get(feature.getGraphicalChildren().size() / 2)), event);
 		}
 		// checks if the selected feature is the root
 		if (parent != null) {
@@ -140,8 +140,8 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 	private void handleLeftRightInvertedLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature,
 			final IGraphicalFeature parent, final int dex) {
 		// checks if the right arrow key is pressed and if the selected feature has visible children
-		if ((event.keyCode == SWT.ARROW_LEFT) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
-			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+		if ((event.keyCode == SWT.ARROW_LEFT) && (feature.getGraphicalChildren() != null) && !feature.getGraphicalChildren().isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren().get(feature.getGraphicalChildren().size() / 2)), event);
 		}
 		// checks if the selected feature is the root
 		if (parent != null) {
@@ -160,8 +160,8 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 	private void handleTopDownLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature, final IGraphicalFeature parent,
 			final int dex) {
 		// checks if the down arrow key is pressed and if the selected feature has visible children
-		if ((event.keyCode == SWT.ARROW_DOWN) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
-			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+		if ((event.keyCode == SWT.ARROW_DOWN) && (feature.getGraphicalChildren() != null) && !feature.getGraphicalChildren().isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren().get(feature.getGraphicalChildren().size() / 2)), event);
 			return;
 		}
 		// checks if the selected feature is the root
@@ -184,8 +184,8 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 	private void handleTopDownInvertedLayout(KeyEvent event, final Map<?, ?> editPartRegistry, final IGraphicalFeature feature, final IGraphicalFeature parent,
 			final int dex) {
 		// checks if the down arrow key is pressed and if the selected feature has visible children
-		if ((event.keyCode == SWT.ARROW_UP) && (feature.getGraphicalChildren(false) != null) && !feature.getGraphicalChildren(false).isEmpty()) {
-			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren(false).get(feature.getGraphicalChildren(false).size() / 2)), event);
+		if ((event.keyCode == SWT.ARROW_UP) && (feature.getGraphicalChildren() != null) && !feature.getGraphicalChildren().isEmpty()) {
+			navigateTo((EditPart) editPartRegistry.get(feature.getGraphicalChildren().get(feature.getGraphicalChildren().size() / 2)), event);
 			return;
 		}
 		// checks if the selected feature is the root
@@ -207,7 +207,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
 	private FeatureEditPart findNextFeature(IGraphicalFeature feature, int dex, Direction direct) {
 		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
-		final List<IGraphicalFeature> graphSiblings = parent.getGraphicalChildren(false);
+		final List<IGraphicalFeature> graphSiblings = parent.getGraphicalChildren();
 		final Map<?, ?> editPartRegistry = getViewer().getEditPartRegistry();
 		final boolean oneMore = checkForOneMore(graphSiblings, dex, direct);
 		final int newDirection = (direct == Direction.RIGHT) ? 1 : (direct == Direction.LEFT) ? -1 : 0;
@@ -226,7 +226,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
 	private IGraphicalFeature searchUp(IGraphicalFeature feature, int layer, Direction direct) {
 		final IGraphicalFeature parent = feature.getSourceConnection().getTarget();
-		final List<IGraphicalFeature> siblings = parent.getGraphicalChildren(false);
+		final List<IGraphicalFeature> siblings = parent.getGraphicalChildren();
 		final int dex = siblings.indexOf(feature);
 		final int listDirection = direct == Direction.LEFT ? -1 : 1;
 		for (int i = dex + listDirection; (i < siblings.size()) && (i >= 0); i += listDirection) {
@@ -245,7 +245,7 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		if (layer == 0) {
 			return feature;
 		}
-		final List<IGraphicalFeature> children = feature.getGraphicalChildren(false);
+		final List<IGraphicalFeature> children = feature.getGraphicalChildren();
 		if ((children != null) && !children.isEmpty()) {
 			final int listDirection = direct == Direction.LEFT ? -1 : 1;
 			final int listStart = direct == Direction.LEFT ? children.size() - 1 : 0;

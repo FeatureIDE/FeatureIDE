@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -38,16 +37,14 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 // TODO unused?
 public class LayoutableFeature {
 
-	private final boolean showHidden;
 	private final IFeature feature;
 
-	public LayoutableFeature(IFeatureStructure featureStructure, boolean showHidden) {
-		this(featureStructure.getFeature(), showHidden);
+	public LayoutableFeature(IFeatureStructure featureStructure) {
+		this(featureStructure.getFeature());
 	}
 
-	public LayoutableFeature(IFeature feature, boolean showHidden) {
+	public LayoutableFeature(IFeature feature) {
 		this.feature = feature;
-		this.showHidden = showHidden;
 	}
 
 	public LinkedList<LayoutableFeature> getChildren() {
@@ -55,14 +52,7 @@ public class LayoutableFeature {
 		final LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
 
 		for (final IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
-			if (showHidden) {
-				children.add(new LayoutableFeature(child, showHidden));
-			} else {
-				if (!child.getStructure().isHidden()) {
-					children.add(new LayoutableFeature(child, showHidden));
-				}
-			}
-
+			children.add(new LayoutableFeature(child));
 		}
 		return children;
 
@@ -91,30 +81,7 @@ public class LayoutableFeature {
 		return feature;
 	}
 
-	public static Collection<IFeature> convertFeatures(Iterable<IFeature> features, boolean showHidden) {
-		if (showHidden) {
-			return Functional.toList(features);
-		} else {
-			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
-			for (final IFeature feature : features) {
-				if (feature.getStructure().hasHiddenParent()) {
-					newFeatures.add(feature);
-				}
-			}
-			return newFeatures;
-		}
+	public static Collection<IFeature> convertFeatures(Iterable<IFeature> features) {
+		return Functional.toList(features);
 	}
-
-	public static boolean isHidden(IFeature feature, boolean showHidden) {
-		if (showHidden) {
-			return false;
-		}
-		final IFeatureStructure structure = feature.getStructure();
-		if (!structure.isRoot()) {
-			return (structure.isHidden() || isHidden(FeatureUtils.getParent(feature), showHidden));
-		} else {
-			return structure.isHidden();
-		}
-	}
-
 }

@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -153,7 +153,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean hidden;
 	private boolean collapsed;
 	private boolean dead;
-	private boolean showHidden;
 	private boolean falseoptional;
 	private boolean indetHidden;
 	private boolean tautologyConst;
@@ -191,12 +190,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private void refreshProperties(IFeatureModelManager featureModelManager) {
 		// TODO get variable analyzer
-		final AnalysesCollection analysisResults = featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection();
 
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
-		final IFeatureModelStructure fmStructure = featureModel.getStructure();
-		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
-		fmStructure.setShowHiddenFeatures(showHidden);
 
 		// Retrieve visible features
 		final List<IGraphicalFeature> graphicalVisibleFeatures = graphicalFeatureModel.getVisibleFeatures();
@@ -214,24 +209,43 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = Functional.toList(Functional.filter(graphicalVisibleFeatures, new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
-		if (analysisResults.isCalculateDeadConstraints()) {
-			dead = analysisResults.getFeatureModelProperties().hasDeadFeatures();
-		}
-		if (analysisResults.isCalculateFOConstraints()) {
-			falseoptional = analysisResults.getFeatureModelProperties().hasFalseOptionalFeatures();
-		}
-		indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
 
-		void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
-		if (void_model) {
+		AnalysesCollection analysisResults = null;
+
+		// skip when automated analyses are deactivated
+		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
+			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())) {
+			analysisResults = featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection();
+
+			if (analysisResults.isCalculateDeadConstraints()) {
+				dead = analysisResults.getFeatureModelProperties().hasDeadFeatures();
+			}
+			if (analysisResults.isCalculateFOConstraints()) {
+				falseoptional = analysisResults.getFeatureModelProperties().hasFalseOptionalFeatures();
+			}
+			indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
+
+			void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
+			if (void_model) {
+				dead = false;
+			}
+
+			tautologyConst = analysisResults.isCalculateTautologyConstraints() && analysisResults.getFeatureModelProperties().hasTautologyConstraints();
+			redundantConst = analysisResults.isCalculateRedundantConstraints() && analysisResults.getFeatureModelProperties().hasRedundantConstraints();
+
+			explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
+		} else {
 			dead = false;
+			falseoptional = false;
+			indetHidden = false;
+			void_model = false;
+			tautologyConst = false;
+			redundantConst = false;
+			explanations = false;
 		}
 
-		tautologyConst = analysisResults.isCalculateTautologyConstraints() && analysisResults.getFeatureModelProperties().hasTautologyConstraints();
-		redundantConst = analysisResults.isCalculateRedundantConstraints() && analysisResults.getFeatureModelProperties().hasRedundantConstraints();
 		implicitConst = isImplicit(graphicalFeatureModel);
-
-		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
+		implicitConst = false;
 
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
@@ -289,7 +303,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getInterfaced());
 		}
-		if (hidden && showHidden) {
+		if (hidden) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getHidden());
 		}
@@ -305,7 +319,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getFalseOptional());
 		}
-		if (showHidden && indetHidden) {
+		if (indetHidden) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getIndetHidden());
 		}
@@ -381,7 +395,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (interfaced) {
 			createRowInterfaced(row++);
 		}
-		if (hidden && showHidden) {
+		if (hidden) {
 			createRowHidden(row++);
 		}
 		if (collapsed) {
@@ -394,7 +408,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (falseoptional) {
 			createRowFalseOpt(row++);
 		}
-		if (showHidden && indetHidden) {
+		if (indetHidden) {
 			createRowIndetHidden(row++);
 		}
 		if (redundantConst) {

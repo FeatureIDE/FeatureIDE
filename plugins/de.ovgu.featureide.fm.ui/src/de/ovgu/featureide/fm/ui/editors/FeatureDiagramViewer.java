@@ -360,9 +360,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	}
 
 	void refreshFeature(IFeature feature) {
-		if (!graphicalFeatureModel.getLayout().showHiddenFeatures() && feature.getStructure().isHidden()) {
-			return;
-		}
 		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
 		if (editPart == null) {

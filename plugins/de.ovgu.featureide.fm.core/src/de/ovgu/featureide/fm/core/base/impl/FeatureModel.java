@@ -306,17 +306,15 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	/**
-	 * Returns a list of features, which are not hidden and not collapsed
+	 * Returns a list of features, which are not collapsed
 	 *
 	 * @return
 	 */
 	@Override
-	public Collection<IFeature> getVisibleFeatures(boolean showHiddenFeatures) {
+	public Collection<IFeature> getVisibleFeatures() {
 		final Collection<IFeature> features = new ArrayList<>();
 		for (final IFeature f : getFeatures()) {
-			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures)) {
-				features.add(f);
-			}
+			features.add(f);
 		}
 		return features;
 	}

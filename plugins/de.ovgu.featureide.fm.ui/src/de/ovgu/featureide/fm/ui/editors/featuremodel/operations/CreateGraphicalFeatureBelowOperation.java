@@ -69,7 +69,7 @@ public class CreateGraphicalFeatureBelowOperation extends AbstractGraphicalFeatu
 					int maxY = graphicalFeature.getLocation().y - yDistanceLeftRight;
 					int yLocation = graphicalFeature.getLocation().y() + yDistanceTopDown + graphicalFeature.getSize().height;
 					int xLocation = graphicalFeature.getLocation().x + xDistanceLeftRight + graphicalFeature.getSize().width;
-					final List<IGraphicalFeature> olderSiblings = graphicalFeature.getGraphicalChildren(true);
+					final List<IGraphicalFeature> olderSiblings = graphicalFeature.getGraphicalChildren();
 
 					if (olderSiblings.size() != 1) {
 						// looks for the most right x coordinate and the lowest y coordinate of a child

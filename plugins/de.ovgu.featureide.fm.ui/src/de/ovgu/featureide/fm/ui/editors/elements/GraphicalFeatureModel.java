@@ -169,7 +169,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public Collection<IGraphicalFeature> getFeatures() {
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
-		for (final IFeature f : featureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+		for (final IFeature f : featureModel.getVisibleFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -267,7 +267,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			}
 
 			features = new HashMap<>((int) (featureModel.getNumberOfFeatures() * 1.5));
-			for (final IFeature feature : featureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+			for (final IFeature feature : featureModel.getVisibleFeatures()) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
@@ -328,7 +328,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	private static final String LAYOUT_ALGORITHM = "layoutalgorithm";
-	private static final String SHOW_HIDDEN_FEATURES = "showhiddenfeatures";
 	private static final String SHOW_COLLAPSED_CONSTRAINTS = "showcollapsedconstraints";
 	private static final String SHOW_SHORT_NAMES = "showshortnames";
 	private static final String LEGEND_AUTO_LAYOUT = "legendautolayout";
@@ -356,9 +355,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		default:
 			getLayout().setVerticalLayout(false);
 		}
-
-		final Boolean hiddenFeatures = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_HIDDEN_FEATURES);
-		getLayout().showHiddenFeatures(hiddenFeatures != null ? hiddenFeatures : true);
 
 		final Boolean shortNames = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_SHORT_NAMES);
 		getLayout().setShowShortNames(shortNames != null ? shortNames : false);
@@ -495,11 +491,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	private void writeAttributes(final IFeatureModel fm) {
-		if (getLayout().showHiddenFeatures()) {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
-		} else {
-			fm.getProperty().set(SHOW_HIDDEN_FEATURES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
-		}
 		if (getLayout().showShortNames()) {
 			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {

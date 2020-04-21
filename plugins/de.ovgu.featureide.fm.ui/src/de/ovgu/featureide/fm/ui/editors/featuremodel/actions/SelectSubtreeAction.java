@@ -55,7 +55,7 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 			final FeatureDiagramViewer featureDiagramViewer = (FeatureDiagramViewer) viewer;
 			final FeatureEditPart part = (FeatureEditPart) featureDiagramViewer.getFocusEditPart();
 			final Map<?, ?> editPartRegistry = featureDiagramViewer.getEditPartRegistry();
-			final List<IGraphicalFeature> children = part.getModel().getGraphicalChildren(true);
+			final List<IGraphicalFeature> children = part.getModel().getGraphicalChildren();
 			selectChildren(editPartRegistry, children, featureDiagramViewer);
 		}
 	}
@@ -64,7 +64,7 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 		for (final IGraphicalFeature child : children) {
 			final EditPart childPart = (EditPart) editPartRegistry.get(child);
 			viewer.appendSelection(childPart);
-			selectChildren(editPartRegistry, child.getGraphicalChildren(true), viewer);
+			selectChildren(editPartRegistry, child.getGraphicalChildren(), viewer);
 		}
 	}
 

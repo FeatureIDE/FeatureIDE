@@ -68,7 +68,7 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 				// checks if manual layout is chosen
 				if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 					final IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
-					final List<IGraphicalFeature> children = graphicalParent.getGraphicalChildren(true);
+					final List<IGraphicalFeature> children = graphicalParent.getGraphicalChildren();
 					int maxX = children.get(0).getLocation().x + children.get(0).getSize().width;
 					int yLocation = children.get(0).getLocation().y;
 					int maxY = children.get(0).getLocation().y + children.get(0).getSize().height;

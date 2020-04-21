@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -116,10 +117,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setLocation(feature.getLocation());
 		}
 
-		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
-			setSize(new Dimension(0, 0));
-		}
-
 		if (feature.hasCollapsedParent()) {
 			setSize(new Dimension(0, 0));
 		}
@@ -132,9 +129,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		final IFeature feature = this.feature.getObject();
-		final FeatureProperties featureProperties =
-			this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection().getFeatureProperty(feature);
-
 		// First draw custom color
 		final FeatureColor color = FeatureColorManager.getColor(feature);
 		if (color != FeatureColor.NO_COLOR) {
@@ -148,7 +142,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 		}
 
-		setLabelIcon(featureProperties);
+		setLabelIcon();
 
 		if (feature instanceof MultiFeature) {
 			final MultiFeature extendedFeature = (MultiFeature) feature;
@@ -195,9 +189,20 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			final IFeature feature = this.feature.getObject();
 
 			final StringBuilder toolTip = new StringBuilder();
-			final FeatureModelFormula variableFormula = this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
-			final AnalysesCollection properties = variableFormula.getAnalyzer().getAnalysesCollection();
-			toolTip.append(createTooltip(properties));
+
+			// Check if automatic calculations are nessecary
+			AnalysesCollection properties = null;
+			if (FeatureModelProperty.isRunCalculationAutomatically(feature.getFeatureModel())
+				&& FeatureModelProperty.isCalculateFeatures(feature.getFeatureModel())) {
+				final FeatureModelFormula variableFormula = this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
+				properties = variableFormula.getAnalyzer().getAnalysesCollection();
+			}
+
+			if (properties == null) {
+				toolTip.append(createTooltip());
+			} else {
+				toolTip.append(createTooltip(properties));
+			}
 			if (getActiveReason() != null) {
 				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
@@ -270,15 +275,23 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		return targetAnchor;
 	}
 
-	private void setLabelIcon(FeatureProperties featureProperties) {
-		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
-			label.setIcon(FM_ERROR);
-		} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-			label.setIcon(FM_WARNING);
-		} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
-			label.setIcon(WARNING_IMAGE);
-		} else {
+	private void setLabelIcon() {
+		// Check if automatic calculations are wanted (properties are only set when analyses are activated)
+		if (!FeatureModelProperty.isRunCalculationAutomatically(feature.getGraphicalModel().getFeatureModelManager().getVarObject())
+			|| !FeatureModelProperty.isCalculateFeatures(feature.getGraphicalModel().getFeatureModelManager().getVarObject())) {
 			label.setIcon(null);
+		} else {
+			final FeatureProperties featureProperties = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
+					.getAnalysesCollection().getFeatureProperty(feature.getObject());
+			if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+				label.setIcon(FM_ERROR);
+			} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+				label.setIcon(FM_WARNING);
+			} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+				label.setIcon(WARNING_IMAGE);
+			} else {
+				label.setIcon(null);
+			}
 		}
 		setName(label.getText());
 	}
