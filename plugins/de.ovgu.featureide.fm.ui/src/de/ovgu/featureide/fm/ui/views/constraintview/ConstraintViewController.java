@@ -493,9 +493,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		if (fmManager != null) {
 			fmManager.removeListener(eventListener);
 		}
-		if (featureModelEditor.diagramEditor != null) {
-			featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+
+		if (featureModelEditor != null) {
+			if (featureModelEditor.diagramEditor != null) {
+				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
 		}
+
 		// remove all PageListener from open FeatureModelEditors
 		final IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
 		for (final IEditorReference ref : editors) {
