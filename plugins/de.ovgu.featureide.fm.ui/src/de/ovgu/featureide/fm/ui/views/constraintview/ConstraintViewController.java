@@ -484,7 +484,11 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	}
 
 	public void removeSelectionListener() {
-		featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+		if (featureModelEditor != null) {
+			if (featureModelEditor.diagramEditor != null) {
+				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
+		}
 	}
 
 	@Override
@@ -494,11 +498,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			fmManager.removeListener(eventListener);
 		}
 
-		if (featureModelEditor != null) {
-			if (featureModelEditor.diagramEditor != null) {
-				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
-			}
-		}
+		removeSelectionListener();
 
 		// remove all PageListener from open FeatureModelEditors
 		final IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
