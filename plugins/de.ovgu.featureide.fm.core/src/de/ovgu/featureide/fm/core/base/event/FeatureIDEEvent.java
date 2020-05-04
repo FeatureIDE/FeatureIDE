@@ -37,7 +37,6 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
-		FEATURE_MODEL_OPERATION,
 		/**
 		 * The constraint was moved.
 		 */

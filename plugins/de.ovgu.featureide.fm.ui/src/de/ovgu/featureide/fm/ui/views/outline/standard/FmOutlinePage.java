@@ -153,7 +153,27 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
+		switch (event.getEventType()) {
+		case MODEL_DATA_OVERWRITTEN:
+		case MODEL_DATA_CHANGED:
+		case MODEL_DATA_SAVED:
+		case MANDATORY_CHANGED:
+		case GROUP_TYPE_CHANGED:
+		case FEATURE_NAME_CHANGED:
+		case FEATURE_ADD_SIBLING:
+		case FEATURE_ADD:
+		case FEATURE_ADD_ABOVE:
+		case FEATURE_DELETE:
+		case CONSTRAINT_MODIFY:
+		case CONSTRAINT_DELETE:
+		case CONSTRAINT_ADD:
+		case FEATURE_COLLAPSED_CHANGED:
+		case FEATURE_COLLAPSED_ALL_CHANGED:
+			update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
+			break;
+		default:
+			break;
+		}
 	}
 
 }

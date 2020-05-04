@@ -141,7 +141,23 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		resetFeatureList();
+		switch (event.getEventType()) {
+		case MODEL_DATA_OVERWRITTEN:
+		case MODEL_DATA_CHANGED:
+		case PARENT_CHANGED:
+		case LOCATION_CHANGED:
+		case FEATURE_NAME_CHANGED:
+		case FEATURE_NAME_PERSISTENTLY_CHANGED:
+		case FEATURE_ADD_SIBLING:
+		case FEATURE_ADD:
+		case FEATURE_ADD_ABOVE:
+		case FEATURE_DELETE:
+			resetFeatureList();
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	/**
