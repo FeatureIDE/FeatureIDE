@@ -33,6 +33,7 @@ import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -142,17 +143,17 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 				add(label);
 				toolTipContent.add(new Label(TAUTOLOGY));
 			} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
-				label.setIcon(FM_WARNING);
+				label.setIcon(FM_INFO);
 				add(label);
 				toolTipContent.add(new Label(REDUNDANCE));
 			} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
-				label.setIcon(FM_INFO);
+				setBorder(new LineBorder(GUIDefaults.IMPLICIT_CONSTRAINT, 3));
+				setBackgroundColor(FMPropertyManager.getWarningColor());
 				add(label);
 				toolTipContent.add(new Label(REDUNDANCE));
 			}
 
 			if (!constraintProperties.getDeadFeatures().isEmpty()) {
-				label.setIcon(null);
 				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
 				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
@@ -164,7 +165,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			}
 
 			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-				label.setIcon(null);
 				final List<String> falseOptionalFeatures =
 					Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
 				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);

@@ -250,7 +250,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 
 		implicitConst = isImplicit(graphicalFeatureModel);
-		implicitConst = false;
 
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
