@@ -675,7 +675,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName.toString());
 		if (format != null) {
 			try {
-				problemList.addAll(format.getInstance().read(FMFactoryManager.getInstance().getFactory(fileName, format).create(), source));
+				final IFeatureModel model = FMFactoryManager.getInstance().getFactory(fileName, format).create();
+				model.setSourceFile(fileName);
+				problemList.addAll(format.getInstance().read(model, source));
 			} catch (final NoSuchExtensionException e) {
 				problemList.add(new Problem(e));
 				Logger.logError(e);

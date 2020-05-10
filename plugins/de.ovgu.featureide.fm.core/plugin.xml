@@ -48,7 +48,7 @@
       </fmFormat>
       <fmFormat
             class="de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat"
-            id="de.ovgu.featureide.fm.core.format.VelvetFeatureModelFormat"
+            id="de.ovgu.featureide.fm.core.format.fm.VelvetFeatureModelFormat"
             name="Velvet">
       </fmFormat>
       <fmFormat

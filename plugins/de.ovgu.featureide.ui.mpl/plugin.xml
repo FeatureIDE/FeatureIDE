@@ -262,7 +262,7 @@
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.mpl.mappingContribution"
-            nameFilter="*.config"
+            nameFilter="*.xml"
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="de.ovgu.featureide.ui.mpl.actions.SetMappingAction"

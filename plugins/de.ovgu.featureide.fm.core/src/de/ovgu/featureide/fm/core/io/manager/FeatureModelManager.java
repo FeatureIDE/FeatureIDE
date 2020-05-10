@@ -66,7 +66,9 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	public static final IFeatureModel load(Path path) {
-		return FeatureModelIO.getInstance().load(path);
+		final IFeatureModel model = FeatureModelIO.getInstance().load(path);
+		model.setSourceFile(path);
+		return model;
 	}
 
 	public static FileHandler<IFeatureModel> getFileHandler(Path path) {

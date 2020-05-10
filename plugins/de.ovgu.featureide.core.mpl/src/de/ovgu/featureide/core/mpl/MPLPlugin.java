@@ -119,11 +119,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 				mappingFolder.create(true, true, null);
 			}
 
-			final IFile mappingFile = mappingFolder.getFile("default.config");
+			final IFile mappingFile = mappingFolder.getFile("default.xml");
 			if (!mappingFile.exists()) {
 				mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
 			}
-			project.setPersistentProperty(mappingConfigID, "default.config");
+			project.setPersistentProperty(mappingConfigID, "default.xml");
 
 			// create interfaces mapping file
 			final IFile mplVelvet = project.getFile("mpl.velvet");
@@ -253,7 +253,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 				newProject.getFile(new Path("model.xml")).create(featureProject.getModelFile().getContents(), true, null);
 
 				final InputStream stream = new ByteArrayInputStream("".getBytes());
-				newProject.getFile(new Path("configuration.config")).create(stream, true, null);
+				newProject.getFile(new Path("configuration.xml")).create(stream, true, null);
 				newProject.getFile(new Path(".xconf")).create(stream, true, null);
 				stream.close();
 
@@ -319,11 +319,11 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		// ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
-		// for (IProject iProject : projects) {
-		// arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
-		// }
-		// FMCorePlugin.getDefault().startJobs(arguments, true);
+//		final ArrayList<JobArguments> arguments = new ArrayList<>(projects.size());
+//		for (final IProject iProject : projects) {
+//			arguments.add(new PrintComparedInterfacesJob.Arguments(iProject));
+//		}
+//		FMCorePlugin.getDefault().startJobs(arguments, true);
 	}
 
 	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {

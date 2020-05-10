@@ -40,6 +40,9 @@ public class FeatureHouseFMComposerExtension extends FMComposerExtension {
 		}
 
 		for (int i = 1; i < c.length; i++) {
+			if ((c[i] != '-') || (c[i] != '.')) {
+				continue;
+			}
 			if (!Character.isJavaIdentifierPart(c[i])) {
 				return false;
 			}

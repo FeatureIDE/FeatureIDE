@@ -285,6 +285,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		 * Refresh the active reason of the target decoration of the main connection (which might not be this one). We have to do this whenever any connection
 		 * is refreshed as the main connection might not be refreshed even though its target decoration has to be.
 		 */
+		if (mainSourceStructure == null) {
+			return;
+		}
 		final IGraphicalFeature mainSource = FeatureUIHelper.getGraphicalFeature(mainSourceStructure, target.getGraphicalModel());
 		final ConnectionEditPart mainConnectionEditPart = (ConnectionEditPart) getViewer().getEditPartRegistry().get(mainSource.getSourceConnection());
 		if (mainConnectionEditPart == null) {

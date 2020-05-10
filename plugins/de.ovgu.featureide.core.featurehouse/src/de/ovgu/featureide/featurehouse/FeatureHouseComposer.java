@@ -90,6 +90,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -1048,7 +1049,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
-		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationExtension());
+		Path configurationFile;
+		configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + new DefaultFormat().getSuffix());
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());

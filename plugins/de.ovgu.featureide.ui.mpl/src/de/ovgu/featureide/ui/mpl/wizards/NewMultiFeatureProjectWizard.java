@@ -54,7 +54,7 @@ public class NewMultiFeatureProjectWizard extends Wizard implements IWorkbenchWi
 	public boolean performFinish() {
 		MPLPlugin.getDefault().setupMultiFeatureProject(multiPage.getProjects());
 		// MPLUIPlugin.getDefault().openEditor(ConfigurationEditor.ID,
-		// getNewProject().getFile("configuration.config"));
+		// getNewProject().getFile("configuration.xml"));
 		return true;
 	}
 

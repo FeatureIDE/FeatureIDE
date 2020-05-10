@@ -50,10 +50,8 @@ import org.antlr.runtime.tree.Tree;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.prop4j.And;
 import org.prop4j.Choose;
 import org.prop4j.Equals;
@@ -72,13 +70,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -106,6 +104,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	public static final String FILE_EXTENSION = "velvet";
 
 	protected File featureModelFile;
+	private java.nio.file.Path featureModelFilePath;
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
@@ -331,8 +330,9 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		final ProblemList problemList = new ProblemList();
 		factory = MultiFeatureModelFactory.getInstance();
 		extFeatureModel = (MultiFeatureModel) object;
-		if (extFeatureModel != null) {
+		if ((extFeatureModel != null) && (extFeatureModel.getSourceFile() != null)) {
 			featureModelFile = extFeatureModel.getSourceFile().toFile();
+			featureModelFilePath = extFeatureModel.getSourceFile();
 		}
 
 		final ByteArrayInputStream inputstr = new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
@@ -673,9 +673,13 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private File getInterfaceModelFile(String name) {
-		if (localSearch) {
-			return localSearch(name);
+		final File file = localSearch(name);
+		if (file != null) {
+			return file;
 		}
+//		if (localSearch) {
+//			return localSearch(name);
+//		}
 		File returnFile = null;
 		final IProject project = getProject();
 		if (project != null) {
@@ -717,19 +721,11 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			return null;
 		}
 
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath filePath;
-		try {
-			filePath = Path.fromOSString(featureModelFile.getCanonicalPath());
-			final IFile file = workspace.getRoot().getFileForLocation(filePath);
-			if ((null == file) || !file.exists()) {
-				return workspace.getRoot().getFile(filePath).getProject();
-			}
-			return file.getProject();
-		} catch (final IOException e) {
-			Logger.logError(e);
-			return null;
-		}
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IFile[] findFilesForLocationURI = root.findFilesForLocationURI(featureModelFilePath.toUri());
+		final IResource res = ((findFilesForLocationURI.length > 0) && (findFilesForLocationURI[0].getProject() != null))
+			? findFilesForLocationURI[0].getProject() : ResourcesPlugin.getWorkspace().getRoot();
+		return res.getProject();
 	}
 
 	/**
@@ -1390,6 +1386,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	public boolean initExtension() {
 		if (super.initExtension()) {
 			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, MultiFeatureModelFactory.ID);
+			return true;
 		}
 		return false;
 	}

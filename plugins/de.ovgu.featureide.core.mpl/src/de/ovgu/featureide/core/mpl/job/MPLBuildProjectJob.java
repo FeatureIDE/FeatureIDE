@@ -171,7 +171,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			String mappingFileName = externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
 			// XXX MPL save information in builder not as persistent property
 			if (mappingFileName == null) {
-				mappingFileName = "default.config";
+				mappingFileName = "default.xml";
 				externalFeatureProject.getProject().setPersistentProperty(MPLPlugin.mappingConfigID, mappingFileName);
 			}
 			final IFile mappingFile = externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
