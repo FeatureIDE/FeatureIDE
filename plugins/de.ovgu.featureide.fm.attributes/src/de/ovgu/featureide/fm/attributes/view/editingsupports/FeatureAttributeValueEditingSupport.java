@@ -111,6 +111,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			setValueInFeatureDiagram(attribute, type, value);
 		}
 		getViewer().update(element, null);
+		view.repackAllColumns();
 	}
 
 	private void setValueInConfig(IFeatureAttribute attribute, String type, Object value) {
