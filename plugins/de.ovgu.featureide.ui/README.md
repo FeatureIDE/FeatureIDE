@@ -7,19 +7,25 @@ Provides configuration generators, statistical computation for feature models, g
 
 | Plugin   | Description |
 | -------- | --------    |
-| de.ovgu.featureide.ui.actions| Contains several actions for managing color schemes and generating configurations/samples|
-| de.ovgu.featureide.ui.statistics | Contains the classes required for the statistics view that describes semantical and syntatical properties of a feature model |
-| de.ovgu.featureide.ui.views.collaboration | Contains the classes required for the collobaration view    |
-| de.ovgu.featureide.ui.configMap | Contains the classes required for the configuration map |
-| de.ovgu.featureide.ui.wizards	| Contains several wizards for creating new FeatureIDE resources (e.g. feature projects/models) |
+| de.ovgu.featureide.ui.actions| Contains several actions for managing color schemes and generating configurations/samples.|
+| de.ovgu.featureide.ui.statistics | Contains the classes required for the statistics view that describes semantical and syntatical properties of a feature model. |
+| de.ovgu.featureide.ui.views.collaboration | Contains the classes required for the collobaration view.    |
+| de.ovgu.featureide.ui.configMap | Contains the classes required for the configuration map. |
+| de.ovgu.featureide.ui.wizards	| Contains several wizards for creating new FeatureIDE resources (e.g. feature projects/models). |
 
 
 # Plugin.xml
 
+### Provided Extension Points
+* none
 
-| Extension Name | Extension ID                            | Description |
-|----------------|-----------------------------------------|-------------| 
-| -   | - |-								|
+### Used Extension Points
+| Extension Point &                                           <br>Class                                 | Description                                                                                         |
+|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------| 
+| de.ovgu.featureide.fm.ui.Outline                       <br>`CollaborationOutline`        | Provides an outline that can be used with the collaboration diagram.                                               |
+| de.ovgu.featureide.fm.ui.Outline                     <br>`ContextOutline`          | TODO                           |
+| de.ovgu.featureide.fm.ui.Outline                  <br>`ExtendedOutline`                | TODO                                               |
+
 
 
 
