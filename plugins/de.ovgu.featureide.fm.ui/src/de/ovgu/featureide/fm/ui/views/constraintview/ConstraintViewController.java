@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
@@ -395,9 +396,15 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ").replaceAll("\r", " ");
 			searchText = searchText.toLowerCase();
 			// RegEx search with part string: .* at the start and at the end enables part search automatically
-			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
-				viewer.addItem(constraint);
+
+			try {
+				if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
+					viewer.addItem(constraint);
+				}
+			} catch (final PatternSyntaxException e) {
+
 			}
+
 		}
 	}
 
