@@ -1,9 +1,9 @@
 # Description
 de.ovgu.featureide.core provides 
 
-- The structure of FeatureIDE projects (FeatureProject, FeatureIDE nature, FST, Signature). 
+- The structure of FeatureIDE projects (Feature Project, FeatureIDE nature, Feature Structure Tree, Signature plugin). 
 - Control over the creation and life cycle of FeatureIDE projects (CorePlugin).
-- Extension point for composers and classes with basic functionality that need to be implemented by them.
+- Extension point for composers and classes with basic functionality that need to be implemented by them (Builder plugin).
 - Functionality specifically for preprocessor-based composers (PPComposerExtensionClass).
 
 # Structure
@@ -12,7 +12,7 @@ de.ovgu.featureide.core provides
 | Plugin   | Description |
 | -------- | --------    |
 | de.ovgu.featureide.core.builder     | Classes used by composers.     |
-| de.ovgu.featureide.core.fstmodel     | Feature structure tree creates      |
+| de.ovgu.featureide.core.fstmodel     | Feature structure tree creates relations between features and assets in the project.     |
 | de.ovgu.featureide.core.signature     | TODO     |
 | de.ovgu.featureide.core.featuremodeling     | Composer extension class for feature modeling. This class does not allow the actual composition of software, just feature modeling.     |
 
