@@ -1,8 +1,10 @@
 # Description
 de.ovgu.featureide.core provides 
 
-* Grundlage von Eclipse Projekt
-* FeatureIDE Nature 
+- The structure of FeatureIDE projects (FeatureProject, FeatureIDE nature, FST, Signature). 
+- Control over the creation and life cycle of FeatureIDE projects (CorePlugin).
+- Extension point for composers and classes with basic functionality that need to be implemented by them.
+- Functionality specifically for preprocessor-based composers (PPComposerExtensionClass).
 
 # Structure
 
