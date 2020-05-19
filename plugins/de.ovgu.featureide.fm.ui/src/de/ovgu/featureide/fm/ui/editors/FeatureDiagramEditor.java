@@ -476,6 +476,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param activeExplanation the new active explanation
 	 */
 	public void setActiveExplanation(Explanation<?> activeExplanation) {
+		if (activeExplanation == this.activeExplanation) {
+			return;
+		}
 		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);

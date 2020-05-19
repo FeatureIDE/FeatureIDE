@@ -53,6 +53,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 		if (part.getPart(false) instanceof FeatureModelEditor) {
 			controller.getView().removeAll();
 			controller.getView().addNoFeatureModelItem();
+			controller.removeSelectionListener();
 			controller.getSettingsMenu().setStateOfActions(false);
 			controller.setFeatureModelEditor(null);
 		}
@@ -72,6 +73,8 @@ public class ConstraintViewPartListener implements IPartListener2 {
 		final IWorkbenchPart activePart = part.getPart(false);
 		if (activePart instanceof FeatureModelEditor) {
 			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
+			controller.removeSelectionListener();
+			controller.addSelectionListener();
 			controller.checkForRefresh();
 			// Check if the constraints view is currently visible
 			if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(controller)) {
