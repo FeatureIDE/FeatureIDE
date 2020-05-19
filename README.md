@@ -33,7 +33,7 @@ development branch:
 
 | Plugin                                                                                                                                                               | Description                                                          |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| [de.ovgu.featureide.fm.attributes](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.attributes/src/de/ovgu/featureide/fm/attributes) | Provides support for extended feature models and feature attributes. |
+| [de.ovgu.featureide.fm.attributes](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.fm.attributes) | Provides support for extended feature models and feature attributes. |
 
 ### Composers
 
