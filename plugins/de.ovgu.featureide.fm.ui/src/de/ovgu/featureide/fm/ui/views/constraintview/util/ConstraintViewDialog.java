@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,187 +20,43 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.util;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.localization.StringTable;
-import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
  * A dialog that asks a user to open the constraint view. Its saves the decision in the workspace wide preferences.
  *
- * @author Rosiak Kamil
+ * @author Tobias Heß
  */
-public class ConstraintViewDialog extends Dialog {
+public class ConstraintViewDialog {
+
 	public static final String CONSTRAINT_VIEW_REMEMBER = "de.ovgu.featureide.fm.ui.views.constraintview_remember";
 	public static final String CONSTRAINT_VIEW_DECISION = "de.ovgu.featureide.fm.ui.views.constraintview_decision";
 
-	private final int ROW_WIDTH = 120;
-	private Shell shell;
-	private static boolean remember;
-	private static boolean decision;
-	private int exitCode = SWT.CANCEL;
+	public static boolean spawn() {
 
-	/**
-	 * Default constructor
-	 */
-	public ConstraintViewDialog(Shell parent) {
-		this(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.Resize);
-		shell = parent;
-		remember = Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "false"));
-		decision = Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "false"));
-	}
-
-	/**
-	 * Constructor that allows to style the dialog window.
-	 */
-	public ConstraintViewDialog(Shell parent, int style) {
-		super(parent, style);
-		shell = parent;
-	}
-
-	public boolean getDecision() {
-		return decision;
-	}
-
-	public boolean isRemember() {
-		return remember;
-	}
-
-	/**
-	 * Opens the dialog.
-	 *
-	 * @return exit code SWT.OK | SWT.NO | SWT.CANCEL
-	 */
-	public int open() {
-		shell.setText(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE);
-		shell.setLocation(Display.getCurrent().getCursorLocation());
-		createContents(shell);
-		shell.pack();
-		shell.open();
-
-		final Display display = getParent().getDisplay();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
+		if (Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "false"))) {
+			return Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "false"));
 		}
-		return exitCode;
-	}
 
-	/**
-	 * This method creates a label with the question.
-	 */
-	private void createLabel(Shell shell) {
-		final CLabel label = new CLabel(shell, SWT.NONE);
-		label.setText(StringTable.CONSTRAINT_VIEW_QUESTION_DIALOG);
-		label.setImage(shell.getDisplay().getSystemImage(SWT.ICON_QUESTION));
-	}
+		final MessageDialogWithToggle dialog =
+			MessageDialogWithToggle.open(MessageDialog.QUESTION, Display.getCurrent().getActiveShell(), StringTable.CONSTRAINT_VIEW_QUESTION_TITLE,
+					StringTable.CONSTRAINT_VIEW_QUESTION_DIALOG, StringTable.CONSTRAINT_VIEW_REMEMBER_DECISION, true, null, null, SWT.NONE);
 
-	/**
-	 * Creates the checkbox for the remember function.
-	 */
-	private void createCheckBox(Shell shell) {
-		final Button rememberDecButton = new Button(shell, SWT.CHECK);
-		rememberDecButton.setText(StringTable.CONSTRAINT_VIEW_REMEMBER_DECISION);
-		rememberDecButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				remember = rememberDecButton.getSelection();
-			}
-		});
-	}
+		final boolean toggleState = dialog.getToggleState();
+		final boolean pressedOK = dialog.getReturnCode() == IDialogConstants.YES_ID;
 
-	/**
-	 * This method creating the buttons on the bottom.
-	 */
-	private Button createButton(Composite parent, int style, String label, RowData layoutData) {
-		final Button button = new Button(parent, style);
-		button.setText(label);
-		button.setLayoutData(layoutData);
-		return button;
-	}
+		final String rememberString = Boolean.toString(toggleState);
+		final String decisionString = Boolean.toString(pressedOK);
+		Preferences.store(CONSTRAINT_VIEW_REMEMBER, rememberString);
+		Preferences.store(CONSTRAINT_VIEW_DECISION, decisionString);
 
-	/**
-	 * This method stores values persistent if the remember flag is true.
-	 */
-	private void storeValue(boolean decision) {
-		if (remember) {
-			final String rememberString = Boolean.toString(remember);
-			final String decisionString = Boolean.toString(decision);
-			Preferences.store(CONSTRAINT_VIEW_REMEMBER, rememberString);
-			Preferences.store(CONSTRAINT_VIEW_DECISION, decisionString);
-			ConstraintViewDialog.decision = decision;
-		}
-	}
-
-	/**
-	 * This method sets the exit code.
-	 */
-	private void setExitCode(int exitCode) {
-		this.exitCode = exitCode;
-	}
-
-	/**
-	 * Creates the dialog's contents
-	 */
-	private void createContents(final Shell shell) {
-		shell.setLayout(new RowLayout(SWT.VERTICAL));
-		createLabel(shell);
-		createCheckBox(shell);
-		// Buttons and Layouting
-
-		final RowData rowData = new RowData();
-		rowData.width = ROW_WIDTH;
-
-		final Composite buttonLayer = new Composite(shell, SWT.None);
-		buttonLayer.setLayout(new RowLayout(SWT.HORIZONTAL));
-
-		final Button cancelButton = createButton(buttonLayer, SWT.PUSH, StringTable.CANCEL, rowData);
-		cancelButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				setExitCode(SWT.CANCEL);
-				shell.dispose();
-			}
-		});
-
-		final Button noButton = createButton(buttonLayer, SWT.PUSH, StringTable.NO, rowData);
-		noButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				storeValue(false);
-				setExitCode(SWT.NO);
-				shell.dispose();
-			}
-		});
-
-		final Button yesButton = createButton(buttonLayer, SWT.PUSH, StringTable.YES, rowData);
-		yesButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				storeValue(true);
-				setExitCode(SWT.YES);
-				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
-				} catch (final PartInitException e) {
-					e.printStackTrace();
-				}
-				shell.dispose();
-			}
-		});
-		shell.setDefaultButton(cancelButton);
+		return pressedOK;
 	}
 }
