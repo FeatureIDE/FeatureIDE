@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -32,7 +32,6 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 /**
  * A dialog that asks a user to open the constraint view. Its saves the decision in the workspace wide preferences.
  *
- * @author Rosiak Kamil (no functionality of that implementation left)
  * @author Tobias Heß
  */
 public class ConstraintViewDialog {
