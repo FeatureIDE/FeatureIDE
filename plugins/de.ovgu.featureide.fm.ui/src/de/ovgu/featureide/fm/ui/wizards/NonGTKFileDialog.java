@@ -34,6 +34,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Workaround for #1003
@@ -115,9 +116,7 @@ public class NonGTKFileDialog {
 		}
 
 		final MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.INFORMATION, Display.getCurrent().getActiveShell(),
-				"Workaround information",
-				"Due to a feature breaking bug in the GTK framework, FeatureIDE has to employ a workaround to maintain functionality. See also bug #1003 in the FeatureIDE bug tracker",
-				"Do not show this message again", true, null, null, SWT.NONE);
+				StringTable.GTK_WORKAROUND_INFO_TITLE, StringTable.GTK_WORKAROUND_INFO_MSG, StringTable.GTK_WORKAROUND_INFO_TOGGLE, true, null, null, SWT.NONE);
 
 		Preferences.store(WORKAROUND_INFO_REMEMBER, String.valueOf(dialog.getToggleState()));
 	}
