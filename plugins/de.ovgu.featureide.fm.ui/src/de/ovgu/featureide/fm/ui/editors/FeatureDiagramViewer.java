@@ -149,7 +149,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
 		}
-		openConstraintDecision();
 	}
 
 	/**
