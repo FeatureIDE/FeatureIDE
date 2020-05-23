@@ -47,6 +47,7 @@ public class NonGTKFileDialog {
 	private final JFileChooser chooser;
 	private String selectedFile = null;
 	private FileFilter[] filters;
+	private int fileFilterDefault = 0;
 
 	public NonGTKFileDialog(String path, String file) {
 		chooser = new JFileChooser();
@@ -54,10 +55,6 @@ public class NonGTKFileDialog {
 		chooser.setSelectedFile(Paths.get(path).resolve(file).toFile());
 	}
 
-	/**
-	 * @param fileNames
-	 * @param fileExtensions
-	 */
 	public void setFilterNamesAndExtensions(String[] fileNames, String[] fileExtensions) {
 
 		int k = 0;
@@ -73,17 +70,11 @@ public class NonGTKFileDialog {
 		}
 	}
 
-	/**
-	 * @param defaultFormat
-	 */
 	public void setFilterIndex(int defaultFormat) {
+		fileFilterDefault = defaultFormat;
 		chooser.setFileFilter(chooser.getChoosableFileFilters()[defaultFormat]);
 	}
 
-	/**
-	 * @param bs
-	 * @return
-	 */
 	public void open(BooleanSupplier bs) {
 
 		final NonGTKFileDialog dialog = this;
@@ -104,9 +95,6 @@ public class NonGTKFileDialog {
 		});
 	}
 
-	/**
-	 * @return
-	 */
 	public int getFilterIndex() {
 
 		final FileFilter filter = chooser.getFileFilter();
@@ -117,7 +105,7 @@ public class NonGTKFileDialog {
 			}
 		}
 
-		return -1;
+		return fileFilterDefault;
 	}
 
 	public static void spawnInfo() {
@@ -134,9 +122,6 @@ public class NonGTKFileDialog {
 		Preferences.store(WORKAROUND_INFO_REMEMBER, String.valueOf(dialog.getToggleState()));
 	}
 
-	/**
-	 * @return
-	 */
 	public String getSelectedFile() {
 		return selectedFile;
 	}
