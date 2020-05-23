@@ -151,6 +151,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final String NO_AUTOMATIC_EXPAND_TOOL_TIP = "Does Not Expand Automatically";
 	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
 
+	private static final String EXPAND_PREFERENCE = "configurationexpandpreference";
+
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
 	protected static final Color blue = new Color(null, 0, 0, 200);
@@ -457,11 +459,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, ExpandAlgorithm.NONE);
-		final MenuItem defaultItem = createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, ExpandAlgorithm.ALL_SELECTED);
+		createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, ExpandAlgorithm.ALL_SELECTED);
 		createMenu(EXPAND_CURRENT_SELECTION, EXPAND_CURRENT_SELECTION_TOOL_TIP, ExpandAlgorithm.CURRENTLY_SELECTED);
 		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, ExpandAlgorithm.OPEN_CLAUSES);
 		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP,
 				ExpandAlgorithm.ALL_SELECTED_OPEN_CLAUSE);
+
+		final int index = FMUIPlugin.getDefault().getPreferenceStore().getInt(EXPAND_PREFERENCE);
+
+		final MenuItem defaultItem = menu.getItem(index);
 
 		menu.setDefaultItem(defaultItem);
 		defaultItem.setSelection(true);
@@ -607,6 +613,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (configurationEditor.getExpandAlgorithm() != algorithm) {
 					configurationEditor.setExpandAlgorithm(algorithm);
+					final int index = menu.indexOf(menuItem);
+					FMUIPlugin.getDefault().getPreferenceStore().setValue(EXPAND_PREFERENCE, index);
 					if (useGroups) {
 						curGroup = 0;
 					}
