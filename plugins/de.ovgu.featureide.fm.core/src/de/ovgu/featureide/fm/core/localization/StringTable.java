@@ -1118,8 +1118,8 @@ public class StringTable {
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
 	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
 	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
-	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
-	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
+	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Open the Constraint View?";
+	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the Constraint View?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
 	public static final String NO_CONFIGURABLE_ATTRIBUTES = "The feature model does not contain configurable attributes.";

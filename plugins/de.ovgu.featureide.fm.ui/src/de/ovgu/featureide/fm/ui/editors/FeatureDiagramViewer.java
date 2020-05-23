@@ -36,7 +36,6 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -162,24 +161,23 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
-			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
-			if (!dialog.isRemember()) {
-				Display.getCurrent().asyncExec(new Runnable() {
 
-					@Override
-					public void run() {
-						dialog.open();
-					}
-				});
-			} else {
-				if (dialog.getDecision()) {
-					try {
-						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
-					} catch (final PartInitException e) {
-						e.printStackTrace();
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					final boolean showConstraintView = ConstraintViewDialog.spawn();
+
+					if (showConstraintView) {
+						try {
+							bench.getActivePage().showView(ConstraintViewController.ID);
+						} catch (final PartInitException e) {
+							e.printStackTrace();
+						}
 					}
 				}
-			}
+			});
+
 		}
 	}
 
