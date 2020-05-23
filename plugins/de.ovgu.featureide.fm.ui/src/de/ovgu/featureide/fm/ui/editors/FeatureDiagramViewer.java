@@ -33,6 +33,7 @@ import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
@@ -123,6 +124,8 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	private final FeatureDiagramEditorKeyHandler editorKeyHandler;
 	private FeatureDiagramLayoutManager layoutManager;
+
+	private boolean openConstraintViewDecisionDialogAlreadySpawned = false;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -427,4 +430,12 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseHandler(getFigureCanvas()));
 	}
 
+	@Override
+	protected void handleFocusGained(FocusEvent fe) {
+
+		if (!openConstraintViewDecisionDialogAlreadySpawned) {
+			openConstraintViewDecisionDialogAlreadySpawned = true;
+			openConstraintDecision();
+		}
+	}
 }
