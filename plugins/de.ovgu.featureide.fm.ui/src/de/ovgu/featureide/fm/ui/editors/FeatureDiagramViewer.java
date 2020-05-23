@@ -35,6 +35,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -163,8 +164,13 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
 			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
 			if (!dialog.isRemember()) {
-				dialog.open();
+				Display.getCurrent().asyncExec(new Runnable() {
 
+					@Override
+					public void run() {
+						dialog.open();
+					}
+				});
 			} else {
 				if (dialog.getDecision()) {
 					try {
