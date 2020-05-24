@@ -69,6 +69,7 @@ public class FeatureAttributeSelectionListener implements ISelectionChangedListe
 		for (IFeature iFeature : selectedAutomaticFeatures) {
 			treeViewer.setExpandedState(iFeature, true);
 		}
+		view.repackAllColumns();
 
 	}
 

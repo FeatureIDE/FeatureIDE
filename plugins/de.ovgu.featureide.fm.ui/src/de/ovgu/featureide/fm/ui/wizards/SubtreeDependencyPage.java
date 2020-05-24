@@ -37,10 +37,13 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.VirtualFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -63,7 +66,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 */
 	private final IFeatureModel completeFm;
 
-	private final FeatureModelAnalyzer subTreeAnalyzer;
+	private FeatureModelAnalyzer subTreeAnalyzer;
 
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation. Used as tool tip for redundant constraint.
@@ -83,7 +86,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 			+ "they are presented below the feature model in a red border.");
 		subtreeModel = fm;
 		completeFm = completeModel;
-		subTreeAnalyzer = FeatureModelManager.getAnalyzer(subtreeModel);
+		subTreeAnalyzer = null;
 	}
 
 	/**
@@ -105,6 +108,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		parent.setLayout(gridLayout);
 
 		final VirtualFeatureModelManager featureModelManager = new VirtualFeatureModelManager(subtreeModel);
+		subTreeAnalyzer = featureModelManager.getPersistentFormula().getAnalyzer();
 		featureModelManager.setUndoContext(new UndoContext());
 		final IGraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModelManager);
 		graphicalFeatureModel.init();
@@ -124,15 +128,29 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().addControlListener(viewer.createControlListener());
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
+		// Reset is nessecary to removed wrong cached values
+		subTreeAnalyzer.reset();
 		subTreeAnalyzer.getAnalysesCollection().inheritSettings(FeatureModelManager.getAnalyzer(completeFm).getAnalysesCollection());
 		subTreeAnalyzer.analyzeFeatureModel(null);
 
 		explainImplicitConstraints(subTreeAnalyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
-		viewer.internRefresh(true);
-		graphicalFeatureModel.redrawDiagram();
+
+		updateGraphicsViewer(viewer, graphicalFeatureModel);
 
 		setPageComplete(true);
 		setControl(compositeBottom);
+	}
+
+	private void updateGraphicsViewer(FeatureDiagramViewer viewer, IGraphicalFeatureModel graphicalFeatureModel) {
+		for (final IGraphicalFeature f : graphicalFeatureModel.getVisibleFeatures()) {
+			f.getObject().fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+			f.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
+		for (final IGraphicalConstraint c : graphicalFeatureModel.getVisibleConstraints()) {
+			c.getObject().fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+			c.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
+		viewer.internRefresh(true);
 	}
 
 	/**
