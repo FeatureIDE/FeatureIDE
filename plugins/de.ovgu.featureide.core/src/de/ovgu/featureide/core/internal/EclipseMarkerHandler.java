@@ -39,7 +39,7 @@ public final class EclipseMarkerHandler {
 
 	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 
-	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID + ".configurationProblemMarker";
+	public static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID + ".configurationProblemMarker";
 
 	private EclipseMarkerHandler() {}
 
