@@ -171,7 +171,8 @@ public class ConstraintView implements GUIDefaults {
 					if (controller.getConstraintProperty(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
 						item.setImage(FM_INFO);
 					} else {
-						item.setImage(IMAGE_EMPTY);
+						// cast needed because of overloaded method setImage
+						item.setImage((Image) null);
 					}
 				}
 			}
