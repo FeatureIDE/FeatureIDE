@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstr
  */
 
 public class ConstraintViewSettingsMenu {
+
 	private ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 
@@ -61,23 +62,19 @@ public class ConstraintViewSettingsMenu {
 	 */
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
-		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
-			final FeatureModelEditor featureModelEditor = controller.getFeatureModelEditor();
-			if (featureModelEditor != null) {
-				setStateOfActions(true);
-				graphicalModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
-				refreshAction.update(controller);
-				collapseAction.update(graphicalModel);
-				if (graphicalModel.getLayout().showCollapsedConstraints()) {
-					collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("collapse.gif")));
-					collapseAction.setToolTipText("Hide Collapsed Constraints");
-				} else {
-					collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("expand.gif")));
-					collapseAction.setToolTipText("Show Collapsed Constraints");
-				}
+		final FeatureModelEditor featureModelEditor = controller.getFeatureModelEditor();
+		if (featureModelEditor != null) {
+			setStateOfActions(true);
+			graphicalModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
+			refreshAction.update(controller);
+			collapseAction.update(graphicalModel);
+			if (graphicalModel.getLayout().showCollapsedConstraints()) {
+				collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("collapse.gif")));
+				collapseAction.setToolTipText("Hide Collapsed Constraints");
+			} else {
+				collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("expand.gif")));
+				collapseAction.setToolTipText("Show Collapsed Constraints");
 			}
-		} else {
-			setStateOfActions(false);
 		}
 	}
 

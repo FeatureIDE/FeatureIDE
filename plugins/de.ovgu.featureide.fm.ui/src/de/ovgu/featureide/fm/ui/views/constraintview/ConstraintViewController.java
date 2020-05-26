@@ -37,6 +37,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -94,9 +95,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	private ConstraintViewSettingsMenu settingsMenu;
 	private Explanation<?> explanation;
 
-	boolean constraintsHidden = false;
-
 	private String searchText = "";
+	private boolean featureDiagramPageVisible = false;
 
 	private FeatureModelEditor featureModelEditor;
 
@@ -154,11 +154,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
-			if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
-				refreshView(featureModelEditor.getFeatureModelManager());
-			} else {
-				viewer.addNoFeatureModelItem();
-			}
+			featureDiagramPageVisible = event.getSelectedPage() instanceof FeatureDiagramEditor;
+			checkForRefresh();
 		}
 	};
 
@@ -171,14 +168,15 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		viewer = new ConstraintView(parent, this);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		if (featureModelEditor != null) {
-			addPageChangeListener(featureModelEditor);
-			refreshView(featureModelEditor.getFeatureModelManager());
-		} else {
-			viewer.addNoFeatureModelItem();
-		}
 		settingsMenu = new ConstraintViewSettingsMenu(this);
 		new ConstraintViewContextMenu(this);
+
+		final IEditorPart activeEditor = getSite().getPage().getActiveEditor();
+		if (activeEditor instanceof FeatureModelEditor) {
+			setFeatureModelEditor((FeatureModelEditor) activeEditor);
+		}
+
+		checkForRefresh();
 	}
 
 	/**
@@ -413,15 +411,22 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 *
 	 */
 	public void checkForRefresh() {
-		if (featureModelEditor != null) {
-			final FeatureModelEditor fme = featureModelEditor;
-			if (fme.getActivePage() == 0) {
-				addPageChangeListener(fme);
-				refreshView(fme.getFeatureModelManager());
-			} else {
-				viewer.addNoFeatureModelItem();
-			}
+		settingsMenu.setStateOfActions(isConstraintsListVisible());
+
+		if (isConstraintsListVisible()) {
+			refreshView(featureModelEditor.getFeatureModelManager());
+		} else {
+			viewer.addNoFeatureModelItem();
 		}
+	}
+
+	/**
+	 * Checks if the constraints list is visible, i.e. there is a FeatureModelEditor which shows the FeatureDiagram page.
+	 *
+	 * @return True if the constraints list is visible, false if not
+	 */
+	public boolean isConstraintsListVisible() {
+		return (featureModelEditor != null) && featureDiagramPageVisible;
 	}
 
 	/**
@@ -527,16 +532,11 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	/**
 	 * Changes if the Constraints are shown under the feature model
 	 */
-	public void setConstraintsHidden(boolean hideConstraints) {
+	public void setConstraintsHidden(FeatureModelEditor featureModelEditor, boolean hideConstraints) {
 		if ((featureModelEditor != null)) {
 			featureModelEditor.diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
 			featureModelEditor.diagramEditor.getGraphicalFeatureModel().redrawDiagram();
-			constraintsHidden = hideConstraints;
 		}
-	}
-
-	public boolean isConstraintsHidden() {
-		return constraintsHidden;
 	}
 
 	public FeatureModelManager getFeatureModelManager() {
@@ -589,8 +589,32 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		return featureModelEditor;
 	}
 
-	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+	/**
+	 * Sets the current FeatureModelEditor. Removes listeners from the previous FeatureModelEditor and adds listeners to the new one.
+	 *
+	 * @param newFeatureModelEditor The new FeatureModelEditor
+	 */
+	public void setFeatureModelEditor(FeatureModelEditor newFeatureModelEditor) {
+		if (featureModelEditor == newFeatureModelEditor) {
+			return;
+		}
+
+		if (featureModelEditor != null) {
+			setConstraintsHidden(featureModelEditor, false);
+			if (featureModelEditor.diagramEditor != null) {
+				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
+			featureModelEditor.removePageChangedListener(pageChangeListener);
+		}
+
+		if (newFeatureModelEditor != null) {
+			setConstraintsHidden(newFeatureModelEditor, true);
+			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
+			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
+			featureDiagramPageVisible = newFeatureModelEditor.getSelectedPage() instanceof FeatureDiagramEditor;
+		}
+
+		featureModelEditor = newFeatureModelEditor;
 	}
 
 	public ConstraintProperties getConstraintProperty(IConstraint element) {
