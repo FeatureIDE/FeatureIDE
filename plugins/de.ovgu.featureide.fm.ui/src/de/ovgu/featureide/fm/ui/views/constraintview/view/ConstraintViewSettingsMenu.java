@@ -51,7 +51,7 @@ public class ConstraintViewSettingsMenu {
 		// create actions:
 		collapseAction = new ShowCollapsedConstraintsInViewAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
 		refreshAction = new RefreshConstraintViewAction(controller); // Action that lets the user refresh the view manually
-		createAction = new CreateConstraintInViewAction(null, controller.getFeatureModelManager()); // Action that lets user create a new constraint
+		createAction = new CreateConstraintInViewAction(controller); // Action that lets user create a new constraint
 		// create layout:
 		update(controller);
 		createToolBarLayout();
