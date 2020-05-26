@@ -237,7 +237,7 @@ public class ConstraintView implements GUIDefaults {
 		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
 		searchBox.setLayoutData(boxData);
 
-		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI);
+		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		final GridData treeData = new GridData();
 		treeData.grabExcessHorizontalSpace = true;
 		treeData.horizontalAlignment = SWT.FILL;
