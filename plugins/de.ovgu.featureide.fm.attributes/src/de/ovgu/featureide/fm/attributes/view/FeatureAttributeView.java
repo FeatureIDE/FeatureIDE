@@ -277,7 +277,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		repackAllColumns();
 	}
 
-	private void repackAllColumns() {
+	public void repackAllColumns() {
 		for (final TreeColumn col : tree.getColumns()) {
 			col.pack();
 		}

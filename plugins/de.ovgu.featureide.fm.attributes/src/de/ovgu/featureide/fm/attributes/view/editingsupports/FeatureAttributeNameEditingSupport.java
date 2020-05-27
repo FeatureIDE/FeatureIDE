@@ -76,13 +76,11 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 		}
 		((IFeatureAttribute) element).setName(value.toString());
 		if (((IFeatureAttribute) element).isRecursive()) {
-			view.getManager()
-					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+			view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
 		} else {
-			view.getManager()
-					.fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
+			view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 		}
 		getViewer().update(element, null);
-
+		view.repackAllColumns();
 	}
 }

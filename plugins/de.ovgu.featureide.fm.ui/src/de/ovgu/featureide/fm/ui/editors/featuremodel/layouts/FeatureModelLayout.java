@@ -34,7 +34,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private Configuration.Location abegoRootposition;
 
 	private boolean autoLayoutLegend;
-	private boolean showHiddenFeatures;
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
 	private final Point legendPos;
@@ -46,7 +45,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	public FeatureModelLayout() {
 		autoLayoutLegend = true;
-		showHiddenFeatures = true;
 		showCollapsedConstraints = false;
 		hasVerticalLayout = true;
 		legendPos = new Point(0, 0);
@@ -56,7 +54,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
 		autoLayoutLegend = featureModelLayout.autoLayoutLegend;
-		showHiddenFeatures = featureModelLayout.showHiddenFeatures;
 		showCollapsedConstraints = featureModelLayout.showCollapsedConstraints;
 		hasVerticalLayout = featureModelLayout.hasVerticalLayout;
 		legendPos = featureModelLayout.legendPos.getCopy();
@@ -82,16 +79,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	@Override
 	public void setShowShortNames(boolean b) {
 		showShortNames = b;
-	}
-
-	@Override
-	public boolean showHiddenFeatures() {
-		return showHiddenFeatures;
-	}
-
-	@Override
-	public void showHiddenFeatures(boolean b) {
-		showHiddenFeatures = b;
 	}
 
 	@Override

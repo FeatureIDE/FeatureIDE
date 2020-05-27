@@ -70,7 +70,7 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 		((IFeatureAttribute) element).setUnit(value.toString());
 		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
 		getViewer().update(element, null);
-
+		view.repackAllColumns();
 	}
 
 }

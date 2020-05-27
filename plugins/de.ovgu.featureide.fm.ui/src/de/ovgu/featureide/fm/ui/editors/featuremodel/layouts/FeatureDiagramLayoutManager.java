@@ -62,7 +62,7 @@ abstract public class FeatureDiagramLayoutManager {
 
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
-	protected boolean showHidden, showCollapsedConstraints;
+	protected boolean showCollapsedConstraints;
 	protected ScrollingGraphicalViewer editor;
 	private boolean firstManualLayout = false;
 
@@ -70,8 +70,6 @@ abstract public class FeatureDiagramLayoutManager {
 
 	public final void layout(IGraphicalFeatureModel featureModel, ScrollingGraphicalViewer editor) {
 		this.editor = editor;
-		showHidden = featureModel.getLayout().showHiddenFeatures();
-		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		showCollapsedConstraints = featureModel.getLayout().showCollapsedConstraints();
 		FeatureUIHelper.showCollapsedConstraints(showCollapsedConstraints, featureModel);
 		layoutFeatureModel(featureModel);
@@ -96,20 +94,6 @@ abstract public class FeatureDiagramLayoutManager {
 			}
 		}
 		newLocations.clear();
-	}
-
-	/**
-	 * check if feature (or any parent) is hidden
-	 */
-	boolean isHidden(IGraphicalFeature feature) {
-		if (showHidden) {
-			return false;
-		}
-		if (!feature.getObject().getStructure().isRoot()) {
-			return (feature.getObject().getStructure().isHidden() || isHidden(FeatureUIHelper.getGraphicalParent(feature)));
-		} else {
-			return feature.getObject().getStructure().isHidden();
-		}
 	}
 
 	protected abstract void layoutFeatureModel(IGraphicalFeatureModel featureModel);
@@ -364,6 +348,6 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 
 	protected List<IGraphicalFeature> getChildren(IGraphicalFeature feature) {
-		return Functional.toList(feature.getGraphicalChildren(showHidden));
+		return Functional.toList(feature.getGraphicalChildren());
 	}
 }

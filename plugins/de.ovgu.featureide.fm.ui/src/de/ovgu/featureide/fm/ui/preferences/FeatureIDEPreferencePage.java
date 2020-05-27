@@ -44,6 +44,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintViewDialog;
+import de.ovgu.featureide.fm.ui.wizards.NonGTKFileDialog;
 
 public class FeatureIDEPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -122,6 +123,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		constraintViewRememberButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP);
 		constraintViewRememberButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "default")));
 		constraintViewRememberButton.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewRememberButton.getSelection()));
@@ -133,9 +135,22 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		constraintViewDecisionButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP);
 		constraintViewDecisionButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "default")));
 		constraintViewDecisionButton.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, String.valueOf(constraintViewDecisionButton.getSelection()));
+			}
+		});
+
+		final Button gtkWorkaroundInfoToggle = new Button(dialogGroup, SWT.CHECK);
+		gtkWorkaroundInfoToggle.setText(StringTable.CONFIGURATION_DIALOGS_GTK_WORKAROUND);
+		gtkWorkaroundInfoToggle.setToolTipText(StringTable.GTK_WORKAROUND_INFO_MSG);
+		gtkWorkaroundInfoToggle.setSelection(Boolean.valueOf(Preferences.getPref(NonGTKFileDialog.WORKAROUND_INFO_REMEMBER, "false")));
+		gtkWorkaroundInfoToggle.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				Preferences.store(NonGTKFileDialog.WORKAROUND_INFO_REMEMBER, String.valueOf(gtkWorkaroundInfoToggle.getSelection()));
 			}
 		});
 

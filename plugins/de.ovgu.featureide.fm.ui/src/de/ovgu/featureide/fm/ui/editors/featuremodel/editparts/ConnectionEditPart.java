@@ -215,7 +215,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	public void refreshSourceDecoration() {
 		final IFeature source = getModel().getSource().getObject();
-		IFeature sourceParent = getModel().getSource().getObject();
 		final IGraphicalFeature graphicalTarget = getModel().getTarget();
 		final IGraphicalFeature graphicalSource = getModel().getSource();
 		if ((graphicalTarget == null) || graphicalSource.hasCollapsedParent()) {
@@ -223,16 +222,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 		final IFeature target = graphicalTarget.getObject();
 
-		boolean parentHidden = false;
-
 		ConnectionDecoration sourceDecoration = null;
-		while (!sourceParent.getStructure().isRoot()) {
-			sourceParent = sourceParent.getStructure().getParent().getFeature();
-			if (sourceParent.getStructure().isHidden()) {
-				parentHidden = true;
-			}
-
-		}
 
 		if (graphicalSource == graphicalTarget) {
 			if (graphicalSource.isCollapsed() && (graphicalSource.getCollapsedDecoration() == null)) {
@@ -242,11 +232,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				graphicalSource.getCollapsedDecoration().refresh();
 			}
 		} else {
-			if (target.getStructure().isAnd()
-				&& (!source.getStructure().isHidden() || FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-				if (!(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
-					sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
-				}
+			if (target.getStructure().isAnd()) {
+				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 			}
 		}
 

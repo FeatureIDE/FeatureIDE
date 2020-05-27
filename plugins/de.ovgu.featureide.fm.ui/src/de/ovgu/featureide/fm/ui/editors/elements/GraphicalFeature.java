@@ -163,7 +163,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (final IFeatureStructure child : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
-			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent()) {
+			if (!graphicalChild.hasCollapsedParent()) {
 				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 			}
 		}
@@ -258,11 +258,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
-	public List<IGraphicalFeature> getGraphicalChildren(boolean showHidden) {
+	public List<IGraphicalFeature> getGraphicalChildren() {
 		final List<IGraphicalFeature> features = new ArrayList<>();
 		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
-			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
+			if (!gf.hasCollapsedParent()) {
 				features.add(gf);
 			}
 		}

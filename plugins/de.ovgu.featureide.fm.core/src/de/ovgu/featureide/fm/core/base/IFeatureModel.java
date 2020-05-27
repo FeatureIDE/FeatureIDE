@@ -383,9 +383,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	Collection<IFeature> getFeatures();
 
 	/**
-	 * Returns the a read-only iterable collection of features stored in this feature model, which are not hidden and not collapsed. This method is intend to
-	 * provide the iteration-concept directly. <br> <br> <b>Example</b> <code> for (IFeature feature : featureModel.getVisibleFeatures()) { // ... } </code> If
-	 * a list interface is required rather than the iterable counterpart, the utility class {@link Functional} provides a set of useful methods. To convert the
+	 * Returns the a read-only iterable collection of features stored in this feature model, which are not collapsed. This method is intend to provide the
+	 * iteration-concept directly. <br> <br> <b>Example</b> <code> for (IFeature feature : featureModel.getVisibleFeatures()) { // ... } </code> If a list
+	 * interface is required rather than the iterable counterpart, the utility class {@link Functional} provides a set of useful methods. To convert the
 	 * iterator directly into a list, use {@link Functional#toList(Iterable)}. By using methods from the {@link Functional} utility class the advantages of a
 	 * functional-like programming style can be directly used. For instance, to convert the collection of features inside a feature model into a set of feature
 	 * names, the following code snippet can be used: <code> import static de.ovgu.featureide.fm.core.functional.Functional.*;
@@ -395,7 +395,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * LinkedList&lt;IFeature&gt;(Functional.toList(fm.getVisibleFeatures()));</code> <br> <b>Note</b>: Many operations of features in feature models runs over
 	 * iteration. This method returns an iterator rather than a collection for <i>lazy evaluation</i> purposes. <br>
 	 *
-	 * @param showHiddenFeatures whether hidden features should be included.
 	 *
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
@@ -406,9 +405,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 *
 	 * @since 3.3
 	 *
-	 * @return A iterable of IFeatures, which are not hidden and not collapsed
+	 * @return A iterable of IFeatures, which are not collapsed
 	 */
-	Iterable<IFeature> getVisibleFeatures(boolean showHiddenFeatures);
+	Iterable<IFeature> getVisibleFeatures();
 
 	/**
 	 * Returns the number of features stored in this feature model. This call must be constistent with {@link IFeatureModel#getFeatureTable()} size.

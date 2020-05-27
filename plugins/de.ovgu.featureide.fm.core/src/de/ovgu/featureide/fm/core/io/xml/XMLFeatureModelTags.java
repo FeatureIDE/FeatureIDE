@@ -65,7 +65,6 @@ public interface XMLFeatureModelTags {
 	static final String CALCULATE_AUTO = AUTO;
 	static final String NAME = "name";
 	static final String FALSE = "false";
-	static final String SHOW_HIDDEN_FEATURES = "showHiddenFeatures";
 	static final String SHOW_COLLAPSED_CONSTRAINTS = "showCollapsedConstraints";
 	static final String LEGEND = "legend";
 	static final String LEGEND_AUTO_LAYOUT = "autoLayout";
