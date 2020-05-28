@@ -47,6 +47,11 @@
             name="SXFM">
       </fmFormat>
       <fmFormat
+            class="de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat"
+            id="de.ovgu.featureide.fm.core.format.UVLFeatureModelFormat"
+            name="UVL">
+      </fmFormat>
+      <fmFormat
             class="de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat"
             id="de.ovgu.featureide.fm.core.format.VelvetFeatureModelFormat"
             name="Velvet">
