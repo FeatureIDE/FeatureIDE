@@ -411,13 +411,26 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 *
 	 */
 	public void checkForRefresh() {
-		settingsMenu.setStateOfActions(isConstraintsListVisible());
+		final boolean constraintsViewVisible = isConstraintsViewVisible();
+		final boolean constraintsListVisible = isConstraintsListVisible();
 
-		if (isConstraintsListVisible()) {
+		settingsMenu.setStateOfActions(constraintsListVisible && constraintsViewVisible);
+		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
+
+		if (constraintsListVisible && constraintsViewVisible) {
 			refreshView(featureModelEditor.getFeatureModelManager());
-		} else {
+		} else if (constraintsViewVisible) {
 			viewer.addNoFeatureModelItem();
 		}
+	}
+
+	/**
+	 * Checks if the ConstraintView is currently visible for the user
+	 *
+	 * @return True if the ConstraintView is visible, false if not
+	 */
+	private boolean isConstraintsViewVisible() {
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(this);
 	}
 
 	/**
@@ -608,7 +621,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		}
 
 		if (newFeatureModelEditor != null) {
-			setConstraintsHidden(newFeatureModelEditor, true);
 			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
 			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
 			featureDiagramPageVisible = newFeatureModelEditor.getSelectedPage() instanceof FeatureDiagramEditor;
