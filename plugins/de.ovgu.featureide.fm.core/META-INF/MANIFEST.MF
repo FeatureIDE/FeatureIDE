@@ -15,7 +15,8 @@ Bundle-ClassPath: .,
  lib/org.sat4j.pb.jar,
  lib/splar.jar,
  lib/SPLCAT.jar,
- lib/commons-math-2.2.jar
+ lib/commons-math-2.2.jar,
+ lib/uvl-parser.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
