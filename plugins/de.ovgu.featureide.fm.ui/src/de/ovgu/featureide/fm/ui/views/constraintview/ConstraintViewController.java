@@ -417,7 +417,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		settingsMenu.setStateOfActions(constraintsListVisible && constraintsViewVisible);
 		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
 
-		if (constraintsListVisible && constraintsViewVisible) {
+		if (constraintsListVisible) {
 			refreshView(featureModelEditor.getFeatureModelManager());
 		} else if (constraintsViewVisible) {
 			viewer.addNoFeatureModelItem();
@@ -429,7 +429,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 *
 	 * @return True if the ConstraintView is visible, false if not
 	 */
-	private boolean isConstraintsViewVisible() {
+	public boolean isConstraintsViewVisible() {
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(this);
 	}
 
@@ -546,9 +546,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 * Changes if the Constraints are shown under the feature model
 	 */
 	public void setConstraintsHidden(FeatureModelEditor featureModelEditor, boolean hideConstraints) {
-		if ((featureModelEditor != null)) {
-			featureModelEditor.diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
-			featureModelEditor.diagramEditor.getGraphicalFeatureModel().redrawDiagram();
+		if (featureModelEditor != null) {
+			IGraphicalFeatureModel graphicalFeatureModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
+
+			// we only need to update the model if the state of hideConstraint is different from the current state
+			if(graphicalFeatureModel.getConstraintsHidden() != hideConstraints) {
+				graphicalFeatureModel.setConstraintsHidden(hideConstraints);
+				graphicalFeatureModel.redrawDiagram();
+			}
 		}
 	}
 
