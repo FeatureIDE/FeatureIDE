@@ -7,6 +7,22 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.6.3 (May 2020)
+* Hotfix containing only stability improvements over v3.6.2
+* Performance of FeatureIDE with large feature models improved (#970, #1004)
+* Performance problem when storing feature model for projects with may configurations fixed (#1011)
+* T-wise configuration generation with ICPL and Chvatal fixed (#983)
+* Exporting of feature models: workaround implemented to fix incompatibility of Eclipse with GTK (#1003)
+* Several minor issues with constraints view fixed (#912, #1007, #1021, #1022, #1023, #1024, #1025)
+* Highlighting of implicit constraints fixed (#946)
+* Handling of the feature attributes improved (#996, #978, #1013)
+* Expansion mode of the configuration editor stored for the workspace (#1012)
+* Removed the option to Show Hidden Features in feature diagram (#961)
+* Error handling in constraint dialog improved (#960)
+* Compatibility of slicing with FeatureIDE extensions improved (#997)
+* Removed redundant code (#933)
+* Several improvements for the feature diagram editor (#932, #977, #986)
+
 Release 3.6.2 (January 2020)
 * Hotfix containing only stability improvements over v3.6.1
 * Analysis of feature models only performed if automatic analysis is enabled in the menu (#942, #944)
@@ -35,6 +51,8 @@ Release 3.6.1 (October 2019)
 * Feature-model slicing fixed (#900)
 * Usability of feature attributes view improved (#862)
 * Support for colors in attributes view (#857)
+* Critical and major bugs _introduced_ with this version
+  * T-wise configuration generation with ICPL and Chvatal does not work anymore (#983)
 
 ## Release 3.6.0 (August 2019) 
 * Increased required Java version to 1.8
@@ -86,6 +104,8 @@ Release 3.6.1 (October 2019)
   * Wrong explanations for feature-model defects (#905, #906)
   * No default configuration selected when loading FeatureIDE example (#911)
   * Export of feature dependency information does not work anymore (#931)
+  * Performance problem when storing feature model for projects with may configurations (#1011)
+  * Computation and highlighting of implicit constraints fails (#920, #946)
 
 Release 3.5.5 (June 2019)
 * Hotfix containing only stability improvements over v3.5.4
