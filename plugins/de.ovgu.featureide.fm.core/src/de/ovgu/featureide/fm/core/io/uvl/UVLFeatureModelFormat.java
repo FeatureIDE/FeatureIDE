@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.uvl;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,6 +38,7 @@ import de.neominik.uvl.ast.Equiv;
 import de.neominik.uvl.ast.Feature;
 import de.neominik.uvl.ast.Group;
 import de.neominik.uvl.ast.Impl;
+import de.neominik.uvl.ast.Import;
 import de.neominik.uvl.ast.Not;
 import de.neominik.uvl.ast.Or;
 import de.neominik.uvl.ast.ParseError;
@@ -44,6 +47,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
@@ -62,6 +66,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + UVLFeatureModelFormat.class.getSimpleName();
 	public static final String FILE_EXTENSION = "uvl";
 
+	private UVLModel rootModel;
+
 	@Override
 	public String getName() {
 		return "UVL";
@@ -79,57 +85,59 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public APersistentFormat<IFeatureModel> getInstance() {
-		// TODO Auto-generated method stub
-		return super.getInstance();
+		return new UVLFeatureModelFormat();
 	}
 
 	@Override
 	public ProblemList read(IFeatureModel fm, CharSequence source) {
+		if (fm.getSourceFile() != null) {
+			return read(fm, source, fm.getSourceFile().toAbsolutePath());
+		}
+		System.err.println("No path set for model. Can't load imported models.");
+		return read(fm, source, new File("./.").toPath());
+	}
+
+	@Override
+	public ProblemList read(IFeatureModel fm, CharSequence source, Path path) {
+		fm.setSourceFile(path);
 		final ProblemList pl = new ProblemList();
-		final Object result = UVLParser.parse(source.toString());
+		final Object result = UVLParser.parse(source.toString(), path.getParent().toString());
 		if (result instanceof UVLModel) {
-			constructFeatureModel(fm, (UVLModel) result);
+			rootModel = (UVLModel) result;
+			constructFeatureModel((MultiFeatureModel) fm);
 		} else if (result instanceof ParseError) {
 			pl.add(toProblem((ParseError) result));
 		}
 		return pl;
 	}
 
-	/**
-	 * @param object
-	 * @param result
-	 */
-	private void constructFeatureModel(IFeatureModel fm, UVLModel result) {
+	private void constructFeatureModel(MultiFeatureModel fm) {
 		fm.reset();
 		IFeature root;
-		if (result.getRootFeatures().length == 1) {
-			final Feature f = result.getRootFeatures()[0];
+		if (rootModel.getRootFeatures().length == 1) {
+			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f);
 		} else {
 			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
-			List.of(result.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
+			List.of(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
 		}
 		fm.getStructure().setRoot(root.getStructure());
-		List.of(result.getConstraints()).forEach(c -> parseConstraint(fm, c));
+		List.of(rootModel.getConstraints()).forEach(c -> parseConstraint(fm, c));
+		List.of(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 	}
 
-	private IFeature parseFeature(IFeatureModel fm, IFeature root, Feature f) {
-		final IFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, f.getName());
+	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
+		final Feature resolved = UVLParser.resolve(f, rootModel);
+		final IFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
 		if (root != null) {
 			root.getStructure().addChild(feature.getStructure());
 		}
-		feature.getStructure().setAbstract(isAbstract(f));
-		List.of(f.getGroups()).forEach(g -> parseGroup(fm, feature, g));
+		feature.getStructure().setAbstract(isAbstract(resolved));
+		List.of(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
 		return feature;
 	}
 
-	/**
-	 * @param fm
-	 * @param root
-	 * @param g
-	 * @return
-	 */
-	private void parseGroup(IFeatureModel fm, IFeature root, Group g) {
+	private void parseGroup(MultiFeatureModel fm, IFeature root, Group g) {
 		final List<IFeature> children = Stream.of(g.getChildren()).map(f -> parseFeature(fm, root, (Feature) f)).collect(Collectors.toList());
 		switch (g.getType()) {
 		case "or":
@@ -150,11 +158,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
-	/**
-	 * @param fm
-	 * @param c
-	 * @return
-	 */
 	private void parseConstraint(IFeatureModel fm, Object c) {
 		fm.addConstraint(MultiFeatureModelFactory.getInstance().createConstraint(fm, parseConstraint(c)));
 	}
@@ -176,6 +179,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return null;
 	}
 
+	private void parseImport(MultiFeatureModel fm, Import i) {
+		fm.addInstance(i.getAlias(), i.getNamespace());
+	}
+
 	/**
 	 * @param error a {@link ParseError}
 	 * @return a {@link Problem}
@@ -189,7 +196,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		sb.append(error.getColumn());
 		sb.append(":\n");
 		sb.append(error.getText());
-		sb.append(error.getExpected().stream().collect(Collectors.joining("\n", "\nExpected one of:\n", "\n")));
+		if (!error.getExpected().isEmpty()) {
+			sb.append(error.getExpected().stream().collect(Collectors.joining("\n", "\nExpected one of:\n", "\n")));
+		}
 		return new Problem(sb.toString(), error.getLine(), Severity.ERROR);
 	}
 
