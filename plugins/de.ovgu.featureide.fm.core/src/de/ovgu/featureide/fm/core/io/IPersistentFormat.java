@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import java.nio.file.Path;
+
 import de.ovgu.featureide.fm.core.IExtension;
 
 /**
@@ -41,6 +43,22 @@ public interface IPersistentFormat<T> extends IExtension {
 	 * @see #supportsRead()
 	 */
 	ProblemList read(T object, CharSequence source);
+
+	/**
+	 * Parses the contents of the given source and transfers all information onto the given object. The object is intended to be completely overridden. A
+	 * subclass may try to reset the information already stored inside the object, but is not obligated to do so. Thus, if possible an empty object should be
+	 * passed here.
+	 *
+	 * @param object the object to write the information into.
+	 * @param source the source content.
+	 * @param path the path of the source file.
+	 * @return A list of {@link Problem problems} that occurred during the parsing process.
+	 *
+	 * @see #supportsRead()
+	 */
+	default ProblemList read(T object, CharSequence source, Path path) {
+		return read(object, source);
+	}
 
 	/**
 	 * Writes the information of an object to a string. (Which information are considered is specified by the implementing class).
@@ -68,13 +86,9 @@ public interface IPersistentFormat<T> extends IExtension {
 
 	/**
 	 * Returns an instance of this format. Clients should always call this method before calling {@link #read(Object, CharSequence)} or {@link #write(Object)}
-	 * and call these methods the returned value to avoid any unintended concurrent access.<br><br>
-	 * <b>Example</b>
-	 * <code>
-	 * IPersistentFormat&lt;?&gt; format = getFormat();
-	 * format.getInstance().write(new Object())</code>
-	 * Implementing classes may return {@code this}, if {@code read} and {@code write} are implemented in a static fashion (i.e., do not use any non-static
-	 * fields).
+	 * and call these methods the returned value to avoid any unintended concurrent access.<br><br> <b>Example</b> <code> IPersistentFormat&lt;?&gt; format =
+	 * getFormat(); format.getInstance().write(new Object())</code> Implementing classes may return {@code this}, if {@code read} and {@code write} are
+	 * implemented in a static fashion (i.e., do not use any non-static fields).
 	 *
 	 * @return An instance of this format.
 	 */
