@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -126,11 +128,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root = parseFeature(fm, null, f);
 		} else {
 			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
-			List.of(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
+			Arrays.asList(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
 		}
 		fm.getStructure().setRoot(root.getStructure());
-		List.of(rootModel.getConstraints()).forEach(c -> parseConstraint(fm, c));
-		List.of(rootModel.getImports()).forEach(i -> parseImport(fm, i));
+		Arrays.asList(rootModel.getConstraints()).forEach(c -> parseConstraint(fm, c));
+		Arrays.asList(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
 	}
 
@@ -141,7 +143,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root.getStructure().addChild(feature.getStructure());
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
-		List.of(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
+		Arrays.asList(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
 		parseAttributes(resolved, fm);
 		return feature;
 	}
@@ -235,7 +237,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final Feature f = new Feature();
 		f.setName(feature.getName());
 		if (feature.getStructure().isAbstract()) {
-			f.setAttributes(Map.of("abstract", true));
+			f.setAttributes(Collections.singletonMap("abstract", true));
 		}
 		f.setGroups(printGroups(feature));
 		return f;
