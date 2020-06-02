@@ -57,13 +57,12 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * TODO description
+ * Reads / writes feature models in the UVL format.
  *
  * @author Dominik Engelhardt
  */
@@ -76,6 +75,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
 
 	private UVLModel rootModel;
+	private ProblemList pl;
+	private IFeatureModel fm;
 
 	@Override
 	public String getName() {
@@ -109,7 +110,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel fm, CharSequence source, Path path) {
 		fm.setSourceFile(path);
-		final ProblemList pl = new ProblemList();
+		this.fm = fm;
+		pl = new ProblemList();
 		final Object result = UVLParser.parse(source.toString(), path.getParent().toString());
 		if (result instanceof UVLModel) {
 			rootModel = (UVLModel) result;
@@ -185,14 +187,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseConstraint(IFeatureModel fm, Object c) {
-		final Node constraint = parseConstraint(c);
-		if (constraint != null) {
-			fm.addConstraint(MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint));
+		try {
+			final Node constraint = parseConstraint(c);
+			if (constraint != null) {
+				fm.addConstraint(MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint));
+			}
+		} catch (final RuntimeException e) {
+			// Contained invalid reference. Already added to problem list
 		}
 	}
 
 	private Node parseConstraint(Object c) {
 		if (c instanceof String) {
+			final String name = (String) c;
+			checkReferenceValid(name);
 			return new Literal((String) c);
 		} else if (c instanceof Not) {
 			return new org.prop4j.Not(parseConstraint(((Not) c).getChild()));
@@ -206,6 +214,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			return new Equals(parseConstraint(((Equiv) c).getLeft()), parseConstraint(((Equiv) c).getRight()));
 		}
 		return null;
+	}
+
+	private void checkReferenceValid(String name) {
+		if (fm.getFeature(name) == null) {
+			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0));
+			throw new RuntimeException("Invalid reference");
+		}
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
@@ -295,18 +310,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean supportsWrite() {
 		return true;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		// TODO Auto-generated method stub
-		return super.supportsContent(content);
-	}
-
-	@Override
-	public boolean supportsContent(LazyReader reader) {
-		// TODO Auto-generated method stub
-		return super.supportsContent(reader);
 	}
 
 	@Override
