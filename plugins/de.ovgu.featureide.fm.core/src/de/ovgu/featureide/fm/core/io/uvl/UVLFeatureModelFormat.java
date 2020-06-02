@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -172,9 +171,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
-	@SuppressWarnings("unchecked")
 	private void parseAttributes(Feature f, MultiFeatureModel fm) {
-		((Map<String, Object>) f.getAttributes()).entrySet().stream().filter(e -> e.getKey().equals("constraint") || e.getKey().equals("constraints"))
+		UVLParser.getAttributes(f).entrySet().stream().filter(e -> e.getKey().equals("constraint") || e.getKey().equals("constraints"))
 				.forEach(e -> parseAttribute(fm, e.getValue()));
 	}
 
