@@ -139,6 +139,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
 		final IFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		fm.addFeature(feature);
 		if (root != null) {
 			root.getStructure().addChild(feature.getStructure());
 		}
