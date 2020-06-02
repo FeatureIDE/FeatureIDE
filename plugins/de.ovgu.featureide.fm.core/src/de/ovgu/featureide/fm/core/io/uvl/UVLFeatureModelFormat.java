@@ -236,14 +236,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	@Override
-	public String write(IFeatureModel object) {
-		return deconstructFeatureModel((MultiFeatureModel) object).toString();
+	public String write(IFeatureModel fm) {
+		return deconstructFeatureModel(fm).toString();
 	}
 
-	private UVLModel deconstructFeatureModel(MultiFeatureModel fm) {
+	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
 		final UVLModel model = new UVLModel();
-		model.setNamespace(fm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME).getValue());
-		model.setImports(fm.getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName())).toArray(Import[]::new));
+		if (fm instanceof MultiFeatureModel) {
+			model.setNamespace(((MultiFeatureModel) fm).getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME).getValue());
+			model.setImports(((MultiFeatureModel) fm).getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName()))
+					.toArray(Import[]::new));
+		} else {
+			model.setNamespace(fm.getStructure().getRoot().getFeature().getName());
+			model.setImports(new Import[0]);
+		}
 		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
 		model.setConstraints(fm.getConstraints().stream().map(this::printConstraint).toArray());
 		return model;
