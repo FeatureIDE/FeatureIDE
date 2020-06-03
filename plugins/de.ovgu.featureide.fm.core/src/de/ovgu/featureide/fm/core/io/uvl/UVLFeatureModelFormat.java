@@ -261,16 +261,17 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private Feature printFeature(IFeature feature) {
 		final Feature f = new Feature();
 		f.setName(feature.getName());
-		if (feature.getStructure().isAbstract()) {
-			f.setAttributes(Collections.singletonMap("abstract", true));
+		if (!f.getName().contains(".")) { // exclude references
+			if (feature.getStructure().isAbstract()) {
+				f.setAttributes(Collections.singletonMap("abstract", true));
+			}
+			f.setGroups(printGroups(feature));
 		}
-		f.setGroups(printGroups(feature));
 		return f;
 	}
 
 	private Group constructGroup(IFeatureStructure fs, String type, Predicate<IFeatureStructure> pred) {
-		return new Group(type, fs.getChildren().stream().filter(f -> !f.getFeature().getName().contains(".")).filter(pred)
-				.map(f -> printFeature(f.getFeature())).toArray(Feature[]::new));
+		return new Group(type, fs.getChildren().stream().filter(pred).map(f -> printFeature(f.getFeature())).toArray(Feature[]::new));
 	}
 
 	private Group[] printGroups(IFeature feature) {
