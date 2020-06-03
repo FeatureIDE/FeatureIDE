@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
@@ -134,6 +135,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		Arrays.asList(rootModel.getConstraints()).forEach(c -> parseConstraint(fm, c));
+		Arrays.asList(rootModel.getOwnConstraints()).forEach(c -> parseOwnConstraint(fm, c));
 		Arrays.asList(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
 	}
@@ -185,11 +187,24 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
-	private void parseConstraint(IFeatureModel fm, Object c) {
+	private void parseConstraint(MultiFeatureModel fm, Object c) {
+		parseConstraint(fm, c, false);
+	}
+
+	private void parseOwnConstraint(MultiFeatureModel fm, Object c) {
+		parseConstraint(fm, c, true);
+	}
+
+	private void parseConstraint(MultiFeatureModel fm, Object c, boolean own) {
 		try {
 			final Node constraint = parseConstraint(c);
 			if (constraint != null) {
-				fm.addConstraint(MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint));
+				final MultiConstraint newConstraint = MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint);
+				if (own) {
+					fm.addOwnConstraint(newConstraint);
+				} else {
+					fm.addConstraint(newConstraint);
+				}
 			}
 		} catch (final RuntimeException e) {
 			// Contained invalid reference. Already added to problem list
@@ -242,19 +257,23 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
 		final UVLModel model = new UVLModel();
 		String namespace = fm.getStructure().getRoot().getFeature().getName();
+		List<IConstraint> constraints = fm.getConstraints();
 		if (fm instanceof MultiFeatureModel) {
-			final FeatureAttribute<String> nsAttribute = ((MultiFeatureModel) fm).getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
+			final MultiFeatureModel mfm = (MultiFeatureModel) fm;
+			final FeatureAttribute<String> nsAttribute = mfm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
 			if (nsAttribute != null) {
 				namespace = nsAttribute.getValue();
 			}
-			model.setImports(((MultiFeatureModel) fm).getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName()))
-					.toArray(Import[]::new));
+			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName())).toArray(Import[]::new));
+			if (mfm.isMultiProductLineModel()) {
+				constraints = mfm.getOwnConstraints();
+			}
 		} else {
 			model.setImports(new Import[0]);
 		}
 		model.setNamespace(namespace);
 		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
-		model.setConstraints(fm.getConstraints().stream().map(this::printConstraint).toArray());
+		model.setConstraints(constraints.stream().map(this::printConstraint).toArray());
 		return model;
 	}
 

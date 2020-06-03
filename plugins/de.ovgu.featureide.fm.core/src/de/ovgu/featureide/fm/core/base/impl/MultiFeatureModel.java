@@ -161,6 +161,10 @@ public class MultiFeatureModel extends FeatureModel {
 		attributeConstraints.add(constraint);
 	}
 
+	public void addOwnConstraint(final IConstraint constraint) {
+		ownConstraints.add(constraint);
+	}
+
 	/**
 	 * Adds a parameter to the available parameters of the model
 	 *
@@ -218,6 +222,10 @@ public class MultiFeatureModel extends FeatureModel {
 		return stringAttributes;
 	}
 
+	public List<IConstraint> getOwnConstraints() {
+		return Collections.unmodifiableList(ownConstraints);
+	}
+
 	public boolean isMultiProductLineModel() {
 		return !usedModels.isEmpty();
 	}
@@ -264,6 +272,7 @@ public class MultiFeatureModel extends FeatureModel {
 		super.reset();
 		usedModels.clear();
 		imports.clear();
+		ownConstraints.clear();
 	}
 
 	/**
