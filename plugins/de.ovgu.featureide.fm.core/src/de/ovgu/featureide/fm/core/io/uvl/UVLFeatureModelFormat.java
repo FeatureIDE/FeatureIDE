@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -240,14 +241,18 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
 		final UVLModel model = new UVLModel();
+		String namespace = fm.getStructure().getRoot().getFeature().getName();
 		if (fm instanceof MultiFeatureModel) {
-			model.setNamespace(((MultiFeatureModel) fm).getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME).getValue());
+			final FeatureAttribute<String> nsAttribute = ((MultiFeatureModel) fm).getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
+			if (nsAttribute != null) {
+				namespace = nsAttribute.getValue();
+			}
 			model.setImports(((MultiFeatureModel) fm).getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName()))
 					.toArray(Import[]::new));
 		} else {
-			model.setNamespace(fm.getStructure().getRoot().getFeature().getName());
 			model.setImports(new Import[0]);
 		}
+		model.setNamespace(namespace);
 		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
 		model.setConstraints(fm.getConstraints().stream().map(this::printConstraint).toArray());
 		return model;
