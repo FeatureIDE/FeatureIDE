@@ -163,6 +163,7 @@ public class MultiFeatureModel extends FeatureModel {
 
 	public void addOwnConstraint(final IConstraint constraint) {
 		ownConstraints.add(constraint);
+		constraints.add(constraint);
 	}
 
 	/**
@@ -265,6 +266,30 @@ public class MultiFeatureModel extends FeatureModel {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void removeConstraint(IConstraint constraint) {
+		ownConstraints.remove(constraint);
+		super.removeConstraint(constraint);
+	}
+
+	@Override
+	public void removeConstraint(int index) {
+		ownConstraints.remove(constraints.get(index));
+		super.removeConstraint(index);
+	}
+
+	@Override
+	public void replaceConstraint(IConstraint constraint, int index) {
+		super.replaceConstraint(constraint, index);
+	}
+
+	@Override
+	public void setConstraint(int index, IConstraint constraint) {
+		ownConstraints.remove(constraints.get(index));
+		ownConstraints.add(constraint);
+		super.setConstraint(index, constraint);
 	}
 
 	@Override
