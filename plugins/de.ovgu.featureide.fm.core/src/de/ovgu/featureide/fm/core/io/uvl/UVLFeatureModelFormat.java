@@ -155,6 +155,22 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseGroup(MultiFeatureModel fm, IFeature root, Group g) {
+		if ("cardinality".equals(g.getType())) {
+			if ((g.getLower() == 1) && (g.getUpper() == -1)) {
+				g.setType("or");
+			} else if ((g.getLower() == 1) && (g.getUpper() == 1)) {
+				g.setType("alternative");
+			} else if ((g.getLower() == 0) && (g.getUpper() == -1)) {
+				g.setType("optional");
+			} else if ((g.getLower() == g.getUpper()) && (g.getUpper() == g.getChildren().length)) {
+				g.setType("mandatory");
+			} else {
+				g.setType("optional");
+				pl.add(new Problem(
+						String.format("Failed to convert cardinality [%d..%d] to known group type at feature %s.", g.getLower(), g.getUpper(), root.getName()),
+						0, Severity.WARNING));
+			}
+		}
 		final List<IFeature> children = Stream.of(g.getChildren()).map(f -> parseFeature(fm, root, (Feature) f)).collect(Collectors.toList());
 		switch (g.getType()) {
 		case "or":
@@ -291,7 +307,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private Group constructGroup(IFeatureStructure fs, String type, Predicate<IFeatureStructure> pred) {
-		return new Group(type, fs.getChildren().stream().filter(pred).map(f -> printFeature(f.getFeature())).toArray(Feature[]::new));
+		return new Group(type, 0, 0, fs.getChildren().stream().filter(pred).map(f -> printFeature(f.getFeature())).toArray(Feature[]::new));
 	}
 
 	private Group[] printGroups(IFeature feature) {
