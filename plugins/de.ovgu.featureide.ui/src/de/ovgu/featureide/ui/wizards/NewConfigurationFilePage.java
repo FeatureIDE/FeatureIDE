@@ -200,7 +200,7 @@ public class NewConfigurationFilePage extends WizardPage {
 
 		if (fileName.length() != 0) {
 			configbool = true;
-			final String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
+			final String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationFormat().getSuffix();
 			final IFolder configFolder = featureProject.getConfigFolder();
 			if ((configFolder != null) && configFolder.getFile(fullFileName).exists()) {
 				updateStatus(FILE + fullFileName + ALREADY_EXISTS_);
