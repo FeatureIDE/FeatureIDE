@@ -131,13 +131,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root = parseFeature(fm, null, f);
 		} else {
 			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
-			Arrays.asList(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
+			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
-		Arrays.asList(rootModel.getConstraints()).stream().filter(c -> !ownConstraints.contains(c)).forEach(c -> parseConstraint(fm, c));
+		Arrays.stream(rootModel.getConstraints()).filter(c -> !ownConstraints.contains(c)).forEach(c -> parseConstraint(fm, c));
 		ownConstraints.forEach(c -> parseOwnConstraint(fm, c));
-		Arrays.asList(rootModel.getImports()).forEach(i -> parseImport(fm, i));
+		Arrays.stream(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
 	}
 
@@ -149,7 +149,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root.getStructure().addChild(feature.getStructure());
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
-		Arrays.asList(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
+		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
 		parseAttributes(resolved, fm);
 		return feature;
 	}
