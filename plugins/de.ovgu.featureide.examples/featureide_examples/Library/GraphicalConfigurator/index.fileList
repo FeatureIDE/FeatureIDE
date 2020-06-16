@@ -2,7 +2,7 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.6.2.jar
+lib/de.ovgu.featureide.lib.fm-v3.6.3.jar
 lib/miglayout15-swing.jar
 lib/org.sat4j.core.jar
 src/de/ovgu/featureide/examples/graphicalconfigurator/GraphicalConfigurator.java

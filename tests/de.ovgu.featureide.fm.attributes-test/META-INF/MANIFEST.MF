@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extended Feature Model Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.fm.attributes-test;singleton:=true
-Bundle-Version: 3.6.2.qualifier
+Bundle-Version: 3.6.3.qualifier
 Bundle-Vendor: University of Magdeburg
-Fragment-Host: de.ovgu.featureide.fm.attributes;bundle-version="3.6.2"
+Fragment-Host: de.ovgu.featureide.fm.attributes
 Automatic-Module-Name: de.ovgu.featureide.fm.attributes-test
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit

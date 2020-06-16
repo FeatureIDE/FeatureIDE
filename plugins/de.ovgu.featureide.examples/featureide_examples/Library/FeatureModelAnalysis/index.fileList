@@ -2,6 +2,6 @@
 .project
 car.xml
 lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.6.2.jar
+lib/de.ovgu.featureide.lib.fm-v3.6.3.jar
 lib/org.sat4j.core.jar
 src/de/ovgu/featureide/examples/featuremodelanalysis/FeatureModelAnalysis.java
