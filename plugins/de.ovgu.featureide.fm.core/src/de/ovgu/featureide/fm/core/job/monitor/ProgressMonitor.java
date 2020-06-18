@@ -67,7 +67,7 @@ public class ProgressMonitor<T> extends ATaskMonitor<T> {
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
-		if (monitor.isCanceled() || Thread.currentThread().isInterrupted()) {
+		if (monitor.isCanceled()) {
 			throw new MethodCancelException();
 		}
 	}
