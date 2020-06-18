@@ -735,8 +735,10 @@ public class StringTable {
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA (experimental)";
+	public static final String CASA_ = "CASA";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
+	public static final String YASA = "Yasa";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
