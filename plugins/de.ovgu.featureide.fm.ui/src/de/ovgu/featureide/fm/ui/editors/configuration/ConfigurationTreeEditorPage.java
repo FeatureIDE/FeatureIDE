@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -85,6 +88,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -97,6 +101,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -112,6 +117,7 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCr
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -149,6 +155,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private static final String NO_AUTOMATIC_EXPAND_TOOL_TIP = "Does Not Expand Automatically";
 	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
+
+	private static final String EXPAND_PREFERENCE = "configurationexpandpreference";
 
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
@@ -263,6 +271,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					break;
 				default:
 					break;
+				}
+			} else {
+				if (evt.getEventType() == EventType.CONFIGURABLE_ATTRIBUTE_CHANGED) {
+					refreshPage();
+					setDirty();
 				}
 			}
 		}
@@ -451,11 +464,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, ExpandAlgorithm.NONE);
-		final MenuItem defaultItem = createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, ExpandAlgorithm.ALL_SELECTED);
+		createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, ExpandAlgorithm.ALL_SELECTED);
 		createMenu(EXPAND_CURRENT_SELECTION, EXPAND_CURRENT_SELECTION_TOOL_TIP, ExpandAlgorithm.CURRENTLY_SELECTED);
 		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, ExpandAlgorithm.OPEN_CLAUSES);
 		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP,
 				ExpandAlgorithm.ALL_SELECTED_OPEN_CLAUSE);
+
+		final IProject project = EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
+
+		final int index = store.getInt(EXPAND_PREFERENCE);
+
+		final MenuItem defaultItem = menu.getItem(index);
 
 		menu.setDefaultItem(defaultItem);
 		defaultItem.setSelection(true);
@@ -601,6 +621,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (configurationEditor.getExpandAlgorithm() != algorithm) {
 					configurationEditor.setExpandAlgorithm(algorithm);
+					final int index = menu.indexOf(menuItem);
+					final IProject project =
+						EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
+					final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
+					store.setValue(EXPAND_PREFERENCE, index);
+					try {
+						store.save();
+					} catch (final IOException e1) {}
 					if (useGroups) {
 						curGroup = 0;
 					}
@@ -1167,7 +1195,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> resetSnapshot(configurationManager)));
 		sequence.addJob(LongRunningWrapper.getRunner(monitor -> updateInfoLabel(currentDisplay, propagator)));
-		LongRunningWrapper.startJob(updateToken, LongRunningWrapper.getRunner(sequence));
+		final IRunner<Boolean> runner = LongRunningWrapper.getRunner(sequence);
+		runner.addJobFinishedListener((finishedJob) -> {
+			currentDisplay.syncExec(() -> configurationManager.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_SELECTION_CHANGED)));
+		});
+		LongRunningWrapper.startJob(updateToken, runner);
 	}
 
 	@Override

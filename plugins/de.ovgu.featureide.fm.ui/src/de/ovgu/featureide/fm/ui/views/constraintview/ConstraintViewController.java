@@ -22,9 +22,11 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
@@ -35,6 +37,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -47,6 +50,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -91,12 +95,25 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	private ConstraintViewSettingsMenu settingsMenu;
 	private Explanation<?> explanation;
 
-	boolean refreshWithDelete = true;
-	boolean constraintsHidden = false;
-
 	private String searchText = "";
+	private boolean featureDiagramPageVisible = false;
 
 	private FeatureModelEditor featureModelEditor;
+
+	private ISelection lastSelection;
+
+	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			if ((lastSelection == null) || !lastSelection.equals(event.getSelection())) {
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					checkForRefresh();
+				}
+			}
+			lastSelection = event.getSelection();
+		}
+	};
 
 	private final IEventListener eventListener = new IEventListener() {
 
@@ -106,14 +123,25 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
 			switch (event.getEventType()) {
+			case MODEL_DATA_OVERWRITTEN:
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_SAVED:
+			case MANDATORY_CHANGED:
+			case GROUP_TYPE_CHANGED:
+			case FEATURE_NAME_CHANGED:
+			case FEATURE_ADD_SIBLING:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case CONSTRAINT_MODIFY:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_ADD:
+			case FEATURE_COLLAPSED_CHANGED:
+			case FEATURE_COLLAPSED_ALL_CHANGED:
+			case ATTRIBUTE_CHANGED:
 			case ACTIVE_EXPLANATION_CHANGED:
 				if (FeatureModelUtil.getActiveFMEditor() != null) {
-					if (!isRefreshWithDelete()) {
-						checkForRefresh();
-						setRefreshWithDelete(true);
-					} else {
-						checkForRefresh();
-					}
+					checkForRefresh();
 				}
 				break;
 			default:
@@ -126,11 +154,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
-			if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
-				refreshView(featureModelEditor.getFeatureModelManager());
-			} else {
-				viewer.addNoFeatureModelItem();
-			}
+			featureDiagramPageVisible = event.getSelectedPage() instanceof FeatureDiagramEditor;
+			checkForRefresh();
 		}
 	};
 
@@ -143,14 +168,15 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		viewer = new ConstraintView(parent, this);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		if (featureModelEditor != null) {
-			addPageChangeListener(featureModelEditor);
-			refreshView(featureModelEditor.getFeatureModelManager());
-		} else {
-			viewer.addNoFeatureModelItem();
-		}
 		settingsMenu = new ConstraintViewSettingsMenu(this);
 		new ConstraintViewContextMenu(this);
+
+		final IEditorPart activeEditor = getSite().getPage().getActiveEditor();
+		if (activeEditor instanceof FeatureModelEditor) {
+			setFeatureModelEditor((FeatureModelEditor) activeEditor);
+		}
+
+		checkForRefresh();
 	}
 
 	/**
@@ -200,35 +226,30 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 */
 	private void refreshConstraints(FeatureModelManager currentModel) {
 		// Refresh entire List
-		if (refreshWithDelete) {
-			viewer.removeAll();
-			// no search text is entered:
-			if (searchText.isEmpty()) {
-				final List<ConstraintColorPair> explanationList = getExplanationConstraints();
-				// If one or more Feature were selected
-				if (!featureModelEditor.diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
-					addFeatureConstraints();
-				} else {
-					addVisibleConstraints();
-				}
-				// Selection has explanation or Model is void
+		viewer.removeAll();
+		// no search text is entered:
+		if (searchText.isEmpty()) {
+			final List<ConstraintColorPair> explanationList = getExplanationConstraints();
+			// If one or more Feature were selected
+			if (!featureModelEditor.diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+				addFeatureConstraints();
+			} else {
+				addVisibleConstraints();
+			}
+			//
+
+			// Check if automatic calculations are enabled and selection has explanation or Model is void
+			if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+				&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
 				if ((explanationList != null) || currentModel.getVariableFormula().getAnalyzer().getFeatureModelProperties().hasVoidModelConstraints()) {
 					changeIntoDecoratedConstraints();
 				}
-			} else {
-				// when searchText is entered, search through all constraints
-				findConstraints(currentModel.getSnapshot());
 			}
-			// Only update explanations
 		} else {
-
-			for (final TreeItem constraint : viewer.getViewer().getTree().getItems()) {
-				viewer.undecorateItem((IConstraint) constraint.getData());
-			}
-			if (searchText.isEmpty()) {
-				changeIntoDecoratedConstraints();
-			}
+			// when searchText is entered, search through all constraints
+			findConstraints(currentModel.getSnapshot());
 		}
+		// Only update explanations
 	}
 
 	/**
@@ -373,9 +394,15 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ").replaceAll("\r", " ");
 			searchText = searchText.toLowerCase();
 			// RegEx search with part string: .* at the start and at the end enables part search automatically
-			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
-				viewer.addItem(constraint);
+
+			try {
+				if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
+					viewer.addItem(constraint);
+				}
+			} catch (final PatternSyntaxException e) {
+
 			}
+
 		}
 	}
 
@@ -384,15 +411,35 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	 *
 	 */
 	public void checkForRefresh() {
-		if (featureModelEditor != null) {
-			final FeatureModelEditor fme = featureModelEditor;
-			if (fme.getActivePage() == 0) {
-				addPageChangeListener(fme);
-				refreshView(fme.getFeatureModelManager());
-			} else {
-				viewer.addNoFeatureModelItem();
-			}
+		final boolean constraintsViewVisible = isConstraintsViewVisible();
+		final boolean constraintsListVisible = isConstraintsListVisible();
+
+		settingsMenu.setStateOfActions(constraintsListVisible && constraintsViewVisible);
+		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
+
+		if (constraintsListVisible) {
+			refreshView(featureModelEditor.getFeatureModelManager());
+		} else if (constraintsViewVisible) {
+			viewer.addNoFeatureModelItem();
 		}
+	}
+
+	/**
+	 * Checks if the ConstraintView is currently visible for the user
+	 *
+	 * @return True if the ConstraintView is visible, false if not
+	 */
+	public boolean isConstraintsViewVisible() {
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(this);
+	}
+
+	/**
+	 * Checks if the constraints list is visible, i.e. there is a FeatureModelEditor which shows the FeatureDiagram page.
+	 *
+	 * @return True if the constraints list is visible, false if not
+	 */
+	public boolean isConstraintsListVisible() {
+		return (featureModelEditor != null) && featureDiagramPageVisible;
 	}
 
 	/**
@@ -402,6 +449,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	public List<ConstraintColorPair> getExplanationConstraints() {
 		if (featureModelEditor != null) {
 			final FeatureModelEditor fmEditor = featureModelEditor;
+
+			// Check if automatic calculations are nessecary (explanations are only present after analysing)
+			if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+				|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
+				return null;
+			}
+
 			if (fmEditor != null) {
 				final FeatureModelAnalyzer analyser = fmEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
 				if (analyser.getAnalysesCollection().getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
@@ -450,12 +504,27 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		getSite().getPage().addPartListener(partListener);
 	}
 
+	public void addSelectionListener() {
+		featureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
+	}
+
+	public void removeSelectionListener() {
+		if (featureModelEditor != null) {
+			if (featureModelEditor.diagramEditor != null) {
+				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
+		}
+	}
+
 	@Override
 	public void dispose() {
 		// remove eventListener from current FeatureModel
 		if (fmManager != null) {
 			fmManager.removeListener(eventListener);
 		}
+
+		removeSelectionListener();
+
 		// remove all PageListener from open FeatureModelEditors
 		final IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
 		for (final IEditorReference ref : editors) {
@@ -476,16 +545,16 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 	/**
 	 * Changes if the Constraints are shown under the feature model
 	 */
-	public void setConstraintsHidden(boolean hideConstraints) {
-		if ((featureModelEditor != null)) {
-			featureModelEditor.diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
-			featureModelEditor.diagramEditor.getGraphicalFeatureModel().redrawDiagram();
-			constraintsHidden = hideConstraints;
-		}
-	}
+	public void setConstraintsHidden(FeatureModelEditor featureModelEditor, boolean hideConstraints) {
+		if (featureModelEditor != null) {
+			IGraphicalFeatureModel graphicalFeatureModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
 
-	public boolean isConstraintsHidden() {
-		return constraintsHidden;
+			// we only need to update the model if the state of hideConstraint is different from the current state
+			if(graphicalFeatureModel.getConstraintsHidden() != hideConstraints) {
+				graphicalFeatureModel.setConstraintsHidden(hideConstraints);
+				graphicalFeatureModel.redrawDiagram();
+			}
+		}
 	}
 
 	public FeatureModelManager getFeatureModelManager() {
@@ -504,14 +573,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		return settingsMenu;
 	}
 
-	public boolean isRefreshWithDelete() {
-		return refreshWithDelete;
-	}
-
-	public void setRefreshWithDelete(Boolean refreshWithDelete) {
-		this.refreshWithDelete = refreshWithDelete;
-	}
-
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		final TreeSelection treeSelection = (TreeSelection) event.getSelection();
@@ -521,10 +582,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 			final FeatureDiagramEditor diagramEditor = activeFMEditor.diagramEditor;
 			if (diagramEditor != null) {
 				final IGraphicalFeatureModel graphicalFeatureModel = diagramEditor.getGraphicalFeatureModel();
-				setRefreshWithDelete(false);
 				if (constraint != null) {
-					final FeatureModelAnalyzer anlyzer = activeFMEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
-					diagramEditor.setActiveExplanation(anlyzer.getExplanation(constraint));
+					// Check if automatic calculations are activated (explanation are only available when anaylses are activated)
+					if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
+						&& FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())
+						&& FeatureModelProperty.isCalculateConstraints(fmManager.getVarObject())) {
+						final FeatureModelAnalyzer anlyzer = activeFMEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
+						diagramEditor.setActiveExplanation(anlyzer.getExplanation(constraint));
+					}
 				}
 				for (final IGraphicalFeature graphFeature : graphicalFeatureModel.getAllFeatures()) {
 					if ((constraint != null) && constraint.getContainedFeatures().contains(graphFeature.getObject())) {
@@ -542,12 +607,41 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults, I
 		return featureModelEditor;
 	}
 
-	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+	/**
+	 * Sets the current FeatureModelEditor. Removes listeners from the previous FeatureModelEditor and adds listeners to the new one.
+	 *
+	 * @param newFeatureModelEditor The new FeatureModelEditor
+	 */
+	public void setFeatureModelEditor(FeatureModelEditor newFeatureModelEditor) {
+		if (featureModelEditor == newFeatureModelEditor) {
+			return;
+		}
+
+		if (featureModelEditor != null) {
+			setConstraintsHidden(featureModelEditor, false);
+			if (featureModelEditor.diagramEditor != null) {
+				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
+			featureModelEditor.removePageChangedListener(pageChangeListener);
+		}
+
+		if (newFeatureModelEditor != null) {
+			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
+			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
+			featureDiagramPageVisible = newFeatureModelEditor.getSelectedPage() instanceof FeatureDiagramEditor;
+		}
+
+		featureModelEditor = newFeatureModelEditor;
 	}
 
 	public ConstraintProperties getConstraintProperty(IConstraint element) {
-		return fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element);
+		// Check if automatic calculations are nessecary (propetries are only available when anaylses are activated)
+		if (FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject()) && FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())
+			&& FeatureModelProperty.isCalculateConstraints(fmManager.getVarObject())) {
+			return fmManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(element);
+		} else {
+			return new ConstraintProperties(element);
+		}
 	}
 
 }

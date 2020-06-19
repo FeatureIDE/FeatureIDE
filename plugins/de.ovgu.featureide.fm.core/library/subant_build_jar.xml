@@ -2,8 +2,8 @@
 <project name="JAR Build Script" default="build" basedir=".">
 
 	<!-- Set JAR name -->
-	<property name="build.jar.version" value="3.6.2" />
-	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm-v${build.jar.version}.jar" />
+	<property name="build.jar.version" value="3.6.3" />
+	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
 
 	<!-- Constants -->
 	<property name="base.dir" value=".." />
@@ -16,7 +16,7 @@
 	<property name="build.excludes.path" value="${build.dir}/excluded_source_files.txt" />
 	<property name="build.jar.dir" value="${build.dir}/jar" />
 	<property name="build.jar.lib.dir" value="${build.jar.dir}/lib" />
-	<property name="build.jar.path" value="${build.jar.dir}/${build.jar.name}" />
+	<property name="build.jar.path" value="${build.jar.dir}/${build.jar.name}-v${build.jar.version}.jar" />
 	<property name="build.version.name" value="version.txt" />
 	<property name="build.version.path" value="${build.bin.dir}/${build.version.name}" />
 

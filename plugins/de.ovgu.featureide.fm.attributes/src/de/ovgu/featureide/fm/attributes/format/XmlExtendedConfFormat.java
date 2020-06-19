@@ -88,7 +88,7 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectableFeature(featureName);
+					selectablefeature = object.getSelectableFeature(featureName, true);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;

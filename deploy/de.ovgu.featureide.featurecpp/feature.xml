@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurecpp"
       label="FeatureIDE extension for FeatureC++ (optional)"
-      version="3.6.2.qualifier"
+      version="3.6.3.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -197,7 +197,7 @@ Library.
          id="de.ovgu.featureide.core.featurecpp"
          download-size="0"
          install-size="0"
-         version="3.6.2.qualifier"
+         version="3.6.3.qualifier"
          unpack="false"/>
 
 </feature>

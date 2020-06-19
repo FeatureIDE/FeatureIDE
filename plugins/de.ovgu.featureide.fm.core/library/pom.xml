@@ -5,7 +5,7 @@
 
 	<groupId>de.ovgu.featureide</groupId>
 	<artifactId>de.ovgu.featureide.lib.fm</artifactId>
-	<version>3.6.2</version>
+	<version>3.6.3</version>
 	<packaging>jar</packaging>
 
 	<name>FeatureIDE fm.core library</name>

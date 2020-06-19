@@ -37,7 +37,6 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
-		FEATURE_MODEL_OPERATION,
 		/**
 		 * The constraint was moved.
 		 */
@@ -163,6 +162,10 @@ public class FeatureIDEEvent {
 		 */
 		DEPENDENCY_CALCULATED,
 		/**
+		 * Selection state of a feature in the configuration editor was changed.
+		 */
+		FEATURE_SELECTION_CHANGED,
+		/**
 		 * The active explanation changed.
 		 */
 		ACTIVE_EXPLANATION_CHANGED,
@@ -170,6 +173,10 @@ public class FeatureIDEEvent {
 		 * Any feature attribute was added or altered.
 		 */
 		FEATURE_ATTRIBUTE_CHANGED,
+		/**
+		 * Value of configurable attribute was overwritten for a configuration
+		 */
+		CONFIGURABLE_ATTRIBUTE_CHANGED,
 		/**
 		 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
 		 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as

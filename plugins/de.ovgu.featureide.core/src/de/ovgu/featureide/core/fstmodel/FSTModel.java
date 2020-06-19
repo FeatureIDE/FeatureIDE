@@ -39,7 +39,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
  *
  * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}.<br>
  *
- * For a visualization of the FSTModels structure see lib/FSTModel.jpg.
+ * For a visualisation of the FSTModels structure see lib/FSTModel.jpg.
  *
  * @author Jens Meinicke
  */

@@ -21,20 +21,20 @@
 package de.ovgu.featureide.fm.ui.views.constraintview.listener;
 
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * This class is the implementation of the IPartListener2 for the ConstraintView.
+ * This class is the implementation of the IPartListener for the ConstraintView.
  *
  * @author Rosiak Kamil
+ * @author Soeren Viegener
+ * @author Philipp Vulpius
  */
-public class ConstraintViewPartListener implements IPartListener2 {
+public class ConstraintViewPartListener implements IPartListener {
 
 	private final ConstraintViewController controller;
 
@@ -43,60 +43,48 @@ public class ConstraintViewPartListener implements IPartListener2 {
 	}
 
 	@Override
-	public void partOpened(IWorkbenchPartReference part) {}
-
-	@Override
-	public void partDeactivated(IWorkbenchPartReference part) {}
-
-	@Override
-	public void partClosed(IWorkbenchPartReference part) {
-		if (part.getPart(false) instanceof FeatureModelEditor) {
-			controller.getView().removeAll();
-			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().setStateOfActions(false);
-			controller.setFeatureModelEditor(null);
-		}
-	}
-
-	@Override
-	public void partBroughtToTop(IWorkbenchPartReference part) {
-		final IWorkbenchPart activePart = part.getPart(false);
-		if (!(activePart instanceof FeatureModelEditor)) {
-			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().setStateOfActions(false);
-		}
-	}
-
-	@Override
-	public void partActivated(IWorkbenchPartReference part) {
-		final IWorkbenchPart activePart = part.getPart(false);
-		if (activePart instanceof FeatureModelEditor) {
-			controller.setFeatureModelEditor((FeatureModelEditor) activePart);
+	public void partActivated(IWorkbenchPart part) {
+		if (part instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) part);
 			controller.checkForRefresh();
-			// Check if the constraints view is currently visible
-			if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().isPartVisible(controller)) {
-				controller.setConstraintsHidden(true);
-			}
-		} else if (activePart instanceof IEditorPart) {
-			controller.setConstraintsHidden(controller.isConstraintsHidden());
+		} else if (part instanceof IEditorPart) {
+			controller.setFeatureModelEditor(null);
+			controller.checkForRefresh();
+		}
+
+		if(!controller.isConstraintsViewVisible()){
+			controller.setConstraintsHidden(controller.getFeatureModelEditor(), false);
+		}else if(part instanceof ConstraintViewController){
+			controller.setConstraintsHidden(controller.getFeatureModelEditor(), true);
 		}
 	}
 
 	@Override
-	public void partHidden(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID)) {
-			controller.setConstraintsHidden(false);
+	public void partBroughtToTop(IWorkbenchPart part) {
+		if (part instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) part);
+			controller.checkForRefresh();
 		}
 	}
 
 	@Override
-	public void partVisible(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID)) {
-			controller.setConstraintsHidden(true);
+	public void partClosed(IWorkbenchPart part) {
+		if ((part instanceof FeatureModelEditor) && (part == controller.getFeatureModelEditor())) {
+			controller.setFeatureModelEditor(null);
+			controller.checkForRefresh();
 		}
 	}
 
 	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) {}
+	public void partDeactivated(IWorkbenchPart part) {
+		// not needed, covered in the other events
+	}
 
+	@Override
+	public void partOpened(IWorkbenchPart part) {
+		if (part instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) part);
+			controller.checkForRefresh();
+		}
+	}
 }

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -32,47 +33,39 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 
 /**
  * Configurations Analysis utils
- * 
- * @author jabier.martinez
+ *
+ * @author Jabier Martinez
  */
 public class ConfigAnalysisUtils {
 
-	/**
-	 * Get a matrix configurations/features
-	 * 
-	 * @param featureProject
-	 * @param featureList
-	 * @return boolean[][]
-	 * @throws CoreException
-	 */
 	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
-		Collection<IFile> configs = new ArrayList<IFile>();
+		final Collection<Configuration> configs = new ArrayList<>();
 		// check that they are config files
-		IFolder configsFolder = featureProject.getConfigFolder();
-		for (IResource res : configsFolder.members()) {
-			if (res instanceof IFile) {
-				if (((IFile) res).getName().endsWith(".config")) {
-					configs.add((IFile) res);
+		final IFolder configsFolder = featureProject.getConfigFolder();
+		for (final IResource res : configsFolder.members()) {
+			if ((res instanceof IFile) && res.isAccessible()) {
+				final Configuration configuration = featureProject.loadConfiguration(EclipseFileSystem.getPath(res));
+				if (configuration != null) {
+					configs.add(configuration);
 				}
 			}
 		}
 
-		boolean[][] matrix = new boolean[configs.size()][featureList.size()];
+		final boolean[][] matrix = new boolean[configs.size()][featureList.size()];
 		int iconf = 0;
-		for (IFile config : configs) {
-			Configuration configuration = ConfigurationManager.load(EclipseFileSystem.getPath(config));
-			configuration.updateFeatures(new FeatureModelFormula(featureProject.getFeatureModel()));
-			Set<String> configFeatures = configuration.getSelectedFeatureNames();
+		for (final Configuration configuration : configs) {
+			final Set<String> configFeatures = configuration.getSelectedFeatureNames();
 			int ifeat = 0;
-			for (String f : featureList) {
+			for (final String f : featureList) {
 				matrix[iconf][ifeat] = configFeatures.contains(f);
 				ifeat++;
 			}
@@ -84,23 +77,16 @@ public class ConfigAnalysisUtils {
 
 	/**
 	 * No core nor hidden features
-	 * 
-	 * @param featureProject
+	 *
+	 * @param featureProject feature project
 	 * @return list of feature names
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
-		// make a copy because it is unmodifiable
-		List<String> featureList1 = featureProject.getFeatureModel().getFeatureOrderList();
-		List<String> featureList = new ArrayList<String>();
-		featureList.addAll(featureList1);
-		List<IFeature> coreFeatures = featureProject.getFeatureModelManager().getPersistentFormula().getAnalyzer().getCoreFeatures(null);
-		Collection<IFeature> hiddenFeatures = FeatureUtils.getHiddenFeatures(featureProject.getFeatureModel());
-		for (IFeature coref : coreFeatures) {
-			featureList.remove(coref.getName());
-		}
-		for (IFeature hiddenf : hiddenFeatures) {
-			featureList.remove(hiddenf.getName());
-		}
-		return featureList;
+		final FeatureModelFormula snapshot = featureProject.getFeatureModelManager().getPersistentFormula();
+		final Predicate<IFeature> coreFeatureFilter = new FeatureSetFilter(snapshot.getAnalyzer().getCoreFeatures(null));
+		final Predicate<IFeature> hiddenFeatureFilter = new HiddenFeatureFilter();
+
+		final Predicate<IFeature> noCoreNoHiddenFilter = hiddenFeatureFilter.or(coreFeatureFilter).negate();
+		return Functional.mapToList(snapshot.getFeatureModel().getFeatures(), noCoreNoHiddenFilter, IFeature::getName);
 	}
 }

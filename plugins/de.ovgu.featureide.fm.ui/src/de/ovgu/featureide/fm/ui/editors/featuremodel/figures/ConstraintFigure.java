@@ -33,6 +33,7 @@ import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -42,6 +43,7 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -115,59 +117,64 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public void updateProperties() {
 		init();
 
-		final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
-				.getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 
-		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
-			label.setIcon(null);
-		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {
-			label.setIcon(FM_ERROR);
-			add(label);
-			toolTipContent.add(new Label(VOID_MODEL));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
-			label.setIcon(FM_ERROR);
-			toolTipContent.add(new Label(UNSATISFIABLE));
-		}
+		// Check if automatic calculations are nessecary (propetries are only available when anaylses are activated)
+		if (FeatureModelProperty.isRunCalculationAutomatically(graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVarObject())
+			&& FeatureModelProperty.isCalculateFeatures(graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVarObject())
+			&& FeatureModelProperty.isCalculateConstraints(graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVarObject())) {
+			final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula()
+					.getAnalyzer().getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
 
-		if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
-			label.setIcon(FM_WARNING);
-			add(label);
-			toolTipContent.add(new Label(TAUTOLOGY));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
-			label.setIcon(FM_WARNING);
-			add(label);
-			toolTipContent.add(new Label(REDUNDANCE));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
-			label.setIcon(FM_INFO);
-			add(label);
-			toolTipContent.add(new Label(REDUNDANCE));
-		}
-
-		if (!constraintProperties.getDeadFeatures().isEmpty()) {
-			label.setIcon(null);
-			final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
-			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-
-			String s = DEAD_FEATURE;
-			for (final String dead : deadFeatures) {
-				s += "\n\u2022 " + dead;
+			if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
+				label.setIcon(null);
+			} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {
+				label.setIcon(FM_ERROR);
+				add(label);
+				toolTipContent.add(new Label(VOID_MODEL));
+			} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
+				label.setIcon(FM_ERROR);
+				toolTipContent.add(new Label(UNSATISFIABLE));
 			}
-			toolTipContent.add(new Label(s));
-		}
 
-		if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-			label.setIcon(null);
-			final List<String> falseOptionalFeatures =
-				Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
-			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-
-			String s = FALSE_OPTIONAL;
-			for (final String feature : falseOptionalFeatures) {
-				s += "\n\u2022 " + feature;
+			if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
+				label.setIcon(FM_WARNING);
+				add(label);
+				toolTipContent.add(new Label(TAUTOLOGY));
+			} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
+				label.setIcon(FM_INFO);
+				add(label);
+				toolTipContent.add(new Label(REDUNDANCE));
+			} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
+				setBorder(new LineBorder(GUIDefaults.IMPLICIT_CONSTRAINT, 3));
+				setBackgroundColor(FMPropertyManager.getWarningColor());
+				add(label);
+				toolTipContent.add(new Label(REDUNDANCE));
 			}
-			toolTipContent.add(new Label(s));
+
+			if (!constraintProperties.getDeadFeatures().isEmpty()) {
+				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				String s = DEAD_FEATURE;
+				for (final String dead : deadFeatures) {
+					s += "\n\u2022 " + dead;
+				}
+				toolTipContent.add(new Label(s));
+			}
+
+			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
+				final List<String> falseOptionalFeatures =
+					Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+
+				String s = FALSE_OPTIONAL;
+				for (final String feature : falseOptionalFeatures) {
+					s += "\n\u2022 " + feature;
+				}
+				toolTipContent.add(new Label(s));
+			}
 		}
 
 		final String description = graphicalConstraint.getObject().getDescription();

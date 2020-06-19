@@ -5,7 +5,7 @@
 	<property name="bin.javac.path.default" value="C:/Program Files/Java/openjdk-8u212-b04/bin/javac.exe" />
 
 	<!-- Set JAR name -->
-	<property name="build.jar.version" value="3.6.2" />
+	<property name="build.jar.version" value="3.6.3" />
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes-v${build.jar.version}" />
 
 	<!-- Constants -->

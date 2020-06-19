@@ -45,7 +45,6 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
@@ -163,7 +162,27 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	public void propertyChange(FeatureIDEEvent event) {
 		final IContentProvider contentProvider = viewer.getContentProvider();
 		if (contentProvider != null) {
-			contentProvider.inputChanged(viewer, null, file);
+			switch (event.getEventType()) {
+			case MODEL_DATA_OVERWRITTEN:
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_SAVED:
+			case MANDATORY_CHANGED:
+			case GROUP_TYPE_CHANGED:
+			case FEATURE_NAME_CHANGED:
+			case FEATURE_ADD_SIBLING:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case CONSTRAINT_MODIFY:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_ADD:
+			case FEATURE_COLLAPSED_CHANGED:
+			case FEATURE_COLLAPSED_ALL_CHANGED:
+				contentProvider.inputChanged(viewer, null, file);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 

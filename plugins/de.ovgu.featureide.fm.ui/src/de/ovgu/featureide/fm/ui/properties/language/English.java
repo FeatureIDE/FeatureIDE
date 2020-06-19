@@ -55,7 +55,7 @@ public class English implements ILanguage {
 	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = "Hidden";
 	private static final String COLLAPSED = "Collapsed";
-	private static final String DEAD = "Dead feature";
+	private static final String DEAD = "Dead Feature";
 	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;

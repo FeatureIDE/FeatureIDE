@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Visualisation
 Bundle-SymbolicName: de.ovgu.featureide.visualisation;singleton:=true
 Bundle-Version: 3.1.2.qualifier
-Bundle-Activator: de.ovgu.featureide.visualisation.activator.Activator
+Bundle-Activator: de.ovgu.featureide.visualisation.activator.VisualPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -14,3 +14,4 @@ Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: de.ovgu.featureide.visualisation
 Export-Package: de.ovgu.featureide.visualisation,
  de.ovgu.featureide.visualisation.activator
+Import-Package: de.ovgu.featureide.fm.ui.handlers.base

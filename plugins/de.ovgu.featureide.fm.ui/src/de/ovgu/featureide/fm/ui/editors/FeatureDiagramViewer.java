@@ -33,8 +33,9 @@ import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -124,6 +125,8 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	private final FeatureDiagramEditorKeyHandler editorKeyHandler;
 	private FeatureDiagramLayoutManager layoutManager;
 
+	private boolean openConstraintViewDecisionDialogAlreadySpawned = false;
+
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
@@ -149,7 +152,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
 		}
-		openConstraintDecision();
 	}
 
 	/**
@@ -159,19 +161,23 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
-			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell());
-			if (!dialog.isRemember()) {
-				dialog.open();
 
-			} else {
-				if (dialog.getDecision()) {
-					try {
-						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
-					} catch (final PartInitException e) {
-						e.printStackTrace();
+			Display.getCurrent().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					final boolean showConstraintView = ConstraintViewDialog.spawn();
+
+					if (showConstraintView) {
+						try {
+							bench.getActivePage().showView(ConstraintViewController.ID);
+						} catch (final PartInitException e) {
+							e.printStackTrace();
+						}
 					}
 				}
-			}
+			});
+
 		}
 	}
 
@@ -360,9 +366,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	}
 
 	void refreshFeature(IFeature feature) {
-		if (!graphicalFeatureModel.getLayout().showHiddenFeatures() && feature.getStructure().isHidden()) {
-			return;
-		}
 		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
 		if (editPart == null) {
@@ -431,4 +434,12 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		getFigureCanvas().addMouseListener(new FeatureDiagramEditorMouseHandler(getFigureCanvas()));
 	}
 
+	@Override
+	protected void handleFocusGained(FocusEvent fe) {
+
+		if (!openConstraintViewDecisionDialogAlreadySpawned) {
+			openConstraintViewDecisionDialogAlreadySpawned = true;
+			openConstraintDecision();
+		}
+	}
 }

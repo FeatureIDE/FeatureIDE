@@ -20,36 +20,30 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Specifies whether hidden features are shown.
+ * Specifies whether the legend should be automatically layout.
  *
- * @author David Halm
- * @author Patrick Sulkowski
- * @author Marcus Pinnecke
+ * @author Joshua Sprey
  */
-public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOperation {
+public class SetLegendToAutoLayoutOperation extends AbstractGraphicalFeatureModelOperation {
 
-	public ShowHiddenFeaturesOperation(IGraphicalFeatureModel featureModel) {
-		super(featureModel, SHOW_HIDDEN_FEATURES);
+	public SetLegendToAutoLayoutOperation(IGraphicalFeatureModel featureModel) {
+		super(featureModel, "");
 	}
 
 	@Override
 	public FeatureIDEEvent operation(IFeatureModel featureModel) {
-		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
-		// TODO !!? add specific handling in FeatureDiagram editor so not everything needs to be reloaded
-		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
+		graphicalFeatureModel.getLayout().setLegendAutoLayout(!graphicalFeatureModel.getLayout().hasLegendAutoLayout());
+		return new FeatureIDEEvent(this, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
 	public FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		return operation(featureModel);
 	}
-
 }

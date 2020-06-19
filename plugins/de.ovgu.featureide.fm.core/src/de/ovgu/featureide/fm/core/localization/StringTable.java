@@ -475,7 +475,6 @@ public class StringTable {
 	public static final String MOVING = "Moving";
 	public static final String REVERSE_FEATURE_ORDER = "Reverse Feature Order";
 	public static final String SELECTION = "Selection";
-	public static final String SHOW_HIDDEN_FEATURES = "Show Hidden Features";
 	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME =
@@ -497,7 +496,7 @@ public class StringTable {
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
 	public static final String FEATURE_MODEL_IS_VOID = " Feature model is void ";
 	public static final String ROOT = " Root ";
-	public static final String VOID_FEATURE_MODEL = "Void feature model";
+	public static final String VOID_FEATURE_MODEL = "Void Feature Model";
 	public static final String SAVE_IMAGE = "Save image";
 	public static final String UNKNOWN_IMAGE_FILE_FORMAT = "Unknown image file format ";
 	public static final String MANUAL_LAYOUT = "Manual Layout";
@@ -519,6 +518,7 @@ public class StringTable {
 	public static final String ABSTRACT_OPERATION = "Abstract Operation";
 	public static final String COLLAPSE_OPERATION = "Collapse Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
+	public static final String DEFAULT_SLICING_ROOT_NAME = "NewRootFeature";
 	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
@@ -815,6 +815,13 @@ public class StringTable {
 	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
 	public static final String MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL =
 		"The open feature model does not support attributes. To use attributes convert your feature model to an extended feature model.";
+	public static final String CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG =
+		"The open configuration does not support attributes. To use attributes create an extended configuration.";
+	public static final String PAGE_NOT_SUPPORTED_EXTENDED_FEATURE_MODEL =
+		"Source and feature order tab of the feature model editor are not supported. To use attributes switch to feature diagram tab.";
+	public static final String PAGE_NOT_SUPPORTED_EXTENDED_CONFIGURATION =
+		"Source tab of the feature model editor is not supported. To use attributes switch to (advanced) configuration tab.";
+
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Semantical statistics";
@@ -1111,8 +1118,15 @@ public class StringTable {
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
 	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
 	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
-	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Constraint View";
-	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the ConstraintView?";
+	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Open the Constraint View?";
+	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Would you like to open the Constraint View?";
 	public static final String SELECT_SUBTREE = "Select Subtree (CTRL + T)";
 	public static final String SELECT_FEATURES_IN_FEATURE_DIAGRAM = "Select features in feature diagram to show their attributes";
+	public static final String NO_CONFIGURABLE_ATTRIBUTES = "The feature model does not contain configurable attributes.";
+
+	public static final String GTK_WORKAROUND_INFO_TITLE = "Workaround information";
+	public static final String GTK_WORKAROUND_INFO_MSG =
+		"Due to a feature breaking bug in the GTK framework, FeatureIDE has to employ a workaround to maintain functionality. See also bug #1003 in the FeatureIDE bug tracker.";
+	public static final String GTK_WORKAROUND_INFO_TOGGLE = "Do not show this message again.";
+	public static final String CONFIGURATION_DIALOGS_GTK_WORKAROUND = "Disable the workaround information for #1003";
 }

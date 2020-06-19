@@ -165,4 +165,57 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 		}
 	}
 
+	/**
+	 * Indicates whether a feature diagram editor and constraint editor should perform analyses automatically based on the users preferences and model size.
+	 *
+	 * @param fm The relative feature model.
+	 * @return true, when analyses should be performed automatically, false otherwise.
+	 */
+	public static boolean isRunCalculationAutomatically(IFeatureModel fm) {
+		Boolean isRunAutomatically =
+			getBooleanProperty(fm.getProperty(), FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+		if (isRunAutomatically == null) {
+			if (fm.getNumberOfFeatures() >= FeatureModelProperty.BIG_MODEL_LIMIT) {
+				// Is big model => no automatic analyses as default
+				isRunAutomatically = Boolean.FALSE;
+			} else {
+				// Is small model => automatic analyses as default
+				isRunAutomatically = Boolean.TRUE;
+			}
+		}
+		return isRunAutomatically;
+	}
+
+	/**
+	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints are also NOT analyzed.
+	 *
+	 * @param fm The relative feature model.
+	 * @return true, when feature should be considered when anayses are performed, false otherwise.
+	 */
+	public static boolean isCalculateFeatures(IFeatureModel fm) {
+		Boolean isCalculatingFeatures = FeatureModelProperty.getBooleanProperty(fm.getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_FEATURES);
+		if (isCalculatingFeatures == null) {
+			// default value == true
+			isCalculatingFeatures = Boolean.TRUE;
+		}
+		return isCalculatingFeatures;
+	}
+
+	/**
+	 * Defines whether constraints should be included into calculations.
+	 *
+	 * @param fm The relative feature model.
+	 * @return true, when constraints should be considered when anayses are performed, false otherwise.
+	 */
+	public static boolean isCalculateConstraints(IFeatureModel fm) {
+		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
+				FeatureModelProperty.PROPERTY_CALCULATIONS_CALCULATE_CONSTRAINTS);
+		if (isCalculatingConstraints == null) {
+			// default value == true
+			isCalculatingConstraints = Boolean.TRUE;
+		}
+		return isCalculatingConstraints;
+	}
+
 }

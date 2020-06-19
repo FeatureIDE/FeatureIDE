@@ -37,3 +37,6 @@ de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeRecursiveCol
 de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeTypeColumnLabelProvider.java
 de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeUnitColumnLabelProvider.java
 de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeValueColumnLabelProvider.java
+de/ovgu/featureide/fm/attributes/view/listener/FeatureAttributeSelectionListener.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeValueOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeConfigurableAttributeValueOperation.java
