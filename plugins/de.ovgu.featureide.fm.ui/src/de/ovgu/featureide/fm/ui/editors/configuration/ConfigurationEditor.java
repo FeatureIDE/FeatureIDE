@@ -251,9 +251,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 						setReadFeatureModelError(true);
 						return null;
 					}
-					modelFile = new File(path);
-					setReadFeatureModelError(!setModelFile(project, path));
 				}
+				modelFile = new File(path);
+				setReadFeatureModelError(!setModelFile(project, path));
 			}
 		}
 		if (modelFile == null) {
