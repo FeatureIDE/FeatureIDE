@@ -462,9 +462,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					} else if (lineText.contains("[1,*]")) {
 						lastFeat.getFeature().getStructure().setOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
-						final int index = lineText.indexOf('[');
-						final int start = Character.getNumericValue(lineText.charAt(index + 1));
-						final int end = Character.getNumericValue(lineText.charAt(index + 3));
+						final String substring = lineText.substring(lineText.indexOf('[') + 1, lineText.indexOf(']'));
+						final String[] numbers = substring.split(",");
+						final int start = Integer.parseInt(numbers[0]);
+						final int end = Integer.parseInt(numbers[1]);
 						final FeatCardinality featCard = new FeatCardinality(lastFeat.getFeature(), start, end);
 						arbCardGroupFeats.add(featCard);
 					} else {
@@ -600,8 +601,9 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			}
 			final int f = children.size();
 			node = buildMinConstr(FeatureUtils.convertToFeatureList(children), (f - start) + 1, feat.getName());
-			object.addConstraint(new Constraint(object, node));
-			if ((start > 0) && (end < f)) {
+			if ((start == 1) && (end == f)) {
+				feat.getStructure().setOr();
+			} else {
 				node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
 				object.addConstraint(new Constraint(object, node));
 			}
