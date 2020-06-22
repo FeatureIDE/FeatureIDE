@@ -1,0 +1,8 @@
+ns OperatingSystem
+
+features
+	OperatingSystem {abstract}	
+		alternative
+			Windows
+			macOS
+			Debian
