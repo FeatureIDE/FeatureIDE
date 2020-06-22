@@ -125,10 +125,17 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return TWiseCombiner.convertExpressions(expressions);
 	}
 
+	public static boolean VERBOSE = false;
+
 	public static final int DEFAULT_ITERATIONS = 5;
+	public static final int DEFAULT_RANDOM_SAMPLE_SIZE = 10_000;
+	public static final int DEFAULT_LOG_FREQUENCY = 60_000;
 
 	// TODO Variation Point: Iterations of removing low-contributing Configurations
 	private int iterations = DEFAULT_ITERATIONS;
+	private int randomSampleSize = DEFAULT_RANDOM_SAMPLE_SIZE;
+	private int logFrequency = DEFAULT_LOG_FREQUENCY;
+	private boolean useMig = true;
 
 	protected TWiseConfigurationUtil util;
 	protected TWiseCombiner combiner;
@@ -164,6 +171,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void init() {
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			System.out.println("Create util instance... ");
+		}
 		final CNF cnf = solver.getSatInstance();
 		if (cnf.getClauses().isEmpty()) {
 			util = new TWiseConfigurationUtil(cnf, null);
@@ -173,8 +183,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		util.setMaxSampleSize(maxSampleSize);
 		util.setRandom(getRandom());
 
-		util.computeRandomSample();
-		if (!util.getCnf().getClauses().isEmpty()) {
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			System.out.println("Compute random sample... ");
+		}
+		util.computeRandomSample(randomSampleSize);
+		if (useMig && !util.getCnf().getClauses().isEmpty()) {
 			util.computeMIG();
 		}
 
@@ -251,7 +264,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		coveredCount = 0;
 		invalidCount = 0;
 
-		samplingMonitor = new MonitorThread(new SamplingMonitor(), 60_000);
+		samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
 		try {
 			samplingMonitor.start();
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
@@ -333,6 +346,30 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	public void setIterations(int iterations) {
 		this.iterations = iterations;
+	}
+
+	public int getRandomSampleSize() {
+		return randomSampleSize;
+	}
+
+	public void setRandomSampleSize(int randomSampleSize) {
+		this.randomSampleSize = randomSampleSize;
+	}
+
+	public boolean isUseMig() {
+		return useMig;
+	}
+
+	public void setUseMig(boolean useMig) {
+		this.useMig = useMig;
+	}
+
+	public int getLogFrequency() {
+		return logFrequency;
+	}
+
+	public void setLogFrequency(int logFrequency) {
+		this.logFrequency = logFrequency;
 	}
 
 }

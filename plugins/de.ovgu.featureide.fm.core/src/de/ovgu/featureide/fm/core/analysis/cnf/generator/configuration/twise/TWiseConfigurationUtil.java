@@ -36,11 +36,12 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.CollectingStrongVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
@@ -75,6 +76,7 @@ public class TWiseConfigurationUtil {
 
 	protected ModalImplicationGraph mig;
 	protected LiteralSet[] strongHull;
+	protected LiteralSet coreDead;
 
 	protected int maxSampleSize = Integer.MAX_VALUE;
 
@@ -85,10 +87,9 @@ public class TWiseConfigurationUtil {
 		randomSample = Collections.emptyList();
 	}
 
-	public void computeRandomSample() {
-		final UniformRandomConfigurationGenerator randomGenerator = new UniformRandomConfigurationGenerator(cnf, 10000);
-		randomGenerator.setAllowDuplicates(false);
-		randomGenerator.setSampleSize(1000);
+	public void computeRandomSample(int randomSampleSize) {
+		final RandomConfigurationGenerator randomGenerator = new RandomConfigurationGenerator(cnf, randomSampleSize);
+		randomGenerator.setAllowDuplicates(true);
 		randomGenerator.setRandom(random);
 		randomSample = LongRunningWrapper.runMethod(randomGenerator);
 
@@ -98,8 +99,8 @@ public class TWiseConfigurationUtil {
 	}
 
 	public void computeMIG() {
-		if (ITWiseConfigurationGenerator.VERBOSE) {
-			System.out.print("Init graph... ");
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			System.out.println("Init graph... ");
 		}
 		mig = LongRunningWrapper.runMethod(new MIGBuilder(localSolver.getSatInstance(), false));
 		strongHull = new LiteralSet[mig.getAdjList().size()];
@@ -114,27 +115,77 @@ public class TWiseConfigurationUtil {
 			final VecInt strong = visitor.getResult()[0];
 			strongHull[vertex.getId()] = new LiteralSet(Arrays.copyOf(strong.toArray(), strong.size()));
 		}
-		if (ITWiseConfigurationGenerator.VERBOSE) {
-			System.out.println("Done!");
-		}
 	}
 
 	public LiteralSet getDeadCoreFeatures() {
-		if (localSolver == null) {
-			return new LiteralSet();
-		}
-		final int[] coreDead = new int[localSolver.getSatInstance().getVariables().size()];
-		int index = 0;
-		for (final Vertex vertex : mig.getAdjList()) {
-			if (vertex.isCore()) {
-				coreDead[index++] = vertex.getVar();
+		if (coreDead == null) {
+			if (hasMig()) {
+				computeDeadCoreFeaturesMig();
+			} else {
+				computeDeadCoreFeatures();
 			}
 		}
-		final LiteralSet coreDeadFeature = new LiteralSet(Arrays.copyOf(coreDead, index));
-		if (!coreDeadFeature.isEmpty()) {
-			localSolver.assignmentPushAll(coreDeadFeature.getLiterals());
+		return coreDead;
+	}
+
+	public LiteralSet computeDeadCoreFeaturesMig() {
+		if (localSolver == null) {
+			coreDead = new LiteralSet();
+		} else {
+			final int[] coreDeadArray = new int[localSolver.getSatInstance().getVariables().size()];
+			int index = 0;
+			for (final Vertex vertex : mig.getAdjList()) {
+				if (vertex.isCore()) {
+					coreDeadArray[index++] = vertex.getVar();
+				}
+			}
+			coreDead = new LiteralSet(Arrays.copyOf(coreDeadArray, index));
+			if (!coreDead.isEmpty()) {
+				localSolver.assignmentPushAll(coreDead.getLiterals());
+			}
 		}
-		return coreDeadFeature;
+		return coreDead;
+	}
+
+	public LiteralSet computeDeadCoreFeatures() {
+		final AdvancedSatSolver solver = new AdvancedSatSolver(localSolver.getSatInstance());
+		final int[] firstSolution = solver.findSolution();
+		if (firstSolution != null) {
+			final int[] coreDeadArray = new int[firstSolution.length];
+			int coreDeadIndex = 0;
+			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			LiteralSet.resetConflicts(firstSolution, solver.findSolution());
+			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+
+			// find core/dead features
+			for (int i = 0; i < firstSolution.length; i++) {
+				final int varX = firstSolution[i];
+				if (varX != 0) {
+					solver.assignmentPush(-varX);
+					switch (solver.hasSolution()) {
+					case FALSE:
+						solver.assignmentReplaceLast(varX);
+						coreDeadArray[coreDeadIndex++] = varX;
+						break;
+					case TIMEOUT:
+						solver.assignmentPop();
+						break;
+					case TRUE:
+						solver.assignmentPop();
+						LiteralSet.resetConflicts(firstSolution, solver.getSolution());
+						solver.shuffleOrder(random);
+						break;
+					}
+				}
+			}
+			coreDead = new LiteralSet(Arrays.copyOf(coreDeadArray, coreDeadIndex));
+			if (!coreDead.isEmpty()) {
+				localSolver.assignmentPushAll(coreDead.getLiterals());
+			}
+		} else {
+			coreDead = new LiteralSet();
+		}
+		return coreDead;
 	}
 
 	public CNF getCnf() {
@@ -151,6 +202,10 @@ public class TWiseConfigurationUtil {
 
 	public boolean hasSolver() {
 		return localSolver != null;
+	}
+
+	public boolean hasMig() {
+		return mig != null;
 	}
 
 	public Random getRandom() {
@@ -190,9 +245,11 @@ public class TWiseConfigurationUtil {
 
 	public boolean isCombinationValid(ClauseList clauses) {
 		if (hasSolver()) {
-			for (final LiteralSet literalSet : clauses) {
-				if (isCombinationInvalidMIG(literalSet)) {
-					return false;
+			if (hasMig()) {
+				for (final LiteralSet literalSet : clauses) {
+					if (isCombinationInvalidMIG(literalSet)) {
+						return false;
+					}
 				}
 			}
 			for (final LiteralSet literalSet : clauses) {
@@ -206,7 +263,7 @@ public class TWiseConfigurationUtil {
 	}
 
 	public boolean isCombinationInvalidMIG(LiteralSet literals) {
-		if (hasSolver()) {
+		if (hasMig()) {
 			for (final int literal : literals.getLiterals()) {
 				if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literals)) {
 					return true;

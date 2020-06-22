@@ -55,7 +55,7 @@ public class TWiseConfigurationTester {
 			util = new TWiseConfigurationUtil(cnf, null);
 		}
 
-		getUtil().computeRandomSample();
+		getUtil().computeRandomSample(TWiseConfigurationGenerator.DEFAULT_RANDOM_SAMPLE_SIZE);
 		if (!cnf.getClauses().isEmpty()) {
 			getUtil().computeMIG();
 		}
