@@ -1,6 +1,5 @@
 package de.ovgu.featureide.fm.ui.views.constraintview.content;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -13,11 +12,17 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
 import de.ovgu.featureide.fm.core.explanations.Reason;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
+/**
+ * This class is the label provider for the ConstraintColumn. It displays the given Constraints as well as adds Explanations or Warnings in form of a circle if
+ * needed.
+ *
+ * @author Soeren Viegener
+ * @author Philipp Vulpius
+ */
 public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProvider {
 
 	private final int CIRCLE_DECORATION_SIZE = 16;
@@ -28,9 +33,15 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		this.controller = controller;
 	}
 
+	/**
+	 * Returns the text that should be displayed. This is usually a Constraint.
+	 *
+	 * @param element almost always a Constraint. Is a String, when no FeatureModelEditor is open to display a message to the user.
+	 * @return the text that should be displayed.
+	 */
 	@Override
 	public String getText(Object element) {
-		// TODO comment
+		// special case when no FeatureModelEditor is opened. Displays "Open a feature diagram" to the user.
 		if (element instanceof String) {
 			return (String) element;
 		} else {
@@ -51,6 +62,12 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		return super.getForeground(element);
 	}
 
+	/**
+	 * Iterates over the explanation reasons of the current FeatureModelEditor to get the warning color for a given constraint.
+	 *
+	 * @param constraint for which a color could be returned.
+	 * @return the color for the given Constraint if needed.
+	 */
 	private Color getConstraintColor(IConstraint constraint) {
 		if ((controller.getFeatureModelEditor() == null) || (controller.getFeatureModelEditor().diagramEditor.getActiveExplanation() == null)) {
 			return null;
@@ -69,6 +86,13 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		return null;
 	}
 
+	/**
+	 * Returns an image if an Explanation for a given Constraint if needed, null otherwise.
+	 *
+	 * @param element usually a Constraint for which an icon is displayed if there is a warning or redundancy for the given constraint. If there is no
+	 *        FeatureModelEditor open element is a String.
+	 * @return an image if needed.
+	 */
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof String) {

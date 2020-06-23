@@ -1,21 +1,27 @@
 package de.ovgu.featureide.fm.ui.views.constraintview.content;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.sat4j.specs.IConstr;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+
+/**
+ * This class is the label provider for the Description. It displays the given Description for the corresponding Constraint and replaces linebreaks.
+ *
+ * @author Soeren Viegener
+ * @author Philipp Vulpius
+ */
 public class ConstraintViewDescriptionColumnLabelProvider extends ColumnLabelProvider {
-    @Override
-    public String getText(Object element) {
-        // TODO comment
-        if(element instanceof String){
-            return "";
-        }else {
-            IConstraint constraint = (IConstraint) element;
-            String descriptionText = constraint.getDescription();
-            descriptionText = descriptionText.replaceAll("\n", " ");
-            return descriptionText;
-        }
-    }
+
+	@Override
+	public String getText(Object element) {
+		// in the special case that there is no FeatureModel opened, a String will be given. The DescriptionColumn should then not show anything.
+		if (element instanceof String) {
+			return "";
+		} else {
+			final IConstraint constraint = (IConstraint) element;
+			String descriptionText = constraint.getDescription();
+			descriptionText = descriptionText.replaceAll("\n", " ");
+			return descriptionText;
+		}
+	}
 }
