@@ -264,9 +264,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		coveredCount = 0;
 		invalidCount = 0;
 
-		samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
-		try {
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
 			samplingMonitor.start();
+		}
+		try {
 			final List<ClauseList> combinationListUncovered = new ArrayList<>();
 			count = coveredCount;
 			phaseCount++;
@@ -326,7 +328,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				}
 			}
 		} finally {
-			samplingMonitor.finish();
+			if (TWiseConfigurationGenerator.VERBOSE) {
+				samplingMonitor.finish();
+			}
 		}
 
 		curResult = util.getResultList();

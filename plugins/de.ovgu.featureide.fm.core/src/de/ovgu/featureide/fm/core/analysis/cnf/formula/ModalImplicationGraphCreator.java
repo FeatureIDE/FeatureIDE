@@ -32,10 +32,14 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 public class ModalImplicationGraphCreator extends ACreator<ModalImplicationGraph> {
 
 	private boolean complete = false;
+	private boolean simplified = true;
 
 	@Override
 	protected ModalImplicationGraph create() {
-		return LongRunningWrapper.runMethod(new MIGBuilder(formula.getElement(new CNFCreator()), complete));
+		final MIGBuilder migBuilder = new MIGBuilder(formula.getElement(new CNFCreator()));
+		migBuilder.setCheckRedundancy(simplified);
+		migBuilder.setDetectStrong(complete);
+		return LongRunningWrapper.runMethod(migBuilder);
 	}
 
 	public boolean isComplete() {
@@ -44,6 +48,14 @@ public class ModalImplicationGraphCreator extends ACreator<ModalImplicationGraph
 
 	public void setComplete(boolean complete) {
 		this.complete = complete;
+	}
+
+	public boolean isSimplified() {
+		return simplified;
+	}
+
+	public void setSimplified(boolean simplified) {
+		this.simplified = simplified;
 	}
 
 }

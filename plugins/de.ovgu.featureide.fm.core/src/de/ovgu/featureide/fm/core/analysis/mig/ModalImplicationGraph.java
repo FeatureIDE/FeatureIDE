@@ -40,8 +40,11 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	private static final long serialVersionUID = 5258868675944962032L;
 
-	public static ModalImplicationGraph build(CNF satInstance, boolean detectStrong) {
-		return LongRunningWrapper.runMethod(new MIGBuilder(satInstance, detectStrong));
+	public static ModalImplicationGraph build(CNF satInstance, boolean detectStrong, boolean checkRedundancy) {
+		final MIGBuilder migBuilder = new MIGBuilder(satInstance);
+		migBuilder.setCheckRedundancy(checkRedundancy);
+		migBuilder.setDetectStrong(detectStrong);
+		return LongRunningWrapper.runMethod(migBuilder);
 	}
 
 	final List<Vertex> adjList;

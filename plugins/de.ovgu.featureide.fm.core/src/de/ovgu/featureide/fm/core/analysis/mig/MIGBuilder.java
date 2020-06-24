@@ -74,17 +74,18 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final byte[] dfsMark;
 	private final AdjMatrix adjMatrix;
 	private final CNF satInstance;
-	private final boolean detectStrong;
 	private final ModalImplicationGraph mig;
 	private final int numberOfVariables;
 
 	private ISatSolver solver;
 
+	private boolean checkRedundancy = false;
+	private boolean detectStrong = false;
+
 	protected Random random = new Random(112358);
 
-	public MIGBuilder(CNF satInstance, boolean detectStrong) {
+	public MIGBuilder(CNF satInstance) {
 		this.satInstance = satInstance;
-		this.detectStrong = detectStrong;
 		numberOfVariables = satInstance.getVariables().size();
 		dfsMark = new byte[numberOfVariables];
 		adjMatrix = new AdjMatrix(numberOfVariables);
@@ -251,7 +252,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(satInstance, false));
 
 		for (final LiteralSet clause : newClauseList) {
-			if ((clause.getLiterals().length < 3) || !isRedundant(newSolver, clause)) {
+			if ((clause.getLiterals().length < 3) || !checkRedundancy || !isRedundant(newSolver, clause)) {
 				newSolver.addClause(clause);
 				adjMatrix.clauseList.add(clause);
 			}
@@ -320,7 +321,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 
 	public void readdEdges() {
 		for (int i = 0; i < adjMatrix.edges.length; i++) {
-			adjMatrix.edges[i] = 0;
+			Arrays.fill(adjMatrix.edges[i], (byte) 0);
 		}
 		for (final LiteralSet clause : adjMatrix.clauseList) {
 			addRelation(clause.getLiterals());
@@ -333,31 +334,29 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (indexX == indexY) {
 			return false;
 		}
-		final int combinationIndexXY = adjMatrix.getIndex(indexX, indexY);
-		final int combinationIndexYX = adjMatrix.getIndex(indexY, indexX);
 
-		final byte oldXY = adjMatrix.edges[combinationIndexXY];
-		final byte oldYX = adjMatrix.edges[combinationIndexYX];
+		final byte oldXY = adjMatrix.edges[indexX][indexY];
+		final byte oldYX = adjMatrix.edges[indexX][indexY];
 
 		if (signedVarX > 0) {
 			if (signedVarY > 0) {
-				adjMatrix.edges[combinationIndexXY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_01);
-				adjMatrix.edges[combinationIndexYX] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_01);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_01);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_01);
 			} else {
-				adjMatrix.edges[combinationIndexXY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_00);
-				adjMatrix.edges[combinationIndexYX] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_11);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_00);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_11);
 			}
 		} else {
 			if (signedVarY > 0) {
-				adjMatrix.edges[combinationIndexXY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_11);
-				adjMatrix.edges[combinationIndexYX] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_00);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_11);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_00);
 			} else {
-				adjMatrix.edges[combinationIndexXY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_10);
-				adjMatrix.edges[combinationIndexYX] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_10);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_10);
+				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_10);
 			}
 		}
 
-		return (oldXY != adjMatrix.edges[combinationIndexXY]) || (oldYX != adjMatrix.edges[combinationIndexYX]);
+		return (oldXY != adjMatrix.edges[indexX][indexY]) || (oldYX != adjMatrix.edges[indexX][indexY]);
 	}
 
 	private void addWeakRelation(final int signedVarX, final int signedVarY) {
@@ -366,42 +365,40 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (indexX == indexY) {
 			return;
 		}
-		final int combinationIndexXY = adjMatrix.getIndex(indexX, indexY);
-		final int combinationIndexYX = adjMatrix.getIndex(indexY, indexX);
 
-		final byte oldXY = adjMatrix.edges[combinationIndexXY];
-		final byte oldYX = adjMatrix.edges[combinationIndexYX];
+		final byte oldXY = adjMatrix.edges[indexX][indexY];
+		final byte oldYX = adjMatrix.edges[indexX][indexY];
 
 		if (signedVarX > 0) {
 			if (signedVarY > 0) {
 				if ((oldXY & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[combinationIndexXY] |= EDGE_01Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_01Q;
 				}
 				if ((oldYX & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[combinationIndexYX] |= EDGE_01Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_01Q;
 				}
 			} else {
 				if ((oldXY & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[combinationIndexXY] |= EDGE_00Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_00Q;
 				}
 				if ((oldYX & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[combinationIndexYX] |= EDGE_11Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_11Q;
 				}
 			}
 		} else {
 			if (signedVarY > 0) {
 				if ((oldXY & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[combinationIndexXY] |= EDGE_11Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_11Q;
 				}
 				if ((oldYX & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[combinationIndexYX] |= EDGE_00Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_00Q;
 				}
 			} else {
 				if ((oldXY & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[combinationIndexXY] |= EDGE_10Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_10Q;
 				}
 				if ((oldYX & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[combinationIndexYX] |= EDGE_10Q;
+					adjMatrix.edges[indexX][indexY] |= EDGE_10Q;
 				}
 			}
 		}
@@ -547,7 +544,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			final int rowIndex = i * adjMatrix.getNumVariables();
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
-				final byte b = adjMatrix.edges[rowIndex + j];
+				final byte b = adjMatrix.edges[rowIndex][j];
 				if ((adjMatrix.core[j] == 0) && ((positive && ((b & EDGE_WEAK_POSITIVE) != 0)) || (!positive && ((b & EDGE_WEAK_NEGATIVE) != 0)))) {
 
 					final int my1 = xModel1[j];
@@ -643,6 +640,22 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			}
 		}
 		throw new RuntimeException();
+	}
+
+	public boolean isCheckRedundancy() {
+		return checkRedundancy;
+	}
+
+	public void setCheckRedundancy(boolean checkRedundancy) {
+		this.checkRedundancy = checkRedundancy;
+	}
+
+	public boolean isDetectStrong() {
+		return detectStrong;
+	}
+
+	public void setDetectStrong(boolean detectStrong) {
+		this.detectStrong = detectStrong;
 	}
 
 }

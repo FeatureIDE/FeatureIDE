@@ -34,21 +34,21 @@ class AdjMatrix implements IEdgeTypes {
 
 	final List<LiteralSet> clauseList = new ArrayList<>();
 
-	final byte[] edges;
+	final byte[][] edges;
 	final byte[] core;
 	private final int numVariables;
 
 	public AdjMatrix(int numVariables) {
 		this.numVariables = numVariables;
 		core = new byte[numVariables];
-		edges = new byte[numVariables * numVariables];
+		edges = new byte[numVariables][numVariables];
 	}
 
 	public List<LiteralSet> getClauseList() {
 		return clauseList;
 	}
 
-	public byte[] getEdges() {
+	public byte[][] getEdges() {
 		return edges;
 	}
 
@@ -61,16 +61,12 @@ class AdjMatrix implements IEdgeTypes {
 	}
 
 	public byte getEdge(int fromIndex, int toIndex) {
-		return edges[getIndex(fromIndex, toIndex)];
+		return edges[fromIndex][toIndex];
 	}
 
 	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
-		final byte edge = edges[getIndex(fromIndex, toIndex)];
+		final byte edge = edges[fromIndex][toIndex];
 		return (byte) (fromSelected ? edge >>> 4 : edge);
-	}
-
-	int getIndex(final int indexX, final int indexY) {
-		return (indexX * numVariables) + indexY;
 	}
 
 }

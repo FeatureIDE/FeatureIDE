@@ -102,7 +102,10 @@ public class TWiseConfigurationUtil {
 		if (TWiseConfigurationGenerator.VERBOSE) {
 			System.out.println("Init graph... ");
 		}
-		mig = LongRunningWrapper.runMethod(new MIGBuilder(localSolver.getSatInstance(), false));
+		final MIGBuilder migBuilder = new MIGBuilder(localSolver.getSatInstance());
+		migBuilder.setCheckRedundancy(false);
+		migBuilder.setDetectStrong(false);
+		mig = LongRunningWrapper.runMethod(migBuilder);
 		strongHull = new LiteralSet[mig.getAdjList().size()];
 
 		for (final Vertex vertex : mig.getAdjList()) {
