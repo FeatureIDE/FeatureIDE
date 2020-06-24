@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-public abstract class SlicedCNFCreator extends ACreator<CNF> {
+public class SlicedCNFCreator extends ACreator<CNF> {
 
 	private final Predicate<IFeature> filter;
 
