@@ -25,7 +25,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.CreateConstraintInViewAction;
@@ -40,7 +39,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstr
 
 public class ConstraintViewSettingsMenu {
 
-	private ConstraintViewController controller;
+	private final ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 
 	private final ShowCollapsedConstraintsInViewAction collapseAction;
@@ -49,32 +48,26 @@ public class ConstraintViewSettingsMenu {
 
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
 		// create actions:
-		collapseAction = new ShowCollapsedConstraintsInViewAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
+		collapseAction = new ShowCollapsedConstraintsInViewAction(controller, this); // Action that Shows/Hides Collapsed Constraints
 		refreshAction = new RefreshConstraintViewAction(controller); // Action that lets the user refresh the view manually
 		createAction = new CreateConstraintInViewAction(controller); // Action that lets user create a new constraint
 		// create layout:
-		update(controller);
+		this.controller = controller;
 		createToolBarLayout();
 	}
 
 	/**
-	 * updates the current controller, graphicalfeaturemodel and actions (e.g. when the active diagram changed)
+	 * Sets the image and tooltip for the "Show collapsed constraints" Button.
+	 * 
+	 * @param collapse True: Show the "collapse"-image and tooltip. False: Show the "expand"-image and tooltip
 	 */
-	public void update(ConstraintViewController controller) {
-		this.controller = controller;
-		final FeatureModelEditor featureModelEditor = controller.getFeatureModelEditor();
-		if (featureModelEditor != null) {
-			setStateOfActions(true);
-			graphicalModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
-			refreshAction.update(controller);
-			collapseAction.update(graphicalModel);
-			if (graphicalModel.getLayout().showCollapsedConstraints()) {
-				collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("collapse.gif")));
-				collapseAction.setToolTipText("Hide Collapsed Constraints");
-			} else {
-				collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("expand.gif")));
-				collapseAction.setToolTipText("Show Collapsed Constraints");
-			}
+	public void setShowCollapsedConstraintsInViewActionImage(boolean collapse) {
+		if (collapse) {
+			collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("collapse.gif")));
+			collapseAction.setToolTipText("Hide Collapsed Constraints");
+		} else {
+			collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("expand.gif")));
+			collapseAction.setToolTipText("Show Collapsed Constraints");
 		}
 	}
 

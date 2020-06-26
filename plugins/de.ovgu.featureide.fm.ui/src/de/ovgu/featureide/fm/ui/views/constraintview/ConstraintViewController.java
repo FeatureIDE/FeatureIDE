@@ -37,6 +37,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -78,6 +81,24 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private boolean featureDiagramPageVisible = false;
 
 	/**
+	 * The constraint used to detect when the analysis is finished
+	 */
+	private IConstraint updateConstraint;
+
+	/**
+	 * The listener used on the updateConstraint. This listener is called in the FeatureDiagramEditor when the analysis is finished. This happens in
+	 * {@link FeatureDiagramEditor#refreshGraphics(AnalysesCollection)}. The whole constraintView is updated as we do not know of a way to figure out the exact
+	 * constraints affected by the analysis.
+	 */
+	private final IEventListener updateConstraintListener = new IEventListener() {
+
+		@Override
+		public void propertyChange(FeatureIDEEvent featureIDEEvent) {
+			constraintView.refresh();
+		}
+	};
+
+	/**
 	 * SelectionListener for the FeatureDiagramEditor
 	 */
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
@@ -111,6 +132,20 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			switch (event.getEventType()) {
 			case ACTIVE_EXPLANATION_CHANGED:
 				constraintView.filter.setActiveExplanation(featureModelEditor.diagramEditor.getActiveExplanation());
+				constraintView.refresh();
+				break;
+			case CONSTRAINT_DELETE:
+				if ((event.getOldValue() == updateConstraint) && (updateConstraint != null)) {
+					// remove the updateConstraintListener if the constraint is deleted
+					updateConstraint.removeListener(updateConstraintListener);
+					updateConstraint = getUpdateConstraint(featureModelEditor);
+					if (updateConstraint != null) {
+						// add a new updateConstraintListener to a new constraint
+						updateConstraint.addListener(updateConstraintListener);
+					}
+				}
+				constraintView.refresh();
+				break;
 			case MODEL_DATA_OVERWRITTEN:
 			case MODEL_DATA_CHANGED:
 			case MODEL_DATA_SAVED:
@@ -122,7 +157,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			case FEATURE_ADD_ABOVE:
 			case FEATURE_DELETE:
 			case CONSTRAINT_MODIFY:
-			case CONSTRAINT_DELETE:
 			case CONSTRAINT_ADD:
 			case FEATURE_COLLAPSED_CHANGED:
 			case FEATURE_COLLAPSED_ALL_CHANGED:
@@ -244,6 +278,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			return;
 		}
 
+		constraintView.getSearchBox().setText("");
+		constraintView.filter.clear();
+
 		// remove listeners from previous FeatureModelEditor
 		if (featureModelEditor != null) {
 			setConstraintsHidden(featureModelEditor, false);
@@ -252,19 +289,48 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			}
 			featureModelEditor.removePageChangedListener(pageChangeListener);
 			featureModelEditor.removeEventListener(eventListener);
+
+			if (updateConstraint != null) {
+				updateConstraint.removeListener(updateConstraintListener);
+			}
 		}
 
-		// add listeners to new FeatureModelEditor
+		// add listeners, etc. to new FeatureModelEditor
 		if (newFeatureModelEditor != null) {
 			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
 			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
 			newFeatureModelEditor.addEventListener(eventListener);
 			featureDiagramPageVisible = newFeatureModelEditor.getSelectedPage() instanceof FeatureDiagramEditor;
 			constraintView.resetSort();
+
+			updateConstraint = getUpdateConstraint(newFeatureModelEditor);
+			if (updateConstraint != null) {
+				updateConstraint.addListener(updateConstraintListener);
+			}
+
+			// update filter and settings menu to correctly handle "showCollapsedConstraints"
+			IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
+			constraintView.filter.setGraphicalFeatureModel(graphicalFeatureModel);
+			settingsMenu.setShowCollapsedConstraintsInViewActionImage(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 		}
 
 		featureModelEditor = newFeatureModelEditor;
 		refresh();
+	}
+
+	/**
+	 * Returns the first constraint in the FeatureModel of the VariableFormula. The FeatureModel returned by {@link FeatureModelManager#getVarObject()} is a
+	 * different one than {@link FeatureModelFormula#getFeatureModel()}.
+	 *
+	 * @param featureModelEditor The FeatureModelEditor that holds the FeatureModel
+	 * @return The first constraint in the FeatureModel
+	 */
+	private IConstraint getUpdateConstraint(FeatureModelEditor featureModelEditor) {
+		final List<IConstraint> graphicalConstraints = featureModelEditor.getFeatureModelManager().getVariableFormula().getFeatureModel().getConstraints();
+		if (!graphicalConstraints.isEmpty()) {
+			return graphicalConstraints.get(0);
+		}
+		return null;
 	}
 
 	/**

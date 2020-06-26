@@ -13,6 +13,7 @@ import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -24,9 +25,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class ConstraintViewFilter extends ViewerFilter {
 
 	private List<FeatureEditPart> selection;
-	private final List<IConstraint> explanationConstraints = new ArrayList<>();;
+	private final List<IConstraint> explanationConstraints = new ArrayList<>();
 	private String searchText = "";
+	private IGraphicalFeatureModel graphicalFeatureModel;
+
 	private final boolean caseSensitive = false;
+
+	/**
+	 * Sets the GraphicalFeatureModel to be used for filtering collapsed constraints
+	 *
+	 * @param graphicalFeatureModel The GraphicalFeatureModel to be used for filtering
+	 */
+	public void setGraphicalFeatureModel(IGraphicalFeatureModel graphicalFeatureModel) {
+		this.graphicalFeatureModel = graphicalFeatureModel;
+	}
 
 	/**
 	 * This method gets called whenever an Explanation in the FeatureModel is changed and updates the List of Explanations for the Constraints.
@@ -81,6 +93,13 @@ public class ConstraintViewFilter extends ViewerFilter {
 		}
 		final IConstraint constraint = (IConstraint) element;
 
+		// filter by collapsed features
+		if ((graphicalFeatureModel != null) && !graphicalFeatureModel.getLayout().showCollapsedConstraints()) {
+			if (graphicalFeatureModel.getGraphicalConstraint(constraint).isCollapsed()) {
+				return false;
+			}
+		}
+
 		// filter by selection and explanation
 		if ((selection != null) && !selection.isEmpty()) {
 
@@ -96,7 +115,6 @@ public class ConstraintViewFilter extends ViewerFilter {
 			}
 		}
 
-		// if no part is selected and there is no search
 		return true;
 	}
 
@@ -168,5 +186,15 @@ public class ConstraintViewFilter extends ViewerFilter {
 
 	public List<FeatureEditPart> getSelection() {
 		return selection;
+	}
+
+	/**
+	 * Clears the filter by removing any active explanation, selection, graphical feature model and search text.
+	 */
+	public void clear() {
+		setActiveExplanation(null);
+		setFeatureModelSelection(null);
+		setSearchText("");
+		setGraphicalFeatureModel(null);
 	}
 }
