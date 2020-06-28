@@ -1048,7 +1048,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
-		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationExtension());
+		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationFormat().getSuffix());
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());

@@ -102,7 +102,7 @@ public class JavaEditor extends CompilationUnitEditor {
 		try {
 			for (final IResource res : parent.members()) {
 				if (res instanceof IFile) {
-					if (composer.getConfigurationExtension().equals(res.getFileExtension())) {
+					if (composer.getConfigurationFormat().getSuffix().equals(res.getFileExtension())) {
 						return res.getName().split("[.]")[0];
 					}
 				}
