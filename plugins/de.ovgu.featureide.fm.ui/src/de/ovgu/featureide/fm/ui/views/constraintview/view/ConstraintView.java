@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -57,12 +59,17 @@ public class ConstraintView implements GUIDefaults {
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
 	// Style parameters for the view
-	private final int CONSTRAINT_NAME_WIDTH = 500;
-	private final int CONSTRAINT_DESCRIPTION_WIDTH = 300;
 	private final int CIRCLE_DECORATION_SIZE = 16;
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
+
+	// offset to account for the margin of the tree and the scrollbar
+	// this value is larger than needed to ensure correctness on all versions and operating systems
+	private static final int TREE_WIDTH_OFFSET = 50;
+	private static final int INITIAL_COLUMN_WIDTH = 500;
+	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
+	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
 
 	// UI elements
 	private TreeViewer treeViewer;
@@ -252,6 +259,24 @@ public class ConstraintView implements GUIDefaults {
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 		addColumns(treeViewer);
+
+		// resize columns on view size change
+		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
+
+			@Override
+			public void controlMoved(ControlEvent e) {
+				// not needed for column resizing
+			}
+
+			@Override
+			public void controlResized(ControlEvent e) {
+				// need to get the size of the tree's parent because the tree's correct size is not set yet
+				// need to subtract some offset to account for the margin of the tree and the scrollbar
+				final int treeWidth = treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
+				constraintColumn.setWidth((int) (treeWidth * NAME_COLUMN_WIDTH_RATIO));
+				descriptionColumn.setWidth((int) (treeWidth * DESCRIPTION_COLUMN_WIDTH_RATIO));
+			}
+		});
 	}
 
 	/**
@@ -261,13 +286,13 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		constraintColumn.setResizable(true);
 		constraintColumn.setMoveable(true);
-		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
+		constraintColumn.setWidth(INITIAL_COLUMN_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
 
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);
-		descriptionColumn.setWidth(CONSTRAINT_DESCRIPTION_WIDTH);
+		descriptionColumn.setWidth(INITIAL_COLUMN_WIDTH);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 	}
 
