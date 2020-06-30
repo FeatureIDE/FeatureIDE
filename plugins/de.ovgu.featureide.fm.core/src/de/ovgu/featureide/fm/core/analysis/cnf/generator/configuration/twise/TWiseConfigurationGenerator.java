@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,6 +96,22 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 	}
 
+	private final class MemoryMonitor implements Runnable {
+
+		@Override
+		public void run() {
+			final long allocatedMemory = Runtime.getRuntime().totalMemory();
+			final long freeMemory = Runtime.getRuntime().freeMemory();
+			final long usedMemory = allocatedMemory - freeMemory;
+			if (allocatedMemory > maxAllocatedMemory) {
+				maxAllocatedMemory = allocatedMemory;
+			}
+			if (usedMemory > maxUsedMemory) {
+				maxUsedMemory = usedMemory;
+			}
+		}
+	}
+
 	/**
 	 * Converts a set of single literals into a grouped expression list.
 	 *
@@ -136,6 +153,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	private int randomSampleSize = DEFAULT_RANDOM_SAMPLE_SIZE;
 	private int logFrequency = DEFAULT_LOG_FREQUENCY;
 	private boolean useMig = true;
+	private boolean migCheckRedundancy = true;
+	private boolean migDetectStrong = false;
+	private Path migPath = null;
+	private Deduce createConfigurationDeduce = Deduce.DP;
+	private Deduce extendConfigurationDeduce = Deduce.NONE;
+
+	public long maxUsedMemory = 0;
+	public long maxAllocatedMemory = 0;
 
 	protected TWiseConfigurationUtil util;
 	protected TWiseCombiner combiner;
@@ -151,6 +176,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	private ArrayList<TWiseConfiguration> bestResult = null;
 
 	protected MonitorThread samplingMonitor;
+	protected MonitorThread memoryMonitor;
 
 	public TWiseConfigurationGenerator(CNF cnf, int t) {
 		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, Integer.MAX_VALUE);
@@ -182,15 +208,24 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		}
 		util.setMaxSampleSize(maxSampleSize);
 		util.setRandom(getRandom());
+		util.setCreateConfigurationDeduce(createConfigurationDeduce);
+		util.setExtendConfigurationDeduce(extendConfigurationDeduce);
 
 		if (TWiseConfigurationGenerator.VERBOSE) {
 			System.out.println("Compute random sample... ");
 		}
 		util.computeRandomSample(randomSampleSize);
 		if (useMig && !util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
+			if (migPath != null) {
+				util.computeMIG(migPath);
+			} else {
+				util.computeMIG(migCheckRedundancy, migDetectStrong);
+			}
 		}
 
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			System.out.println("Set up PresenceConditionManager... ");
+		}
 		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
 		// TODO Variation Point: Building Combinations
@@ -206,12 +241,25 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		phaseCount = 0;
 
-		for (int i = 0; i < iterations; i++) {
-			trimConfigurations();
-			buildCombinations();
+		memoryMonitor = new MonitorThread(new MemoryMonitor(), 1);
+		memoryMonitor.start();
+		if (TWiseConfigurationGenerator.VERBOSE) {
+			samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
+			samplingMonitor.start();
 		}
+		try {
+			for (int i = 0; i < iterations; i++) {
+				trimConfigurations();
+				buildCombinations();
+			}
 
-		bestResult.forEach(configuration -> addResult(configuration.getCompleteSolution()));
+			bestResult.forEach(configuration -> addResult(configuration.getCompleteSolution()));
+		} finally {
+			memoryMonitor.finish();
+			if (TWiseConfigurationGenerator.VERBOSE) {
+				samplingMonitor.finish();
+			}
+		}
 	}
 
 	private void trimConfigurations() {
@@ -264,72 +312,62 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		coveredCount = 0;
 		invalidCount = 0;
 
-		if (TWiseConfigurationGenerator.VERBOSE) {
-			samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
-			samplingMonitor.start();
-		}
-		try {
-			final List<ClauseList> combinationListUncovered = new ArrayList<>();
-			count = coveredCount;
-			phaseCount++;
-			ICoverStrategy phase = phaseList.get(0);
-			while (true) {
-				final ClauseList combinedCondition = it.get();
-				if (combinedCondition == null) {
+		final List<ClauseList> combinationListUncovered = new ArrayList<>();
+		count = coveredCount;
+		phaseCount++;
+		ICoverStrategy phase = phaseList.get(0);
+		while (true) {
+			final ClauseList combinedCondition = it.get();
+			if (combinedCondition == null) {
+				break;
+			}
+			if (combinedCondition.isEmpty()) {
+				invalidCount++;
+			} else {
+				final CombinationStatus covered = phase.cover(combinedCondition);
+				switch (covered) {
+				case NOT_COVERED:
+					combinationListUncovered.add(combinedCondition);
+					break;
+				case COVERED:
+					coveredCount++;
+					combinedCondition.clear();
+					break;
+				case INVALID:
+					invalidCount++;
+					combinedCondition.clear();
+					break;
+				default:
+					combinedCondition.clear();
 					break;
 				}
-				if (combinedCondition.isEmpty()) {
+			}
+			count++;
+		}
+
+		int coveredIndex = -1;
+		for (int j = 1; j < phaseList.size(); j++) {
+			phaseCount++;
+			phase = phaseList.get(j);
+			count = coveredCount + invalidCount;
+			for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
+				final ClauseList combination = combinationListUncovered.get(i);
+				final CombinationStatus covered = phase.cover(combination);
+				switch (covered) {
+				case COVERED:
+					Collections.swap(combinationListUncovered, i, ++coveredIndex);
+					coveredCount++;
+					break;
+				case NOT_COVERED:
+					break;
+				case INVALID:
+					Collections.swap(combinationListUncovered, i, ++coveredIndex);
 					invalidCount++;
-				} else {
-					final CombinationStatus covered = phase.cover(combinedCondition);
-					switch (covered) {
-					case NOT_COVERED:
-						combinationListUncovered.add(combinedCondition);
-						break;
-					case COVERED:
-						coveredCount++;
-						combinedCondition.clear();
-						break;
-					case INVALID:
-						invalidCount++;
-						combinedCondition.clear();
-						break;
-					default:
-						combinedCondition.clear();
-						break;
-					}
+					break;
+				default:
+					break;
 				}
 				count++;
-			}
-
-			int coveredIndex = -1;
-			for (int j = 1; j < phaseList.size(); j++) {
-				phaseCount++;
-				phase = phaseList.get(j);
-				count = coveredCount + invalidCount;
-				for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
-					final ClauseList combination = combinationListUncovered.get(i);
-					final CombinationStatus covered = phase.cover(combination);
-					switch (covered) {
-					case COVERED:
-						Collections.swap(combinationListUncovered, i, ++coveredIndex);
-						coveredCount++;
-						break;
-					case NOT_COVERED:
-						break;
-					case INVALID:
-						Collections.swap(combinationListUncovered, i, ++coveredIndex);
-						invalidCount++;
-						break;
-					default:
-						break;
-					}
-					count++;
-				}
-			}
-		} finally {
-			if (TWiseConfigurationGenerator.VERBOSE) {
-				samplingMonitor.finish();
 			}
 		}
 
@@ -368,12 +406,52 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		this.useMig = useMig;
 	}
 
+	public Path getMigPath() {
+		return migPath;
+	}
+
+	public void setMigPath(Path migPath) {
+		this.migPath = migPath;
+	}
+
+	public boolean isMigCheckRedundancy() {
+		return migCheckRedundancy;
+	}
+
+	public void setMigCheckRedundancy(boolean migCheckRedundancy) {
+		this.migCheckRedundancy = migCheckRedundancy;
+	}
+
+	public boolean isMigDetectStrong() {
+		return migDetectStrong;
+	}
+
+	public void setMigDetectStrong(boolean migDetectStrong) {
+		this.migDetectStrong = migDetectStrong;
+	}
+
 	public int getLogFrequency() {
 		return logFrequency;
 	}
 
 	public void setLogFrequency(int logFrequency) {
 		this.logFrequency = logFrequency;
+	}
+
+	public Deduce getCreateConfigurationDeduce() {
+		return createConfigurationDeduce;
+	}
+
+	public void setCreateConfigurationDeduce(Deduce createConfigurationDeduce) {
+		this.createConfigurationDeduce = createConfigurationDeduce;
+	}
+
+	public Deduce getExtendConfigurationDeduce() {
+		return extendConfigurationDeduce;
+	}
+
+	public void setExtendConfigurationDeduce(Deduce extendConfigurationDeduce) {
+		this.extendConfigurationDeduce = extendConfigurationDeduce;
 	}
 
 }
