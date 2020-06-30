@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author Domenik Eichhorn
  */
 public class RefreshConstraintViewAction extends Action {
+
 	private static final Image REFRESH_IMG = FMUIPlugin.getImage("refresh_tab.gif");
 	private ConstraintViewController controller;
 
@@ -43,7 +44,6 @@ public class RefreshConstraintViewAction extends Action {
 
 	@Override
 	public void run() {
-		// TODO
 		controller.refresh();
 		controller.getView().refresh();
 	}

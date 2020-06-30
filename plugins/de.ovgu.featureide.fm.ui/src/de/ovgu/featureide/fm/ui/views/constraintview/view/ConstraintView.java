@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.views.constraintview.content.*;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -30,44 +29,41 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewComparator;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewConstraintColumnLabelProvider;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewContentProvider;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewDescriptionColumnLabelProvider;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewFilter;
 
 /**
- * This class represents the view (MVC) of the constraint view. It creates all UI elements and
- * provides methods to get the conten of the view.
+ * This class represents the view (MVC) of the constraint view.
  *
  * @author Rosiak Kamil
  * @author Domenik Eichhorn
  * @author Thomas Graave
  * @author Rahel Arens
+ * @author Soeren Viegener
+ * @author Philipp Vulpius
  */
 public class ConstraintView implements GUIDefaults {
 
-    @SuppressWarnings("unused")
-    private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
-    @SuppressWarnings("unused")
-    private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
-    private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+	@SuppressWarnings("unused")
+	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
+	@SuppressWarnings("unused")
+	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
+	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
     // Style parameters for the view
     private final String CONSTRAINT_HEADER = "Constraint";
     private final String DESCRIPTION_HEADER = "Description";
-    private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
 
     // offset to account for the margin of the tree and the scrollbar
     // this value is larger than needed to ensure correctness on all versions and operating systems
@@ -78,7 +74,6 @@ public class ConstraintView implements GUIDefaults {
 
     // UI elements
     private TreeViewer treeViewer;
-    private Tree tree;
     private Text searchBox;
 
     public ConstraintViewFilter filter;
@@ -92,45 +87,26 @@ public class ConstraintView implements GUIDefaults {
         init(parent);
     }
 
-    public void dispose() {
-        treeViewer.getTree().dispose();
-    }
-
-
-    /**
-     * This method returns the tree viewer
-     */
-    public TreeViewer getViewer() {
-        return treeViewer;
-    }
-
-    /**
-     * This method removes all constraints from the view
-     */
-    public void removeAll() {
-        if (treeViewer.getTree() != null) {
-            treeViewer.getTree().removeAll();
-        }
-    }
-
-    /**
-     * This method initializes the view
-     */
-    private void init(Composite parent) {
+	/**
+	 * Initializes the view by adding the search box, the TreeViewer and the content classes such as the ConstraintViewFilter, ConstraintViewComparator and
+	 * ConstraintViewContentProvider
+	 */
+	private void init(Composite parent) {
 
         parent.setLayout(new GridLayout(1, false));
 
-        final GridData searchBoxData = new GridData();
-        searchBoxData.grabExcessHorizontalSpace = true;
-        searchBoxData.horizontalAlignment = SWT.FILL;
-        searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
-        searchBox.setLayoutData(searchBoxData);
+		// create the search box
+		final GridData searchBoxData = new GridData();
+		searchBoxData.grabExcessHorizontalSpace = true;
+		searchBoxData.horizontalAlignment = SWT.FILL;
+		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
+		searchBox.setLayoutData(searchBoxData);
 
-        treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-        createColumns();
-        tree = treeViewer.getTree();
-        tree.setHeaderVisible(true);
-        tree.setLinesVisible(true);
+		// create the tree viewer
+		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		createColumns();
+		treeViewer.getTree().setHeaderVisible(true);
+		treeViewer.getTree().setLinesVisible(true);
 
         treeViewer.setContentProvider(new ConstraintViewContentProvider());
         filter = new ConstraintViewFilter();
@@ -147,43 +123,44 @@ public class ConstraintView implements GUIDefaults {
         treeData.verticalAlignment = SWT.FILL;
         treeViewer.getControl().setLayoutData(treeData);
 
-        // XXX Not available for Eclipse Neon or below
+		// XXX Not available for Eclipse Neon or below
 //		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
 //		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
-        tree.setHeaderVisible(true);
-        tree.setLinesVisible(true);
-        createColumns();
-    }
+	}
 
-    /**
-     * Adds the columns with topics to the tree viewer
-     * TODO
-     */
-    private void createColumns() {
+	/**
+	 * Creates the columns for the TreeViewer
+	 */
+	private void createColumns() {
 
-        TreeViewerColumn constraintColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
-        constraintColumn.getColumn().setText(CONSTRAINT_HEADER);
-        constraintColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
-        constraintColumn.getColumn().setResizable(true);
-        constraintColumn.getColumn().setMoveable(true);
-        constraintColumn.setLabelProvider(new ConstraintViewConstraintColumnLabelProvider(controller));
-        constraintColumn.getColumn().addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
-                treeViewer.getTree().setSortDirection(comparator.getDirection());
-                treeViewer.getTree().setSortColumn(constraintColumn.getColumn());
-                refresh();
-            }
-        });
+		final TreeViewerColumn constraintColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+		constraintColumn.getColumn().setText(CONSTRAINT_HEADER);
+		constraintColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+		constraintColumn.getColumn().setResizable(true);
+		constraintColumn.getColumn().setMoveable(true);
+		constraintColumn.setLabelProvider(new ConstraintViewConstraintColumnLabelProvider(controller));
 
-        TreeViewerColumn descriptionColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+		// sort when clicking on the header of the column
+		constraintColumn.getColumn().addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
+				treeViewer.getTree().setSortDirection(comparator.getDirection());
+				treeViewer.getTree().setSortColumn(constraintColumn.getColumn());
+				refresh();
+			}
+		});
+
+		final TreeViewerColumn descriptionColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
         descriptionColumn.getColumn().setText(DESCRIPTION_HEADER);
         descriptionColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
         descriptionColumn.getColumn().setResizable(true);
         descriptionColumn.getColumn().setMoveable(true);
         descriptionColumn.setLabelProvider(new ConstraintViewDescriptionColumnLabelProvider());
-        descriptionColumn.getColumn().addSelectionListener(new SelectionAdapter() {
+
+		// sort when clicking on the header of the column
+		descriptionColumn.getColumn().addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 comparator.setColumn(ConstraintViewComparator.DESCRIPTION_COLUMN);
@@ -225,13 +202,16 @@ public class ConstraintView implements GUIDefaults {
         treeViewer.getTree().setSortColumn(treeViewer.getTree().getColumn(0));
     }
 
-    /**
-     * Text searchBox
-     */
-    public Text getSearchBox() {
-        return searchBox;
+    public TreeViewer getViewer() {
+     return treeViewer;
+	}
 
-    }
+    public Text getSearchBox() {
+        return searchBox;}
+
+    public void dispose() {
+		treeViewer.getTree().dispose();
+	}
 
     public void refresh() {
         treeViewer.refresh();

@@ -46,12 +46,10 @@ public class ConstraintViewPartListener implements IPartListener {
 	public void partActivated(IWorkbenchPart part) {
 		updateActiveEditor(part);
 
-		// TODO look at this:
-		if(!controller.isConstraintsViewVisible()){
+		if (!controller.isConstraintsViewVisible()) {
 			controller.setConstraintsHidden(controller.getFeatureModelEditor(), false);
-		}else if(part instanceof ConstraintViewController){
+		} else if (part instanceof ConstraintViewController) {
 			controller.refresh();
-			//controller.setConstraintsHidden(controller.getFeatureModelEditor(), true);
 		}
 	}
 
@@ -67,8 +65,7 @@ public class ConstraintViewPartListener implements IPartListener {
 
 	@Override
 	public void partDeactivated(IWorkbenchPart part) {
-		// TODO needed?
-		//updateActiveEditor(part);
+		// this method is not needed. Every case is covered in the other events
 	}
 
 	@Override
@@ -76,11 +73,11 @@ public class ConstraintViewPartListener implements IPartListener {
 		updateActiveEditor(part);
 	}
 
-	private void updateActiveEditor(IWorkbenchPart part){
-		IEditorPart activeEditor = part.getSite().getPage().getActiveEditor();
-		if(activeEditor instanceof FeatureModelEditor){
+	private void updateActiveEditor(IWorkbenchPart part) {
+		final IEditorPart activeEditor = part.getSite().getPage().getActiveEditor();
+		if (activeEditor instanceof FeatureModelEditor) {
 			controller.setFeatureModelEditor((FeatureModelEditor) activeEditor);
-		}else {
+		} else {
 			controller.setFeatureModelEditor(null);
 		}
 	}

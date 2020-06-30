@@ -14,26 +14,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class tests the ConstraintViewFilter. As test for the selection in the feature model would require too much mockup, only the search is tested
+ *
+ * @author Soeren Viegener
+ * @author Philipp Vulpius
+ */
 public class ConstraintViewFilterTest {
     private static final String MOCKUP_FEATURE_MODEL_FACTORY_ID = "MOCKUP_FEATURE_MODEL_FACTORY_ID";
 
-    private static final String[] SEARCH_STRINGS = new String[]{
-            "feature",
-            "2",
-            "package",
-            "a",
-            "b",
-            "if",
-            "and",
-            "6",
-            "++",
-            ".*feature.*",
-            ".*\\d"
-    };
-
-
     private FeatureModel featureModel = new FeatureModel(MOCKUP_FEATURE_MODEL_FACTORY_ID);
-    private List<Object> createList(String[] constraintStrings) {
+
+
+    /**
+     * Creates a list of constraints from an array of String descriptions of those constraints
+     * @param constraintStrings An array of Strings containing constraint descriptions
+     * @return List of Constraints created from the descriptions
+     */
+    private List<Object> createConstraintList(String[] constraintStrings) {
 
         List<Object> constraintList = new ArrayList<>();
 
@@ -51,11 +49,14 @@ public class ConstraintViewFilterTest {
         return constraintList;
     }
 
+    /**
+     * Tests the search functionality of the filter by using different search texts and checking the results
+     */
     @Test
     public void testSearch() {
         ConstraintViewFilter filter = new ConstraintViewFilter();
 
-        List<Object> constraintList = createList(CONSTRAINT_STRINGS);
+        List<Object> constraintList = createConstraintList(CONSTRAINT_STRINGS);
         List<Object> filteredConstraintList;
 
         for (int i = 0; i < SEARCH_STRINGS.length; i++) {
@@ -72,6 +73,13 @@ public class ConstraintViewFilterTest {
         }
     }
 
+    /**
+     * Filters a list of objects using the given filter. This is a mockup for what would actually happen when using a content provider
+     *
+     * @param list List of objects to be filtered
+     * @param filter ConstraintViewFilter
+     * @return Filtered list of objects for which the filter returned true
+     */
     private List<Object> filterList(List<Object> list, ConstraintViewFilter filter) {
         List<Object> result = new ArrayList<>();
         for (Object l : list) {
@@ -100,7 +108,6 @@ public class ConstraintViewFilterTest {
             "Package",    // 12
             "STRAWBERRIES"  // 13
     };
-
     private static final String[] CONSTRAINT_STRINGS = new String[]{
             /* 0 */ "not feature0",
             /* 1 */ "not STRAWBERRIES",
@@ -119,9 +126,19 @@ public class ConstraintViewFilterTest {
             /* 12*/ "feature0 implies ( feature1 or feature2 or feature3 or feature4 )",
             /* 13*/ "Package and not feature0"
     };
-
-    // "and", "not", "iff", etc. should not be searchable
-
+    private static final String[] SEARCH_STRINGS = new String[]{
+            "feature",
+            "2",
+            "package",
+            "a",
+            "b",
+            "if",
+            "and",
+            "6",
+            "++",
+            ".*feature.*",
+            ".*\\d"
+    };
     private static final int[][] SEARCH_RESULTS = new int[][]{
             {0, 2, 5, 6, 8, 10, 11, 12, 13},
             {4, 6, 10, 11, 12},
@@ -134,5 +151,6 @@ public class ConstraintViewFilterTest {
             {},
             {0, 2, 5, 6, 8, 10, 11, 12, 13},
             {0, 4, 5, 6, 8, 10, 11, 12, 13}
+
     };
 }
