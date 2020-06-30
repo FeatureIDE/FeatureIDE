@@ -20,10 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.*;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -43,7 +48,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
+ * This class represents the view (MVC) of the constraint view. It creates all UI elements and
+ * provides methods to get the conten of the view.
  *
  * @author Rosiak Kamil
  * @author Domenik Eichhorn
@@ -52,256 +58,182 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  */
 public class ConstraintView implements GUIDefaults {
 
-	@SuppressWarnings("unused")
-	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
-	@SuppressWarnings("unused")
-	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
-	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+    @SuppressWarnings("unused")
+    private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
+    @SuppressWarnings("unused")
+    private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
+    private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
-	// Style parameters for the view
-	private final int CIRCLE_DECORATION_SIZE = 16;
-	private final String CONSTRAINT_HEADER = "Constraint";
-	private final String DESCRIPTION_HEADER = "Description";
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
+    // Style parameters for the view
+    private final String CONSTRAINT_HEADER = "Constraint";
+    private final String DESCRIPTION_HEADER = "Description";
+    private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
 
-	// offset to account for the margin of the tree and the scrollbar
-	// this value is larger than needed to ensure correctness on all versions and operating systems
-	private static final int TREE_WIDTH_OFFSET = 50;
-	private static final int INITIAL_COLUMN_WIDTH = 500;
-	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
-	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
+    // offset to account for the margin of the tree and the scrollbar
+    // this value is larger than needed to ensure correctness on all versions and operating systems
+    private static final int TREE_WIDTH_OFFSET = 50;
+    private static final int INITIAL_COLUMN_WIDTH = 500;
+    private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
+    private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
 
-	// UI elements
-	private TreeViewer treeViewer;
-	private Tree tree;
-	private Text searchBox;
+    // UI elements
+    private TreeViewer treeViewer;
+    private Tree tree;
+    private Text searchBox;
 
-	private final ConstraintViewController controller;
+    public ConstraintViewFilter filter;
+    private ConstraintViewComparator comparator;
 
-	private TreeColumn constraintColumn, descriptionColumn;
 
-	public void dispose() {
-		treeViewer.getTree().dispose();
-	}
+    private final ConstraintViewController controller;
 
-	public ConstraintView(Composite parent, ConstraintViewController controller) {
-		this.controller = controller;
-		init(parent);
-	}
+    public ConstraintView(Composite parent, ConstraintViewController controller) {
+        this.controller = controller;
+        init(parent);
+    }
 
-	/**
-	 * This method adds a constraint to the view
-	 */
-	public TreeItem addItem(IConstraint element) {
-		final TreeItem item = createTreeItem(element);
-		String displayName = ((IConstraint) element).getDisplayName();
-		displayName = stringStyling(displayName);
-		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
-		if (((tree.getItemCount() % 2) == 1)) {
-			item.setBackground(ROW_ALTER_COLOR);
-		}
-		if (controller.getConstraintProperty(element).hasStatus(ConstraintStatus.REDUNDANT)) {
-			item.setImage(FM_INFO);
-		}
-		tree.setHeaderVisible(true);
-		return item;
-	}
+    public void dispose() {
+        treeViewer.getTree().dispose();
+    }
 
-	/**
-	 * This method creates a TreeItem and adds the constraint as data to it.
-	 */
-	public TreeItem createTreeItem(IConstraint constraint) {
-		final TreeItem item = new TreeItem(tree, SWT.None);
-		item.setData(constraint);
-		return item;
-	}
 
-	/**
-	 * This method decorates the icon of the TreeItem with the evidence color of the explanation.
-	 *
-	 * @param constraint the constraint that would be shown in the view.
-	 * @param color the evidence color of the explanation.
-	 */
-	public void addDecoratedItem(IConstraint constraint, Color color) {
-		final TreeItem item = addItem(constraint);
-		Image elementImg;
-		if (color == null) {
-			elementImg = FM_INFO;
-		} else {
-			elementImg = getColoredCircleIcon(color);
-		}
-		item.setImage(elementImg);
-	}
+    /**
+     * This method returns the tree viewer
+     */
+    public TreeViewer getViewer() {
+        return treeViewer;
+    }
 
-	/**
-	 * Changes the existing item to a decorated item
-	 */
-	public void changeToDecoratedItem(IConstraint constraint, Color color) {
-		for (final TreeItem item : tree.getItems()) {
-			if (item.getData() instanceof IConstraint) {
-				if (item.getData().equals(constraint)) {
-					Image elementImg;
-					if (color == null) {
-						elementImg = FM_INFO;
-					} else {
-						elementImg = getColoredCircleIcon(color);
-					}
-					item.setImage(elementImg);
-				}
-			}
-		}
-	}
+    /**
+     * This method removes all constraints from the view
+     */
+    public void removeAll() {
+        if (treeViewer.getTree() != null) {
+            treeViewer.getTree().removeAll();
+        }
+    }
 
-	/**
-	 * This method draws a circle icon filled with the parameters color.
-	 *
-	 * @param color that the icon will be filled with.
-	 * @return
-	 */
-	private Image getColoredCircleIcon(Color color) {
-		final Image image = new Image(Display.getDefault(), CIRCLE_DECORATION_SIZE, CIRCLE_DECORATION_SIZE);
-		final GC gc = new GC(image);
-		gc.setBackground(color);
-		gc.setAntialias(SWT.ON);
-		gc.fillOval(0, 0, CIRCLE_DECORATION_SIZE, CIRCLE_DECORATION_SIZE);
-		gc.dispose();
-		return image;
-	}
+    /**
+     * This method initializes the view
+     */
+    private void init(Composite parent) {
 
-	/**
-	 * Removes decoration from item
-	 */
-	public void undecorateItem(IConstraint constraint) {
-		for (final TreeItem item : tree.getItems()) {
-			if (item.getData() instanceof IConstraint) {
-				if (item.getData().equals(constraint)) {
-					if (controller.getConstraintProperty(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
-						item.setImage(FM_INFO);
-					} else {
-						// cast needed because of overloaded method setImage
-						item.setImage((Image) null);
-					}
-				}
-			}
-		}
+        parent.setLayout(new GridLayout(1, false));
 
-	}
+        final GridData searchBoxData = new GridData();
+        searchBoxData.grabExcessHorizontalSpace = true;
+        searchBoxData.horizontalAlignment = SWT.FILL;
+        searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
+        searchBox.setLayoutData(searchBoxData);
 
-	/**
-	 * replaces logical connectives with unicode signs
-	 */
-	private String stringStyling(String string) {
-		string = string.replace("|", "\u2228");
-		string = string.replace("<=>", "\u21D4");
-		string = string.replace("=>", "\u21D2");
-		string = string.replace("&", "\u2227");
-		string = string.replace("-", "\u00AC");
-		return string;
-	}
+        treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+        createColumns();
+        tree = treeViewer.getTree();
+        tree.setHeaderVisible(true);
+        tree.setLinesVisible(true);
 
-	/**
-	 * This method adds an item to represent that no feature model editor is activated or no feature model is loaded.
-	 */
-	public void addNoFeatureModelItem() {
-		removeAll();
-		final TreeItem item = new TreeItem(tree, SWT.None);
-		item.setText(DEFAULT_MESSAGE);
-		item.setImage(DEFAULT_IMAGE);
-		tree.setHeaderVisible(false);
-	}
+        treeViewer.setContentProvider(new ConstraintViewContentProvider());
+        filter = new ConstraintViewFilter();
+        treeViewer.addFilter(filter);
 
-	/**
-	 * This method removes a constraint from the view
-	 */
-	public void removeItem(IConstraint element) {
-		treeViewer.remove(element);
-	}
+        comparator = new ConstraintViewComparator();
+        treeViewer.setComparator(comparator);
+        resetSort();
 
-	/**
-	 * This method returns the tree viewer
-	 */
-	public TreeViewer getViewer() {
-		return treeViewer;
-	}
+        final GridData treeData = new GridData();
+        treeData.grabExcessHorizontalSpace = true;
+        treeData.horizontalAlignment = SWT.FILL;
+        treeData.grabExcessVerticalSpace = true;
+        treeData.verticalAlignment = SWT.FILL;
+        treeViewer.getControl().setLayoutData(treeData);
 
-	/**
-	 * This method removes all constraints from the view
-	 */
-	public void removeAll() {
-		if (treeViewer.getTree() != null) {
-			treeViewer.getTree().removeAll();
-		}
-	}
-
-	/**
-	 * This method initializes the view
-	 */
-	private void init(Composite parent) {
-		parent.setLayout(new GridLayout(1, false));
-
-		final GridData boxData = new GridData();
-		boxData.grabExcessHorizontalSpace = true;
-		boxData.horizontalAlignment = SWT.FILL;
-		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
-		searchBox.setLayoutData(boxData);
-
-		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-		final GridData treeData = new GridData();
-		treeData.grabExcessHorizontalSpace = true;
-		treeData.horizontalAlignment = SWT.FILL;
-		treeData.grabExcessVerticalSpace = true;
-		treeData.verticalAlignment = SWT.FILL;
-		tree = treeViewer.getTree();
-		tree.setLayoutData(treeData);
-		// XXX Not available for Eclipse Neon or below
+        // XXX Not available for Eclipse Neon or below
 //		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
 //		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
-		tree.setHeaderVisible(true);
-		tree.setLinesVisible(true);
-		addColumns(treeViewer);
+        tree.setHeaderVisible(true);
+        tree.setLinesVisible(true);
+        createColumns();
+    }
 
-		// resize columns on view size change
-		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
+    /**
+     * Adds the columns with topics to the tree viewer
+     * TODO
+     */
+    private void createColumns() {
 
-			@Override
-			public void controlMoved(ControlEvent e) {
-				// not needed for column resizing
-			}
+        TreeViewerColumn constraintColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+        constraintColumn.getColumn().setText(CONSTRAINT_HEADER);
+        constraintColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+        constraintColumn.getColumn().setResizable(true);
+        constraintColumn.getColumn().setMoveable(true);
+        constraintColumn.setLabelProvider(new ConstraintViewConstraintColumnLabelProvider(controller));
+        constraintColumn.getColumn().addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
+                treeViewer.getTree().setSortDirection(comparator.getDirection());
+                treeViewer.getTree().setSortColumn(constraintColumn.getColumn());
+                refresh();
+            }
+        });
 
-			@Override
-			public void controlResized(ControlEvent e) {
-				// need to get the size of the tree's parent because the tree's correct size is not set yet
-				// need to subtract some offset to account for the margin of the tree and the scrollbar
-				final int treeWidth = treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
-				constraintColumn.setWidth((int) (treeWidth * NAME_COLUMN_WIDTH_RATIO));
-				descriptionColumn.setWidth((int) (treeWidth * DESCRIPTION_COLUMN_WIDTH_RATIO));
-			}
-		});
-	}
+        TreeViewerColumn descriptionColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+        descriptionColumn.getColumn().setText(DESCRIPTION_HEADER);
+        descriptionColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+        descriptionColumn.getColumn().setResizable(true);
+        descriptionColumn.getColumn().setMoveable(true);
+        descriptionColumn.setLabelProvider(new ConstraintViewDescriptionColumnLabelProvider());
+        descriptionColumn.getColumn().addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                comparator.setColumn(ConstraintViewComparator.DESCRIPTION_COLUMN);
+                treeViewer.getTree().setSortDirection(comparator.getDirection());
+                treeViewer.getTree().setSortColumn(descriptionColumn.getColumn());
+                refresh();
+            }
+        });
 
-	/**
-	 * Adds the columns with topics to the tree viewer
-	 */
-	private void addColumns(TreeViewer viewer) {
-		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
-		constraintColumn.setResizable(true);
-		constraintColumn.setMoveable(true);
-		constraintColumn.setWidth(INITIAL_COLUMN_WIDTH);
-		constraintColumn.setText(CONSTRAINT_HEADER);
+        // resize columns on view size change
+        treeViewer.getTree().getParent().addControlListener(new ControlListener() {
 
-		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
-		descriptionColumn.setResizable(true);
-		descriptionColumn.setMoveable(true);
-		descriptionColumn.setWidth(INITIAL_COLUMN_WIDTH);
-		descriptionColumn.setText(DESCRIPTION_HEADER);
-	}
+            @Override
+            public void controlMoved(ControlEvent e) {
+                // not needed for column resizing
+            }
 
-	/**
-	 * Text searchBox
-	 */
-	public Text getSearchBox() {
-		return searchBox;
+            @Override
+            public void controlResized(ControlEvent e) {
+                // need to get the size of the tree's parent because the tree's correct size is
+                // not set yet
+                // need to subtract some offset to account for the margin of the tree and the
+                // scrollbar
+                final int treeWidth =
+                        treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
+                constraintColumn.getColumn().setWidth((int) (treeWidth * NAME_COLUMN_WIDTH_RATIO));
+                descriptionColumn.getColumn().setWidth((int) (treeWidth * DESCRIPTION_COLUMN_WIDTH_RATIO));
+            }
+        });
+    }
 
-	}
+    /**
+     * Resets the sorting of the ConstraintView to the constraint column in ascending order.
+     */
+    public void resetSort() {
+        comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
+        comparator.setDirection(ConstraintViewComparator.ASCENDING);
+        treeViewer.getTree().setSortDirection(comparator.getDirection());
+        treeViewer.getTree().setSortColumn(treeViewer.getTree().getColumn(0));
+    }
 
+    /**
+     * Text searchBox
+     */
+    public Text getSearchBox() {
+        return searchBox;
+
+    }
+
+    public void refresh() {
+        treeViewer.refresh();
+    }
 }

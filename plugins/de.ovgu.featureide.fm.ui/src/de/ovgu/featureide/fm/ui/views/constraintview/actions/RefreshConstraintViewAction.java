@@ -43,7 +43,9 @@ public class RefreshConstraintViewAction extends Action {
 
 	@Override
 	public void run() {
-		controller.refreshView(controller.getFeatureModelManager());
+		// TODO
+		controller.refresh();
+		controller.getView().refresh();
 	}
 
 	/**
