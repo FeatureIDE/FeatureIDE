@@ -74,7 +74,7 @@ public class ConstraintViewContextMenu {
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
 		contextMenu.add(new CreateConstraintAction(viewer, controller.getFeatureModelManager()));
 		contextMenu.add(new FocusOnContainedFeaturesInViewAction(viewer, controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel()));
-		contextMenu.add(new FocusOnExplanationInViewAction(controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel(), viewer));
+		contextMenu.add(new FocusOnExplanationInViewAction(viewer, controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel()));
 		contextMenu.add(new EditConstraintInViewAction(viewer, controller.getFeatureModelManager()));
 		contextMenu.add(new DeleteConstraintInViewAction(viewer, controller.getFeatureModelManager()));
 	}
