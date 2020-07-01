@@ -50,6 +50,7 @@ public class ConstraintViewPartListener implements IPartListener {
 			controller.setConstraintsHidden(controller.getFeatureModelEditor(), false);
 		} else if (part instanceof ConstraintViewController) {
 			controller.refresh();
+			controller.getView().refresh();
 		}
 	}
 
