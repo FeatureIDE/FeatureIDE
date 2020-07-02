@@ -146,6 +146,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
 	protected int phaseCount;
+	protected boolean initialized = false;
 
 	private List<TWiseConfiguration> curResult = null;
 	private ArrayList<TWiseConfiguration> bestResult = null;
@@ -170,34 +171,37 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		this.nodes = nodes;
 	}
 
-	private void init() {
-		if (TWiseConfigurationGenerator.VERBOSE) {
-			System.out.println("Create util instance... ");
-		}
-		final CNF cnf = solver.getSatInstance();
-		if (cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, null);
-		} else {
-			util = new TWiseConfigurationUtil(cnf, solver);
-		}
-		util.setMaxSampleSize(maxSampleSize);
-		util.setRandom(getRandom());
+	public void init() {
+		if (!initialized) {
+			if (TWiseConfigurationGenerator.VERBOSE) {
+				System.out.println("Create util instance... ");
+			}
+			final CNF cnf = solver.getSatInstance();
+			if (cnf.getClauses().isEmpty()) {
+				util = new TWiseConfigurationUtil(cnf, null);
+			} else {
+				util = new TWiseConfigurationUtil(cnf, solver);
+			}
+			util.setMaxSampleSize(maxSampleSize);
+			util.setRandom(getRandom());
 
-		if (TWiseConfigurationGenerator.VERBOSE) {
-			System.out.println("Compute random sample... ");
-		}
-		util.computeRandomSample(randomSampleSize);
-		if (useMig && !util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
-		}
+			if (TWiseConfigurationGenerator.VERBOSE) {
+				System.out.println("Compute random sample... ");
+			}
+			util.computeRandomSample(randomSampleSize);
+			if (useMig && !util.getCnf().getClauses().isEmpty()) {
+				util.computeMIG();
+			}
 
-		// TODO Variation Point: Sorting Nodes
-		presenceConditionManager = new PresenceConditionManager(util, nodes);
-		// TODO Variation Point: Building Combinations
-		combiner = new TWiseCombiner(cnf.getVariables().size());
+			// TODO Variation Point: Sorting Nodes
+			presenceConditionManager = new PresenceConditionManager(util, nodes);
+			// TODO Variation Point: Building Combinations
+			combiner = new TWiseCombiner(cnf.getVariables().size());
 
-		solver.useSolutionList(0);
-		solver.setSelectionStrategy(SelectionStrategy.ORG);
+			solver.useSolutionList(0);
+			solver.setSelectionStrategy(SelectionStrategy.ORG);
+			initialized = true;
+		}
 	}
 
 	@Override
