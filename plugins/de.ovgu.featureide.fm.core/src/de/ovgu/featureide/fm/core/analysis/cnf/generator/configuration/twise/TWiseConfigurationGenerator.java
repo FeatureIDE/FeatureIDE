@@ -154,6 +154,9 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, t, solver);
 		}
 		util.setMaxSampleSize(maxSampleSize);
+		if (!util.getCnf().getClauses().isEmpty()) {
+			util.computeMIG();
+		}
 
 		// TODO Variation Point: Sorting Nodes
 		presenceConditionManager = new PresenceConditionManager(util, nodes);
@@ -169,9 +172,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		util.setRandom(getRandom());
 
 		util.computeRandomSample();
-		if (!util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
-		}
 
 		phaseCount = 0;
 

@@ -55,7 +55,7 @@ public interface IConfigurationBuilderBasics {
 	};
 
 	enum TWise {
-		ICPL, CHVATAL, CASA, INCLING
+		ICPL, CHVATAL, CASA, INCLING, YASA
 	}
 
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
@@ -112,4 +112,5 @@ public interface IConfigurationBuilderBasics {
 	int ICPL_MAX = 3;
 	int CASA_MAX = 6;
 	int MASK_MAX = 2;
+	int YASA_MAX = 10;
 }

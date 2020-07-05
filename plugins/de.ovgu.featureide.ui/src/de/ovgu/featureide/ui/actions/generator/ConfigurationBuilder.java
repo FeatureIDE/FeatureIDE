@@ -20,10 +20,14 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CASA_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YASA;
 
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
@@ -65,6 +69,7 @@ import de.ovgu.featureide.ui.actions.generator.configuration.ICPLConfigurationGe
 import de.ovgu.featureide.ui.actions.generator.configuration.IncLingConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.ModuleConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.configuration.RandConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.YasaConfigurationGenerator;
 import de.ovgu.featureide.ui.actions.generator.sorter.AbstractConfigurationSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.InteractionSorter;
 import de.ovgu.featureide.ui.actions.generator.sorter.PriorizationSorter;
@@ -256,13 +261,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
-			if (algorithm.equals(INCLING)) {
+			if (algorithm.equals(YASA)) {
+				configurationGenerator = new YasaConfigurationGenerator(this, featureModel, t);
+			} else if (algorithm.equals(INCLING)) {
 				configurationGenerator = new IncLingConfigurationGenerator(this, featureModel);
-			} else if (algorithm.equals("ICPL")) {
+			} else if (algorithm.equals(ICPL)) {
 				configurationGenerator = new ICPLConfigurationGenerator(this, featureModel, t);
-			} else if (algorithm.equals("Chvatal")) {
+			} else if (algorithm.equals(CHVATAL)) {
 				configurationGenerator = new CHVATALConfigurationGenerator(this, featureModel, t);
-			} else if (algorithm.equals("CASA")) {
+			} else if (algorithm.equals(CASA_)) {
 				configurationGenerator = new CASAConfigurationGenerator(this, featureModel, t);
 			} else {
 				throw new RuntimeException(buildType + " not supported");
