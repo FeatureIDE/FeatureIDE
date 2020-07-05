@@ -457,15 +457,17 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					lastFeat = feat;
-					if (lineText.contains("[1,1]")) {
-						lastFeat.getFeature().getStructure().setAlternative();
-					} else if (lineText.contains("[1,*]")) {
-						lastFeat.getFeature().getStructure().setOr();
-					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
+					if ((lineText.contains("[")) && (lineText.contains("]"))) {
 						final String substring = lineText.substring(lineText.indexOf('[') + 1, lineText.indexOf(']'));
 						final String[] numbers = substring.split(",");
 						final int start = Integer.parseInt(numbers[0]);
-						final int end = Integer.parseInt(numbers[1]);
+						int end = 0;
+						if (numbers[1].equals("*")) {
+							// Children number currently not known => mark an * cardinality with Integer.MAX_VALUE
+							end = Integer.MAX_VALUE;
+						} else {
+							end = Integer.parseInt(numbers[1]);
+						}
 						final FeatCardinality featCard = new FeatCardinality(lastFeat.getFeature(), start, end);
 						arbCardGroupFeats.add(featCard);
 					} else {
@@ -511,7 +513,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				lastFeat = feat;
 				line++;
 			}
-			// Check that there are only OR connections when the parent has more than one feature
+			// Check that there are only AND connections when the parent has only one child feature
 			for (final IFeature f : object.getFeatures()) {
 				if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
 					f.getStructure().setAnd();
@@ -528,7 +530,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private void removeUnnecessaryAbstractFeatures(IFeature feature) {
 		if (feature.getStructure().getChildrenCount() == 1) {
 			final IFeatureStructure child = feature.getStructure().getFirstChild();
-			if (child.isAbstract()) {
+			// Only remove abstract features when they are not mentioned in any constraint
+			if (child.isAbstract() && (child.getRelevantConstraints().size() == 0)) {
 				for (final IFeatureStructure grantChild : feature.getStructure().getFirstChild().getChildren()) {
 					grantChild.setParent(feature.getStructure());
 					feature.getStructure().addChild(grantChild);
@@ -595,102 +598,84 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				child.setMandatory(false);
 			}
 			final int start = featCard.start;
-			final int end = featCard.end;
-			if ((start < 0) || (start > end) || (end > children.size())) {
+			// Transform * cardinalities into max children
+			final int end = featCard.end == Integer.MAX_VALUE ? children.size() : featCard.end;
+			if ((start < 0) || (start > end) || ((end > children.size()))) {
 				throw new UnsupportedModelException(GROUP_CARDINALITY + INVALID, line);
 			}
-			final int f = children.size();
-			node = buildMinConstr(FeatureUtils.convertToFeatureList(children), (f - start) + 1, feat.getName());
-			if ((start == 1) && (end == f)) {
+			final int childCount = children.size();
+			if ((start == 1) && (end == 1)) {
+				// Use case [1,1] => set ALTERNATIVE group
+				feat.getStructure().setAlternative();
+			} else if ((start == 1) && (end == childCount)) {
+				// Use case [1,*] or [1,childCount] => set OR group
 				feat.getStructure().setOr();
+			} else if ((start == 0) && (end == childCount)) {
+				// Use case [0,*] or [1,childCount] => set AND group
+				feat.getStructure().setAnd();
+			} else if ((start == childCount) && (end == childCount)) {
+				// Use case [childCount,childCount] => set AND group and all children as mandatory
+				feat.getStructure().setAnd();
+				feat.getStructure().getChildren().stream().forEach(x -> x.setMandatory(true));
+			} else if ((start == end)) {
+				// Use case [n,n] => Choose exactly 'start' elements
+				node = buildChooseConstr(FeatureUtils.convertToFeatureList(children), start);
+				object.addConstraint(new Constraint(object, node));
+			} else if ((start > 0) && (end == childCount)) {
+				// Use case [>0, *] or [>0, k] => Choose at least 'start' elements
+				node = buildAtLeastConstr(FeatureUtils.convertToFeatureList(children), start);
+				object.addConstraint(new Constraint(object, node));
+			} else if ((start == 0) && (end < childCount)) {
+				// Use case [0, <childCount] => Choose at most 'end' elements
+				node = buildAtMostConstr(FeatureUtils.convertToFeatureList(children), end);
+				object.addConstraint(new Constraint(object, node));
 			} else {
-				node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
+				// Use case [>0, <childCount] => Choose at least 'start' elements and at most 'end' elements
+				node = buildAtLeastConstr(FeatureUtils.convertToFeatureList(children), start);
+				object.addConstraint(new Constraint(object, node));
+				node = buildAtMostConstr(FeatureUtils.convertToFeatureList(children), end);
 				object.addConstraint(new Constraint(object, node));
 			}
 		}
 	}
 
 	/**
-	 * Builds the propositional constraint, denoting a minimum of features has to be selected
+	 * Builds the propositional constraint, denoting that exactly n features need to be selected.
 	 *
-	 * @param list
-	 * @param length
-	 * @param parentName
-	 * @return
+	 * @param list List of all features.
+	 * @param length Denotes the amount of features to be selected.
+	 * @return The propositional constraint as CNF.
 	 */
-	private org.prop4j.Node buildMinConstr(List<IFeature> list, int length, String parentName) {
-		final LinkedList<org.prop4j.Node> result = new LinkedList<>();
-		final LinkedList<org.prop4j.Node> partResult = new LinkedList<>();
-		final int listLength = list.size();
-		final int[] indexes = new int[length];
-		final int[] resIndexes = new int[length];
-		for (int i = 0; i < length; i++) {
-			indexes[i] = i;
-			resIndexes[i] = i + (listLength - length);
-		}
-		while (!Arrays.equals(indexes, resIndexes)) {
-			partResult.add(new Literal(parentName, false));
-			for (int i = 0; i < length; i++) {
-				partResult.add(new Literal(list.get(indexes[i]).getName()));
-			}
-			result.add(new Or(partResult));
-			for (int i = length - 1; i >= 0; i--) {
-				if (indexes[i] >= resIndexes[i]) {
-					continue;
-				}
-				indexes[i] = indexes[i] + 1;
-				for (int j = i + 1; j < length; j++) {
-					indexes[j] = indexes[j - 1] + 1;
-				}
-				break;
-			}
-		}
-		partResult.add(new Literal(parentName, false));
-		for (int i = 0; i < length; i++) {
-			partResult.add(new Literal(list.get(indexes[i]).getName()));
-		}
-		result.add(new Or(partResult));
-		return new And(result);
+	private org.prop4j.Node buildChooseConstr(List<IFeature> list, int choose) {
+		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
+		list.stream().forEach((x) -> literals.add(new Literal(x)));
+		return new org.prop4j.Choose(choose, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
 	}
 
 	/**
-	 * Builds the propositional constraint, denoting a maximum of features can be selected
+	 * Builds the propositional constraint, denoting that at least n features need to be selected.
 	 *
-	 * @param list
-	 * @param length
-	 * @return
+	 * @param list List of all features.
+	 * @param min Denotes the amount of features to be selected.
+	 * @return The propositional constraint as CNF.
 	 */
-	private org.prop4j.Node buildMaxConstr(List<IFeature> list, int length) {
-		final LinkedList<org.prop4j.Node> result = new LinkedList<>();
-		final LinkedList<org.prop4j.Node> partResult = new LinkedList<>();
-		final int listLength = list.size();
-		final int[] indexes = new int[length];
-		final int[] resIndexes = new int[length];
-		for (int i = 0; i < length; i++) {
-			indexes[i] = i;
-			resIndexes[i] = i + (listLength - length);
-		}
-		while (!Arrays.equals(indexes, resIndexes)) {
-			for (int i = 0; i < length; i++) {
-				partResult.add(new Literal(list.get(indexes[i]).getName(), false));
-			}
-			result.add(new Or(partResult));
-			for (int i = length - 1; i >= 0; i--) {
-				if (indexes[i] >= resIndexes[i]) {
-					continue;
-				}
-				indexes[i] = indexes[i] + 1;
-				for (int j = i + 1; j < length; j++) {
-					indexes[j] = indexes[j - 1] + 1;
-				}
-				break;
-			}
-		}
-		for (int i = 0; i < length; i++) {
-			partResult.add(new Literal(list.get(indexes[i]).getName(), false));
-		}
-		result.add(new Or(partResult));
-		return new And(result);
+	private org.prop4j.Node buildAtLeastConstr(List<IFeature> list, int min) {
+		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
+		list.stream().forEach((x) -> literals.add(new Literal(x)));
+		return new org.prop4j.AtLeast(min, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
+	}
+
+	/**
+	 * Builds the propositional constraint, denoting that at most n features need to be selected.
+	 *
+	 * @param list List of all features.
+	 * @param min Denotes the amount of features to be selected.
+	 * @return The propositional constraint as CNF.
+	 */
+	private org.prop4j.Node buildAtMostConstr(List<IFeature> list, int max) {
+		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
+		list.stream().forEach((x) -> literals.add(new Literal(x)));
+		return new org.prop4j.AtMost(max, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
 	}
 
 	/**
