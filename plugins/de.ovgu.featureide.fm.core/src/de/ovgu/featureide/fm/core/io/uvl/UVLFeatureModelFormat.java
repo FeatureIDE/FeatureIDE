@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
@@ -143,7 +144,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
-		final IFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		if (resolved.getName().contains(".")) {
+			feature.setType(MultiFeature.TYPE_INTERFACE);
+		}
 		fm.addFeature(feature);
 		if (root != null) {
 			root.getStructure().addChild(feature.getStructure());
