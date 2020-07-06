@@ -1228,7 +1228,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createCalculationsMenuManager(true));
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
-			menuManager.add(showCollapsedConstraintsAction);
+			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor
+			if(!graphicalFeatureModel.getConstraintsHidden()) {
+				menuManager.add(showCollapsedConstraintsAction);
+			}
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
 			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

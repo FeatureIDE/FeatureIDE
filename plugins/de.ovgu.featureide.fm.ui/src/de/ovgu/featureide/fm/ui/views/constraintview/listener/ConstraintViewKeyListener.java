@@ -62,12 +62,14 @@ public class ConstraintViewKeyListener implements KeyListener {
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
 						null, null);
+				controller.getView().refresh();
 			} catch (final ExecutionException e1) {}
 		} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
 			// pressing CTRL + SHIFT + Z will redo undos
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
 						null, null);
+				controller.getView().refresh();
 			} catch (final ExecutionException e1) {}
 		} else if (e.keyCode == SWT.ESC) {
 			// pressing the escape button will remove the focus or current selection

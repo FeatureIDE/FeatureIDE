@@ -44,47 +44,42 @@ public class ConstraintViewPartListener implements IPartListener {
 
 	@Override
 	public void partActivated(IWorkbenchPart part) {
-		if (part instanceof FeatureModelEditor) {
-			controller.setFeatureModelEditor((FeatureModelEditor) part);
-			controller.checkForRefresh();
-		} else if (part instanceof IEditorPart) {
-			controller.setFeatureModelEditor(null);
-			controller.checkForRefresh();
-		}
+		updateActiveEditor(part);
 
-		if(!controller.isConstraintsViewVisible()){
+		if (!controller.isConstraintsViewVisible()) {
 			controller.setConstraintsHidden(controller.getFeatureModelEditor(), false);
-		}else if(part instanceof ConstraintViewController){
-			controller.setConstraintsHidden(controller.getFeatureModelEditor(), true);
+		} else if (part instanceof ConstraintViewController) {
+			controller.refresh();
+			controller.getView().refresh();
 		}
 	}
 
 	@Override
 	public void partBroughtToTop(IWorkbenchPart part) {
-		if (part instanceof FeatureModelEditor) {
-			controller.setFeatureModelEditor((FeatureModelEditor) part);
-			controller.checkForRefresh();
-		}
+		updateActiveEditor(part);
 	}
 
 	@Override
 	public void partClosed(IWorkbenchPart part) {
-		if ((part instanceof FeatureModelEditor) && (part == controller.getFeatureModelEditor())) {
-			controller.setFeatureModelEditor(null);
-			controller.checkForRefresh();
-		}
+		updateActiveEditor(part);
 	}
 
 	@Override
 	public void partDeactivated(IWorkbenchPart part) {
-		// not needed, covered in the other events
+		// this method is not needed. Every case is covered in the other events
 	}
 
 	@Override
 	public void partOpened(IWorkbenchPart part) {
-		if (part instanceof FeatureModelEditor) {
-			controller.setFeatureModelEditor((FeatureModelEditor) part);
-			controller.checkForRefresh();
+		updateActiveEditor(part);
+	}
+
+	private void updateActiveEditor(IWorkbenchPart part) {
+		final IEditorPart activeEditor = part.getSite().getPage().getActiveEditor();
+		if (activeEditor instanceof FeatureModelEditor) {
+			controller.setFeatureModelEditor((FeatureModelEditor) activeEditor);
+		} else {
+			controller.setFeatureModelEditor(null);
 		}
 	}
 }
