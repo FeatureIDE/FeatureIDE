@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -341,15 +342,35 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} else if (n instanceof org.prop4j.Not) {
 			return new Not(printConstraint(n.getChildren()[0]));
 		} else if (n instanceof org.prop4j.And) {
-			return new And(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return printMultiArity(And.class, n.getChildren());
 		} else if (n instanceof org.prop4j.Or) {
-			return new Or(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return printMultiArity(Or.class, n.getChildren());
 		} else if (n instanceof Implies) {
 			return new Impl(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
 		} else if (n instanceof Equals) {
 			return new Equiv(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
 		}
 		return null;
+	}
+
+	private Object printMultiArity(Class<?> clazz, Node[] args) {
+		try {
+			switch (args.length) {
+			case 0:
+				return null;
+			case 1:
+				return printConstraint(args[0]);
+			case 2:
+				return clazz.getConstructor(Object.class, Object.class).newInstance(printConstraint(args[0]), printConstraint(args[1]));
+			default:
+				return clazz.getConstructor(Object.class, Object.class).newInstance(printConstraint(args[0]),
+						printMultiArity(clazz, Arrays.copyOfRange(args, 1, args.length)));
+			}
+		} catch (
+				NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			return null;
+		}
 	}
 
 	@Override
