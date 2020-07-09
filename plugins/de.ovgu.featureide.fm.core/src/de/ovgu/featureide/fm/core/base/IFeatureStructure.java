@@ -93,6 +93,13 @@ public interface IFeatureStructure {
 
 	boolean isRoot();
 
+	/**
+	 * Calculates the depth of the subtree starting from this feature. If this feature has no children, the depth is 0.
+	 * 
+	 * @return The depth of the subtree starting from this feature
+	 */
+	int getSubtreeDepth();
+
 	void removeChild(IFeatureStructure child);
 
 	IFeatureStructure removeLastChild();

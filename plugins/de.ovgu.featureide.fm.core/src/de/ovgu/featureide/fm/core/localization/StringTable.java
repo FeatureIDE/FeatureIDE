@@ -1129,4 +1129,10 @@ public class StringTable {
 		"Due to a feature breaking bug in the GTK framework, FeatureIDE has to employ a workaround to maintain functionality. See also bug #1003 in the FeatureIDE bug tracker.";
 	public static final String GTK_WORKAROUND_INFO_TOGGLE = "Do not show this message again.";
 	public static final String CONFIGURATION_DIALOGS_GTK_WORKAROUND = "Disable the workaround information for #1003";
+	public static final String SHOW_SUBTREE = "Show Subtree";
+	public static final String LEVEL = "Level";
+	public static final String LEVELS = "Levels";
+	public static final String SHOW = "Show";
+	public static final String SHOW_ALL_LEVELS = "Show All Levels";
+
 }
