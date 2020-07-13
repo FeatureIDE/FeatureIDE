@@ -21,12 +21,12 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -342,9 +342,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} else if (n instanceof org.prop4j.Not) {
 			return new Not(printConstraint(n.getChildren()[0]));
 		} else if (n instanceof org.prop4j.And) {
-			return printMultiArity(And.class, n.getChildren());
+			return printMultiArity(And::new, n.getChildren());
 		} else if (n instanceof org.prop4j.Or) {
-			return printMultiArity(Or.class, n.getChildren());
+			return printMultiArity(Or::new, n.getChildren());
 		} else if (n instanceof Implies) {
 			return new Impl(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
 		} else if (n instanceof Equals) {
@@ -353,23 +353,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return null;
 	}
 
-	private Object printMultiArity(Class<?> clazz, Node[] args) {
-		try {
-			switch (args.length) {
-			case 0:
-				return null;
-			case 1:
-				return printConstraint(args[0]);
-			case 2:
-				return clazz.getConstructor(Object.class, Object.class).newInstance(printConstraint(args[0]), printConstraint(args[1]));
-			default:
-				return clazz.getConstructor(Object.class, Object.class).newInstance(printConstraint(args[0]),
-						printMultiArity(clazz, Arrays.copyOfRange(args, 1, args.length)));
-			}
-		} catch (
-				NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
+	private Object printMultiArity(BiFunction<Object, Object, Object> constructor, Node[] args) {
+		switch (args.length) {
+		case 0:
 			return null;
+		case 1:
+			return printConstraint(args[0]);
+		case 2:
+			return constructor.apply(printConstraint(args[0]), printConstraint(args[1]));
+		default:
+			return constructor.apply(printConstraint(args[0]), printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length)));
 		}
 	}
 
