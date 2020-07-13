@@ -25,9 +25,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -105,14 +103,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			final List<FeatureEditPart> selectionList = new ArrayList<>();
-
-			for (final Object o : event.getStructuredSelection().toList()) {
-				// only consider FeatureEditParts
-				if (o instanceof FeatureEditPart) {
-					selectionList.add((FeatureEditPart) o);
-				}
-			}
+			final List<FeatureEditPart> selectionList = getSelectionList(event.getStructuredSelection());
 
 			// only update and refresh when the selection changed
 			if (!selectionList.equals(constraintView.filter.getFeatureModelSelection())) {
@@ -309,6 +300,11 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				updateConstraint.addListener(updateConstraintListener);
 			}
 
+			constraintView.filter.setFeatureModelSelection(getSelectionList(
+					newFeatureModelEditor.diagramEditor.getViewer().getSelection()));
+			constraintView.filter.setActiveExplanation(
+					newFeatureModelEditor.diagramEditor.getActiveExplanation());
+
 			// update filter and settings menu to correctly handle "showCollapsedConstraints"
 			IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
 			constraintView.filter.setGraphicalFeatureModel(graphicalFeatureModel);
@@ -387,6 +383,24 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				graphicalFeatureModel.redrawDiagram();
 			}
 		}
+	}
+
+	/**
+	 * Filters the selection by only returning the selected FeatureEditParts
+	 *
+	 * @param selection StructuredSelection to be filtered
+	 * @return List of FeatureEditParts that are contained in the selection
+	 */
+	public List<FeatureEditPart> getSelectionList(ISelection selection){
+		final List<FeatureEditPart> selectionList = new ArrayList<>();
+
+		for (final Object o : ((IStructuredSelection) selection).toList()) {
+			// only consider FeatureEditParts
+			if (o instanceof FeatureEditPart) {
+				selectionList.add((FeatureEditPart) o);
+			}
+		}
+		return selectionList;
 	}
 
 	public FeatureModelManager getFeatureModelManager() {
