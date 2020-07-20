@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -118,5 +120,10 @@ public class DeleteAction extends AFeatureModelAction {
 		}
 
 		return true;
+	}
+
+	@Override
+	protected List<IFeature> getInvolvedFeatures() {
+		return ElementDeleteOperation.getFeatureNames(viewer).stream().map(f -> featureModelManager.getObject().getFeature(f)).collect(Collectors.toList());
 	}
 }

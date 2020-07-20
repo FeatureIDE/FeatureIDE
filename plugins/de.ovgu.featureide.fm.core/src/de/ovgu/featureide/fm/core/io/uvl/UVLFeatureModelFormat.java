@@ -225,6 +225,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
+					newConstraint.setType(MultiFeature.TYPE_INTERFACE);
 					fm.addConstraint(newConstraint);
 				}
 			}

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -189,6 +190,11 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 			|| EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
+	}
+
+	@Override
+	protected List<IFeature> getInvolvedFeatures() {
+		return getSelectedFeatures().stream().map(f -> featureModelManager.getObject().getFeature(f)).collect(Collectors.toList());
 	}
 
 }

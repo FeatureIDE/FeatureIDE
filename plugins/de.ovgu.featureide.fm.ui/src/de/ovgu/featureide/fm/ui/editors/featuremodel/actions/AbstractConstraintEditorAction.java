@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
@@ -44,6 +45,7 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 	protected IStructuredSelection selection;
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			setSelection(event.getSelection());
@@ -74,5 +76,14 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 	}
 
 	protected abstract boolean isValidSelection(IStructuredSelection selection);
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean isEnabled() {
+		if (selection.toList().stream().filter(o -> o instanceof MultiConstraint).anyMatch(c -> ((MultiConstraint) c).isFromExtern())) {
+			return false;
+		}
+		return super.isEnabled();
+	}
 
 }
