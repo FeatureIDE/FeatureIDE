@@ -1097,7 +1097,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			selectedFeature = ((FeatureEditPart) firstElement).getModel().getObject();
 		}
 
-		final int subtreeDepth = selectedFeature.getStructure().getSubtreeDepth();
+		final int subtreeDepth = FeatureUtils.getSubtreeDepth(selectedFeature);
 
 		if (!(oneFeatureSelected && (subtreeDepth > 1))) {
 			// there is more than one feature selected or the depth of the subtree is not bigger than 1.

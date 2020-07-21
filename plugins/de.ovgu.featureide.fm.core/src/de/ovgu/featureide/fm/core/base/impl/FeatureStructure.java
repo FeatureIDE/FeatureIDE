@@ -196,26 +196,6 @@ public class FeatureStructure implements IFeatureStructure {
 		return children.size();
 	}
 
-	/**
-	 * Recursive implementation of {@link IFeatureStructure#getSubtreeDepth()} using DFS.
-	 * 
-	 * @return The depth of the subtree starting from this feature
-	 */
-	@Override
-	public int getSubtreeDepth() {
-		if (!hasChildren()) {
-			return 0;
-		}
-		int max = -1;
-		for (final IFeatureStructure featureStructure : getChildren()) {
-			final int current = featureStructure.getSubtreeDepth();
-			if (current > max) {
-				max = current;
-			}
-		}
-		return max + 1;
-	}
-
 	@Override
 	public IFeature getFeature() {
 		return correspondingFeature;

@@ -669,6 +669,25 @@ public final class FeatureUtils {
 		return feature.getStructure().hasChildren();
 	}
 
+	/**
+	 * Recursively calculates the depth of the subtree starting from this feature using DFS. If this feature has no children, the depth is 0.
+	 *
+	 * @return The depth of the subtree starting from this feature
+	 */
+	public static final int getSubtreeDepth(IFeature feature) {
+		if (!hasChildren(feature)) {
+			return 0;
+		}
+		int max = -1;
+		for (final IFeature f : getChildren(feature)) {
+			final int current = getSubtreeDepth(f);
+			if (current > max) {
+				max = current;
+			}
+		}
+		return max + 1;
+	}
+
 	public static final boolean hasConcrete(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
