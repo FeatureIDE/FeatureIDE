@@ -261,7 +261,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		fm.addInstance(i.getAlias(), i.getNamespace());
+		fm.addInstance(i.getNamespace(), i.getAlias());
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			if (nsAttribute != null) {
 				namespace = nsAttribute.getValue();
 			}
-			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName())).toArray(Import[]::new));
+			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getModelName(), um.getVarName())).toArray(Import[]::new));
 			if (mfm.isMultiProductLineModel()) {
 				constraints = mfm.getOwnConstraints();
 			}
