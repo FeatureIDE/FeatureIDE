@@ -167,9 +167,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, solver);
 		}
 		util.setMaxSampleSize(maxSampleSize);
-		util.setRandom(getRandom());
-
-		util.computeRandomSample();
 		if (!util.getCnf().getClauses().isEmpty()) {
 			util.computeMIG();
 		}
@@ -185,7 +182,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	@Override
 	protected void generate(IMonitor<List<LiteralSet>> monitor) throws Exception {
-		init();
+		util.setRandom(getRandom());
+		util.computeRandomSample();
 
 		phaseCount = 0;
 

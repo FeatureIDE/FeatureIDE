@@ -579,7 +579,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				// for folders do recursively
 				preprocessSourceFiles((IFolder) res, preprocessor, null, featureModelNode);
 			} else if (res instanceof IFile) {
-				if (res.getName().equals(congurationName + "." + getConfigurationExtension())) {
+				if (res.getName().equals(congurationName + "." + getConfigurationFormat().getSuffix())) {
 					continue;
 				}
 				// get all lines from file
@@ -643,7 +643,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
 					final String fileExtension = res.getFileExtension();
-					if ((fileExtension != null) && fileExtension.equals(getConfigurationExtension())) {
+					if ((fileExtension != null) && fileExtension.equals(getConfigurationFormat().getSuffix())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));

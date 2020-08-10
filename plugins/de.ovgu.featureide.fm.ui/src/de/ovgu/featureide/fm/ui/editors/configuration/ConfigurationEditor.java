@@ -49,9 +49,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
@@ -114,35 +112,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private boolean readConfigurationError = false;
 	private boolean readFeatureModelError = false;
 
-	private final IPartListener iPartListener = new IPartListener() {
-
-		@Override
-		public void partBroughtToTop(IWorkbenchPart part) {}
-
-		@Override
-		public void partClosed(IWorkbenchPart part) {
-			LongRunningWrapper.cancelAllJobs(configJobToken);
-			if (featureModelManager != null) {
-				featureModelManager.removeListener(ConfigurationEditor.this);
-			}
-			if (configurationManager != null) {
-				configurationManager.removeListener(ConfigurationEditor.this);
-				configurationManager.overwrite();
-			}
-			FeatureColorManager.removeListener(ConfigurationEditor.this);
+	@Override
+	public void dispose() {
+		super.dispose();
+		LongRunningWrapper.cancelAllJobs(configJobToken);
+		if (featureModelManager != null) {
+			featureModelManager.removeListener(ConfigurationEditor.this);
 		}
-
-		@Override
-		public void partDeactivated(IWorkbenchPart part) {
-
+		if (configurationManager != null) {
+			configurationManager.removeListener(ConfigurationEditor.this);
+			configurationManager.overwrite();
 		}
-
-		@Override
-		public void partOpened(IWorkbenchPart part) {}
-
-		@Override
-		public void partActivated(IWorkbenchPart part) {}
-	};
+		FeatureColorManager.removeListener(ConfigurationEditor.this);
+	}
 
 	public List<IConfigurationEditorPage> getExtensionPages() {
 		return extensionPages;
@@ -168,7 +150,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		FeatureColorManager.addListener(this);
 		super.setInput(input);
 		setPartName(file.getName());
-		getSite().getPage().addPartListener(iPartListener);
 
 		final File modelFile = setFeatureModelFile(file.getProject());
 

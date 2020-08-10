@@ -38,6 +38,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YASA;
 
 import java.util.ArrayList;
 
@@ -352,6 +353,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return ICPL;
 		case INCLING:
 			return INCLING;
+		case YASA:
+			return YASA;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
@@ -419,6 +422,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				scaleTWise.setSelection(MASK_MAX);
 				scaleTWise.setEnabled(false);
 				labelTWise.setText(LABEL_INTERACTIONS + "2");
+			} else if (selection.equals(YASA)) {
+				scaleTWise.setMaximum(YASA_MAX);
 			}
 		} else {
 			scaleTWise.setEnabled(false);

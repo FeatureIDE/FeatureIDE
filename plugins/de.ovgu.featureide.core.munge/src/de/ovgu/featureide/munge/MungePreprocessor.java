@@ -505,7 +505,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
-					if (res.getFileExtension().equals(getConfigurationExtension())) {
+					if (res.getFileExtension().equals(getConfigurationFormat().getSuffix())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));

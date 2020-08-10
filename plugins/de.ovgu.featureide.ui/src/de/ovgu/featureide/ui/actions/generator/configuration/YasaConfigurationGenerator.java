@@ -24,8 +24,8 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
@@ -36,24 +36,20 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class TWiseConfigurationGenerator extends ACNFConfigurationGenerator {
+public class YasaConfigurationGenerator extends ACNFConfigurationGenerator {
 
 	private final int t;
 
-	public TWiseConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, int t) {
+	public YasaConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula, int t) {
 		super(builder, formula);
 		this.t = t;
 	}
 
 	@Override
-	protected de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator getGenerator(CNF cnf,
-			int numberOfConfigurations) {
-		final Iterable<String> concreteFeatureNames = FeatureUtils.getConcreteFeatureNames(snapshot.getFeatureModel());
-		final LiteralSet literals = cnf.getVariables().convertToLiterals(Functional.toList(concreteFeatureNames), true, true);
-		final List<List<ClauseList>> expressions =
-			de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator.convertLiterals(literals);
-		return new de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator(cnf, expressions, t,
-				numberOfConfigurations);
+	protected TWiseConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
+		final List<List<ClauseList>> expressions = TWiseConfigurationGenerator.convertLiterals(
+				cnf.getVariables().convertToLiterals(Functional.toList(FeatureUtils.getConcreteFeatureNames(snapshot.getFeatureModel())), true, true));
+		return new TWiseConfigurationGenerator(cnf, expressions, t, numberOfConfigurations);
 	}
 
 }
