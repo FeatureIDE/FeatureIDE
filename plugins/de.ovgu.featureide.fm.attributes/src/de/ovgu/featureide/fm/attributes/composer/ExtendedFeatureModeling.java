@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.attributes.composer;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -128,5 +130,16 @@ public class ExtendedFeatureModeling extends ComposerExtensionClass {
 	@Override
 	public IFeatureModelFormat getFeatureModelFormat() {
 		return new XmlExtendedFeatureModelFormat();
+	}
+
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
 	}
 }

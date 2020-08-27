@@ -439,4 +439,15 @@ public class AheadComposer extends ComposerExtensionClass {
 	public boolean supportsMigration() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
+	}
 }

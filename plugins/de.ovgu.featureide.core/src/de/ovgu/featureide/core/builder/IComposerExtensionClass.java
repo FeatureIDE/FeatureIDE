@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -32,6 +33,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -52,7 +54,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/** Defines the product-line implementation-mechanism of the composition tool **/
 	static enum Mechanism {
-		FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR
+	FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR
 	};
 
 	final static String PACKAGE_PATTERN = "#package#";
@@ -214,4 +216,12 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 * @return The format that should be used to create the feature model
 	 */
 	IFeatureModelFormat getFeatureModelFormat();
+
+	/**
+	 * @param removedFeatureNameList
+	 * @throws CoreException
+	 * @throws IOException
+	 */
+	void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException;
 }

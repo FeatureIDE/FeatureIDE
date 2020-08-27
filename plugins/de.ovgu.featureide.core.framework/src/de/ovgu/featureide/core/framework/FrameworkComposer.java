@@ -356,4 +356,15 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	public boolean clean() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
+	}
 }

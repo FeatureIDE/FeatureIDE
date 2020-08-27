@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1210,4 +1211,41 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return true;
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return true;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+		deleteFeatureFolders(sourceFolder, removedFeatures);
+	}
+
+	private void deleteFeatureFolders(IFolder sourceFolder, ArrayList<String> removedFeatures) {
+		final ArrayList<IResource> featureFolders = new ArrayList<IResource>();
+		try {
+			Collections.addAll(featureFolders, sourceFolder.members());
+		} catch (final CoreException e) {
+			e.printStackTrace();
+		}
+
+		final ArrayList<IResource> foldersToDelete = new ArrayList<IResource>();
+
+		for (final String feature : removedFeatures) {
+			for (final IResource folder : featureFolders) {
+				if (folder.getName().equals(feature)) {
+					foldersToDelete.add(folder);
+				}
+			}
+		}
+
+		for (final IResource folder : foldersToDelete) {
+			try {
+				folder.delete(true, null);
+			} catch (final CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

@@ -724,4 +724,119 @@ public abstract class Node {
 		return assignments;
 	}
 
+	/**
+	 * Replaces all instances of the passed feature names with False. Depending on the value of resolveq, this method will either try to resolve the entire
+	 * formula down to a True/False or leave it as is.
+	 *
+	 * @param node
+	 * @param features
+	 * @param resolve
+	 * @return
+	 */
+	public static Node replaceLiterals(Node node, ArrayList<String> features, boolean resolve) {
+		if (node instanceof And) {
+			final List<Node> children = new ArrayList<>();
+			for (final Node child : node.getChildren()) {
+				final Node newchild = replaceLiterals(child, features, resolve);
+
+				// check if children already contains negation of child, which makes it a contradiction
+				if (resolve) {
+					if (children.contains(new Not(newchild))) {
+						return new False();
+					}
+					if (newchild instanceof Not) {
+						if (children.contains(((Not) newchild).getChildren()[0])) {
+							return new False();
+						}
+					}
+				}
+
+				if (newchild instanceof False) {
+					return newchild;
+				} else if (newchild instanceof True) {
+					continue;
+				} else {
+					children.add(newchild);
+				}
+			}
+
+			if (children.size() > 1) {
+				return new And(children);
+			} else if (children.size() == 1) {
+				return children.get(0);
+			} else if (children.size() == 0) {
+				return new True();
+			}
+
+		} else if (node instanceof Or) {
+			final List<Node> children = new ArrayList<Node>();
+			for (final Node child : node.getChildren()) {
+				final Node newchild = replaceLiterals(child, features, resolve);
+
+				// check if children already contains negation of child, which makes it a tautology
+				if (resolve) {
+					if (children.contains(new Not(newchild))) {
+						return new True();
+					}
+					if (newchild instanceof Not) {
+						if (children.contains(((Not) newchild).getChildren()[0])) {
+							return new True();
+						}
+					}
+				}
+
+				if (newchild instanceof False) {
+					continue;
+				} else if (newchild instanceof True) {
+					return newchild;
+				} else {
+					children.add(newchild);
+				}
+			}
+			if (children.size() > 1) {
+				return new Or(children);
+			} else if (children.size() == 1) {
+				return children.get(0);
+			} else if (children.size() == 0) {
+				return new False();
+			}
+
+		} else if (node instanceof Literal) {
+			if (features.contains(((Literal) node).getContainedFeatures().get(0))) {
+				if (((Literal) node).positive) {
+					return new False();
+				} else {
+					return new True();
+				}
+
+			} else {
+				return node;
+			}
+		} else if (node instanceof Not) {
+			final Node child = replaceLiterals(node.getChildren()[0], features, resolve);
+			if (child instanceof False) {
+				return new True();
+			} else if (child instanceof True) {
+				return new False();
+			} else {
+				return new Not(child);
+			}
+		} else if (node instanceof Equals) {
+			// todo: add resolve cases
+			final Node leftChild = replaceLiterals(node.getChildren()[0], features, resolve);
+			final Node rightChild = replaceLiterals(node.getChildren()[1], features, resolve);
+			if (leftChild instanceof True) {
+				return rightChild;
+			} else if (rightChild instanceof True) {
+				return leftChild;
+			} else if (leftChild instanceof False) {
+				return new Not(rightChild);
+			} else if (rightChild instanceof False) {
+				return new Not(leftChild);
+			} else {
+				return node;
+			}
+		}
+		return null;
+	}
 }

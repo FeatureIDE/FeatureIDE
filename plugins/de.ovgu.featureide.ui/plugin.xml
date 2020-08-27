@@ -1163,6 +1163,20 @@
 					</reference>
 				</visibleWhen>
 			</dynamic>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.buildPartialProject"
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.fm.ui.actions.buildPartialProject"
+         label="Derive partial Feature Project with this configuration"
+         style="push"
+         tooltip="Use the selected Configuration to derive a Partial Feature Project">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
+         </reference>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 
 		<menuContribution
@@ -1279,6 +1293,10 @@
 				id="de.ovgu.featureide.fm.ui.colorscheme"
 				name="Colorscheme">
 		</command>
+  <command
+        id="de.ovgu.featureide.ui.commands.buildPartialProject"
+        name="Build Partial Project">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1314,6 +1332,10 @@
 				class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
 				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 		</handler>
+  <handler
+        class="de.ovgu.featureide.ui.handlers.buildPartialProjectHandler"
+        commandId="de.ovgu.featureide.ui.commands.buildPartialProject">
+  </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">
