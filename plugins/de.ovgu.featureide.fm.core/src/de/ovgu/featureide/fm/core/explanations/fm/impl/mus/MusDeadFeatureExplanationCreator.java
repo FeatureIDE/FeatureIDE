@@ -24,7 +24,6 @@ import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
@@ -58,7 +57,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(NodeCreator.getVariable(getSubject()), true);
+			oracle.addAssumption(getSubject().getName(), true);
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
