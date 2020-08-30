@@ -1333,7 +1333,7 @@
 				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 		</handler>
   <handler
-        class="de.ovgu.featureide.ui.handlers.buildPartialProjectHandler"
+        class="de.ovgu.featureide.ui.handlers.BuildPartialProjectHandler"
         commandId="de.ovgu.featureide.ui.commands.buildPartialProject">
   </handler>
 	</extension>

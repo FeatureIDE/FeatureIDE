@@ -357,14 +357,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
 
-		// initialize project structure
-		try {
-			// workaround needed for project imports
-			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
-		}
-
 		final String projectBuildPath = getProjectBuildPath();
 
 		try {

@@ -22,10 +22,18 @@ package de.ovgu.featureide.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DERIVE_PARTIAL_PROJECT_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.PartialFeatureProjectBuilder;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -34,7 +42,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  *
  * @author Paul Westphal
  */
-public class buildPartialProjectHandler extends AFileHandler {
+public class BuildPartialProjectHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
@@ -42,8 +50,33 @@ public class buildPartialProjectHandler extends AFileHandler {
 		if (project == null) {
 			UIPlugin.getDefault().logWarning(CANT_DERIVE_PARTIAL_PROJECT_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT);
 		} else {
-			// Things happen here
+			final IFeatureProject baseProject = CorePlugin.getFeatureProject(file);
+
+			final String newProjectName = baseProject.getProjectName() + "_" + getConfigName(file);
+
+			try {
+				baseProject.getProject().copy(baseProject.getProject().getFullPath().removeLastSegments(1).append(newProjectName), true, null);
+			} catch (final CoreException e) {
+				e.printStackTrace();
+			}
+
+			final IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
+			IFeatureProject newFeatureProject = CorePlugin.getFeatureProject(newProject);
+			while ((newFeatureProject = CorePlugin.getFeatureProject(newProject)) == null) {}
+			final Configuration config =
+				baseProject.loadConfiguration(Paths.get(ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + file.getFullPath()));
+
+			System.out.println("check");
+			LongRunningWrapper.runMethod(new PartialFeatureProjectBuilder(newFeatureProject, config));
 		}
 	}
 
+	private String getConfigName(IFile file) {
+		String configName = file.getName();
+		final int pos = configName.lastIndexOf(".");
+		if (pos > 0) {
+			configName = configName.substring(0, pos);
+		}
+		return configName;
+	}
 }
