@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.wizards.SubtreeDependencyWizard;
  *
  * @author Ananieva Sofia
  */
-public class CalculateDependencyAction extends SingleSelectionAction {
+public class CalculateDependencyAction extends SingleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	private static final JobToken calculateDependencyToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 

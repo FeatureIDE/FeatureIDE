@@ -1,4 +1,4 @@
-ns Server
+namespace Server
 
 imports
 	OperatingSystem as os

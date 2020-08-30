@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -153,6 +156,11 @@ public abstract class SingleSelectionAction extends AFeatureModelAction implemen
 		default:
 			break;
 		}
+	}
+
+	@Override
+	protected List<IFeature> getInvolvedFeatures() {
+		return Collections.singletonList(feature);
 	}
 
 }

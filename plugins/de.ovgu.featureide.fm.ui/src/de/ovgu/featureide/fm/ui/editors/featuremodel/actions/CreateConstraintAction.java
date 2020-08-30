@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateConstraintAction extends AbstractConstraintEditorAction {
+public class CreateConstraintAction extends AbstractConstraintEditorAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.createconstraint";
 

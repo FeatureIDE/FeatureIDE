@@ -88,7 +88,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		return ID;
 	}
 
-	private static List<String> getFeatureNames(Object viewer) {
+	public static List<String> getFeatureNames(Object viewer) {
 		final IStructuredSelection selection;
 		if (viewer instanceof GraphicalViewerImpl) {
 			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();

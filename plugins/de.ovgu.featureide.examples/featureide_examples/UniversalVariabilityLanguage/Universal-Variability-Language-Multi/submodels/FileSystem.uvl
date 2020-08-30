@@ -1,4 +1,4 @@
-ns submodels.FileSystem
+namespace submodels.FileSystem
 
 features
 	FileSystem	

@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ActionAllowedInExternalSubmodel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanationOperation;
 
@@ -45,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanati
  *
  * @author Rahel Arens
  */
-public class FocusOnExplanationInViewAction extends AbstractConstraintEditorAction {
+public class FocusOnExplanationInViewAction extends AbstractConstraintEditorAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.focusonexplanationinview";
 

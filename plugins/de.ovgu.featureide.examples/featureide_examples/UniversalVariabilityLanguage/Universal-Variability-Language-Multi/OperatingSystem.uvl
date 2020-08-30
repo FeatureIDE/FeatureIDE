@@ -1,4 +1,4 @@
-ns OperatingSystem
+namespace OperatingSystem
 
 features
 	OperatingSystem {abstract}	

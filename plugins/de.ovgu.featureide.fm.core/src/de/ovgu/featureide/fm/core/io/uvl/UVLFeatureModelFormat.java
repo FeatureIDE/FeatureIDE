@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
@@ -143,7 +145,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
-		final IFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		if (resolved.getName().contains(".")) {
+			feature.setType(MultiFeature.TYPE_INTERFACE);
+		}
 		fm.addFeature(feature);
 		if (root != null) {
 			root.getStructure().addChild(feature.getStructure());
@@ -220,6 +225,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
+					newConstraint.setType(MultiFeature.TYPE_INTERFACE);
 					fm.addConstraint(newConstraint);
 				}
 			}
@@ -255,7 +261,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		fm.addInstance(i.getAlias(), i.getNamespace());
+		fm.addInstance(i.getNamespace(), i.getAlias());
 	}
 
 	/**
@@ -281,7 +287,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			if (nsAttribute != null) {
 				namespace = nsAttribute.getValue();
 			}
-			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getVarName(), um.getModelName())).toArray(Import[]::new));
+			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getModelName(), um.getVarName())).toArray(Import[]::new));
 			if (mfm.isMultiProductLineModel()) {
 				constraints = mfm.getOwnConstraints();
 			}
@@ -337,15 +343,28 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} else if (n instanceof org.prop4j.Not) {
 			return new Not(printConstraint(n.getChildren()[0]));
 		} else if (n instanceof org.prop4j.And) {
-			return new And(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return printMultiArity(And::new, n.getChildren());
 		} else if (n instanceof org.prop4j.Or) {
-			return new Or(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return printMultiArity(Or::new, n.getChildren());
 		} else if (n instanceof Implies) {
 			return new Impl(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
 		} else if (n instanceof Equals) {
 			return new Equiv(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
 		}
 		return null;
+	}
+
+	private Object printMultiArity(BiFunction<Object, Object, Object> constructor, Node[] args) {
+		switch (args.length) {
+		case 0:
+			return null;
+		case 1:
+			return printConstraint(args[0]);
+		case 2:
+			return constructor.apply(printConstraint(args[0]), printConstraint(args[1]));
+		default:
+			return constructor.apply(printConstraint(args[0]), printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length)));
+		}
 	}
 
 	@Override

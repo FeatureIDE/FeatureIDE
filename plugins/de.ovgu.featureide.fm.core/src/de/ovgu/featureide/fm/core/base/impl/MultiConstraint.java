@@ -50,6 +50,10 @@ public class MultiConstraint extends Constraint {
 		this.type = type;
 	}
 
+	public boolean isFromExtern() {
+		return type != MultiFeature.TYPE_INTERN;
+	}
+
 	@Override
 	public IConstraint clone(IFeatureModel newFeatureModel) {
 		return new MultiConstraint(this, newFeatureModel);
