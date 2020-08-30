@@ -615,6 +615,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final Object source = event.getSource();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
+			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			IFeature newCompound = null;
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
 				newCompound = (IFeature) event.getNewValue();
@@ -630,6 +631,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				} else {
 					// new Feature is root so update all childs from root
 					viewer.refreshChildAll(newCompound);
+				}
+
+				final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newCompound);
+				final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+				if (newEditPart != null) {// TODO move to FeatureEditPart
+					newEditPart.activate();
+					viewer.select(newEditPart);
+					// open the renaming command
+					new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel())
+							.show();
 				}
 			}
 			viewer.internRefresh(true);

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
@@ -43,12 +42,12 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 	private static final int topDownDefaultDistance = 50;
 	private static final int leftRightDefaultDistance = 120;
 
-	private final LinkedList<String> selectedFeatureNames;
+	private final List<String> selectedFeatureNames;
 
 	private String newFeatureName;
 	private int distance;
 
-	public CreateGraphicalFeatureAboveOperation(IGraphicalFeatureModel graphicalFeatureModel, LinkedList<String> selectedFeatures) {
+	public CreateGraphicalFeatureAboveOperation(IGraphicalFeatureModel graphicalFeatureModel, List<String> selectedFeatures) {
 		super(graphicalFeatureModel, "Create Feature Above");
 		selectedFeatureNames = selectedFeatures;
 	}
