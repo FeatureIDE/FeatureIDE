@@ -279,7 +279,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	public void repackAllColumns() {
 		for (final TreeColumn col : tree.getColumns()) {
-			col.pack();
+			if (!col.getText().equals(COLUMN_VALUE)) {
+				col.pack();
+			}
 		}
 	}
 
@@ -408,7 +410,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		// Value
 		final TreeViewerColumn colValue = new TreeViewerColumn(treeViewer, SWT.NONE);
-		colValue.getColumn().setWidth(200);
+		colValue.getColumn().setWidth(400);
 		colValue.getColumn().setText(COLUMN_VALUE);
 		colValue.setEditingSupport(valueEditingSupport);
 		colValue.setLabelProvider(new FeatureAttributeValueColumnLabelProvider(cachedImages, this));
