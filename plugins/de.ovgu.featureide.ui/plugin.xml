@@ -1172,9 +1172,40 @@
          tooltip="Use the selected Configuration to derive a Partial Feature Project">
       <visibleWhen
             checkEnabled="false">
-         <reference
-               definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
-         </reference>
+         <with
+               variable="activeMenuSelection">
+            <and>
+               <or>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.preprocessor.antenna"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.composer.featurehouse"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.core.FeatureModeling"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+               </or>
+            </and>
+            <reference
+                  definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
+            </reference>
+         </with>
       </visibleWhen>
    </command>
 		</menuContribution>
