@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Represents a placeholder node that is always false. Do not continue using Nodes with an instance of this class in them.
  *
- * @author paula
+ * @author Paul Westphal
  */
 public class False extends Node {
 

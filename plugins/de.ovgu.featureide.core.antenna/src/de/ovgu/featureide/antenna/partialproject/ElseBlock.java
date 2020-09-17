@@ -23,9 +23,9 @@ package de.ovgu.featureide.antenna.partialproject;
 import org.prop4j.Node;
 
 /**
- * TODO description
+ * Represents an Else preprocessor code block.
  *
- * @author paula
+ * @author Paul Westphal
  */
 public class ElseBlock extends CodeBlock {
 

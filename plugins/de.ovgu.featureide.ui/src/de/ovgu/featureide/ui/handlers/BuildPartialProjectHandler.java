@@ -48,5 +48,4 @@ public class BuildPartialProjectHandler extends AFileHandler {
 			job.schedule();
 		}
 	}
-
 }

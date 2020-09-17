@@ -36,7 +36,8 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * This copies a feature project, waits for the copy to be registered, and then runs the Partial Feature Project builder to build a partial feature project.
+ * This job copies a feature project, waits for the copy to be registered by the Core Plugin, and then runs the Partial Feature Project builder to build a
+ * partial feature project.
  *
  * @author Paul Westphal
  */

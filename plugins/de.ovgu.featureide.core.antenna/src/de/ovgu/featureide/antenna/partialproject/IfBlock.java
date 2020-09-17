@@ -23,9 +23,9 @@ package de.ovgu.featureide.antenna.partialproject;
 import org.prop4j.Node;
 
 /**
- * TODO description
+ * Represents an If preprocessor code block.
  *
- * @author paula
+ * @author Paul Westphal
  */
 public class IfBlock extends CodeBlock {
 

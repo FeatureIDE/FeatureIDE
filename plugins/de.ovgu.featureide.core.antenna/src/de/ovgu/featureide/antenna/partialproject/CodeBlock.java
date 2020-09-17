@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import org.prop4j.Node;
 
 /**
- * TODO description
+ * This class remembers preprocessor code blocks and the corresponding propositional formula.
  *
- * @author paula
+ * @author Paul Westphal
  */
 public class CodeBlock {
 
