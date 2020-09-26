@@ -761,6 +761,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @throws TimeoutException
 	 */
 	private boolean updateAnnotations(ArrayList<CodeBlock> children, Vector<String> lines, ArrayList<String> features) throws TimeoutException {
+		boolean changed = false;
+
 		final int ANNOTATION_KEPT = 0;
 		final int ANNOTATION_REMOVED = 1;
 		final int ANNOTATION_AND_BLOCK_REMOVED = 2;
@@ -882,7 +884,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 			// recursively do the same for children if they haven't already been deleted
 			if (annotationDecision.get(i) != ANNOTATION_AND_BLOCK_REMOVED) {
-				updateAnnotations(block.getChildren(), lines, features);
+				changed = updateAnnotations(block.getChildren(), lines, features);
 			}
 		}
 
@@ -913,7 +915,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 
-		return false;
+		return changed;
 	}
 
 	/**
