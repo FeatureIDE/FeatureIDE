@@ -50,7 +50,8 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 
 	public CreateGraphicalFeatureAboveOperation(IGraphicalFeatureModel graphicalFeatureModel, LinkedList<String> selectedFeatures) {
 		super(graphicalFeatureModel, "Create Feature Above");
-		selectedFeatureNames = selectedFeatures;
+		selectedFeatureNames = new LinkedList<String>();
+		selectedFeatureNames.addAll(selectedFeatures);
 	}
 
 	/**
