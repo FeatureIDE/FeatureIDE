@@ -115,6 +115,7 @@ public class FeatureModel implements IFeatureModel {
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
 		factoryID = oldFeatureModel.factoryID;
 		id = oldFeatureModel.id;
+		nextElementId = oldFeatureModel.nextElementId;
 		featureOrderList = new LinkedList<>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
@@ -548,4 +549,20 @@ public class FeatureModel implements IFeatureModel {
 		return elements.get(id);
 	}
 
+	/**
+	 * Sets the next element ID to the correct value for this feature model to avoid duplicate IDs.
+	 */
+	public void updateNextElementId() {
+		long max = 0;
+		final List<IFeatureModelElement> elements = new ArrayList<>();
+		elements.addAll(getFeatures());
+		elements.addAll(getConstraints());
+
+		for (final IFeatureModelElement element : elements) {
+			if (element.getInternalId() > max) {
+				max = element.getInternalId();
+			}
+		}
+		nextElementId = max + 1;
+	}
 }
