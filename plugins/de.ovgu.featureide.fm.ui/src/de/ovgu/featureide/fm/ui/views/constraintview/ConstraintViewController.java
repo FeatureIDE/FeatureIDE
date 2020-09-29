@@ -131,7 +131,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		public void propertyChange(FeatureIDEEvent event) {
 			switch (event.getEventType()) {
 			case ACTIVE_EXPLANATION_CHANGED:
-				constraintView.filter.setActiveExplanation(featureModelEditor.diagramEditor.getActiveExplanation());
+				if (featureModelEditor != null) {
+					constraintView.filter.setActiveExplanation(featureModelEditor.diagramEditor.getActiveExplanation());
+				}
 				constraintView.refresh();
 				break;
 			case CONSTRAINT_DELETE:
@@ -147,7 +149,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				constraintView.refresh();
 				break;
 			case MODEL_DATA_CHANGED:
-				if(updateConstraint != null) {
+				if (updateConstraint != null) {
 					updateConstraint.removeListener(updateConstraintListener);
 				}
 				updateConstraint = getUpdateConstraint(featureModelEditor);
@@ -260,7 +262,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
 
 		if (constraintsViewVisible && constraintsListVisible) {
-			settingsMenu.setShowCollapsedConstraintsInViewActionImage(featureModelEditor.diagramEditor.getGraphicalFeatureModel().getLayout().showCollapsedConstraints());
+			settingsMenu.setShowCollapsedConstraintsInViewActionImage(
+					featureModelEditor.diagramEditor.getGraphicalFeatureModel().getLayout().showCollapsedConstraints());
 			// set the input (the current FeatureModel) for the content provider
 			final IFeatureModel featureModel = featureModelEditor.getFeatureModelManager().getVarObject();
 			if (constraintView.getViewer().getInput() != featureModel) {
@@ -321,7 +324,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			}
 
 			// update filter and settings menu to correctly handle "showCollapsedConstraints"
-			IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
+			final IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
 			constraintView.filter.setGraphicalFeatureModel(graphicalFeatureModel);
 		}
 
