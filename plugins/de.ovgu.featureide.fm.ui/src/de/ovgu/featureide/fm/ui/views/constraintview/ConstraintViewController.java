@@ -25,7 +25,11 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -240,7 +244,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
 
 		if (constraintsViewVisible && constraintsListVisible) {
-			settingsMenu.setShowCollapsedConstraintsInViewActionImage(featureModelEditor.diagramEditor.getGraphicalFeatureModel().getLayout().showCollapsedConstraints());
+			settingsMenu.setShowCollapsedConstraintsInViewActionImage(
+					featureModelEditor.diagramEditor.getGraphicalFeatureModel().getLayout().showCollapsedConstraints());
 			// set the input (the current FeatureModel) for the content provider
 			final IFeatureModel featureModel = featureModelEditor.getFeatureModelManager().getVarObject();
 			if (constraintView.getViewer().getInput() != featureModel) {
@@ -300,13 +305,11 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				updateConstraint.addListener(updateConstraintListener);
 			}
 
-			constraintView.filter.setFeatureModelSelection(getSelectionList(
-					newFeatureModelEditor.diagramEditor.getViewer().getSelection()));
-			constraintView.filter.setActiveExplanation(
-					newFeatureModelEditor.diagramEditor.getActiveExplanation());
+			constraintView.filter.setFeatureModelSelection(getSelectionList(newFeatureModelEditor.diagramEditor.getViewer().getSelection()));
+			constraintView.filter.setActiveExplanation(newFeatureModelEditor.diagramEditor.getActiveExplanation());
 
 			// update filter and settings menu to correctly handle "showCollapsedConstraints"
-			IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
+			final IGraphicalFeatureModel graphicalFeatureModel = newFeatureModelEditor.diagramEditor.getGraphicalFeatureModel();
 			constraintView.filter.setGraphicalFeatureModel(graphicalFeatureModel);
 		}
 
@@ -391,7 +394,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	 * @param selection StructuredSelection to be filtered
 	 * @return List of FeatureEditParts that are contained in the selection
 	 */
-	public List<FeatureEditPart> getSelectionList(ISelection selection){
+	public List<FeatureEditPart> getSelectionList(ISelection selection) {
 		final List<FeatureEditPart> selectionList = new ArrayList<>();
 
 		for (final Object o : ((IStructuredSelection) selection).toList()) {
