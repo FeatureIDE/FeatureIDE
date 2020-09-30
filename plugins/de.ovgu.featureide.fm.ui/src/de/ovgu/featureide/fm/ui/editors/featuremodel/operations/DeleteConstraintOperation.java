@@ -42,6 +42,7 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 	public static final String ID = ID_PREFIX + "DeleteConstraintOperation";
 
 	private final IConstraint oldConstraint;
+	private int oldConstraintIndex;
 
 	public DeleteConstraintOperation(IConstraint constraint, IFeatureModelManager featureModelManager) {
 		super(featureModelManager, DELETE_CONSTRAINT);
@@ -50,6 +51,7 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		oldConstraintIndex = featureModel.getConstraintIndex(oldConstraint);
 		featureModel.removeConstraint(oldConstraint);
 		return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_DELETE, featureModel, oldConstraint, null);
 	}
@@ -57,7 +59,7 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).copyConstraint(featureModel, oldConstraint);
-		featureModel.addConstraint(constraint);
+		featureModel.addConstraint(constraint, oldConstraintIndex);
 		return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_ADD, featureModel, null, constraint);
 	}
 
