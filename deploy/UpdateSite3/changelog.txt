@@ -7,6 +7,17 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.6.4 (September 2020)
+* Hotfix containing only stability improvements over v3.6.3
+* Minor stability improvements for the feature-model editor (#1027, #1028, #1080) 
+* Fixes for the automated product generation (#1018, #1046, #1066)
+* Deletion of folders/packages in Antenna projects fixed (#1053)
+* Enhancements for the attributes view (#1013)
+* Propagation modes are restored in the configuration editor (#1049, thanks for the report by Claudia Fritsch)
+* Feature-model export into SXFM format fixed (#1009, thanks for the report by Jabier Martinez)
+* Feature-model generator fixed (#1008, thanks for the report by Jabier Martinez)
+* When comparing feature models only examples products are generated (#264)
+
 Release 3.6.3 (May 2020)
 * Hotfix containing only stability improvements over v3.6.2
 * Performance of FeatureIDE with large feature models improved (#970, #1004)
