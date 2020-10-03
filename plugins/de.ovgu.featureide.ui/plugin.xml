@@ -1130,7 +1130,7 @@
 					commandId="de.ovgu.featureide.ui.commands.setConfiguration"
 					icon="icons/currentconfiguration.gif"
 					id="de.ovgu.featureide.fm.ui.actions.setConfiguration"
-					label="Set as current configuration"
+					label="Set as Current Configuration"
 					tooltip="Only the current configuration is build"
 					style="push">
 				<visibleWhen
@@ -1167,7 +1167,7 @@
          commandId="de.ovgu.featureide.ui.commands.buildPartialProject"
          icon="icons/FeatureIconSmall.ico"
          id="de.ovgu.featureide.fm.ui.actions.buildPartialProject"
-         label="Derive partial Feature Project with this configuration"
+         label="Derive Partial Feature Project with this Configuration"
          style="push"
          tooltip="Use the selected Configuration to derive a Partial Feature Project">
       <visibleWhen
