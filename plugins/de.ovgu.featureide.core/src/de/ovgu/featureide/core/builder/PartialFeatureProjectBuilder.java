@@ -40,6 +40,7 @@ import org.prop4j.True;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -126,6 +127,15 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 
 		// Features that are now core features because they were selected in the configuration
 		final ArrayList<String> coreFeatures = new ArrayList<String>(selectedFeatures);
+
+		final FeatureModelAnalyzer fma = new FeatureModelAnalyzer(model);
+		final List<IFeature> currentCoreFeatures = fma.getCoreFeatures(null);
+
+		// Do not add features to the constraint that are already core
+		for (final IFeature cCoreFeature : currentCoreFeatures) {
+			coreFeatures.remove(cCoreFeature.getName());
+		}
+
 		if (!coreFeatures.isEmpty()) {
 			Node coreFeaturesConstraintNode = new Literal(coreFeatures.get(0));
 			for (int i = 1; i < coreFeatures.size(); i++) {
@@ -144,9 +154,9 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 						// Constraint is now tautology and was removed, nothing to do now.
 					} else if (newNode instanceof False) {
 						// Constraint is now contradiction and makes the feature model void.
-						constraintsToAdd.add(new Constraint(model, new Not(new Literal(model.getStructure().getRoot().getFeature().getName()))));
+						constraintsToAdd.add(0, new Constraint(model, new Not(new Literal(model.getStructure().getRoot().getFeature().getName()))));
 					} else {
-						constraintsToAdd.add(new Constraint(model, newNode));
+						constraintsToAdd.add(0, new Constraint(model, newNode));
 					}
 					break;
 				}

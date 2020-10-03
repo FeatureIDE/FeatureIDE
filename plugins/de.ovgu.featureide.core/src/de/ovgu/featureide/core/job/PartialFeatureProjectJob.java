@@ -61,7 +61,7 @@ public class PartialFeatureProjectJob implements LongRunningMethod<Boolean> {
 	@Override
 	public Boolean execute(IMonitor<Boolean> monitor) throws Exception {
 		final IFeatureProject baseProject = CorePlugin.getFeatureProject(file);
-		final String newProjectName = baseProject.getProjectName() + "_" + getConfigName(file);
+		final String newProjectName = baseProject.getProjectName() + "_" + getConfigName(file) + "_" + System.currentTimeMillis();
 
 		try {
 			baseProject.getProject().copy(baseProject.getProject().getFullPath().removeLastSegments(1).append(newProjectName), true, null);
