@@ -884,7 +884,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 			// recursively do the same for children if they haven't already been deleted
 			if (annotationDecision.get(i) != ANNOTATION_AND_BLOCK_REMOVED) {
-				changed = updateAnnotations(block.getChildren(), lines, features);
+				if (updateAnnotations(block.getChildren(), lines, features) == true) {
+					changed = true;
+				}
 			}
 		}
 
