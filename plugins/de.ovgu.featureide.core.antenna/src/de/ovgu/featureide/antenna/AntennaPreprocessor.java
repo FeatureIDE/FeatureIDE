@@ -792,7 +792,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				annotationDecision.add(ANNOTATION_KEPT);
 			} else if (!((afterNode instanceof True) || (afterNode instanceof False))) {
 				// has a solution and is not a tautology
-				// annotation anpassen, dafür afternode zu string verarbeiten
 
 				if (block instanceof ElifBlock) {
 					boolean makeIf = false;
@@ -842,14 +841,14 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				}
 			} else if (new SatSolver(beforeNode, 1000).hasSolution() && (afterNode instanceof False)) {
 				// removing features causes this annotation to be a contradiction
-				// gesamten codeblock entfernen
+				// removes the entire code block
 				for (int line = block.getStartLine(); line <= (block.getEndLine() - 1); line++) {
 					lines.set(line, "");
 				}
 				annotationDecision.add(ANNOTATION_AND_BLOCK_REMOVED);
 			} else if (new SatSolver(new Not(beforeNode), 1000).hasSolution() && (afterNode instanceof True)) {
 				// removing features causes this annotation to be a tautology
-				// annotation entfernen
+				// removes the preprocessor annotation
 				lines.set(block.getStartLine(), "");
 				annotationDecision.add(ANNOTATION_REMOVED);
 			} else if ((!new SatSolver(beforeNode, 1000).hasSolution() && (afterNode instanceof False))
@@ -921,8 +920,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	/**
-	 * @param afterNode
-	 * @return
+	 * @param node
+	 * @param elif
+	 * @return antenna statement made of a node
 	 */
 	private String translateNodeToAntennaStatement(Node node, boolean elif) {
 		final String line;
@@ -941,9 +941,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	/**
-	 * @param codeBlocks
-	 * @param i
-	 * @param size
+	 * This method scans the lines of a java file with antenna preprocessor annotations for code blocks and adds them to the empty code block that was passed as
+	 * an argument.
+	 *
+	 * @param parentBlock
+	 * @param firstLine
+	 * @param lastLine
+	 * @param lines
 	 */
 	private void lookForCodeBlocks(CodeBlock parentBlock, int firstLine, int lastLine, Vector<String> lines) {
 		CodeBlock block = null;
@@ -1000,7 +1004,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/**
 	 * @param parentBlock
-	 * @param buildNode
 	 * @return
 	 */
 	private Node getPreviousNodesNegated(CodeBlock parentBlock) {

@@ -1230,21 +1230,15 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			e.printStackTrace();
 		}
 
-		final ArrayList<IResource> foldersToDelete = new ArrayList<IResource>();
-
 		for (final String feature : removedFeatures) {
 			for (final IResource folder : featureFolders) {
 				if (folder.getName().equals(feature)) {
-					foldersToDelete.add(folder);
+					try {
+						folder.delete(true, null);
+					} catch (final CoreException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-		}
-
-		for (final IResource folder : foldersToDelete) {
-			try {
-				folder.delete(true, null);
-			} catch (final CoreException e) {
-				e.printStackTrace();
 			}
 		}
 	}

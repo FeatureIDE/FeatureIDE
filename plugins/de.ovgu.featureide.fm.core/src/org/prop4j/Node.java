@@ -822,7 +822,6 @@ public abstract class Node {
 				return new Not(child);
 			}
 		} else if (node instanceof Equals) {
-			// todo: add resolve cases
 			final Node leftChild = replaceLiterals(node.getChildren()[0], features, resolve);
 			final Node rightChild = replaceLiterals(node.getChildren()[1], features, resolve);
 			if (leftChild instanceof True) {
