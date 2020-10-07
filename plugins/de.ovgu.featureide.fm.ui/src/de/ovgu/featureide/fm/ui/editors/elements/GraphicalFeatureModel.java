@@ -258,7 +258,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void init() {
-		final IFeatureModel featureModel = featureModelManager.getSnapshot();
+		final IFeatureModel featureModel = featureModelManager.getVarObject();
 		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			constraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
