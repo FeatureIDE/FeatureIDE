@@ -410,7 +410,9 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void setConstraints(Iterable<IConstraint> constraints) {
 		this.constraints.clear();
-		this.constraints.addAll(Functional.toList(constraints));
+		for(IConstraint constraint : constraints){
+			addConstraint(constraint);
+		}
 	}
 
 	@Override
