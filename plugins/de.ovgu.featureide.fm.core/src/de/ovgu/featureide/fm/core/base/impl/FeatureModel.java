@@ -410,7 +410,7 @@ public class FeatureModel implements IFeatureModel {
 	@Override
 	public void setConstraints(Iterable<IConstraint> constraints) {
 		this.constraints.clear();
-		for(IConstraint constraint : constraints){
+		for (final IConstraint constraint : constraints) {
 			addConstraint(constraint);
 		}
 	}
@@ -566,5 +566,9 @@ public class FeatureModel implements IFeatureModel {
 			}
 		}
 		nextElementId = max + 1;
+	}
+
+	public void setNextElementId(long nextElementId) {
+		this.nextElementId = nextElementId;
 	}
 }
