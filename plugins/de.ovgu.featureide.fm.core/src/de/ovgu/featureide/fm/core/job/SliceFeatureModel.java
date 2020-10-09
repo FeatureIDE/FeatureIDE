@@ -122,7 +122,13 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		// needs to be done before resetting to get a unique ID
 		final IFeature nroot = factory.createFeature(m, FeatureUtils.getFeatureName(orgFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
 
+		final long nextElementId = m.getNextElementId();
 		m.reset();
+
+		// keep the nextElementId so newly created abstract features get a unique ID
+		if (m instanceof FeatureModel) {
+			((FeatureModel) m).setNextElementId(nextElementId);
+		}
 
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
@@ -256,8 +262,8 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (final IFeature child : list) {
-								pseudoAlternative.getStructure().addChild(child.getStructure());
 								structure.removeChild(child.getStructure());
+								pseudoAlternative.getStructure().addChild(child.getStructure());
 							}
 							list.clear();
 							structure.setAnd();
