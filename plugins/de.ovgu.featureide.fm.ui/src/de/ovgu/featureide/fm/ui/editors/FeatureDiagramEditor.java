@@ -30,6 +30,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_ALL_LEVELS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_SUBTREE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
 import java.io.IOException;
@@ -122,6 +124,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseLevelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ConvertGraphicalFileAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -166,6 +169,7 @@ import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandle
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.SearchField;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature diagrams and cross-tree constraints.
@@ -1070,6 +1074,59 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.createMouseHandlers();
 	}
 
+	/**
+	 * Creates the menu entry for showing the subtree starting from a feature. This menu consists of n-1 entries for a subtree of depth n and an entry to show
+	 * all levels.
+	 *
+	 * @return The MenuManager for showing the subtree
+	 */
+	private MenuManager createShowSubtreeMenuManager() {
+		final MenuManager menuManager = new ToolBarMenuManager(SHOW_SUBTREE, FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif"), "");
+		menuManager.setRemoveAllWhenShown(true);
+
+		final IStructuredSelection selection = ((IStructuredSelection) viewer.getSelection());
+		final Object firstElement = selection.getFirstElement();
+
+		final boolean oneFeatureSelected = (selection.size() == 1) && ((firstElement instanceof FeatureEditPart) || (firstElement instanceof ConnectionEditPart)
+			|| (firstElement instanceof FmOutlineGroupStateStorage) || (firstElement instanceof IFeature));
+
+		IFeature selectedFeature;
+		if (firstElement instanceof ConnectionEditPart) {
+			selectedFeature = ((ConnectionEditPart) firstElement).getModel().getTarget().getObject();
+		} else {
+			selectedFeature = ((FeatureEditPart) firstElement).getModel().getObject();
+		}
+
+		final int subtreeDepth = FeatureUtils.getSubtreeDepth(selectedFeature);
+
+		if (!(oneFeatureSelected && (subtreeDepth > 1))) {
+			// there is more than one feature selected or the depth of the subtree is not bigger than 1.
+			// in this case we don't want to show this entry
+			menuManager.setVisible(false);
+			return menuManager;
+		}
+
+		menuManager.addMenuListener(new IMenuListener() {
+
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				for (int i = 1; i < subtreeDepth; i++) {
+					final Action action = new CollapseLevelAction(viewer, graphicalFeatureModel, i);
+					action.setEnabled(true);
+					action.setChecked(false);
+					menuManager.add(action);
+
+				}
+				final Action allLevelsAction = new CollapseLevelAction(viewer, graphicalFeatureModel, subtreeDepth);
+				allLevelsAction.setText(SHOW_ALL_LEVELS);
+				allLevelsAction.setEnabled(true);
+				allLevelsAction.setChecked(false);
+				menuManager.add(allLevelsAction);
+			}
+		});
+		return menuManager;
+	}
+
 	private MenuManager createLayoutMenuManager(boolean showText) {
 		final MenuManager menuManager =
 			new ToolBarMenuManager(showText ? SET_LAYOUT : "", FMUIPlugin.getDefault().getImageDescriptor("icons/tree_mode.gif"), "");
@@ -1200,6 +1257,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(collapseAction);
 			menuManager.add(collapseFeaturesAction);
+			menuManager.add(createShowSubtreeMenuManager());
 			menuManager.add(calculateDependencyAction);
 			menuManager.add(focusOnExplanationAction);
 			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
@@ -1228,7 +1286,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createCalculationsMenuManager(true));
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
-			menuManager.add(showCollapsedConstraintsAction);
+			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor
+			if(!graphicalFeatureModel.getConstraintsHidden()) {
+				menuManager.add(showCollapsedConstraintsAction);
+			}
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
 			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

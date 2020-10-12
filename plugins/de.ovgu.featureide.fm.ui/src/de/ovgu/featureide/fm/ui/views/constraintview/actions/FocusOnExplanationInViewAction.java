@@ -25,15 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_EXPLA
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
-import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
@@ -49,10 +43,9 @@ public class FocusOnExplanationInViewAction extends AbstractConstraintEditorActi
 
 	public static final String ID = "de.ovgu.featureide.focusonexplanationinview";
 
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private IConstraint constraint;
+	IGraphicalFeatureModel graphicalFeatureModel;
 
-	public FocusOnExplanationInViewAction(IGraphicalFeatureModel graphicalFeatureModel, Object viewer) {
+	public FocusOnExplanationInViewAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(viewer, graphicalFeatureModel.getFeatureModelManager(), FOCUS_ON_EXPLANATION, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
@@ -63,72 +56,25 @@ public class FocusOnExplanationInViewAction extends AbstractConstraintEditorActi
 		if ((selection != null) && !selection.isEmpty()) {
 			final Object firstElement = selection.getFirstElement();
 			if (firstElement instanceof IConstraint) {
-				constraint = (IConstraint) firstElement;
-				return hasExplanation(constraint);
+				final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
+				return analyzer.getExplanation((IConstraint) firstElement) != null;
 			}
 		}
-		constraint = null;
 		return false;
 	}
 
 	@Override
 	public void run() {
-		final IFeatureModelManager fmManager = featureModelManager;
-		final FeatureModelFormula formula = fmManager.getVariableFormula();
-		final FeatureModelAnalyzer analyser = formula.getAnalyzer();
-		if (constraint == null) {
-			if (!analyser.isValid(null)) {
-				FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(graphicalFeatureModel, analyser.getVoidFeatureModelExplanation()));
-			}
-		} else if (formula.getFeatureModel() == constraint.getFeatureModel()) {
-			if (analyser.getExplanation(constraint) != null) {
-				FeatureModelOperationWrapper
-						.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(constraint)));
-				// Check if any feature has this constraint as a reason in its explanation
-			} else {
-				for (final IFeature feature : formula.getFeatureModel().getFeatures()) {
-					// Check if Feature has an Explanation
-					final Explanation<?> featureExplanation = analyser.getExplanation(feature);
-					if ((featureExplanation != null) && constraintIsInExplanation(featureExplanation)) {
-						FeatureModelOperationWrapper
-								.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) analyser.getExplanation(feature)));
-					}
-				}
-			}
+		if ((selection == null) || selection.isEmpty() || !(selection.getFirstElement() instanceof IConstraint)) {
+			return;
 		}
-	}
+		final IConstraint constraint = (IConstraint) selection.getFirstElement();
+		final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
+		final Explanation<?> explanation = analyzer.getExplanation(constraint);
 
-	/**
-	 * This method checks if the constraint appears in a given Explanation
-	 */
-	private boolean constraintIsInExplanation(Explanation<?> featureExplanation) {
-		// Iterate Reasons
-		for (final Object reason : featureExplanation.getReasons()) {
-			if (reason instanceof FeatureModelReason) {
-				final FeatureModelReason fmReason = (FeatureModelReason) reason;
-				// Check if this Constraint is one of the reasons
-				if (fmReason.getSubject().getElement().equals(constraint)) {
-					return true;
-				}
-			}
+		if (explanation != null) {
+			FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(graphicalFeatureModel, (FeatureModelExplanation<?>) explanation));
 		}
-		return false;
-	}
-
-	/**
-	 * This method checks if the selection has some explanation.
-	 *
-	 * @return If selection has explanation true else false.
-	 */
-	public boolean hasExplanation(IConstraint constraint) {
-		if (constraint == null) {
-			return false;
-		}
-		final ConstraintProperties constraintProperties =
-			featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
-		return constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)
-			|| constraintProperties.hasStatus(ConstraintStatus.VOID) || constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)
-			|| constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY);
 	}
 
 }
