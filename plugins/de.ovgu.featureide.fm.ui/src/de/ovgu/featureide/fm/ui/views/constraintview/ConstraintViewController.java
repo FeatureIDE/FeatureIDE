@@ -126,7 +126,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		public void propertyChange(FeatureIDEEvent event) {
 			switch (event.getEventType()) {
 			case ACTIVE_EXPLANATION_CHANGED:
-				constraintView.filter.setActiveExplanation(featureModelEditor.diagramEditor.getActiveExplanation());
+				if (featureModelEditor != null) {
+					constraintView.filter.setActiveExplanation(featureModelEditor.diagramEditor.getActiveExplanation());
+				}
 				constraintView.refresh();
 				break;
 			case CONSTRAINT_DELETE:
@@ -141,8 +143,18 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				}
 				constraintView.refresh();
 				break;
-			case MODEL_DATA_OVERWRITTEN:
 			case MODEL_DATA_CHANGED:
+				if (updateConstraint != null) {
+					updateConstraint.removeListener(updateConstraintListener);
+				}
+				updateConstraint = getUpdateConstraint(featureModelEditor);
+				if (updateConstraint != null) {
+					// add a new updateConstraintListener to a new constraint
+					updateConstraint.addListener(updateConstraintListener);
+				}
+				constraintView.refresh();
+				break;
+			case MODEL_DATA_OVERWRITTEN:
 			case MODEL_DATA_SAVED:
 			case MANDATORY_CHANGED:
 			case GROUP_TYPE_CHANGED:
@@ -156,6 +168,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			case FEATURE_COLLAPSED_CHANGED:
 			case FEATURE_COLLAPSED_ALL_CHANGED:
 			case ATTRIBUTE_CHANGED:
+			case STRUCTURE_CHANGED:
 				constraintView.refresh();
 				break;
 			default:
