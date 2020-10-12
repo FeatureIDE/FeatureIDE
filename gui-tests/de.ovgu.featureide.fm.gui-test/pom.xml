@@ -44,7 +44,7 @@
                 	<!--<test>CreateFeaturesInFeatureDiagram.test</test>-->
                 	<test>EditAdvancedConfiguration.test</test>
                 	<test>EditConfiguration.test</test>
-                	<test>HandsOn1.test</test>
+                	<!--  <test>HandsOn1.test</test>-->
                 	<test>HandsOn2.test</test>
                 	<!--  <test>HandsOn3.test</test> -->
                 	<!--  <test>HandsOn4.test</test> -->
@@ -59,7 +59,7 @@
                    <!--<execTimeout>150</execTimeout>-->
                    <!--5min is max for each job-->
                     <testExecTimeout>300</testExecTimeout>
-                    <eclExecutionDelay>1000</eclExecutionDelay>
+                    <eclExecutionDelay>500</eclExecutionDelay>
                 </testOptions> 
                 
             </configuration>
