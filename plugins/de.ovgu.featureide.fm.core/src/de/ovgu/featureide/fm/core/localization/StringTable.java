@@ -779,6 +779,8 @@ public class StringTable {
 	public static final String DOCUMENTATION_WIZARD = "Documentation Wizard";
 	public static final String CANT_SET_CONFIGURATION_AS_CURRENT_CONFIGURATION_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT =
 		"Can't set configuration as current configuration because it does not belong to a feature project";
+	public static final String CANT_DERIVE_PARTIAL_PROJECT_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT =
+		"Can't use this configuration to derive a partial project because it does not belong to a feature project";
 	public static final String LEFT = "left";
 	public static final String RIGHT = "right";
 	public static final String CREATE_CONFIGURATIONS = "Create configurations";

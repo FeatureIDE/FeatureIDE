@@ -52,15 +52,24 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.prop4j.And;
+import org.prop4j.False;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader.ErrorHandling;
 import org.prop4j.Not;
+import org.prop4j.SatSolver;
+import org.prop4j.True;
+import org.sat4j.specs.TimeoutException;
 
 import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
 import de.ovgu.featureide.antenna.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
+import de.ovgu.featureide.antenna.partialproject.CodeBlock;
+import de.ovgu.featureide.antenna.partialproject.ElifBlock;
+import de.ovgu.featureide.antenna.partialproject.ElseBlock;
+import de.ovgu.featureide.antenna.partialproject.IfBlock;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -404,17 +413,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		final boolean conditionIsSet = containsPreprocessorDirective(line, "condition");
 		final boolean negative = containsPreprocessorDirective(line, "ifndef|elifndef");
 
-		// remove "//#if ", "//ifdef", ...
-		line = replaceCommandPattern.matcher(line).replaceAll("");
-
-		// prepare expression for NodeReader()
-		line = line.trim();
-		line = line.replace("&&", "&");
-		line = line.replace("||", "|");
-		line = line.replace("!", "-");
-		line = line.replace("&", " and ");
-		line = line.replace("|", " or ");
-		line = line.replace("-", " not ");
+		convertLineForNodeReader(line);
 
 		// get all features and generate Node expression for given line
 		Node ppExpression = nodereader.stringToNode(line, featureList);
@@ -698,4 +697,362 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return false;
 	}
 
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> coreFeatures)
+			throws IOException, CoreException {
+		for (final IResource res : sourceFolder.members()) {
+			if (res instanceof IFolder) {
+				// for folders do recursively
+				buildPartialFeatureProjectAssets((IFolder) res, removedFeatures, coreFeatures);
+			} else if (res instanceof IFile) {
+				// delete all existing builder markers
+
+				featureProject.deleteBuilderMarkers(res, 0);
+
+				// get all lines from file
+				final Vector<String> lines = loadStringsFromFile((IFile) res);
+
+				// run antenna preprocessor
+				boolean changed = false;
+				final CodeBlock codeBlock = new CodeBlock();
+
+				lookForCodeBlocks(codeBlock, 0, lines.size() - 1, lines);
+				try {
+					changed = updateAnnotations(codeBlock.getChildren(), lines, removedFeatures);
+				} catch (final TimeoutException e) {
+					e.printStackTrace();
+				}
+
+				// if this process changed file: check if the file should be deleted entirely, save & refresh
+				if (changed) {
+					if (isFileBlank(lines)) {
+						res.delete(true, null);
+					} else {
+						FileOutputStream ostr = null;
+						try {
+							ostr = new FileOutputStream(res.getRawLocation().toOSString());
+							Preprocessor.saveStrings(lines, ostr, ((IFile) res).getCharset());
+						} finally {
+							if (ostr != null) {
+								ostr.close();
+							}
+						}
+						// use touch to support e.g. linux
+						res.touch(null);
+						res.refreshLocal(IResource.DEPTH_ZERO, null);
+					}
+				}
+			}
+		}
+	}
+
+	private boolean isFileBlank(Vector<String> lines) {
+		for (final String line : lines) {
+			if (line.trim().length() > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @param children
+	 * @param features
+	 * @throws TimeoutException
+	 */
+	private boolean updateAnnotations(ArrayList<CodeBlock> children, Vector<String> lines, ArrayList<String> features) throws TimeoutException {
+		boolean changed = false;
+
+		final int ANNOTATION_KEPT = 0;
+		final int ANNOTATION_REMOVED = 1;
+		final int ANNOTATION_AND_BLOCK_REMOVED = 2;
+
+		final ArrayList<Integer> annotationDecision = new ArrayList<Integer>();
+
+		for (int i = 0; i < children.size(); i++) {
+
+			final CodeBlock block = children.get(i);
+
+			final Node beforeNode;
+			final Node afterNode;
+
+			beforeNode = block.getNode();
+			afterNode = Node.replaceLiterals(beforeNode, features, true);
+			// check if anything even needs to be changed for this node
+			boolean containsDeletedFeature = false;
+			for (final String featureName : beforeNode.getContainedFeatures()) {
+				if (features.contains(featureName)) {
+					containsDeletedFeature = true;
+					break;
+				}
+			}
+
+			if (!containsDeletedFeature) {
+				// node stayed the same
+				annotationDecision.add(ANNOTATION_KEPT);
+			} else if (!((afterNode instanceof True) || (afterNode instanceof False))) {
+				// has a solution and is not a tautology
+
+				if (block instanceof ElifBlock) {
+					boolean makeIf = false;
+
+					// if all previous blocks have been removed
+					for (int x = i - 1; x >= 0; x--) {
+						if (children.get(x) instanceof ElifBlock) {
+							continue;
+						}
+						if (children.get(x) instanceof IfBlock) {
+							if ((annotationDecision.get(x) == ANNOTATION_AND_BLOCK_REMOVED) || (annotationDecision.get(x) == ANNOTATION_REMOVED)) {
+								boolean elifTurnedIf = false;
+								for (int y = x + 1; y < i; y++) {
+									if (annotationDecision.get(y) == ANNOTATION_KEPT) {
+										elifTurnedIf = true;
+										break;
+									}
+								}
+								makeIf = !elifTurnedIf;
+								break;
+							} else {
+								makeIf = false;
+								break;
+							}
+						}
+					}
+
+					if (makeIf) {
+						// Make an if annotation
+						lines.set(block.getStartLine(),
+								translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, true), false));
+						annotationDecision.add(ANNOTATION_KEPT);
+					} else if (Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof True) {
+						// Make an else annotation
+						lines.set(block.getStartLine(), "//#else");
+						annotationDecision.add(ANNOTATION_KEPT);
+					} else {
+						// Change elif
+						lines.set(block.getStartLine(), translateNodeToAntennaStatement(((ElifBlock) block).getElifNode(), true));
+						annotationDecision.add(ANNOTATION_KEPT);
+					}
+				} else if (block instanceof IfBlock) {
+					lines.set(block.getStartLine(), translateNodeToAntennaStatement(afterNode, false));
+					annotationDecision.add(ANNOTATION_KEPT);
+				} else if (block instanceof ElseBlock) {
+					annotationDecision.add(ANNOTATION_KEPT);
+				}
+			} else if (new SatSolver(beforeNode, 1000).hasSolution() && (afterNode instanceof False)) {
+				// removing features causes this annotation to be a contradiction
+				// removes the entire code block
+				for (int line = block.getStartLine(); line <= (block.getEndLine() - 1); line++) {
+					lines.set(line, "");
+				}
+				annotationDecision.add(ANNOTATION_AND_BLOCK_REMOVED);
+			} else if (new SatSolver(new Not(beforeNode), 1000).hasSolution() && (afterNode instanceof True)) {
+				// removing features causes this annotation to be a tautology
+				// removes the preprocessor annotation
+				lines.set(block.getStartLine(), "");
+				annotationDecision.add(ANNOTATION_REMOVED);
+			} else if ((!new SatSolver(beforeNode, 1000).hasSolution() && (afterNode instanceof False))
+				|| (!new SatSolver(new Not(beforeNode), 1000).hasSolution() && (afterNode instanceof True))) {
+				// afterNode is a contradiction or a tautology, but not because of the removal of a feature
+				if (block instanceof ElifBlock) {
+					if ((Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof False)
+						|| (Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof True)) {
+						lines.set(block.getStartLine(), "//#else");
+						annotationDecision.add(ANNOTATION_KEPT);
+					} else {
+						if (annotationDecision.get(i - 1) == ANNOTATION_KEPT) {
+							lines.set(block.getStartLine(),
+									translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), true));
+							annotationDecision.add(ANNOTATION_KEPT);
+						} else {
+							// make an if
+							lines.set(block.getStartLine(),
+									translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), false));
+							annotationDecision.add(ANNOTATION_KEPT);
+						}
+					}
+				} else if (block instanceof IfBlock) {
+					lines.set(block.getStartLine(), translateNodeToAntennaStatement(Node.replaceLiterals(beforeNode, features, false), false));
+					annotationDecision.add(ANNOTATION_KEPT);
+				} else if (block instanceof ElseBlock) {
+					annotationDecision.add(ANNOTATION_KEPT);
+				}
+			} else {
+				// If there are any other cases, add them here.
+			}
+
+			// recursively do the same for children if they haven't already been deleted
+			if (annotationDecision.get(i) != ANNOTATION_AND_BLOCK_REMOVED) {
+				if (updateAnnotations(block.getChildren(), lines, features) == true) {
+					changed = true;
+				}
+			}
+		}
+
+		// remove endif for all blocks that are completely gone
+		for (int x = 0; x < children.size(); x++) {
+			if (children.get(x) instanceof IfBlock) {
+				for (int y = x; y < children.size(); y++) {
+					if (((y + 1) == children.size()) || (children.get(y + 1) instanceof IfBlock)) {
+						boolean removeEndif = true;
+						for (int z = x; z <= y; z++) {
+							if (annotationDecision.get(z) == ANNOTATION_KEPT) {
+								removeEndif = false;
+								break;
+							}
+						}
+						if (removeEndif) {
+							lines.set(children.get(y).getEndLine(), "");
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		for (final int decision : annotationDecision) {
+			if (decision != ANNOTATION_KEPT) {
+				return true;
+			}
+		}
+
+		return changed;
+	}
+
+	/**
+	 * @param node
+	 * @param elif
+	 * @return antenna statement made of a node
+	 */
+	private String translateNodeToAntennaStatement(Node node, boolean elif) {
+		final String line;
+
+		if (elif) {
+			line = "//#elif ";
+		} else {
+			line = "//#if ";
+		}
+		String statement = node.toString();
+
+		statement = statement.replace("&", " && ");
+		statement = statement.replace("|", " || ");
+		statement = statement.replace("-", "!");
+		return line + statement;
+	}
+
+	/**
+	 * This method scans the lines of a java file with antenna preprocessor annotations for code blocks and adds them to the empty code block that was passed as
+	 * an argument.
+	 *
+	 * @param parentBlock
+	 * @param firstLine
+	 * @param lastLine
+	 * @param lines
+	 */
+	private void lookForCodeBlocks(CodeBlock parentBlock, int firstLine, int lastLine, Vector<String> lines) {
+		CodeBlock block = null;
+		int ifcount = 0;
+		for (int currentLine = firstLine; currentLine <= lastLine; currentLine++) {
+			final String line = lines.get(currentLine);
+			// if line is preprocessor directive
+			if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|elifdef|elifndef|if|else|elif")) {
+				if (containsPreprocessorDirective(line, "ifdef|ifndef|condition|if")) {
+					if (block == null) {
+						block = new IfBlock(currentLine, nodereader.stringToNode(convertLineForNodeReader(line)));
+					} else {
+						ifcount++;
+					}
+				} else if (containsPreprocessorDirective(line, "elifdef|elifndef|else|elif")) {
+					if (block == null) {
+						if (containsPreprocessorDirective(line, "else")) {
+							// This is never supposed to happen, invalid input
+							block = new ElseBlock(currentLine, null);
+						} else if (containsPreprocessorDirective(line, "elif")) {
+							block = new ElifBlock(currentLine, null, null);
+						}
+					} else if ((ifcount == 0) && (block != null)) {
+						if (containsPreprocessorDirective(line, "else")) {
+							block.setEndLine(currentLine);
+							parentBlock.addChild(block);
+
+							final Node buildNode = getPreviousNodesNegated(parentBlock);
+
+							block = new ElseBlock(currentLine, buildNode);
+						} else if (containsPreprocessorDirective(line, "elif")) {
+							block.setEndLine(currentLine);
+							parentBlock.addChild(block);
+
+							final Node buildNode = getPreviousNodesNegated(parentBlock);
+							final Node elifNode = nodereader.stringToNode(convertLineForNodeReader(line));
+
+							block = new ElifBlock(currentLine, new And(buildNode, elifNode), elifNode);
+						}
+					}
+				}
+			} else if (containsPreprocessorDirective(line, "endif")) {
+				if ((ifcount == 0) && (block != null)) {
+					block.setEndLine(currentLine);
+					lookForCodeBlocks(block, block.getStartLine() + 1, currentLine - 1, lines);
+					parentBlock.addChild(block);
+					block = null;
+				} else {
+					ifcount--;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param parentBlock
+	 * @return
+	 */
+	private Node getPreviousNodesNegated(CodeBlock parentBlock) {
+		Node buildNode = null;
+		for (int i = parentBlock.getChildren().size() - 1; i >= 0; i--) {
+			final CodeBlock currentBlock = parentBlock.getChildren().get(i);
+			if (buildNode == null) {
+				if (currentBlock instanceof IfBlock) {
+					buildNode = new Not(currentBlock.getNode());
+					break;
+				} else if (currentBlock instanceof ElifBlock) {
+					buildNode = new Not(((ElifBlock) currentBlock).getElifNode());
+					continue;
+				}
+			} else {
+				if (currentBlock instanceof IfBlock) {
+					buildNode = new And(buildNode, new Not(currentBlock.getNode()));
+					break;
+				} else if (currentBlock instanceof ElifBlock) {
+					buildNode = new And(buildNode, new Not(((ElifBlock) currentBlock).getElifNode()));
+					continue;
+				}
+			}
+		}
+		return buildNode;
+	}
+
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return true;
+	}
+
+	private String convertLineForNodeReader(String line) {
+		String trimmedLine = line;
+
+		// remove "//#if ", "//ifdef", ...
+		trimmedLine = replaceCommandPattern.matcher(trimmedLine).replaceAll("");
+
+		trimmedLine = trimmedLine.trim();
+		trimmedLine = trimmedLine.replace("&&", "&");
+		trimmedLine = trimmedLine.replace("||", "|");
+		trimmedLine = trimmedLine.replace("!", "-");
+		trimmedLine = trimmedLine.replace("==", "=");
+
+		trimmedLine = trimmedLine.replace("&", " and ");
+		trimmedLine = trimmedLine.replace("|", " or ");
+		trimmedLine = trimmedLine.replace("-", " not ");
+
+		trimmedLine = trimmedLine.replace("=", " iff ");
+		return trimmedLine;
+	}
 }
