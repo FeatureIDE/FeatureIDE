@@ -1129,7 +1129,6 @@ public class StringTable {
 		"Due to a feature breaking bug in the GTK framework, FeatureIDE has to employ a workaround to maintain functionality. See also bug #1003 in the FeatureIDE bug tracker.";
 	public static final String GTK_WORKAROUND_INFO_TOGGLE = "Do not show this message again.";
 	public static final String CONFIGURATION_DIALOGS_GTK_WORKAROUND = "Disable the workaround information for #1003";
-
 	public static final String DELETE_WARNING = "Delete Warning";
 	public static final String DELETE_WITH_SLICING = "Delete With Slicing";
 	public static final String DELETE_WITHOUT_SLICING = "Delete Without Slicing";
@@ -1142,4 +1141,9 @@ public class StringTable {
 	public static final String DELETING_THESE_FEATURES_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting these features may result in unwanted changes as";
 	public static final String FOR_MORE_INFORMATION_PLEASE_VISIT_THE = "For more information please visit the";
 	public static final String WIKI = "wiki";
+	public static final String SHOW_SUBTREE = "Show Subtree";
+	public static final String LEVEL = "Level";
+	public static final String LEVELS = "Levels";
+	public static final String SHOW = "Show";
+	public static final String SHOW_ALL_LEVELS = "Show All Levels";
 }
