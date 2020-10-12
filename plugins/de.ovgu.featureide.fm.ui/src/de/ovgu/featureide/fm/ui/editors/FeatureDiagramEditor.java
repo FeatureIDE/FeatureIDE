@@ -710,6 +710,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			viewer.reload();
 			setDirty();
+			analyzeFeatureModel();
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
