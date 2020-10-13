@@ -18,5 +18,6 @@ Export-Package: antenna.preprocessor,
  antenna.preprocessor.v3.parser,
  de.ovgu.featureide.antenna,
  de.ovgu.featureide.antenna.documentation,
- de.ovgu.featureide.antenna.model
+ de.ovgu.featureide.antenna.model,
+ de.ovgu.featureide.antenna.partialproject
 Automatic-Module-Name: de.ovgu.featureide.core.antenna
