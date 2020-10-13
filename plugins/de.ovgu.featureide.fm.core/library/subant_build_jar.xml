@@ -3,7 +3,7 @@
 
 	<!-- Set JAR name -->
 	<property name="build.jar.version" value="3.7.0" />
-	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm-v${build.jar.version}" />
+	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
 
 	<!-- Constants -->
 	<property name="base.dir" value=".." />
