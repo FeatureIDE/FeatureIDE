@@ -76,7 +76,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param viewer The viewer with the selection
 	 * @return String List of the names of all the selected features in the viewer
 	 */
-	private static List<String> getFeatureNames(Object viewer) {
+	public static List<String> getFeatureNames(Object viewer) {
 		final IStructuredSelection selection;
 		if (viewer instanceof GraphicalViewerImpl) {
 			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();

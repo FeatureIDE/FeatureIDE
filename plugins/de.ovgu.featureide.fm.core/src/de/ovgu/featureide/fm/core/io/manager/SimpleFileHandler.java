@@ -252,7 +252,7 @@ public class SimpleFileHandler<T> {
 	boolean parse(String content) {
 		if (content != null) {
 			try {
-				final List<Problem> parsingProblemList = format.getInstance().read(object, content);
+				final List<Problem> parsingProblemList = format.getInstance().read(object, content, path);
 				if (problemList != null) {
 					problemList.addAll(parsingProblemList);
 				}

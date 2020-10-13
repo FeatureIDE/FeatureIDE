@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview.listener;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -37,6 +38,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author Rosiak Kamil
  */
 public class ConstraintViewKeyListener implements KeyListener {
+
 	// integer values that are returned when pressing a special button (from keyListener)
 	private final int F_BUTTON_PRESSED = 102;
 	private final int Z_BUTTON_PRESSED = 122;
@@ -53,7 +55,10 @@ public class ConstraintViewKeyListener implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		if (e.keyCode == SWT.DEL) {
 			// pressing the del button while having a constraint selected will delete it
-			new DeleteConstraintInViewAction(viewer.getViewer(), controller.getFeatureModelManager()).run();
+			final Action deleteAction = new DeleteConstraintInViewAction(viewer.getViewer(), controller.getFeatureModelManager());
+			if (deleteAction.isEnabled()) {
+				deleteAction.run();
+			}
 		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
 			// pressing CTRL + F will get you in the search box
 			viewer.getSearchBox().setFocus();

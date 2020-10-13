@@ -23,15 +23,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -49,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateFeatureAboveAction extends Action {
+public class CreateFeatureAboveAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.createfeatureabove";
 
@@ -57,45 +51,29 @@ public class CreateFeatureAboveAction extends Action {
 
 	private IFeature parent = null;
 
-	private final LinkedList<String> selectedFeatures = new LinkedList<>();
-
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-		}
-	};
-
 	public CreateFeatureAboveAction(Object viewer, IGraphicalFeatureModel featureModel) {
-		super(CREATE_FEATURE_ABOVE, createImage);
+		super(CREATE_FEATURE_ABOVE, viewer, ID, featureModel.getFeatureModelManager());
+		setImageDescriptor(createImage);
 		graphicalFeatureModel = featureModel;
-		setEnabled(false);
-		setId(ID);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		} else {
-			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		}
 	}
 
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new CreateGraphicalFeatureAboveOperation(graphicalFeatureModel, selectedFeatures));
+		FeatureModelOperationWrapper.run(new CreateGraphicalFeatureAboveOperation(graphicalFeatureModel, getSelectedFeatures()));
 	}
 
-	private boolean isValidSelection(IStructuredSelection selection) {
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
 		// check that selected features have the same parent
-		selectedFeatures.clear();
 		final Iterator<?> iter = selection.iterator();
+		parent = null;
 		while (iter.hasNext()) {
 			final Object editPart = iter.next();
 			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
@@ -112,16 +90,19 @@ public class CreateFeatureAboveAction extends Action {
 			final IFeatureStructure structureParent = feature.getStructure().getParent();
 			if (structureParent != null) {
 				final IFeature featureParent = structureParent.getFeature();
-				if (selectedFeatures.isEmpty()) {
+				if (parent == null) {
 					parent = featureParent;
 				} else if (parent != featureParent) {
 					return false;
 				}
 			}
-
-			selectedFeatures.add(feature.getName());
 		}
-		return !selectedFeatures.isEmpty();
+		return true;
+	}
+
+	@Override
+	protected void updateProperties() {
+		setEnabled(true);
 	}
 
 }
