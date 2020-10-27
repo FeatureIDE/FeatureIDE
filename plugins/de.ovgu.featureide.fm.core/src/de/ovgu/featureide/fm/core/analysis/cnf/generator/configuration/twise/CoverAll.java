@@ -54,14 +54,6 @@ class CoverAll implements ICoverStrategy {
 			return CombinationStatus.COVERED;
 		}
 
-//		if (util.removeInvalidClausesLight(nextCondition, candidatesList)) {
-//			return CombinationStatus.INVALID;
-//		}
-//
-//		if (util.removeInvalidClausesSat(nextCondition, candidatesList)) {
-//			return CombinationStatus.INVALID;
-//		}
-
 		if (util.removeInvalidClauses(nextCondition, candidatesList)) {
 			return CombinationStatus.INVALID;
 		}

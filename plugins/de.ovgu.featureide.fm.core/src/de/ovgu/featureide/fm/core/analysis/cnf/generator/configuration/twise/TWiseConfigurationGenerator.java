@@ -49,69 +49,6 @@ import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
  */
 public class TWiseConfigurationGenerator extends AConfigurationGenerator implements ITWiseConfigurationGenerator {
 
-	private final class SamplingMonitor implements Runnable {
-
-		@Override
-		public void run() {
-			if (VERBOSE) {
-				final long uncoveredCount = (numberOfCombinations - coveredCount) - invalidCount;
-				final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
-				final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final double uncoverProgress = ((int) Math.floor(((((double) uncoveredCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
-				final StringBuilder sb = new StringBuilder();
-
-				sb.append(phaseCount);
-				sb.append(" - ");
-				sb.append(phaseProgress);
-				sb.append(" (");
-				sb.append(count);
-
-				sb.append(") -- Configurations: ");
-				sb.append(util.getIncompleteSolutionList().size() + util.getCompleteSolutionList().size());
-				sb.append(" (");
-				sb.append(util.getIncompleteSolutionList().size());
-				sb.append(" | ");
-				sb.append(util.getCompleteSolutionList().size());
-
-				sb.append(") -- Covered: ");
-				sb.append(coverProgress);
-				sb.append(" (");
-				sb.append(coveredCount);
-				sb.append(")");
-
-				sb.append(" -- Uncovered: ");
-				sb.append(uncoverProgress);
-				sb.append(" (");
-				sb.append(uncoveredCount);
-				sb.append(")");
-
-				sb.append(" -- Invalid: ");
-				sb.append(invalidProgress);
-				sb.append(" (");
-				sb.append(invalidCount);
-				sb.append(")");
-				System.out.println(sb.toString());
-			}
-		}
-	}
-
-	private final class MemoryMonitor implements Runnable {
-
-		@Override
-		public void run() {
-			final long allocatedMemory = Runtime.getRuntime().totalMemory();
-			final long freeMemory = Runtime.getRuntime().freeMemory();
-			final long usedMemory = allocatedMemory - freeMemory;
-			if (allocatedMemory > maxAllocatedMemory) {
-				maxAllocatedMemory = allocatedMemory;
-			}
-			if (usedMemory > maxUsedMemory) {
-				maxUsedMemory = usedMemory;
-			}
-		}
-	}
-
 	/**
 	 * Converts a set of single literals into a grouped expression list.
 	 *
@@ -158,9 +95,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	private Path migPath = null;
 	private Deduce createConfigurationDeduce = Deduce.DP;
 	private Deduce extendConfigurationDeduce = Deduce.NONE;
-
-	public long maxUsedMemory = 0;
-	public long maxAllocatedMemory = 0;
 
 	protected TWiseConfigurationUtil util;
 	protected TWiseCombiner combiner;
@@ -244,7 +178,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		memoryMonitor = new MonitorThread(new MemoryMonitor(), 1);
 		memoryMonitor.start();
 		if (TWiseConfigurationGenerator.VERBOSE) {
-			samplingMonitor = new MonitorThread(new SamplingMonitor(), logFrequency);
+			samplingMonitor = new MonitorThread(this::printStatus, logFrequency);
 			samplingMonitor.start();
 		}
 		try {
@@ -375,6 +309,49 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		if ((bestResult == null) || (bestResult.size() > curResult.size())) {
 			bestResult = new ArrayList<>(curResult.size());
 			curResult.stream().map(TWiseConfiguration::clone).forEach(bestResult::add);
+		}
+	}
+
+	public void printStatus() {
+		if (VERBOSE) {
+			final long uncoveredCount = (numberOfCombinations - coveredCount) - invalidCount;
+			final double phaseProgress = ((int) Math.floor((1 - (((double) count) / numberOfCombinations)) * 1000)) / 10.0;
+			final double coverProgress = ((int) Math.floor(((((double) coveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+			final double uncoverProgress = ((int) Math.floor(((((double) uncoveredCount) / numberOfCombinations)) * 1000)) / 10.0;
+			final double invalidProgress = ((int) Math.floor(((((double) invalidCount) / numberOfCombinations)) * 1000)) / 10.0;
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append(phaseCount);
+			sb.append(" - ");
+			sb.append(phaseProgress);
+			sb.append(" (");
+			sb.append(count);
+
+			sb.append(") -- Configurations: ");
+			sb.append(util.getIncompleteSolutionList().size() + util.getCompleteSolutionList().size());
+			sb.append(" (");
+			sb.append(util.getIncompleteSolutionList().size());
+			sb.append(" | ");
+			sb.append(util.getCompleteSolutionList().size());
+
+			sb.append(") -- Covered: ");
+			sb.append(coverProgress);
+			sb.append(" (");
+			sb.append(coveredCount);
+			sb.append(")");
+
+			sb.append(" -- Uncovered: ");
+			sb.append(uncoverProgress);
+			sb.append(" (");
+			sb.append(uncoveredCount);
+			sb.append(")");
+
+			sb.append(" -- Invalid: ");
+			sb.append(invalidProgress);
+			sb.append(" (");
+			sb.append(invalidCount);
+			sb.append(")");
+			System.out.println(sb.toString());
 		}
 	}
 
