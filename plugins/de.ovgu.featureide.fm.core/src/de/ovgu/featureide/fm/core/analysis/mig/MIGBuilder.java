@@ -71,6 +71,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final Set<LiteralSet> cleanClauseSet = new HashSet<>();
 	private final List<LiteralSet> newClauseList = new ArrayList<>();
 	private final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
+	private final List<LiteralSet> redundantClauses = new ArrayList<>();
 	private final byte[] dfsMark;
 	private final AdjMatrix adjMatrix;
 	private final CNF satInstance;
@@ -255,6 +256,8 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			if ((clause.getLiterals().length < 3) || !checkRedundancy || !isRedundant(newSolver, clause)) {
 				newSolver.addClause(clause);
 				adjMatrix.clauseList.add(clause);
+			} else {
+				redundantClauses.add(clause);
 			}
 		}
 
@@ -336,27 +339,27 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		}
 
 		final byte oldXY = adjMatrix.edges[indexX][indexY];
-		final byte oldYX = adjMatrix.edges[indexX][indexY];
+		final byte oldYX = adjMatrix.edges[indexY][indexX];
 
 		if (signedVarX > 0) {
 			if (signedVarY > 0) {
 				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_01);
-				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_01);
+				adjMatrix.edges[indexY][indexX] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_01);
 			} else {
 				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_NEGATIVE)) | EDGE_00);
-				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_11);
+				adjMatrix.edges[indexY][indexX] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_11);
 			}
 		} else {
 			if (signedVarY > 0) {
 				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_11);
-				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_00);
+				adjMatrix.edges[indexY][indexX] = (byte) ((oldYX & (~EDGE_NEGATIVE)) | EDGE_00);
 			} else {
 				adjMatrix.edges[indexX][indexY] = (byte) ((oldXY & (~EDGE_POSITIVE)) | EDGE_10);
-				adjMatrix.edges[indexX][indexY] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_10);
+				adjMatrix.edges[indexY][indexX] = (byte) ((oldYX & (~EDGE_POSITIVE)) | EDGE_10);
 			}
 		}
 
-		return (oldXY != adjMatrix.edges[indexX][indexY]) || (oldYX != adjMatrix.edges[indexX][indexY]);
+		return (oldXY != adjMatrix.edges[indexX][indexY]) || (oldYX != adjMatrix.edges[indexY][indexX]);
 	}
 
 	private void addWeakRelation(final int signedVarX, final int signedVarY) {
@@ -367,7 +370,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		}
 
 		final byte oldXY = adjMatrix.edges[indexX][indexY];
-		final byte oldYX = adjMatrix.edges[indexX][indexY];
+		final byte oldYX = adjMatrix.edges[indexY][indexX];
 
 		if (signedVarX > 0) {
 			if (signedVarY > 0) {
@@ -375,14 +378,14 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					adjMatrix.edges[indexX][indexY] |= EDGE_01Q;
 				}
 				if ((oldYX & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[indexX][indexY] |= EDGE_01Q;
+					adjMatrix.edges[indexY][indexX] |= EDGE_01Q;
 				}
 			} else {
 				if ((oldXY & EDGE_STRONG_NEGATIVE) == 0) {
 					adjMatrix.edges[indexX][indexY] |= EDGE_00Q;
 				}
 				if ((oldYX & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[indexX][indexY] |= EDGE_11Q;
+					adjMatrix.edges[indexY][indexX] |= EDGE_11Q;
 				}
 			}
 		} else {
@@ -391,14 +394,14 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					adjMatrix.edges[indexX][indexY] |= EDGE_11Q;
 				}
 				if ((oldYX & EDGE_STRONG_NEGATIVE) == 0) {
-					adjMatrix.edges[indexX][indexY] |= EDGE_00Q;
+					adjMatrix.edges[indexY][indexX] |= EDGE_00Q;
 				}
 			} else {
 				if ((oldXY & EDGE_STRONG_POSITIVE) == 0) {
 					adjMatrix.edges[indexX][indexY] |= EDGE_10Q;
 				}
 				if ((oldYX & EDGE_STRONG_POSITIVE) == 0) {
-					adjMatrix.edges[indexX][indexY] |= EDGE_10Q;
+					adjMatrix.edges[indexY][indexX] |= EDGE_10Q;
 				}
 			}
 		}
@@ -656,6 +659,10 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 
 	public void setDetectStrong(boolean detectStrong) {
 		this.detectStrong = detectStrong;
+	}
+
+	public List<LiteralSet> getRedundantClauses() {
+		return redundantClauses;
 	}
 
 }
