@@ -71,6 +71,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final Set<LiteralSet> cleanClauseSet = new HashSet<>();
 	private final List<LiteralSet> newClauseList = new ArrayList<>();
 	private final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
+	private final List<LiteralSet> redundantClauses = new ArrayList<>();
 	private final byte[] dfsMark;
 	private final AdjMatrix adjMatrix;
 	private final CNF satInstance;
@@ -651,6 +652,10 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 
 	public void setDetectStrong(boolean detectStrong) {
 		this.detectStrong = detectStrong;
+	}
+
+	public List<LiteralSet> getRedundantClauses() {
+		return redundantClauses;
 	}
 
 }

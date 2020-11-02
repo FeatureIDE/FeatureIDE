@@ -81,6 +81,15 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public void addClause(LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
+		newLiteralsCheck: for (final int literal : literals) {
+			for (int i = 0; i < adjList.size(); i++) {
+				if (adjList.get(i).getVar() == literal) {
+					continue newLiteralsCheck;
+				}
+			}
+			addVertexForLiteral(literal);
+
+		}
 		switch (clause.size()) {
 		case 0:
 			throw new RuntimeContradictionException();
@@ -89,6 +98,7 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 			final Vertex vertex = getVertex(literal);
 			vertex.setCore(literal > 0);
 			vertex.setDead(literal < 0);
+			// irgendwas neues jetzt auch core oder dead?
 			break;
 		}
 		case 2: {
@@ -109,6 +119,27 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		}
 	}
 
+	private void addVertexForLiteral(int literal) {
+		final Vertex negVertex = new Vertex(-Math.abs(literal));
+		final Vertex posVertex = new Vertex(Math.abs(literal));
+
+		negVertex.setCore(false);
+		negVertex.setDead(false);
+		posVertex.setCore(false);
+		posVertex.setDead(false);
+
+		negVertex.setStrongEdges(new int[0]);
+		posVertex.setStrongEdges(new int[0]);
+
+		negVertex.setComplexClauses(new int[0]);
+		posVertex.setComplexClauses(new int[0]);
+
+		negVertex.setId(adjList.size());
+		adjList.add(negVertex);
+		posVertex.setId(adjList.size());
+		adjList.add(posVertex);
+	}
+
 	public void removeClause(LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
 		switch (clause.size()) {
@@ -117,25 +148,56 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		case 1: {
 			final int literal = literals[0];
 			final Vertex vertex = getVertex(literal);
-			vertex.setCore(literal > 0);
-			vertex.setDead(literal < 0);
+			// core oder dead vorbei?
 			break;
 		}
 		case 2: {
 			final Vertex vertex0 = getVertex(-literals[0]);
 			final Vertex vertex1 = getVertex(-literals[1]);
-			addStrongEdge(vertex0, -vertex1.getVar());
-			addStrongEdge(vertex1, -vertex0.getVar());
+			removeStrongEdge(vertex0, -vertex1.getVar());
+			removeStrongEdge(vertex1, -vertex0.getVar());
 			break;
 		}
 		default: {
-			final int newClauseIndex = complexClauses.size();
-			complexClauses.add(clause);
-			for (final int literal : literals) {
-				addWeakEdge(getVertex(-literal), newClauseIndex);
+			int oldClauseIndex = -1;
+			for (int i = 0; i < complexClauses.size(); i++) {
+				if (complexClauses.get(i).containsAll(clause)) {
+					oldClauseIndex = i;
+					break;
+				}
+			}
+			if (oldClauseIndex > -1) {
+				for (final int literal : literals) {
+					removeWeakEdge(getVertex(-literal), oldClauseIndex);
+				}
 			}
 			break;
 		}
+		}
+	}
+
+	private void removeWeakEdge(Vertex vertex, int oldClauseIndex) {
+		final int[] oldWeakEdges = vertex.getComplexClauses();
+
+	}
+
+	private void removeStrongEdge(Vertex vertex, int edge) {
+		final int[] tempNewStrongEdges = vertex.getStrongEdges().clone();
+		boolean move = false;
+		for (int i = 0; i < (tempNewStrongEdges.length); i++) {
+			if (tempNewStrongEdges[i] == edge) {
+				move = true;
+			}
+			if (move && (i < (tempNewStrongEdges.length - 1))) {
+				tempNewStrongEdges[i] = tempNewStrongEdges[i + 1];
+			}
+		}
+		if (move) {
+			final int[] newStrongEdges = new int[tempNewStrongEdges.length - 1];
+			for (int i = 0; i < newStrongEdges.length; i++) {
+				newStrongEdges[i] = tempNewStrongEdges[i];
+			}
+			vertex.setStrongEdges(newStrongEdges);
 		}
 	}
 
