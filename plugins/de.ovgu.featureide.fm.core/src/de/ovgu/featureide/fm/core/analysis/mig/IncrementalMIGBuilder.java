@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.mig;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,17 +71,17 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	}
 
 	public static void main(String[] args) throws Exception {
-		installLibraries();
-		final IFeatureModel fm = FeatureModelManager.load(Paths.get(
-				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\Automotive01\\model.xml"));
+		for (int i = 0; i < 20; i++) {
+			installLibraries();
+			final IFeatureModel fm = FeatureModelManager.load(Paths.get(
+					"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\busybox_modelle_entpackt\\2007-05-20_21-51-38\\2007-05-20_21-51-38\\model.xml"));
+			final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
+			final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
+			incMigbuilder.buildPreconditions();
+			incMigbuilder.buildPreconditions();
+			incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
 
-		final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
-		newCnfPrep.getClauses().remove(700);
-		final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
-		incMigbuilder.buildPreconditions();
-//		for (int i = 0; i < 10; i++) {
-		incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
-//		}
+		}
 	}
 
 	/**
@@ -87,10 +89,11 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	 */
 	private void buildPreconditions() {
 		final IFeatureModel fm = FeatureModelManager.load(Paths.get(
-				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\Automotive01\\model.xml"));
+				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\busybox_modelle_entpackt\\2007-05-20_17-12-43\\2007-05-20_17-12-43\\model.xml"));
 
 		oldCNF = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF();
 		final MIGBuilder migBuilder = new MIGBuilder(oldCNF);
+		// migBuilder.setCheckRedundancy(true);
 		oldMig = LongRunningWrapper.runMethod(migBuilder);
 		redundantClauses = migBuilder.getRedundantClauses();
 		adjMatrix = new AdjMatrix(numberOfVariablesNew);
@@ -116,46 +119,75 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 	@Override
 	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
-//		System.out.println(oldCNF.toString());
-//		System.out.println("MIG");
-//		for (final Vertex ver : oldMig.getAdjList()) {
-//			System.out.print("vertex: " + ver.getVar());
-//			System.out.print("  strong Edges: ");
-//			for (final int strongEdge : ver.getStrongEdges()) {
-//				System.out.print(" " + strongEdge + " ");
-//			}
-//			System.out.print("  weak Edges: ");
-//			for (final int weakEdge : ver.getComplexClauses()) {
-//				System.out.print(" " + weakEdge + " ");
-//			}
-//			System.out.println();
-//		}
+		System.out.println();
+		System.out.println();
+
+		final FileWriter fw = new FileWriter("ausgabe.txt");
+		final BufferedWriter bw = new BufferedWriter(fw);
+
+		final FileWriter fw_eval = new FileWriter("eval_time_incomplete_nored_notrans.txt");
+		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
+
+		bw.write(oldCNF.toString());
+		bw.newLine();
+		bw.write("MIG");
+		bw.newLine();
+
+		for (final Vertex ver : oldMig.getAdjList()) {
+			bw.write("vertex: " + ver.getVar());
+			bw.write("  strong Edges: ");
+			for (final int strongEdge : ver.getStrongEdges()) {
+				bw.write(" " + strongEdge + " ");
+			}
+			bw.write("  weak Edges: ");
+			for (final int weakEdge : ver.getComplexClauses()) {
+				bw.write(" " + weakEdge + " ");
+			}
+			bw.newLine();
+		}
 
 		// zeitzähler
 		final long startTime = System.nanoTime();
 
 		final Pair<List<LiteralSet>, List<LiteralSet>> difference = calculateCNFDifference();
+
+		final long cnfDiff = System.nanoTime() - startTime;
+		bw_eval.write("calculate CNF difference: " + cnfDiff);
+		bw_eval.newLine();
+
 		final List<LiteralSet> removed = difference.getKey();
 		List<LiteralSet> affectedClauses = new ArrayList<>();
-		System.out.println(System.nanoTime() - startTime);
+
 		if (!redundantClauses.isEmpty()) {
 			removed.removeAll(redundantClauses);
 			affectedClauses = getAllAffectedClauses(removed, redundantClauses);
 			handlePreviouslyRedundant(affectedClauses);
 		}
+
+		final long redClauses = System.nanoTime() - cnfDiff - startTime;
+		bw_eval.write("checked redundant Clauses of removed: " + redClauses);
+		bw_eval.newLine();
+
 		for (final LiteralSet clause : removed) {
 			newMig.removeClause(clause);
 		}
-		System.out.println(System.nanoTime() - startTime);
+
+		final long remClauses = System.nanoTime() - redClauses - cnfDiff - startTime;
+		bw_eval.write("removed Clauses: " + remClauses);
+		bw_eval.newLine();
 
 		final List<LiteralSet> added = difference.getValue();
 		final List<LiteralSet> notRedundantClauses = newCNF.getClauses().clone();
-		if (redundantClauses != null) {
+		if (!redundantClauses.isEmpty()) {
 			notRedundantClauses.removeAll(redundantClauses);
+			affectedClauses = getAllAffectedClauses(added, notRedundantClauses);
+			handleNewlyRedundant(affectedClauses);
 		}
-		System.out.println(System.nanoTime() - startTime);
 
-		affectedClauses = getAllAffectedClauses(added, notRedundantClauses);
+		final long redClauses2 = System.nanoTime() - remClauses - redClauses - cnfDiff - startTime;
+		bw_eval.write("checked redundant Clauses of added: " + redClauses2);
+		bw_eval.newLine();
+
 		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNF, false));
 		for (final LiteralSet clause : added) {
 			if ((clause.size() < 3) || !isRedundant(newSolver, clause)) {
@@ -167,7 +199,13 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 		// zeitzähler
 		final long endTime = System.nanoTime();
+		bw_eval.write("add clauses: " + (endTime - redClauses2 - remClauses - redClauses - cnfDiff - startTime));
+		bw_eval.newLine();
+		System.out.println();
+		System.out.println();
 
+		bw_eval.write("Benötigte Zeit beim incremental: " + (endTime - startTime));
+		bw_eval.newLine();
 		System.out.println("Benötigte Zeit beim incremental: " + (endTime - startTime));
 
 		final long startTimeOld = System.nanoTime();
@@ -183,25 +221,35 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 		final long endTimeOld = System.nanoTime();
 
+		bw_eval.write("Benötigte Zeit beim neu Berechnen: " + (endTimeOld - startTimeOld));
+		bw_eval.newLine();
+		bw_eval.write("Zeitsparen durch incremental: " + (endTimeOld - startTimeOld - (endTime - startTime)));
 		System.out.println("Benötigte Zeit beim neu Berechnen: " + (endTimeOld - startTimeOld));
+		System.out.println("Zeitsparen durch incremental: " + (endTimeOld - startTimeOld - (endTime - startTime)));
 
-		System.out.println();
 		compare(newMig, testMIG);
 
-//		System.out.println(newCNF.toString());
-//		System.out.println("MIG");
-//		for (final Vertex ver : newMig.getAdjList()) {
-//			System.out.print("vertex: " + ver.getVar());
-//			System.out.print("  strong Edges: ");
-//			for (final int strongEdge : ver.getStrongEdges()) {
-//				System.out.print(" " + strongEdge + " ");
-//			}
-//			System.out.print("  weak Edges: ");
-//			for (final int weakEdge : ver.getComplexClauses()) {
-//				System.out.print(" " + weakEdge + " ");
-//			}
-//			System.out.println();
-//		}
+		bw.write(newCNF.toString());
+		bw.newLine();
+		bw.write("MIG");
+		bw.newLine();
+
+		for (final Vertex ver : newMig.getAdjList()) {
+			bw.write("vertex: " + ver.getVar());
+			bw.write("  strong Edges: ");
+			for (final int strongEdge : ver.getStrongEdges()) {
+				bw.write(" " + strongEdge + " ");
+			}
+			bw.write("  weak Edges: ");
+			for (final int weakEdge : ver.getComplexClauses()) {
+				bw.write(" " + weakEdge + " ");
+			}
+			bw.newLine();
+		}
+
+		bw.close();
+		bw_eval.close();
+
 		return newMig;
 	}
 

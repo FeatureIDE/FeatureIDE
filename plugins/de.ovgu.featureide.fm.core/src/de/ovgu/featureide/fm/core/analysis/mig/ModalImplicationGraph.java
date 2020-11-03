@@ -170,15 +170,44 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 				for (final int literal : literals) {
 					removeWeakEdge(getVertex(-literal), oldClauseIndex);
 				}
+				removeComplexClause(oldClauseIndex);
 			}
 			break;
 		}
 		}
 	}
 
+	private void removeComplexClause(int oldClauseIndex) {
+		final List<LiteralSet> oldComplexClauses = getComplexClauses();
+		final boolean move = false;
+		if (move) {
+			final List<LiteralSet> newComplexClauses = new ArrayList<>(oldComplexClauses.size() - 1);
+			for (int i = oldClauseIndex; i < newComplexClauses.size(); i++) {
+				newComplexClauses.set(i, oldComplexClauses.get(i + 1));
+			}
+			complexClauses.clear();
+			complexClauses.addAll(newComplexClauses);
+		}
+	}
+
 	private void removeWeakEdge(Vertex vertex, int oldClauseIndex) {
 		final int[] oldWeakEdges = vertex.getComplexClauses();
-
+		boolean move = false;
+		for (int i = 0; i < oldWeakEdges.length; i++) {
+			if (oldWeakEdges[i] == oldClauseIndex) {
+				move = true;
+			}
+			if (move && (i < (oldWeakEdges.length - 1))) {
+				oldWeakEdges[i] = oldWeakEdges[i + 1];
+			}
+		}
+		if (move) {
+			final int[] newWeakEdges = new int[oldWeakEdges.length - 1];
+			for (int i = 0; i < newWeakEdges.length; i++) {
+				newWeakEdges[i] = oldWeakEdges[i];
+			}
+			vertex.setComplexClauses(newWeakEdges);
+		}
 	}
 
 	private void removeStrongEdge(Vertex vertex, int edge) {
