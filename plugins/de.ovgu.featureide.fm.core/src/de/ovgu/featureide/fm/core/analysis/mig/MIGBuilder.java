@@ -251,8 +251,8 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (checkRedundancy) {
 			final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(satInstance, false));
 			newClauseList.stream() //
-					.filter(clause -> clause.getLiterals().length < 3) //
-					.filter(clause -> !isRedundant(newSolver, clause)) //
+					.filter(clause -> (clause.getLiterals().length < 3) //
+						|| !isRedundant(newSolver, clause)) //
 					.peek(newSolver::addClause).forEach(adjMatrix.clauseList::add); //
 		} else {
 			newClauseList.stream().forEach(adjMatrix.clauseList::add);
