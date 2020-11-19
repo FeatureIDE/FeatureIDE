@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -56,27 +57,39 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 	private static final String MARK1 = "?", MARK2 = "??";
+	private static final String ABSTRACT_NAME = "Abstract_";
 
 	private boolean changed = false;
 	private final boolean considerConstraints;
 	private final FeatureModelFormula formula;
 	private final Collection<String> featureNames;
+	private final IFeatureModel featureModel;
 
-	public SliceFeatureModel(IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
-		formula = FeatureModelManager.getInstance(featuremodel).getPersistentFormula();
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints) {
+		this(featureModel, featureNames, considerConstraints, true);
+	}
+
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints, boolean usePersistentFormula) {
+		if (usePersistentFormula) {
+			formula = FeatureModelManager.getInstance(featureModel).getPersistentFormula();
+			this.featureModel = formula.getFeatureModel();
+		} else {
+			formula = FeatureModelManager.getInstance(featureModel).getVariableFormula();
+			this.featureModel = featureModel;
+		}
 		this.featureNames = featureNames;
 		this.considerConstraints = considerConstraints;
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
-		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(formula.getFeatureModel());
+		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 		monitor.setRemainingWork(100);
 
 		monitor.checkCancel();
 		final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
 		monitor.checkCancel();
-		final IFeatureModel featureTree = sliceTree(featureNames, formula.getFeatureModel(), factory, monitor.subTask(2));
+		final IFeatureModel featureTree = sliceTree(featureNames, featureModel, factory, monitor.subTask(2));
 		monitor.checkCancel();
 		merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
 
@@ -85,7 +98,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(formula.getFeatureModel()));
+		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
@@ -104,10 +117,19 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		final IFeature root = m.getStructure().getRoot().getFeature();
 
 		m.getStructure().setRoot(null);
-		m.reset();
 
 		// set new abstract root
+		// needs to be done before resetting to get a unique ID
 		final IFeature nroot = factory.createFeature(m, FeatureUtils.getFeatureName(orgFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
+
+		final long nextElementId = m.getNextElementId();
+		m.reset();
+
+		// keep the nextElementId so newly created abstract features get a unique ID
+		if (m instanceof FeatureModel) {
+			((FeatureModel) m).setNextElementId(nextElementId);
+		}
+
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -121,7 +143,21 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		} while (changed);
 		monitor.step();
 
-		int count = 0;
+		// needed to correctly set unique names for newly created abstract features
+		int abstractCount = 0;
+		for (final IFeature f : orgFeatureModel.getFeatures()) {
+			if (f.getName().startsWith(ABSTRACT_NAME)) {
+				try {
+					final int abstractNumber = Integer.parseInt(f.getName().substring(ABSTRACT_NAME.length()));
+					if (abstractNumber >= abstractCount) {
+						abstractCount = abstractNumber + 1;
+					}
+				} catch (final NumberFormatException e) {
+					// feature name is not "Abstract_NUMBER". Can be ignored
+				}
+			}
+		}
+
 		final Hashtable<String, IFeature> featureTable = new Hashtable<>();
 		final LinkedList<IFeature> featureStack = new LinkedList<>();
 		featureStack.push(nroot);
@@ -131,13 +167,17 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName("_Abstract_" + count++);
+				curFeature.setName(ABSTRACT_NAME + abstractCount++);
 				curFeature.getStructure().setAbstract(true);
 			}
 			featureTable.put(curFeature.getName(), curFeature);
 		}
 		m.setFeatureTable(featureTable);
 		m.getStructure().setRoot(nroot.getStructure());
+
+		if (m instanceof FeatureModel) {
+			((FeatureModel) m).updateNextElementId();
+		}
 
 		if (considerConstraints) {
 			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
@@ -222,8 +262,8 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
 							for (final IFeature child : list) {
-								pseudoAlternative.getStructure().addChild(child.getStructure());
 								structure.removeChild(child.getStructure());
+								pseudoAlternative.getStructure().addChild(child.getStructure());
 							}
 							list.clear();
 							structure.setAnd();

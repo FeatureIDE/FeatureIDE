@@ -247,5 +247,7 @@
     <project name="Telecom Example-AspectJ" path="featureide_examples/Telecom Example-AspectJ/.project"/>
     <project name="Tracing Example-AspectJ" path="featureide_examples/Tracing Example-AspectJ/.project"/>
     <project name="UnionFind-FH-JML" path="featureide_examples/UnionFind-FH-JML/.project"/>
+	<project name="Universal-Variability-Language-Multi" path="featureide_examples/UniversalVariabilityLanguage/Universal-Variability-Language-Multi/.project"/>
+	<project name="Universal-Variability-Language" path="featureide_examples/UniversalVariabilityLanguage/Universal-Variability-Language/.project"/>
     <project name="VariableCharacters-ImageComposer" path="featureide_examples/VariableCharacters-ImageComposer/.project"/>
 </projectRecords>

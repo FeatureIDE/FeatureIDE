@@ -56,13 +56,12 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
@@ -352,8 +351,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	@Override
-	public String getConfigurationExtension() {
-		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
+	public IConfigurationFormat getConfigurationFormat() {
+		return ConfigFormatManager.getDefaultFormat();
 	}
 
 	@Override
@@ -362,11 +361,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			if (!folder.exists()) {
 				folder.create(true, true, null);
 			}
-			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
+			final IPersistentFormat<Configuration> format = getConfigurationFormat();
 			final IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
 			SimpleFileHandler.save(EclipseFileSystem.getPath(configurationFile), configuration, format);
 			copyNotComposedFiles(configuration, folder);
-		} catch (CoreException | NoSuchExtensionException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -480,8 +479,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		final Configuration configuration = fileHandler.getObject();
 
 		try {
-			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + new DefaultFormat().getSuffix());
-			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + getConfigurationFormat().getSuffix());
+			new JavaFileSystem().write(tempFile, getConfigurationFormat().write(configuration).getBytes(Charset.defaultCharset()));
 			tempFile.toFile().deleteOnExit();
 			return tempFile;
 		} catch (final IOException e) {

@@ -196,7 +196,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 				} else {
 					detectFormat(content);
 				}
-				final ProblemList problems = format.getInstance().read(variableObject, content);
+				final ProblemList problems = format.getInstance().read(variableObject, content, path);
 				final T newPersistentObject = createObject();
 				format.getInstance().read(newPersistentObject, content);
 				if (problems != null) {

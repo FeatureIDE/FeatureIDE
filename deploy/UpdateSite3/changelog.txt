@@ -7,6 +7,26 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.7.0 (October 2020)
+* Universal Variability Language (UVL) integrated into FeatureIDE (#1050)
+* New operation to derive subset product lines given a partial configuration (#1079)
+* Significantly revised constraints view with improved performance, sorting (#874, #886, #887, #1014, #1037, #1038, #1039, #1060, #1063, #1064, #1068)
+* Removal of features that occur in cross-tree constraints by means of slicing (#200, #984)
+* Subtrees of feature models can be collapsed to a specified level (#851, thanks for the report by cpwnd)
+* Stability of feature-model editor (#992, #1028, #1083) and sampling with YASA (#967) improved
+* API improved (#917, thanks for the report by Robert Müller)
+
+Release 3.6.4 (September 2020)
+* Hotfix containing only stability improvements over v3.6.3
+* Minor stability improvements for the feature-model editor (#1027, #1028, #1080) 
+* Fixes for the automated product generation (#1018, #1046, #1066)
+* Deletion of folders/packages in Antenna projects fixed (#1053)
+* Enhancements for the attributes view (#1013)
+* Propagation modes are restored in the configuration editor (#1049, thanks for the report by Claudia Fritsch)
+* Feature-model export into SXFM format fixed (#1009, thanks for the report by Jabier Martinez)
+* Feature-model generator fixed (#1008, thanks for the report by Jabier Martinez)
+* When comparing feature models only examples products are generated (#264)
+
 Release 3.6.3 (May 2020)
 * Hotfix containing only stability improvements over v3.6.2
 * Performance of FeatureIDE with large feature models improved (#970, #1004)

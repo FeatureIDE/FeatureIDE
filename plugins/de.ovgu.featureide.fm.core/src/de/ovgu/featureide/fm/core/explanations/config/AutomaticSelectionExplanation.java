@@ -26,7 +26,6 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * An explanation for an automatic selection in a configuration.
@@ -46,7 +45,7 @@ public class AutomaticSelectionExplanation extends ConfigurationExplanation<Sele
 
 	@Override
 	public Node getImplication() {
-		return new Literal(NodeCreator.getVariable(getSubject().getFeature()), getSubject().getAutomatic() == Selection.SELECTED);
+		return new Literal(getSubject().getFeature().getName(), getSubject().getAutomatic() == Selection.SELECTED);
 	}
 
 	@Override

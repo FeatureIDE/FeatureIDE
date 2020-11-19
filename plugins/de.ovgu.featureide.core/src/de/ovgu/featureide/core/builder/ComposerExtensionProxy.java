@@ -159,4 +159,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return defaultComposerExtensionClass.hasBuildFolder();
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
 }

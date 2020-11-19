@@ -43,14 +43,15 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 	private static final int topDownDefaultDistance = 50;
 	private static final int leftRightDefaultDistance = 120;
 
-	private final LinkedList<String> selectedFeatureNames;
+	private final List<String> selectedFeatureNames;
 
 	private String newFeatureName;
 	private int distance;
 
-	public CreateGraphicalFeatureAboveOperation(IGraphicalFeatureModel graphicalFeatureModel, LinkedList<String> selectedFeatures) {
+	public CreateGraphicalFeatureAboveOperation(IGraphicalFeatureModel graphicalFeatureModel, List<String> selectedFeatures) {
 		super(graphicalFeatureModel, "Create Feature Above");
-		selectedFeatureNames = selectedFeatures;
+		selectedFeatureNames = new LinkedList<String>();
+		selectedFeatureNames.addAll(selectedFeatures);
 	}
 
 	/**

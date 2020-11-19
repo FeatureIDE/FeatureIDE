@@ -2,10 +2,10 @@
 <project name="JAR Build Script" default="build" basedir=".">
 
 	<!-- Path to Java Compiler (Can be adated in file build_jar.properties) -->
-	<property name="bin.javac.path.default" value="C:/Program Files/Java/openjdk-8u212-b04/bin/javac.exe" />
+	<!--<property name="bin.javac.path.default" value="C:/Program Files/Java/openjdk-8u212-b04/bin/javac.exe" />-->
 
 	<!-- Set JAR name -->
-	<property name="build.jar.version" value="3.6.3" />
+	<property name="build.jar.version" value="3.7.0" />
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes-v${build.jar.version}" />
 
 	<!-- Constants -->
@@ -50,7 +50,7 @@
 		</path>
 
 		<!-- Compile the src folder -->
-		<javac srcdir="${src.dir}" destdir="${build.bin.dir}" classpathref="classpath" excludesfile="${build.excludes.path}" debug="on" includeantruntime="false" source="1.8" target="1.8" fork="yes" executable="${bin.javac.path}">
+		<javac srcdir="${src.dir}" destdir="${build.bin.dir}" classpathref="classpath" excludesfile="${build.excludes.path}" debug="on" includeantruntime="false" source="1.8" target="1.8" fork="yes">
 			<compilerarg value="-Xlint" />
 		</javac>
 

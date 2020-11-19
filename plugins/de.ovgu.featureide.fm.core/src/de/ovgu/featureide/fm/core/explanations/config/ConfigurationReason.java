@@ -25,7 +25,6 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
@@ -57,7 +56,7 @@ public class ConfigurationReason extends Reason<SelectableFeature> {
 
 	@Override
 	public Node toNode() {
-		return new Literal(NodeCreator.getVariable(getSubject().getFeature()), getSubject().getSelection() == Selection.SELECTED);
+		return new Literal(getSubject().getFeature().getName(), getSubject().getSelection() == Selection.SELECTED);
 	}
 
 	@Override

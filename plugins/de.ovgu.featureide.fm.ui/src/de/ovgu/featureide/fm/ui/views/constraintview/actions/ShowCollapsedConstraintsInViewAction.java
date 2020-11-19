@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_COLLAPSED_CONSTRAINTS;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -31,6 +30,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedConstraintsOperation;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewSettingsMenu;
 
 /**
  * A modified ShowCollapsedConstraintsAction for the ConstraintView
@@ -38,24 +39,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedCon
  * @author Domenik Eichhorn
  */
 public class ShowCollapsedConstraintsInViewAction extends Action {
-	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
-	private IGraphicalFeatureModel featureModel;
 
-	public ShowCollapsedConstraintsInViewAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
+	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
+	private final ConstraintViewController controller;
+	private final ConstraintViewSettingsMenu settingsMenu;
+
+	public ShowCollapsedConstraintsInViewAction(ConstraintViewController controller, ConstraintViewSettingsMenu constraintViewSettingsMenu) {
 		super(SHOW_COLLAPSED_CONSTRAINTS, ImageDescriptor.createFromImage(SHOW_HIDE_IMAGE));
-		this.featureModel = featureModel;
+		this.controller = controller;
+		settingsMenu = constraintViewSettingsMenu;
 	}
 
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new ShowCollapsedConstraintsOperation(featureModel));
+		final IGraphicalFeatureModel graphicalFeatureModel = controller.getFeatureModelEditor().diagramEditor.getGraphicalFeatureModel();
+		FeatureModelOperationWrapper.run(new ShowCollapsedConstraintsOperation(graphicalFeatureModel));
+		controller.getView().refresh();
+		settingsMenu.setShowCollapsedConstraintsInViewActionImage(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 	}
-
-	/**
-	 * This method updates the feature model
-	 */
-	public void update(IGraphicalFeatureModel featureModel) {
-		this.featureModel = featureModel;
-	}
-
 }

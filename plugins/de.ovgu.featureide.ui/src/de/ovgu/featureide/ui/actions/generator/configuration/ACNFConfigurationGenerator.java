@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.NoAbstractCNFCreator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -44,20 +45,15 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 
 	private class Consumer implements Runnable {
 
-		private final IConfigurationGenerator gen;
-		private final Configuration configuration = new Configuration(snapshot);
 		private boolean run = true;
-
-		public Consumer(IConfigurationGenerator gen) {
-			this.gen = gen;
-		}
 
 		@Override
 		public void run() {
 			final LinkedBlockingQueue<LiteralSet> resultQueue = gen.getResultQueue();
 			while (run) {
 				try {
-					generateConfiguration(resultQueue.take());
+					final LiteralSet take = resultQueue.take();
+					generateConfiguration(take);
 				} catch (final InterruptedException e) {
 					break;
 				}
@@ -72,22 +68,26 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 			run = false;
 		}
 
-		private void generateConfiguration(LiteralSet solution) {
-			configuration.resetValues();
-			for (final int selection : solution.getLiterals()) {
-				final String name = cnf.getVariables().getName(selection);
-				configuration.setManual(name, selection > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-			}
-			addConfiguration(configuration);
-		}
-
 	}
 
-	protected final CNF cnf;
+	protected final CNF noAbstractCNF;
+	private final Configuration configuration = new Configuration(snapshot);
+	private IConfigurationGenerator gen;
+
+	private void generateConfiguration(LiteralSet solution) {
+		configuration.resetValues();
+		for (final int selection : solution.getLiterals()) {
+			final String name = noAbstractCNF.getVariables().getName(selection);
+			configuration.setManual(name, selection > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+		}
+		final ConfigurationAnalyzer a = new ConfigurationAnalyzer(snapshot, configuration);
+		a.completeMin();
+		addConfiguration(configuration);
+	}
 
 	public ACNFConfigurationGenerator(ConfigurationBuilder builder, FeatureModelFormula formula) {
 		super(builder, formula);
-		cnf = snapshot.getElement(new NoAbstractCNFCreator());
+		noAbstractCNF = snapshot.getElement(new NoAbstractCNFCreator()).normalize();
 	}
 
 	@Override
@@ -97,8 +97,8 @@ public abstract class ACNFConfigurationGenerator extends AConfigurationGenerator
 
 	@Override
 	public List<LiteralSet> execute(IMonitor<List<LiteralSet>> monitor) throws Exception {
-		final IConfigurationGenerator gen = getGenerator(cnf, (int) builder.configurationNumber);
-		final Consumer consumer = new Consumer(gen);
+		gen = getGenerator(noAbstractCNF, (int) builder.configurationNumber);
+		final Consumer consumer = new Consumer();
 		final Thread thread = new Thread(consumer);
 		thread.start();
 		try {

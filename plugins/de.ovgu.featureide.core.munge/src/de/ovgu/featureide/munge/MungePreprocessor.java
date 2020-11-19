@@ -505,7 +505,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
-					if (res.getFileExtension().equals(getConfigurationExtension())) {
+					if (res.getFileExtension().equals(getConfigurationFormat().getSuffix())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
@@ -594,4 +594,14 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		return false;// TODO munge seems to have parallelization problems
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
+	}
 }

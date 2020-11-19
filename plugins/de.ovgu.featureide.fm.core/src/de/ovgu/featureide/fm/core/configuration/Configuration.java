@@ -240,6 +240,26 @@ public class Configuration implements Cloneable {
 		return result;
 	}
 
+	public Set<String> getUnselectedFeatureNames() {
+		final Set<String> result = new HashSet<String>();
+		for (final SelectableFeature feature : selectableFeatures.values()) {
+			if (feature.getSelection() == Selection.UNSELECTED) {
+				result.add(feature.getName());
+			}
+		}
+		return result;
+	}
+
+	public Set<String> getUndefinedFeatureNames() {
+		final Set<String> result = new HashSet<String>();
+		for (final SelectableFeature feature : selectableFeatures.values()) {
+			if (feature.getSelection() == Selection.UNDEFINED) {
+				result.add(feature.getName());
+			}
+		}
+		return result;
+	}
+
 	public List<IFeature> getSelectedFeatures() {
 		return getFeatures(Selection.SELECTED);
 	}

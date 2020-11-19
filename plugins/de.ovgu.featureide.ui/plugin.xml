@@ -1130,7 +1130,7 @@
 					commandId="de.ovgu.featureide.ui.commands.setConfiguration"
 					icon="icons/currentconfiguration.gif"
 					id="de.ovgu.featureide.fm.ui.actions.setConfiguration"
-					label="Set as current configuration"
+					label="Set as Current Configuration"
 					tooltip="Only the current configuration is build"
 					style="push">
 				<visibleWhen
@@ -1163,6 +1163,51 @@
 					</reference>
 				</visibleWhen>
 			</dynamic>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.buildPartialProject"
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.fm.ui.actions.buildPartialProject"
+         label="Derive Partial Feature Project with this Configuration"
+         style="push"
+         tooltip="Use the selected Configuration to derive a Partial Feature Project">
+      <visibleWhen
+            checkEnabled="false">
+         <with
+               variable="activeMenuSelection">
+            <and>
+               <or>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.preprocessor.antenna"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.composer.featurehouse"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           args="de.ovgu.featureide.core.FeatureModeling"
+                           property="de.ovgu.featureide.fm.ui.properties.composer">
+                     </test>
+                  </iterate>
+               </or>
+            </and>
+            <reference
+                  definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
+            </reference>
+         </with>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 
 		<menuContribution
@@ -1279,6 +1324,10 @@
 				id="de.ovgu.featureide.fm.ui.colorscheme"
 				name="Colorscheme">
 		</command>
+  <command
+        id="de.ovgu.featureide.ui.commands.buildPartialProject"
+        name="Build Partial Project">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1314,6 +1363,10 @@
 				class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
 				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 		</handler>
+  <handler
+        class="de.ovgu.featureide.ui.handlers.BuildPartialProjectHandler"
+        commandId="de.ovgu.featureide.ui.commands.buildPartialProject">
+  </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">

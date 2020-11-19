@@ -35,6 +35,7 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -70,8 +71,12 @@ public abstract class Generator {
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
 		final IFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
 		final IFeatureModel fm = factory.create();
+		// Create root feature
+		final IFeature rootFeature = factory.createFeature(fm, "C1");
+		fm.addFeature(rootFeature);
+		fm.getStructure().setRoot(rootFeature.getStructure());
 		final List<IFeature> leaves = new LinkedList<>();
-		leaves.add(fm.getFeature("C1"));
+		leaves.add(rootFeature);
 		int count = 1;
 		while (count < numberOfFeatures) {
 			final int parentIndex = random.nextInt(leaves.size());
@@ -103,7 +108,7 @@ public abstract class Generator {
 		if (!valid) {
 			Logger.logInfo("Feature model not valid!");
 		}
-		final Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
+		final Object[] names = (Object[]) FeatureUtils.getFeatureNamesList(fm).toArray(new Object[FeatureUtils.getFeatureNamesList(fm).size()]);
 		int k = 0;
 		for (int i = 0; i < numberOfConstraints;) {
 			Node node = getRandomLiteral(names, random);
@@ -125,12 +130,13 @@ public abstract class Generator {
 					node = new Not(node);
 				}
 			}
-			fm.addConstraint(new Constraint(fm, node));
+			final IConstraint constraint = DefaultFeatureModelFactory.getInstance().createConstraint(fm, node);
+			fm.addConstraint(constraint);
 			if (!valid || FeatureModelManager.getAnalyzer(fm).isValid(null)) {
 				i++;
 				System.out.println("E\t" + i + "\t" + node);
 			} else {
-				fm.getConstraints().remove(new Constraint(fm, node));
+				fm.removeConstraint(constraint);
 				Logger.logInfo("F\t" + ++k + "\t" + node);
 			}
 		}

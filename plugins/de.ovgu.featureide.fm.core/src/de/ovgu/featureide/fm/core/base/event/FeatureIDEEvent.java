@@ -134,7 +134,7 @@ public class FeatureIDEEvent {
 		 */
 		MODEL_LAYOUT_CHANGED,
 		/**
-		 * The model data changed (i.e., the underlying model file was changed).
+		 * The model data changed (e.g. the underlying model file was changed or the model data was changed because of slicing).
 		 */
 		MODEL_DATA_CHANGED,
 		/**
