@@ -4,15 +4,11 @@ language: java
 
 jdk: openjdk11
 
-env: DISPLAY=:99.0
+env: 
+  global:
+    - DISPLAY=:99.0
 
 install: true
-
-before_install:
- - sudo apt-get update
- - sudo apt-get install gnome-themes-standard
- - sudo apt-get install metacity
- - sudo apt-get install libwebkit-dev
 
 before_script:
  - sh -e /etc/init.d/xvfb start
