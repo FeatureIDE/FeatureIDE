@@ -73,7 +73,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
-                <module>gui-tests/de.ovgu.featureide.fm.gui-test</module>
+                <module>gui-tests/de.ovgu.featureide.fm.gui-tests-swtbot</module>
             </modules>
         </profile>
     </profiles>
