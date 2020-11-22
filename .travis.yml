@@ -1,5 +1,5 @@
 language: java
-dist: bionic
+dist: focal
 
 services:
   - xvfb
@@ -11,6 +11,10 @@ cache:
     - $HOME/.m2
 
 install: true
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install at-spi2-core
 
 script:
   - mvn -Pnu -Pgui clean verify
