@@ -41,7 +41,7 @@
 		<module>plugins/de.ovgu.featureide.ui.mpl</module>
 		
 		<!--Testmodules-->
-		<module>tests/de.ovgu.featureide.fm.core-test</module>
+		<!--<module>tests/de.ovgu.featureide.fm.core-test</module>
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
 		<module>tests/de.ovgu.featureide.ui-test</module>
 		<module>tests/de.ovgu.featureide.core.ahead-test</module>
@@ -49,7 +49,7 @@
 		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
-		<module>tests/de.ovgu.featureide.fm.attributes-test</module>
+		<module>tests/de.ovgu.featureide.fm.attributes-test</module>-->
 	</modules>
 
 	<!--The profiles are NightlyUpdates (nu) and GuiTests (gui)
@@ -157,7 +157,7 @@
 				<version>0.8.4</version>
 				<executions>
 					<execution>
-						<id>jacoco-initialize</id>
+						<id>default-prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
