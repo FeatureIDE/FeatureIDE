@@ -1,6 +1,7 @@
 sudo: false
 
 language: java
+dist: focal
 
 jdk: openjdk11
 
