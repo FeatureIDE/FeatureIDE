@@ -7,8 +7,8 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho-version>1.1.0</tycho-version>
-		<tycho-extras-version>1.1.0</tycho-extras-version>
+		<tycho-version>1.3.0</tycho-version>
+		<tycho-extras-version>1.3.0</tycho-extras-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -210,7 +210,7 @@
 											tycho-compiler-plugin
 										</artifactId>
 										<versionRange>
-											[1.3.0,)
+											[0.23.1,)
 										</versionRange>
 										<goals>
 											<goal>compile</goal>
@@ -229,7 +229,7 @@
 											tycho-packaging-plugin
 										</artifactId>
 										<versionRange>
-											[1.3.0,)
+											[0.23.1,)
 										</versionRange>
 										<goals>
 											<goal>build-qualifier</goal>
@@ -250,10 +250,28 @@
 		</pluginManagement>
 	</build>
 
+	<!-- mvn clean verify jacoco:report -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.4</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+
 	<repositories>
 		<repository>
-			<id>latest</id>
-			<url>https://download.eclipse.org/releases/latest/</url>
+			<id>oxygen</id>
+			<url>http://download.eclipse.org/releases/oxygen</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
