@@ -1,21 +1,26 @@
 sudo: false
 
 language: java
-dist: focal
+dist: trusty
 
-jdk: openjdk11
 
 env: 
   global:
     - DISPLAY=:99.0
 
-install: true
-
-before_script:
+before_install:
  - sh -e /etc/init.d/xvfb start
  - sleep 10 # give xvfb some time to start
  - metacity --sm-disable --replace &
  - sleep 10 # give metacity some time to start
+
+jdk: openjdk11
+
+cache:
+  directories:
+  - $HOME/.m2
+
+install: true
 
 script:
 - mvn -Pnu -Pgui clean verify
