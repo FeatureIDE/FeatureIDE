@@ -3,16 +3,11 @@ sudo: false
 language: java
 dist: focal
 
-
-env: 
-  global:
-    - DISPLAY=:99.0
-
+services:
+  - xvfb
+  
 before_install:
-  - sudo apt-get update
-  - sudo apt-get xvfb
-  - sh -e xvfb start
-  - sleep 10 # give xvfb some time to start
+  - apt-get update
 
 jdk: openjdk11
 
@@ -23,7 +18,7 @@ cache:
 install: true
 
 script:
-- mvn -Pnu -Pgui clean verify
+  - xvfb-run mvn -Pnu -Pgui clean verify
 
 after_failure:
-- find -name "*.txt" | grep -F 'surefire-reports' | xargs cat
+  - find -name "*.txt" | grep -F 'surefire-reports' | xargs cat
