@@ -250,28 +250,10 @@
 		</pluginManagement>
 	</build>
 
-	<!-- mvn clean verify jacoco:report -->
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
-
 	<repositories>
 		<repository>
-			<id>oxygen</id>
-			<url>http://download.eclipse.org/releases/oxygen</url>
+			<id>latest</id>
+			<url>https://download.eclipse.org/releases/latest/</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>

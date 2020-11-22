@@ -1,6 +1,8 @@
+sudo: false
+
 language: java
 
-jdk: oraclejdk8
+jdk: openjdk11
 
 env: DISPLAY=:99.0
 
