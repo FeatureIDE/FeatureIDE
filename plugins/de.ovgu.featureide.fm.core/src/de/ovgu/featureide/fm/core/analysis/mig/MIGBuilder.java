@@ -252,8 +252,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (checkRedundancy) {
 			final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(satInstance, false));
 			newClauseList.stream() //
-					.filter(clause -> clause.getLiterals().length < 3) //
-					.filter(clause -> !isRedundant(newSolver, clause)) //
+					.filter(clause -> (clause.getLiterals().length < 3) || !isRedundant(newSolver, clause)) //
 					.peek(newSolver::addClause).forEach(adjMatrix.clauseList::add); //
 		} else {
 			newClauseList.stream().forEach(adjMatrix.clauseList::add);
@@ -262,7 +261,12 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
-		return solver.hasSolution(curClause.negate()) == SatResult.FALSE;
+		if (solver.hasSolution(curClause.negate()) == SatResult.FALSE) {
+			redundantClauses.add(curClause);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void initEdges() {
@@ -416,6 +420,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (size > 1) {
 			// Note the minus (we construct a virtual clause)
 			addStrongRelation(-dfsStack.getFirst(), curVar);
+			mig.getTransitiveStrongEdges().add(new LiteralSet(-dfsStack.getFirst(), curVar));
 		}
 
 		if ((size > 0) && ((dfsMark[Math.abs(dfsStack.getLast()) - 1] & 2) != 0)) {

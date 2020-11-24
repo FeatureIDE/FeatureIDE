@@ -24,7 +24,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -47,6 +49,7 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		return LongRunningWrapper.runMethod(migBuilder);
 	}
 
+	private final Set<LiteralSet> transitiveStrongEdges = new HashSet<>();
 	final List<Vertex> adjList;
 	final List<LiteralSet> complexClauses = new ArrayList<>(0);
 
@@ -77,6 +80,10 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public List<LiteralSet> getComplexClauses() {
 		return Collections.unmodifiableList(complexClauses);
+	}
+
+	public Set<LiteralSet> getTransitiveStrongEdges() {
+		return transitiveStrongEdges;
 	}
 
 	public void addClause(LiteralSet clause) {
