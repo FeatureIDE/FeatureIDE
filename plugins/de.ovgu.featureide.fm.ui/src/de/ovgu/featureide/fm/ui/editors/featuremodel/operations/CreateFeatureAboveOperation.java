@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	private final String childName;
-	private final LinkedList<String> selectedFeatureNames;
+	private final List<String> selectedFeatureNames;
 	private final TreeMap<Integer, String> children = new TreeMap<>();
 
 	private String featureName;
@@ -54,7 +54,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	boolean parentOr = false;
 	boolean parentAlternative = false;
 
-	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, LinkedList<String> selectedFeatures) {
+	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatures) {
 		super(featureModelManager, "Add Feature");
 		selectedFeatureNames = selectedFeatures;
 		childName = selectedFeatures.get(0);

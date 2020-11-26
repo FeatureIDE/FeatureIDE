@@ -25,7 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.charset.Charset;
+import java.util.Base64;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
@@ -43,10 +43,12 @@ public class ModalImplicationGraphFormat extends APersistentFormat<ModalImplicat
 	@Override
 	public ProblemList read(ModalImplicationGraph object, CharSequence source) {
 		final ProblemList problems = new ProblemList();
-		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
+		final byte[] bytes = Base64.getDecoder().decode(source.toString());
+		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
 			final ModalImplicationGraph adjList = (ModalImplicationGraph) in.readObject();
 			object.copyValues(adjList);
 		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
 			problems.add(new Problem(e));
 		}
 		return problems;
@@ -58,8 +60,9 @@ public class ModalImplicationGraphFormat extends APersistentFormat<ModalImplicat
 		String ret = null;
 		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {
 			out.writeObject(object);
-			ret = byteArrayOutputStream.toString("UTF-8");
+			ret = Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
 		} catch (final IOException e) {
+			e.printStackTrace();
 			Logger.logError(e);
 		}
 		return ret;

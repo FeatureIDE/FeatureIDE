@@ -267,7 +267,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @return a literal for the given feature; not null
 		 */
 		private Literal getLiteral(IFeature feature) {
-			return new Literal(NodeCreator.getVariable(feature));
+			return new Literal(feature.getName());
 		}
 
 		@Override

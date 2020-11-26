@@ -53,6 +53,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AbstractGraphicalFe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.AlternativeGroupFilter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.ConcreteGraphicalFeatureFilter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.HiddenGraphicalFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.ImportedFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.InheritedFeatureFilter;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.InterfaceFeatureFilter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.MandatoryGraphicalFeatureFilter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.OptionalGraphicalFeatureFilter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.filters.OrGroupFilter;
@@ -248,10 +251,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
-			interfaced = extendedFeatureModel.hasInterface();
+			interfaced = Functional.toList(Functional.filter(graphicalVisibleFeatures, new InterfaceFeatureFilter())).size() > 0;
 			// interfaces hide other features
-			imported = !interfaced && extendedFeatureModel.hasInstance();
-			inherited = !interfaced && extendedFeatureModel.hasInherited();
+			imported = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new ImportedFeatureFilter())).size() > 0);
+			inherited = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new InheritedFeatureFilter())).size() > 0);
+
 		}
 
 		language = FMPropertyManager.getLanguage();

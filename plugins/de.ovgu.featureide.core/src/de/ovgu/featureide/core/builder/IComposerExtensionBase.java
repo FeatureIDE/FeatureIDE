@@ -93,6 +93,12 @@ public interface IComposerExtensionBase extends IExtension {
 	boolean supportsMigration();
 
 	/**
+	 *
+	 * @return true if the composition tool supports the creation of a partial feature project.
+	 */
+	boolean supportsPartialFeatureProject();
+
+	/**
 	 * @return whether all dependencies are fulfilled to use this composer
 	 */
 	IStatus isComposable();

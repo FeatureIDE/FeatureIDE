@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -258,7 +259,24 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public void init() {
-		final IFeatureModel featureModel = featureModelManager.getSnapshot();
+		final Pair<Map<IFeature, IGraphicalFeature>, Map<IConstraint, IGraphicalConstraint>> mapPair =
+			featureModelManager.processObject(this::initFeaturesAndConstraints);
+		features = mapPair.getKey();
+		constraints = mapPair.getValue();
+		readValues();
+	}
+
+	/**
+	 * Creates HashMaps containing GraphicalConstraints and GraphicalFeatures for the given FeatureModel
+	 *
+	 * @param featureModel FeatureModel from which to get Features and Constraints
+	 * @return Pair of two HashMaps. First HashMap contains Features and their corresponding GraphicalFeatures. Second HashMap contains Constraints and their
+	 *         corresponding GraphicalConstraints.
+	 */
+	private Pair<Map<IFeature, IGraphicalFeature>, Map<IConstraint, IGraphicalConstraint>> initFeaturesAndConstraints(IFeatureModel featureModel) {
+		Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<>();
+		Map<IFeature, IGraphicalFeature> features = new HashMap<>();
+
 		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			constraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
@@ -270,11 +288,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			for (final IFeature feature : featureModel.getVisibleFeatures()) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
-		} else {
-			constraints = new HashMap<>();
-			features = new HashMap<>();
 		}
-		readValues();
+		return new Pair<>(features, constraints);
 	}
 
 	@Override

@@ -20,8 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -41,5 +46,22 @@ public abstract class AFeatureModelAction extends Action {
 	}
 
 	public void update() {}
+
+	@Override
+	public boolean isEnabled() {
+		// determine if the action has to be disabled to prevent editing imported features in other files
+		if (!(this instanceof ActionAllowedInExternalSubmodel) && getInvolvedFeatures().stream().anyMatch(f -> isExternalFeature((IFeature) f))) {
+			return false;
+		}
+		return super.isEnabled();
+	}
+
+	protected List<IFeature> getInvolvedFeatures() {
+		return Collections.emptyList();
+	}
+
+	private boolean isExternalFeature(IFeature feature) {
+		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
+	}
 
 }

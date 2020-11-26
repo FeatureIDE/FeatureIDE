@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.splconquerer.ConquererFMWriter;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
+import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningCore;
@@ -84,6 +85,7 @@ public final class FMCoreLibrary implements ILibrary {
 		FMFormatManager.getInstance().addExtension(new GuidslFormat());
 		FMFormatManager.getInstance().addExtension(new ConquererFMWriter());
 		FMFormatManager.getInstance().addExtension(new CNFFormat());
+		FMFormatManager.getInstance().addExtension(new UVLFeatureModelFormat());
 
 		ConfigurationFactoryManager.getInstance().addExtension(DefaultConfigurationFactory.getInstance());
 		ConfigurationFactoryManager.getInstance().setWorkspaceLoader(new CoreFactoryWorkspaceLoader());

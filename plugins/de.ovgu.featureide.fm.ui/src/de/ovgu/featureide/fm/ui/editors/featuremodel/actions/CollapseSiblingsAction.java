@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCol
  *
  * @author Maximilian Kühl
  */
-public class CollapseSiblingsAction extends SingleSelectionAction {
+public class CollapseSiblingsAction extends SingleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.collapsefeatures";
 

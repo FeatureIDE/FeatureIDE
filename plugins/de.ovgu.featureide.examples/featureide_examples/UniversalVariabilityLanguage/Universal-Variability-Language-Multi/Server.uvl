@@ -1,0 +1,19 @@
+namespace Server
+
+imports
+	OperatingSystem as os
+	submodels.FileSystem as fs
+
+features
+	Server {abstract}	
+		mandatory
+			fs.FileSystem
+			os.OperatingSystem
+
+		optional
+			Logging
+
+constraints
+	os.Windows => fs.NTFS
+	os.macOS => fs.APFS
+	os.Debian => fs.EXT4

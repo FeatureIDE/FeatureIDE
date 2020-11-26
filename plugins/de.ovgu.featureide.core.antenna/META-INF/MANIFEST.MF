@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for Antenna
 Bundle-SymbolicName: de.ovgu.featureide.core.antenna;singleton:=true
-Bundle-Version: 3.6.3.qualifier
+Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: de.ovgu.featureide.antenna.AntennaCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -18,5 +18,6 @@ Export-Package: antenna.preprocessor,
  antenna.preprocessor.v3.parser,
  de.ovgu.featureide.antenna,
  de.ovgu.featureide.antenna.documentation,
- de.ovgu.featureide.antenna.model
+ de.ovgu.featureide.antenna.model,
+ de.ovgu.featureide.antenna.partialproject
 Automatic-Module-Name: de.ovgu.featureide.core.antenna

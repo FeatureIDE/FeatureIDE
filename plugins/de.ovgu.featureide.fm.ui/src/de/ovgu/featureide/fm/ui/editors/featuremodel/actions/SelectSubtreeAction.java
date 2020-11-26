@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Sabrina Hugo
  * @author Christian Orsinger
  */
-public class SelectSubtreeAction extends SingleSelectionAction {
+public class SelectSubtreeAction extends SingleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.selectSubtree";
 	private static ImageDescriptor createImage;

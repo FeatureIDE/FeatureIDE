@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +68,7 @@ import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -90,9 +93,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -1048,7 +1055,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
-		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationExtension());
+		final Path configurationFile = EclipseFileSystem.getPath(folder).resolve(congurationName + '.' + getConfigurationFormat().getSuffix());
 		final FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
@@ -1070,6 +1077,36 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		}
 		fhModelBuilder.buildModel(composer.getFstnodes(), false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#createTemporaryConfigrationFile(java.nio.file.Path)
+	 */
+	@Override
+	public Path createTemporaryConfigrationFile(Path config) {
+		final String configName = FileHandler.getFileName(config);
+		CorePlugin.getDefault().logInfo("create config " + configName);
+
+		final FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(config);
+		if (fileHandler.getLastProblems().containsError()) {
+			CorePlugin.getDefault().logWarning("failed to read " + config);
+			return null;
+		}
+		final Configuration configuration = fileHandler.getObject();
+
+		try {
+			// Feature house composer requires a file with each selected feature in one line. Thus, the default format is used here.
+			final IConfigurationFormat outputFormat = new DefaultFormat();
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + outputFormat.getSuffix());
+			new JavaFileSystem().write(tempFile, outputFormat.write(configuration).getBytes(Charset.defaultCharset()));
+			tempFile.toFile().deleteOnExit();
+			return tempFile;
+		} catch (final IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+
+		return null;
 	}
 
 	/**
@@ -1174,4 +1211,35 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return true;
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return true;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+		deleteFeatureFolders(sourceFolder, removedFeatures);
+	}
+
+	private void deleteFeatureFolders(IFolder sourceFolder, ArrayList<String> removedFeatures) {
+		final ArrayList<IResource> featureFolders = new ArrayList<IResource>();
+		try {
+			Collections.addAll(featureFolders, sourceFolder.members());
+		} catch (final CoreException e) {
+			e.printStackTrace();
+		}
+
+		for (final String feature : removedFeatures) {
+			for (final IResource folder : featureFolders) {
+				if (folder.getName().equals(feature)) {
+					try {
+						folder.delete(true, null);
+					} catch (final CoreException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
 }

@@ -735,8 +735,10 @@ public class StringTable {
 	public static final String DISSIMILARITY = "Dissimilarity";
 	public static final String CHVATAL = "Chvatal";
 	public static final String CASA = "CASA (experimental)";
+	public static final String CASA_ = "CASA";
 	public static final String ICPL = "ICPL";
 	public static final String INCLING = "IncLing";
+	public static final String YASA = "Yasa";
 	public static final String SORT_CONFIGURATIONS = "Sort configurations";
 	public static final String COMPILER = "Compiler";
 	public static final String SYMBOL = "symbol";
@@ -777,6 +779,8 @@ public class StringTable {
 	public static final String DOCUMENTATION_WIZARD = "Documentation Wizard";
 	public static final String CANT_SET_CONFIGURATION_AS_CURRENT_CONFIGURATION_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT =
 		"Can't set configuration as current configuration because it does not belong to a feature project";
+	public static final String CANT_DERIVE_PARTIAL_PROJECT_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT =
+		"Can't use this configuration to derive a partial project because it does not belong to a feature project";
 	public static final String LEFT = "left";
 	public static final String RIGHT = "right";
 	public static final String CREATE_CONFIGURATIONS = "Create configurations";
@@ -1129,4 +1133,21 @@ public class StringTable {
 		"Due to a feature breaking bug in the GTK framework, FeatureIDE has to employ a workaround to maintain functionality. See also bug #1003 in the FeatureIDE bug tracker.";
 	public static final String GTK_WORKAROUND_INFO_TOGGLE = "Do not show this message again.";
 	public static final String CONFIGURATION_DIALOGS_GTK_WORKAROUND = "Disable the workaround information for #1003";
+	public static final String DELETE_WARNING = "Delete Warning";
+	public static final String DELETE_WITH_SLICING = "Delete With Slicing";
+	public static final String DELETE_WITHOUT_SLICING = "Delete Without Slicing";
+	public static final String WIKI_DELETING_URL = "https://github.com/FeatureIDE/FeatureIDE/wiki/Feature-Model-Edit-Operations#deleting";
+	public static final String AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS = "at least one feature is contained in constraints";
+	public static final String AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT = "at least one feature has a different group than its parent";
+	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN = "a feature is the root of the feature diagram and has multiple children";
+	public static final String LIST_BULLET_DASH = "  - ";
+	public static final String DELETING_THIS_FEATURE_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting this feature may result in unwanted changes as";
+	public static final String DELETING_THESE_FEATURES_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting these features may result in unwanted changes as";
+	public static final String FOR_MORE_INFORMATION_PLEASE_VISIT_THE = "For more information please visit the";
+	public static final String WIKI = "wiki";
+	public static final String SHOW_SUBTREE = "Show Subtree";
+	public static final String LEVEL = "Level";
+	public static final String LEVELS = "Levels";
+	public static final String SHOW = "Show";
+	public static final String SHOW_ALL_LEVELS = "Show All Levels";
 }

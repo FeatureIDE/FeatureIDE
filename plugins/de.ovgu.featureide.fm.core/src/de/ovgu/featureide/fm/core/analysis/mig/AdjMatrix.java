@@ -48,10 +48,6 @@ class AdjMatrix implements IEdgeTypes {
 		return clauseList;
 	}
 
-	public byte[][] getEdges() {
-		return edges;
-	}
-
 	public byte getCore(int i) {
 		return core[i];
 	}

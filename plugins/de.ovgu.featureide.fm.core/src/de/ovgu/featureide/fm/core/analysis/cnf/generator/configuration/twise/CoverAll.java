@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -39,7 +40,7 @@ class CoverAll implements ICoverStrategy {
 		this.util = util;
 	}
 
-	private final ArrayList<Pair<LiteralSet, TWiseConfiguration>> candidatesList = new ArrayList<>();
+	private final List<Pair<LiteralSet, TWiseConfiguration>> candidatesList = new ArrayList<>();
 
 	@Override
 	public CombinationStatus cover(ClauseList nextCondition) {
@@ -49,7 +50,7 @@ class CoverAll implements ICoverStrategy {
 
 		util.initCandidatesList(nextCondition, candidatesList);
 
-		if (util.cover(false, candidatesList)) {
+		if (util.coverSol(candidatesList)) {
 			return CombinationStatus.COVERED;
 		}
 
@@ -57,8 +58,14 @@ class CoverAll implements ICoverStrategy {
 			return CombinationStatus.INVALID;
 		}
 
-		if (util.cover(true, candidatesList)) {
-			return CombinationStatus.COVERED;
+		if (candidatesList.size() < 32) {
+			if (util.coverSat(candidatesList)) {
+				return CombinationStatus.COVERED;
+			}
+		} else {
+			if (util.coverSatPara(candidatesList)) {
+				return CombinationStatus.COVERED;
+			}
 		}
 
 		util.newConfiguration(nextCondition.get(0));

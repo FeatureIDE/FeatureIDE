@@ -406,7 +406,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		super.buildConfiguration(folder, configuration, configurationName);
 		ahead.setCompositionFolder(folder);
 		try {
-			ahead.setConfiguration(folder.getFile(configurationName + "." + getConfigurationExtension()));
+			ahead.setConfiguration(folder.getFile(configurationName + "." + getConfigurationFormat().getSuffix()));
 			ahead.buildAll();
 		} catch (final Exception e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -440,4 +440,14 @@ public class AheadComposer extends ComposerExtensionClass {
 		return false;
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
+	}
 }

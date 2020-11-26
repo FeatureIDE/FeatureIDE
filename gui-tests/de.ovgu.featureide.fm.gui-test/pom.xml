@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.ovgu.featureide</groupId>
     <artifactId>de.ovgu.featureide.root</artifactId>
-    <version>3.6.3-SNAPSHOT</version>
+    <version>3.7.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>de.ovgu.featureide.fm.gui-test</artifactId>
@@ -41,24 +41,24 @@
 					<test>ExplainingAnomaliesInFeatureDiagram.test</test>
                 	<test>CreateFeatureModelInFeatureIDEProject.test</test>
                 	<test>CreateFeatureModelInJavaProject.test</test>
-                	<test>CreateFeaturesInFeatureDiagram.test</test>
+                	<!--<test>CreateFeaturesInFeatureDiagram.test</test>-->
                 	<test>EditAdvancedConfiguration.test</test>
                 	<test>EditConfiguration.test</test>
-                	<test>HandsOn1.test</test>
+                	<!--  <test>HandsOn1.test</test>-->
                 	<test>HandsOn2.test</test>
-                	<test>HandsOn3.test</test>
-                	<test>HandsOn4.test</test>
+                	<!--  <test>HandsOn3.test</test> -->
+                	<!--  <test>HandsOn4.test</test> -->
                 	<!--<test>HandsOn5.test</test>-->
                 	<test>SelectingFeaturesInFeatureDiagram.test</test>
-                	<test>SetAbstractInFeatureDiagram.test</test>
-                	<test>SetCollapsedInFeatureDiagram.test</test>
-                	<test>SetHiddenInFeatureDiagram.test</test>
+                	<!-- <test>SetAbstractInFeatureDiagram.test</test> -->
+                	<!--<test>SetCollapsedInFeatureDiagram.test</test> -->
+                	<!--<test>SetHiddenInFeatureDiagram.test</test> -->
                 </tests>
                 	
                 <testOptions>
                    <!--<execTimeout>150</execTimeout>-->
-                   <!--3min is max for each job-->
-                    <testExecTimeout>180</testExecTimeout>
+                   <!--5min is max for each job-->
+                    <testExecTimeout>300</testExecTimeout>
                     <eclExecutionDelay>500</eclExecutionDelay>
                 </testOptions> 
                 

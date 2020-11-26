@@ -572,4 +572,14 @@ public class RuntimeParameters extends ComposerExtensionClass {
 		return false;
 	}
 
+	@Override
+	public boolean supportsPartialFeatureProject() {
+		return false;
+	}
+
+	@Override
+	public void buildPartialFeatureProjectAssets(IFolder sourceFolder, ArrayList<String> removedFeatures, ArrayList<String> mandatoryFeatures)
+			throws IOException, CoreException {
+
+	}
 }

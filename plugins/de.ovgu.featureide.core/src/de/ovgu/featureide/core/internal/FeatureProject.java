@@ -1628,10 +1628,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				modelFile.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		}
-		try {
-			createAndDeleteFeatureFolders();
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
+		if (composerExtension.createFolderForFeatures()) {
+			try {
+				createAndDeleteFeatureFolders();
+			} catch (final CoreException e) {
+				LOGGER.logError(e);
+			}
 		}
 	}
 

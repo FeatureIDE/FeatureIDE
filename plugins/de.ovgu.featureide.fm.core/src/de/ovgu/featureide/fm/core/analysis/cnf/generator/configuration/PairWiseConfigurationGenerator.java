@@ -400,18 +400,18 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
-			core = new byte[solver.getSatInstance().getVariables().maxVariableID()];
-			recArray = new byte[solver.getSatInstance().getVariables().maxVariableID()];
+			core = new byte[numVariables];
+			recArray = new byte[numVariables];
 			final int[] model1Copy = Arrays.copyOf(allYesSolution, allYesSolution.length);
 			LiteralSet.resetConflicts(model1Copy, allNoSolution);
 			for (int i = 0; i < model1Copy.length; i++) {
 				final int varX = model1Copy[i];
 				if (varX != 0) {
-					solver.assignmentPush(-varX);
+					solver.assignmentPush(solver.getInternalMapping().convertToOriginal(-varX));
 					switch (solver.hasSolution()) {
 					case FALSE:
 						core[i] = (byte) (varX > 0 ? 1 : -1);
-						solver.assignmentReplaceLast(varX);
+						solver.assignmentReplaceLast(solver.getInternalMapping().convertToOriginal(varX));
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
@@ -605,7 +605,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		time = System.nanoTime();
 
 		try {
-			solver.addClause(solution.negate());
+			solver.addInternalClause(solution.negate());
 		} catch (final RuntimeContradictionException e) {
 			return true;
 		}
@@ -654,10 +654,10 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			}
 
 			if (varStatus[1] == 0) {
-				solver.assignmentPush(sb);
+				solver.assignmentPush(solver.getInternalMapping().convertToOriginal(sb));
 				switch (solver.hasSolution()) {
 				case FALSE:
-					solver.assignmentReplaceLast(-sb);
+					solver.assignmentReplaceLast(solver.getInternalMapping().convertToOriginal(-sb));
 					varStatus[1] = -sigB;
 					featuresUsed[b] = true;
 					printCount();
@@ -672,13 +672,13 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 			}
 
 			if (varStatus[0] == 0) {
-				solver.assignmentPush(sa);
+				solver.assignmentPush(solver.getInternalMapping().convertToOriginal(sa));
 			}
 
 			switch (solver.hasSolution()) {
 			case FALSE:
 				if (varStatus[1] != 0) {
-					solver.assignmentReplaceLast(-sa);
+					solver.assignmentReplaceLast(solver.getInternalMapping().convertToOriginal(-sa));
 					varStatus[0] = -sigA;
 					featuresUsed[a] = true;
 					printCount();
@@ -721,7 +721,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 			int c = 0;
 
-			solver.assignmentPush(mx1);
+			solver.assignmentPush(solver.getInternalMapping().convertToOriginal(mx1));
 			if (xModel1 == null) {
 				xModel1 = solver.findSolution();
 				if (xModel1 == null) {
@@ -744,7 +744,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 						}
 					}
 
-					solver.assignmentPush(-my1);
+					solver.assignmentPush(solver.getInternalMapping().convertToOriginal(-my1));
 					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.hasSolution()) {
@@ -756,7 +756,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 						solver.assignmentPop();
 						solver.assignmentPop();
 						testVariable();
-						solver.assignmentPush(mx1);
+						solver.assignmentPush(solver.getInternalMapping().convertToOriginal(mx1));
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
@@ -839,7 +839,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 		final int numberOfFixedFeatures = solver.getAssignmentSize();
 		final boolean[] featuresUsedOrg = new boolean[featureCount];
 		for (int i = 0; i < numberOfFixedFeatures; i++) {
-			featuresUsedOrg[Math.abs(solver.assignmentGet(i)) - 1] = true;
+			featuresUsedOrg[Math.abs(solver.getInternalMapping().convertToInternal(solver.assignmentGet(i))) - 1] = true;
 		}
 
 		featureIndexArray = new FeatureIndex[numVariables - numberOfFixedFeatures];
