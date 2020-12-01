@@ -88,6 +88,9 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public void addClause(LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
+		if (literals[0] == -460) {
+			System.out.println();
+		}
 		newLiteralsCheck: for (final int literal : literals) {
 			for (int i = 0; i < adjList.size(); i++) {
 				if (adjList.get(i).getVar() == literal) {
@@ -101,11 +104,10 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		case 0:
 			throw new RuntimeContradictionException();
 		case 1: {
-			final int literal = literals[0];
-			final Vertex vertex = getVertex(literal);
-			vertex.setCore(literal > 0);
-			vertex.setDead(literal < 0);
-			// irgendwas neues jetzt auch core oder dead?
+//			final int literal = literals[0];
+//			final Vertex vertex = getVertex(literal);
+//			vertex.setCore(literal > 0);
+//			vertex.setDead(literal < 0);
 			break;
 		}
 		case 2: {
@@ -149,6 +151,9 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public void removeClause(LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
+		if ((literals[0] == -460) && (literals[1] == 1115)) {
+			System.out.println();
+		}
 		switch (clause.size()) {
 		case 0:
 			throw new RuntimeContradictionException();
@@ -186,15 +191,20 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	private void removeComplexClause(int oldClauseIndex) {
 		final List<LiteralSet> oldComplexClauses = getComplexClauses();
-		final boolean move = false;
-		if (move) {
-			final List<LiteralSet> newComplexClauses = new ArrayList<>(oldComplexClauses.size() - 1);
-			for (int i = oldClauseIndex; i < newComplexClauses.size(); i++) {
-				newComplexClauses.set(i, oldComplexClauses.get(i + 1));
+		final List<LiteralSet> newComplexClauses = new ArrayList<>(oldComplexClauses.size() - 1);
+		boolean move = false;
+		for (int i = 0; i < (oldComplexClauses.size() - 1); i++) {
+			if (i == oldClauseIndex) {
+				move = true;
 			}
-			complexClauses.clear();
-			complexClauses.addAll(newComplexClauses);
+			if (move) {
+				newComplexClauses.add(oldComplexClauses.get(i + 1));
+			} else {
+				newComplexClauses.add(oldComplexClauses.get(i));
+			}
 		}
+		complexClauses.clear();
+		complexClauses.addAll(newComplexClauses);
 	}
 
 	private void removeWeakEdge(Vertex vertex, int oldClauseIndex) {
@@ -246,6 +256,11 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	private void addStrongEdge(final Vertex vertex, final int edge) {
 		final int[] oldStrongEdges = vertex.getStrongEdges();
+		for (int i = 0; i < oldStrongEdges.length; i++) {
+			if (oldStrongEdges[i] == edge) {
+				return;
+			}
+		}
 		final int[] newStrongEdges = Arrays.copyOf(oldStrongEdges, oldStrongEdges.length + 1);
 		newStrongEdges[oldStrongEdges.length] = edge;
 		vertex.setStrongEdges(newStrongEdges);

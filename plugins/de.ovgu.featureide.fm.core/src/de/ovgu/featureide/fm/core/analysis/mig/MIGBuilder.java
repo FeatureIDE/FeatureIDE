@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.analysis.mig;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,6 +80,14 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final CNF satInstance;
 	private final ModalImplicationGraph mig;
 	private final int numberOfVariables;
+	private long startTime;
+	private long coreDeadFeature;
+	private long sortOutCoreDead;
+	private long redClauses;
+	private long addEdges;
+	private long detectStrongEdges;
+	private long endTime;
+	private final List<LiteralSet> clausesInMig = new ArrayList<>();
 
 	private ISatSolver solver;
 
@@ -96,6 +107,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	@Override
 	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 		monitor.setRemainingWork(5 + (detectStrong ? 3 : 0));
+		startTime = System.nanoTime();
 		if (!init()) {
 			return null;
 		}
@@ -113,15 +125,21 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		}
 		cleanClauseList();
 		monitor.step();
+		redClauses = System.nanoTime();
 
 		readdEdges();
 		monitor.step();
-		dfsStrong();
+		addEdges = System.nanoTime();
+
+		// dfsStrong();
 		monitor.step();
+		detectStrongEdges = System.nanoTime();
 
 		transformToAdjList();
 		monitor.step();
+		endTime = System.nanoTime();
 
+		printTime(startTime, coreDeadFeature, sortOutCoreDead, redClauses, addEdges, detectStrongEdges, endTime);
 		return mig;
 	}
 
@@ -230,8 +248,10 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 		final boolean satisfiable = getCoreFeatures();
+		coreDeadFeature = System.nanoTime();
 		if (satisfiable) {
 			initEdges();
+			sortOutCoreDead = System.nanoTime();
 		}
 		return satisfiable;
 	}
@@ -257,6 +277,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		} else {
 			newClauseList.stream().forEach(adjMatrix.clauseList::add);
 		}
+		clausesInMig.addAll(newClauseList);
 		newClauseList.clear();
 	}
 
@@ -279,6 +300,9 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			for (int i = 0; i < childrenCount; i++) {
 				final int var = literals[i];
 				final int coreB = var * adjMatrix.core[Math.abs(var) - 1];
+				if (var == -18276) {
+					System.out.println();
+				}
 				if (coreB > 0) {
 					// Clause is satisfied
 					continue outer;
@@ -495,6 +519,9 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					solver.assignmentPush(-varX);
 					switch (solver.hasSolution()) {
 					case FALSE:
+						if (varX == 18276) {
+							System.out.println();
+						}
 						addClause(varX);
 						solver.assignmentReplaceLast(varX);
 						adjMatrix.core[i] = (byte) Math.signum(varX);
@@ -661,6 +688,31 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 
 	public Set<LiteralSet> getRedundantClauses() {
 		return redundantClauses;
+	}
+
+	public List<LiteralSet> getClausesInMig() {
+		return clausesInMig;
+	}
+
+	private void printTime(long startTime2, long coreDeadFeature2, long sortOutCoreDead2, long redClauses2, long addEdges2, long detectStrongEdges2,
+			long endTime2) throws IOException {
+		final FileWriter fw_eval = new FileWriter("eval_time_calculated.txt");
+		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
+		bw_eval.write("calculate Core And Dead Features " + (coreDeadFeature2 - startTime2));
+		bw_eval.newLine();
+		bw_eval.write("sort out core and dead features: " + (sortOutCoreDead2 - coreDeadFeature2));
+		bw_eval.newLine();
+		bw_eval.write("calculate redundant Clauses: " + (redClauses2 - sortOutCoreDead2));
+		bw_eval.newLine();
+		bw_eval.write("added Edges: " + (addEdges2 - redClauses2));
+		bw_eval.newLine();
+		bw_eval.write("find transitive strong Edges: " + (detectStrongEdges2 - addEdges2));
+		bw_eval.newLine();
+		bw_eval.write("transform to AdjList: " + (endTime2 - detectStrongEdges2));
+		bw_eval.newLine();
+		bw_eval.write("overall Time: " + (endTime2 - startTime2));
+		bw_eval.newLine();
+		bw_eval.close();
 	}
 
 }
