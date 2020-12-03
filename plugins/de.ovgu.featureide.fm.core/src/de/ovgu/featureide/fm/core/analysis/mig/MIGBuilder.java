@@ -131,7 +131,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		monitor.step();
 		addEdges = System.nanoTime();
 
-		// dfsStrong();
+		dfsStrong();
 		monitor.step();
 		detectStrongEdges = System.nanoTime();
 
@@ -300,9 +300,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			for (int i = 0; i < childrenCount; i++) {
 				final int var = literals[i];
 				final int coreB = var * adjMatrix.core[Math.abs(var) - 1];
-				if (var == -18276) {
-					System.out.println();
-				}
 				if (coreB > 0) {
 					// Clause is satisfied
 					continue outer;
@@ -519,9 +516,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					solver.assignmentPush(-varX);
 					switch (solver.hasSolution()) {
 					case FALSE:
-						if (varX == 18276) {
-							System.out.println();
-						}
 						addClause(varX);
 						solver.assignmentReplaceLast(varX);
 						adjMatrix.core[i] = (byte) Math.signum(varX);

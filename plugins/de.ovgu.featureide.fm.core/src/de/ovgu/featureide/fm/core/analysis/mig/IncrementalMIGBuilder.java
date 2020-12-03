@@ -84,8 +84,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	private Set<LiteralSet> redundantClauses;
 	private ModalImplicationGraph newMig;
 	private ModalImplicationGraph oldMig;
-	private final int numberOfVariablesNew;
-	private final byte[] dfsMark;
+	private int numberOfVariablesNew;
+	private byte[] dfsMark;
 	private MIGBuilder migBuilder;
 	final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
 
@@ -120,6 +120,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		newCNFclean = new CNF(variables);
 		migBuilder = new MIGBuilder(oldCNF);
 		migBuilder.setCheckRedundancy(false);
+		migBuilder.setDetectStrong(false);
 		oldMig = LongRunningWrapper.runMethod(migBuilder);
 		redundantClauses = migBuilder.getRedundantClauses();
 		newMig = new ModalImplicationGraph(declareMigSize(oldCNF.getVariables().size(), numberOfVariablesNew) * 2);
@@ -146,10 +147,21 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		// zeitzähler
 		final long startTime = System.nanoTime();
 
-//		// handle core/dead features
+		final Set<LiteralSet> transEdges = oldMig.getTransitiveStrongEdges();
+		for (final LiteralSet literalset : migBuilder.getClausesInMig()) {
+			if (transEdges.contains(literalset)) {
+				transEdges.remove(literalset);
+			}
+		}
+
+		for (final LiteralSet literalSet : transEdges) {
+			newMig.removeClause(literalSet);
+		}
+
+		// handle core/dead features
 		calculateDeadAndCoreFeatures();
-//
-//		// clean new CNF
+
+		// clean new CNF
 		sortOutClauses();
 
 		// calculate CNF difference
@@ -190,14 +202,16 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 		final long newlyDeadCoreFeatures = System.nanoTime() - newlyRedClauses - remClauses - prevRedClauses - cnfDiff - startTime;
 
-		// TODO: Welche clauses müssen wegen nicht mehr core feature durch removed wieder hinzugefügt werden?
 		for (final LiteralSet clause : addedClauses) {
 			newMig.addClause(clause);
 		}
 
 		final long addClauses = System.nanoTime() - newlyDeadCoreFeatures - newlyRedClauses - remClauses - prevRedClauses - cnfDiff - startTime;
 
-		// detectStrong();
+		numberOfVariablesNew = newCNF.getVariables().size();
+		dfsMark = new byte[numberOfVariablesNew * 2];
+
+		detectStrong();
 
 		// zeitzähler
 		final long endTime = System.nanoTime();
@@ -234,75 +248,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		return newMig;
 	}
 
-	/**
-	 * @throws IOException
-	 *
-	 */
-	private void printClauses() throws IOException {
-		final FileWriter fw = new FileWriter("clauses.txt");
-		final BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write("oldCNF: ");
-		bw.newLine();
-		for (final LiteralSet literals : oldCNF.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("newCNF: ");
-		bw.newLine();
-		for (final LiteralSet literals : newCNF.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("newCNFclean: ");
-		bw.newLine();
-		for (final LiteralSet literals : newCNFclean.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("addedClauses: ");
-		bw.newLine();
-		for (final LiteralSet literals : addedClauses) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("removedClauses: ");
-		bw.newLine();
-		for (final LiteralSet literals : removedClauses) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.close();
-	}
-
-	/**
-	 *
-	 */
 	private void sortOutClauses() {
 		outer: for (final LiteralSet clause : newCNF.getClauses()) {
 			final int[] literals = clause.getLiterals();
@@ -367,9 +312,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 				switch (solver.hasSolution()) {
 				case FALSE:
 					solver.assignmentReplaceLast(varX);
-					if (varX == 18276) {
-						System.out.println();
-					}
 					newMig.getVertex(varX).setCore(true);
 					newMig.getVertex(varX).setDead(false);
 					newMig.getVertex(-varX).setDead(true);
@@ -397,13 +339,9 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		}
 	}
 
-//	private void calculateDeadAndCoreFeaturesDC() {
-//		final FileWriter fw = new FileWriter("Clauses.txt");
-//		final BufferedWriter bw = new BufferedWriter(fw);
-//
-//		//TODO
-//		bw.close();
-//	}
+	private void calculateDeadAndCoreFeaturesDC() {
+		// TODO
+	}
 
 	private void mark() {
 		for (int i = 0; i < dfsMark.length; i++) {
@@ -444,7 +382,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		}
 
 		dfsStack.addLast(curVar);
-
 		if (curVar > 0) {
 			curVarAdjListPos = (curVar * 2) - 1;
 		} else {
@@ -687,7 +624,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			final int[] strongEdgesCalc = calculatedMig.getAdjList().get(i).getStrongEdges();
 			final int[] strongEdgesAdapt = adaptedMig.getAdjList().get(i).getStrongEdges();
 			if (strongEdgesAdapt.length != strongEdgesCalc.length) {
-				bw_diff.write("Variablen an Stelle" + i + "haben unterschiedlich viele strong Edges");
+				bw_diff.write("Variablen an Stelle " + calculatedMig.getAdjList().get(i).getVar() + " haben unterschiedlich viele strong Edges");
+				bw_diff.newLine();
+				bw_diff.write("adapted Mig hat " + strongEdgesAdapt.length + " strong edges");
+				bw_diff.newLine();
+				bw_diff.write("calculated Mig hat " + strongEdgesCalc.length + " strong edges");
+				bw_diff.newLine();
 				bw_diff.newLine();
 				continue m;
 			}
@@ -729,6 +671,68 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 		}
 		bw_diff.close();
+	}
+
+	private void printClauses() throws IOException {
+		final FileWriter fw = new FileWriter("clauses.txt");
+		final BufferedWriter bw = new BufferedWriter(fw);
+
+		bw.write("oldCNF: ");
+		bw.newLine();
+		for (final LiteralSet literals : oldCNF.getClauses()) {
+			for (final int literal : literals.getLiterals()) {
+				bw.write(literal + ", ");
+			}
+			bw.write("<    >");
+		}
+		bw.newLine();
+		bw.newLine();
+
+		bw.write("newCNF: ");
+		bw.newLine();
+		for (final LiteralSet literals : newCNF.getClauses()) {
+			for (final int literal : literals.getLiterals()) {
+				bw.write(literal + ", ");
+			}
+			bw.write("<    >");
+		}
+		bw.newLine();
+		bw.newLine();
+
+		bw.write("newCNFclean: ");
+		bw.newLine();
+		for (final LiteralSet literals : newCNFclean.getClauses()) {
+			for (final int literal : literals.getLiterals()) {
+				bw.write(literal + ", ");
+			}
+			bw.write("<    >");
+		}
+		bw.newLine();
+		bw.newLine();
+
+		bw.write("addedClauses: ");
+		bw.newLine();
+		for (final LiteralSet literals : addedClauses) {
+			for (final int literal : literals.getLiterals()) {
+				bw.write(literal + ", ");
+			}
+			bw.write("<    >");
+		}
+		bw.newLine();
+		bw.newLine();
+
+		bw.write("removedClauses: ");
+		bw.newLine();
+		for (final LiteralSet literals : removedClauses) {
+			for (final int literal : literals.getLiterals()) {
+				bw.write(literal + ", ");
+			}
+			bw.write("<    >");
+		}
+		bw.newLine();
+		bw.newLine();
+
+		bw.close();
 	}
 
 	public static void installLibraries() {

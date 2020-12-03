@@ -88,9 +88,6 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public void addClause(LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
-		if (literals[0] == -460) {
-			System.out.println();
-		}
 		newLiteralsCheck: for (final int literal : literals) {
 			for (int i = 0; i < adjList.size(); i++) {
 				if (adjList.get(i).getVar() == literal) {
@@ -104,10 +101,6 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		case 0:
 			throw new RuntimeContradictionException();
 		case 1: {
-//			final int literal = literals[0];
-//			final Vertex vertex = getVertex(literal);
-//			vertex.setCore(literal > 0);
-//			vertex.setDead(literal < 0);
 			break;
 		}
 		case 2: {
