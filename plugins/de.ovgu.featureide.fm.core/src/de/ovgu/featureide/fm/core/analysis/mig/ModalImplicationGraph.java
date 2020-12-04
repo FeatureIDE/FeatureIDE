@@ -95,7 +95,6 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 				}
 			}
 			addVertexForLiteral(literal);
-
 		}
 		switch (clause.size()) {
 		case 0:
@@ -151,9 +150,6 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		case 0:
 			throw new RuntimeContradictionException();
 		case 1: {
-			final int literal = literals[0];
-			final Vertex vertex = getVertex(literal);
-			// core oder dead vorbei?
 			break;
 		}
 		case 2: {
