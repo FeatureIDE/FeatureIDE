@@ -87,6 +87,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	private int numberOfVariablesNew;
 	private byte[] dfsMark;
 	private MIGBuilder migBuilder;
+	private Variables variables;
 	final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
 
 	public IncrementalMIGBuilder(CNF satInstance) {
@@ -114,13 +115,13 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		oldCNF = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF();
 		final Set<String> allVariables = new HashSet<>(Arrays.asList(oldCNF.getVariables().getNames()).subList(1, oldCNF.getVariables().getNames().length));
 		allVariables.addAll(Arrays.asList(newCNF.getVariables().getNames()).subList(1, newCNF.getVariables().getNames().length));
-		final Variables variables = new Variables(allVariables);
+		variables = new Variables(allVariables);
 		oldCNF = oldCNF.adapt(variables);
 		newCNF = newCNF.adapt(variables);
 		assert Objects.equals(oldCNF.getVariables(), newCNF.getVariables());
 		newCNFclean = new CNF(variables);
 		migBuilder = new MIGBuilder(oldCNF);
-		migBuilder.setCheckRedundancy(false);
+		migBuilder.setCheckRedundancy(true);
 		migBuilder.setDetectStrong(false);
 		oldMig = LongRunningWrapper.runMethod(migBuilder);
 		redundantClauses = migBuilder.getRedundantClauses();
@@ -135,12 +136,10 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	@Override
 	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 		Set<LiteralSet> affectedClauses = new HashSet<>();
-		final Set<LiteralSet> notRedundantClauses = new HashSet<>(newCNF.getClauses());
-		notRedundantClauses.removeAll(redundantClauses);
 
 		printOldMig();
 
-		oldCNF = new CNF(migBuilder.getClausesInMig());
+		oldCNF = new CNF(variables, migBuilder.getClausesInMig());
 
 		oldCNF.getClauses().forEach(c -> c.setOrder(LiteralSet.Order.NATURAL));
 		newCNF.getClauses().forEach(c -> c.setOrder(LiteralSet.Order.NATURAL));
@@ -173,13 +172,11 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		final long cnfDiff = System.nanoTime();
 
 		// remove clauses from MIG
+		final Set<LiteralSet> remRed = new HashSet<>(redundantClauses);
+		redundantClauses.removeAll(removedClauses);
+		removedClauses.removeAll(remRed);
 		for (final LiteralSet clause : removedClauses) {
-			if (redundantClauses.contains(clause)) {
-				redundantClauses.remove(clause);
-				removedClauses.remove(clause);
-			} else {
-				newMig.removeClause(clause);
-			}
+			newMig.removeClause(clause);
 		}
 		final long remClauses = System.nanoTime();
 
@@ -192,22 +189,31 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		final long prevRedClauses = System.nanoTime();
 
 		// handle newly redundant clauses
+		final Set<LiteralSet> notRedundantClauses = new HashSet<>(newCNFclean.getClauses());
 		if (!redundantClauses.isEmpty()) {
 			notRedundantClauses.removeAll(redundantClauses);
 		}
-//		affectedClauses =
-//			new HashSet<>(getThroughLiteralsAffectedClauses(new ArrayList<LiteralSet>(addedClauses), new ArrayList<LiteralSet>(notRedundantClauses)));
-//		handleNewlyRedundant(new ArrayList<>(affectedClauses));
+		affectedClauses =
+			new HashSet<>(getThroughLiteralsAffectedClauses(new ArrayList<LiteralSet>(addedClauses), new ArrayList<LiteralSet>(notRedundantClauses)));
+		handleNewlyRedundant(new ArrayList<>(affectedClauses));
 		final long newlyRedClauses = System.nanoTime();
 
-		for (final LiteralSet clause : addedClauses) {
-			newMig.addClause(clause);
+		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
+		final Set<LiteralSet> notAddedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
+		notAddedClauses.removeAll(addedClauses);
+		newSolver.addClauses(notAddedClauses);
+		m: for (final LiteralSet clause : addedClauses) {
+			if ((clause.getLiterals().length < 3) || !isRedundant(newSolver, clause)) {
+				newMig.addClause(clause);
+				newSolver.addClause(clause);
+			} else {
+				redundantClauses.add(clause);
+			}
 		}
 		final long addClauses = System.nanoTime();
 
 		numberOfVariablesNew = newCNF.getVariables().size();
 		dfsMark = new byte[numberOfVariablesNew * 2];
-
 		detectStrong();
 
 		// zeitzähler
@@ -219,7 +225,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 		final MIGBuilder migBuilder = new MIGBuilder(newCNF);
 		ModalImplicationGraph testMIG = new ModalImplicationGraph();
-		migBuilder.setCheckRedundancy(false);
+		migBuilder.setCheckRedundancy(true);
 		migBuilder.setDetectStrong(false);
 		try {
 			testMIG = migBuilder.execute(new NullMonitor<ModalImplicationGraph>());
@@ -447,8 +453,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 	public void handlePreviouslyRedundant(List<LiteralSet> clauses) {
 		Collections.sort(clauses, lengthComparator);
-		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNF, false));
-		final Set<LiteralSet> notAffectedClauses = new LinkedHashSet<>(newCNF.getClauses());
+		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
+		final Set<LiteralSet> notAffectedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
 		notAffectedClauses.removeAll(clauses);
 		newSolver.addClauses(notAffectedClauses);
 		for (final LiteralSet clause : clauses) {
@@ -462,8 +468,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 
 	public void handleNewlyRedundant(List<LiteralSet> clauses) {
 		Collections.sort(clauses, lengthComparator);
-		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNF, false));
-		final Set<LiteralSet> notAffectedClauses = new LinkedHashSet<>(newCNF.getClauses());
+		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
+		final Set<LiteralSet> notAffectedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
 		notAffectedClauses.removeAll(clauses);
 		newSolver.addClauses(notAffectedClauses);
 		for (final LiteralSet clause : clauses) {
