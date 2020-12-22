@@ -86,6 +86,9 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private long redClauses;
 	private long addEdges;
 	private long detectStrongEdges;
+	private long detectStrongEdgesComplete;
+	private long detectWeakEdges;
+	private long detectImplicitStrongEdges;
 	private long endTime;
 	private final List<LiteralSet> clausesInMig = new ArrayList<>();
 
@@ -117,11 +120,14 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 			// Build transitive hull
 			dfsStrong();
 			monitor.step();
+			detectStrongEdgesComplete = System.nanoTime();
 			dfsWeak();
 			monitor.step();
+			detectWeakEdges = System.nanoTime();
 
 			dfsDetectStrongEdges();
 			monitor.step();
+			detectImplicitStrongEdges = System.nanoTime();
 		}
 		cleanClauseList();
 		monitor.step();
@@ -139,7 +145,8 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		monitor.step();
 		endTime = System.nanoTime();
 
-		printTime(startTime, coreDeadFeature, sortOutCoreDead, redClauses, addEdges, detectStrongEdges, endTime);
+		printTime(startTime, coreDeadFeature, sortOutCoreDead, detectStrongEdgesComplete, detectWeakEdges, detectImplicitStrongEdges, redClauses, addEdges,
+				detectStrongEdges, endTime);
 		return mig;
 	}
 
@@ -475,6 +482,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (size > 1) {
 			// Note the minus (we construct a virtual clause)
 			addWeakRelation(-dfsStack.getFirst(), curVar);
+			mig.getTransitiveWeakEdges().add(new LiteralSet(-dfsStack.getFirst(), curVar));
 		}
 
 		if ((size > 0) && ((dfsMark[Math.abs(dfsStack.getLast()) - 1] & 2) != 0)) {
@@ -586,6 +594,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 						for (final int mx0 : dfsStack) {
 							if (addStrongRelation(-mx0, my1)) {
 								addClause(-mx0, my1);
+								mig.getImplicitStrongEdges().add(new LiteralSet(-mx0, my1));
 							}
 						}
 						dfsStack.push(my1);
@@ -688,15 +697,21 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		return clausesInMig;
 	}
 
-	private void printTime(long startTime2, long coreDeadFeature2, long sortOutCoreDead2, long redClauses2, long addEdges2, long detectStrongEdges2,
-			long endTime2) throws IOException {
+	private void printTime(long startTime2, long coreDeadFeature2, long sortOutCoreDead2, long detectStrongEdgesComplete2, long detectWeakEdges2,
+			long detectImplicitStrongEdges, long redClauses2, long addEdges2, long detectStrongEdges2, long endTime2) throws IOException {
 		final FileWriter fw_eval = new FileWriter("eval_time_calculated.txt");
 		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
 		bw_eval.write("calculate Core And Dead Features " + (coreDeadFeature2 - startTime2));
 		bw_eval.newLine();
 		bw_eval.write("sort out core and dead features: " + (sortOutCoreDead2 - coreDeadFeature2));
 		bw_eval.newLine();
-		bw_eval.write("calculate redundant Clauses: " + (redClauses2 - sortOutCoreDead2));
+		bw_eval.write("detect transitive strong edges: " + (detectStrongEdgesComplete2 - sortOutCoreDead2));
+		bw_eval.newLine();
+		bw_eval.write("detect transitive weak edges: " + (detectWeakEdges2 - detectStrongEdgesComplete2));
+		bw_eval.newLine();
+		bw_eval.write("detect implicit strong edges: " + (detectImplicitStrongEdges - detectWeakEdges2));
+		bw_eval.newLine();
+		bw_eval.write("calculate redundant Clauses: " + (redClauses2 - detectImplicitStrongEdges));
 		bw_eval.newLine();
 		bw_eval.write("added Edges: " + (addEdges2 - redClauses2));
 		bw_eval.newLine();

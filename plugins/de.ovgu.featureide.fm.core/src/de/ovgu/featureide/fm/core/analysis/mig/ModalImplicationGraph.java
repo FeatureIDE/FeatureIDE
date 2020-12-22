@@ -50,6 +50,8 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 	}
 
 	private final Set<LiteralSet> transitiveStrongEdges = new HashSet<>();
+	private final Set<LiteralSet> transitiveWeakEdges = new HashSet<>();
+	private final Set<LiteralSet> implicitStrongEdges = new HashSet<>();
 	final List<Vertex> adjList;
 	final List<LiteralSet> complexClauses = new ArrayList<>(0);
 
@@ -84,6 +86,14 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 
 	public Set<LiteralSet> getTransitiveStrongEdges() {
 		return transitiveStrongEdges;
+	}
+
+	public Set<LiteralSet> getTransitiveWeakEdges() {
+		return transitiveWeakEdges;
+	}
+
+	public Set<LiteralSet> getImplicitStrongEdges() {
+		return implicitStrongEdges;
 	}
 
 	public void addClause(LiteralSet clause) {
@@ -187,7 +197,15 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 				move = true;
 			}
 			if (move) {
-				newComplexClauses.add(oldComplexClauses.get(i + 1));
+				newComplexClauses.add(oldComplexClauses.get(oldComplexClauses.size() - 1));
+				for (final int containedLiteral : oldComplexClauses.get(oldComplexClauses.size() - 1).getLiterals()) {
+					for (int j = 0; j < getVertex(-containedLiteral).getComplexClauses().length; j++) {
+						if (getVertex(-containedLiteral).getComplexClauses()[j] == (oldComplexClauses.size() - 1)) {
+							getVertex(-containedLiteral).getComplexClauses()[j] = i;
+						}
+					}
+				}
+				move = false;
 			} else {
 				newComplexClauses.add(oldComplexClauses.get(i));
 			}
@@ -254,5 +272,4 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 		newStrongEdges[oldStrongEdges.length] = edge;
 		vertex.setStrongEdges(newStrongEdges);
 	}
-
 }
