@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.mig;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,18 +77,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private final CNF satInstance;
 	private final ModalImplicationGraph mig;
 	private final int numberOfVariables;
-	private long startTime;
-	private long coreDeadFeature;
-	private long sortOutCoreDead;
-	private long redClauses;
-	private long addEdges;
-	private long detectStrongEdges;
-	private long detectStrongEdgesComplete;
-	private long detectWeakEdges;
-	private long detectImplicitStrongEdges;
-	private long endTime;
 	private final List<LiteralSet> clausesInMig = new ArrayList<>();
-	private int satCalls = 0;
 
 	private ISatSolver solver;
 
@@ -111,46 +97,33 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	@Override
 	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 		monitor.setRemainingWork(5 + (detectStrong ? 3 : 0));
-		startTime = System.nanoTime();
 		if (!init()) {
 			return null;
 		}
 		monitor.step();
 
-		detectStrongEdgesComplete = System.nanoTime();
-		detectWeakEdges = System.nanoTime();
-		detectImplicitStrongEdges = System.nanoTime();
 		if (detectStrong) {
 			// Build transitive hull
 			dfsStrong();
 			monitor.step();
-			detectStrongEdgesComplete = System.nanoTime();
 			dfsWeak();
 			monitor.step();
-			detectWeakEdges = System.nanoTime();
 
 			dfsDetectStrongEdges();
 			monitor.step();
-			detectImplicitStrongEdges = System.nanoTime();
 		}
 		cleanClauseList();
 		monitor.step();
-		redClauses = System.nanoTime();
 
 		readdEdges();
 		monitor.step();
-		addEdges = System.nanoTime();
 
 		dfsStrong();
 		monitor.step();
-		detectStrongEdges = System.nanoTime();
 
 		transformToAdjList();
 		monitor.step();
-		endTime = System.nanoTime();
 
-		printTime(startTime, coreDeadFeature, sortOutCoreDead, detectStrongEdgesComplete, detectWeakEdges, detectImplicitStrongEdges, redClauses, addEdges,
-				detectStrongEdges, endTime);
 		return mig;
 	}
 
@@ -259,10 +232,8 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 		final boolean satisfiable = getCoreFeatures();
-		coreDeadFeature = System.nanoTime();
 		if (satisfiable) {
 			initEdges();
-			sortOutCoreDead = System.nanoTime();
 		}
 		return satisfiable;
 	}
@@ -293,7 +264,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
-		satCalls++;
 		if (solver.hasSolution(curClause.negate()) == SatResult.FALSE) {
 			redundantClauses.add(curClause);
 			return true;
@@ -527,7 +497,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 				final int varX = firstSolution[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
-					satCalls++;
 					switch (solver.hasSolution()) {
 					case FALSE:
 						addClause(varX);
@@ -595,7 +564,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
-					satCalls++;
 					switch (solver.hasSolution()) {
 					case FALSE:
 						for (final int mx0 : dfsStack) {
@@ -702,37 +670,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 
 	public List<LiteralSet> getClausesInMig() {
 		return clausesInMig;
-	}
-
-	public int getSatCalls() {
-		return satCalls;
-	}
-
-	private void printTime(long startTime2, long coreDeadFeature2, long sortOutCoreDead2, long detectStrongEdgesComplete2, long detectWeakEdges2,
-			long detectImplicitStrongEdges, long redClauses2, long addEdges2, long detectStrongEdges2, long endTime2) throws IOException {
-		final FileWriter fw_eval = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant_calculated.txt", true);
-		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
-		bw_eval.write("calculate Core And Dead Features " + (coreDeadFeature2 - startTime2));
-		bw_eval.newLine();
-		bw_eval.write("sort out core and dead features: " + (sortOutCoreDead2 - coreDeadFeature2));
-		bw_eval.newLine();
-		bw_eval.write("detect transitive strong edges: " + (detectStrongEdgesComplete2 - sortOutCoreDead2));
-		bw_eval.newLine();
-		bw_eval.write("detect transitive weak edges: " + (detectWeakEdges2 - detectStrongEdgesComplete2));
-		bw_eval.newLine();
-		bw_eval.write("detect implicit strong edges: " + (detectImplicitStrongEdges - detectWeakEdges2));
-		bw_eval.newLine();
-		bw_eval.write("calculate redundant Clauses: " + (redClauses2 - detectImplicitStrongEdges));
-		bw_eval.newLine();
-		bw_eval.write("added Edges: " + (addEdges2 - redClauses2));
-		bw_eval.newLine();
-		bw_eval.write("find transitive strong Edges: " + (detectStrongEdges2 - addEdges2));
-		bw_eval.newLine();
-		bw_eval.write("transform to AdjList: " + (endTime2 - detectStrongEdges2));
-		bw_eval.newLine();
-		bw_eval.write("overall Time: " + (endTime2 - startTime2));
-		bw_eval.newLine();
-		bw_eval.close();
 	}
 
 }
