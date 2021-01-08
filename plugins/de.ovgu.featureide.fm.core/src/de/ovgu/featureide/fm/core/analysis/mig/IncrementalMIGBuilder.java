@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.mig;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -92,9 +89,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	private Variables variables;
 	private boolean detectStrong = false;
 	private final boolean checkRedundancy = true;
-	private static String dateiname = "";
-	private int satCall = 0;
-	ModalImplicationGraph testMIG;
 	final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
 	Set<LiteralSet> possiblyImplicitStrongEdges = new HashSet<LiteralSet>();
 	List<LiteralSet> throughImplStrongAffected;
@@ -106,23 +100,14 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	}
 
 	public static void main(String[] args) throws Exception {
-//		for (int i = 0; i < 3; i++) {
 		installLibraries();
-//		final File file = new File(
-//				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\FinancialServices01\\history");
-//		final File[] fileArray = file.listFiles();
-//		for (int i = 0; i < fileArray.length; i++) {
-//			if (i < 2) {
-//
-//			} else {
-//				dateiname = fileArray[i].getName();
-//				final IFeatureModel fm = FeatureModelManager.load(Paths.get(fileArray[i].getPath()));
-//				final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
-//				final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
-//				incMigbuilder.buildPreconditions(FeatureModelManager.load(Paths.get(fileArray[i - 1].getPath())));
-//				incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
-//			}
-//		}
+		final IFeatureModel fm = FeatureModelManager.load(Paths.get(
+				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\FinancialServices01\\history\\2017-10-20.xml"));
+		final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
+		final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
+		incMigbuilder.buildPreconditions();
+		incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
+		System.gc();
 	}
 
 	private void buildPreconditions() {
@@ -153,15 +138,10 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	public ModalImplicationGraph execute(IMonitor<ModalImplicationGraph> monitor) throws Exception {
 		Set<LiteralSet> affectedClauses = new HashSet<>();
 
-		printOldMig();
-
 		oldCNF = new CNF(variables, migBuilder.getClausesInMig());
 
 		oldCNF.getClauses().forEach(c -> c.setOrder(LiteralSet.Order.NATURAL));
 		newCNF.getClauses().forEach(c -> c.setOrder(LiteralSet.Order.NATURAL));
-
-		// zeitzähler
-		final long startTime = System.nanoTime();
 
 		// remove transitive strong edges from the MIG
 		final Set<LiteralSet> transStrongEdges = oldMig.getTransitiveStrongEdges();
@@ -173,8 +153,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		for (final LiteralSet literalSet : transStrongEdges) {
 			newMig.removeClause(literalSet);
 		}
-		final long removeTransStrongEdges = System.nanoTime();
 
+		// remove transitive weak edges from the MIG
 		if (!oldMig.getTransitiveWeakEdges().isEmpty()) {
 			final Set<LiteralSet> transWeakEdges = oldMig.getTransitiveWeakEdges();
 			for (final LiteralSet literalset : migBuilder.getClausesInMig()) {
@@ -186,15 +166,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 				newMig.getTransitiveWeakEdges().remove(literalSet);
 			}
 		}
-		final long removeTransWeakEdges = System.nanoTime();
 
 		// handle core/dead features
 		calculateDeadAndCoreFeatures();
-		final long deadCoreFeatures = System.nanoTime();
 
 		// clean new CNF
 		sortOutClauses();
-		final long cleanCNF = System.nanoTime();
 
 		// check old implicit strong edges
 		if (!oldMig.getImplicitStrongEdges().isEmpty()) {
@@ -210,7 +187,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 						final int secondLiteral = literals[j];
 						solver.assignmentPush(-secondLiteral);
 						final LiteralSet newImplicitStrongEdge = new LiteralSet(firstLiteral, secondLiteral);
-						satCall++;
 						switch (solver.hasSolution()) {
 						case FALSE:
 							newMig.getImplicitStrongEdges().add(newImplicitStrongEdge);
@@ -235,11 +211,9 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 				}
 			}
 		}
-		final long checkOldImplicitStrongEdges = System.nanoTime();
 
 		// calculate CNF difference
 		calculateCNFDifference();
-		final long cnfDiff = System.nanoTime();
 
 		// remove clauses from MIG
 		final Set<LiteralSet> remRed = new HashSet<>(redundantClauses);
@@ -248,15 +222,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		for (final LiteralSet clause : removedClauses) {
 			newMig.removeClause(clause);
 		}
-		final long remClauses = System.nanoTime();
 
-		long prevRedClauses = System.nanoTime();
 		if (checkRedundancy) {
 			// handle previously redundant clauses
 			if (!redundantClauses.isEmpty() && !removedClauses.isEmpty()) {
 				handlePreviouslyRedundant(new ArrayList<>(redundantClauses));
 			}
-			prevRedClauses = System.nanoTime();
 
 			// handle newly redundant clauses
 			final Set<LiteralSet> notRedundantClauses = new HashSet<>(newCNFclean.getClauses());
@@ -266,16 +237,15 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			affectedClauses = new HashSet<>(getThroughLiteralsAffectedClauses(new ArrayList<>(addedClauses), new ArrayList<>(notRedundantClauses)));
 			handleNewlyRedundant(new ArrayList<>(affectedClauses));
 		}
-		final long newlyRedClauses = System.nanoTime();
 
 		// add clauses
 		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
 		final Set<LiteralSet> notAddedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
 		notAddedClauses.removeAll(addedClauses);
 		newSolver.addClauses(notAddedClauses);
-		final List<LiteralSet> adddedClausesList = new ArrayList<>(addedClauses);
-		Collections.sort(adddedClausesList, lengthComparator);
-		for (final LiteralSet clause : adddedClausesList) {
+		final List<LiteralSet> addedClausesList = new ArrayList<>(addedClauses);
+		Collections.sort(addedClausesList, lengthComparator);
+		for (final LiteralSet clause : addedClausesList) {
 			if (checkRedundancy) {
 				if ((clause.getLiterals().length < 3) || !isRedundant(newSolver, clause)) {
 					newMig.addClause(clause);
@@ -295,59 +265,20 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 				newMig.addClause(clause);
 			}
 		}
-		final long addClauses = System.nanoTime();
 
-		long completeDfsStrong = System.nanoTime();
-		long completeDfsWeak = System.nanoTime();
-		long completeImplicitStrong = System.nanoTime();
 		numberOfVariablesNew = newCNF.getVariables().size();
 		dfsMark = new byte[numberOfVariablesNew * 2];
-		throughImplStrongAffected = new ArrayList<LiteralSet>(newCNFclean.getClauses()); // mit mehr als 3!!
+		throughImplStrongAffected = new ArrayList<LiteralSet>(newCNFclean.getClauses());
 		if (detectStrong) {
 			dfsStrong();
-			completeDfsStrong = System.nanoTime();
 			dfsWeak();
-			completeDfsWeak = System.nanoTime();
 			possiblyImplicitStrongEdges
 					.addAll(getThroughLiteralsAffectedClauses(new ArrayList<LiteralSet>(possiblyImplicitStrongEdges), throughImplStrongAffected));
 			detectStrongEdges(possiblyImplicitStrongEdges);
-			completeImplicitStrong = System.nanoTime();
 		}
 
 		dfsMark = new byte[numberOfVariablesNew * 2];
 		dfsStrong();
-		// zeitzähler
-		final long endTime = System.nanoTime();
-
-		System.out.println("Benötigte Zeit beim incremental: " + (endTime - startTime));
-
-		final long startTimeOld = System.nanoTime();
-
-		final MIGBuilder migBuilder = new MIGBuilder(newCNF);
-		testMIG = new ModalImplicationGraph();
-		migBuilder.setCheckRedundancy(checkRedundancy);
-		migBuilder.setDetectStrong(detectStrong);
-		try {
-			testMIG = migBuilder.execute(new NullMonitor<ModalImplicationGraph>());
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-
-		final long endTimeOld = System.nanoTime();
-
-		System.out.println("Benötigte Zeit beim neu Berechnen: " + (endTimeOld - startTimeOld));
-		System.out.println("Zeitsparen durch incremental: " + (endTimeOld - startTimeOld - (endTime - startTime)));
-
-		compare(newMig, testMIG);
-
-		printTimes(startTime, removeTransStrongEdges, removeTransWeakEdges, deadCoreFeatures, cleanCNF, checkOldImplicitStrongEdges, cnfDiff, remClauses,
-				prevRedClauses, newlyRedClauses, addClauses, completeDfsStrong, completeDfsWeak, endTime, endTimeOld, startTimeOld, migBuilder);
-
-		printNewMig();
-
-		printCalculatedMig(testMIG);
-
-		printClauses();
 
 		return newMig;
 	}
@@ -380,7 +311,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 						continue m;
 					}
 					solver.assignmentPush(-secondLiteral);
-					satCall++;
 					switch (solver.hasSolution()) {
 					case FALSE:
 						final LiteralSet newImplicitStrongEdge = new LiteralSet(new int[] { firstLiteral, secondLiteral }, Order.NATURAL);
@@ -516,7 +446,6 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			final int varX = solution1[i];
 			if (varX != 0) {
 				solver.assignmentPush(-varX);
-				satCall++;
 				switch (solver.hasSolution()) {
 				case FALSE:
 					solver.assignmentReplaceLast(varX);
@@ -553,17 +482,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		}
 	}
 
-	private void calculateDeadAndCoreFeaturesDC() {
-		// TODO
-	}
-
 	private void mark() {
 		for (int i = 0; i < dfsMark.length; i++) {
 			dfsMark[i] &= 2;
 		}
 	}
 
-	// TODO: Kann man da auch was sparen wegen evolution?
 	private void dfsStrong() {
 		for (int nextIndex = 1; nextIndex <= numberOfVariablesNew; nextIndex++) {
 			dfsStrong(nextIndex);
@@ -666,7 +590,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		Collections.sort(clauses, lengthComparator);
 		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
 		final Set<LiteralSet> notAffectedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
-		notAffectedClauses.removeAll(clauses); // vermutlich unnötig, nochma drüber nachdenken.
+		notAffectedClauses.removeAll(clauses);
 		newSolver.addClauses(notAffectedClauses);
 		for (final LiteralSet clause : clauses) {
 			if (!isRedundant(newSolver, clause)) {
@@ -694,302 +618,11 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
-		satCall++;
 		return solver.hasSolution(curClause.negate()) == SatResult.FALSE;
 	}
 
 	public void setDetectStrong(boolean detectStrong) {
 		this.detectStrong = detectStrong;
-	}
-
-	private void printNewMig() throws IOException {
-		final FileWriter fw = new FileWriter("newMig.txt");
-		final BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write(newCNF.toString());
-		bw.newLine();
-		bw.write("MIG");
-		bw.newLine();
-
-		for (final Vertex ver : newMig.getAdjList()) {
-			bw.write("vertex: " + ver.getVar());
-			bw.write("  strong Edges: ");
-			for (final int strongEdge : ver.getStrongEdges()) {
-				bw.write(" " + strongEdge + " ");
-			}
-			bw.write("  weak Edges: ");
-			for (final int weakEdge : ver.getComplexClauses()) {
-				bw.write(" " + weakEdge + " ");
-			}
-			bw.newLine();
-		}
-
-		bw.close();
-	}
-
-	private void printCalculatedMig(ModalImplicationGraph testMig) throws IOException {
-		final FileWriter fw = new FileWriter("testMig.txt");
-		final BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write(newCNF.toString());
-		bw.newLine();
-		bw.write("MIG");
-		bw.newLine();
-
-		for (final Vertex ver : testMig.getAdjList()) {
-			bw.write("vertex: " + ver.getVar());
-			bw.write("  strong Edges: ");
-			for (final int strongEdge : ver.getStrongEdges()) {
-				bw.write(" " + strongEdge + " ");
-			}
-			bw.write("  weak Edges: ");
-			for (final int weakEdge : ver.getComplexClauses()) {
-				bw.write(" " + weakEdge + " ");
-			}
-			bw.newLine();
-		}
-
-		bw.close();
-	}
-
-	private void printOldMig() throws IOException {
-		final FileWriter fw = new FileWriter("oldMig.txt");
-		final BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write(oldCNF.toString());
-		bw.newLine();
-		bw.write("MIG");
-		bw.newLine();
-
-		for (final Vertex ver : oldMig.getAdjList()) {
-			bw.write("vertex: " + ver.getVar());
-			bw.write("  strong Edges: ");
-			for (final int strongEdge : ver.getStrongEdges()) {
-				bw.write(" " + strongEdge + " ");
-			}
-			bw.write("  weak Edges: ");
-			for (final int weakEdge : ver.getComplexClauses()) {
-				bw.write(" " + weakEdge + " ");
-			}
-			bw.newLine();
-		}
-		bw.close();
-	}
-
-	private void printTimes(long startTime, long removeTransStrongEdges, long deadCoreFeatures, long cleanCNF, long checkOldImplicitStrongEdges, long cnfDiff,
-			long remClauses, long prevRedClauses, long newlyRedClauses, long addClauses, long completeDfsStrong, long completeDfsWeak,
-			long completeImplicitStrong, long endTime, long endTimeOld, long startTimeOld, MIGBuilder testMigBuilder) throws IOException {
-		final FileWriter fw_eval = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant.csv", true);
-		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
-		final FileWriter fw_eval1 = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant_adapted.txt", true);
-		final BufferedWriter bw_eval1 = new BufferedWriter(fw_eval1);
-		bw_eval1.write("remove transitive strong edges: " + (removeTransStrongEdges - startTime));
-		bw_eval1.newLine();
-		bw_eval1.write("calculated Core and Dead Features: " + (deadCoreFeatures - removeTransStrongEdges));
-		bw_eval1.newLine();
-		bw_eval1.write("clean CNF: " + (cleanCNF - deadCoreFeatures));
-		bw_eval1.newLine();
-		bw_eval1.write("check previously implicit strong edges: " + (checkOldImplicitStrongEdges - cleanCNF));
-		bw_eval1.newLine();
-		bw_eval1.write("calculate CNF difference: " + (cnfDiff - checkOldImplicitStrongEdges));
-		bw_eval1.newLine();
-		bw_eval1.write("removed Clauses: " + (remClauses - cnfDiff));
-		bw_eval1.newLine();
-		bw_eval1.write("checked preiously redundant Clauses of removed: " + (prevRedClauses - remClauses));
-		bw_eval1.newLine();
-		bw_eval1.write("checked newly redundant Clauses because of added: " + (newlyRedClauses - prevRedClauses));
-		bw_eval1.newLine();
-		bw_eval1.write("add Clauses: " + (addClauses - newlyRedClauses));
-		bw_eval1.newLine();
-		bw_eval1.write("detect transitive strong edges: " + (completeDfsStrong - addClauses));
-		bw_eval1.newLine();
-		bw_eval1.write("detect transitive weak edges: " + (completeDfsWeak - completeDfsStrong));
-		bw_eval1.newLine();
-		bw_eval1.write("detect implicit strong edges: " + (completeImplicitStrong - completeDfsWeak));
-		bw_eval1.newLine();
-		bw_eval1.write("detect transitive strong edges: " + (endTime - completeImplicitStrong));
-		bw_eval1.newLine();
-		bw_eval.write(dateiname);
-		bw_eval.write(";" + (endTime - startTime));
-		bw_eval.write(";" + (endTimeOld - startTimeOld));
-		bw_eval.write(";" + (newMig.getImplicitStrongEdges().size()));
-		bw_eval.write(";" + testMIG.getImplicitStrongEdges().size());
-		bw_eval.write(";" + satCall);
-		bw_eval.write(";" + testMigBuilder.getSatCalls());
-		bw_eval.newLine();
-		bw_eval.write("Zeitsparen durch incremental: " + (endTimeOld - startTimeOld - (endTime - startTime)));
-		bw_eval.close();
-		bw_eval1.close();
-	}
-
-	private void compare(ModalImplicationGraph adaptedMig, ModalImplicationGraph calculatedMig) throws IOException {
-		final FileWriter fw_diff = new FileWriter("diff_eval_time_automotive_complete_ohne_affected_redundant.txt", true);
-		final BufferedWriter bw_diff = new BufferedWriter(fw_diff);
-		m: for (final LiteralSet literalSetAdaptedMig : adaptedMig.getComplexClauses()) {
-			for (final LiteralSet literalSetCalculatedMig : calculatedMig.getComplexClauses()) {
-				if (literalSetCalculatedMig.containsAll(literalSetAdaptedMig)) {
-					continue m;
-				}
-			}
-			bw_diff.write("LiteralSet kommt so nicht vor in berechnetem Mig: " + literalSetAdaptedMig.toString());
-			bw_diff.newLine();
-		}
-		m: for (final LiteralSet literalSetCalculatedMig : calculatedMig.getComplexClauses()) {
-			for (final LiteralSet literalSetAdaptedMig : adaptedMig.getComplexClauses()) {
-				if (literalSetAdaptedMig.containsAll(literalSetCalculatedMig)) {
-					continue m;
-				}
-			}
-			bw_diff.write("LiteralSet kommt so nicht vor in adapted Mig: " + literalSetCalculatedMig.toString());
-			bw_diff.newLine();
-		}
-		m: for (final Vertex vertexCalculatedMig : adaptedMig.getAdjList()) {
-			for (final Vertex vertexSetAdaptedMig : calculatedMig.getAdjList()) {
-				if (vertexCalculatedMig.getVar() == vertexSetAdaptedMig.getVar()) {
-					continue m;
-				}
-			}
-			System.out.println("Variable kommt so nicht vor in berechnetem Mig: " + vertexCalculatedMig.getVar());
-		}
-		m: for (final Vertex vertexSetAdaptedMig : calculatedMig.getAdjList()) {
-			for (final Vertex vertexCalculatedMig : adaptedMig.getAdjList()) {
-				if (vertexSetAdaptedMig.getVar() == vertexCalculatedMig.getVar()) {
-					for (final int complClause : vertexSetAdaptedMig.getComplexClauses()) {
-						for (final int complClauseCal : vertexCalculatedMig.getComplexClauses()) {
-							for (final int complClauseLiteral : calculatedMig.getComplexClauses().get(complClause).getLiterals()) {
-								for (final int complClauseCalLiteral : adaptedMig.getComplexClauses().get(complClauseCal).getLiterals()) {
-									if (complClauseLiteral == complClauseCalLiteral) {
-										continue m;
-									}
-								}
-							}
-							System.out.println("ist unterschiedlich");
-						}
-					}
-					continue m;
-				}
-			}
-			System.out.println("Variable kommt so nicht vor in adapted Mig: " + vertexSetAdaptedMig.getVar());
-		}
-		m: for (int i = 0; i < adaptedMig.getAdjList().size(); i++) {
-			final int[] strongEdgesCalc = calculatedMig.getAdjList().get(i).getStrongEdges();
-			final int[] strongEdgesAdapt = adaptedMig.getAdjList().get(i).getStrongEdges();
-			if (strongEdgesAdapt.length != strongEdgesCalc.length) {
-				bw_diff.write("Variablen an Stelle " + calculatedMig.getAdjList().get(i).getVar() + " haben unterschiedlich viele strong Edges");
-				bw_diff.newLine();
-				bw_diff.write("adapted Mig hat " + strongEdgesAdapt.length + " strong edges");
-				bw_diff.newLine();
-				bw_diff.write("calculated Mig hat " + strongEdgesCalc.length + " strong edges");
-				bw_diff.newLine();
-				bw_diff.newLine();
-				continue m;
-			}
-			for (int j = 0; j < strongEdgesCalc.length; j++) {
-				for (int strongEdge = 0; strongEdge < strongEdgesCalc.length; strongEdge++) {
-					if (strongEdgesAdapt[j] == strongEdgesCalc[strongEdge]) {
-						continue m;
-					}
-				}
-				bw_diff.write("Variablen an Stelle" + i + "haben unterschiedliche strong Edges");
-				bw_diff.newLine();
-			}
-		}
-		for (int i = 0; i < adaptedMig.getAdjList().size(); i++) {
-			if (adaptedMig.getAdjList().get(i).isCore()) {
-				if (!calculatedMig.getAdjList().get(i).isCore()) {
-					bw_diff.write("Variable an Stelle" + i + "ist core bei adaptedMig aber nicht bei calculated");
-					bw_diff.newLine();
-				}
-			}
-			if (adaptedMig.getAdjList().get(i).isDead()) {
-				if (!calculatedMig.getAdjList().get(i).isDead()) {
-					bw_diff.write("Variable an Stelle" + i + "ist dead bei adaptedMig aber nicht bei calculated");
-					bw_diff.newLine();
-				}
-			}
-			if (calculatedMig.getAdjList().get(i).isCore()) {
-				if (!adaptedMig.getAdjList().get(i).isCore()) {
-					bw_diff.write("Variable an Stelle" + i + "ist core bei calculated aber nicht bei adaptedMig");
-					bw_diff.newLine();
-				}
-			}
-			if (calculatedMig.getAdjList().get(i).isDead()) {
-				if (!adaptedMig.getAdjList().get(i).isDead()) {
-					bw_diff.write("Variable an Stelle" + i + "ist dead bei calculated aber nicht bei adaptedMig");
-					bw_diff.newLine();
-				}
-			}
-
-		}
-		bw_diff.write("Insgesamt hat der adapted MIG " + adaptedMig.getImplicitStrongEdges().size() + " implicit strong edges und der calculated MIG "
-			+ calculatedMig.getImplicitStrongEdges().size());
-		bw_diff.write("ende");
-		bw_diff.newLine();
-		bw_diff.newLine();
-		bw_diff.newLine();
-		bw_diff.close();
-	}
-
-	private void printClauses() throws IOException {
-		final FileWriter fw = new FileWriter("clauses.txt");
-		final BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write("oldCNF: ");
-		bw.newLine();
-		for (final LiteralSet literals : oldCNF.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("newCNF: ");
-		bw.newLine();
-		for (final LiteralSet literals : newCNF.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("newCNFclean: ");
-		bw.newLine();
-		for (final LiteralSet literals : newCNFclean.getClauses()) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("addedClauses: ");
-		bw.newLine();
-		for (final LiteralSet literals : addedClauses) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.write("removedClauses: ");
-		bw.newLine();
-		for (final LiteralSet literals : removedClauses) {
-			for (final int literal : literals.getLiterals()) {
-				bw.write(literal + ", ");
-			}
-			bw.write("<    >");
-		}
-		bw.newLine();
-		bw.newLine();
-
-		bw.close();
 	}
 
 	public static void installLibraries() {
