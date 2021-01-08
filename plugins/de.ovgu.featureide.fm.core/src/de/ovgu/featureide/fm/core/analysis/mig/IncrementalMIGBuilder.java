@@ -38,6 +38,7 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
@@ -80,6 +81,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	private CNF newCNF;
 	private CNF newCNFclean;
 	private Set<LiteralSet> removedClauses;
+	private final Set<LiteralSet> strongEdges = new HashSet<>();
 	private Set<LiteralSet> addedClauses;
 	private Set<LiteralSet> redundantClauses;
 	private ModalImplicationGraph newMig;
@@ -88,8 +90,11 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	private byte[] dfsMark;
 	private MIGBuilder migBuilder;
 	private Variables variables;
-	private boolean detectStrong = true;
+	private boolean detectStrong = false;
 	private final boolean checkRedundancy = true;
+	private static String dateiname = "";
+	private int satCall = 0;
+	ModalImplicationGraph testMIG;
 	final ArrayDeque<Integer> dfsStack = new ArrayDeque<>();
 	Set<LiteralSet> possiblyImplicitStrongEdges = new HashSet<LiteralSet>();
 	List<LiteralSet> throughImplStrongAffected;
@@ -103,13 +108,20 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	public static void main(String[] args) throws Exception {
 //		for (int i = 0; i < 3; i++) {
 		installLibraries();
-		final IFeatureModel fm = FeatureModelManager.load(Paths.get(
-				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\FinancialServices01\\history\\2017-10-20.xml"));
-		final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
-		final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
-		incMigbuilder.buildPreconditions();
-		incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
-		System.gc();
+//		final File file = new File(
+//				"C:\\Users\\rahel\\OneDrive\\Dokumente\\Uni\\Bachelorarbeit\\FeatureIDE\\FeatureIDE\\plugins\\de.ovgu.featureide.examples\\featureide_examples\\FeatureModels\\FinancialServices01\\history");
+//		final File[] fileArray = file.listFiles();
+//		for (int i = 0; i < fileArray.length; i++) {
+//			if (i < 2) {
+//
+//			} else {
+//				dateiname = fileArray[i].getName();
+//				final IFeatureModel fm = FeatureModelManager.load(Paths.get(fileArray[i].getPath()));
+//				final CNF newCnfPrep = FeatureModelManager.getInstance(fm).getPersistentFormula().getCNF().clone();
+//				final IncrementalMIGBuilder incMigbuilder = new IncrementalMIGBuilder(newCnfPrep);
+//				incMigbuilder.buildPreconditions(FeatureModelManager.load(Paths.get(fileArray[i - 1].getPath())));
+//				incMigbuilder.execute(new NullMonitor<ModalImplicationGraph>());
+//			}
 //		}
 	}
 
@@ -125,8 +137,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		assert Objects.equals(oldCNF.getVariables(), newCNF.getVariables());
 		newCNFclean = new CNF(variables);
 		migBuilder = new MIGBuilder(oldCNF);
-		migBuilder.setCheckRedundancy(true);
-		migBuilder.setDetectStrong(true);
+		migBuilder.setCheckRedundancy(checkRedundancy);
+		migBuilder.setDetectStrong(detectStrong);
 		oldMig = LongRunningWrapper.runMethod(migBuilder);
 		redundantClauses = migBuilder.getRedundantClauses();
 		newMig = new ModalImplicationGraph(declareMigSize(oldCNF.getVariables().size(), numberOfVariablesNew) * 2);
@@ -190,32 +202,37 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			solver.useSolutionList(0);
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			for (final LiteralSet implicitStrongEdge : oldMig.getImplicitStrongEdges()) {
-				for (final int firstLiteral : implicitStrongEdge.getLiterals()) {
+				final int[] literals = implicitStrongEdge.getLiterals();
+				for (int i = 0; i < literals.length; i++) {
+					final int firstLiteral = literals[i];
 					solver.assignmentPush(-firstLiteral);
-					m: for (final int secondLiteral : implicitStrongEdge.getLiterals()) {
-						if (secondLiteral == firstLiteral) {
-							continue m;
-						}
+					for (int j = i + 1; j < literals.length; j++) {
+						final int secondLiteral = literals[j];
 						solver.assignmentPush(-secondLiteral);
 						final LiteralSet newImplicitStrongEdge = new LiteralSet(firstLiteral, secondLiteral);
+						satCall++;
 						switch (solver.hasSolution()) {
 						case FALSE:
 							newMig.getImplicitStrongEdges().add(newImplicitStrongEdge);
 							newCNFclean.addClause(newImplicitStrongEdge);
 							solver.addClause(newImplicitStrongEdge);
-							solver.assignmentPop();
+							strongEdges.add(newImplicitStrongEdge);
 							break;
 						case TIMEOUT:
-							solver.assignmentPop();
 							break;
 						case TRUE:
 							newMig.removeClause(newImplicitStrongEdge);
-							solver.assignmentPop();
+							for (final LiteralSet clause : newCNFclean.getClauses()) {
+								if ((clause.size() > 3) && (clause.containsAll(newImplicitStrongEdge))) {
+									newMig.addClause(clause);
+								}
+							}
 							break;
 						}
+						solver.assignmentPop();
 					}
+					solver.assignmentPop();
 				}
-				solver.assignmentPop();
 			}
 		}
 		final long checkOldImplicitStrongEdges = System.nanoTime();
@@ -233,7 +250,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		}
 		final long remClauses = System.nanoTime();
 
-		long prevRedClauses = 0;
+		long prevRedClauses = System.nanoTime();
 		if (checkRedundancy) {
 			// handle previously redundant clauses
 			if (!redundantClauses.isEmpty() && !removedClauses.isEmpty()) {
@@ -246,39 +263,46 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			if (!redundantClauses.isEmpty()) {
 				notRedundantClauses.removeAll(redundantClauses);
 			}
-			affectedClauses =
-				new HashSet<>(getThroughLiteralsAffectedClauses(new ArrayList<LiteralSet>(addedClauses), new ArrayList<LiteralSet>(notRedundantClauses)));
+			affectedClauses = new HashSet<>(getThroughLiteralsAffectedClauses(new ArrayList<>(addedClauses), new ArrayList<>(notRedundantClauses)));
 			handleNewlyRedundant(new ArrayList<>(affectedClauses));
 		}
 		final long newlyRedClauses = System.nanoTime();
 
+		// add clauses
 		final AdvancedSatSolver newSolver = new AdvancedSatSolver(new CNF(newCNFclean, false));
 		final Set<LiteralSet> notAddedClauses = new LinkedHashSet<>(newCNFclean.getClauses());
 		notAddedClauses.removeAll(addedClauses);
 		newSolver.addClauses(notAddedClauses);
-		for (final LiteralSet clause : addedClauses) {
+		final List<LiteralSet> adddedClausesList = new ArrayList<>(addedClauses);
+		Collections.sort(adddedClausesList, lengthComparator);
+		for (final LiteralSet clause : adddedClausesList) {
 			if (checkRedundancy) {
 				if ((clause.getLiterals().length < 3) || !isRedundant(newSolver, clause)) {
 					newMig.addClause(clause);
 					newSolver.addClause(clause);
 					if (clause.getLiterals().length > 2) {
 						possiblyImplicitStrongEdges.add(clause);
+					} else {
+						strongEdges.add(clause);
 					}
 				} else {
 					redundantClauses.add(clause);
 				}
 			} else {
+				if (clause.getLiterals().length > 2) {
+					possiblyImplicitStrongEdges.add(clause);
+				}
 				newMig.addClause(clause);
 			}
 		}
 		final long addClauses = System.nanoTime();
 
-		long completeDfsStrong = 0;
-		long completeDfsWeak = 0;
-		long completeImplicitStrong = 0;
+		long completeDfsStrong = System.nanoTime();
+		long completeDfsWeak = System.nanoTime();
+		long completeImplicitStrong = System.nanoTime();
 		numberOfVariablesNew = newCNF.getVariables().size();
 		dfsMark = new byte[numberOfVariablesNew * 2];
-		throughImplStrongAffected = new ArrayList<LiteralSet>(newCNFclean.getClauses());
+		throughImplStrongAffected = new ArrayList<LiteralSet>(newCNFclean.getClauses()); // mit mehr als 3!!
 		if (detectStrong) {
 			dfsStrong();
 			completeDfsStrong = System.nanoTime();
@@ -290,8 +314,8 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			completeImplicitStrong = System.nanoTime();
 		}
 
+		dfsMark = new byte[numberOfVariablesNew * 2];
 		dfsStrong();
-
 		// zeitzähler
 		final long endTime = System.nanoTime();
 
@@ -300,9 +324,9 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		final long startTimeOld = System.nanoTime();
 
 		final MIGBuilder migBuilder = new MIGBuilder(newCNF);
-		ModalImplicationGraph testMIG = new ModalImplicationGraph();
-		migBuilder.setCheckRedundancy(true);
-		migBuilder.setDetectStrong(true);
+		testMIG = new ModalImplicationGraph();
+		migBuilder.setCheckRedundancy(checkRedundancy);
+		migBuilder.setDetectStrong(detectStrong);
 		try {
 			testMIG = migBuilder.execute(new NullMonitor<ModalImplicationGraph>());
 		} catch (final Exception e) {
@@ -317,7 +341,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		compare(newMig, testMIG);
 
 		printTimes(startTime, removeTransStrongEdges, removeTransWeakEdges, deadCoreFeatures, cleanCNF, checkOldImplicitStrongEdges, cnfDiff, remClauses,
-				prevRedClauses, newlyRedClauses, addClauses, completeDfsStrong, completeDfsWeak, completeImplicitStrong, endTime, endTimeOld, startTimeOld);
+				prevRedClauses, newlyRedClauses, addClauses, completeDfsStrong, completeDfsWeak, endTime, endTimeOld, startTimeOld, migBuilder);
 
 		printNewMig();
 
@@ -332,7 +356,23 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		final ISatSolver solver = new AdvancedSatSolver(newCNFclean);
 		solver.useSolutionList(0);
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+		final Set<LiteralSet> literalSetsImpl = new HashSet<>();
 		for (final LiteralSet implicitStrongEdge : possibilyImplicitStrongEdges) {
+			final int[] literals = implicitStrongEdge.getLiterals();
+			for (int i = 0; i < literals.length; i++) {
+				for (int j = i + 1; j < literals.length; j++) {
+					final LiteralSet literalSet = new LiteralSet(new int[] { literals[i], literals[j] }, Order.NATURAL);
+					final LiteralSet literalSet2 = new LiteralSet(new int[] { -literals[i], -literals[j] }, Order.NATURAL);
+					if (!strongEdges.contains(literalSet)) {
+						literalSetsImpl.add(literalSet);
+					}
+					if (!strongEdges.contains(literalSet2)) {
+						literalSetsImpl.add(literalSet2);
+					}
+				}
+			}
+		}
+		for (final LiteralSet implicitStrongEdge : literalSetsImpl) {
 			for (final int firstLiteral : implicitStrongEdge.getLiterals()) {
 				solver.assignmentPush(-firstLiteral);
 				m: for (final int secondLiteral : implicitStrongEdge.getLiterals()) {
@@ -340,32 +380,10 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 						continue m;
 					}
 					solver.assignmentPush(-secondLiteral);
+					satCall++;
 					switch (solver.hasSolution()) {
 					case FALSE:
-						final LiteralSet newImplicitStrongEdge = new LiteralSet(firstLiteral, secondLiteral);
-						newMig.addClause(newImplicitStrongEdge);
-						newMig.getImplicitStrongEdges().add(newImplicitStrongEdge);
-						solver.addClause(newImplicitStrongEdge);
-						solver.assignmentPop();
-						break;
-					case TIMEOUT:
-						solver.assignmentPop();
-						break;
-					case TRUE:
-						solver.assignmentPop();
-						break;
-					}
-				}
-				solver.assignmentPop();
-				solver.assignmentPush(firstLiteral);
-				m: for (final int secondLiteral : implicitStrongEdge.getLiterals()) {
-					if (secondLiteral == firstLiteral) {
-						continue m;
-					}
-					solver.assignmentPush(secondLiteral);
-					switch (solver.hasSolution()) {
-					case FALSE:
-						final LiteralSet newImplicitStrongEdge = new LiteralSet(-firstLiteral, -secondLiteral);
+						final LiteralSet newImplicitStrongEdge = new LiteralSet(new int[] { firstLiteral, secondLiteral }, Order.NATURAL);
 						newMig.addClause(newImplicitStrongEdge);
 						newMig.getImplicitStrongEdges().add(newImplicitStrongEdge);
 						solver.addClause(newImplicitStrongEdge);
@@ -498,6 +516,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			final int varX = solution1[i];
 			if (varX != 0) {
 				solver.assignmentPush(-varX);
+				satCall++;
 				switch (solver.hasSolution()) {
 				case FALSE:
 					solver.assignmentReplaceLast(varX);
@@ -512,6 +531,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 					break;
 				case TRUE:
 					solver.assignmentPop();
+					final Vertex vertexPos = newMig.getVertex(i + 1);
+					final Vertex vertexNeg = newMig.getVertex(-(i + 1));
+					vertexPos.setCore(false);
+					vertexPos.setDead(false);
+					vertexNeg.setCore(false);
+					vertexNeg.setDead(false);
 					LiteralSet.resetConflicts(solution1, solver.getSolution());
 					solver.shuffleOrder(new Random(112358));
 					break;
@@ -564,6 +589,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			final LiteralSet newTransitiveStrongEdge = new LiteralSet(-dfsStack.getFirst(), curVar);
 			newMig.addClause(newTransitiveStrongEdge);
 			newMig.getTransitiveStrongEdges().add(newTransitiveStrongEdge);
+			strongEdges.add(newTransitiveStrongEdge);
 		}
 
 		if ((size > 0) && ((dfsMark[Math.abs(dfsStack.getLast()) - 1] & 2) != 0)) {
@@ -668,6 +694,7 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
+		satCall++;
 		return solver.hasSolution(curClause.negate()) == SatResult.FALSE;
 	}
 
@@ -749,49 +776,54 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 		bw.close();
 	}
 
-	private void printTimes(long startTime, long removeTransStrongEdges, long removeTransWeakEdges, long deadCoreFeatures, long cleanCNF,
-			long checkOldImplicitStrongEdges, long cnfDiff, long remClauses, long prevRedClauses, long newlyRedClauses, long addClauses, long completeDfsStrong,
-			long completeDfsWeak, long completeImplicitStrong, long endTime, long endTimeOld, long startTimeOld) throws IOException {
-		final FileWriter fw_eval = new FileWriter("eval_time_adapted.txt");
+	private void printTimes(long startTime, long removeTransStrongEdges, long deadCoreFeatures, long cleanCNF, long checkOldImplicitStrongEdges, long cnfDiff,
+			long remClauses, long prevRedClauses, long newlyRedClauses, long addClauses, long completeDfsStrong, long completeDfsWeak,
+			long completeImplicitStrong, long endTime, long endTimeOld, long startTimeOld, MIGBuilder testMigBuilder) throws IOException {
+		final FileWriter fw_eval = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant.csv", true);
 		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
-		bw_eval.write("remove transitive strong edges: " + (removeTransStrongEdges - startTime));
-		bw_eval.newLine();
-		bw_eval.write("remove transitive weak edges: " + (removeTransWeakEdges - removeTransStrongEdges));
-		bw_eval.newLine();
-		bw_eval.write("calculated Core and Dead Features: " + (deadCoreFeatures - removeTransWeakEdges));
-		bw_eval.newLine();
-		bw_eval.write("clean CNF: " + (cleanCNF - deadCoreFeatures));
-		bw_eval.newLine();
-		bw_eval.write("check previously implicit strong edges: " + (checkOldImplicitStrongEdges - cleanCNF));
-		bw_eval.newLine();
-		bw_eval.write("calculate CNF difference: " + (cnfDiff - checkOldImplicitStrongEdges));
-		bw_eval.newLine();
-		bw_eval.write("removed Clauses: " + (remClauses - cnfDiff));
-		bw_eval.newLine();
-		bw_eval.write("checked preiously redundant Clauses of removed: " + (prevRedClauses - remClauses));
-		bw_eval.newLine();
-		bw_eval.write("checked newly redundant Clauses because of added: " + (newlyRedClauses - prevRedClauses));
-		bw_eval.newLine();
-		bw_eval.write("add Clauses: " + (addClauses - newlyRedClauses));
-		bw_eval.newLine();
-		bw_eval.write("detect transitive strong edges: " + (completeDfsStrong - addClauses));
-		bw_eval.newLine();
-		bw_eval.write("detect transitive weak edges: " + (completeDfsWeak - completeDfsStrong));
-		bw_eval.newLine();
-		bw_eval.write("detect implicit strong edges: " + (completeImplicitStrong - completeDfsWeak));
-		bw_eval.newLine();
-		bw_eval.write("detect transitive strong edges: " + (endTime - completeImplicitStrong));
-		bw_eval.newLine();
-		bw_eval.write("Benötigte Zeit beim incremental: " + (endTime - startTime));
-		bw_eval.newLine();
-		bw_eval.write("Benötigte Zeit beim neu Berechnen: " + (endTimeOld - startTimeOld));
+		final FileWriter fw_eval1 = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant_adapted.txt", true);
+		final BufferedWriter bw_eval1 = new BufferedWriter(fw_eval1);
+		bw_eval1.write("remove transitive strong edges: " + (removeTransStrongEdges - startTime));
+		bw_eval1.newLine();
+		bw_eval1.write("calculated Core and Dead Features: " + (deadCoreFeatures - removeTransStrongEdges));
+		bw_eval1.newLine();
+		bw_eval1.write("clean CNF: " + (cleanCNF - deadCoreFeatures));
+		bw_eval1.newLine();
+		bw_eval1.write("check previously implicit strong edges: " + (checkOldImplicitStrongEdges - cleanCNF));
+		bw_eval1.newLine();
+		bw_eval1.write("calculate CNF difference: " + (cnfDiff - checkOldImplicitStrongEdges));
+		bw_eval1.newLine();
+		bw_eval1.write("removed Clauses: " + (remClauses - cnfDiff));
+		bw_eval1.newLine();
+		bw_eval1.write("checked preiously redundant Clauses of removed: " + (prevRedClauses - remClauses));
+		bw_eval1.newLine();
+		bw_eval1.write("checked newly redundant Clauses because of added: " + (newlyRedClauses - prevRedClauses));
+		bw_eval1.newLine();
+		bw_eval1.write("add Clauses: " + (addClauses - newlyRedClauses));
+		bw_eval1.newLine();
+		bw_eval1.write("detect transitive strong edges: " + (completeDfsStrong - addClauses));
+		bw_eval1.newLine();
+		bw_eval1.write("detect transitive weak edges: " + (completeDfsWeak - completeDfsStrong));
+		bw_eval1.newLine();
+		bw_eval1.write("detect implicit strong edges: " + (completeImplicitStrong - completeDfsWeak));
+		bw_eval1.newLine();
+		bw_eval1.write("detect transitive strong edges: " + (endTime - completeImplicitStrong));
+		bw_eval1.newLine();
+		bw_eval.write(dateiname);
+		bw_eval.write(";" + (endTime - startTime));
+		bw_eval.write(";" + (endTimeOld - startTimeOld));
+		bw_eval.write(";" + (newMig.getImplicitStrongEdges().size()));
+		bw_eval.write(";" + testMIG.getImplicitStrongEdges().size());
+		bw_eval.write(";" + satCall);
+		bw_eval.write(";" + testMigBuilder.getSatCalls());
 		bw_eval.newLine();
 		bw_eval.write("Zeitsparen durch incremental: " + (endTimeOld - startTimeOld - (endTime - startTime)));
 		bw_eval.close();
+		bw_eval1.close();
 	}
 
 	private void compare(ModalImplicationGraph adaptedMig, ModalImplicationGraph calculatedMig) throws IOException {
-		final FileWriter fw_diff = new FileWriter("diff.txt");
+		final FileWriter fw_diff = new FileWriter("diff_eval_time_automotive_complete_ohne_affected_redundant.txt", true);
 		final BufferedWriter bw_diff = new BufferedWriter(fw_diff);
 		m: for (final LiteralSet literalSetAdaptedMig : adaptedMig.getComplexClauses()) {
 			for (final LiteralSet literalSetCalculatedMig : calculatedMig.getComplexClauses()) {
@@ -889,6 +921,12 @@ public class IncrementalMIGBuilder implements LongRunningMethod<ModalImplication
 			}
 
 		}
+		bw_diff.write("Insgesamt hat der adapted MIG " + adaptedMig.getImplicitStrongEdges().size() + " implicit strong edges und der calculated MIG "
+			+ calculatedMig.getImplicitStrongEdges().size());
+		bw_diff.write("ende");
+		bw_diff.newLine();
+		bw_diff.newLine();
+		bw_diff.newLine();
 		bw_diff.close();
 	}
 

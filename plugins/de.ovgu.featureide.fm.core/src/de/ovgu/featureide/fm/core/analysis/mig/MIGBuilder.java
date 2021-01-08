@@ -91,6 +91,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	private long detectImplicitStrongEdges;
 	private long endTime;
 	private final List<LiteralSet> clausesInMig = new ArrayList<>();
+	private int satCalls = 0;
 
 	private ISatSolver solver;
 
@@ -116,6 +117,9 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		}
 		monitor.step();
 
+		detectStrongEdgesComplete = System.nanoTime();
+		detectWeakEdges = System.nanoTime();
+		detectImplicitStrongEdges = System.nanoTime();
 		if (detectStrong) {
 			// Build transitive hull
 			dfsStrong();
@@ -289,6 +293,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	private final boolean isRedundant(ISatSolver solver, LiteralSet curClause) {
+		satCalls++;
 		if (solver.hasSolution(curClause.negate()) == SatResult.FALSE) {
 			redundantClauses.add(curClause);
 			return true;
@@ -522,6 +527,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 				final int varX = firstSolution[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
+					satCalls++;
 					switch (solver.hasSolution()) {
 					case FALSE:
 						addClause(varX);
@@ -589,6 +595,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 					solver.assignmentPush(-my1);
 					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
+					satCalls++;
 					switch (solver.hasSolution()) {
 					case FALSE:
 						for (final int mx0 : dfsStack) {
@@ -697,9 +704,13 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		return clausesInMig;
 	}
 
+	public int getSatCalls() {
+		return satCalls;
+	}
+
 	private void printTime(long startTime2, long coreDeadFeature2, long sortOutCoreDead2, long detectStrongEdgesComplete2, long detectWeakEdges2,
 			long detectImplicitStrongEdges, long redClauses2, long addEdges2, long detectStrongEdges2, long endTime2) throws IOException {
-		final FileWriter fw_eval = new FileWriter("eval_time_calculated.txt");
+		final FileWriter fw_eval = new FileWriter("eval_time_automotive_complete_ohne_affected_redundant_calculated.txt", true);
 		final BufferedWriter bw_eval = new BufferedWriter(fw_eval);
 		bw_eval.write("calculate Core And Dead Features " + (coreDeadFeature2 - startTime2));
 		bw_eval.newLine();

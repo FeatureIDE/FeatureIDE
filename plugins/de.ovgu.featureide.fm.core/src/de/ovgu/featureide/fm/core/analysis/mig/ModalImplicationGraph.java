@@ -189,29 +189,19 @@ public class ModalImplicationGraph implements IEdgeTypes, Serializable {
 	}
 
 	private void removeComplexClause(int oldClauseIndex) {
-		final List<LiteralSet> oldComplexClauses = getComplexClauses();
-		final List<LiteralSet> newComplexClauses = new ArrayList<>(oldComplexClauses.size() - 1);
-		boolean move = false;
-		for (int i = 0; i < (oldComplexClauses.size() - 1); i++) {
-			if (i == oldClauseIndex) {
-				move = true;
-			}
-			if (move) {
-				newComplexClauses.add(oldComplexClauses.get(oldComplexClauses.size() - 1));
-				for (final int containedLiteral : oldComplexClauses.get(oldComplexClauses.size() - 1).getLiterals()) {
-					for (int j = 0; j < getVertex(-containedLiteral).getComplexClauses().length; j++) {
-						if (getVertex(-containedLiteral).getComplexClauses()[j] == (oldComplexClauses.size() - 1)) {
-							getVertex(-containedLiteral).getComplexClauses()[j] = i;
-						}
+		final int newClauseIndex = complexClauses.size() - 1;
+		Collections.swap(complexClauses, oldClauseIndex, newClauseIndex);
+		complexClauses.remove(newClauseIndex);
+		if (oldClauseIndex != newClauseIndex) {
+			for (final int containedLiteral : complexClauses.get(oldClauseIndex).getLiterals()) {
+				final int[] complexClausesVertex = getVertex(-containedLiteral).getComplexClauses();
+				for (int j = 0; j < complexClausesVertex.length; j++) {
+					if (complexClausesVertex[j] == newClauseIndex) {
+						complexClausesVertex[j] = oldClauseIndex;
 					}
 				}
-				move = false;
-			} else {
-				newComplexClauses.add(oldComplexClauses.get(i));
 			}
 		}
-		complexClauses.clear();
-		complexClauses.addAll(newComplexClauses);
 	}
 
 	private void removeWeakEdge(Vertex vertex, int oldClauseIndex) {
