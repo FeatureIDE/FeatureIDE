@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -105,12 +106,15 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 				return getColoredCircleImage(color);
 			}
 
-			final ConstraintProperties constraintProperties =
-				controller.getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
-			if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.REDUNDANT)) {
-				return GUIDefaults.FM_INFO;
-			}
+			final Boolean isAutomaticCalculation = FeatureModelProperty.getBooleanProperty(controller.getFeatureModelManager().getSnapshot().getProperty(),
+					FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+			if ((isAutomaticCalculation != null) && isAutomaticCalculation) {
 
+				final ConstraintProperties constraintProperties = controller.getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
+				if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.REDUNDANT)) {
+					return GUIDefaults.FM_INFO;
+				}
+			}
 			return null;
 		}
 	}
