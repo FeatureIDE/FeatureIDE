@@ -1,0 +1,8 @@
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+lib/antlr-3.4.jar
+lib/uvl-parser-0.1.0.jar
+lib/de.ovgu.featureide.lib.fm-v3.7.0.jar
+model.xml
+src/de/ovgu/featureide/examples/transformation/FeatureModelTransformation.java

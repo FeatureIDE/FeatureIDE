@@ -226,6 +226,7 @@
     <project name="LibSSH-Colligens" path="featureide_examples/LibSSH-Colligens/.project"/>
     <project name="CommandLineConfigurator" path="featureide_examples/Library/CommandLineConfigurator/.project"/>
     <project name="FeatureAttributes" path="featureide_examples/Library/FeatureAttributes/.project"/>
+    <project name="FeatureModelTransformation" path="featureide_examples/Library/FeatureModelTransformation/.project"/>
     <project name="FeatureModelAnalysis" path="featureide_examples/Library/FeatureModelAnalysis/.project"/>
     <project name="GraphicalConfigurator" path="featureide_examples/Library/GraphicalConfigurator/.project"/>
     <project name="Notepad-FH-Java" path="featureide_examples/Notepad-FH-Java/.project">
