@@ -964,6 +964,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						checked = false;
 						grayed = true;
 						fgColor = gray;
+						// On most operating systems, we use gray text color to show that a feature cannot be selected.
+						// On Ubuntu, this does not work and instead, we use an italic font (see issue #1055).
 						font = treeItemItalicFont;
 						break;
 					case UNDEFINED:
@@ -975,6 +977,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					if (automatic == Selection.UNDEFINED) {
 						switch (recommended) {
 						case SELECTED:
+							// again, this is a workaround for Ubuntu, which does not show the gray font color correctly
 							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
 							fgColor = green;
 							break;
