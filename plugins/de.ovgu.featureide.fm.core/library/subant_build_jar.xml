@@ -55,7 +55,7 @@
 
 		<!-- Get all libraries in lib folder -->
 		<path id="classpath">
-			<fileset dir="${lib.dir}" includes="*.jar" />
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
 		</path>
 		<pathconvert property="jar.class.path" pathsep=" ">
 			<path refid="classpath"/>

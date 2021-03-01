@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
-
-	<!-- Path to Java Compiler (Can be adated in file build_jar.properties) -->
-	<!--<property name="bin.javac.path.default" value="C:/Program Files/Java/openjdk-8u212-b04/bin/javac.exe" />-->
-
+	
 	<!-- Set JAR name -->
 	<property name="build.jar.version" value="3.7.0" />
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes-v${build.jar.version}" />
 
 	<!-- Constants -->
-	<property name="src.dir" value="../src" />
-	<property name="lib.jar.dir" value="jar/lib" />
-	<property name="license.path" value="../license.txt" />
+	<property name="base.dir" value=".." />
+	<property name="src.dir" value="${base.dir}/src" />
+	<property name="license.path" value="${base.dir}/license.txt" />
 
 	<property name="build.dir" value="." />
 	<property name="build.bin.dir" value="${build.dir}/bin" />
 	<property name="build.excludes.path" value="${build.dir}/excluded_source_files.txt" />
 	<property name="build.jar.dir" value="${build.dir}/jar" />
-	<property name="build.jar.path" value="${build.jar.dir}/${build.jar.name}" />
+	<property name="build.jar.lib.dir" value="${build.jar.dir}/lib" />
+	<property name="build.jar.path" value="${build.jar.dir}/${build.jar.name}-v${build.jar.version}.jar" />
 	<property name="build.version.name" value="version.txt" />
 	<property name="build.version.path" value="${build.bin.dir}/${build.version.name}" />
 
 	<condition property="exist-custom-properties">
 		<available file="build_jar.properties" />
+	</condition>
+	
+	<condition property="not-exist-custom-properties">
+	    <not>
+			<available file="build_jar.properties" />
+	    </not>
 	</condition>
 
 	<target name="load-custom-properties" if="exist-custom-properties">
@@ -42,18 +46,26 @@
 		<!-- Create folders, if they do not exist yet -->
 		<mkdir dir="${build.bin.dir}" />
 		<mkdir dir="${build.jar.dir}" />
-		<mkdir dir="${lib.jar.dir}" />
+		<mkdir dir="${build.jar.lib.dir}" />
 
 		<!-- Get all libraries in lib folder -->
 		<path id="classpath">
-			<fileset dir="${lib.jar.dir}" includes="**/*.jar" />
+			<fileset dir="${build.jar.lib.dir}" includes="**/*.jar" />
 		</path>
-
+		<pathconvert property="jar.class.path" pathsep=" ">
+			<path refid="classpath"/>
+			<mapper>
+				<chainedmapper>
+				   <flattenmapper/>
+				   <globmapper from="*.jar" to="lib/*.jar"/>
+				</chainedmapper>
+			</mapper>
+		</pathconvert>
+		
 		<!-- Compile the src folder -->
-		<javac srcdir="${src.dir}" destdir="${build.bin.dir}" classpathref="classpath" excludesfile="${build.excludes.path}" debug="on" includeantruntime="false" source="1.8" target="1.8" fork="yes">
-			<compilerarg value="-Xlint" />
-		</javac>
-
+		<antcall target="custom-javac" />
+		<antcall target="default-javac" />
+		
 		<!-- Calculate checksum for .class files -->
 		<checksum algorithm="SHA-256" totalproperty="build.checksum" forceoverwrite="yes">
 			<fileset dir="${build.bin.dir}">
@@ -65,12 +77,43 @@
 		<!-- Get current timestamp -->
 		<tstamp>
 			<format property="timeStamp" pattern="yyyy/MM/dd HH-mm-ss" />
-			<format property="file.timeStamp" pattern="yyyyMMdd-HH-mm-ss" />
 		</tstamp>
 
 		<!-- Create version file -->
 		<echo file="${build.version.path}" append="false">FeatureIDE Version:	${build.jar.version}${line.separator}Build Time:         ${timeStamp}${line.separator}Checksum (SHA-256): ${build.checksum}${line.separator}</echo>
-
+	</target>
+	
+	<target name="default-javac" if="not-exist-custom-properties">
+    	<echo>Using default JDK</echo>
+		<path id="classpath">
+			<fileset dir="${build.jar.lib.dir}" includes="*.jar" />
+		</path>
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.bin.dir}"
+			classpathref="classpath"
+			excludesfile="${build.excludes.path}"
+			debug="on" includeantruntime="false" fork="yes"
+			source="1.8" target="1.8">
+			<compilerarg value="-Xlint" />
+		</javac>
+	</target>
+	
+	<target name="custom-javac" if="exist-custom-properties">
+    	<echo>Using custom JDK: ${bin.javac.path}</echo>
+		<path id="classpath">
+			<fileset dir="${build.jar.lib.dir}" includes="*.jar" />
+		</path>
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.bin.dir}"
+			classpathref="classpath"
+			excludesfile="${build.excludes.path}"
+			debug="on" includeantruntime="false" fork="yes"
+			source="1.8" target="1.8"
+			executable="${bin.javac.path}">
+			<compilerarg value="-Xlint" />
+		</javac>
 	</target>
 
 	<!-- Build jar file, including source files and license file -->
