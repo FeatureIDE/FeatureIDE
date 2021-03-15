@@ -1,4 +1,7 @@
 package de.ovgu.featureide.examples.transformation;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -35,10 +38,9 @@ import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
- * A simple configurator without GUI using the FeatureIDE library.
+ * An example used to translate feature models in various formats such as UVL and DIMACS. 
  *
- * @author Thomas Thuem
- * @author Sebastian Krieter
+ * @author Chico Sundermann
  */
 public class FeatureModelTransformation {
 
@@ -47,7 +49,7 @@ public class FeatureModelTransformation {
 	}
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		final Path path = Paths.get("model.xml");
 		IFeatureModel model = FeatureModelManager.load(path);
 		List<IPersistentFormat<IFeatureModel>> formats = new ArrayList<>();
@@ -55,9 +57,11 @@ public class FeatureModelTransformation {
 		formats.add(new DIMACSFormat());
 		formats.add(new SXFMFormat());
 		formats.add(new SimpleVelvetFeatureModelFormat());
+		Files.createDirectories(Paths.get("result"));
 		for (IPersistentFormat<IFeatureModel> format : formats) {
-			saveFeatureModel(model, "model_" + format.getName() + "." + format.getSuffix(), format);
+			saveFeatureModel(model, "result" + File.separator + "model_" + format.getName() + "." + format.getSuffix(), format);
 		}
+		System.out.println("The different formats are stored in result/. It may be necessary to refresh the view.");
 	}
 	
 	public static void saveFeatureModel(IFeatureModel model, String savePath, IPersistentFormat<IFeatureModel> format) {

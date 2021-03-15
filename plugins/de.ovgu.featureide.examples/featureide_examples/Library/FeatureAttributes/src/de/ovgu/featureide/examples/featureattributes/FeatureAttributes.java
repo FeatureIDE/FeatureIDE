@@ -37,30 +37,39 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 /**
  * An example usage of the FeatureIDE attributes library.
  *
- * @author Thomas Thuem
+ * @author Chico Sundermann
  */
 public class FeatureAttributes {
 
 	public static void main(String[] args) {
 		
+		ExtendedFeatureModel featureModel = performSetup();
+		
+		readAttributeValues(featureModel);
+		
+		addAttributeValues(featureModel);
+	}
+	
+	// -------------------- Structure Methods --------------------
+	
+	private static ExtendedFeatureModel performSetup() {
 		// Register required libraries
 		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
 		LibraryManager.registerLibrary(FMAttributesLibrary.getInstance());
 		
 		// load extended feature model
 		final Path path = Paths.get("sandwich.xml");
-		final ExtendedFeatureModel featureModel = (ExtendedFeatureModel) FeatureModelManager.load(path);
-		
-		// Read attribute values
+		return (ExtendedFeatureModel) FeatureModelManager.load(path);
+	}
+	
+	private static void addAttributeValues(ExtendedFeatureModel featureModel) {
 		IFeature ham = featureModel.getFeature("Ham");
-		printAttributes(ham);
-		
 		// Create new attribute
 		IFeatureAttribute supplier = new StringFeatureAttribute(ham, "supplier", "", "Farmer Mike", false, false);
 		
 		// Append attribute
 		addAttribute(ham, supplier);
-		printAttributes(ham);
+		printAttributes(ham, "Attributes of Ham after change");
 		
 		// Create recursive attribute; a recursive attribute is added to all descendants of the feature
 		IFeature bread = featureModel.getFeature("Bread");
@@ -70,14 +79,23 @@ public class FeatureAttributes {
 		// Add value for recursive attributes of descendants
 		IFeature flatbread = featureModel.getFeature("Flatbread");
 		changeAttributesValue("gluten", flatbread, true);
-		printAttributes(flatbread);
-		
+		printAttributes(flatbread, "Attributes of Flatbread with new recursive attribute gluten");
 	}
 	
-	private static void printAttributes(IFeature feat) {
+	private static void readAttributeValues(ExtendedFeatureModel featureModel) {
+		// Read attribute values
+		IFeature ham = featureModel.getFeature("Ham");
+		printAttributes(ham, "Attributes of Ham before Changes");
+	}
+	
+	
+	
+	// -------------------- Support Methods --------------------
+	
+	private static void printAttributes(IFeature feat, String header) {
 		if (feat instanceof ExtendedFeature) {
 			ExtendedFeature ext = (ExtendedFeature) feat;
-			System.out.println("Properties of " + ext.getName());
+			System.out.println("\n" + header);
 			for (IFeatureAttribute attribute : ext.getAttributes()) {
 				System.out.println(attribute.getName() + ":" + attribute.getValue() + attribute.getUnit());
 			}
