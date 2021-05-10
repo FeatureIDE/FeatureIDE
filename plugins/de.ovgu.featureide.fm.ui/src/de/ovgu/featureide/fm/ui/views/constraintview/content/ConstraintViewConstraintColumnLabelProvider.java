@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
@@ -108,9 +109,11 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 
 			final Boolean isAutomaticCalculation = FeatureModelProperty.getBooleanProperty(controller.getFeatureModelManager().getSnapshot().getProperty(),
 					FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
-			if ((isAutomaticCalculation != null) && isAutomaticCalculation) {
 
-				final ConstraintProperties constraintProperties = controller.getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
+			final FeatureModelAnalyzer analyzer = controller.getAnalyzer();
+			if (analyzer != null) {
+
+				final ConstraintProperties constraintProperties = analyzer.getAnalysesCollection().getConstraintProperty(constraint);
 				if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.REDUNDANT)) {
 					return GUIDefaults.FM_INFO;
 				}

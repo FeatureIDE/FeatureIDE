@@ -254,7 +254,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	 * a FeatureDiagram" text is shown.
 	 */
 	public void refresh() {
-		System.err.println("REFRESH CALLED");
 		final boolean constraintsViewVisible = isConstraintsViewVisible();
 		final boolean constraintsListVisible = isConstraintsListVisible();
 
@@ -315,7 +314,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			final Boolean isAutomaticCalculation =
 				FeatureModelProperty.getBooleanProperty(newFeatureModelEditor.getFeatureModelManager().getSnapshot().getProperty(),
 						FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
-			if ((isAutomaticCalculation != null) && isAutomaticCalculation) {
+			if (isAutomaticCalculation == Boolean.TRUE) {
 				analyzer = newFeatureModelEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
 			}
 
