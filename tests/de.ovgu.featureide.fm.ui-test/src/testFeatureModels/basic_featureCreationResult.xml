@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Root">
+			<and name="A">
+				<feature name="C"/>
+				<feature name="D"/>
+			</and>
+			<and name="E">
+				<feature name="B"/>
+			</and>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<conj>
+				<var>A</var>
+				<var>B</var>
+			</conj>
+		</rule>
+	</constraints>
+</featureModel>
