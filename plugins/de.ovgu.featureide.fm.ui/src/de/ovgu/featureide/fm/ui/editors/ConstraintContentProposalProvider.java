@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +68,8 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		final List<ContentProposal> proposalList = getProposalList(words, contents);
 
+		// TODO: Wenn current word ein ")" enthält müssen wir da cutten und leerzeichen automatisch einfügen
+
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
 	}
@@ -104,56 +107,49 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		final String[] words = new String[2];
 
-		int posMarker = position - 1;
+		// cut the rest of the string away
+		contents = contents.substring(0, position);
+
+		// cut away ( and ) because they do not change the last appearing word of the constraint but this way we can shorten the following code
+		contents = contents.replaceAll("\\(|\\)", " ");
+
 		if (position == 0) {
 			words[CURRENT] = "";
 			words[LAST] = "";
 		} else {
-			while ((posMarker > 0) && (contents.charAt(posMarker) != ' ')) {
-				posMarker--;
-			}
-			words[CURRENT] = contents.substring(posMarker, position);
+			int quotMarkCounter = 0;
 
-			while ((posMarker > 0) && (contents.charAt(posMarker) == ' ')) {
-				posMarker--;
-			}
-			int startBefore = posMarker;
-			while ((startBefore > 0) && (contents.charAt(startBefore) != ' ')) {
-				startBefore--;
-			}
-			if (posMarker == 0) {
-				if (contents.charAt(0) == '(') {
-					words[LAST] = "(";
-				} else {
-					words[LAST] = "";
+			// count number of quotation marks
+			for (int i = 0; i < contents.length(); i++) {
+				if (contents.charAt(i) == '\"') {
+					quotMarkCounter++;
 				}
+			}
+
+			// detect whether it is a feature with multiple words
+			final char separator = (quotMarkCounter % 2) != 0 ? '\"' : ' ';
+
+			// detect the position where the current feature starts
+			int posMarker = contents.lastIndexOf(separator) + 1;
+
+			// words[CURRENT] is the current typed feature
+			words[CURRENT] = contents.substring(posMarker);
+
+			if (separator == '\"') {
+				posMarker--;
+			}
+			contents = contents.substring(0, posMarker);
+			contents = contents.trim();
+
+			if (contents.endsWith("\"")) {
+				contents = contents.substring(0, contents.length() - 1);
+				words[LAST] = contents.substring(contents.lastIndexOf('\"') + 1);
 			} else {
-				words[LAST] = contents.substring(startBefore, posMarker + 1);
+				words[LAST] = contents.substring(contents.lastIndexOf(' ') + 1);
 			}
-
 		}
 
-		if (words[LAST].trim().startsWith("(") && (words[LAST].length() > 1)) {
-			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
-
-		}
-		if (words[CURRENT].trim().startsWith("(")) {
-			words[CURRENT] = words[CURRENT].trim();
-			words[CURRENT] = words[CURRENT].substring(1);
-			words[LAST] = "(";
-		}
-		if (words[LAST].endsWith(")")) {
-			words[LAST] = ")";
-			if (contents.charAt(posMarker) == ')') {
-				words[LAST] = ") ";
-			}
-
-		}
-		if (words[CURRENT].endsWith(")")) {
-			words[LAST] = ")";
-			words[CURRENT] = "";
-
-		}
+		System.out.println(Arrays.toString(words));
 
 		return words;
 	}
@@ -198,4 +194,85 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		return proposals;
 	}
+
+//
+//	/**
+//	 * Returns the word that is being written and the word before it, given the current content and cursor position
+//	 *
+//	 * @param contents the content,i.e. the string which contains the text
+//	 * @param position current position of the cursor, first position is 0
+//	 * @return Array with two elements: current word and the word before, words can be empty String, index: CURRENT, LAST
+//	 */
+//	static String[] getWords2(String contents, int position) {
+//
+//		final String[] words = new String[2];
+//
+//		int posMarker = position - 1;
+//		if (position == 0) {
+//			words[CURRENT] = "";
+//			words[LAST] = "";
+//		} else {
+////			int quotMarkCounter = 0;
+////
+////			for (int i = 0; i < contents.length(); i++) {
+////				if(contents.charAt(i) == '\"') {
+////					quotMarkCounter++;
+////				}
+////			}
+////
+////			char separator = quotMarkCounter % 2 != 0 ? '\"' : ' ';
+////
+////			while ((posMarker > 0) && (contents.charAt(posMarker) != separator)) {
+////				posMarker--;
+////			}
+////			words[CURRENT] = contents.substring(posMarker, position);
+//
+//			while ((posMarker > 0) && (contents.charAt(posMarker) != ' ')) {
+//				posMarker--;
+//			}
+//			words[CURRENT] = contents.substring(posMarker, position);
+//
+//			while ((posMarker > 0) && (contents.charAt(posMarker) == ' ')) {
+//				posMarker--;
+//			}
+//			int startBefore = posMarker;
+//			while ((startBefore > 0) && (contents.charAt(startBefore) != ' ')) {
+//				startBefore--;
+//			}
+//			if (posMarker == 0) {
+//				if (contents.charAt(0) == '(') {
+//					words[LAST] = "(";
+//				} else {
+//					words[LAST] = "";
+//				}
+//			} else {
+//				words[LAST] = contents.substring(startBefore, posMarker + 1);
+//			}
+//
+//		}
+//
+//		if (words[LAST].trim().startsWith("(") && (words[LAST].length() > 1)) {
+//			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
+//
+//		}
+//		if (words[CURRENT].trim().startsWith("(")) {
+//			words[CURRENT] = words[CURRENT].trim();
+//			words[CURRENT] = words[CURRENT].substring(1);
+//			words[LAST] = "(";
+//		}
+//		if (words[LAST].endsWith(")")) {
+//			words[LAST] = ")";
+//			if (contents.charAt(posMarker) == ')') {
+//				words[LAST] = ") ";
+//			}
+//
+//		}
+//		if (words[CURRENT].endsWith(")")) {
+//			words[LAST] = ")";
+//			words[CURRENT] = "";
+//
+//		}
+//
+//		return words;
+//	}
 }
