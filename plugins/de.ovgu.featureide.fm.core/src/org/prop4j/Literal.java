@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
+
 /**
  * A variable or negated variable.
  *
@@ -143,7 +145,17 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		return positive == map.get(var);
+		if (var == NodeCreator.varFalse) {
+			return !positive;
+		}
+		if (var == NodeCreator.varTrue) {
+			return positive;
+		}
+		final Boolean value = map.get(var);
+		if (value == null) {
+			throw new IllegalArgumentException("No value for " + String.valueOf(var));
+		}
+		return positive == value;
 	}
 
 	@Override
