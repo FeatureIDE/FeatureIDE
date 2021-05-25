@@ -22,30 +22,26 @@ package org.prop4j;
 
 import java.util.Map;
 
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
+
 /**
  * Represents a placeholder node that is always false. Do not continue using Nodes with an instance of this class in them.
  *
  * @author Paul Westphal
  */
-public class False extends Node {
+public class False extends Literal {
+
+	public False() {
+		super(NodeCreator.varFalse);
+	}
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> assignment) {
-		return false;
+		return !positive;
 	}
 
 	@Override
-	public boolean isConjunctiveNormalForm() {
-		return false;
-	}
-
-	@Override
-	protected Node eliminateNonCNFOperators(Node[] newChildren) {
-		return null;
-	}
-
-	@Override
-	public Node clone() {
+	public False clone() {
 		return new False();
 	}
 

@@ -40,11 +40,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -81,6 +83,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	private FeatureModelEditor featureModelEditor;
 	private boolean featureDiagramPageVisible = false;
+
+	private FeatureModelAnalyzer analyzer;
 
 	/**
 	 * The constraint used to detect when the analysis is finished
@@ -307,6 +311,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		// add listeners, etc. to new FeatureModelEditor
 		if (newFeatureModelEditor != null) {
+			final Boolean isAutomaticCalculation =
+				FeatureModelProperty.getBooleanProperty(newFeatureModelEditor.getFeatureModelManager().getSnapshot().getProperty(),
+						FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+			if (isAutomaticCalculation == Boolean.TRUE) {
+				analyzer = newFeatureModelEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
+			}
+
 			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
 			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
 			newFeatureModelEditor.addEventListener(eventListener);
@@ -439,4 +450,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		return featureModelEditor;
 	}
 
+	public FeatureModelAnalyzer getAnalyzer() {
+		return analyzer;
+	}
 }
