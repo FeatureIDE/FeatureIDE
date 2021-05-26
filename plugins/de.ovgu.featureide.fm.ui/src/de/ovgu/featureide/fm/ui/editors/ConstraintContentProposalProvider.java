@@ -42,6 +42,8 @@ import de.ovgu.featureide.fm.core.Operator;
  * @author Fabian Benduhn
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Rahel Arens
+ * @author Johannes Herschel
  */
 public class ConstraintContentProposalProvider implements IContentProposalProvider {
 
@@ -65,15 +67,13 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		final List<ContentProposal> proposalList = getProposalList(context);
 
-		// TODO: Wenn current word ein ")" enthält müssen wir da cutten und leerzeichen automatisch einfügen
-
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
 	}
 
 	/**
-	 * @return all possible feature names or junctors.
-	 * @param words current and previous word of edited string
+	 * @param context context of proposal
+	 * @return List of proposals, only contains proposals consistent with previous and current word.
 	 */
 	private List<ContentProposal> getProposalList(ProposalContext context) {
 		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
@@ -92,11 +92,9 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	}
 
 	/**
-	 * Returns the word that is being written and the word before it, given the current content and cursor position
-	 *
-	 * @param contents the content,i.e. the string which contains the text
+	 * @param contents the content, i.e. the string which contains the text
 	 * @param position current position of the cursor, first position is 0
-	 * @return Array with two elements: current word and the word before, words can be empty String, index: CURRENT, LAST
+	 * @return context of proposal
 	 */
 	static ProposalContext getProposalContext(String contents, int position) {
 
@@ -125,7 +123,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 			// detect the position where the current feature starts
 			int posMarker = contents.lastIndexOf(separator) + 1;
 
-			// the current typed feature
+			// the current typed word
 			final String currentWord = contents.substring(posMarker);
 
 			if (quotationMark) {
@@ -134,6 +132,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 			contents = contents.substring(0, posMarker);
 			contents = contents.trim();
 
+			// text before current word
 			if (contents.endsWith("\"")) {
 				return new ProposalContext(true, currentWord, quotationMark);
 			} else {
@@ -144,11 +143,10 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	}
 
 	/**
-	 *
-	 * @param wordBefore
-	 *
-	 * @param features set of features
-	 * @return List of proposals, either operators or feature names
+	 * @param context context of proposal
+	 * @param features set of all features
+	 * @return List of proposals, either operators or feature names. Contains only proposals consistent with the previous text, but may contain proposals
+	 *         inconsistent with current word.
 	 */
 	private static List<ContentProposal> getProposalList(ProposalContext context, Collection<String> features) {
 
@@ -171,6 +169,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 			}
 		} else {
 			if (context.quotationMark) {
+				// Add features with spaces
 				for (final String s : featureList) {
 					if (s.contains(" ")) {
 						proposals.add(new ContentProposal(s));
@@ -196,10 +195,25 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		return proposals;
 	}
 
+	/**
+	 *
+	 * Summarizes necessary information about the current context of proposals, i.e. the currently typed word and the word before.
+	 *
+	 * @author Johannes Herschel
+	 */
 	private static class ProposalContext {
 
+		/**
+		 * True iff the word before the current word is a feature name. False if the previous word is empty.
+		 */
 		private final boolean featureBefore;
+		/**
+		 * Currently typed word, empty if a new word is started.
+		 */
 		private final String currentWord;
+		/**
+		 * True iff the currently typed word is started with a quotation mark.
+		 */
 		private final boolean quotationMark;
 
 		private ProposalContext(boolean featureBefore, String currentWord, boolean quotationMark) {

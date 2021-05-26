@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.Features;
  *
  * @author David Broneske
  * @author Fabian Benduhn
+ * @author Rahel Arens
+ * @author Johannes Herschel
  */
 public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControlContentAdapter, IControlContentAdapter2 {
 
@@ -45,8 +47,15 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	public static class InsertionResult {
 
-		Point selection;
-		String text;
+		/**
+		 * Selection after performing the insertion
+		 */
+		final Point selection;
+
+		/**
+		 * Resulting text after performing the insertion
+		 */
+		final String text;
 
 		public InsertionResult(Point selection, String text) {
 			this.selection = selection;
@@ -78,9 +87,10 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	/**
-	 * @param currentText current text
-	 * @param selection selection point
-	 * @param textToInsert text to insert
+	 * @param currentText complete constraint text
+	 * @param selection caret position, beginning and end of selection if a substring is selected
+	 * @param textToInsert text to be inserted, without quotation marks
+	 * @param isFeature true iff the inserted text is a feature
 	 * @return return
 	 */
 	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert, final boolean isFeature) {
