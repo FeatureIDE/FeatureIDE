@@ -74,7 +74,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final Point selection = editor.getSelection();
 		final String currentText = editor.getText();
 
-		final boolean isFeature = !Arrays.asList(NodeReader.textualSymbols).contains(text);
+		final boolean isFeature = !Arrays.asList(NodeReader.textualSymbols).contains(" " + text + " ");
 		final InsertionResult result = performInsertion(currentText, selection, text, isFeature);
 
 		editor.setText(result.text);
@@ -131,7 +131,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			before += " ";
 		}
 
-		if (!before.isEmpty() && isFeature && !before.endsWith("(")) {
+		if (!before.isEmpty() && isFeature && !before.endsWith("(") && !before.endsWith(" ")) {
 			before += " ";
 		}
 
