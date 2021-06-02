@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +31,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * {@link FeatureSubtreeSelectionTest} verifies that selecting subtrees of single and multiple features works correctly.
@@ -61,12 +64,28 @@ public class FeatureSubtreeSelectionTest {
 		editor = new FeatureDiagramEditor(manager, graphicalModel, true);
 		editor.setFocus();
 		viewer = editor.getViewer();
-		// viewer.getContents().activate();
+		viewer.setContents(graphicalModel);
 	}
 
 	@Test
 	public void testSingleSelection() {
+		// Get and select the my_root feature.
+		final Map<?, ?> editParts = viewer.getEditPartRegistry();
+		final IFeatureModel model = editor.getFeatureModel().getObject();
+		select(editParts, model, "my_Root");
 
+		// Run the SelectSubtreeAction.
+		new SelectSubtreeAction(viewer, manager).run();
+
+		// Assert that all other features are selected.
+		final List<EditPart> parts = viewer.getSelectedEditParts();
+		assertTrue(isSelected(parts, editParts, model, "Alternative1"));
+		assertTrue(isSelected(parts, editParts, model, "Alternative2"));
+		assertTrue(isSelected(parts, editParts, model, "Or1"));
+		assertTrue(isSelected(parts, editParts, model, "Or2"));
+		assertTrue(isSelected(parts, editParts, model, "Optional"));
+		assertTrue(isSelected(parts, editParts, model, "Mandatory"));
+		assertTrue(isSelected(parts, editParts, model, "notSelected"));
 	}
 
 	/**
@@ -76,12 +95,13 @@ public class FeatureSubtreeSelectionTest {
 	@Test
 	public void testMultipleSelection() {
 		final Map<?, ?> editParts = viewer.getEditPartRegistry();
+
 		// Get and select the Optional feature from the feature model.
 		final IFeatureModel model = editor.getFeatureModel().getObject();
-		final IFeature optFeature = model.getFeature("Optional");
-		// Also get the mandatory feature.
-		final IFeature manFeature = model.getFeature("Mandatory");
-		// graphicalModel.getGraphicalFeature(manFeature).setConstraintSelected(true);
+		select(editParts, model, "Optional");
+
+		// Also select the mandatory feature.
+		select(editParts, model, "Mandatory");
 
 		// Run the SelctSubtreeAction.
 		final SelectSubtreeAction action = new SelectSubtreeAction(viewer, manager);
@@ -89,5 +109,24 @@ public class FeatureSubtreeSelectionTest {
 
 		// Assert that the Optional, Mandatory feature and their sub features have been selected.
 		final List<EditPart> parts = viewer.getSelectedEditParts();
+		assertTrue(isSelected(parts, editParts, model, "Alternative1"));
+		assertTrue(isSelected(parts, editParts, model, "Alternative2"));
+		assertTrue(isSelected(parts, editParts, model, "Or1"));
+		assertTrue(isSelected(parts, editParts, model, "Or2"));
+	}
+
+	/**
+	 * @param editParts
+	 * @param model
+	 * @return
+	 */
+	private void select(final Map<?, ?> editParts, final IFeatureModel model, CharSequence featName) {
+		final IGraphicalFeature optFeature = graphicalModel.getGraphicalFeature(model.getFeature(featName));
+		final FeatureEditPart optPart = (FeatureEditPart) editParts.get(optFeature);
+		optPart.setSelected(1);
+	}
+
+	private boolean isSelected(Collection<EditPart> parts, Map<?, ?> editParts, final IFeatureModel model, String featName) {
+		return parts.contains(editParts.get(graphicalModel.getGraphicalFeature(model.getFeature(featName))));
 	}
 }
