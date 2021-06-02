@@ -20,12 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 
@@ -74,10 +80,11 @@ public class FeatureCreationAndRenamingTest {
 
 		// Create a new FeatureIDEEvent that adds a new feature to the parent
 		// feature "A" for the given feature model. Add the feature "C" below it.
-		// As i currently cannot write SWTBot tests, this code is commented out.
-		/*
-		 * editor.propertyChange(new FeatureIDEEvent(model, EventType.FEATURE_ADD, aFeature, new Feature(model, "C"))); // Assert that "C" exists and has "A" as
-		 * parent. final IFeature cFeature = model.getFeature("C"); assertNotNull(cFeature); assertEquals(aFeature, cFeature.getStructure().getParent());
-		 */
+		final IFeature cFeature = new Feature(model, "C");
+		editor.propertyChange(new FeatureIDEEvent(model, EventType.FEATURE_ADD, aFeature, cFeature));
+		// Assert that "C" exists and has "A" as parent.
+		final IGraphicalFeature cGraphicalFeature = graphicalModel.getGraphicalFeature(cFeature);
+		assertNotNull(cGraphicalFeature);
+		assertTrue(graphicalModel.getGraphicalFeature(aFeature).getGraphicalChildren().contains(cGraphicalFeature));
 	}
 }
