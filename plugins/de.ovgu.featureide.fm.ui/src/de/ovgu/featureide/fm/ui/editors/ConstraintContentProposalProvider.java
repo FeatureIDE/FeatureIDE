@@ -201,22 +201,22 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 *
 	 * @author Johannes Herschel
 	 */
-	private static class ProposalContext {
+	static class ProposalContext {
 
 		/**
 		 * True iff the word before the current word is a feature name. False if the previous word is empty.
 		 */
-		private final boolean featureBefore;
+		final boolean featureBefore;
 		/**
 		 * Currently typed word, empty if a new word is started.
 		 */
-		private final String currentWord;
+		final String currentWord;
 		/**
 		 * True iff the currently typed word is started with a quotation mark.
 		 */
-		private final boolean quotationMark;
+		final boolean quotationMark;
 
-		private ProposalContext(boolean featureBefore, String currentWord, boolean quotationMark) {
+		ProposalContext(boolean featureBefore, String currentWord, boolean quotationMark) {
 			this.featureBefore = featureBefore;
 			this.currentWord = currentWord;
 			this.quotationMark = quotationMark;

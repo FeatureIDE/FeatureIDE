@@ -136,6 +136,26 @@ public final class ContentProposalActionTest {
 	}
 
 	@Test
+	public void testCase24() {
+		testProposalInsertion("\"|", "Output Signal", "\"Output Signal\"|");
+	}
+
+	@Test
+	public void testCase25() {
+		testProposalInsertion("\"Outp|", "Output Signal", "\"Output Signal\"|");
+	}
+
+	@Test
+	public void testCase26() {
+		testProposalInsertion("\"Output |", "Output Signal", "\"Output Signal\"|");
+	}
+
+	@Test
+	public void testCase27() {
+		testProposalInsertion("|", "and (Feature)", "\"and\"|");
+	}
+
+	@Test
 	public void testCase3() {
 		testProposalInsertion("  |  ", "FeatureA", "  FeatureA|  ");
 	}
