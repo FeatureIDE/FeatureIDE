@@ -363,29 +363,29 @@ public class ConstraintContentProposalProviderTest {
 		testGetProposals(content, expectedProps);
 	}
 
-//	@Test
-//	public void getProposalsOperatorNameAnd(){
-//		features.add("And");
-//		String content = "\"|";
-//		String[] expectedProps = {"\"And\""};
-//		testGetProposals(content,expectedProps);
-//	}
+	@Test
+	public void getProposalsOperatorNameAnd() {
+		features.add("and");
+		final String content = "\"|";
+		final String[] expectedProps = { "and (Feature)" };
+		testGetProposals(content, expectedProps);
+	}
 
-//	@Test
-//	public void getProposalsOperatorNameOr(){
-//		features.add("Or");
-//		String content = "\"|";
-//		String[] expectedProps = {"\"Or\""};
-//		testGetProposals(content,expectedProps);
-//	}
+	@Test
+	public void getProposalsOperatorNameOr() {
+		features.add("or");
+		final String content = "\"|";
+		final String[] expectedProps = { "or (Feature)" };
+		testGetProposals(content, expectedProps);
+	}
 
-//	@Test
-//	public void getProposalsOperatorNameNot(){
-//		features.add("Not");
-//		String content = "\"|";
-//		String[] expectedProps = {"\"Not\""};
-//		testGetProposals(content,expectedProps);
-//	}
+	@Test
+	public void getProposalsOperatorNameNot() {
+		features.add("not");
+		final String content = "\"|";
+		final String[] expectedProps = { "not (Feature)" };
+		testGetProposals(content, expectedProps);
+	}
 
 	@Test
 	public void getProposalsWhiteSpace() {
