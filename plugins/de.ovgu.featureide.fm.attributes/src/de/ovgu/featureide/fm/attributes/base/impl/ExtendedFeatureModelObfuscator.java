@@ -74,7 +74,7 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 				break;
 			case FeatureAttribute.STRING:
 				obfFeatureAttribute = attributeFactory.createStringAttribute(obfuscatedFeature, obfAttributeName, attribute.getUnit(),
-						getObfuscatedStringValue(), attribute.isRecursive(), attribute.isConfigurable());
+						getObfuscatedStringValue((String) attribute.getValue()), attribute.isRecursive(), attribute.isConfigurable());
 			}
 			obfuscatedFeature.addAttribute(obfFeatureAttribute);
 		}
@@ -97,12 +97,12 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 		}
 	}
 
-	private String getObfuscatedStringValue() {
-		return "";
+	private String getObfuscatedStringValue(String orgValue) {
+		return obfuscate(orgValue, new char[RESULT_LENGTH]);
 	}
 
 	private String getObfuscatedFeatureAttributeName(String attributeName) {
-		return "";
+		return obfuscate(attributeName, new char[RESULT_LENGTH]);
 	}
 
 }
