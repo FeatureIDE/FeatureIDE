@@ -38,7 +38,7 @@ public class MethodNodeParent extends AbstractSortModeNode {
 		super(descString);
 		this.fstMethod = fstMethod;
 		final int numberOfRoles = countMethodsWithSameName(allMethods);
-		setValue(new Integer(numberOfRoles));
+		setValue(Integer.valueOf(numberOfRoles));
 	}
 
 	private int countMethodsWithSameName(LinkedList<FSTMethod> methods) {
