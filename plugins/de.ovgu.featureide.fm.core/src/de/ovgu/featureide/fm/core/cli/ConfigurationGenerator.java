@@ -30,16 +30,18 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SolutionList;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.AllConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.IConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.PairWiseConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.SPLCAToolConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseConfigurationGenerator;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.csv.ConfigurationListFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormatCNF;
 import de.ovgu.featureide.fm.core.io.expression.ExpressionGroupFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
@@ -78,16 +80,16 @@ public class ConfigurationGenerator extends ACLIFunction {
 			throw new IllegalArgumentException("No algorithm specified!");
 		}
 
-		final CNF cnf = new CNF();
-		ProblemList lastProblems = FileHandler.load(fmFile, cnf, new DIMACSFormatCNF());
-		if (lastProblems.containsError()) {
-			throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
+		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.getFileHandler(fmFile);
+		if (fileHandler.getLastProblems().containsError()) {
+			throw new IllegalArgumentException(fileHandler.getLastProblems().getErrors().get(0).error);
 		}
+		final CNF cnf = new FeatureModelFormula(fileHandler.getObject()).getCNF();
 
 		final ArrayList<List<ClauseList>> expressionGroups;
 		if (expressionFile != null) {
 			expressionGroups = new ArrayList<>();
-			lastProblems = FileHandler.load(expressionFile, expressionGroups, new ExpressionGroupFormat());
+			final ProblemList lastProblems = FileHandler.load(expressionFile, expressionGroups, new ExpressionGroupFormat());
 			if (lastProblems.containsError()) {
 				throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
 			}
