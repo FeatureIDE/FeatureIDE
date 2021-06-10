@@ -50,10 +50,10 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR);
 
 	private final IFeatureModel orgFeatureModel;
-	private final IFeatureModelFactory factory;
+	protected final IFeatureModelFactory factory;
 	private final byte[] salt;
 
-	private MessageDigest digest;
+	protected MessageDigest digest;
 	private IFeatureModel obfuscatedFeatureModel;
 
 	/**
@@ -114,7 +114,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		}
 	}
 
-	private void obfuscateConstraints() {
+	protected void obfuscateConstraints() {
 		for (final IConstraint constraint : orgFeatureModel.getConstraints()) {
 			final Node clone = constraint.getNode().clone();
 			for (final Literal literal : clone.getLiterals()) {
@@ -124,11 +124,11 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		}
 	}
 
-	private String getObfuscatedFeatureName(String name) {
+	protected String getObfuscatedFeatureName(String name) {
 		return obfuscate(name, new char[RESULT_LENGTH]);
 	}
 
-	private String getObfuscatedDescription(String description) {
+	protected String getObfuscatedDescription(String description) {
 		return obfuscate(description, new char[RESULT_LENGTH]);
 	}
 

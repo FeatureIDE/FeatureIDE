@@ -26,12 +26,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 public class ObfuscatorHandler extends FMExportHandler {
 
@@ -45,7 +46,13 @@ public class ObfuscatorHandler extends FMExportHandler {
 	@Override
 	protected void save(IPersistentFormat<IFeatureModel> format, FileHandler<IFeatureModel> fileHandler, Path path) {
 		if (!fileHandler.getLastProblems().containsError()) {
-			final IFeatureModel ofm = LongRunningWrapper.runMethod(new FeatureModelObfuscator(fileHandler.getObject(), getSalt(fileHandler.getPath())));
+			IFeatureModel ofm = null;
+			try {
+				ofm = FMFactoryManager.getInstance().getFactory(format).createObfuscatedFeatureModel((IFeatureModel) fileHandler.getObject(),
+						getSalt(fileHandler.getPath()));
+			} catch (final NoSuchExtensionException e) {
+				e.printStackTrace();
+			}
 			FileHandler.save(path, ofm, format);
 		}
 	}
