@@ -106,7 +106,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 			Logger.logWarning("Problems occurred during the execution of " + algorithm);
 		}
 		final IVariables variables = solver.getSatInstance().getVariables();
-		for (final List<String> solution : solutions) {
+		solutions.stream().limit(maxSampleSize).forEach(solution -> {
 			final int[] literals = new int[variables.size()];
 			for (int i = 0; i < literals.length; i++) {
 				literals[i] = -(i + 1);
@@ -119,7 +119,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 				}
 			}
 			addResult(new LiteralSet(literals, LiteralSet.Order.INDEX));
-		}
+		});
 	}
 
 	/**
