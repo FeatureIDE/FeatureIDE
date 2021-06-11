@@ -1,6 +1,28 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
 import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -10,21 +32,36 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
+/**
+ * ExtendedFeatureModelObfuscator obfuscates an {@link ExtendedFeatureModel} along with the names and string values of its feature attributes.
+ * 
+ * @see {@link FeatureModelObfuscator}
+ * 
+ * @author Rahel Arens
+ * @author Benedikt Jutz
+ */
 public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
 	private final IFeatureModel orgFeatureModel;
 	private IFeatureModel obfuscatedFeatureModel;
+	private Map<String, String> obfuscatedStrings;
+
+	public Map<String, String> getObfuscatedStrings() {
+		return obfuscatedStrings;
+	}
 
 	public ExtendedFeatureModelObfuscator(IFeatureModel featureModel) {
 		super(featureModel);
 
 		orgFeatureModel = featureModel;
+		obfuscatedStrings = new HashMap<>();
 	}
 
 	public ExtendedFeatureModelObfuscator(IFeatureModel featureModel, String salt) {
 		super(featureModel, salt);
 
 		orgFeatureModel = featureModel;
+		obfuscatedStrings = new HashMap<>();
 	}
 
 	@Override
@@ -44,8 +81,9 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 	private void obfuscateStructure(IFeatureStructure orgFeatureStructure, IFeature parentFeature) {
 		final ExtendedFeature orgFeature = (ExtendedFeature) orgFeatureStructure.getFeature();
 
-		final ExtendedFeature obfuscatedFeature =
-			(ExtendedFeature) factory.createFeature(obfuscatedFeatureModel, getObfuscatedFeatureName(orgFeature.getName()));
+		final String obfuscatedFeatureName = getObfuscatedFeatureName(orgFeature.getName());
+		obfuscatedStrings.put(obfuscatedFeatureName, orgFeature.getName());
+		final ExtendedFeature obfuscatedFeature = (ExtendedFeature) factory.createFeature(obfuscatedFeatureModel, obfuscatedFeatureName);
 		final String description = orgFeatureStructure.getFeature().getProperty().getDescription();
 		if ((description != null) && !description.isEmpty()) {
 			obfuscatedFeature.getProperty().setDescription(getObfuscatedDescription(description));
@@ -57,7 +95,8 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
 			IFeatureAttribute obfFeatureAttribute = null;
 
-			String obfAttributeName = getObfuscatedFeatureAttributeName(attribute.getName());
+			final String obfAttributeName = getObfuscatedFeatureAttributeName(attribute.getName());
+			obfuscatedStrings.put(obfAttributeName, orgFeature.getName() + "/" + attribute.getName());
 
 			switch (attribute.getType()) {
 			case FeatureAttribute.BOOLEAN:
@@ -73,8 +112,14 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 						(Long) attribute.getValue(), attribute.isRecursive(), attribute.isConfigurable());
 				break;
 			case FeatureAttribute.STRING:
-				obfFeatureAttribute = attributeFactory.createStringAttribute(obfuscatedFeature, obfAttributeName, attribute.getUnit(),
-						getObfuscatedStringValue((String) attribute.getValue()), attribute.isRecursive(), attribute.isConfigurable());
+				String oldValue = (String) attribute.getValue();
+				if (oldValue == null) {
+					oldValue = "";
+				}
+				String obfuscatedValue = getObfuscatedStringValue(oldValue);
+				obfuscatedStrings.put(obfuscatedValue, orgFeature.getName() + "/" + attribute.getName() + "/" + oldValue);
+				obfFeatureAttribute = attributeFactory.createStringAttribute(obfuscatedFeature, obfAttributeName, attribute.getUnit(), obfuscatedValue,
+						attribute.isRecursive(), attribute.isConfigurable());
 			}
 			obfuscatedFeature.addAttribute(obfFeatureAttribute);
 		}

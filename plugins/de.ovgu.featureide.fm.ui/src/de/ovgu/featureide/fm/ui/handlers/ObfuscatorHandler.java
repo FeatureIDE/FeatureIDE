@@ -29,11 +29,20 @@ import java.nio.file.StandardOpenOption;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
+/**
+ * {@link ObfuscatorHandler} receives a {@link IFeatureModel}, calls the correct {@link IFeatureModelFactory} depending on the feature model format to have it
+ * obfuscated, and saves it in a new feature model file.
+ *
+ * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Benedikt Jutz
+ */
 public class ObfuscatorHandler extends FMExportHandler {
 
 	private static final String SALT_FILENAME_PATTERN = ".%s.salt";
@@ -57,7 +66,14 @@ public class ObfuscatorHandler extends FMExportHandler {
 		}
 	}
 
-	private String getSalt(Path modelFilePath) {
+	/**
+	 * Reads and returns the salt from the salt file with ending ".salt" that has been assigned to the feature model in the file at modelFilePath. If no such
+	 * file exists, return a new salt string instead, and save it.
+	 *
+	 * @param modelFilePath - {@link Path}
+	 * @return - {@link String}
+	 */
+	public String getSalt(Path modelFilePath) {
 		final Path saltPath = modelFilePath.getParent().resolve(String.format(SALT_FILENAME_PATTERN, modelFilePath.getFileName().toString()));
 		if (Files.exists(saltPath)) {
 			try {
@@ -69,6 +85,12 @@ public class ObfuscatorHandler extends FMExportHandler {
 		return getRandomSalt(saltPath);
 	}
 
+	/**
+	 * Creates a new salt and saves it in the file with the path saltPath.
+	 *
+	 * @param saltPath - {@link Path}
+	 * @return {@link String}
+	 */
 	private String getRandomSalt(final Path saltPath) {
 		final String randomSalt = FeatureModelObfuscator.getRandomSalt();
 		try {

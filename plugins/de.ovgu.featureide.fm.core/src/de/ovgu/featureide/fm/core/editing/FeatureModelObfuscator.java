@@ -41,6 +41,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * Returns a copy of the given model with obfuscated feature names and descriptions.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Benedikt Jutz
  */
 public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> {
 
