@@ -95,7 +95,7 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
 			IFeatureAttribute obfFeatureAttribute = null;
 
-			final String obfAttributeName = getObfuscatedFeatureAttributeName(attribute.getName());
+			final String obfAttributeName = getObfuscatedFeatureAttributeName(orgFeature.getName() + "/" + attribute.getName());
 			obfuscatedStrings.put(obfAttributeName, orgFeature.getName() + "/" + attribute.getName());
 
 			switch (attribute.getType()) {
@@ -116,7 +116,7 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 				if (oldValue == null) {
 					oldValue = "";
 				}
-				String obfuscatedValue = getObfuscatedStringValue(oldValue);
+				String obfuscatedValue = getObfuscatedStringValue(orgFeature.getName() + "/" + attribute.getName() + "/" + oldValue);
 				obfuscatedStrings.put(obfuscatedValue, orgFeature.getName() + "/" + attribute.getName() + "/" + oldValue);
 				obfFeatureAttribute = attributeFactory.createStringAttribute(obfuscatedFeature, obfAttributeName, attribute.getUnit(), obfuscatedValue,
 						attribute.isRecursive(), attribute.isConfigurable());
