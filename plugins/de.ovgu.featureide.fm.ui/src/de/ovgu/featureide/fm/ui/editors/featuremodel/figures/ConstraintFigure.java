@@ -87,7 +87,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
 		label.setFont(DEFAULT_FONT);
-		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
+		label.setLocation(new Point(0, 0));
 
 		setText(getConstraintText(constraint.getObject()));
 
@@ -211,13 +211,12 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	 */
 	private void setText(String newText) {
 		label.setText(newText);
+
 		final Dimension labelSize = new Dimension(label.getPreferredSize());
+		labelSize.expand(CONSTRAINT_INSETS.getWidth(), CONSTRAINT_INSETS.getHeight());
+
 		label.setSize(labelSize);
-
-		final int w = CONSTRAINT_INSETS.getWidth();
-		final int h = CONSTRAINT_INSETS.getHeight();
-		setSize(labelSize.expand(w, h));
-
+		setSize(labelSize);
 	}
 
 	public Rectangle getLabelBounds() {
