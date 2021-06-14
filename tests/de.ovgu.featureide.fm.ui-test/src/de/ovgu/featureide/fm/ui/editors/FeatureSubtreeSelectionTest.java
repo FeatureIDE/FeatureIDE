@@ -116,9 +116,12 @@ public class FeatureSubtreeSelectionTest {
 	}
 
 	/**
-	 * @param editParts
-	 * @param model
-	 * @return
+	 * Simulates the selection of the feature with the name featName in the given feature model model. We look up the graphical feature in model with featName,
+	 * then the associated {@link FeatureEditPart} in editParts, and select it manually.
+	 *
+	 * @param editParts - {@link Map}
+	 * @param model - {@link IFeatureModel}
+	 * @param featName - {@link CharSequence}
 	 */
 	private void select(final Map<?, ?> editParts, final IFeatureModel model, CharSequence featName) {
 		final IGraphicalFeature optFeature = graphicalModel.getGraphicalFeature(model.getFeature(featName));
