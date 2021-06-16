@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IFF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,10 +164,10 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 				// Example:
 				// Show "and" for "A |"
 				// Hide "and" for "A and |"
-				proposals.add(new ContentProposal("and"));
-				proposals.add(new ContentProposal(IFF));
-				proposals.add(new ContentProposal(IMPLIES));
-				proposals.add(new ContentProposal("or"));
+				proposals.add(new ContentProposal(AND.toLowerCase()));
+				proposals.add(new ContentProposal(IFF.toLowerCase()));
+				proposals.add(new ContentProposal(IMPLIES.toLowerCase()));
+				proposals.add(new ContentProposal(OR.toLowerCase()));
 			}
 		} else {
 			if (context.quotationMark) {
@@ -180,7 +182,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 				// Example:
 				// Show NOT for "A implies |"
 				// Hide NOT for "A |"
-				proposals.add(new ContentProposal(NOT));
+				proposals.add(new ContentProposal(NOT.toLowerCase()));
 
 				// Add features only iff a feature name is valid in context
 				// Example:
@@ -199,6 +201,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 *
 	 * Summarizes necessary information about the current context of proposals, i.e. the currently typed word and the word before.
 	 *
+	 * @author Rahel Arens
 	 * @author Johannes Herschel
 	 */
 	static class ProposalContext {
