@@ -173,8 +173,8 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 			if (context.quotationMark) {
 				// Add features with spaces
 				for (final String s : featureList) {
-					if (s.contains(" ")) {
-						proposals.add(new ContentProposal(s));
+					if (s.contains(" ") || operatorNamesInFeatures.contains(s)) {
+						proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s) ? " " + Features.FEATURE_SUFFIX : "")));
 					}
 				}
 			} else {
