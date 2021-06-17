@@ -758,6 +758,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
 			viewer.internRefresh(true);
+			autoLayoutConstraintAction.setAutoLayoutConstraints(false);
 			setDirty();
 			break;
 		case CONSTRAINT_MODIFY:
@@ -1157,7 +1158,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				selectedAction.setChecked(true);
 				menuManager.insert(1, new Separator("ManualLayoutSeparator"));
 				menuManager.insertBefore("ManualLayoutSeparator", autoLayoutConstraintAction);
-				autoLayoutConstraintAction.setEnabled(!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout());
+				final boolean haveAutoLayout = !graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
+				autoLayoutConstraintAction.setEnabled(haveAutoLayout);
+				autoLayoutConstraintAction.setChecked(haveAutoLayout && autoLayoutConstraintAction.isAutoLayoutConstraints());
 			}
 		});
 		return menuManager;
@@ -1299,7 +1302,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor
-			if(!graphicalFeatureModel.getConstraintsHidden()) {
+			if (!graphicalFeatureModel.getConstraintsHidden()) {
 				menuManager.add(showCollapsedConstraintsAction);
 			}
 			menuManager.add(new Separator());

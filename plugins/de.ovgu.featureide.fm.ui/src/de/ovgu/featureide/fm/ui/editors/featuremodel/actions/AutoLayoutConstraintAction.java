@@ -43,6 +43,16 @@ public class AutoLayoutConstraintAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.autolayoutconstraint";
 
+	private boolean autoLayoutConstraints;
+
+	public boolean isAutoLayoutConstraints() {
+		return autoLayoutConstraints;
+	}
+
+	public void setAutoLayoutConstraints(boolean autoLayoutConstraints) {
+		this.autoLayoutConstraints = autoLayoutConstraints;
+	}
+
 	private final IGraphicalFeatureModel featureModel;
 	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
@@ -54,6 +64,10 @@ public class AutoLayoutConstraintAction extends Action {
 
 	@Override
 	public void run() {
+		autoLayoutConstraints = !autoLayoutConstraints;
+		if (!autoLayoutConstraints) {
+			return;
+		}
 		final LinkedList<Point> newList = new LinkedList<Point>();
 		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
 			newList.add(featureModel.getConstraints().get(i).getLocation());
