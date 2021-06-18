@@ -29,6 +29,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
@@ -43,16 +44,6 @@ public class AutoLayoutConstraintAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.autolayoutconstraint";
 
-	private boolean autoLayoutConstraints;
-
-	public boolean isAutoLayoutConstraints() {
-		return autoLayoutConstraints;
-	}
-
-	public void setAutoLayoutConstraints(boolean autoLayoutConstraints) {
-		this.autoLayoutConstraints = autoLayoutConstraints;
-	}
-
 	private final IGraphicalFeatureModel featureModel;
 	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
@@ -60,21 +51,22 @@ public class AutoLayoutConstraintAction extends Action {
 		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
 		setId(ID);
+
 	}
 
 	@Override
 	public void run() {
-		autoLayoutConstraints = !autoLayoutConstraints;
-		if (!autoLayoutConstraints) {
-			return;
-		}
 		final LinkedList<Point> newList = new LinkedList<Point>();
 		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
 			newList.add(featureModel.getConstraints().get(i).getLocation());
 		}
-		final int counter = oldPos.size();
-		oldPos.add(newList);
-		FeatureModelOperationWrapper.run(new AutoLayoutConstraintOperation(featureModel, oldPos, counter));
+		final FeatureModelLayout layout = featureModel.getLayout();
+		layout.setAutoLayoutConstraints(!layout.isAutoLayoutConstraints());
+		if (layout.isAutoLayoutConstraints()) {
+			final int counter = oldPos.size();
+			oldPos.add(newList);
+			FeatureModelOperationWrapper.run(new AutoLayoutConstraintOperation(featureModel, oldPos, counter));
+		}
 	}
 
 }

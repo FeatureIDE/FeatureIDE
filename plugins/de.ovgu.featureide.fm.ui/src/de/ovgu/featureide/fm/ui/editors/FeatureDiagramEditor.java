@@ -758,7 +758,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
 			viewer.internRefresh(true);
-			autoLayoutConstraintAction.setAutoLayoutConstraints(false);
 			setDirty();
 			break;
 		case CONSTRAINT_MODIFY:
@@ -1160,7 +1159,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				menuManager.insertBefore("ManualLayoutSeparator", autoLayoutConstraintAction);
 				final boolean haveAutoLayout = !graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
 				autoLayoutConstraintAction.setEnabled(haveAutoLayout);
-				autoLayoutConstraintAction.setChecked(haveAutoLayout && autoLayoutConstraintAction.isAutoLayoutConstraints());
+				autoLayoutConstraintAction.setChecked(haveAutoLayout && graphicalFeatureModel.getLayout().isAutoLayoutConstraints());
 			}
 		});
 		return menuManager;
