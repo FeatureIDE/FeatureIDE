@@ -25,7 +25,6 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Layouts the features at the feature diagram using their saved Positions.
@@ -48,12 +47,12 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 		if (featureModel.getLayout().isAutoLayoutConstraints()) {
 			final IGraphicalFeature root =
 				FeatureUIHelper.getGraphicalFeature(FeatureUtils.getRoot(featureModel.getFeatureModelManager().getSnapshot()), featureModel);
-			// Calculate yoffset as the position of the lowest visible feature + its height.
-			int yoffset = FMPropertyManager.getLayoutMarginY();
 
+			// Calculate yoffset as the position of the lowest visible feature + its height.
+			int yoffset = 0;
 			for (final IGraphicalFeature feat : featureModel.getVisibleFeatures()) {
 				if (yoffset < feat.getLocation().y) {
-					yoffset += FMPropertyManager.getFeatureSpaceY();
+					yoffset = feat.getLocation().y;
 				}
 			}
 
