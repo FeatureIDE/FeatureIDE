@@ -438,6 +438,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
+						if (!gfm.hasInitialLayout()) {
+							diagramEditor.adjustModelToEditorSize();
+						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();

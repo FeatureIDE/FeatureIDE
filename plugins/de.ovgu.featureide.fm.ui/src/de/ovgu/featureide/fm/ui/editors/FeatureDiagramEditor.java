@@ -1299,7 +1299,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor
-			if(!graphicalFeatureModel.getConstraintsHidden()) {
+			if (!graphicalFeatureModel.getConstraintsHidden()) {
 				menuManager.add(showCollapsedConstraintsAction);
 			}
 			menuManager.add(new Separator());
@@ -1457,5 +1457,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		viewer.removeSelectionChangedListener(listener);
+	}
+
+	public void adjustModelToEditorSize() {
+		adjustModelToEditorSizeAction.run();
 	}
 }

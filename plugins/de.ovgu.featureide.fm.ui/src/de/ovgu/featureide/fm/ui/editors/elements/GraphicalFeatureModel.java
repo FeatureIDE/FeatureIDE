@@ -62,6 +62,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	protected final IFeatureModelManager featureModelManager;
 
+	protected boolean hasInitialLayout = false;
 	protected final FeatureModelLayout layout;
 
 	protected Map<IFeature, IGraphicalFeature> features = new HashMap<>();
@@ -114,6 +115,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public GraphicItem getItemType() {
 		return GraphicItem.Model;
+	}
+
+	@Override
+	public boolean hasInitialLayout() {
+		return hasInitialLayout;
 	}
 
 	@Override
@@ -360,6 +366,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public void readValues() {
 		final IFeatureModel fm = featureModelManager.getSnapshot();
+
+		hasInitialLayout = fm.getProperty().has(LAYOUT_ALGORITHM, TYPE_GRAPHICS);
 
 		getLayout().setLayout(Integer.parseInt(fm.getProperty().get(LAYOUT_ALGORITHM, TYPE_GRAPHICS, "1")));
 
