@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Sabrina Hugo
  * @author Christian Orsinger
  */
-public class SelectSubtreeAction extends SingleSelectionAction implements ActionAllowedInExternalSubmodel {
+public class SelectSubtreeAction extends MultipleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.selectSubtree";
 	private static ImageDescriptor createImage;
@@ -53,10 +53,17 @@ public class SelectSubtreeAction extends SingleSelectionAction implements Action
 	public void run() {
 		if (viewer instanceof FeatureDiagramViewer) {
 			final FeatureDiagramViewer featureDiagramViewer = (FeatureDiagramViewer) viewer;
-			final FeatureEditPart part = (FeatureEditPart) featureDiagramViewer.getFocusEditPart();
 			final Map<?, ?> editPartRegistry = featureDiagramViewer.getEditPartRegistry();
-			final List<IGraphicalFeature> children = part.getModel().getGraphicalChildren();
-			selectChildren(editPartRegistry, children, featureDiagramViewer);
+			// Select all feature edit parts that are selected in some way
+			for (final Object e : editPartRegistry.values()) {
+				if (e instanceof FeatureEditPart) {
+					final FeatureEditPart part = (FeatureEditPart) e;
+					if (part.getSelected() >= EditPart.SELECTED) {
+						final List<IGraphicalFeature> children = part.getModel().getGraphicalChildren();
+						selectChildren(editPartRegistry, children, featureDiagramViewer);
+					}
+				}
+			}
 		}
 	}
 
