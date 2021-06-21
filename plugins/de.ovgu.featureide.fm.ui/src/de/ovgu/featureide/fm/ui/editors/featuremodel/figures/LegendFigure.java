@@ -36,7 +36,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
@@ -44,6 +46,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -203,6 +206,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			visibleFeatures.add(iGraphicalFeature.getObject());
 		}
 
+		// Retrieve visible constraints
+		final List<IGraphicalConstraint> graphicalVisibleConstraints = graphicalFeatureModel.getVisibleConstraints();
+		final List<IConstraint> visibleConstraints = new ArrayList<>();
+		for (final IGraphicalConstraint iGraphicalConstraint : graphicalVisibleConstraints) {
+			visibleConstraints.add(iGraphicalConstraint.getObject());
+		}
+
 		mandatory = Functional.toList(Functional.filter(graphicalVisibleFeatures, new MandatoryGraphicalFeatureFilter())).size() > 0;
 		optional = Functional.toList(Functional.filter(graphicalVisibleFeatures, new OptionalGraphicalFeatureFilter())).size() > 0;
 		alternative = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleRelations(), new AlternativeGroupFilter())).size() > 0;
@@ -213,28 +223,32 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 
-		AnalysesCollection analysisResults = null;
-
 		// skip when automated analyses are deactivated
 		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())) {
-			analysisResults = featureModelManager.getVariableFormula().getAnalyzer().getAnalysesCollection();
+			final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
+			final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
+			final List<IFeature> deadFeatures = analyzer.getDeadFeatures(null);
+			final List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
+			final List<IFeature> indetHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
+			final List<IConstraint> tautologyConstraints = analyzer.getTautologyConstraints(new NullMonitor<>());
+			final List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
 
 			if (analysisResults.isCalculateDeadConstraints()) {
-				dead = analysisResults.getFeatureModelProperties().hasDeadFeatures();
+				dead = containsAny(visibleFeatures, deadFeatures);
 			}
 			if (analysisResults.isCalculateFOConstraints()) {
-				falseoptional = analysisResults.getFeatureModelProperties().hasFalseOptionalFeatures();
+				falseoptional = containsAny(visibleFeatures, falseOptionalFeatures);
 			}
-			indetHidden = analysisResults.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
+			indetHidden = containsAny(visibleFeatures, indetHiddenFeatures);
 
 			void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
 			if (void_model) {
 				dead = false;
 			}
 
-			tautologyConst = analysisResults.isCalculateTautologyConstraints() && analysisResults.getFeatureModelProperties().hasTautologyConstraints();
-			redundantConst = analysisResults.isCalculateRedundantConstraints() && analysisResults.getFeatureModelProperties().hasRedundantConstraints();
+			tautologyConst = analysisResults.isCalculateTautologyConstraints() && containsAny(visibleConstraints, tautologyConstraints);
+			redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints);
 
 			explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 		} else {
@@ -259,6 +273,24 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		}
 
 		language = FMPropertyManager.getLanguage();
+	}
+
+	/**
+	 * @param <T> List element type
+	 * @param visible First list
+	 * @param all Second list
+	 * @return True iff the first list contains an element that is also present in the second list.
+	 */
+	private <T> boolean containsAny(List<T> visible, List<T> all) {
+		if (all.isEmpty()) {
+			return false;
+		}
+		for (final T t : visible) {
+			if (all.contains(t)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void setLegendSize() {
