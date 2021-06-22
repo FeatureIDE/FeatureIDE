@@ -122,4 +122,10 @@
             nature="FeatureIDE_Core.FeatureModelingNature">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.ui.views">
+      <viewid
+            id="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView">
+      </viewid>
+   </extension>
 </plugin>
