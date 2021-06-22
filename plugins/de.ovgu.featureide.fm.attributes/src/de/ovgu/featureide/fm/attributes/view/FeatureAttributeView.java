@@ -49,6 +49,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
@@ -137,6 +138,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public final static String synch_tree = "synch_tree.gif";
 	private final HashMap<String, Image> cachedImages;
 
+	// Components for the actual Feature Attribute View.
 	private Tree tree;
 	private TreeViewer treeViewer;
 	private GridLayout layout;
@@ -147,6 +149,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_UNIT = "Unit";
 	private final String COLUMN_RECURSIVE = "Recursive";
 	private final String COLUMN_CONFIGURABLE = "Configureable";
+
+	// Components for the Extension Conversion view.
+	private Label conversionAdvertLabel;
 
 	// EditingSupports
 	private FeatureAttributeNameEditingSupport nameEditingSupport;
@@ -239,6 +244,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// Add part listener and resource listener
 		getSite().getPage().addPartListener(editorListener);
 
+		// Create Label
+		conversionAdvertLabel = new Label(parent, SWT.HORIZONTAL);
 		// Create Layout
 		layout = new GridLayout(2, false);
 		parent.setLayout(layout);
@@ -505,13 +512,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				// Valid
 				manager = featureModelManager;
 				manager.addListener(this);
+				// Show tree, but not conversion.
+				tree.setVisible(true);
+				conversionAdvertLabel.setVisible(false);
+
 				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(curFeatureModel);
 				}
 			} else {
-				// Wrong format
+				// Wrong format; hide tree and show label.
 				mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
+				conversionAdvertLabel.setVisible(true);
+				conversionAdvertLabel.setText(mode.message.toString());
+				tree.setVisible(false);
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput("");
 				}
@@ -519,6 +533,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		} else {
 			// Wrong page
 			mode = FeatureAttributeOperationMode.INVALID_FM_PAGE;
+			tree.setVisible(false);
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.setInput("");
 			}
