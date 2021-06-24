@@ -48,6 +48,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
@@ -150,8 +151,15 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_RECURSIVE = "Recursive";
 	private final String COLUMN_CONFIGURABLE = "Configureable";
 
-	// Components for the Extension Conversion view.
+	// Components for the Extension Conversion view
+	/**
+	 * A label that advertises the user to convert the normal feature model/configuration to an extended one that supports attributes.
+	 */
 	private Label conversionAdvertLabel;
+	/**
+	 * A button the user can click to convert a normal feature model/configuration into an extended one.
+	 */
+	private Button conversionButton;
 
 	// EditingSupports
 	private FeatureAttributeNameEditingSupport nameEditingSupport;
@@ -246,6 +254,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		// Create Label
 		conversionAdvertLabel = new Label(parent, SWT.HORIZONTAL);
+		// Create and name button
+		conversionButton = new Button(parent, SWT.HORIZONTAL);
+		conversionButton.setText("Convert...");
 		// Create Layout
 		layout = new GridLayout(2, false);
 		parent.setLayout(layout);
@@ -274,8 +285,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			setEditorContent(null);
 		}
 
-		// create the contex menu
-		createContexMenu();
+		// create the context menu
+		createContextMenu();
 
 		// create a tree viewer editor to only activate the editing supports when double clicking a cell
 		createTreeViewerEditor();
@@ -359,7 +370,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		configureableEditingSupport = new FeatureAttributeConfigureableEditingSupport(this, treeViewer, true);
 	}
 
-	private void createContexMenu() {
+	private void createContextMenu() {
 		// Toolbar
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
@@ -474,6 +485,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				repackAllColumns();
 			}
 		}
+		showOrHideConversionElements();
 	}
 
 	private void setEmptyEditorContent() {
@@ -512,10 +524,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				// Valid
 				manager = featureModelManager;
 				manager.addListener(this);
-				// Show tree, but not conversion.
-				tree.setVisible(true);
-				conversionAdvertLabel.setVisible(false);
-
 				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(curFeatureModel);
@@ -523,9 +531,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			} else {
 				// Wrong format; hide tree and show label.
 				mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
-				conversionAdvertLabel.setVisible(true);
-				conversionAdvertLabel.setText(mode.message.toString());
-				tree.setVisible(false);
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput("");
 				}
@@ -533,12 +538,33 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		} else {
 			// Wrong page
 			mode = FeatureAttributeOperationMode.INVALID_FM_PAGE;
-			tree.setVisible(false);
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.setInput("");
 			}
 		}
 		repackAllColumns();
+	}
+
+	private void showOrHideConversionElements() {
+		// Hide the button if we do now show a normal feture configuration or model to convert.
+		if (!conversionButton.isDisposed()) {
+			conversionButton.setVisible(
+					mode == FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL || mode == FeatureAttributeOperationMode.NON_EXTENDED_CONFIGURATION);
+		}
+
+		// Hide the text label when we do not show an extended feature model or configuration.
+		boolean showExtended = mode == FeatureAttributeOperationMode.CONFIGURATION_EDITOR || mode == FeatureAttributeOperationMode.FEATURE_DIAGRAM;
+		if (!conversionAdvertLabel.isDisposed()) {
+			conversionAdvertLabel.setVisible(!showExtended);
+			if (!showExtended) {
+				conversionAdvertLabel.setText(mode.getMessage().toString());
+			}
+		}
+
+		// Hide the tree if we do not show something extended.
+		if (!tree.isDisposed()) {
+			tree.setVisible(showExtended);
+		}
 	}
 
 	private void setConfEditorContent(ConfigurationEditor editor) {
