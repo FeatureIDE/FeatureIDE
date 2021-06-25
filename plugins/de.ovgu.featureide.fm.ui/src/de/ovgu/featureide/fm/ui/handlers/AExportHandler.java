@@ -40,8 +40,11 @@ public abstract class AExportHandler<T> extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile modelFile) {
+		singleAction(EclipseFileSystem.getPath(modelFile));
+	}
 
-		final Path modelFilePath = EclipseFileSystem.getPath(modelFile);
+	public void singleAction(Path modelFilePath) {
+
 		final List<? extends IPersistentFormat<T>> formatExtensions = getFormats();
 		final String[][] filter = getFilter(formatExtensions);
 
