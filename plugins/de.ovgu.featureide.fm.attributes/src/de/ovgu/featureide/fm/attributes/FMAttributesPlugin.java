@@ -21,9 +21,15 @@
 package de.ovgu.featureide.fm.attributes;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -45,6 +51,41 @@ public class FMAttributesPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		LibraryManager.registerLibrary(FMAttributesEclipseLibrary.getInstance());
+
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page.addPartListener(new IPartListener() {
+
+			@Override
+			public void partOpened(IWorkbenchPart part) {
+				if (part instanceof FeatureModelEditor) {
+					try {
+						page.showView("de.ovgu.featureide.fm.attributes.view.FeatureAttributeView");
+					} catch (PartInitException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			public void partDeactivated(IWorkbenchPart part) {
+
+			}
+
+			@Override
+			public void partClosed(IWorkbenchPart part) {
+
+			}
+
+			@Override
+			public void partBroughtToTop(IWorkbenchPart part) {
+
+			}
+
+			@Override
+			public void partActivated(IWorkbenchPart part) {
+
+			}
+		});
 	}
 
 	public void stop(BundleContext context) throws Exception {
