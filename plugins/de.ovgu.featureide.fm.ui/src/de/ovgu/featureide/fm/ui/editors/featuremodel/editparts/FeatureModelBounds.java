@@ -67,17 +67,19 @@ public class FeatureModelBounds {
 					if (((IGraphicalFeature) element).getCollapsedDecoration() != null) {
 						final CollapsedDecoration collapsedDecoration = ((IGraphicalFeature) element).getCollapsedDecoration();
 						position = getBounds(collapsedDecoration);
-						if (position.x < min.x) {
-							min.x = position.x;
-						}
-						if (position.y < min.y) {
-							min.y = position.y;
-						}
-						if ((position.right()) > max.x) {
-							max.x = position.right();
-						}
-						if ((position.bottom()) > max.y) {
-							max.y = position.bottom();
+						if (!((position.x == 0) && (position.y == 0))) {
+							if (position.x < min.x) {
+								min.x = position.x;
+							}
+							if (position.y < min.y) {
+								min.y = position.y;
+							}
+							if ((position.right()) > max.x) {
+								max.x = position.right();
+							}
+							if ((position.bottom()) > max.y) {
+								max.y = position.bottom();
+							}
 						}
 					}
 				}
