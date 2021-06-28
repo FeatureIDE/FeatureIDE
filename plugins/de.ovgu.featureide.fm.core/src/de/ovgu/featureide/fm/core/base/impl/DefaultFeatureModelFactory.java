@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  *
@@ -73,6 +75,11 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 		return oldConstraint.clone(featureModel);
+	}
+
+	@Override
+	public IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt) {
+		return LongRunningWrapper.runMethod(new FeatureModelObfuscator(featureModel, salt));
 	}
 
 }

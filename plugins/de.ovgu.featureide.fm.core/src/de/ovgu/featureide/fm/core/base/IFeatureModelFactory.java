@@ -23,9 +23,11 @@ package de.ovgu.featureide.fm.core.base;
 import org.prop4j.Node;
 
 /**
- * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
+ * Factory to create or copy instances of {@link IFeature}, {@link IFeatureModel}, {@link IConstraint}, and to obfuscate {@link IFeatureModel}s.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Benedikt Jutz
  */
 public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 
@@ -36,6 +38,8 @@ public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
+
+	IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt);
 
 	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
 

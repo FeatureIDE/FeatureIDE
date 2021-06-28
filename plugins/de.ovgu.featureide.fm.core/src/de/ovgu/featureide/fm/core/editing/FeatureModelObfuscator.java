@@ -41,19 +41,21 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * Returns a copy of the given model with obfuscated feature names and descriptions.
  *
  * @author Sebastian Krieter
+ * @author Rahel Arens
+ * @author Benedikt Jutz
  */
 public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> {
 
 	private final static SecureRandom secureRandom = new SecureRandom();
 
 	private final static int LENGTH_FACTOR = 8;
-	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR);
+	protected static final int RESULT_LENGTH = (4 * LENGTH_FACTOR);
 
 	private final IFeatureModel orgFeatureModel;
-	private final IFeatureModelFactory factory;
+	protected final IFeatureModelFactory factory;
 	private final byte[] salt;
 
-	private MessageDigest digest;
+	protected MessageDigest digest;
 	private IFeatureModel obfuscatedFeatureModel;
 
 	/**
@@ -114,7 +116,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		}
 	}
 
-	private void obfuscateConstraints() {
+	protected void obfuscateConstraints() {
 		for (final IConstraint constraint : orgFeatureModel.getConstraints()) {
 			final Node clone = constraint.getNode().clone();
 			for (final Literal literal : clone.getLiterals()) {
@@ -124,15 +126,15 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		}
 	}
 
-	private String getObfuscatedFeatureName(String name) {
+	protected String getObfuscatedFeatureName(String name) {
 		return obfuscate(name, new char[RESULT_LENGTH]);
 	}
 
-	private String getObfuscatedDescription(String description) {
+	protected String getObfuscatedDescription(String description) {
 		return obfuscate(description, new char[RESULT_LENGTH]);
 	}
 
-	private String obfuscate(String string, final char[] result) {
+	protected String obfuscate(String string, final char[] result) {
 		digest.reset();
 		digest.update(salt);
 		digest.update(string.getBytes(StandardCharsets.UTF_8));
