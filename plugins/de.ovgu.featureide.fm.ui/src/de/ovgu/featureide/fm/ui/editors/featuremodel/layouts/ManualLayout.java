@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -42,8 +44,23 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 		for (final IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 			setLocation(feature, feature.getLocation());
 		}
-		for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
-			constraint.setLocation(constraint.getLocation());
+		if (featureModel.getLayout().isAutoLayoutConstraints()) {
+			final IGraphicalFeature root =
+				FeatureUIHelper.getGraphicalFeature(FeatureUtils.getRoot(featureModel.getFeatureModelManager().getSnapshot()), featureModel);
+
+			// Calculate yoffset as the position of the lowest visible feature + its height.
+			int yoffset = 0;
+			for (final IGraphicalFeature feat : featureModel.getVisibleFeatures()) {
+				if (yoffset < feat.getLocation().y) {
+					yoffset = feat.getLocation().y;
+				}
+			}
+
+			layoutConstraints(yoffset, featureModel.getVisibleConstraints(), getBounds(root));
+		} else {
+			for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
+				constraint.setLocation(constraint.getLocation());
+			}
 		}
 	}
 

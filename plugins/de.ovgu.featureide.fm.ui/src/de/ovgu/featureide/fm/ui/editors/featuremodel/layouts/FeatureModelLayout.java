@@ -39,6 +39,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private final Point legendPos;
 	private boolean leftRightInverted;
 	private boolean topDownInverted;
+	private boolean autoLayoutConstraints;
 
 	private int selectedLayoutAlgorithm;
 	private boolean showShortNames;
@@ -50,6 +51,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		legendPos = new Point(0, 0);
 		selectedLayoutAlgorithm = 4;
 		usesAbegoTreeLayout = false;
+		autoLayoutConstraints = false;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
@@ -59,6 +61,15 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		legendPos = featureModelLayout.legendPos.getCopy();
 		selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
 		usesAbegoTreeLayout = featureModelLayout.usesAbegoTreeLayout;
+		autoLayoutConstraints = featureModelLayout.autoLayoutConstraints;
+	}
+
+	public boolean isAutoLayoutConstraints() {
+		return autoLayoutConstraints;
+	}
+
+	public void setAutoLayoutConstraints(boolean autoLayoutConstraints) {
+		this.autoLayoutConstraints = autoLayoutConstraints;
 	}
 
 	@Override

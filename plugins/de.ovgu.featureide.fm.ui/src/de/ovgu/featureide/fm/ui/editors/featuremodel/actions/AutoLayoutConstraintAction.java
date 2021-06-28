@@ -29,6 +29,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
@@ -50,6 +51,7 @@ public class AutoLayoutConstraintAction extends Action {
 		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
 		setId(ID);
+
 	}
 
 	@Override
@@ -58,9 +60,13 @@ public class AutoLayoutConstraintAction extends Action {
 		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
 			newList.add(featureModel.getConstraints().get(i).getLocation());
 		}
-		final int counter = oldPos.size();
-		oldPos.add(newList);
-		FeatureModelOperationWrapper.run(new AutoLayoutConstraintOperation(featureModel, oldPos, counter));
+		final FeatureModelLayout layout = featureModel.getLayout();
+		layout.setAutoLayoutConstraints(!layout.isAutoLayoutConstraints());
+		if (layout.isAutoLayoutConstraints()) {
+			final int counter = oldPos.size();
+			oldPos.add(newList);
+			FeatureModelOperationWrapper.run(new AutoLayoutConstraintOperation(featureModel, oldPos, counter));
+		}
 	}
 
 }
