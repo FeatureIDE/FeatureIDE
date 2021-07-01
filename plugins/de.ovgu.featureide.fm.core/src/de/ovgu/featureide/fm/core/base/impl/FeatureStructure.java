@@ -345,6 +345,16 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
+	public boolean isAndInternal() {
+		return and;
+	}
+
+	@Override
+	public boolean isMultipleInternal() {
+		return multiple;
+	}
+
+	@Override
 	public void removeChild(IFeatureStructure child) {
 		if (!children.remove(child)) {
 			throw new NoSuchElementException();
@@ -459,26 +469,6 @@ public class FeatureStructure implements IFeatureStructure {
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#isAndInternal()
-	 */
-	@Override
-	public boolean isAndInternal() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#isMultipleInternal()
-	 */
-	@Override
-	public boolean isMultipleInternal() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }
