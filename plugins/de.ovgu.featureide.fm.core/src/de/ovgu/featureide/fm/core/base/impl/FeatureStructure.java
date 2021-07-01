@@ -321,7 +321,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isMandatory() {
-		return (parent == null) || !parent.isAnd() || mandatory;
+		return (parent == null) || (!parent.isAndInternal() && (parent.getChildrenCount() == 1)) || mandatory;
 	}
 
 	@Override
@@ -459,6 +459,26 @@ public class FeatureStructure implements IFeatureStructure {
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#isAndInternal()
+	 */
+	@Override
+	public boolean isAndInternal() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#isMultipleInternal()
+	 */
+	@Override
+	public boolean isMultipleInternal() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

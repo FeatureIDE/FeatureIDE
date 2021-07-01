@@ -93,6 +93,24 @@ public interface IFeatureStructure {
 
 	boolean isRoot();
 
+	/**
+	 * Returns the internal value of the variable {@code and}. In most cases the method {@link #isAnd()} should be used instead.
+	 *
+	 * @return the internal value of {@code and}
+	 */
+	default boolean isAndInternal() {
+		return isAnd();
+	}
+
+	/**
+	 * Returns the internal value of the variable {@code multiple}. In most cases the method {@link #isMultiple()} should be used instead.
+	 *
+	 * @return the internal value of {@code multiple}
+	 */
+	default boolean isMultipleInternal() {
+		return isMultiple();
+	}
+
 	void removeChild(IFeatureStructure child);
 
 	IFeatureStructure removeLastChild();
