@@ -27,8 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -52,7 +50,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public class NewFeatureModelWizardPage extends WizardPage {
 
-	@CheckForNull
 	private final IProject project;
 	Text fileName;
 

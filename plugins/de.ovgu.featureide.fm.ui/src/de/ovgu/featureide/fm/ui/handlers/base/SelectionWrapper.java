@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.handlers.base;
 
 import java.util.Iterator;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -57,7 +55,6 @@ public class SelectionWrapper<T> {
 		this.it = selection.iterator();
 	}
 
-	@CheckForNull
 	public T getNext() {
 		while (it.hasNext()) {
 			final T element = checkClass(it.next(), type);

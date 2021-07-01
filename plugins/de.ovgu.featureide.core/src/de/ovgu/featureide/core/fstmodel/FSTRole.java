@@ -23,8 +23,6 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
-
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
@@ -78,27 +76,22 @@ public class FSTRole {
 		return classFragment;
 	}
 
-	@Nonnull
 	public TreeSet<FSTField> getFields() {
 		return classFragment.getFields();
 	}
 
-	@Nonnull
 	public TreeSet<FSTInvariant> getInvariants() {
 		return classFragment.getInvariants();
 	}
 
-	@Nonnull
 	public TreeSet<FSTMethod> getMethods() {
 		return classFragment.getMethods();
 	}
 
-	@Nonnull
 	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return classFragment.getInnerClasses();
 	}
 
-	@Nonnull
 	public TreeSet<FSTDirective> getDirectives() {
 		return directives;
 	}

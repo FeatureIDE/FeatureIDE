@@ -23,8 +23,6 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -70,7 +68,6 @@ public class FSTFeature {
 		return name;
 	}
 
-	@Nonnull
 	public LinkedList<FSTRole> getRoles() {
 		return new LinkedList<FSTRole>(roles.values());
 	}

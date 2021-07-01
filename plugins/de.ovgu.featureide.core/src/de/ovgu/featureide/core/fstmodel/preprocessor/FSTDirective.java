@@ -24,9 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
@@ -43,13 +40,13 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	private FSTDirectiveCommand command;
 	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
 	private final LinkedList<RoleElement<?>> roleChildren = new LinkedList<RoleElement<?>>();
-	private @CheckForNull FSTDirective parent;
+	private FSTDirective parent;
 	private int startLine;
 	private int startOffset;
 	private int endLine;
 	private int endLength;
 	private int id = -1;
-	private @CheckForNull FSTRole role;
+	private FSTRole role;
 	private List<AbstractSignature> insideOfSig;
 	private List<AbstractSignature> includedSig;
 
@@ -93,7 +90,6 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 		return elements;
 	}
 
-	@Nonnull
 	public LinkedList<FSTDirective> getChildrenList() {
 		return children;
 	}

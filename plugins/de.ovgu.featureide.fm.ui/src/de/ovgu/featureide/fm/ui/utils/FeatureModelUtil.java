@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.utils;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -42,7 +40,6 @@ public class FeatureModelUtil {
 	 *
 	 * @return the active feature model editor or {@code null} if none is available.
 	 */
-	@CheckForNull
 	public static FeatureModelEditor getActiveFMEditor() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench != null) {

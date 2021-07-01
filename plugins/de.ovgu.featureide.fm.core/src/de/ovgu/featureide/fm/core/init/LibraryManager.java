@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import javax.annotation.Nonnull;
-
 public class LibraryManager {
 
 	private static List<ILibrary> libraries = new ArrayList<>();
@@ -50,7 +48,7 @@ public class LibraryManager {
 	 * @see #deregisterLibraries()
 	 * @see #deregisterLibrary(ILibrary)
 	 */
-	public static synchronized void registerLibrary(@Nonnull ILibrary library) {
+	public static synchronized void registerLibrary(ILibrary library) {
 		if (!libraries.contains(library)) {
 			library.install();
 			for (final ListIterator<ILibrary> iterator = libraries.listIterator(); iterator.hasNext();) {
@@ -71,7 +69,7 @@ public class LibraryManager {
 	 *
 	 * @see #deregisterLibraries()
 	 */
-	public static synchronized void deregisterLibrary(@Nonnull ILibrary library) {
+	public static synchronized void deregisterLibrary(ILibrary library) {
 		for (final ListIterator<ILibrary> iterator = libraries.listIterator(); iterator.hasNext();) {
 			final ILibrary curLibrary = iterator.next();
 			if ((curLibrary != null) && (curLibrary == library)) {
