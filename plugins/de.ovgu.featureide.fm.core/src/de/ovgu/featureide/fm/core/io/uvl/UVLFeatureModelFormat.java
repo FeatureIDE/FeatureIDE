@@ -127,6 +127,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
 		fm.reset();
+		Arrays.stream(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		IFeature root;
 		if (rootModel.getRootFeatures().length == 1) {
 			final Feature f = rootModel.getRootFeatures()[0];
@@ -139,12 +140,17 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
 		Arrays.stream(rootModel.getConstraints()).filter(c -> !ownConstraints.contains(c)).forEach(c -> parseConstraint(fm, c));
 		ownConstraints.forEach(c -> parseOwnConstraint(fm, c));
-		Arrays.stream(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
 	}
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
+		if (resolved.getName().contains(".")) {
+			final String alias = resolved.getName().split("\\.")[0];
+			if (!fm.getExternalModels().containsKey(alias)) {
+				pl.add(new Problem("Cannot resolve alias " + alias, 0, Severity.ERROR));
+			}
+		}
 		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
 		if (resolved.getName().contains(".")) {
 			feature.setType(MultiFeature.TYPE_INTERFACE);
@@ -255,7 +261,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private void checkReferenceValid(String name) {
 		if (fm.getFeature(name) == null) {
-			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0));
+			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0, Severity.ERROR));
 			throw new RuntimeException("Invalid reference");
 		}
 	}
