@@ -128,4 +128,10 @@
             id="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView">
       </viewid>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.FMEditorListener">
+      <listener
+            class="de.ovgu.featureide.fm.attributes.view.FeatureModelEditorListener">
+      </listener>
+   </extension>
 </plugin>

@@ -9,6 +9,7 @@
 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline" schema="schema/de.ovgu.featureide.fm.ui.Outline.exsd"/>
  <extension-point id="de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry" name="configurationoutlineentry" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry.exsd"/>
+ <extension-point id="de.ovgu.featureide.fm.ui.FMEditorListener" name="FMEditorListener" schema="schema/de.ovgu.featureide.fm.ui.FMEditorListener.exsd"/>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type

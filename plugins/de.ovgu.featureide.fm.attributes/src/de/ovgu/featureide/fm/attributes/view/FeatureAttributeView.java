@@ -112,6 +112,8 @@ import de.ovgu.featureide.fm.ui.handlers.FMExportHandler;
  */
 public class FeatureAttributeView extends ViewPart implements IEventListener {
 
+	public static final String ID = FMAttributesPlugin.PLUGIN_ID + ".view.FeatureAttributeView";
+
 	public enum FeatureAttributeOperationMode {
 
 		NONE(StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR), NON_EXTENDED_FEATURE_MODEL(
