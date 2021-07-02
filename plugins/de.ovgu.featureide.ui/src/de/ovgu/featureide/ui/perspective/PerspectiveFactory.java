@@ -77,7 +77,13 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(CollaborationView.ID);
 		down.addView(FeatureStatisticsView.ID);
 
-		addViewExtensions(down);
+		// Add extension views of the extension point de.ovgu.featureide.ui.views to the bottom layout and in the shortcut list.
+		final IConfigurationElement[] ces = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.views");
+		for (final IConfigurationElement ce : ces) {
+			final String viewid = ce.getAttribute("id");
+			down.addView(viewid);
+			layout.addShowViewShortcut(viewid);
+		}
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
@@ -98,18 +104,5 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 
-	}
-
-	/**
-	 * Adds extension views of the extension point de.ovgu.featureide.ui.views to the specified layout.
-	 *
-	 * @param layout {@link IFolderLayout}
-	 */
-	private void addViewExtensions(IFolderLayout layout) {
-		final IConfigurationElement[] ces = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.views");
-
-		for (final IConfigurationElement ce : ces) {
-			layout.addView(ce.getAttribute("id"));
-		}
 	}
 }
