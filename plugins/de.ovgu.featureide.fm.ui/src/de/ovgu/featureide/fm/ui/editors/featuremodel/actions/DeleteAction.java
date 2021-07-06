@@ -37,6 +37,8 @@ import org.eclipse.ui.actions.ActionFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -119,7 +121,31 @@ public class DeleteAction extends AFeatureModelAction {
 			return false;
 		}
 
-		return true;
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * @param selection
+	 * @return
+	 */
+	private boolean hasExternalFeature(IStructuredSelection selection) {
+		for (final Object selectedElement : selection) {
+			if (selectedElement instanceof FeatureEditPart) {
+				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
+					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
+					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
+						return true;
+					}
+
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
