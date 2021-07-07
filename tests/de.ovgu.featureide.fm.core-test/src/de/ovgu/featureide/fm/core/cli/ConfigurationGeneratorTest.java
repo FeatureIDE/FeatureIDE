@@ -58,17 +58,14 @@ public class ConfigurationGeneratorTest {
 			"basic", //
 			"simple", //
 			"car", //
-			"gpl_medium_model", //
-			"apl_model", //
-			"berkeley_db_model", //
-			"500-100");
+			"gpl_medium_model");
 
 	@Test
 	public void AllCoverage() {
 		testSize("basic", "all", 1);
 		testSize("simple", "all", 2);
 		testSize("car", "all", 7);
-		testSize("gpl_medium_model", "all", 1015);
+		testSize("gpl_medium_model", "all", 960);
 	}
 
 	@Test
@@ -85,9 +82,9 @@ public class ConfigurationGeneratorTest {
 		testLimitedSize("car", "all", 7, 7);
 		testLimitedSize("car", "all", 7, 10);
 		testLimitedSize("car", "all", 7, Integer.MAX_VALUE);
-		testLimitedSize("gpl_medium_model", "all", 1015, 10);
-		testLimitedSize("gpl_medium_model", "all", 1015, 1015);
-		testLimitedSize("gpl_medium_model", "all", 1015, Integer.MAX_VALUE);
+		testLimitedSize("gpl_medium_model", "all", 960, 10);
+		testLimitedSize("gpl_medium_model", "all", 960, 960);
+		testLimitedSize("gpl_medium_model", "all", 960, Integer.MAX_VALUE);
 	}
 
 	@Test
@@ -104,9 +101,9 @@ public class ConfigurationGeneratorTest {
 		testLimitedSize("car", "random", 7, 7);
 		testLimitedSize("car", "random", 7, 10);
 		testLimitedSize("car", "random", 7, Integer.MAX_VALUE);
-		testLimitedSize("gpl_medium_model", "random", 1015, 10);
-		testLimitedSize("gpl_medium_model", "random", 1015, 1015);
-		testLimitedSize("gpl_medium_model", "random", 1015, Integer.MAX_VALUE);
+		testLimitedSize("gpl_medium_model", "random", 960, 10);
+		testLimitedSize("gpl_medium_model", "random", 960, 960);
+		testLimitedSize("gpl_medium_model", "random", 960, Integer.MAX_VALUE);
 		testLimitedSize("apl_model", "random", 100, 100);
 	}
 
@@ -150,7 +147,7 @@ public class ConfigurationGeneratorTest {
 
 	@Test
 	public void YASAThreeWiseCoverage() {
-		testCoverageAndDeterminism("yasa", 3, modelNames.subList(0, 6));
+		testCoverageAndDeterminism("yasa", 3, modelNames);
 	}
 
 	@Test
@@ -170,7 +167,7 @@ public class ConfigurationGeneratorTest {
 
 	@Test
 	public void ICPLThreeWiseCoverage() {
-		testCoverage("icpl", 3, modelNames.subList(0, 6));
+		testCoverage("icpl", 3, modelNames);
 	}
 
 //	@Test
@@ -185,7 +182,7 @@ public class ConfigurationGeneratorTest {
 
 	@Test
 	public void ChvatalThreeWiseCoverage() {
-		testCoverage("chvatal", 3, modelNames.subList(0, 6));
+		testCoverage("chvatal", 3, modelNames);
 	}
 
 	private void testCoverage(final String algorithmName, final int t, final List<String> modelNameList) {
