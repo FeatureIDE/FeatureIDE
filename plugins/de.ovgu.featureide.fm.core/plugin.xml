@@ -37,11 +37,6 @@
             name="DIMACS">
       </fmFormat>
       <fmFormat
-            class="de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat"
-            id="de.ovgu.featureide.fm.core.format.GuidslFormat"
-            name="Guidsl">
-      </fmFormat>
-      <fmFormat
             class="de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat"
             id="de.ovgu.featureide.fm.core.format.SXFMFormat"
             name="SXFM">

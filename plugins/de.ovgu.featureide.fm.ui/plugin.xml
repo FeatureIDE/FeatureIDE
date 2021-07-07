@@ -262,20 +262,6 @@
 				allPopups="false"
 				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
-					icon="icons/guidsl.gif"
-					id="de.ovgu.featureide.fm.ui.actions.openWithGuidsl"
-					label="Open with GUIDSL"
-					style="push"
-					tooltip="GUIDSL is a configuration tool written by Don Batory">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
-					</reference>
-				</visibleWhen>
-			</command>
-			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvet"
@@ -416,10 +402,6 @@
 				name="Export feature model">
 		</command>
 		<command
-				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
-				name="Open with GUIDSL">
-		</command>
-		<command
 				id="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
 				name="Feature Model Slicing">
 		</command>
@@ -453,10 +435,6 @@
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.FMExportHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FMExport">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.fm.ui.handlers.OpenWithGUIDSLHandler"
-				commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.EliminateComplexConstraintsHandler"

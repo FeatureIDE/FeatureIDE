@@ -18,11 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.ahead.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
@@ -35,15 +36,8 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 public class ExportGUIDSLHandler extends AbstractFMExportHandler {
 
 	@Override
-	protected IFeatureModelFormat getOutputFormat() {
-		final GuidslFormat fmWriter = new GuidslFormat();
-		// TODO Guidsl
-		// if (fmWriter.hasConcreteCompounds()
-		// && !MessageDialog.openQuestion(new Shell(), "Warning!",
-		// "The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
-		// return null;
-		// }
-		return fmWriter;
+	protected IPersistentFormat<IFeatureModel> getOutputFormat() {
+		return new GuidslFormat();
 	}
 
 	@Override

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.ahead.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
