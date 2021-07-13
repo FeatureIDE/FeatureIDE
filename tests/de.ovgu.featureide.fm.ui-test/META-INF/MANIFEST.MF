@@ -8,3 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
 Automatic-Module-Name: de.ovgu.featureide.fm.ui-test
+Import-Package: de.ovgu.featureide.fm.core.base
