@@ -637,21 +637,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.refreshChildAll(newCompound);
 				}
 
-				final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newCompound);
-				final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-				if (newEditPart != null) {// TODO move to FeatureEditPart
-					newEditPart.activate();
-					viewer.select(newEditPart);
-					// open the renaming command
-					new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel())
-							.show();
-				}
+				openRenameEditor(newCompound);
 			}
 			viewer.internRefresh(true);
 			setDirty();
 			analyzeFeatureModel();
 			break;
 		case FEATURE_ADD_SIBLING:
+			// Update the Edit part registry; try to make the edit part for the sibling feature available.
+			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
 				final IFeature parent = (IFeature) event.getOldValue();
 				if (parent != null) {
@@ -659,9 +653,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					graphicalParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 					viewer.refreshChildAll(parent);
 				}
+
+				final IFeature siblingFeature = (IFeature) event.getNewValue();
+				openRenameEditor(siblingFeature);
 			}
-			viewer.internRefresh(true);
 			setDirty();
+			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			break;
 		case FEATURE_ADD:
@@ -698,15 +695,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			}
 
-			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
-			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-
-			if (newEditPart != null) {// TODO move to FeatureEditPart
-				newEditPart.activate();
-				viewer.select(newEditPart);
-				// open the renaming command
-				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
-			}
+			openRenameEditor(newFeature);
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			break;
@@ -1023,6 +1012,23 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 //		for (final IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 //			page.propertyChange(event);
 //		}
+	}
+
+	/**
+	 * Opens the {@link FeatureLabelEditManager} for a given added feature newFeature so that it can be renamed immediately.
+	 *
+	 * @param newFeature - {@link IFeature}
+	 */
+	private void openRenameEditor(final IFeature newFeature) {
+		final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
+		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+
+		if (newEditPart != null) {// TODO move to FeatureEditPart
+			newEditPart.activate();
+			viewer.select(newEditPart);
+			// open the renaming command
+			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
+		}
 	}
 
 	@Override
