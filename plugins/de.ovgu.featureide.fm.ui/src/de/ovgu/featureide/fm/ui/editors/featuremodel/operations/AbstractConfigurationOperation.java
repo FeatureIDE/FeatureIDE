@@ -1,7 +1,5 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -47,7 +45,7 @@ public abstract class AbstractConfigurationOperation {
 		return ConfigurationManager.CHANGE_ALL;
 	}
 
-	protected final void fireEvent(@Nonnull FeatureIDEEvent event) {
+	protected final void fireEvent(FeatureIDEEvent event) {
 		if (event == null) {
 			Logger.logWarning(getClass() + " operation() must return a FeatureIDEEvent");
 			event = new FeatureIDEEvent(configurationManager, null, null, null);

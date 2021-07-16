@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.ahead"
       label="FeatureIDE extension for AHEAD (optional)"
-      version="3.7.1.qualifier"
+      version="3.7.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -186,17 +186,19 @@ Library.
    </url>
 
    <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.core.ahead"
          download-size="0"
          install-size="0"
-         version="3.7.1.qualifier"
+         version="3.7.2.qualifier"
          unpack="false"/>
 
 </feature>

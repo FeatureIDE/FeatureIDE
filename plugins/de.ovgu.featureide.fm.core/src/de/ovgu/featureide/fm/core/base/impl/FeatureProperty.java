@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -57,7 +55,6 @@ public class FeatureProperty implements IFeatureProperty {
 	 * @return The description of the Feature.
 	 */
 	@Override
-	@Nonnull
 	public String getDescription() {
 		return description;
 	}
@@ -73,7 +70,7 @@ public class FeatureProperty implements IFeatureProperty {
 	}
 
 	@Override
-	public void setDescription(@Nonnull final CharSequence description) {
+	public void setDescription(final CharSequence description) {
 		this.description = description.toString();
 	}
 

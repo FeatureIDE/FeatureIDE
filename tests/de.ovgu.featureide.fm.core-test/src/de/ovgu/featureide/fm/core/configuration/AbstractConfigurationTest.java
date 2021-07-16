@@ -29,7 +29,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
@@ -64,10 +63,6 @@ public abstract class AbstractConfigurationTest {
 
 	public ConfigurationPropagator getConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
 		return new ConfigurationPropagator(formula, configuration);
-	}
-
-	protected static IFeatureModel loadGUIDSL(String grammar) {
-		return load(new GuidslFormat(), grammar);
 	}
 
 	/**

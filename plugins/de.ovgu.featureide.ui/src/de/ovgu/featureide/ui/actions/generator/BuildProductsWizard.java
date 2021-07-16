@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YASA;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -87,12 +88,12 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private String getAlgorithm() {
 		final String tWise = getTWise();
 		if (tWise == null) {
-			return ICPL;
+			return YASA;
 		}
 		final String algorithm = tWise.split("[|]")[0];
-		if (!(algorithm.equals(ICPL) || algorithm.equals(CASA) || algorithm.equals(INCLING) || algorithm.equals(CHVATAL))) {
+		if (!(algorithm.equals(ICPL) || algorithm.equals(YASA) || algorithm.equals(CASA) || algorithm.equals(INCLING) || algorithm.equals(CHVATAL))) {
 			// return the default algorithm if the algorithm was saved wrong
-			return ICPL;
+			return YASA;
 		}
 		return algorithm;
 	}

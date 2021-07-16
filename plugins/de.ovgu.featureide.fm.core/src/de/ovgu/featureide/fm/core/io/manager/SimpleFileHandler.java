@@ -30,8 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -67,7 +65,6 @@ public class SimpleFileHandler<T> {
 	 * @param path the given path
 	 * @return the file name
 	 */
-	@Nonnull
 	public static String getFileName(Path path) {
 		final String fileName = path.getFileName().toString();
 		final int extensionIndex = fileName.lastIndexOf('.');
@@ -80,7 +77,6 @@ public class SimpleFileHandler<T> {
 	 * @param fileName the file name with a (possible) extension
 	 * @return the file name
 	 */
-	@Nonnull
 	public static String getFileName(String fileName) {
 		final int extensionIndex = fileName.lastIndexOf('.');
 		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
@@ -95,7 +91,6 @@ public class SimpleFileHandler<T> {
 	 *
 	 * @see #getFileExtension(String)
 	 */
-	@Nonnull
 	public static String getFileExtension(Path path) {
 		return getFileExtension(path.getFileName().toString());
 	}
@@ -109,7 +104,6 @@ public class SimpleFileHandler<T> {
 	 *
 	 * @see #getFileExtension(Path)
 	 */
-	@Nonnull
 	public static String getFileExtension(String fileName) {
 		final int extensionIndex = fileName.lastIndexOf('.');
 		return (extensionIndex > 0) ? fileName.substring(extensionIndex + 1) : "";

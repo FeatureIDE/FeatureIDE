@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -51,7 +49,6 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	private FeatureModelFormula persistentFormula = null;
 	private FeatureModelFormula variableFormula = null;
 
-	@CheckForNull
 	public static FeatureModelManager getInstance(Path path) {
 		return getOrCreateInstance(path, FeatureModelManager.class, null);
 	}

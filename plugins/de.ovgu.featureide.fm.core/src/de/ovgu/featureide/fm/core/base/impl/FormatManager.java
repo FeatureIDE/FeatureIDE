@@ -28,8 +28,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -48,8 +46,7 @@ public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 	}
 
 	/**
-	 * Checks, whether there is a compatible format for the given file.<br>
-	 * Convenience method for {@link #hasFormat(Path, String) hasFormat(file, null)}.
+	 * Checks, whether there is a compatible format for the given file.<br> Convenience method for {@link #hasFormat(Path, String) hasFormat(file, null)}.
 	 *
 	 * @param file the given file.
 	 * @return {@code true} if the file is compatible with the format and {@code false} otherwise.
@@ -84,7 +81,6 @@ public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByContent(Path)}, which also take into account the content that should be
 	 *         parsed.
 	 */
-	@CheckForNull
 	public IPersistentFormat<T> getFormatByContent(CharSequence content, String fileName) {
 		if (fileName != null) {
 			final String extension = SimpleFileHandler.getFileExtension(fileName);
@@ -97,7 +93,6 @@ public class FormatManager<T> extends ExtensionManager<IPersistentFormat<T>> {
 		return null;
 	}
 
-	@CheckForNull
 	public IPersistentFormat<T> getFormatByContent(Path path) {
 		if ((path != null) && Files.isRegularFile(path) && Files.exists(path)) {
 			final String extension = SimpleFileHandler.getFileExtension(path);

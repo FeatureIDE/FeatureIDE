@@ -34,9 +34,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
@@ -320,21 +317,18 @@ public final class FeatureUtils {
 		return Functional.toList(featureModel.getProperty().getComments());
 	}
 
-	@Nonnull
 	public static final Iterable<String> getConcreteFeatureNames(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
 		return FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 	}
 
-	@Nonnull
 	public static final Collection<IFeature> getConcreteFeatures(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
 		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
 	}
 
-	@Nonnull
 	public static final Collection<IFeature> getHiddenFeatures(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
@@ -524,7 +518,6 @@ public final class FeatureUtils {
 	 * @param feature the feature to check
 	 * @return the direct parent; null if there is no parent
 	 */
-	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
 			final IFeatureStructure parent = feature.getStructure().getParent();

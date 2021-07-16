@@ -321,7 +321,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isMandatory() {
-		return (parent == null) || !parent.isAnd() || mandatory;
+		return (parent == null) || (!parent.isAndInternal() && (parent.getChildrenCount() == 1)) || mandatory;
 	}
 
 	@Override
@@ -342,6 +342,16 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public boolean isRoot() {
 		return parent == null;
+	}
+
+	@Override
+	public boolean isAndInternal() {
+		return and;
+	}
+
+	@Override
+	public boolean isMultipleInternal() {
+		return multiple;
 	}
 
 	@Override

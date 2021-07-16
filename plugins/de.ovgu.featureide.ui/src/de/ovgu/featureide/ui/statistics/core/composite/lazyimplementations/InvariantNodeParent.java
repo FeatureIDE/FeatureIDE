@@ -38,7 +38,7 @@ public class InvariantNodeParent extends Parent {
 		super(discription);
 		this.fstInvariant = fstInvariant;
 		final int numberOfInvariants = countInvariantsWithSameName(allInvariants);
-		setValue(new Integer(numberOfInvariants));
+		setValue(Integer.valueOf(numberOfInvariants));
 	}
 
 	private int countInvariantsWithSameName(LinkedList<FSTInvariant> invariants) {

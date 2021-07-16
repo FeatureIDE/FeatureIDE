@@ -39,7 +39,7 @@ public class AllConfigrationsGenerator extends ACNFConfigurationGenerator {
 
 	@Override
 	protected AllConfigurationGenerator getGenerator(CNF cnf, int numberOfConfigurations) {
-		return new AllConfigurationGenerator(cnf);
+		return new AllConfigurationGenerator(cnf, numberOfConfigurations);
 	}
 
 }

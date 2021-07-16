@@ -42,8 +42,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.YASA;
 
 import java.util.ArrayList;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -92,7 +90,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
 
-	@CheckForNull
 	private final IFeatureProject project;
 
 	Text fileName;

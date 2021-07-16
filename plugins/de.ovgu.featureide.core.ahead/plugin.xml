@@ -34,6 +34,38 @@
 				</visibleWhen>
 			</menu>
 		</menuContribution>
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
+					icon="icons/guidsl.gif"
+					id="de.ovgu.featureide.fm.ui.actions.openWithGuidsl"
+					label="Open with GUIDSL"
+					style="push"
+					tooltip="GUIDSL is a configuration tool written by Don Batory">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+					</reference>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension
+			point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
+				name="Open with GUIDSL">
+		</command>
+	</extension>
+	<extension
+			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.ahead.ui.handlers.OpenWithGUIDSLHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl">
+		</handler>
 	</extension>
  <extension
        point="de.ovgu.featureide.fm.core.FMComposer">
@@ -43,5 +75,13 @@
           id="de.ovgu.featureide.core.ahead.fmComposer"
           name="de.ovgu.featureide.core.ahead.fmComposer">
     </fmComposer>
+ </extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMFormat">
+    <fmFormat
+          class="de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat"
+          id="de.ovgu.featureide.fm.core.format.GuidslFormat"
+          name="Guidsl">
+    </fmFormat>
  </extension>
 </plugin>

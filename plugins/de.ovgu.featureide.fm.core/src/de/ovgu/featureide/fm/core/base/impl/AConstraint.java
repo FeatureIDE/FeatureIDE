@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -127,7 +125,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
-	public void setDescription(@Nonnull final String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 

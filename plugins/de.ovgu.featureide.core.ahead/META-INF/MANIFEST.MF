@@ -2,22 +2,37 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for AHEAD
 Bundle-SymbolicName: de.ovgu.featureide.core.ahead;singleton:=true
-Bundle-Version: 3.7.1.qualifier
+Bundle-Version: 3.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.ahead.AheadCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.ui,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.core
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
-Bundle-ClassPath: lib/jak2java.jar,
+Bundle-ClassPath: .,
+ lib/jak2java.jar,
  lib/mixin.jar,
  lib/jampack.jar,
- .
-Export-Package: de.ovgu.featureide.ahead,
+ lib/guidsl.jar,
+ lib/jakarta.jar
+Export-Package: Jakarta.DRAttributes,
+ Jakarta.SwingUtils,
+ Jakarta.collection,
+ Jakarta.io,
+ Jakarta.loader,
+ Jakarta.string,
+ Jakarta.symtab,
+ Jakarta.util,
+ de.ovgu.featureide.ahead,
  de.ovgu.featureide.ahead.model,
+ de.ovgu.featureide.ahead.ui.handlers,
  de.ovgu.featureide.ahead.wrapper,
+ de.ovgu.featureide.fm.core.io.guidsl,
+ guidsl,
  jak2java,
  jampack,
  mixin

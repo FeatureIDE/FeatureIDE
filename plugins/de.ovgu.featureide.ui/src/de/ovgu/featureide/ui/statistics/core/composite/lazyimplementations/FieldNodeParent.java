@@ -38,7 +38,7 @@ public class FieldNodeParent extends AbstractSortModeNode {
 		super(descString);
 		this.fstField = fstField;
 		final int numberOfRoles = countFieldsWithSameName(allFields);
-		setValue(new Integer(numberOfRoles));
+		setValue(Integer.valueOf(numberOfRoles));
 	}
 
 	private int countFieldsWithSameName(LinkedList<FSTField> fields) {

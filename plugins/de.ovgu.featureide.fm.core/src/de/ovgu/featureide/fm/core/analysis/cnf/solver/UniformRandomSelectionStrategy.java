@@ -42,7 +42,7 @@ public class UniformRandomSelectionStrategy implements IPhaseSelectionStrategy {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Random RAND = new Random(123456789);
+	public final Random RAND = new Random(123456789);
 
 	private final LinkedList<LiteralSet> usedSamples = new LinkedList<>();
 	private final LinkedList<LiteralSet> notUsedSamples = new LinkedList<>();

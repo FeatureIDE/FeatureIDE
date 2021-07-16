@@ -375,7 +375,7 @@ class TWiseConfigurationUtil {
 	}
 
 	public void newConfiguration(final LiteralSet literals) {
-		if (completeSolutionList.size() < maxSampleSize) {
+		if ((completeSolutionList.size() + incompleteSolutionList.size()) < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(this);
 			selectLiterals(configuration, Deduce.DP, literals);
 			configuration.updateSolverSolutions();
