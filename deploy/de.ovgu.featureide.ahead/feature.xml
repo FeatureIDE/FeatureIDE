@@ -186,10 +186,12 @@ Library.
    </url>
 
    <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
    </requires>
 
    <plugin
