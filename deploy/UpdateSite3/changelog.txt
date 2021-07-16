@@ -7,6 +7,17 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.7.2 (July 2021)
+* Hotfix containing only bugfixes and code quality improvements over v3.7.1
+* Cleaned up outdated libraries in fm.core plug-in (#1144)
+  * Removed findbugs annotations
+  * Moved guidsl to AHEAD plug-in
+* Fixed several issues regarding sampling algorithms
+  * Fixed non-deterministic behavior of YASA and IncLing (#1145)
+  * Fixed problems when using YASA and other algorithms via CLI and GUI (#1118, #1119, #1120, thanks for the report by cpwnd)
+  * Added test cases to ensure correctness after future updates
+* Fixed bug regarding alternatives and or-groups with one child (#1139)
+
 Release 3.7.1 (June 2021)
 * Hotfix containing only stability improvements over v3.7.0
 * Significant speed-ups when opening and working with large feature models (#1093)
