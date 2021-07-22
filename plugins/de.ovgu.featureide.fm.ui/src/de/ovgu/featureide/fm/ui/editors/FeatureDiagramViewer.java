@@ -297,11 +297,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			}
 		}
 
-		if (!graphicalFeatureModel.isLegendHidden()) {
-			if (graphicalFeatureModel.getLayout().hasLegendAutoLayout()) {
-				layoutManager.layoutLegend(graphicalFeatureModel);
-			}
-		}
 	}
 
 	public void layoutLegendOnIntersect() {

@@ -88,6 +88,12 @@ abstract public class FeatureDiagramLayoutManager {
 			firstManualLayout = false;
 		}
 
+		if (!featureModel.isLegendHidden()) {
+			if (featureModel.getLayout().hasLegendAutoLayout()) {
+				layoutLegend(featureModel);
+			}
+		}
+
 		newLocations.clear();
 	}
 

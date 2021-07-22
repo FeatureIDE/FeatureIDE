@@ -80,6 +80,9 @@ public class FeatureModelBounds {
 							if ((position.bottom()) > max.y) {
 								max.y = position.bottom();
 							}
+							if (element.getGraphicalModel().getLayout().hasVerticalLayout()) {
+								max.x = max.x + position.width;
+							}
 						}
 					}
 				}
