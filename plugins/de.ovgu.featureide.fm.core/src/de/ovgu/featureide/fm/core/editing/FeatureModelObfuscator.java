@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Base32Encoder;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Returns a copy of the given model with obfuscated feature names and descriptions.
@@ -51,12 +52,12 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	private final static int LENGTH_FACTOR = 8;
 	protected static final int RESULT_LENGTH = (4 * LENGTH_FACTOR);
 
-	private final IFeatureModel orgFeatureModel;
+	protected final IFeatureModel orgFeatureModel;
 	protected final IFeatureModelFactory factory;
 	private final byte[] salt;
 
 	protected MessageDigest digest;
-	private IFeatureModel obfuscatedFeatureModel;
+	protected IFeatureModel obfuscatedFeatureModel;
 
 	/**
 	 * Instantiates the obfuscater with a default salt value (Not recommended!). Alternatively, {@link #FeatureModelObfuscator(IFeatureModel, String)} can be
@@ -82,7 +83,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 
 	@Override
 	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
-		digest = MessageDigest.getInstance("SHA-256");
+		digest = MessageDigest.getInstance(StringTable.SHA_256_DIGEST_ALGORITHM);
 		obfuscatedFeatureModel = factory.create();
 		obfuscateStructure(orgFeatureModel.getStructure().getRoot(), null);
 		obfuscateConstraints();

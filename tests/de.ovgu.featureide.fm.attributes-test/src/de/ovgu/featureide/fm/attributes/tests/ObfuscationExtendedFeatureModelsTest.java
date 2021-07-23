@@ -24,7 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -32,6 +34,7 @@ import org.junit.Test;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelObfuscator;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -85,12 +88,13 @@ public class ObfuscationExtendedFeatureModelsTest {
 			Map<String, Object> featAttrs = new HashMap<>();
 			for (Map.Entry<String, Object> attribute : entry.getValue().entrySet()) {
 				// featName/attrName -> [featName, attrName]
-				String[] attrNameParts = obfuscatedStrings.get(attribute.getKey()).split("/");
+				String[] attrNameParts = obfuscatedStrings.get(featName + "/" + attribute.getKey()).split("/");
 				String attrName = attrNameParts[1];
+
 				// Deobfuscate String values: featName/attrName/attrValue -> [featName, attrName, attrValue]
 				Object attrValue = attribute.getValue();
 				if (attrValue instanceof String) {
-					String[] attrValueParts = obfuscatedStrings.get(attrValue).split("/");
+					String[] attrValueParts = obfuscatedStrings.get(featName + "/" + attrName + "/" + attrValue).split("/");
 					if (attrValueParts.length == 3) {
 						attrValue = attrValueParts[2];
 					} else {
@@ -126,5 +130,25 @@ public class ObfuscationExtendedFeatureModelsTest {
 			assertEquals(obsFeatureStruct.isHidden(), extFeatureStructure.isHidden());
 		}
 
+		// Assert that the obfuscated feature model contains the same constraints, except with obfuscated names.
+		// Therefore assert that all feature names can be mapped to their deobfuscated equivalents.
+		assertEquals(model.getConstraintCount(), obfuscatedModel.getConstraintCount());
+		for (int iC = 0; iC < model.getConstraintCount(); iC++) {
+			final IConstraint obfuscatedConstraint = obfuscatedModel.getConstraints().get(iC);
+			final IConstraint constraint = model.getConstraints().get(iC);
+			List<String> constraintFeatureNames = new ArrayList<>();
+			for (IFeature feature : constraint.getContainedFeatures()) {
+				constraintFeatureNames.add(feature.getName());
+			}
+
+			for (IFeature obsFeature : obfuscatedConstraint.getContainedFeatures()) {
+				assertTrue(constraintFeatureNames.contains(obfuscatedStrings.get(obsFeature.getName())));
+			}
+		}
+	}
+
+	private IConstraint deobfuscateConstraint(IConstraint constraint) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

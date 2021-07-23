@@ -67,4 +67,20 @@
 			</and>
 		</and>
 	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>Chicken Breast</var>
+				<var>Lettuce</var>
+			</imp>
+		</rule>
+		<rule>
+			<eq>
+				<var>Salami </var>
+				<not>
+					<var>Toast</var>
+				</not>
+			</eq>
+		</rule>
+	</constraints>
 </extendedFeatureModel>

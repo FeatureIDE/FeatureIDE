@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * ExtendedFeatureModelObfuscator obfuscates an {@link ExtendedFeatureModel} along with the names and string values of its feature attributes.
@@ -42,8 +43,6 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
-	private final IFeatureModel orgFeatureModel;
-	private IFeatureModel obfuscatedFeatureModel;
 	private Map<String, String> obfuscatedStrings;
 
 	public Map<String, String> getObfuscatedStrings() {
@@ -52,26 +51,17 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
 	public ExtendedFeatureModelObfuscator(IFeatureModel featureModel) {
 		super(featureModel);
-
-		orgFeatureModel = featureModel;
 		obfuscatedStrings = new HashMap<>();
 	}
 
 	public ExtendedFeatureModelObfuscator(IFeatureModel featureModel, String salt) {
 		super(featureModel, salt);
-
-		orgFeatureModel = featureModel;
 		obfuscatedStrings = new HashMap<>();
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
-
-		if (!(orgFeatureModel instanceof ExtendedFeatureModel)) {
-			return super.execute(monitor);
-		}
-
-		digest = MessageDigest.getInstance("SHA-256");
+		digest = MessageDigest.getInstance(StringTable.SHA_256_DIGEST_ALGORITHM);
 		obfuscatedFeatureModel = factory.create();
 		obfuscateStructure(orgFeatureModel.getStructure().getRoot(), null);
 		super.obfuscateConstraints();
@@ -81,8 +71,9 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 	private void obfuscateStructure(IFeatureStructure orgFeatureStructure, IFeature parentFeature) {
 		final ExtendedFeature orgFeature = (ExtendedFeature) orgFeatureStructure.getFeature();
 
-		final String obfuscatedFeatureName = getObfuscatedFeatureName(orgFeature.getName());
-		obfuscatedStrings.put(obfuscatedFeatureName, orgFeature.getName());
+		final String featureName = orgFeature.getName();
+		final String obfuscatedFeatureName = getObfuscatedFeatureName(featureName);
+		obfuscatedStrings.put(obfuscatedFeatureName, featureName);
 		final ExtendedFeature obfuscatedFeature = (ExtendedFeature) factory.createFeature(obfuscatedFeatureModel, obfuscatedFeatureName);
 		final String description = orgFeatureStructure.getFeature().getProperty().getDescription();
 		if ((description != null) && !description.isEmpty()) {
@@ -92,11 +83,11 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 		final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
 
 		for (IFeatureAttribute attribute : orgFeature.getAttributes()) {
-
 			IFeatureAttribute obfFeatureAttribute = null;
 
-			final String obfAttributeName = getObfuscatedFeatureAttributeName(orgFeature.getName() + "/" + attribute.getName());
-			obfuscatedStrings.put(obfAttributeName, orgFeature.getName() + "/" + attribute.getName());
+			final String attributeName = attribute.getName();
+			final String obfAttributeName = getObfuscatedFeatureAttributeName(attributeName);
+			obfuscatedStrings.put(featureName + "/" + obfAttributeName, featureName + "/" + attributeName);
 
 			switch (attribute.getType()) {
 			case FeatureAttribute.BOOLEAN:
@@ -116,8 +107,8 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 				if (oldValue == null) {
 					oldValue = "";
 				}
-				String obfuscatedValue = getObfuscatedStringValue(orgFeature.getName() + "/" + attribute.getName() + "/" + oldValue);
-				obfuscatedStrings.put(obfuscatedValue, orgFeature.getName() + "/" + attribute.getName() + "/" + oldValue);
+				String obfuscatedValue = getObfuscatedStringValue(oldValue);
+				obfuscatedStrings.put(featureName + "/" + attributeName + "/" + obfuscatedValue, featureName + "/" + attributeName + "/" + oldValue);
 				obfFeatureAttribute = attributeFactory.createStringAttribute(obfuscatedFeature, obfAttributeName, attribute.getUnit(), obfuscatedValue,
 						attribute.isRecursive(), attribute.isConfigurable());
 			}
