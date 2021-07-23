@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -188,28 +187,6 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 
 		return false;
 
-	}
-
-	/**
-	 * method to check if the selection in the editor includes a feature from an external submodel
-	 *
-	 * @param selection the selection from the editor
-	 *
-	 * @return true if there is a feature from an external submodel, false otherwise
-	 */
-	protected boolean hasExternalFeature(IStructuredSelection selection) {
-		for (final Object selectedElement : selection) {
-			if (selectedElement instanceof FeatureEditPart) {
-				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
-					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
-					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
-						return true;
-					}
-
-				}
-			}
-		}
-		return false;
 	}
 
 	@Override
