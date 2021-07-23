@@ -146,9 +146,4 @@ public class ObfuscationExtendedFeatureModelsTest {
 			}
 		}
 	}
-
-	private IConstraint deobfuscateConstraint(IConstraint constraint) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
