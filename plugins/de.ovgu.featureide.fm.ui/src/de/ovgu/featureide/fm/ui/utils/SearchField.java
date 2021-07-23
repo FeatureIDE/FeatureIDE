@@ -61,6 +61,7 @@ public class SearchField<T> {
 	}
 
 	private final class SearchModifyListener implements ModifyListener {
+
 		@Override
 		public void modifyText(ModifyEvent e) {
 			curIndex = 0;
@@ -154,15 +155,17 @@ public class SearchField<T> {
 	}
 
 	private void expand(T next) {
-		if (((IGraphicalFeature) next).getSourceConnection().getTarget() != null) {
-			final IGraphicalFeature parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
-			if (parent.getSourceConnection().getTarget() != null) {
-				expand((T) parent);
-			}
-			if (parent.isCollapsed()) {
-				parent.setCollapsed(false);
-				if (featureDiagramEditor != null) {
-					refresh();
+		if (next instanceof IGraphicalFeature) {
+			if (((IGraphicalFeature) next).getSourceConnection().getTarget() != null) {
+				final IGraphicalFeature parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
+				if (parent.getSourceConnection().getTarget() != null) {
+					expand((T) parent);
+				}
+				if (parent.isCollapsed()) {
+					parent.setCollapsed(false);
+					if (featureDiagramEditor != null) {
+						refresh();
+					}
 				}
 			}
 		}
