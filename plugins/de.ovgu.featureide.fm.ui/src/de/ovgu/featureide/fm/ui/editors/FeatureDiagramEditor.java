@@ -1163,7 +1163,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				selectedAction.setChecked(true);
 				menuManager.insert(1, new Separator("ManualLayoutSeparator"));
 				menuManager.insertBefore("ManualLayoutSeparator", autoLayoutConstraintAction);
-				autoLayoutConstraintAction.setEnabled(!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout());
+				final boolean enableAutoLayoutConstraints = !graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
+				autoLayoutConstraintAction.setEnabled(enableAutoLayoutConstraints);
+				autoLayoutConstraintAction.setChecked(enableAutoLayoutConstraints && graphicalFeatureModel.getLayout().isAutoLayoutConstraints());
 			}
 		});
 		return menuManager;
