@@ -148,7 +148,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (resolved.getName().contains(".")) {
 			final String alias = resolved.getName().split("\\.")[0];
 			if (!fm.getExternalModels().containsKey(alias)) {
-				pl.add(new Problem("Cannot resolve alias " + alias, 0, Severity.ERROR));
+				pl.add(new Problem("Cannot resolve alias " + alias + " of feature " + resolved.getName(), 0, Severity.ERROR));
 			}
 		}
 		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
