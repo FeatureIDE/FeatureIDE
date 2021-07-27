@@ -22,10 +22,18 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -50,6 +58,43 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	@Override
 	protected void createUITree(Composite parent) {
 		tree = new Tree(parent, SWT.CHECK);
+
+		final MenuManager contextMenu = new MenuManager(null);
+		contextMenu.setRemoveAllWhenShown(true);
+		contextMenu.addMenuListener(new IMenuListener() {
+
+			@Override
+			public void menuAboutToShow(IMenuManager mgr) {
+				contextMenu.add(new Action("Export As...", IMAGE_EXPORT_AS) {
+
+					@Override
+					public void run() {
+						ConfigurationExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
+					}
+				});
+			}
+		});
+
+		final Menu createContextMenu = contextMenu.createContextMenu(tree);
+
+		tree.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				if (tree.getItem(new Point(e.x, e.y)) != null) {
+					tree.setMenu(null);
+				} else {
+					tree.setMenu(createContextMenu);
+				}
+			}
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {}
+
+			@Override
+			public void mouseUp(MouseEvent e) {}
+		});
+
 		tree.addSelectionListener(new SelectionListener() {
 
 			@Override
