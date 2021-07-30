@@ -41,6 +41,7 @@ public class FeatureModelBounds {
 	public Rectangle getFeatureModelBounds(List<? extends IGraphicalElement> elements) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
+		boolean mostRightFeature = false;
 
 		/*
 		 * update lowest, highest, most left, most right coordinates for elements
@@ -56,6 +57,7 @@ public class FeatureModelBounds {
 				min.y = position.y;
 			}
 			if ((position.right()) > max.x) {
+				mostRightFeature = true;
 				max.x = position.right();
 			}
 			if ((position.bottom()) > max.y) {
@@ -80,10 +82,15 @@ public class FeatureModelBounds {
 							if ((position.bottom()) > max.y) {
 								max.y = position.bottom();
 							}
+						} else if (mostRightFeature) {
+							if (element.getGraphicalModel().getLayout().hasVerticalLayout()) {
+								max.x = max.x + position.width;
+							}
 						}
 					}
 				}
 			}
+			mostRightFeature = false;
 		}
 		return new Rectangle(min, max);
 	}
