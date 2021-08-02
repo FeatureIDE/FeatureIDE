@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -131,10 +132,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		IFeature root;
 		if (rootModel.getRootFeatures().length == 1) {
 			final Feature f = rootModel.getRootFeatures()[0];
-			root = parseFeature(fm, null, f);
+			root = parseFeature(fm, null, f, rootModel);
 		} else {
 			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
-			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
+			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
@@ -143,14 +144,34 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
 	}
 
-	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
+	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f, UVLModel submodel) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
-		if (resolved.getName().contains(".")) {
-			final String alias = resolved.getName().split("\\.")[0];
-			if (!fm.getExternalModels().containsKey(alias)) {
-				pl.add(new Problem("Cannot resolve alias " + alias + " of feature " + resolved.getName(), 0, Severity.ERROR));
+
+		// Validate imported feature
+		if ((root == null ? -1 : root.getName().lastIndexOf('.')) < resolved.getName().lastIndexOf('.')) {
+			// Update current submodel or add an error if the feature does not exist
+			boolean invalid = true;
+			Optional<UVLModel> sub;
+			// Find submodel declaring the current feature, iterate in case a submodel has an imported root feature
+			while ((sub = Arrays.stream(submodel.getSubmodels())
+					.filter(m -> Arrays.stream(m.getRootFeatures()).map(Feature::getName).anyMatch(resolved.getName()::equals)).findFirst()).isPresent()) {
+				submodel = sub.get();
+				invalid = false;
+			}
+			if (invalid) {
+				pl.add(new Problem("Feature " + resolved.getName() + " does not exist", 0, Severity.ERROR));
+			}
+
+			// Check for invalid attributes and child groups
+			if (!f.getAttributes().isEmpty()) {
+				pl.add(new Problem("Invalid attribute of imported feature " + f.getName(), 0, Severity.ERROR));
+			}
+			if (f.getGroups().length != 0) {
+				pl.add(new Problem("Invalid group of imported feature " + f.getName(), 0, Severity.ERROR));
 			}
 		}
+		final UVLModel finalSubmodel = submodel;
+
 		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
 		if (resolved.getName().contains(".")) {
 			feature.setType(MultiFeature.TYPE_INTERFACE);
@@ -160,12 +181,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root.getStructure().addChild(feature.getStructure());
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
-		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
+		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
 		parseAttributes(resolved, fm);
 		return feature;
 	}
 
-	private void parseGroup(MultiFeatureModel fm, IFeature root, Group g) {
+	private void parseGroup(MultiFeatureModel fm, IFeature root, Group g, UVLModel submodel) {
 		if ("cardinality".equals(g.getType())) {
 			if ((g.getLower() == 1) && (g.getUpper() == -1)) {
 				g.setType("or");
@@ -182,7 +203,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 						0, Severity.WARNING));
 			}
 		}
-		final List<IFeature> children = Stream.of(g.getChildren()).map(f -> parseFeature(fm, root, (Feature) f)).collect(Collectors.toList());
+		final List<IFeature> children = Stream.of(g.getChildren()).map(f -> parseFeature(fm, root, (Feature) f, submodel)).collect(Collectors.toList());
 		switch (g.getType()) {
 		case "or":
 			root.getStructure().setOr();
