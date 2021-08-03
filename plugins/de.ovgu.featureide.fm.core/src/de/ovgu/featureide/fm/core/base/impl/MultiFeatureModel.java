@@ -28,6 +28,8 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -205,6 +207,26 @@ public class MultiFeatureModel extends FeatureModel {
 
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
+	}
+
+	/**
+	 * Tests if the given path has a reference as a model this composed model uses.
+	 *
+	 * @param path - {@link IPath}
+	 * @return boolean
+	 */
+	public boolean references(IPath path) {
+		// Convert the project-relative path to a model reference.
+		String modelString = path.removeTrailingSeparator().toString();
+		modelString = modelString.split("\\.")[0];
+		modelString = modelString.replace('/', '.');
+
+		for (final UsedModel usedModel : usedModels.values()) {
+			if (usedModel.modelName.equals(modelString)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<Equation> getAttributConstraints() {
