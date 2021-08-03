@@ -87,6 +87,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -168,6 +169,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			textEditor.resetTextEditor();
 			setPageModified(false);
 		}
+
 	}
 
 	@Override
@@ -254,9 +256,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			if (delta == null) {
 				return;
 			}
+			// Get affected file.
 			while (delta.getAffectedChildren().length != 0) {
 				delta = delta.getAffectedChildren()[0];
 			}
+			// Handle Deletion.
 			if ((delta.getKind() == IResourceDelta.REMOVED) && delta.getResource().equals(inputFile)) {
 				Display.getDefault().asyncExec(new Runnable() {
 
@@ -275,6 +279,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 						}
 					}
 				});
+			}
+			// Ask if this editor manages a MultiFeatureModel, and the resource changed
+			// contains a submodel this model uses.
+			final IFeatureModel model = getOriginalFeatureModel();
+			if (model instanceof MultiFeatureModel) {
+				final MultiFeatureModel multiModel = (MultiFeatureModel) model;
+				if (multiModel.references(delta.getProjectRelativePath())) {
+					Logger.logInfo("Changed a model this multi feature model uses.");
+					// TODO Read the changed model without overwrite, as it marks the unchanged composed model as dirty.
+					fmManager.overwrite();
+				}
 			}
 		}
 
