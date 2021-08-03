@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -76,6 +77,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private static final String NS_ATTRIBUTE_NAME = "namespace";
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
+
+	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
 
 	private UVLModel rootModel;
 	private ProblemList pl;
@@ -375,6 +378,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean supportsWrite() {
 		return true;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return !content.toString().contains(EXTENDED_ATTRIBUTE_NAME);
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return supportsContent((CharSequence) reader);
 	}
 
 	@Override

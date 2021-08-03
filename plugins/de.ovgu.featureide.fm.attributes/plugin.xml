@@ -18,6 +18,11 @@
             id="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
             name="XmlExtendedFeatureModelFormat">
       </fmFormat>
+      <fmFormat
+            class="de.ovgu.featureide.fm.attributes.format.UVLExtendedFeatureModelFormat"
+            id="de.ovgu.featureide.fm.attributes.format.UVLExtendedFeatureModelFormat"
+            name="UVLExtendedFeatureModelFormat">
+      </fmFormat>
    </extension>
    <extension
          point="de.ovgu.featureide.fm.core.FMFactory">
