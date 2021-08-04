@@ -35,9 +35,9 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 /**
- * Provides all data needed for the FeatureIDE Outline A provider consists of: <ul> <li>OutlineTreeContentProvider</li> <li>OutlineLabelProvider</li>
+ * Provides all data needed for the FeatureIDE Outline. A provider consists of: <ul> <li>OutlineTreeContentProvider</li> <li>OutlineLabelProvider</li>
  * <li>ContextMenuActions</li> <li>ToolbarActions</li> <li>Filters</li> </ul> A check is performed to determine if the provider is applicable through the
- * isSupported method
+ * {@link OutlineProvider#isSupported} method.
  *
  * @author Christopher Sontag
  */
