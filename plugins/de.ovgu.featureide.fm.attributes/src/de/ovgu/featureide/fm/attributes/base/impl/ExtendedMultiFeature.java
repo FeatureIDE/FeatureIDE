@@ -74,4 +74,11 @@ public class ExtendedMultiFeature extends MultiFeature {
 	public ExtendedMultiFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new ExtendedMultiFeature(this, newFeatureModel, newStructure);
 	}
+
+	@Override
+	public String createTooltip(Object... objects) {
+		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
+
+		return ExtendedFeature.createExtendedTooltip(attributes, tooltip);
+	}
 }

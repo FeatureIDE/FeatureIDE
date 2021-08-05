@@ -87,6 +87,12 @@ public class ExtendedFeature extends Feature {
 	@Override
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
+
+		return createExtendedTooltip(attributes, tooltip);
+
+	}
+
+	public static String createExtendedTooltip(List<IFeatureAttribute> attributes, StringBuilder tooltip) {
 		tooltip.append("\n\n");
 
 		StringBuilder attributesString = new StringBuilder();
@@ -162,6 +168,5 @@ public class ExtendedFeature extends Feature {
 			}
 		}
 		return tooltip.toString();
-
 	}
 }

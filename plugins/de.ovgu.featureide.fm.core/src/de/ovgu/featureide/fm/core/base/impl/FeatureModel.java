@@ -480,7 +480,7 @@ public class FeatureModel implements IFeatureModel {
 		return sb.toString();
 	}
 
-	private void print(List<IConstraint> constraints, StringBuilder sb) {
+	protected void print(List<IConstraint> constraints, StringBuilder sb) {
 		for (int i = 0; i < constraints.size(); i++) {
 			sb.append("[");
 			sb.append(new NodeWriter(constraints.get(i).getNode()).nodeToString());

@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
@@ -28,7 +34,73 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
  */
 public class ExtendedMultiFeatureModel extends MultiFeatureModel {
 
+	private IFeatureModelFactory factory;
+
+	public ExtendedMultiFeatureModel(ExtendedMultiFeatureModel copyFeatureModel, ExtendedMultiFeature newRoot) {
+		super(copyFeatureModel, newRoot);
+
+		try {
+			factory = FMFactoryManager.getInstance().getFactory(factoryID);
+		} catch (NoSuchExtensionException e) {
+			factory = new ExtendedMultiFeatureModelFactory();
+		}
+	}
+
 	public ExtendedMultiFeatureModel(String factoryID) {
 		super(factoryID);
+
+		try {
+			factory = FMFactoryManager.getInstance().getFactory(factoryID);
+		} catch (NoSuchExtensionException e) {
+			factory = new ExtendedMultiFeatureModelFactory();
+		}
+	}
+
+	@Override
+	public void createDefaultValues(CharSequence projectName) {
+		String rootName = getValidJavaIdentifier(projectName);
+		if (rootName.isEmpty()) {
+			rootName = "Root";
+		}
+		if (featureTable.isEmpty()) {
+			final IFeature root = factory.createFeature(this, rootName);
+			structure.setRoot(root.getStructure());
+			addFeature(root);
+		}
+		final IFeature feature = factory.createFeature(this, "Base");
+		addFeature(feature);
+
+		structure.getRoot().addChild(feature.getStructure());
+		structure.getRoot().setAbstract(true);
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("ExtendedMultiFeatureModel(");
+		if (getStructure().getRoot() != null) {
+			sb.append("Structure=[");
+			FeatureUtils.print(getStructure().getRoot().getFeature(), sb);
+			sb.append("], Constraints=[");
+			print(getConstraints(), sb);
+			sb.append("], ");
+		} else {
+			sb.append("Feature model without root feature.");
+		}
+		final StringBuilder features = new StringBuilder();
+		final String[] feat = featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
+		for (int i = 0; i < feat.length; i++) {
+			features.append(feat[i]);
+			if ((i + 1) < feat.length) {
+				features.append(", ");
+			}
+		}
+		sb.append("Features=[" + (features.length() > 0 ? features.toString() : ""));
+		sb.append("])");
+		return sb.toString();
+	}
+
+	@Override
+	public FeatureModel clone() {
+		return new ExtendedMultiFeatureModel(this, null);
 	}
 }

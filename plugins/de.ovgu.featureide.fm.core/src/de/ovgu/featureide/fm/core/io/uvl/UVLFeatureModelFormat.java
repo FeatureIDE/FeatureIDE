@@ -81,8 +81,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
 
 	private UVLModel rootModel;
-	private ProblemList pl;
+	protected ProblemList pl;
 	private IFeatureModel fm;
+	protected MultiFeatureModelFactory factory;
 
 	@Override
 	public String getName() {
@@ -129,13 +130,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
+		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
 		IFeature root;
 		if (rootModel.getRootFeatures().length == 1) {
 			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f);
 		} else {
-			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
+			root = factory.createFeature(fm, "Root");
 			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f));
 		}
 		fm.getStructure().setRoot(root.getStructure());
@@ -148,7 +150,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
-		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		final MultiFeature feature = factory.createFeature(fm, resolved.getName());
 		if (resolved.getName().contains(".")) {
 			feature.setType(MultiFeature.TYPE_INTERFACE);
 		}
@@ -224,7 +226,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		try {
 			final Node constraint = parseConstraint(c);
 			if (constraint != null) {
-				final MultiConstraint newConstraint = MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint);
+				final MultiConstraint newConstraint = factory.createConstraint(fm, constraint);
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
