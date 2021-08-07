@@ -2,7 +2,9 @@ package de.ovgu.featureide.fm.attributes.format;
 
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 
@@ -11,8 +13,18 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	public static final String ID = PluginID.PLUGIN_ID + ".format." + UVLExtendedFeatureModelFormat.class.getSimpleName();
 
 	@Override
+	public String getName() {
+		return "Extended UVL";
+	}
+
+	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public APersistentFormat<IFeatureModel> getInstance() {
+		return new UVLExtendedFeatureModelFormat();
 	}
 
 	// Override

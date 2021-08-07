@@ -26,8 +26,8 @@ import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 
 /**
  * Factory for {@link ExtendedMultiFeatureModel}. Creates feature models, features and constraints for extended multi feature models.
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
  * @author Rahel Arens
  * @author Johannes Herschel
  */
-public class ExtendedMultiFeatureModelFactory implements IFeatureModelFactory {
+public class ExtendedMultiFeatureModelFactory extends MultiFeatureModelFactory {
 
 	public static final String ID = FMAttributesPlugin.PLUGIN_ID + ".base.impl.ExtendedMultiFeatureModelFactory";
 
