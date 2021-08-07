@@ -31,6 +31,11 @@
             id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
             name="ExtendedFeatureModelFactory">
       </fmFactory>
+      <fmFactory
+            class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory"
+            id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory"
+            name="ExtendedMultiFeatureModelFactory">
+      </fmFactory>
    </extension>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">

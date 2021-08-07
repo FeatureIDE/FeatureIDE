@@ -160,7 +160,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
 		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g));
-		parseAttributes(resolved, fm);
+		parseAttributes(fm, feature, resolved);
 		return feature;
 	}
 
@@ -201,16 +201,17 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
-	private void parseAttributes(Feature f, MultiFeatureModel fm) {
-		UVLParser.getAttributes(f).entrySet().stream().filter(e -> e.getKey().equals("constraint") || e.getKey().equals("constraints"))
-				.forEach(e -> parseAttribute(fm, e.getValue()));
+	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature f) {
+		UVLParser.getAttributes(f).entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
 	}
 
-	private void parseAttribute(MultiFeatureModel fm, Object value) {
-		if (value instanceof List<?>) {
-			((List<?>) value).forEach(v -> parseConstraint(fm, v));
-		} else {
-			parseConstraint(fm, value);
+	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
+		if (attributeKey.equals("constraint") || attributeKey.equals("constraints")) {
+			if (attributeValue instanceof List<?>) {
+				((List<?>) attributeValue).forEach(v -> parseConstraint(fm, v));
+			} else {
+				parseConstraint(fm, attributeValue);
+			}
 		}
 	}
 
