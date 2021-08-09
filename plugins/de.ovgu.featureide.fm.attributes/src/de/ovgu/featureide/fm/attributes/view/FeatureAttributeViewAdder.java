@@ -33,10 +33,12 @@ import de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorListener;
  * @author Benedikt Jutz
  * @author Johannes Herschel
  */
-public class FeatureModelEditorListener implements IFeatureModelEditorListener {
+public class FeatureAttributeViewAdder implements IFeatureModelEditorListener {
 
 	/**
-	 * Opens FeatureAttributeView when an extended feature model is opened.
+	 * Opens the FeatureAttributeView whenever an editor with an {@link ExtendedFeatureModel} is opened.
+	 * 
+	 * @param editor - {@link FeatureModelEditor}
 	 */
 	@Override
 	public void editorOpened(FeatureModelEditor editor) {

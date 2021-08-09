@@ -6,7 +6,7 @@
          <meta.schema plugin="de.ovgu.featureide.fm.ui" id="de.ovgu.featureide.fm.ui.FMEditorListener" name="FMEditorListener"/>
       </appInfo>
       <documentation>
-         Extension point to register listeners for the FeatureModelEditor.
+         Extension Point to register external listeners for the FeatureModelEditor. Any extension needs to implement the IFeatureModelEditorListener interface.
       </documentation>
    </annotation>
 
@@ -50,7 +50,7 @@
    <element name="listener">
       <annotation>
          <documentation>
-            Listener to be notified when a new FeatureModelEditor is opened.
+            Listener that will be notified whenever a new FeatureModelEditor is opened.
          </documentation>
       </annotation>
       <complexType>
@@ -72,7 +72,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         3.8.0
       </documentation>
    </annotation>
 
@@ -81,7 +81,7 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         The de.ovgu.featureide.fm.attributes plug-in uses this extension point in de.ovgu.featureide.fm.attributes.view.FeatureAttributeViewAdder.
       </documentation>
    </annotation>
 
@@ -90,7 +90,9 @@
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         The interface required for the implementation, IFeatureModelEditorListener, contains the
+editorOpened method, that has the last opened FeatureModelEditor as parameter. A listener may access
+this editor, for example to add additional views that aren&apos;t part of the base Feature Modelling UI.
       </documentation>
    </annotation>
 
