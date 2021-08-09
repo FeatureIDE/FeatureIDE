@@ -44,11 +44,16 @@ import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IActionBars;
@@ -97,6 +102,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTreeEditorPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
+import de.ovgu.featureide.fm.ui.handlers.FMExportHandler;
 
 /**
  * A view to help the user of managing attributes of {@link ExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
@@ -105,6 +111,8 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
  * @author Chico Sundermann
  */
 public class FeatureAttributeView extends ViewPart implements IEventListener {
+
+	public static final String ID = FMAttributesPlugin.PLUGIN_ID + ".view.FeatureAttributeView";
 
 	public enum FeatureAttributeOperationMode {
 
@@ -137,9 +145,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public final static String synch_tree = "synch_tree.gif";
 	private final HashMap<String, Image> cachedImages;
 
+	// Components for the actual Feature Attribute View.
 	private Tree tree;
 	private TreeViewer treeViewer;
-	private GridLayout layout;
+	private StackLayout layout;
 	private MenuManager menuManager;
 	private final String COLUMN_ELEMENT = "Element";
 	private final String COLUMN_TYPE = "Type";
@@ -147,6 +156,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private final String COLUMN_UNIT = "Unit";
 	private final String COLUMN_RECURSIVE = "Recursive";
 	private final String COLUMN_CONFIGURABLE = "Configureable";
+
+	// Components for the Extension Conversion view
+	/**
+	 * Composite for conversion controls.
+	 */
+	private Composite conversionContent;
+	/**
+	 * A label that advertises the user to convert the normal feature model/configuration to an extended one that supports attributes.
+	 */
+	private Label conversionAdvertLabel;
+	/**
+	 * A button the user can click to convert a normal feature model/configuration into an extended one.
+	 */
+	private Button conversionButton;
 
 	// EditingSupports
 	private FeatureAttributeNameEditingSupport nameEditingSupport;
@@ -240,8 +263,27 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		getSite().getPage().addPartListener(editorListener);
 
 		// Create Layout
-		layout = new GridLayout(2, false);
+		layout = new StackLayout();
 		parent.setLayout(layout);
+
+		conversionContent = new Composite(parent, SWT.NONE);
+		RowLayout conversionContentLayout = new RowLayout();
+		conversionContentLayout.center = true;
+		conversionContent.setLayout(conversionContentLayout);
+
+		// Create Label
+		conversionAdvertLabel = new Label(conversionContent, SWT.HORIZONTAL);
+		// Create and configure button
+		conversionButton = new Button(conversionContent, SWT.HORIZONTAL);
+		conversionButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				new FMExportHandler().singleAction(manager.getPath());
+			}
+		});
+		conversionButton.setText("Convert...");
+		conversionButton.pack();
 
 		// define the TableViewer
 		treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
@@ -267,8 +309,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			setEditorContent(null);
 		}
 
-		// create the contex menu
-		createContexMenu();
+		// create the context menu
+		createContextMenu();
 
 		// create a tree viewer editor to only activate the editing supports when double clicking a cell
 		createTreeViewerEditor();
@@ -352,7 +394,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		configureableEditingSupport = new FeatureAttributeConfigureableEditingSupport(this, treeViewer, true);
 	}
 
-	private void createContexMenu() {
+	private void createContextMenu() {
 		// Toolbar
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
@@ -467,6 +509,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				repackAllColumns();
 			}
 		}
+		showOrHideConversionElements();
 	}
 
 	private void setEmptyEditorContent() {
@@ -500,17 +543,17 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		editor.diagramEditor.addSelectionChangedListener(selectionListener);
 		if (editor.getSelectedPage() instanceof FeatureDiagramEditor) {
 			final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
+			manager = featureModelManager;
 			IFeatureModel curFeatureModel = featureModelManager.getVarObject();
 			if (curFeatureModel instanceof ExtendedFeatureModel) {
 				// Valid
-				manager = featureModelManager;
 				manager.addListener(this);
 				mode = FeatureAttributeOperationMode.FEATURE_DIAGRAM;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput(curFeatureModel);
 				}
 			} else {
-				// Wrong format
+				// Wrong format; hide tree and show label.
 				mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
 				if (!treeViewer.getControl().isDisposed()) {
 					treeViewer.setInput("");
@@ -531,10 +574,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		editor.addPageChangedListener(pageListener);
 		if (editor.getSelectedPage() instanceof ConfigurationTreeEditorPage) {
 			final ConfigurationManager configurationManager = editor.getConfigurationManager();
+			manager = configurationManager;
 			Configuration currentConfiguration = configurationManager.getVarObject();
 			if (currentConfiguration instanceof ExtendedConfiguration) {
 				// Valid
-				manager = configurationManager;
 				manager.addListener(this);
 				mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
 				if (!treeViewer.getControl().isDisposed()) {
@@ -556,6 +599,33 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 		treeViewer.expandAll();
 		repackAllColumns();
+	}
+
+	private void showOrHideConversionElements() {
+		boolean showExtended = mode == FeatureAttributeOperationMode.CONFIGURATION_EDITOR || mode == FeatureAttributeOperationMode.FEATURE_DIAGRAM;
+
+		// Show tree view for extended configurations and feature models, conversion content for anything else
+		layout.topControl = showExtended ? tree : conversionContent;
+
+		// Hide the button if we do not show a normal feature configuration or model to convert.
+		if (!conversionButton.isDisposed()) {
+			conversionButton.setVisible(
+					mode == FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL || mode == FeatureAttributeOperationMode.NON_EXTENDED_CONFIGURATION);
+		}
+
+		// Hide the text label when we do not show an extended feature model or configuration.
+		if (!conversionAdvertLabel.isDisposed()) {
+			if (!showExtended) {
+				conversionAdvertLabel.setText(mode.getMessage().toString());
+				conversionAdvertLabel.pack();
+			}
+		}
+
+		// Update layout
+		if (!conversionContent.isDisposed()) {
+			conversionContent.layout();
+			conversionContent.getParent().layout();
+		}
 	}
 
 	@Override

@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
- de.ovgu.featureide.core
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.base,
