@@ -1194,6 +1194,19 @@
          </with>
       </visibleWhen>
    </command>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.exportAs"
+         icon="icons/export_icon.gif"
+         id="de.ovgu.featureide.fm.ui.actions.exportAs"
+         label="Export As"
+         style="push">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
+         </reference>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 
 		<menuContribution
@@ -1314,6 +1327,10 @@
         id="de.ovgu.featureide.ui.commands.buildPartialProject"
         name="Build Partial Project">
   </command>
+  <command
+        id="de.ovgu.featureide.ui.commands.exportAs"
+        name="Export As">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1352,6 +1369,10 @@
   <handler
         class="de.ovgu.featureide.ui.handlers.BuildPartialProjectHandler"
         commandId="de.ovgu.featureide.ui.commands.buildPartialProject">
+  </handler>
+  <handler
+        class="de.ovgu.featureide.ui.handlers.ExportAsHandler"
+        commandId="de.ovgu.featureide.ui.commands.exportAs">
   </handler>
 	</extension>
 	<extension
