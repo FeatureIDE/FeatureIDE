@@ -232,8 +232,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private ReverseOrderAction reverseOrderAction;
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
 
+	/**
+	 * Different actions for different layouts and possible calculations
+	 */
 	private List<Action> setLayoutActions, calculationActions;
-	private List<Action> setNameTypeActions;
+	/**
+	 * Actions to toggle between short and long names.
+	 */
+	private NameTypeSelectionAction shortNamesAction;
+	private NameTypeSelectionAction longNamesAction;
 	private final List<Action> actions = new ArrayList<>();
 
 	private int index;
@@ -308,9 +315,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// View actions
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
 		legendAction = addAction(new LegendAction(viewer, graphicalFeatureModel));
-		setNameTypeActions = new ArrayList<>(2);
-		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1)));
-		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0)));
+		// Name view actions
+		shortNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0));
+		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1));
 
 		// Calculation actions
 		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModelManager));
@@ -1183,6 +1190,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	/**
+	 * Creates a MenuManager with the short/long name labels.
+	 *
+	 * @return new {@link MenuManager}
+	 */
 	private MenuManager createNameTypeMenuManager() {
 		final MenuManager menuManager = new MenuManager(SET_NAME_TYPE);
 		menuManager.setRemoveAllWhenShown(true);
@@ -1190,12 +1202,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				for (final Action action : setNameTypeActions) {
-					menuManager.add(action);
-				}
-				final Action selectedAction = setNameTypeActions.get((graphicalFeatureModel.getLayout().showShortNames()) ? 1 : 0);
-				selectedAction.setChecked(true);
-				selectedAction.setEnabled(false);
+				// Add actions
+				menuManager.add(shortNamesAction);
+				menuManager.add(longNamesAction);
+
+				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
+				shortNamesAction.setEnabled(!useShortNames);
+				shortNamesAction.setChecked(useShortNames);
+				longNamesAction.setEnabled(useShortNames);
+				longNamesAction.setChecked(!useShortNames);
 			}
 		});
 		return menuManager;
@@ -1246,7 +1261,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
-			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createNameTypeMenuManager());
 		}
 		if (isFeatureMenu(selection)) {
@@ -1299,7 +1313,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor
-			if(!graphicalFeatureModel.getConstraintsHidden()) {
+			if (!graphicalFeatureModel.getConstraintsHidden()) {
 				menuManager.add(showCollapsedConstraintsAction);
 			}
 			menuManager.add(new Separator());
