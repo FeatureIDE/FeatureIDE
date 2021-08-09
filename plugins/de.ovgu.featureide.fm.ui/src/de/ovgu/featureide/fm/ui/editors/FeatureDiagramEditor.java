@@ -316,8 +316,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
 		legendAction = addAction(new LegendAction(viewer, graphicalFeatureModel));
 		// Name view actions
-		shortNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0));
-		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1));
+		shortNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, true));
+		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, false));
 
 		// Calculation actions
 		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModelManager));
