@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
@@ -73,6 +74,11 @@ public class VirtualFeatureModelManager extends VirtualManager<IFeatureModel> im
 	@Override
 	public FeatureModelFormula getVariableFormula() {
 		return variableFormula;
+	}
+
+	@Override
+	public void informImports(FeatureIDEEvent e) {
+		// TODO
 	}
 
 }
