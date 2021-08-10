@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.core.io.uvl;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -310,12 +311,18 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final Feature f = new Feature();
 		f.setName(feature.getName());
 		if (!f.getName().contains(".")) { // exclude references
-			if (feature.getStructure().isAbstract()) {
-				f.setAttributes(Collections.singletonMap("abstract", true));
-			}
+			f.setAttributes(printAttributes(feature));
 			f.setGroups(printGroups(feature));
 		}
 		return f;
+	}
+
+	protected Map<String, Object> printAttributes(IFeature feature) {
+		final Map<String, Object> attributes = new TreeMap<>();
+		if (feature.getStructure().isAbstract()) {
+			attributes.put("abstract", true);
+		}
+		return attributes;
 	}
 
 	private Group constructGroup(IFeatureStructure fs, String type, Predicate<IFeatureStructure> pred) {
