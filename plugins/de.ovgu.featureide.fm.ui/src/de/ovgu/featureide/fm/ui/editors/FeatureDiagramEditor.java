@@ -1031,6 +1031,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;
 		}
+
+		if (!recentEvents.isEmpty()) {
+			final FeatureIDEEvent e = recentEvents.remove(0);
+			graphicalFeatureModel.getFeatureModelManager().informImports(e);
+		}
 	}
 
 	/**

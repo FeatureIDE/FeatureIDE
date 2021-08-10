@@ -25,11 +25,14 @@ import java.nio.file.Path;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -176,6 +179,32 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	public static FeatureModelAnalyzer getAnalyzer(IFeatureModel fm) {
 		return new FeatureModelAnalyzer(new FeatureModelFormula(fm));
+	}
+
+	@Override
+	public void informImports(FeatureIDEEvent e) {
+
+		// Für jeden Listener möchte man überprüfen, ob sich dieser auf ein Feature Modell bezieht, welches genau das Modell importiert, welches dieser
+		// FeatureModelManager verwaltet.
+
+		// Problem: Zyklische Abhängigkeit zwischen fm.core und fm.ui über FeatureModelEditor
+		for (final IEventListener i : getListeners()) {
+			if (i instanceof FeatureModelEditor) {
+				final FeatureModelEditor fme = (FeatureModelEditor) i;
+				final IFeatureModel fm = fme.getFeatureModelManager().getObject();
+				if (fm instanceof MultiFeatureModel) {
+					final MultiFeatureModel mfm = (MultiFeatureModel) fm;
+//					Map<String, UsedModels> m = ((MultiFeatureModel) fm).getExternalModels();
+//					mfm.references(IPT);
+				}
+			}
+			System.out.println(i);
+			i.propertyChange(e);
+		}
+
+//		for (final FeatureModelManager fmi : ) {
+//			fmi.fireEvent(e);
+//		}
 	}
 
 }
