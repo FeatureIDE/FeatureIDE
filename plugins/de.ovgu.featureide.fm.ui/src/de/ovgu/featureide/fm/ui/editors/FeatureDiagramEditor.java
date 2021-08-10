@@ -253,6 +253,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private Explanation<?> activeExplanation;
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
+	/**
+	 * recentEvents holds all events that occurred on this feature model after its last save. These can be used by other feature models that reference this
+	 * model to update themselves.
+	 */
+	private final List<FeatureIDEEvent> recentEvents;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -266,6 +271,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		graphicalFeatureModel = gfm;
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
 		fmManager.addListener(this);
+		recentEvents = new ArrayList<>();
 		createActions();
 
 		FeatureColorManager.addListener(this);
@@ -649,6 +655,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case FEATURE_ADD_SIBLING:
 			// Update the Edit part registry; try to make the edit part for the sibling feature available.
@@ -667,6 +674,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setDirty();
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
@@ -705,6 +713,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			openRenameEditor(newFeature);
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case FEATURE_NAME_CHANGED:
 			final String newValue = (String) event.getNewValue();
@@ -722,6 +731,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.reload();
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			updateFeatureNameTypes();
@@ -730,6 +740,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case GROUP_TYPE_CHANGED:
 			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) source, graphicalFeatureModel)) {
@@ -737,15 +748,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
 			setDirty();
 			viewer.internRefresh(false);
+			recentEvents.add(event);
 			break;
 		case LOCATION_CHANGED:
 			viewer.internRefresh(true);
 			setDirty();
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
@@ -786,6 +800,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			recentEvents.add(event);
 			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
@@ -834,8 +849,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.deselectAll();
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case MODEL_DATA_SAVED:
+
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			graphicalFeatureModel.writeValues();
@@ -937,6 +954,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			viewer.reload();
 			refreshGraphics(null);
+			recentEvents.add(event);
 			break;
 		case DEPENDENCY_CALCULATED:
 			setDirty();
@@ -996,6 +1014,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			if (!graphicalFeatureModel.isLegendHidden()) {
 				viewer.layoutLegendOnIntersect();
 			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
 			setDirty();
@@ -1004,6 +1023,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				final IGraphicalFeature graphicalAttributeChangedFeature = graphicalFeatureModel.getGraphicalFeature(attributeChangedFeature);
 				graphicalAttributeChangedFeature.update(event);
 			}
+			recentEvents.add(event);
 			break;
 		case DEFAULT:
 			break;
@@ -1043,6 +1063,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// open the renaming command
 			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
 		}
+	}
+
+	public List<FeatureIDEEvent> getRecentEvents() {
+		return recentEvents;
 	}
 
 	@Override
