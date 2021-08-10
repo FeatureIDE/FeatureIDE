@@ -60,9 +60,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
@@ -99,7 +99,7 @@ import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTreeEditorPag
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 
 /**
- * A view to help the user of managing attributes of {@link ExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
+ * A view to help the user of managing attributes of {@link IExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
@@ -368,7 +368,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				final IStructuredSelection selection = treeViewer.getStructuredSelection();
 				if (!selection.isEmpty() && mode == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
 					FeatureModelManager fmManager = (FeatureModelManager) FeatureAttributeView.this.manager;
-					if ((selection.size() == 1) && (selection.getFirstElement() instanceof ExtendedFeature)) {
+					if ((selection.size() == 1) && (selection.getFirstElement() instanceof IExtendedFeature)) {
 						final String featureName = selection.getFirstElement().toString();
 						// Add actions to create new attributes
 						menuManager.add(new AddFeatureAttributeAction(fmManager, featureName, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
@@ -501,7 +501,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (editor.getSelectedPage() instanceof FeatureDiagramEditor) {
 			final FeatureModelManager featureModelManager = editor.getFeatureModelManager();
 			IFeatureModel curFeatureModel = featureModelManager.getVarObject();
-			if (curFeatureModel instanceof ExtendedFeatureModel) {
+			if (curFeatureModel instanceof IExtendedFeatureModel) {
 				// Valid
 				manager = featureModelManager;
 				manager.addListener(this);
@@ -578,9 +578,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				}
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ADD) {
-			if (event.getSource() instanceof ExtendedFeatureModel) {
-				ExtendedFeature feature = (ExtendedFeature) event.getNewValue();
-				for (IFeatureAttribute att : ((ExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
+			if (event.getSource() instanceof IExtendedFeatureModel) {
+				IExtendedFeature feature = (IExtendedFeature) event.getNewValue();
+				for (IFeatureAttribute att : ((IExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
 						feature.addAttribute(att.cloneRecursive(feature));
 					}
@@ -590,13 +590,13 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		} else if (event.getEventType() == EventType.STRUCTURE_CHANGED) {
 			if (event.getSource() instanceof GraphicalFeature) {
 				GraphicalFeature graphFeat = (GraphicalFeature) event.getSource();
-				ExtendedFeature feat = (ExtendedFeature) graphFeat.getObject();
+				IExtendedFeature feat = (IExtendedFeature) graphFeat.getObject();
 				for (IFeatureAttribute att : feat.getAttributes()) {
-					if (att.isRecursive() && !((ExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
+					if (att.isRecursive() && !((IExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
 						feat.removeAttribute(att);
 					}
 				}
-				for (IFeatureAttribute att : ((ExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
+				for (IFeatureAttribute att : ((IExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
 						if (!feat.isContainingAttribute(att)) {
 							feat.addAttribute(att.cloneRecursive(feat));

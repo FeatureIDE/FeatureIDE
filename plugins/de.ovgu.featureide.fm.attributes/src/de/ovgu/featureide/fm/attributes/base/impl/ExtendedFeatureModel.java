@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -32,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
  * @author Joshua Sprey
  * @author Chico SUndermann
  */
-public class ExtendedFeatureModel extends FeatureModel {
+public class ExtendedFeatureModel extends FeatureModel implements IExtendedFeatureModel {
 
 	IFeatureModelFactory factory;
 

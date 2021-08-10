@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -33,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
  * @author Rahel Arens
  * @author Johannes Herschel
  */
-public class ExtendedMultiFeature extends MultiFeature {
+public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeature {
 
 	protected List<IFeatureAttribute> attributes;
 
@@ -54,18 +55,22 @@ public class ExtendedMultiFeature extends MultiFeature {
 		}
 	}
 
+	@Override
 	public List<IFeatureAttribute> getAttributes() {
 		return attributes;
 	}
 
+	@Override
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
 	}
 
+	@Override
 	public void removeAttribute(IFeatureAttribute attribute) {
 		attributes.remove(attribute);
 	}
 
+	@Override
 	public boolean isContainingAttribute(IFeatureAttribute attribute) {
 		return attributes.stream().anyMatch(a -> attribute.getName().equals(a.getName()));
 	}

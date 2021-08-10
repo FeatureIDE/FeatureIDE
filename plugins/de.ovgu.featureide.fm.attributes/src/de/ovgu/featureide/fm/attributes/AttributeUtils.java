@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.attributes;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -30,11 +30,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 public class AttributeUtils {
 
 //	public static String[] getNumericalAttributes(IFeatureModel featureModel) {
-//		if (featureModel instanceof ExtendedFeatureModel) {
-//			ExtendedFeatureModel extModel = (ExtendedFeatureModel) featureModel;
+//		if (featureModel instanceof IExtendedFeatureModel) {
+//			IExtendedFeatureModel extModel = (IExtendedFeatureModel) featureModel;
 //			List<String> numericalAttributeNames = new ArrayList<>();
 //			for (IFeature feat : extModel.getFeatures()) {
-//				ExtendedFeature ext = (ExtendedFeature) feat;
+//				IExtendedFeature ext = (IExtendedFeature) feat;
 //				for (IFeatureAttribute att : ext.getAttributes()) {
 //					if (isNumerical(att)) {
 //						numericalAttributeNames.add(att.getName());
@@ -50,11 +50,11 @@ public class AttributeUtils {
 //	}
 
 //	public static String[] getBooleanAttributes(IFeatureModel featureModel) {
-//		if (featureModel instanceof ExtendedFeatureModel) {
-//			ExtendedFeatureModel extModel = (ExtendedFeatureModel) featureModel;
+//		if (featureModel instanceof IExtendedFeatureModel) {
+//			IExtendedFeatureModel extModel = (IExtendedFeatureModel) featureModel;
 //			List<String> booleanAttributeNames = new ArrayList<>();
 //			for (IFeature feat : extModel.getFeatures()) {
-//				ExtendedFeature ext = (ExtendedFeature) feat;
+//				IExtendedFeature ext = (IExtendedFeature) feat;
 //				for (IFeatureAttribute att : ext.getAttributes()) {
 //					if (isBoolean(att)) {
 //						booleanAttributeNames.add(att.getName());
@@ -80,10 +80,10 @@ public class AttributeUtils {
 		if (attribute == null) {
 			return null;
 		}
-		if (featureModel instanceof ExtendedFeatureModel) {
-			ExtendedFeatureModel extModel = (ExtendedFeatureModel) featureModel;
+		if (featureModel instanceof IExtendedFeatureModel) {
+			IExtendedFeatureModel extModel = (IExtendedFeatureModel) featureModel;
 			for (IFeature feat : extModel.getFeatures()) {
-				ExtendedFeature ext = (ExtendedFeature) feat;
+				IExtendedFeature ext = (IExtendedFeature) feat;
 				for (IFeatureAttribute att : ext.getAttributes()) {
 					if (att.getName().equals(attribute)) {
 						return att.getUnit();
