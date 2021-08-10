@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -78,7 +78,7 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 
 	private double getSubtreeValue(IFeature root) {
 		double value = 0;
-		ExtendedFeature ext = (ExtendedFeature) root;
+		IExtendedFeature ext = (IExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
 			if (att.getName().equals(attribute.getName())) {
 				if (att instanceof LongFeatureAttribute) {
