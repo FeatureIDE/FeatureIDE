@@ -80,7 +80,7 @@ pipeline {
                     author = author.substring(1, author.length()-1)
                 }
                 def gitBranch = currentBuild.displayName.substring(currentBuild.displayName.indexOf('/')+1, currentBuild.displayName.indexOf('['))
-                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  'thomas.thuem@uni-ulm.de, Sebastian.Krieter@ovgu.de, chico.sundermann@uni-ulm.de, paul.westphal@tu-braunschweig.de, tobias.hess@uni-ulm.de'
+                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  'featureide@uni-ulm.de'
             }
         }
     }    
