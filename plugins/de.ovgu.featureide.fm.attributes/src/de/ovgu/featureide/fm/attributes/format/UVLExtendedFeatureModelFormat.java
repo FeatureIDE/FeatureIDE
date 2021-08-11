@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.format;
 
+import java.util.List;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -70,14 +71,59 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			super.parseAttribute(fm, feature, attributeKey, attributeValue);
 		} else if (!attributeKey.equals("abstract") && !attributeKey.equals(EXTENDED_ATTRIBUTE_NAME)) {
 			ExtendedMultiFeature extendedFeature = (ExtendedMultiFeature) feature;
-			if (attributeValue instanceof String) {
-				extendedFeature.addAttribute(new StringFeatureAttribute(extendedFeature, attributeKey, null, (String) attributeValue, false, false));
-			} else if (attributeValue instanceof Double) {
-				extendedFeature.addAttribute(new DoubleFeatureAttribute(extendedFeature, attributeKey, null, (Double) attributeValue, false, false));
-			} else if (attributeValue instanceof Long) {
-				extendedFeature.addAttribute(new LongFeatureAttribute(extendedFeature, attributeKey, null, (Long) attributeValue, false, false));
-			} else if (attributeValue instanceof Boolean) {
-				extendedFeature.addAttribute(new BooleanFeatureAttribute(extendedFeature, attributeKey, null, (Boolean) attributeValue, false, false));
+			if (attributeValue instanceof List<?>) {
+				List<?> attributeList = (List<?>) attributeValue;
+				if (attributeList.size() == 2 && attributeList.get(1) instanceof Map<?, ?>) {
+					Map<?, ?> attributeMap = (Map<?, ?>) attributeList.get(1);
+					Object value = attributeMap.get("value");
+					Object unitObj = attributeMap.get("unit");
+					String unit = unitObj instanceof String ? (String) unitObj : "";
+					Object recursiveObj = attributeMap.get("recursive");
+					boolean recursive = recursiveObj instanceof Boolean ? (Boolean) recursiveObj : false;
+					Object configurableObj = attributeMap.get("configurable");
+					boolean configurable = configurableObj instanceof Boolean ? (Boolean) configurableObj : false;
+					if (value == null) {
+						Object type = attributeMap.get("type");
+						createAttribute(extendedFeature, type instanceof String ? (String) type : null, attributeKey, value, unit, recursive, configurable);
+					} else {
+						createAttribute(extendedFeature, attributeKey, value, unit, recursive, configurable);
+					}
+				}
+			} else {
+				createAttribute(extendedFeature, attributeKey, attributeValue, "", false, false);
+			}
+		}
+	}
+
+	private void createAttribute(ExtendedMultiFeature feature, String key, Object value, String unit, boolean recursive, boolean configurable) {
+		String type = null;
+		if (value instanceof String) {
+			type = "string";
+		} else if (value instanceof Double) {
+			type = "double";
+		} else if (value instanceof Long) {
+			type = "long";
+		} else if (value instanceof Boolean) {
+			type = "boolean";
+		}
+		createAttribute(feature, type, key, value, unit, recursive, configurable);
+	}
+
+	private void createAttribute(ExtendedMultiFeature feature, String type, String key, Object value, String unit, boolean recursive, boolean configurable) {
+		if (type != null) {
+			switch (type) {
+			case "string":
+				feature.addAttribute(new StringFeatureAttribute(feature, key, unit, (String) value, recursive, configurable));
+				break;
+			case "double":
+				feature.addAttribute(new DoubleFeatureAttribute(feature, key, unit, (Double) value, recursive, configurable));
+				break;
+			case "long":
+				feature.addAttribute(new LongFeatureAttribute(feature, key, unit, (Long) value, recursive, configurable));
+				break;
+			case "boolean":
+				feature.addAttribute(new BooleanFeatureAttribute(feature, key, unit, (Boolean) value, recursive, configurable));
+				break;
 			}
 		}
 	}
