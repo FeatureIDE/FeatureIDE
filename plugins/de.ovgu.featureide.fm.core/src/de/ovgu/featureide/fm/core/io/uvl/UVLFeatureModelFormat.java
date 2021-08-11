@@ -261,7 +261,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
+		// Add the appropriate instance, and the import path.
 		fm.addInstance(i.getNamespace(), i.getAlias());
+		// Reconstruct the import path; add it to the import list.
+		String path = i.getNamespace().replaceAll("\\.", "/");
+		path += ".uvl";
+		fm.addImport(path);
 	}
 
 	/**
