@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -133,6 +134,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+
 		super.init(site, input);
 	}
 
@@ -143,6 +145,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
 			fmManager.removeListener(diagramEditor);
+			// TODO de-register from imported feature models; also de-register all importers.
 			fmManager.overwrite();
 		}
 		super.dispose();
@@ -169,7 +172,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			textEditor.resetTextEditor();
 			setPageModified(false);
 		}
-
+		// With update (of possible imports): re-register for imported feature models here on success
 	}
 
 	@Override
@@ -565,6 +568,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			gfm = new GraphicalFeatureModel(fmManager);
 			gfm.init();
 			FMPropertyManager.registerEditor(this);
+
+			// Register for imported feature models here.
+			if (fmManager.getObject() instanceof MultiFeatureModel) {
+				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
+				for (final String importPathString : mfm.getImports()) {
+					final Path importPath = FileSystems.getDefault().getPath(importPathString);
+					FeatureModelManager.getInstance(importPath).addImportListener(this);
+				}
+			}
 
 			final IFile modelFile = getModelFile();
 			final String modelFileName = modelFile.getName();

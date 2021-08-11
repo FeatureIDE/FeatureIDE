@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
@@ -29,10 +31,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -78,9 +78,14 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	protected Object undoContext = null;
+	/**
+	 * importers is a list of all listeners that need to be updated when the feature model managed through this model is changed.
+	 */
+	private final List<IEventListener> importers;
 
 	protected FeatureModelManager(Path identifier) {
 		super(identifier, FMFormatManager.getInstance(), FMFactoryManager.getInstance());
+		importers = new ArrayList<>();
 	}
 
 	@Override
@@ -181,6 +186,32 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		return new FeatureModelAnalyzer(new FeatureModelFormula(fm));
 	}
 
+	/**
+	 * Adds an listener that imports this feature model.
+	 *
+	 * @param listener - {@link IEventListener}
+	 */
+	public void addImportListener(IEventListener listener) {
+		importers.add(listener);
+	}
+
+	/**
+	 * Removes this listener from the import list.
+	 *
+	 * @param e - {@link IEventListener}
+	 */
+	public void removeImportListener(IEventListener e) {
+		importers.remove(e);
+	}
+
+	/**
+	 * Removes all listeners from the import list. Call this method when the feature model is closed and its changes need not to be propagated to (still opened)
+	 * importers anymore.
+	 */
+	public void removeAllListeners() {
+		importers.clear();
+	}
+
 	@Override
 	public void informImports(FeatureIDEEvent e) {
 
@@ -188,23 +219,9 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		// FeatureModelManager verwaltet.
 
 		// Problem: Zyklische Abhängigkeit zwischen fm.core und fm.ui über FeatureModelEditor
-		for (final IEventListener i : getListeners()) {
-			if (i instanceof FeatureModelEditor) {
-				final FeatureModelEditor fme = (FeatureModelEditor) i;
-				final IFeatureModel fm = fme.getFeatureModelManager().getObject();
-				if (fm instanceof MultiFeatureModel) {
-					final MultiFeatureModel mfm = (MultiFeatureModel) fm;
-//					Map<String, UsedModels> m = ((MultiFeatureModel) fm).getExternalModels();
-//					mfm.references(IPT);
-				}
-			}
-			System.out.println(i);
+		for (final IEventListener i : importers) {
 			i.propertyChange(e);
 		}
-
-//		for (final FeatureModelManager fmi : ) {
-//			fmi.fireEvent(e);
-//		}
 	}
 
 }

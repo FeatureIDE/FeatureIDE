@@ -1034,6 +1034,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		if (!recentEvents.isEmpty()) {
 			final FeatureIDEEvent e = recentEvents.remove(0);
+
 			graphicalFeatureModel.getFeatureModelManager().informImports(e);
 		}
 	}
