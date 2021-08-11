@@ -569,8 +569,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			// Register for imported feature models here.
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
 				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-				for (final String importPathString : mfm.getImports()) {
-					final Path importPath = FileSystems.getDefault().getPath(importPathString);
+				for (String importPathString : mfm.getImports()) {
+					importPathString = importPathString.replace("\\", ".");
+					final String[] paths = path.toString().split("/");
+					paths[paths.length - 1] = "";
+					String s = String.join("/", paths);
+					s += importPathString;
+					final Path importPath = FileSystems.getDefault().getPath(s);
 					FeatureModelManager.getInstance(importPath).addImportListener(this);
 				}
 			}
