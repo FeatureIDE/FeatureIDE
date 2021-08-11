@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.format;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,9 +138,35 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			attributes.put(EXTENDED_ATTRIBUTE_NAME, true);
 		}
 		for (IFeatureAttribute attr : extendedFeature.getAttributes()) {
-			attributes.put(attr.getName(), attr.getValue());
+			attributes.put(attr.getName(), printAttribute(attr));
 		}
 		return attributes;
+	}
+
+	private Object printAttribute(IFeatureAttribute attr) {
+		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
+			return attr.getValue();
+		} else {
+			Map<String, Object> attributeMap = new HashMap<>();
+			if (attr.isConfigurable()) {
+				attributeMap.put("configurable", true);
+			}
+			if (attr.isRecursive()) {
+				attributeMap.put("recursive", true);
+			}
+			if (attr.getUnit() != null && !attr.getUnit().equals("")) {
+				attributeMap.put("unit", attr.getUnit());
+			}
+			if (attr.getValue() == null) {
+				attributeMap.put("type", attr.getType());
+			} else {
+				attributeMap.put("value", attr.getValue());
+			}
+			List<Object> finalAttrList = new ArrayList<>();
+			finalAttrList.add(null);
+			finalAttrList.add(attributeMap);
+			return finalAttrList;
+		}
 	}
 
 	@Override
