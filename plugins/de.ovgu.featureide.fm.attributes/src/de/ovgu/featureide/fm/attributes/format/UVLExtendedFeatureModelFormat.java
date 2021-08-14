@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.attributes.format;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import clojure.lang.Symbol;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
@@ -147,25 +147,22 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
 			return attr.getValue();
 		} else {
-			Map<String, Object> attributeMap = new HashMap<>();
+			Map<Object, Object> attributeMap = new HashMap<>();
 			if (attr.isConfigurable()) {
-				attributeMap.put("configurable", true);
+				attributeMap.put(Symbol.create("configurable"), true);
 			}
 			if (attr.isRecursive()) {
-				attributeMap.put("recursive", true);
+				attributeMap.put(Symbol.create("recursive"), true);
 			}
 			if (attr.getUnit() != null && !attr.getUnit().equals("")) {
-				attributeMap.put("unit", attr.getUnit());
+				attributeMap.put(Symbol.create("unit"), attr.getUnit());
 			}
 			if (attr.getValue() == null) {
-				attributeMap.put("type", attr.getType());
+				attributeMap.put(Symbol.create("type"), attr.getType());
 			} else {
-				attributeMap.put("value", attr.getValue());
+				attributeMap.put(Symbol.create("value"), attr.getValue());
 			}
-			List<Object> finalAttrList = new ArrayList<>();
-			finalAttrList.add(null);
-			finalAttrList.add(attributeMap);
-			return finalAttrList;
+			return attributeMap;
 		}
 	}
 
