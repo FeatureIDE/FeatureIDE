@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.operations.IUndoContext;
@@ -96,6 +97,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -103,6 +105,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -156,6 +159,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Constr
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -246,6 +250,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private Explanation<?> activeExplanation;
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
+
 	/**
 	 * recentEvents holds all events that occurred on this feature model after its last save. These can be used by other feature models that reference this
 	 * model to update themselves.
@@ -720,22 +725,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			recentEvents.add(event);
 			break;
 		case FEATURE_NAME_CHANGED:
-			final String newValue = (String) event.getNewValue();
-			final IFeature feature = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeature(newValue);
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-			graphicalFeature.update(event);
-			final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
-			if (part != null) {// TODO move to FeatureEditPart
-				viewer.internRefresh(true);
-				viewer.deselectAll();
-				viewer.select(part);
-			} else {
-				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
-			}
-			viewer.reload();
-			setDirty();
-			analyzeFeatureModel();
-			recentEvents.add(event);
+			handleFeatureNameChanged(event);
+			break;
+		case IMPORTED_MODEL_CHANGED:
+			final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
+			final String modelAlias = extractModelAlias(event, mfm);
+
+			// Construct the original model name from originalPath.
+			final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
+			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
+
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -1046,9 +1045,55 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		if (!recentEvents.isEmpty()) {
 			final FeatureIDEEvent e = recentEvents.remove(0);
+			final FeatureIDEEvent e2 = new FeatureIDEEvent(fmManager.getObject(), EventType.IMPORTED_MODEL_CHANGED, null, e);
 
-			graphicalFeatureModel.getFeatureModelManager().informImports(e);
+			graphicalFeatureModel.getFeatureModelManager().informImports(e2);
 		}
+	}
+
+	/**
+	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that mfm imports. The imported model is stored in event.source.
+	 *
+	 * @param event - {@link FeatureIDEEvent} A IMPORTED_MODEL_CHANGED event.
+	 * @param mfm - {@link MultiFeatureModel} The importing feature model.
+	 * @return String
+	 */
+	private String extractModelAlias(FeatureIDEEvent event, final MultiFeatureModel mfm) {
+		final IFeatureModel originalModel = (IFeatureModel) event.getSource();
+		final Path originalPath = originalModel.getSourceFile();
+		// Original Path -> remove the first segment for the project, then the file extension.
+		final String originalPathString = FeatureModelManager.getProject(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
+		final String importedModelName = originalPathString.replace("/", ".");
+		String modelAlias = null;
+		for (final Entry<String, MultiFeatureModel.UsedModel> entry : mfm.getExternalModels().entrySet()) {
+			if (entry.getValue().getModelName().equals(importedModelName)) {
+				modelAlias = entry.getKey() + ".";
+				break;
+			}
+		}
+		return modelAlias;
+	}
+
+	/**
+	 * @param event
+	 */
+	private void handleFeatureNameChanged(FeatureIDEEvent event) {
+		final String newValue = (String) event.getNewValue();
+		final IFeature feature = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeature(newValue);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		graphicalFeature.update(event);
+		final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
+		if (part != null) {// TODO move to FeatureEditPart
+			viewer.internRefresh(true);
+			viewer.deselectAll();
+			viewer.select(part);
+		} else {
+			FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
+		}
+		viewer.reload();
+		setDirty();
+		analyzeFeatureModel();
+		recentEvents.add(event);
 	}
 
 	public List<FeatureIDEEvent> getRecentEvents() {
