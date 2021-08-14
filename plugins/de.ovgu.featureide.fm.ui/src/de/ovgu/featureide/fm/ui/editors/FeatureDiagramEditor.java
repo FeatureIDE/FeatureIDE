@@ -90,12 +90,15 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -1062,6 +1065,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case FEATURE_NAME_CHANGED:
 			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
 			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
+			break;
+		case FEATURE_ADD:
+			// For an added feature, find the added feature name and add the feature manually:
+			final IFeature originalParent = ((IFeature) oldEvent.getOldValue());
+			final IFeature originalChild = ((IFeature) oldEvent.getNewValue());
+			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(mfm);
+			// Find the new parent by name.
+			final IFeature newParent = mfm.getFeature(modelAlias + originalParent.getName());
+			// Make a new child with the appropriate name and add it to the new parent.
+			final IFeature newChild = factory.createFeature(mfm, modelAlias + originalChild);
+			mfm.addFeature(newChild);
+			newParent.getStructure().addChild(new FeatureStructure(newChild));
+			// Fire the correct event for this feature model.
+			propertyChange(new FeatureIDEEvent(mfm, EventType.FEATURE_ADD, newParent, newChild));
 			break;
 		default:
 			return;
