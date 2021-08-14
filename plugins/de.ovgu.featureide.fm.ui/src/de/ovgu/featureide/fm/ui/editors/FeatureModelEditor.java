@@ -84,6 +84,7 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
@@ -172,7 +173,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			textEditor.resetTextEditor();
 			setPageModified(false);
 		}
-		// With update (of possible imports): re-register for imported feature models here on success
+		// With update (of possible imports): also update imported feature models.
+		fmManager.informImports(new FeatureIDEEvent(monitor, EventType.MODEL_DATA_SAVED));
 	}
 
 	@Override
@@ -282,17 +284,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 						}
 					}
 				});
-			}
-			// Ask if this editor manages a MultiFeatureModel, and the resource changed
-			// contains a submodel this model uses.
-			final IFeatureModel model = getOriginalFeatureModel();
-			if (model instanceof MultiFeatureModel) {
-				final MultiFeatureModel multiModel = (MultiFeatureModel) model;
-				if (multiModel.references(delta.getProjectRelativePath())) {
-					Logger.logInfo("Changed a model this multi feature model uses.");
-					// TODO Read the changed model without overwrite, as it marks the unchanged composed model as dirty.
-					fmManager.overwrite();
-				}
 			}
 		}
 
@@ -697,9 +688,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		if (getActivePage() == getDiagramEditorIndex()) {
-			diagramEditor.propertyChange(event);
+		// Deal with saves in other models by saving the importer, too.
+		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
+			doSave((IProgressMonitor) event.getSource());
+			return;
 		}
+		diagramEditor.propertyChange(event);
 	}
 
 	public ProblemList checkModel(String source) {
