@@ -636,6 +636,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final EventType prop = event.getEventType();
 		final Object source = event.getSource();
 		switch (prop) {
+		case IMPORTED_MODEL_CHANGED:
+			handleChangeInImportedModel(event);
+			break;
 		case FEATURE_ADD_ABOVE:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			IFeature newCompound = null;
@@ -722,15 +725,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_NAME_CHANGED:
 			handleFeatureNameChanged(event);
-			break;
-		case IMPORTED_MODEL_CHANGED:
-			final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-			final String modelAlias = extractModelAlias(event, mfm);
-
-			// Construct the original model name from originalPath.
-			final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
-			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
-
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			updateFeatureNameTypes();
@@ -851,7 +845,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			recentEvents.add(event);
 			break;
 		case MODEL_DATA_SAVED:
-
+			recentEvents.add(event);
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			graphicalFeatureModel.writeValues();
@@ -1040,7 +1034,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	/**
-<<<<<<< Upstream, based on develop
 	 * Updates the feature name representations, both for features in the diagram and for all cross-tree-constraints they appear in.
 	 */
 	private void updateFeatureNameTypes() {
@@ -1070,7 +1063,32 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// open the renaming command
 			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
 		}
-=======
+	}
+
+	/**
+	 * Deals with a change that occurred in an imported feature model that can be found under event.getSource(). The original event to process is in
+	 * event.getNewValue.
+	 *
+	 * @param event - {@link FeatureIDEEvent}DE
+	 */
+	private void handleChangeInImportedModel(FeatureIDEEvent event) {
+		final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
+		// Construct the original model name from originalPath.
+		final String modelAlias = extractModelAlias(event, mfm);
+		// Extract the old event.
+		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
+
+		switch (oldEvent.getEventType()) {
+		case FEATURE_NAME_CHANGED:
+			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
+			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
+			break;
+		default:
+			return;
+		}
+	}
+
+	/**
 	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that mfm imports. The imported model is stored in event.source.
 	 *
 	 * @param event - {@link FeatureIDEEvent} A IMPORTED_MODEL_CHANGED event.
@@ -1113,7 +1131,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		setDirty();
 		analyzeFeatureModel();
 		recentEvents.add(event);
->>>>>>> 3b3036f Added new FeatureIDEEvent IMPORTED_MODEL_CHANGED
 	}
 
 	public List<FeatureIDEEvent> getRecentEvents() {
