@@ -573,6 +573,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
 				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
 				for (String importPathString : mfm.getImports()) {
+					// TODO Trennzeichen für Windows
 					importPathString = importPathString.replace("\\", ".");
 					final String[] paths = path.toString().split("/");
 					paths[paths.length - 1] = "";

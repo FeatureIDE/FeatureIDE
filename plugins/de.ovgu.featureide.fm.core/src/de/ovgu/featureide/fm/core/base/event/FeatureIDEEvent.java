@@ -78,6 +78,11 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
+		 * A change occurred in an imported model. source is the imported model that has been changed, and newValue contains the original
+		 * {@link FeatureIDEEvent} that occurred for source.
+		 */
+		IMPORTED_MODEL_CHANGED,
+		/**
 		 * A feature's name was changed and persistently saved.
 		 */
 		FEATURE_NAME_PERSISTENTLY_CHANGED,

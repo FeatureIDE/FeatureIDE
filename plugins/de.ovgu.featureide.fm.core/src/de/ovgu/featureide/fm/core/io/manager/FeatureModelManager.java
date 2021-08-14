@@ -20,11 +20,20 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -78,6 +87,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	protected Object undoContext = null;
+
 	/**
 	 * importers is a list of all listeners that need to be updated when the feature model managed through this model is changed.
 	 */
@@ -218,9 +228,29 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 		// Für jeden Listener möchte man überprüfen, ob sich dieser auf ein Feature Modell bezieht, welches genau das Modell importiert, welches dieser
 		// FeatureModelManager verwaltet.
 
-		// Problem: Zyklische Abhängigkeit zwischen fm.core und fm.ui über FeatureModelEditor
 		for (final IEventListener i : importers) {
 			i.propertyChange(e);
+		}
+	}
+
+	/**
+	 * Looks up the project-relative Eclipse path for the given Java file. With this method, we may get the project of a feature model file, for example.
+	 *
+	 * @param file - {@link File}
+	 * @return an {@link IProject} for the project file is contained in, or null otherwise.
+	 */
+	public static IPath getProject(File file) {
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		try {
+			final IPath path = org.eclipse.core.runtime.Path.fromOSString(file.getCanonicalPath());
+			final IFile fileForPath = workspace.getRoot().getFileForLocation(path);
+			if ((null == fileForPath) || !fileForPath.exists()) {
+				return null;
+			}
+			return fileForPath.getFullPath();
+		} catch (final IOException e) {
+			Logger.logError(e);
+			return null;
 		}
 	}
 
