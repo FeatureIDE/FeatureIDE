@@ -206,6 +206,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		UVLParser.getAttributes(f).entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
 	}
 
+	/**
+	 * This method parses an attribute that is contained in UVL under a feature to an attribute/constraint in the feature model.
+	 *
+	 * @param fm the featuremodel that is parsed from UVL
+	 * @param feature the feature that contains the attribute that is parsed
+	 * @param attributeKey the name of the attribute that is parsed
+	 * @param attributeValue the value of the attribute that is parsed
+	 */
 	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
 		if (attributeKey.equals("constraint") || attributeKey.equals("constraints")) {
 			if (attributeValue instanceof List<?>) {
@@ -317,6 +325,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return f;
 	}
 
+	/**
+	 * This method writes all attributes of the specified feature to a map that can be converted to UVL.
+	 *
+	 * @param feature the feature whose attributes are written
+	 * @return a map containing the attributes
+	 */
 	protected Map<String, Object> printAttributes(IFeature feature) {
 		final Map<String, Object> attributes = new TreeMap<>();
 		if (feature.getStructure().isAbstract()) {

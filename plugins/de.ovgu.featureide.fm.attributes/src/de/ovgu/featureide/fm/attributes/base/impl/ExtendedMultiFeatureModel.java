@@ -30,6 +30,9 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
+ * This class extends {@link MultiFeatureModel} to support usage of attributes. Instances of this class can be created by
+ * {@link ExtendedMultiFeatureModelFactory}.
+ * 
  * @author Rahel Arens
  * @author Johannes Herschel
  */

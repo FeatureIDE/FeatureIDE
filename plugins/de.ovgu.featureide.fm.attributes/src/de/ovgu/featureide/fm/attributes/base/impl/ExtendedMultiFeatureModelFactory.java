@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 
 /**
- * Factory for {@link ExtendedMultiFeatureModel}. Creates feature models, features and constraints for extended multi feature models.
+ * Factory for {@link ExtendedMultiFeatureModel}. Creates {@link ExtendedMultiFeatureModel}s, {@link ExtendedMultiFeature}s and {@link MultiConstraint}s.
  * 
  * @author Rahel Arens
  * @author Johannes Herschel

@@ -20,8 +20,17 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
+/**
+ * This interface extends {@link IFeatureModel} for feature models that support attributes. It needs to be implemented by {@link ExtendedFeatureModel} and
+ * {@link ExtendedMultiFeatureModel}. Features of IExtendedFeatureModel are expected to implement {@link IExtendedFeature}.
+ * 
+ * @author Johannes Herschel
+ * @author Rahel Arens
+ */
 public interface IExtendedFeatureModel extends IFeatureModel {
 
 }

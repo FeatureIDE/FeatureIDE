@@ -29,7 +29,9 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeature;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory;
+import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
 import de.ovgu.featureide.fm.core.PluginID;
@@ -43,7 +45,8 @@ import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 
 /**
- * Reads / writes extended feature models in UVL format including attributes
+ * This class extends {@link UVLFeatureModelFormat} to support usage of attributes in UVL. Reads / writes {@link ExtendedMultiFeatureModel}s in UVL format.
+ * Parses / prints {@link FeatureAttribute}s.
  * 
  * @author Johannes Herschel
  * @author Rahel Arens
@@ -69,13 +72,17 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 
 	@Override
 	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
+		// call super.parseAttribute to parse the constraints that are written under a feature
 		if (attributeKey.equals("constraint") || attributeKey.equals("constraints")) {
 			super.parseAttribute(fm, feature, attributeKey, attributeValue);
 		} else if (!attributeKey.equals("abstract") && !attributeKey.equals(EXTENDED_ATTRIBUTE_NAME)) {
 			ExtendedMultiFeature extendedFeature = (ExtendedMultiFeature) feature;
+			// check whether the attribute has only a simple value or a list as value. When having a list it means that the attribute has more information saved
+			// than just its own value.
 			if (attributeValue instanceof List<?>) {
 				List<?> attributeList = (List<?>) attributeValue;
 				if (attributeList.size() == 2 && attributeList.get(1) instanceof Map<?, ?>) {
+					// check if the attributes list contains informations of the attribute in FeatureIDE, which are value, unit, recrusive, and/or configurable
 					Map<?, ?> attributeMap = (Map<?, ?>) attributeList.get(1);
 					Object value = attributeMap.get("value");
 					Object unitObj = attributeMap.get("unit");
@@ -85,6 +92,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 					Object configurableObj = attributeMap.get("configurable");
 					boolean configurable = configurableObj instanceof Boolean ? (Boolean) configurableObj : false;
 					if (value == null) {
+						// if the attribute has no value from which we can automatically read the type, the type needs to be found
 						Object type = attributeMap.get("type");
 						createAttribute(extendedFeature, type instanceof String ? (String) type : null, attributeKey, value, unit, recursive, configurable);
 					} else {
@@ -97,6 +105,16 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		}
 	}
 
+	/**
+	 * This method determines the type of the given attribute and then adds the attribute to the given feature
+	 * 
+	 * @param feature the feature that contains the attribute
+	 * @param key the name of the attribute
+	 * @param value the value of the attribute
+	 * @param unit the unit of the attribute
+	 * @param recursive true if the attribute is recursive, false otherwise
+	 * @param configurable true if the attribute is configurable, false otherwise
+	 */
 	private void createAttribute(ExtendedMultiFeature feature, String key, Object value, String unit, boolean recursive, boolean configurable) {
 		String type = null;
 		if (value instanceof String) {
@@ -111,6 +129,17 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		createAttribute(feature, type, key, value, unit, recursive, configurable);
 	}
 
+	/**
+	 * This method adds the given attribute to the given feature.
+	 * 
+	 * @param feature the feature that contains the attribute
+	 * @param type the type of the attribute
+	 * @param key the name of the attribute
+	 * @param value the value of the attribute
+	 * @param unit the unit of the attribute
+	 * @param recursive true if the attribute is recursive, false otherwise
+	 * @param configurable true if the attribute is configurable, false otherwise
+	 */
 	private void createAttribute(ExtendedMultiFeature feature, String type, String key, Object value, String unit, boolean recursive, boolean configurable) {
 		if (type != null) {
 			switch (type) {
@@ -143,6 +172,13 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		return attributes;
 	}
 
+	/**
+	 * This method takes an attribute from the feature model and converts it to an object that can be written to UVL.
+	 * 
+	 * @param attr the attribute that has to be written to UVL
+	 * @return the value of the attribute. This is either simply the value, if the attr has no other information, or a map containing all information of the
+	 *         attribute.
+	 */
 	private Object printAttribute(IFeatureAttribute attr) {
 		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
 			return attr.getValue();

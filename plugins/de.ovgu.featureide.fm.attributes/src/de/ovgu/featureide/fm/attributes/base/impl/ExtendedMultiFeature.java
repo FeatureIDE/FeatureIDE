@@ -31,6 +31,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 
 /**
+ * This class extends {@link MultiFeature} to support usage of attributes for features in {@link ExtendedMultiFeatureModel}s. Instances of this class can be
+ * created by {@link ExtendedMultiFeatureModelFactory}.
+ * 
  * @author Rahel Arens
  * @author Johannes Herschel
  */
@@ -83,7 +86,6 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 	@Override
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
-
 		return ExtendedFeature.createExtendedTooltip(attributes, tooltip);
 	}
 }

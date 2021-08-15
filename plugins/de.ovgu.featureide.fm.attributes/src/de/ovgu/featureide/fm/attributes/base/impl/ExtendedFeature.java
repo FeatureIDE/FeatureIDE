@@ -92,9 +92,7 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 	@Override
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
-
 		return createExtendedTooltip(attributes, tooltip);
-
 	}
 
 	public static String createExtendedTooltip(List<IFeatureAttribute> attributes, StringBuilder tooltip) {
