@@ -214,7 +214,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	private String getConstraintText(IConstraint constraint) {
 		Node node = constraint.getNode();
 		if (graphicalConstraint.getGraphicalModel().getLayout().showShortNames()) {
-			node = rewrite(node);
+			node = rewriteShortLabels(node);
 		}
 		return node.toString(symbols);
 	}
@@ -225,7 +225,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	 * @param node - {@link Node}
 	 * @return new {@link Node}
 	 */
-	private Node rewrite(Node node) {
+	private Node rewriteShortLabels(Node node) {
 		// Rewrite feature names for literal nodes.
 		if (node instanceof Literal) {
 			final String oldName = ((Literal) node).var.toString();
@@ -233,14 +233,14 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			final String newName = oldName.substring(++lastIndexOf);
 			return new Literal(newName, ((Literal) node).positive);
 		}
-		// Reconstruct other nodes as well (Not, And, Or, Implies, Equals, True, False).
+		// Reconstruct other nodes as well.
 		else {
 			final Node clone = node.clone();
 			// Rewrite the child nodes.
 			final Node[] oldChildNodes = node.getChildren();
 			final Node[] newChildNodes = new Node[oldChildNodes.length];
 			for (int iN = 0; iN < oldChildNodes.length; iN++) {
-				newChildNodes[iN] = rewrite(oldChildNodes[iN]);
+				newChildNodes[iN] = rewriteShortLabels(oldChildNodes[iN]);
 			}
 			clone.setChildren(newChildNodes);
 			return clone;

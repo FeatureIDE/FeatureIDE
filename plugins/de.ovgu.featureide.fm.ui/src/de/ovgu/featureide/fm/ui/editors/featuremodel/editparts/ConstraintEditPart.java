@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
 public class ConstraintEditPart extends ModelElementEditPart {
 
