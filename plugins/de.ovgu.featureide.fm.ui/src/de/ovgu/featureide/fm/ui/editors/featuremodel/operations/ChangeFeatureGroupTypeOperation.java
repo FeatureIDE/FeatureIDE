@@ -51,6 +51,10 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		this.featureName = featureName;
 	}
 
+	/**
+	 * Changes the structure group type of the feature named featureName depending on groupType, and stores the old group in oldGroupType. The returned event is
+	 * an GROUP_TYPE_CHANGED event whose source is the feature named featureName.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
@@ -65,6 +69,9 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
+	/**
+	 * Changes the structure group type back to oldGroupType.
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
@@ -78,7 +85,13 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
-	private static int getGroupType(IFeature feature) {
+	/**
+	 * Returns the group type of the given feature as saved in its structure.
+	 *
+	 * @param feature - {@link IFeature}
+	 * @return int - either one of ALTERNATIVE, AND or OR.
+	 */
+	public static int getGroupType(IFeature feature) {
 		if (feature.getStructure().isAlternative()) {
 			return ALTERNATIVE;
 		} else if (feature.getStructure().isAnd()) {

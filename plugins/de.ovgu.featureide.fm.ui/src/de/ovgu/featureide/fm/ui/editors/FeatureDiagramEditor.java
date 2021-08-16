@@ -171,7 +171,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -755,7 +758,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case LOCATION_CHANGED:
 			viewer.internRefresh(true);
 			setDirty();
-			recentEvents.add(event);
 			break;
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
@@ -1072,7 +1074,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * Deals with a change that occurred in an imported feature model that can be found under event.getSource(). The original event to process is in
 	 * event.getNewValue.
 	 *
-	 * @param event - {@link FeatureIDEEvent}DE
+	 * @param event - {@link FeatureIDEEvent}
 	 */
 	private void handleChangeInImportedModel(FeatureIDEEvent event) {
 		final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
@@ -1085,6 +1087,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case FEATURE_NAME_CHANGED:
 			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
 			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
+			break;
+		case MANDATORY_CHANGED:
+			// When the mandatory status of a feature changed, run another MandatoryFeatureOperation for the corresponding feature.
+			new MandatoryFeatureOperation(modelAlias + ((IFeature) oldEvent.getSource()).getName(), fmManager).execute();
+			break;
+		case GROUP_TYPE_CHANGED:
+			// Ask the current group type of the original feature.
+			final IFeature originalFeature = ((IFeature) oldEvent.getSource());
+			final int groupType = ChangeFeatureGroupTypeOperation.getGroupType(originalFeature);
+			// Run a new group type change operation for the referenced feature.
+			new ChangeFeatureGroupTypeOperation(groupType, modelAlias + originalFeature.getName(), fmManager).execute();
+			break;
+		case ATTRIBUTE_CHANGED:
+			// Handle an change in the abstract value of a feature
+			// (stored in a FeatureModelOperationEvent).
+			if (oldEvent instanceof FeatureModelOperationEvent) {
+				final FeatureModelOperationEvent fmOp = (FeatureModelOperationEvent) oldEvent;
+				if (fmOp.getID().equals(AbstractFeatureOperation.ID)) {
+					new AbstractFeatureOperation(modelAlias + ((IFeature) oldEvent.getSource()).getName(), fmManager).execute();
+				}
+			}
 			break;
 		case FEATURE_ADD:
 			// For an added feature, find the added feature name and add the feature manually:

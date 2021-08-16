@@ -73,13 +73,7 @@ public class SetFeatureToMandatoryOperation extends MultiFeatureModelOperation {
 	}
 
 	public static boolean isEveryFeatureMandatory(IFeatureModel featureModel, List<String> featureNames) {
-		for (final String name : featureNames) {
-			final IFeature tempFeature = featureModel.getFeature(name);
-			if (!(tempFeature.getStructure().isMandatory())) {
-				return false;
-			}
-		}
-		return true;
+		return featureNames.stream().allMatch(name -> featureModel.getFeature(name).getStructure().isMandatory());
 	}
 
 	@Override

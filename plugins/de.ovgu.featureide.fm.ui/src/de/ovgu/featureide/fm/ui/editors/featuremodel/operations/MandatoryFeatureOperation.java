@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
- * This class is required to set a feature to mandatory The operation method() returns the operation used to set a single feature to mandatory
+ * This class is required to set a feature to mandatory. The operation method() returns the operation used to set a single feature to mandatory
  *
  * @author Chico Sundermann
  * @author Paul Westphal
@@ -47,6 +47,10 @@ public class MandatoryFeatureOperation extends AbstractFeatureModelOperation {
 		this.featureName = featureName;
 	}
 
+	/**
+	 * Flips the mandatory value of the feature named featureName, and returns a new {@link FeatureModelOperationEvent} with feature as source and
+	 * MANDATORY_CHANGED as event type.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
@@ -54,6 +58,9 @@ public class MandatoryFeatureOperation extends AbstractFeatureModelOperation {
 		return new FeatureModelOperationEvent(ID, EventType.MANDATORY_CHANGED, feature, null, null);
 	}
 
+	/**
+	 * Flips the mandatory value of the feature again; thus restoring its original value and reversing the operation.
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		return operation(featureModel);
