@@ -63,13 +63,7 @@ public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 	}
 
 	public static boolean isEveryFeatureAbstract(IFeatureModel featureModel, List<String> featureNames) {
-		for (final String name : featureNames) {
-			final IFeature feature = featureModel.getFeature(name);
-			if (!(feature.getStructure().isAbstract())) {
-				return false;
-			}
-		}
-		return true;
+		return featureNames.stream().allMatch(featureName -> featureModel.getFeature(featureName).getStructure().isAbstract());
 	}
 
 	@Override
