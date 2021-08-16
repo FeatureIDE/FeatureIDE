@@ -37,6 +37,8 @@ import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.prop4j.Literal;
+import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
@@ -202,8 +204,47 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		setText(label.getText());
 	}
 
+	/**
+	 * Returns the text this figure should show for the given constraint. This text might have long or short feature names (though constraint remains
+	 * unchanged).
+	 *
+	 * @param constraint - {@link IConstraint}
+	 * @return {@link String}
+	 */
 	private String getConstraintText(IConstraint constraint) {
-		return constraint.getNode().toString(symbols);
+		Node node = constraint.getNode();
+		if (graphicalConstraint.getGraphicalModel().getLayout().showShortNames()) {
+			node = rewrite(node);
+		}
+		return node.toString(symbols);
+	}
+
+	/**
+	 * Rewrites the given formula represented by node into a new one that has the correct-length feature names to display. node remains unchanged.
+	 *
+	 * @param node - {@link Node}
+	 * @return new {@link Node}
+	 */
+	private Node rewrite(Node node) {
+		// Rewrite feature names for literal nodes.
+		if (node instanceof Literal) {
+			final String oldName = ((Literal) node).var.toString();
+			int lastIndexOf = oldName.lastIndexOf(".");
+			final String newName = oldName.substring(++lastIndexOf);
+			return new Literal(newName, ((Literal) node).positive);
+		}
+		// Reconstruct other nodes as well (Not, And, Or, Implies, Equals, True, False).
+		else {
+			final Node clone = node.clone();
+			// Rewrite the child nodes.
+			final Node[] oldChildNodes = node.getChildren();
+			final Node[] newChildNodes = new Node[oldChildNodes.length];
+			for (int iN = 0; iN < oldChildNodes.length; iN++) {
+				newChildNodes[iN] = rewrite(oldChildNodes[iN]);
+			}
+			clone.setChildren(newChildNodes);
+			return clone;
+		}
 	}
 
 	/**

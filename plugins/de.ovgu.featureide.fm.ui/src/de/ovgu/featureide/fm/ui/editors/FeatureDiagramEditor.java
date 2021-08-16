@@ -735,11 +735,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
-			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				f.update(FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED));
-			}
-			viewer.internRefresh(true);
-			viewer.reload();
+			updateFeatureNameTypes();
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
@@ -1026,10 +1022,21 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;
 		}
-//		TODO
-//		for (final IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
-//			page.propertyChange(event);
-//		}
+	}
+
+	/**
+	 * Updates the feature name representations, both for features in the diagram and for all cross-tree-constraints they appear in.
+	 */
+	private void updateFeatureNameTypes() {
+		final FeatureIDEEvent nameChangedEvent = FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED);
+		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+			f.update(nameChangedEvent);
+		}
+		for (final IGraphicalConstraint c : graphicalFeatureModel.getConstraints()) {
+			c.update(nameChangedEvent);
+		}
+		viewer.internRefresh(true);
+		viewer.reload();
 	}
 
 	@Override
@@ -1203,8 +1210,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				// Add actions
-				menuManager.add(shortNamesAction);
 				menuManager.add(longNamesAction);
+				menuManager.add(shortNamesAction);
 
 				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
 				shortNamesAction.setEnabled(!useShortNames);
