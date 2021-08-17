@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -47,12 +48,23 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 	private static final int yDistanceLeftRight = 8;
 
 	private final String selectedFeatureName;
+	private final boolean createAsImport;
+	private final String siblingName;
 
 	private CreateFeatureOperation createFeatureOperation;
 
 	public CreateGraphicalSiblingOperation(IGraphicalFeatureModel featureModel, String selectedFeatureName) {
 		super(featureModel, CREATE_SIBLING);
 		this.selectedFeatureName = selectedFeatureName;
+		createAsImport = false;
+		siblingName = null;
+	}
+
+	public CreateGraphicalSiblingOperation(IGraphicalFeatureModel featureModel, String selectedFeatureName, String siblingName) {
+		super(featureModel, CREATE_SIBLING);
+		this.selectedFeatureName = selectedFeatureName;
+		createAsImport = true;
+		this.siblingName = siblingName;
 	}
 
 	@Override
@@ -61,7 +73,12 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 		final IFeature parent = FeatureUtils.getParent(selectedFeature);
 		if (parent != null) {
 			final int index = parent.getStructure().getChildIndex(selectedFeature.getStructure()) + 1;
-			createFeatureOperation = new CreateFeatureOperation(parent.getName(), index, featureModelManager);
+			final String parentName = parent.getName();
+			if (createAsImport) {
+				createFeatureOperation = new CreateFeatureOperation(parentName, siblingName, index, featureModelManager);
+			} else {
+				createFeatureOperation = new CreateFeatureOperation(parentName, index, featureModelManager);
+			}
 			final FeatureIDEEvent event = createFeatureOperation.operation(featureModel);
 			if (event != null) {
 				final IFeature newFeature = (IFeature) event.getNewValue();
@@ -92,7 +109,14 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 					} else {
 						graphicalFeatureModel.getGraphicalFeature(newFeature).setLocation(new Point(maxX + xDistanceTopDown, yLocation));
 					}
+
 				}
+				// set MultiFeature as interface
+				if (createAsImport) {
+					final MultiFeature multiFeature = (MultiFeature) newFeature;
+					multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+				}
+				// oldValue -> two Features: Parent (Index 0) and Sibling (Index 1).
 				return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent : null, newFeature);
 			}
 		}

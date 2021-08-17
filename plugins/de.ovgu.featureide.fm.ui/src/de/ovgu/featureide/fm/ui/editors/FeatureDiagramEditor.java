@@ -172,6 +172,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
@@ -725,7 +726,23 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			}
 
+<<<<<<< Upstream, based on develop
 			openRenameEditor(newFeature);
+=======
+			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
+			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+
+			if (newEditPart != null) {// TODO move to FeatureEditPart
+				newEditPart.activate();
+				viewer.select(newEditPart);
+				// open the renaming command
+				final IFeature referencedFeature = newEditPart.getModel().getObject();
+				if (!(referencedFeature instanceof MultiFeature) || !(((MultiFeature) referencedFeature).isInterface())) {
+					new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel())
+							.show();
+				}
+			}
+>>>>>>> 075f1b4 Create Sibling Features works now.
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			recentEvents.add(event);
@@ -1113,20 +1130,30 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_ADD:
+			// Index variable.
+			int index;
 			// For an added feature, find the added feature names,
 			final IFeature originalParent = ((IFeature) oldEvent.getOldValue());
 			final IFeature originalChild = ((IFeature) oldEvent.getNewValue());
 			// ... then translate the names and execute the insertion operation.
 			final String newParentName = modelAlias + originalParent.getName();
 			final String newChildName = modelAlias + originalChild.getName();
-			final int index = originalParent.getStructure().getChildrenCount() - 1;
+			index = originalParent.getStructure().getChildIndex(mfm.getFeature(newChildName).getStructure()) - 1;
 			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
-			// Finally mark the feature as imported from an interface.
-			final MultiFeature newFeature = (MultiFeature) mfm.getFeature(newChildName);
-			newFeature.setType(MultiFeature.TYPE_INTERFACE);
 			break;
 		case FEATURE_ADD_ABOVE:
+			break;
 		case FEATURE_ADD_SIBLING:
+			// For a sibling feature, get the added feature and its parent.
+			final IFeature originalSibling = ((IFeature) oldEvent.getNewValue());
+			final IFeature originalParent2 = ((IFeature) oldEvent.getOldValue());
+			// Ask the index of the sibling. The previous child was the sibling we created the feature for.
+			index = originalParent2.getStructure().getChildIndex(originalSibling.getStructure()) - 1;
+			// ask the siblings name.
+			final String selectedFeatureName = modelAlias + originalParent2.getStructure().getChildren().get(index).getFeature().toString();
+			final String siblingName = modelAlias + originalSibling.getName();
+			new CreateGraphicalSiblingOperation(graphicalFeatureModel, selectedFeatureName, siblingName).execute();
+			break;
 		case FEATURE_DELETE:
 		case CONSTRAINT_MODIFY:
 		case CONSTRAINT_ADD:

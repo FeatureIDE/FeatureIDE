@@ -28,8 +28,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Operation with functionality to create a layer feature. Enables undo/redo functionality.
@@ -41,19 +43,22 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 
 	private final String parentName;
 	private String newFeatureName;
+	private final boolean createAsImport;
 	private final int index;
 
 	public CreateFeatureOperation(String parentName, int index, IFeatureModelManager featureModelManager) {
-		super(featureModelManager, "Create Feature");
+		super(featureModelManager, StringTable.CREATE_FEATURE);
 		this.parentName = parentName;
 		this.index = index;
+		createAsImport = false;
 	}
 
 	public CreateFeatureOperation(String parentName, String childName, int index, IFeatureModelManager manager) {
-		super(manager, "Create Feature");
+		super(manager, StringTable.CREATE_FEATURE);
 		this.parentName = parentName;
 		newFeatureName = childName;
 		this.index = index;
+		createAsImport = true;
 	}
 
 	@Override
@@ -63,6 +68,11 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
 		parent.getStructure().addChildAtPosition(index, newFeature.getStructure());
+		if (createAsImport) {
+			// Finally mark the feature as imported from an interface.
+			final MultiFeature multiFeature = (MultiFeature) newFeature;
+			multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+		}
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
 	}
 
