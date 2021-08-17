@@ -766,6 +766,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case LOCATION_CHANGED:
 			viewer.internRefresh(true);
 			setDirty();
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
@@ -783,6 +784,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
@@ -1103,6 +1105,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Fire the correct event for this feature model.
 			propertyChange(new FeatureIDEEvent(mfm, EventType.FEATURE_ADD, newParent, newChild));
 			break;
+		case FEATURE_ADD_ABOVE:
+		case FEATURE_ADD_SIBLING:
+		case FEATURE_DELETE:
+		case CONSTRAINT_MODIFY:
+		case CONSTRAINT_ADD:
+		case CONSTRAINT_DELETE:
+		case STRUCTURE_CHANGED:
+		case ACTIVE_EXPLANATION_CHANGED:
+		case FEATURE_ATTRIBUTE_CHANGED:
+		case LOCATION_CHANGED:
 		default:
 			return;
 		}
