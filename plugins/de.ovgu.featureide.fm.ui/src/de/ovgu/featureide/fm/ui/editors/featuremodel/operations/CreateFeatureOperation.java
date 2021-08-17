@@ -49,9 +49,16 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 		this.index = index;
 	}
 
+	public CreateFeatureOperation(String parentName, String childName, int index, IFeatureModelManager manager) {
+		super(manager, "Create Feature");
+		this.parentName = parentName;
+		newFeatureName = childName;
+		this.index = index;
+	}
+
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		newFeatureName = FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		newFeatureName = (newFeatureName == null) ? FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION) : newFeatureName;
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, newFeatureName);
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
