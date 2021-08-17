@@ -90,14 +90,13 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -172,6 +171,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditP
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
@@ -1080,7 +1080,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param event - {@link FeatureIDEEvent}
 	 */
 	private void handleChangeInImportedModel(FeatureIDEEvent event) {
-		final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getSnapshot();
+		final MultiFeatureModel mfm = (MultiFeatureModel) graphicalFeatureModel.getFeatureModelManager().getVarObject();
 		// Construct the original model name from originalPath.
 		final String modelAlias = extractModelAlias(event, mfm);
 		// Extract the old event.
@@ -1113,18 +1113,17 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_ADD:
-			// For an added feature, find the added feature name and add the feature manually:
+			// For an added feature, find the added feature names,
 			final IFeature originalParent = ((IFeature) oldEvent.getOldValue());
 			final IFeature originalChild = ((IFeature) oldEvent.getNewValue());
-			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(mfm);
-			// Find the new parent by name.
-			final IFeature newParent = mfm.getFeature(modelAlias + originalParent.getName());
-			// Make a new child with the appropriate name and add it to the new parent.
-			final IFeature newChild = factory.createFeature(mfm, modelAlias + originalChild);
-			mfm.addFeature(newChild);
-			newParent.getStructure().addChild(newChild.getStructure());
-			// Fire the correct event for this feature model.
-			propertyChange(new FeatureIDEEvent(mfm, EventType.FEATURE_ADD, newParent, newChild));
+			// ... then translate the names and execute the insertion operation.
+			final String newParentName = modelAlias + originalParent.getName();
+			final String newChildName = modelAlias + originalChild.getName();
+			final int index = originalParent.getStructure().getChildrenCount() - 1;
+			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
+			// Finally mark the feature as imported from an interface.
+			final MultiFeature newFeature = (MultiFeature) mfm.getFeature(newChildName);
+			newFeature.setType(MultiFeature.TYPE_INTERFACE);
 			break;
 		case FEATURE_ADD_ABOVE:
 		case FEATURE_ADD_SIBLING:

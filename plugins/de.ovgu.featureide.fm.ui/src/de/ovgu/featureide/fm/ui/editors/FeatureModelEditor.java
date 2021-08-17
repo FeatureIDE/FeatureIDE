@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -566,10 +567,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				for (String importPathString : mfm.getImports()) {
 					// TODO Trennzeichen für Windows
 					importPathString = importPathString.replace("\\", ".");
-					final String[] paths = path.toString().split("/");
+					final String[] paths = path.toString().split(File.separator);
 					paths[paths.length - 1] = "";
-					String s = String.join("/", paths);
+					String s = String.join(File.separator, paths);
 					s += importPathString;
+					// "OperatingSystem.uvl"
 					final Path importPath = FileSystems.getDefault().getPath(s);
 					FeatureModelManager.getInstance(importPath).addImportListener(this);
 				}
