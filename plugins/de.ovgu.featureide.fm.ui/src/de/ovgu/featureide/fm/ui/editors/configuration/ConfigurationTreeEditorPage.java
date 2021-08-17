@@ -164,7 +164,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static final Color red = new Color(null, 240, 0, 0);
 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
-	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	protected static final Font treeItemBoldFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	protected static final Font treeItemItalicFont = new Font(null, ARIAL, 8, SWT.ITALIC);
+	protected static final Font treeItemBoldItalicFont = new Font(null, ARIAL, 8, SWT.BOLD | SWT.ITALIC);
 
 	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
@@ -962,6 +964,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						checked = false;
 						grayed = true;
 						fgColor = gray;
+						// On most operating systems, we use gray text color to show that a feature cannot be selected.
+						// On Ubuntu, this does not work and instead, we use an italic font (see issue #1055).
+						font = treeItemItalicFont;
 						break;
 					case UNDEFINED:
 						checked = feature.getManual() == Selection.SELECTED;
@@ -972,11 +977,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					if (automatic == Selection.UNDEFINED) {
 						switch (recommended) {
 						case SELECTED:
-							font = treeItemSpecialFont;
+							// again, this is a workaround for Ubuntu, which does not show the gray font color correctly
+							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
 							fgColor = green;
 							break;
 						case UNSELECTED:
-							font = treeItemSpecialFont;
+							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
 							fgColor = blue;
 							break;
 						case UNDEFINED:
