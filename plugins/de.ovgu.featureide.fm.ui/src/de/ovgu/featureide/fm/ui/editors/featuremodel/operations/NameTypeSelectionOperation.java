@@ -27,28 +27,44 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
- * Operation to select the layout for the feature model editor.
+ * Operation that chooses the type of name labels (short or long ones) for MultiFeatureModels.
+ *
+ * @author Reimar Schroeter
+ * @author Sebastian Krieter
+ * @author Benedikt Jutz
  */
 public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private final int newNameType;
-	private final int oldNameType;
+	/**
+	 * Specifies if either short or long labels should be used.
+	 */
+	private final boolean useShortLabels;
 
-	public NameTypeSelectionOperation(IGraphicalFeatureModel graphicalFeatureModel, int newNameType, int oldNameType) {
-		super(graphicalFeatureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
+	public NameTypeSelectionOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean useShortLabels) {
+		super(graphicalFeatureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(useShortLabels));
+		this.useShortLabels = useShortLabels;
 	}
 
+	/**
+	 * Sets the short labels property of the garphical feature model to useShortLabels, and then returns an ALL_FEATURES_CHANGED_NAME_TYPE event to trigger the
+	 * display of the new names.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#operation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		graphicalFeatureModel.getLayout().setShowShortNames(newNameType == 1);
+		graphicalFeatureModel.getLayout().setShowShortNames(useShortLabels);
 		return FeatureIDEEvent.getDefault(EventType.ALL_FEATURES_CHANGED_NAME_TYPE);
 	}
 
+	/**
+	 * Works like inverseOperation, but setw the short labels property to !useShortLabels.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#inverseOperation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		graphicalFeatureModel.getLayout().setShowShortNames(oldNameType == 1);
+		graphicalFeatureModel.getLayout().setShowShortNames(!useShortLabels);
 		return FeatureIDEEvent.getDefault(EventType.ALL_FEATURES_CHANGED_NAME_TYPE);
 	}
 

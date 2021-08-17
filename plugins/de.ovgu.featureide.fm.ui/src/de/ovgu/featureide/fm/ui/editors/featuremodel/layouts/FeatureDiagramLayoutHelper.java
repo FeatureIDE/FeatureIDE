@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Marcus Pinnecke
  * @author Lukas Vogt
  * @author Martha Nyerembe
+ * @author Benedikt Jutz
  */
 public class FeatureDiagramLayoutHelper {
 
@@ -83,15 +84,13 @@ public class FeatureDiagramLayoutHelper {
 	}
 
 	/**
-	 * @param layoutType layout type
-	 * @return label texts (e.g. for the context menu)
+	 * @param useShortLabels - boolean
+	 * @return SHORT_NAMES for useShortLabels = true, LONG_NAMES, otherwise.
 	 */
-	public static String getNameTypeLabel(int layoutType) {
-		switch (layoutType) {
-		case 1:
+	public static String getNameTypeLabel(boolean useShortLabels) {
+		if (useShortLabels) {
 			return SHORT_NAMES;
-		case 0:
-		default:
+		} else {
 			return LONG_NAMES;
 		}
 	}
