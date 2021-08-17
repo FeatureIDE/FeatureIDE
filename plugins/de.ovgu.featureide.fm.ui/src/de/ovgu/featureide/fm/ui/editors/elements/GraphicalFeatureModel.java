@@ -168,6 +168,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
+		// On an import, we get a different feature model than the one we wanted to change.
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(featureModel.getNumberOfFeatures());
 		for (final IFeature f : featureModel.getVisibleFeatures()) {

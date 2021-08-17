@@ -56,7 +56,7 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
 		parent.getStructure().addChildAtPosition(index, newFeature.getStructure());
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
 	}
 
 	@Override

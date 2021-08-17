@@ -227,10 +227,6 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	@Override
 	public void informImports(FeatureIDEEvent e) {
-
-		// Für jeden Listener möchte man überprüfen, ob sich dieser auf ein Feature Modell bezieht, welches genau das Modell importiert, welches dieser
-		// FeatureModelManager verwaltet.
-
 		for (final IEventListener i : importers) {
 			i.propertyChange(e);
 		}
