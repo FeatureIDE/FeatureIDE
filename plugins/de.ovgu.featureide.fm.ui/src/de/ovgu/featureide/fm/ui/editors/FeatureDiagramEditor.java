@@ -98,7 +98,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
-import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -691,6 +690,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			recentEvents.add(event);
 			break;
 		case FEATURE_ADD:
+			// At this point, refresh creates new FeatureEditParts for features that we added.
+			// but if we import a feature, this doesn't work (why?).
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			setDirty();
 			final IFeature newFeature = (IFeature) event.getNewValue();
@@ -1079,7 +1080,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param event - {@link FeatureIDEEvent}
 	 */
 	private void handleChangeInImportedModel(FeatureIDEEvent event) {
-		final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
+		final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getSnapshot();
 		// Construct the original model name from originalPath.
 		final String modelAlias = extractModelAlias(event, mfm);
 		// Extract the old event.
@@ -1121,7 +1122,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Make a new child with the appropriate name and add it to the new parent.
 			final IFeature newChild = factory.createFeature(mfm, modelAlias + originalChild);
 			mfm.addFeature(newChild);
-			newParent.getStructure().addChild(new FeatureStructure(newChild));
+			newParent.getStructure().addChild(newChild.getStructure());
 			// Fire the correct event for this feature model.
 			propertyChange(new FeatureIDEEvent(mfm, EventType.FEATURE_ADD, newParent, newChild));
 			break;
