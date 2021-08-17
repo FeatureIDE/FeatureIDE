@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-class TWiseConfigurationUtil {
+public class TWiseConfigurationUtil {
 
 	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
 
