@@ -1150,4 +1150,5 @@ public class StringTable {
 	public static final String LEVELS = "Levels";
 	public static final String SHOW = "Show";
 	public static final String SHOW_ALL_LEVELS = "Show All Levels";
+	public static final String CREATE_FEATURE = "Create Feature";
 }
