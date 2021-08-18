@@ -69,9 +69,9 @@ public interface IFeatureModelManager extends IManager<IFeatureModel> {
 	FeatureModelFormula getVariableFormula();
 
 	/**
-	 * Inform all feature models that import the current feature model.
+	 * Inform all feature models that import the current feature model that the event <code>e</code> occurred.
 	 *
-	 * @param e
+	 * @param e - {@link FeatureIDEEvent}
 	 */
 	public void informImports(FeatureIDEEvent e);
 

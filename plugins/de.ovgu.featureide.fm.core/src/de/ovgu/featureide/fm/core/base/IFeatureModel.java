@@ -119,12 +119,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	/**
 	 * A constraint is an additional restriction on features in the feature model.
 	 *
-	 * This methods adds the constraint <code>constraint</code> to the <i>end</i> of the existing collection. Please note that <ul> <li>the specification do not
-	 * require a check if <code>constraint</code> is <i>null</i>. However, for regular use, <code>constraint</code> is assumed to be <i>non-null</i></li>
-	 * <li>the specification do not require a check of duplicates. In FeatureIDE's default implementation, the collection is managed using a <code>List</code>.
-	 * For regular use case, this collection is assumed to be duplicate-free. Therefore, duplicates should not be added.</li> </ul>
+	 * This methods adds the constraint <code>constraint</code> to the <i>end</i> of the existing collection. Please note that <ul> <li>the specification does
+	 * not require a check if <code>constraint</code> is <i>null</i>. However, for regular use, <code>constraint</code> is assumed to be <i>non-null</i></li>
+	 * <li>the specification does not require a check of duplicates. In FeatureIDE's default implementation, the collection is managed using a
+	 * <code>List</code>. For regular use case, this collection is assumed to be duplicate-free. Therefore, duplicates should not be added.</li> </ul>
 	 *
-	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)}
+	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)} instead.
 	 *
 	 * @param constraint The constraint to be added at the end of the existing collection
 	 *
@@ -150,10 +150,10 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * <i>non-null</i></li> <li>the specification do not require a check of duplicates. In FeatureIDE's default implementation, the collection is managed using
 	 * a <code>List</code>. For regular use case, this collection is assumed to be duplicate-free. Therefore, duplicates should not be added.</li> </ul>
 	 *
-	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)}
+	 * To add a constraint at a specific position, use this method.
 	 *
 	 * @param constraint The constraint to be added at position <i>index</i> of the existing collection
-	 * @param index The position. It is assumed, that the index is valid. Otherwise a exception have to be thrown by the implementation.
+	 * @param index The position. It is assumed, that the index is valid. Otherwise a exception has to be thrown by the implementation.
 	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #getConstraintCount()
@@ -206,7 +206,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	IFeatureModel clone(IFeature newRoot);
 
 	/**
-	 * Resets this feature model to the default values. The parameter <code>projectName</code> will be used as the new root features name if there are no
+	 * Resets this feature model to the default values. The parameter <code>projectName</code> will be used as the new root feature's name if there are no
 	 * features in this model (the <i>feature table</i> is empty). Independent of this, a new feature called <code>Base</code> will be added as child of the
 	 * feature models root feature, and the feature models root feature will be set as <i>abstract feature</i>.
 	 *
@@ -226,8 +226,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * method must ensure, that after removing <code>feature</code>, the feature's <i>parent feature</i> is changed to an <i>and</i> ( <i>or</i>,
 	 * <i>alternative</i>) group if <code>feature</code> was an <i>and</i> (<i>or</i>, <i>alternative</i>) group. Additionally, removing <code>feature</code>
 	 * has to add the children of <code>feature</code> as children to the <i>parent feature</i>. <br> <br> Removing a feature also removes this feature from the
-	 * <i>feature table</i> and the <i>feature order list</i>. Both must be consistent with {@link #getFeatureOrderList()} and {@link #getFeatureOrderList()}
-	 * <br> <br> <b>Note</b>If the structure should not be changed, use {@link #deleteFeatureFromTable(IFeature)}
+	 * <i>feature table</i> and the <i>feature order list</i>. Both must be consistent with {@link #getFeatureTable()} and {@link #getFeatureOrderList()} <br>
+	 * <br> <b>Note </b>If the structure should not be changed, use {@link #deleteFeatureFromTable(IFeature)}
 	 *
 	 * @param feature the feature that should be removed. It is assumed to be <i>non-null</i>
 	 * @return <b>false</b> if <code>feature</code> is the models <i>root</i> feature, or if <code>feature</code> is not contained in this model. Otherwise
@@ -246,7 +246,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	/**
 	 * Removes the feature <code>feature</code> from the <i>feature table</i> by <code>feature</code>'s name with {@link IFeature#getName()}. If the <i>feature
 	 * table</i> does not contain a feature with such a name, there will be no changes. <br> <br> This method only affects the collection of features stored in
-	 * the feature model, but do not change the <i>structure</i> neither of <code>feature</code> nor it's <i>parent</i> or <i>children</i>. <br> <br>
+	 * the feature model, but does not change the <i>structure</i> neither of <code>feature</code> nor it's <i>parent</i> or <i>children</i>. <br> <br>
 	 * <b>Note</b> There is no equality check over the identifiers between the feature to be deleted and the feature contained in the collection, expect for
 	 * equality in their names. To avoid confusion, this check should be done before calling this method. <br> <b>Note</b> If the structure should be changed,
 	 * use {@link #deleteFeature(IFeature)}
@@ -279,7 +279,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> if <code>constraint</code> is not
-	 * contained. <br> <br> <b>Note</b>:
+	 * contained. <br>
 	 *
 	 * @param constraint the element to be removed. It is assumed that this parameter is <i>non-null</i>
 	 * @throws NullPointerException - if <code>constraint</code> is null (optional)
@@ -302,7 +302,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the list of constraints stored in this feature model. <br> <br> <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external
-	 * access to internal data
+	 * access to internal data.
 	 *
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -664,7 +664,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Set the feature models source file to <code>file</code>. By definition, the feature model's unique identifier is bidirectional mapped to the source
-	 * files. Therefore, two feature model's based on the same file must have to same unique identifier. The feature model's identifier will not be changed, if
+	 * files. Therefore, two feature models based on the same file must have the same unique identifier. The feature model's identifier will not be changed, if
 	 * <code>file</code> is <b>null</b>. <br><br> The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that: <code>
 	 * this.sourceFile = file; if (file != null) { id = ModelFileIdMap.getModelId(this, file); } </code> <b>Note</b>: The specification does not require to
 	 * reload the content of this feature model, when the source file is changes. Hence, using this method only will affect the return value of

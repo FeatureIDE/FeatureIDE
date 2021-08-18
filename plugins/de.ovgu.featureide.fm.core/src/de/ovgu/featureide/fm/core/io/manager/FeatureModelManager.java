@@ -200,7 +200,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	/**
-	 * Adds an listener that imports this feature model.
+	 * Adds an listener <code>listener</code> that imports this feature model.
 	 *
 	 * @param listener - {@link IEventListener}
 	 */
@@ -209,12 +209,12 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	/**
-	 * Removes this listener from the import list.
+	 * Removes the listener <code>listener/code> from the import list.
 	 *
-	 * @param e - {@link IEventListener}
+	 * @param listener - {@link IEventListener}
 	 */
-	public void removeImportListener(IEventListener e) {
-		importers.remove(e);
+	public void removeImportListener(IEventListener listener) {
+		importers.remove(listener);
 	}
 
 	/**
@@ -233,7 +233,8 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	}
 
 	/**
-	 * Looks up the project-relative Eclipse path for the given Java file. With this method, we may get the project of a feature model file, for example.
+	 * Looks up the project-relative Eclipse path for the given Java file <code>file</code>. With this method, we may get the project of a feature model file,
+	 * for example.
 	 *
 	 * @param file - {@link File}
 	 * @return an {@link IProject} for the project file is contained in, or null otherwise.
