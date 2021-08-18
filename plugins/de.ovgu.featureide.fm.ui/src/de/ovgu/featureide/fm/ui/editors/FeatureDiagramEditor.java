@@ -171,6 +171,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditP
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
@@ -653,7 +654,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
-				final IFeature oldParent = (IFeature) event.getOldValue();
+				final Object[] oldValues = (Object[]) event.getOldValue();
+				final IFeature oldParent = (IFeature) oldValues[0];
 				if (oldParent != null) {
 					final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
 					parent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
@@ -664,7 +666,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.refreshChildAll(newCompound);
 				}
 
-				openRenameEditor(newCompound);
+				showFirstNamingDialog(newCompound);
 			}
 			viewer.internRefresh(true);
 			setDirty();
@@ -726,23 +728,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			}
 
-<<<<<<< Upstream, based on develop
-			openRenameEditor(newFeature);
-=======
-			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
-			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-
-			if (newEditPart != null) {// TODO move to FeatureEditPart
-				newEditPart.activate();
-				viewer.select(newEditPart);
-				// open the renaming command
-				final IFeature referencedFeature = newEditPart.getModel().getObject();
-				if (!(referencedFeature instanceof MultiFeature) || !(((MultiFeature) referencedFeature).isInterface())) {
-					new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel())
-							.show();
-				}
-			}
->>>>>>> 075f1b4 Create Sibling Features works now.
+			showFirstNamingDialog(newFeature);
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			recentEvents.add(event);
@@ -1132,8 +1118,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case FEATURE_ADD:
 			// Index variable.
 			int index;
+			// The previous parent of an added feature.
+			IFeature originalParent;
+
 			// For an added feature, find the added feature names,
-			final IFeature originalParent = ((IFeature) oldEvent.getOldValue());
+			originalParent = ((IFeature) oldEvent.getOldValue());
 			final IFeature originalChild = ((IFeature) oldEvent.getNewValue());
 			// ... then translate the names and execute the insertion operation.
 			final String newParentName = modelAlias + originalParent.getName();
@@ -1142,15 +1131,24 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
 			break;
 		case FEATURE_ADD_ABOVE:
+			// For a feature added above other ones, first get the new parent,
+			originalParent = (IFeature) oldEvent.getNewValue();
+			// then translate the old feature names into new ones.
+			final Object[] oldValues = (Object[]) oldEvent.getOldValue();
+			final List<String> oldSelectedNames = (List<String>) oldValues[1];
+			final List<String> newSelectedNames = new ArrayList<>(oldSelectedNames.size());
+			oldSelectedNames.forEach(oldName -> newSelectedNames.add(modelAlias + oldName));
+			// Rerun the CreateFeatureAboveOperation.
+			new CreateFeatureAboveOperation(fmManager, newSelectedNames, modelAlias + originalParent.getName()).execute();
 			break;
 		case FEATURE_ADD_SIBLING:
 			// For a sibling feature, get the added feature and its parent.
 			final IFeature originalSibling = ((IFeature) oldEvent.getNewValue());
-			final IFeature originalParent2 = ((IFeature) oldEvent.getOldValue());
+			originalParent = ((IFeature) oldEvent.getOldValue());
 			// Ask the index of the sibling. The previous child was the sibling we created the feature for.
-			index = originalParent2.getStructure().getChildIndex(originalSibling.getStructure()) - 1;
+			index = originalParent.getStructure().getChildIndex(originalSibling.getStructure()) - 1;
 			// ask the siblings name.
-			final String selectedFeatureName = modelAlias + originalParent2.getStructure().getChildren().get(index).getFeature().toString();
+			final String selectedFeatureName = modelAlias + originalParent.getStructure().getChildren().get(index).getFeature().toString();
 			final String siblingName = modelAlias + originalSibling.getName();
 			new CreateGraphicalSiblingOperation(graphicalFeatureModel, selectedFeatureName, siblingName).execute();
 			break;
@@ -1188,6 +1186,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		}
 		return modelAlias;
+	}
+
+	/**
+	 * Allows the user to rename the last added feature <code>newFeature</code> by opening a {@link FeatureLabelEditManager} for the associated
+	 * {@link FeatureEditPart}. We do not open a dialog when <code>newFeature</code> is an external feature, which then has already been named in another
+	 * editor.
+	 *
+	 * @param newFeature - {@link IFeature}
+	 */
+	private void showFirstNamingDialog(final IFeature newFeature) {
+		if ((newFeature instanceof MultiFeature) && (((MultiFeature) newFeature).isFromExtern())) {
+			return;
+		}
+		final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
+		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+		if (newEditPart != null) {// TODO move to FeatureEditPart
+			newEditPart.activate();
+			viewer.select(newEditPart);
+			// open the renaming command
+			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
+		}
 	}
 
 	/**

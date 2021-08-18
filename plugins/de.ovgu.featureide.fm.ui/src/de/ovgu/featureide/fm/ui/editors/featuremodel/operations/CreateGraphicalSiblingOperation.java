@@ -116,8 +116,7 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 					final MultiFeature multiFeature = (MultiFeature) newFeature;
 					multiFeature.setType(MultiFeature.TYPE_INTERFACE);
 				}
-				// oldValue -> two Features: Parent (Index 0) and Sibling (Index 1).
-				return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent : null, newFeature);
+				return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent, newFeature);
 			}
 		}
 		return null;

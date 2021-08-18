@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
@@ -45,33 +46,88 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  */
 public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
-	private final String childName;
+	/**
+	 * Contains the names of the features for whom we create a new parent feature.
+	 */
 	private final List<String> selectedFeatureNames;
+	/**
+	 * <code>childName</code> is the name of the first selected feature name.
+	 */
+	private final String childName;
+	/**
+	 * <code>children</code> stores the old positions and names for selectedFeatures to run <code>inverseOperation</code> correctly.
+	 */
 	private final TreeMap<Integer, String> children = new TreeMap<>();
 
+	/**
+	 * <code>featureName</code> contains the name of the new parent feature.
+	 */
 	private String featureName;
+	/**
+	 * Declares whether this action occurs from an imported/referenced model, or not,
+	 */
+	private final boolean createAsImport;
+	/**
+	 * Stores whether the parent of the feature <code>childName</code> has an or group.
+	 */
+	private boolean parentOr = false;
+	/**
+	 * Stores whether the parent of the feature <code>childName</code> has an alternative group.
+	 */
+	private boolean parentAlternative = false;
 
-	boolean parentOr = false;
-	boolean parentAlternative = false;
-
-	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatures) {
+	/**
+	 * Creates a new {@link CreateFeatureAboveOperation}.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param selectedFeatureNames - {@link List}
+	 */
+	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatureNames) {
 		super(featureModelManager, "Add Feature");
-		selectedFeatureNames = selectedFeatures;
-		childName = selectedFeatures.get(0);
+		this.selectedFeatureNames = selectedFeatureNames;
+		childName = selectedFeatureNames.get(0);
+		createAsImport = false;
 	}
 
+	/**
+	 * Creates a new {@link CreateFeatureAboveOperation} for imported features.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param selectedFeatureNames - {@link List}
+	 * @param featureName - {@link String}
+	 */
+	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatureNames, String featureName) {
+		super(featureModelManager, "Add Feature");
+		this.selectedFeatureNames = selectedFeatureNames;
+		childName = selectedFeatureNames.get(0);
+		createAsImport = true;
+		this.featureName = featureName;
+	}
+
+	/**
+	 * Creates a new feature with the given <code>featureName</code>. For an import, mark this {@link MultiFeature} as interface and do not create a new name.
+	 * <br> The new feature takes the group type of the previous parent of the features named in <code>selectedFeatures</code>, and has them as children. The
+	 * old parent loses those children, and its type is converted into an AND.
+	 *
+	 * @return new {@link FeatureIDEEvent} with {@link EventType#FEATURE_ADD_ABOVE} as type.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		featureName = FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		featureName = (!createAsImport) ? FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION) : featureName;
 		children.clear();
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, featureName);
+		if (createAsImport) {
+			final MultiFeature multiFeature = (MultiFeature) newFeature;
+			multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+		}
 		final IFeature child = featureModel.getFeature(childName);
+
 		final IFeatureStructure parent = child.getStructure().getParent();
 		if (parent != null) {
 			parentOr = parent.isOr();
 			parentAlternative = parent.isAlternative();
-
 			newFeature.getStructure().setMultiple(parent.isMultiple());
+
 			final int index = parent.getChildIndex(child.getStructure());
 			for (final String name : selectedFeatureNames) {
 				final IFeature iFeature = featureModel.getFeature(name);
@@ -97,9 +153,18 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			featureModel.addFeature(newFeature);
 			featureModel.getStructure().setRoot(newFeature.getStructure());
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newFeature);
+
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE,
+				new Object[] { parent != null ? parent.getFeature() : null, selectedFeatureNames }, newFeature);
 	}
 
+	/**
+	 * Deletes the feature named with <code>featureName</code>, and converts the group type of its parent as saved in <code>parentOr/parentAlternative</code>.
+	 * Also adds the previous features back at the right indexes, according to the entries in <code>children</code>.
+	 *
+	 * @return new {@link FeatureIDEEvent} with {@link EventType#FEATURE_DELETE} as type.
+	 * @see {@link CreateFeatureAboveOperation#operation(IFeatureModel)} for the creation of <code>children/parentAlternative/parentOr</code>.
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IFeature newFeature = featureModel.getFeature(featureName);
@@ -119,12 +184,12 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			} else {
 				parent.changeToAnd();
 			}
+			return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, parent.getFeature(), null);
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());
 			newFeature.getStructure().removeChild(child.getStructure());
 			return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, null);
 		}
-		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, parent.getFeature(), null);
 	}
 
 	@Override

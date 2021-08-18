@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
@@ -62,11 +64,12 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_DELETE,
 		/**
-		 * A feature was added above another feature.
+		 * A feature was added above other features. oldEvent stores both the names of the existing features in a {@link List} (oldEvent[0]), as well as their
+		 * previous parent in (oldEvent[1]). newEvent then contains the newly created feature.
 		 */
 		FEATURE_ADD_ABOVE,
 		/**
-		 * A feature was added.
+		 * A feature was added below another feature.
 		 */
 		FEATURE_ADD,
 		/**
