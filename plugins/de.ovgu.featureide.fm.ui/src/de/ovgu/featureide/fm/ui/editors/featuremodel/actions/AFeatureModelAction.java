@@ -75,7 +75,7 @@ public abstract class AFeatureModelAction extends Action {
 	 * @return true if there is a feature from an external submodel, false otherwise
 	 */
 	protected boolean hasExternalFeature(IStructuredSelection selection) {
-		for (final Object selectedElement : selection) {
+		for (final Object selectedElement : selection.toArray()) {
 			if (selectedElement instanceof FeatureEditPart) {
 				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
 					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
