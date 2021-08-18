@@ -54,6 +54,16 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.SyncCollapsedStateAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
+/**
+ * FMOutlineProvider provides specifically the data for the currently shown feature model in a {@link FeatureModelEditor}.
+ *
+ * @author Christopher Sontag
+ * @author Thomas Thuem
+ * @author Sebastian Krieter
+ * @author Joshua Sprey
+ * @author Chico Sundermann
+ * @author Benedikt Jutz
+ */
 public class FMOutlineProvider extends OutlineProvider implements IEventListener {
 
 	private SyncCollapsedStateAction syncCollapsedStateAction;
@@ -68,12 +78,20 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		super(treeProvider, labelProvider);
 	}
 
+	/**
+	 * FMOutlineProvider supports feature models in the FeatureIDE format (File ending .xml), and UVL models (File ending .uvl).
+	 *
+	 * @see {@link OutlineProvider#isSupported(IEditorPart, IFile)}
+	 */
 	@Override
 	public boolean isSupported(IEditorPart part, IFile file) {
-		if (file != null) {
-			return "xml".equalsIgnoreCase(file.getFileExtension()) && (FMFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file)));
+		if (file == null) {
+			return false;
 		}
-		return false;
+
+		final String extension = file.getFileExtension();
+		return ("xml".equalsIgnoreCase(extension) || "uvl".equalsIgnoreCase(extension))
+			&& (FMFormatManager.getInstance().hasFormat(EclipseFileSystem.getPath(file)));
 	}
 
 	@Override

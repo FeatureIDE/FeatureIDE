@@ -288,7 +288,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		layoutManager.layout(graphicalFeatureModel, this);
 
-		if (!graphicalFeatureModel.isLegendHidden() && graphicalFeatureModel.getLayout().hasLegendAutoLayout()) {
+		if (!graphicalFeatureModel.isLegendHidden()) {
 			for (final Object obj : getEditPartRegistry().values()) {
 				if (obj instanceof LegendEditPart) {
 					final LegendFigure fig = ((LegendEditPart) obj).getFigure();
@@ -296,6 +296,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 				}
 			}
 		}
+
 	}
 
 	public void layoutLegendOnIntersect() {

@@ -27,6 +27,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Factory for {@link IFeatureModel feature models} used in multi product lines.
@@ -76,6 +78,11 @@ public class MultiFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 		return (MultiConstraint) oldConstraint.clone(featureModel);
+	}
+
+	@Override
+	public IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt) {
+		return LongRunningWrapper.runMethod(new FeatureModelObfuscator(featureModel, salt));
 	}
 
 }

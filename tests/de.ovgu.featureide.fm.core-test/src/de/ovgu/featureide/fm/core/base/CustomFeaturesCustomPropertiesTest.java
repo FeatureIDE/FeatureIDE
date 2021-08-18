@@ -32,12 +32,14 @@ import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 public class CustomFeaturesCustomPropertiesTest {
 
@@ -90,6 +92,11 @@ public class CustomFeaturesCustomPropertiesTest {
 		@Override
 		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
 			return (Constraint) oldConstraint.clone(featureModel);
+		}
+
+		@Override
+		public IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt) {
+			return LongRunningWrapper.runMethod(new FeatureModelObfuscator(featureModel, salt));
 		}
 
 	}

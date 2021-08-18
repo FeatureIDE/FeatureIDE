@@ -24,10 +24,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Abstract action for modifying a feature model.
@@ -62,6 +65,27 @@ public abstract class AFeatureModelAction extends Action {
 
 	private boolean isExternalFeature(IFeature feature) {
 		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
+	}
+
+	/**
+	 * method to check if the selection in the editor includes a feature from an external submodel
+	 *
+	 * @param selection the selection from the editor
+	 *
+	 * @return true if there is a feature from an external submodel, false otherwise
+	 */
+	protected boolean hasExternalFeature(IStructuredSelection selection) {
+		for (final Object selectedElement : selection.toArray()) {
+			if (selectedElement instanceof FeatureEditPart) {
+				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
+					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
+					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }

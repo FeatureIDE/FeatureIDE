@@ -168,10 +168,10 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	protected abstract void updateProperties();
 
 	/**
-	 * Checks whether selection only contains features
+	 * Checks whether selection only contains features and that those features are editable (not external features)
 	 *
 	 * @param selection
-	 * @return boolean indicating whether there are only features selected
+	 * @return boolean indicating whether there are only editable features selected
 	 */
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		for (final Object obj : selection.toArray()) {
@@ -179,7 +179,14 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 				return false;
 			}
 		}
-		return true;
+
+		// check whether the selection includes no feature from an external submodel
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+			return true;
+		}
+
+		return false;
+
 	}
 
 	@Override

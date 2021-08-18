@@ -24,6 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LEFT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RIGHT;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -46,6 +48,8 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
  * @author Christian Becker
  * @author Thomas Thuem
  * @author Christopher Sontag
+ * @author Benedikt Jutz
+ * @author Johannes Herschel
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 
@@ -72,6 +76,14 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(ConfigurationMap.ID);
 		down.addView(CollaborationView.ID);
 		down.addView(FeatureStatisticsView.ID);
+
+		// Add extension views of the extension point de.ovgu.featureide.ui.views to the bottom layout and in the shortcut list.
+		final IConfigurationElement[] ces = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.views");
+		for (final IConfigurationElement ce : ces) {
+			final String viewid = ce.getAttribute("id");
+			down.addView(viewid);
+			layout.addShowViewShortcut(viewid);
+		}
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");

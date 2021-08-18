@@ -232,8 +232,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private ReverseOrderAction reverseOrderAction;
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
 
+	/**
+	 * Different actions for different layouts and possible calculations
+	 */
 	private List<Action> setLayoutActions, calculationActions;
-	private List<Action> setNameTypeActions;
+	/**
+	 * Actions to toggle between short and long names.
+	 */
+	private NameTypeSelectionAction shortNamesAction;
+	private NameTypeSelectionAction longNamesAction;
 	private final List<Action> actions = new ArrayList<>();
 
 	private int index;
@@ -308,9 +315,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// View actions
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
 		legendAction = addAction(new LegendAction(viewer, graphicalFeatureModel));
-		setNameTypeActions = new ArrayList<>(2);
-		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 0, 1)));
-		setNameTypeActions.add(addAction(new NameTypeSelectionAction(graphicalFeatureModel, 1, 0)));
+		// Name view actions
+		shortNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, true));
+		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, false));
 
 		// Calculation actions
 		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModelManager));
@@ -717,11 +724,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
-			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
-				f.update(FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED));
-			}
-			viewer.internRefresh(true);
-			viewer.reload();
+			updateFeatureNameTypes();
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
@@ -1008,10 +1011,21 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;
 		}
-//		TODO
-//		for (final IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
-//			page.propertyChange(event);
-//		}
+	}
+
+	/**
+	 * Updates the feature name representations, both for features in the diagram and for all cross-tree-constraints they appear in.
+	 */
+	private void updateFeatureNameTypes() {
+		final FeatureIDEEvent nameChangedEvent = FeatureIDEEvent.getDefault(EventType.FEATURE_NAME_CHANGED);
+		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
+			f.update(nameChangedEvent);
+		}
+		for (final IGraphicalConstraint c : graphicalFeatureModel.getConstraints()) {
+			c.update(nameChangedEvent);
+		}
+		viewer.internRefresh(true);
+		viewer.reload();
 	}
 
 	/**
@@ -1163,7 +1177,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				selectedAction.setChecked(true);
 				menuManager.insert(1, new Separator("ManualLayoutSeparator"));
 				menuManager.insertBefore("ManualLayoutSeparator", autoLayoutConstraintAction);
-				autoLayoutConstraintAction.setEnabled(!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout());
+				final boolean enableAutoLayoutConstraints = !graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
+				autoLayoutConstraintAction.setEnabled(enableAutoLayoutConstraints);
+				autoLayoutConstraintAction.setChecked(enableAutoLayoutConstraints && graphicalFeatureModel.getLayout().isAutoLayoutConstraints());
 			}
 		});
 		return menuManager;
@@ -1189,6 +1205,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	/**
+	 * Creates a MenuManager with the short/long name labels.
+	 *
+	 * @return new {@link MenuManager}
+	 */
 	private MenuManager createNameTypeMenuManager() {
 		final MenuManager menuManager = new MenuManager(SET_NAME_TYPE);
 		menuManager.setRemoveAllWhenShown(true);
@@ -1196,12 +1217,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				for (final Action action : setNameTypeActions) {
-					menuManager.add(action);
-				}
-				final Action selectedAction = setNameTypeActions.get((graphicalFeatureModel.getLayout().showShortNames()) ? 1 : 0);
-				selectedAction.setChecked(true);
-				selectedAction.setEnabled(false);
+				// Add actions
+				menuManager.add(longNamesAction);
+				menuManager.add(shortNamesAction);
+
+				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
+				shortNamesAction.setEnabled(!useShortNames);
+				shortNamesAction.setChecked(useShortNames);
+				longNamesAction.setEnabled(useShortNames);
+				longNamesAction.setChecked(!useShortNames);
 			}
 		});
 		return menuManager;
@@ -1252,7 +1276,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
-			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createNameTypeMenuManager());
 		}
 		if (isFeatureMenu(selection)) {
@@ -1463,5 +1486,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		viewer.removeSelectionChangedListener(listener);
+	}
+
+	public void adjustModelToEditorSize() {
+		adjustModelToEditorSizeAction.run();
 	}
 }
