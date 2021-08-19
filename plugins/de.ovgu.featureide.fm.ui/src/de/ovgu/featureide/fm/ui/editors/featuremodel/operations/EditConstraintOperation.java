@@ -38,37 +38,46 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Marcus Pinnecke
  * @author Marlen Bernier
  * @author Dawid Szczepanski
+ * @author Benedikt Jutz
  */
 public class EditConstraintOperation extends AbstractFeatureModelOperation {
 
-	private final int constraintIndex;
-
 	/**
-	 * This wrapper is used to wrap both fields (node and description) of a constraint It is needed because the FeatureIDEEvent constructor expects only one set
-	 * of objects (oldState and newState) This way it is possible to cache the state of two different fields.
+	 * This wrapper holds both fields (node and description) of a constraint. In this way, we can store the fields for the old and new constraints in only two
+	 * objects (oldValue and newValue) like the {@link FeatureIDEEvent} constructor expects.
 	 */
 	public static class ConstraintDescription {
 
-		private final Node node;
-		private final String description;
+		public final Node node;
+		public final String description;
 
 		public ConstraintDescription(Node node, String description) {
 			this.node = node;
 			this.description = description;
 		}
-
-		public Node getNode() {
-			return node;
-		}
-
-		public String getDescription() {
-			return description;
-		}
 	}
 
-	private final ConstraintDescription newWrapper;
+	/**
+	 * <code>oldWrapper</code> holds the old Constraint.
+	 */
 	private final ConstraintDescription oldWrapper;
+	/**
+	 * <code>constraintIndex</code> contains the index of <code>oldConstraint</code>.
+	 */
+	private final int constraintIndex;
+	/**
+	 * <code>newWrapper</code> holds the new constraint data we replace <code>oldWrapper</code> with.
+	 */
+	private final ConstraintDescription newWrapper;
 
+	/**
+	 * Creates a new {@link EditConstraintOperation}.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager} The manager for the feature model where we change the constraint.
+	 * @param constraint - {@link IConstraint} The constraint to modify.
+	 * @param propNode - {@link Node} The propositional formula that constraint now has.
+	 * @param description - {@link String} The description constraint now has.
+	 */
 	public EditConstraintOperation(IFeatureModelManager featureModelManager, IConstraint constraint, Node propNode, String description) {
 		super(featureModelManager, EDIT_CONSTRAINT);
 		oldWrapper = new ConstraintDescription(constraint.getNode(), constraint.getDescription());
@@ -76,19 +85,27 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
+	/**
+	 * Replaces the propositional formula and description of the constraint with the values in newWrapper. Returns a event of the
+	 * {@link EventType#CONSTRAINT_MODIFY} type.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
-		constraint.setNode(newWrapper.getNode());
-		constraint.setDescription(newWrapper.getDescription());
+		constraint.setNode(newWrapper.node);
+		constraint.setDescription(newWrapper.description);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldWrapper, newWrapper);
 	}
 
+	/**
+	 * The inverse operation for {@link EditConstraintOperation} replaces the now changed values with the previous ones stored in oldWrapper. Returns a event of
+	 * the {@link EventType#CONSTRAINT_MODIFY} type.
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
-		constraint.setNode(newWrapper.getNode());
-		constraint.setDescription(newWrapper.getDescription());
+		constraint.setNode(oldWrapper.node);
+		constraint.setDescription(oldWrapper.description);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);
 	}
 

@@ -52,11 +52,11 @@ public class FeatureIDEEvent {
 		 */
 		CONSTRAINT_MODIFY,
 		/**
-		 * A constraint was deleted.
+		 * A constraint c was deleted. c can be found in oldValue.
 		 */
 		CONSTRAINT_DELETE,
 		/**
-		 * A constraint was added.
+		 * A constraint c was added. c can be found in newValue.
 		 */
 		CONSTRAINT_ADD,
 		/**
