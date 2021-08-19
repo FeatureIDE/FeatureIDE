@@ -56,8 +56,8 @@ development branch:
 
 | Plugin                                                                                                                            | Description                                                                                              |
 |-----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
-| [e.ovgu.featureide.Cloneanalysis](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.Cloneanalysis) | Provides a tool to create migrated software product lines with support for feature-aware clone analysis. |
-| [de.ovgu.featureide.core.mpl](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.mpl)          | WIP                                                                                                      |
+| [de.ovgu.featureide.Cloneanalysis](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.Cloneanalysis) | Provides a tool to create migrated software product lines with support for feature-aware clone analysis. |
+| [de.ovgu.featureide.core.mpl](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.core.mpl)          | Provides tools to create multiple product line (MPL) projects.                                                                                                      |
 | [de.ovgu.featureide.migration](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.migration)        | Provides components to migrate multiple projects into a single FeatureIDE project.                       |
 
 ### Examples 
