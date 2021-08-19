@@ -79,6 +79,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
+import org.prop4j.Literal;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -171,9 +173,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditP
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
@@ -1154,8 +1160,30 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_DELETE:
 		case CONSTRAINT_MODIFY:
+			Node newFormula;
+			// For an modified constraint, extract the old constraint description, and find the constraint to replace.
+			final ConstraintDescription originalDescription = (ConstraintDescription) oldEvent.getOldValue();
+			newFormula = rewriteNodeImports(originalDescription.node, modelAlias);
+			final IConstraint constraintToModify = findConstraint(mfm, newFormula, originalDescription.description);
+			// Execute the appropriate EditConstraintOperation.
+			final ConstraintDescription modifiedDescription = (ConstraintDescription) oldEvent.getNewValue();
+			final Node editedFormula = rewriteNodeImports(modifiedDescription.node, modelAlias);
+			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description).execute();
 		case CONSTRAINT_ADD:
+			// For an added constraint, rewrite the formula contained in it.
+			IConstraint originalConstraint;
+			originalConstraint = (IConstraint) oldEvent.getNewValue();
+			newFormula = rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			// Execute the appropriate CreateConstraintOperation.
+			new CreateConstraintOperation(newFormula, fmManager, originalConstraint.getDescription()).execute();
+			break;
 		case CONSTRAINT_DELETE:
+			// For an deleted constraint, first clone it and rewrite its formula, so that a delete succeeds.
+			originalConstraint = (IConstraint) oldEvent.getOldValue();
+			newFormula = rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			final IConstraint constraintToDelete = findConstraint(mfm, newFormula, originalConstraint.getDescription());
+			new DeleteConstraintOperation(constraintToDelete, fmManager).execute();
+			break;
 		case STRUCTURE_CHANGED:
 		case ACTIVE_EXPLANATION_CHANGED:
 		case FEATURE_ATTRIBUTE_CHANGED:
@@ -1186,6 +1214,51 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		}
 		return modelAlias;
+	}
+
+	/**
+	 * Rewrites the literals in the given {@link Node} <code>oldNode</code> as to append <code>modelAlias</code> to the literals/feature names. This way, we
+	 * rewrite an imported constraint's formula whenever we create, remove or change it.
+	 *
+	 * @param oldNode - {@link Node}
+	 * @param modelAlias - {@link String}
+	 * @return new {@link Node}
+	 */
+	private Node rewriteNodeImports(Node oldNode, String modelAlias) {
+		if (oldNode instanceof Literal) {
+			final Literal literal = (Literal) oldNode;
+			final String oldFeatureName = literal.getUniqueContainedFeatures().iterator().next();
+			final String newFeatureName = modelAlias + oldFeatureName;
+			return new Literal(newFeatureName, literal.positive);
+		} else {
+			final Node clonedNode = oldNode.clone();
+			final Node[] oldChildren = clonedNode.getChildren();
+			final Node[] newChildren = new Node[oldChildren.length];
+			for (int iN = 0; iN < newChildren.length; iN++) {
+				newChildren[iN] = rewriteNodeImports(oldChildren[iN], modelAlias);
+			}
+			clonedNode.setChildren(newChildren);
+			return clonedNode;
+		}
+	}
+
+	/**
+	 * Returns the constraint from the constraint list of the feature model <code>mfm</code> that has the same propositional formula as <code>node</code>, and
+	 * the same description text as <code>description</code>. This method is used to delete/modify imported constraints, because comparison by their ID does not
+	 * work.
+	 *
+	 * @param mfm - {@link MultiFeatureModel}
+	 * @param newFormula - {@link Node}
+	 * @param description - {@link String}
+	 * @return c - {@link IConstraint}
+	 */
+	private IConstraint findConstraint(MultiFeatureModel mfm, Node newFormula, String description) {
+		for (final IConstraint constraint : mfm.getConstraints()) {
+			if (newFormula.equals(constraint.getNode()) && description.equals(constraint.getDescription())) {
+				return constraint;
+			}
+		}
+		return null;
 	}
 
 	/**
