@@ -81,10 +81,15 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_NAME_CHANGED,
 		/**
-		 * A change occurred in an imported model. source is the imported model that has been changed, and newValue contains the original
-		 * {@link FeatureIDEEvent} that occurred for source.
+		 * A change occurred in an imported model. <code>source</code> is the imported model that has been changed, and <code>newValue</code> contains the
+		 * original {@link FeatureIDEEvent} that occurred for source.
 		 */
 		IMPORTED_MODEL_CHANGED,
+		/**
+		 * Multiple changes occurred in a single model. <code>newValue</code> is a {@link List} that stores the single {@link FeatureIDEEvent}s, and
+		 * <code>source</code> is the feature model those changes occurred in.
+		 */
+		MULTIPLE_CHANGES_OCCURRED,
 		/**
 		 * A feature's name was changed and persistently saved.
 		 */

@@ -39,16 +39,17 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Operation to delete a feature from the model.
+ * Operation to delete a single feature from the model.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
 public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "DeleteFeatureOperation";
 
-	private final LinkedList<String> oldChildrenName = new LinkedList<>();
+	private final LinkedList<String> oldChildrenNames = new LinkedList<>();
 	private final String featureName;
 	private final String replacementName;
 
@@ -72,6 +73,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		oldFeature = featureModel.getFeature(featureName);
+		// Save data about the old parent (name, index, group type).
 		final IFeature oldParent = FeatureUtils.getParent(oldFeature);
 		if (oldParent != null) {
 			oldParentName = oldParent.getName();
@@ -80,11 +82,12 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			alternative = oldParent.getStructure().isAlternative();
 		}
 
+		// Save old child names.
 		final Iterable<IFeature> oldChildren = FeatureUtils.getChildren(oldFeature);
+		oldChildrenNames.clear();
+		oldChildrenNames.addAll(Functional.mapToStringList(oldChildren));
 
-		oldChildrenName.clear();
-		oldChildrenName.addAll(Functional.mapToStringList(oldChildren));
-
+		// Should oldFeature be the (former) root feature, replace it with its last child.
 		if (oldFeature.getStructure().isRoot()) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
@@ -92,14 +95,14 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			deleted = featureModel.deleteFeature(oldFeature);
 		}
 
-		// Replace feature name in constraints
+		// Replace feature name in constraints.
 		if (replacementName != null) {
 			for (final IConstraint c : featureModel.getConstraints()) {
 				c.getNode().replaceFeature(featureName, replacementName);
 			}
 		}
 
-		// make sure after delete the group type of the parent is set to and if there is only one child left
+		// Ensure after deletion that the group type of the parent is set to and if there is only one child left.
 		if (oldParent != null) {
 			if (oldParent.getStructure().getChildrenCount() == 1) {
 				oldParent.getStructure().changeToAnd();
@@ -119,7 +122,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			final IFeature oldParent = (oldParentName != null) ? featureModel.getFeature(oldParentName) : null;
 
 			final LinkedList<IFeature> oldChildren = new LinkedList<>();
-			for (final String name : oldChildrenName) {
+			for (final String name : oldChildrenNames) {
 				final IFeature child = featureModel.getFeature(name);
 				oldChildren.add(child);
 				final IFeatureStructure structure = child.getStructure();
@@ -150,7 +153,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			} else if ((oldParent != null) && alternative) {
 				oldParent.getStructure().changeToAlternative();
 			}
-			
+
 			return new FeatureModelOperationEvent(ID, EventType.FEATURE_ADD, featureModel, oldParent, feature);
 		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);

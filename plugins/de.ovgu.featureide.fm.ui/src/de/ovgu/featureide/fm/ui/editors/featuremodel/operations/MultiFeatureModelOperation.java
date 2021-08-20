@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,22 +35,66 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
+/**
+ * {@link MultiFeatureModelOperation} extends {@link AbstractFeatureModelOperation} with the Composite pattern in order to run an operation that consists of
+ * multiple other operations in the correct order.
+ *
+ * @author Sebastian Krieter
+ * @author Jens Meinicke
+ * @author Tobias Heß
+ * @author Benedikt Jutz (Documentation)
+ */
 public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * <code>operations</code> is a double-ended queue to store the single operations required to execute this {@link MultiFeatureModelOperation}.
+	 */
 	protected final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
-
+	/**
+	 * <code>featureNames</code> stores the feature names <code>operations</code> were executed on.
+	 */
 	protected final List<String> featureNames;
+	/**
+	 * <code>commonAncestor</code> contains the lowest common ancestor feature for the features in <code>featureNames</code>.
+	 */
 	private String commonAncestor;
 
+	/**
+	 * Creates a new {@link MultiFeatureModelOperation}.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param name - {@link String}
+	 * @param featureNames - {@link List}
+	 */
 	public MultiFeatureModelOperation(IFeatureModelManager featureModelManager, String name, List<String> featureNames) {
 		super(featureModelManager, name);
 		this.featureNames = featureNames;
 	}
 
+	/**
+	 * Constructs the single operations that need to be executed for this operation to run on <code>featureModel</code>.
+	 *
+	 * @param featureModel - {@link IFeatureModel}
+	 */
 	protected abstract void createSingleOperations(IFeatureModel featureModel);
 
+	/**
+	 * Returns the identifier of the concrete {@link MultiFeatureModelOperation}. This identifier is also stored in the {@link FeatureModelOperationEvent}s that
+	 * are fired.
+	 *
+	 * @return {@link String}
+	 */
 	protected abstract String getID();
 
+	/**
+	 * Runs this operation the first time. <br> In preparation, we call createSingleOperations to create the single operations to execute, then attempt to find
+	 * the common ancestor of the features in <code>featureNames</code>. <br> Afterwards, we call
+	 * {@link AbstractFeatureModelOperation#firstOperation(IFeatureModel)} for each operation in <code>operations</code>, and store the result in a
+	 * {@link List}. The returned {@link FeatureModelOperationEvent} has the {@link EventType#MULTIPLE_CHANGES_OCCURRED} type, and stores the single events as
+	 * new value.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#firstOperation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent firstOperation(IFeatureModel featureModel) {
 		createSingleOperations(featureModel);
@@ -68,42 +113,52 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 		for (final AbstractFeatureModelOperation operation : operations) {
 			events.add((FeatureModelOperationEvent) operation.firstOperation(featureModel));
 		}
-		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
+		return new FeatureModelOperationEvent(getID(), EventType.MULTIPLE_CHANGES_OCCURRED, featureModel, getFeature(featureModel), events);
 	}
 
+	/**
+	 * Looks up and returns the feature named <code>commonAncestor</code> in the given <code>featureModel</code>. If <code>commonAncestor</code> is
+	 * null/unknown, return null instead.
+	 *
+	 * @param featureModel - {@link IFeatureModel}t
+	 * @return {@link IFeatureModel}
+	 */
 	private IFeature getFeature(IFeatureModel featureModel) {
 		return commonAncestor == null ? null : featureModel.getFeature(commonAncestor);
 	}
 
+	/**
+	 * Runs each operation in <code>operations</code> in-order, stores the resulting events in a list, and returns a {@link FeatureModelOperationEvent} again
+	 * with the {@link EventType#MULTIPLE_CHANGES_OCCURRED} event type, and the events in-order.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#operation(IFeatureModel)}
+	 * @see {@link MultiFeatureModelOperation#firstOperation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
 		for (final AbstractFeatureModelOperation operation : operations) {
 			events.add((FeatureModelOperationEvent) operation.operation(featureModel));
 		}
-		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
+		return new FeatureModelOperationEvent(getID(), EventType.MULTIPLE_CHANGES_OCCURRED, featureModel, getFeature(featureModel), events);
 	}
 
+	/**
+	 * Runs the inverse operations for all operations in <code>operations</code> in reversed order. Otherwise works like
+	 * {@link MultiFeatureModelOperation#operationIFeatureModel)}.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#inverseOperation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
-
-		final ArrayList<AbstractFeatureModelOperation> copiedList = new ArrayList<>();
+		final ArrayList<AbstractFeatureModelOperation> copiedList = new ArrayList<>(operations);
+		Collections.reverse(copiedList);
 
 		for (final AbstractFeatureModelOperation operation : operations) {
-			copiedList.add(operation);
-		}
-
-		for (int i = copiedList.size() - 1; i >= 0; i--) {
-
-			final AbstractFeatureModelOperation operation = copiedList.get(i);
 			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
 		}
-
-//		for (final AbstractFeatureModelOperation operation : operations) {
-//			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
-//		}
-		return new FeatureModelOperationEvent(getID(), EventType.STRUCTURE_CHANGED, events, null, getFeature(featureModel));
+		return new FeatureModelOperationEvent(getID(), EventType.MULTIPLE_CHANGES_OCCURRED, featureModel, getFeature(featureModel), events);
 	}
 
 	public void addOperation(AbstractFeatureModelOperation operation) {
