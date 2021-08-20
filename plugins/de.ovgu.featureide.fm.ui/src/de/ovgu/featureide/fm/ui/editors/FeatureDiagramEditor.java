@@ -788,19 +788,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			recentEvents.add(event);
 			break;
+		case MULTIPLE_CHANGES_OCCURRED:
+			// Deal with the single event changes.
+			final List<FeatureIDEEvent> singleEvents = (List<FeatureIDEEvent>) event.getNewValue();
+			for (final FeatureIDEEvent singleEvent : singleEvents) {
+				propertyChange(singleEvent);
+			}
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
-			if (source instanceof ArrayList) {
-				final ArrayList<?> sList = (ArrayList<?>) source;
-				for (final Object object : sList) {
-					if (object instanceof FeatureModelOperationEvent) {
-
-						propertyChange((FeatureModelOperationEvent) object);
-					}
-				}
-			}
-
 			viewer.reload();
 			analyzeFeatureModel();
 			viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
@@ -1096,6 +1092,17 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
 
 		switch (oldEvent.getEventType()) {
+		case IMPORTED_MODEL_CHANGED:
+			// Repeat the single changes stored in newValue for the given source.
+			if (oldEvent.getNewValue() instanceof List<?>) {
+				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();
+				for (final Object obj : singleEvents) {
+					if (obj instanceof FeatureIDEEvent) {
+						final FeatureIDEEvent singleEvent = (FeatureIDEEvent) obj;
+						handleChangeInImportedModel(new FeatureIDEEvent(oldEvent.getSource(), EventType.IMPORTED_MODEL_CHANGED, null, singleEvent));
+					}
+				}
+			}
 		case FEATURE_NAME_CHANGED:
 			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
 			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();

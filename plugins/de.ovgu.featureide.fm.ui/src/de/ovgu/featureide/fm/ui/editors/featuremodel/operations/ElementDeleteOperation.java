@@ -71,10 +71,10 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Gets the names of all selected features in a viewer
+	 * Gets the names of all selected features in a viewer.
 	 *
-	 * @param viewer The viewer with the selection
-	 * @return String List of the names of all the selected features in the viewer
+	 * @param viewer - {@link Object} The viewer with the selection
+	 * @return {@link List} of the names of all the selected features in the viewer
 	 */
 	public static List<String> getFeatureNames(Object viewer) {
 		final IStructuredSelection selection;
@@ -104,7 +104,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Creates the single delete operations which are part of this MultiFeatureModelOperation
+	 * Creates the single delete operations which are part of this MultiFeatureModelOperation.
 	 *
 	 * @param featureModel The FeatureModel on which these operations take place
 	 */
@@ -291,10 +291,10 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Casts an object to a feature
+	 * Casts the object <code>element</code> to a feature.
 	 *
-	 * @param element Object that needs to be casted to a feature
-	 * @return Feature of the object or <code>null</code> if it can't be casted
+	 * @param element - {@link Object} The Object that needs to be casted to a feature.
+	 * @return {@link IFeature} of the object, or <code>null</code> if it can't be casted.
 	 */
 	private IFeature getFeatureFromObject(Object element) {
 		IFeature feature = null;
