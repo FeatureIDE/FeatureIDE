@@ -178,6 +178,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
@@ -847,7 +848,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.deselectAll();
 			setDirty();
 			analyzeFeatureModel();
-			recentEvents.add(event);
 			break;
 		case MODEL_DATA_SAVED:
 			recentEvents.add(event);
@@ -1056,7 +1056,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
 
 		switch (oldEvent.getEventType()) {
-		case IMPORTED_MODEL_CHANGED:
+		case MULTIPLE_CHANGES_OCCURRED:
 			// Repeat the single changes stored in newValue for the given source.
 			if (oldEvent.getNewValue() instanceof List<?>) {
 				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();
@@ -1067,6 +1067,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 				}
 			}
+			break;
 		case FEATURE_NAME_CHANGED:
 			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
 			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
@@ -1130,6 +1131,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			new CreateGraphicalSiblingOperation(graphicalFeatureModel, selectedFeatureName, siblingName).execute();
 			break;
 		case FEATURE_DELETE:
+			// Extract the name of the deleted feature, and rewrite it for this model.
+			final IFeature originalFeatureToDelete = ((IFeature) oldEvent.getSource());
+			final String featureToDeleteName = modelAlias + originalFeatureToDelete.getName();
+			new DeleteFeatureOperation(fmManager, featureToDeleteName).execute();
+			break;
 		case CONSTRAINT_MODIFY:
 			Node newFormula;
 			// For an modified constraint, extract the old constraint description, and find the constraint to replace.
