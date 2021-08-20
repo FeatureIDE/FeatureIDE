@@ -148,6 +148,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			diagramEditor.dispose();
 			fmManager.removeListener(diagramEditor);
 			// TODO de-register from imported feature models; also de-register all importers.
+			final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
+			if (fmManager.getObject() instanceof MultiFeatureModel) {
+				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
+				final List<Path> importPaths = getImportPaths(path, mfm);
+				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).removeImportListener(this));
+			}
+
 			fmManager.overwrite();
 		}
 		super.dispose();
@@ -564,17 +571,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			// Register for imported feature models here.
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
 				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-				for (String importPathString : mfm.getImports()) {
-					// TODO Trennzeichen für Windows
-					importPathString = importPathString.replace("\\", ".");
-					final String[] paths = path.toString().split(File.separator);
-					paths[paths.length - 1] = "";
-					String s = String.join(File.separator, paths);
-					s += importPathString;
-					// "OperatingSystem.uvl"
-					final Path importPath = FileSystems.getDefault().getPath(s);
-					FeatureModelManager.getInstance(importPath).addImportListener(this);
-				}
+				final List<Path> importPaths = getImportPaths(path, mfm);
+				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).addImportListener(this));
 			}
 
 			final IFile modelFile = getModelFile();
@@ -597,6 +595,27 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		// FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
 
 		// featureModel.getColorschemeTable().readColorsFromFile(file.getProject());
+	}
+
+	/**
+	 * @param path
+	 * @param mfm
+	 * @return
+	 */
+	private List<Path> getImportPaths(final Path path, final MultiFeatureModel mfm) {
+		final List<Path> importPaths = new ArrayList<>(mfm.getImports().size());
+
+		for (String importPathString : mfm.getImports()) {
+			// TODO Trennzeichen für Windows
+			importPathString = importPathString.replace("\\", ".");
+			final String[] paths = path.toString().split(File.separator);
+			paths[paths.length - 1] = "";
+			String s = String.join(File.separator, paths);
+			s += importPathString;
+			// "OperatingSystem.uvl"
+			importPaths.add(FileSystems.getDefault().getPath(s));
+		}
+		return importPaths;
 	}
 
 	private void createModelFileMarkers(ProblemList warnings) {
