@@ -1105,7 +1105,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// ... then translate the names and execute the insertion operation.
 			final String newParentName = modelAlias + originalParent.getName();
 			final String newChildName = modelAlias + originalChild.getName();
-			index = originalParent.getStructure().getChildIndex(mfm.getFeature(newChildName).getStructure()) - 1;
+			index = originalParent.getStructure().getChildIndex(originalChild.getStructure());
 			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
 			break;
 		case FEATURE_ADD_ABOVE:
