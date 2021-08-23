@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
 
 /**
  * This command allows the user to move features at the feature diagram using drag and drop.
@@ -113,8 +113,10 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public void execute() {
-		final FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		FeatureModelOperationWrapper.run(new MoveFeatureOperation(featureModel, data, newLocation, feature.getLocation().getCopy()));
+		final boolean or = oldParent.getObject().getStructure().isOr();
+		final boolean alternative = oldParent.getObject().getStructure().isAlternative();
+		final FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, oldIndex, newIndex, or, alternative, false);
+		FeatureModelOperationWrapper.run(new GraphicalMoveFeatureOperation(featureModel, data, newLocation, feature.getLocation().getCopy()));
 	}
 
 	private boolean calculateNewParentAndIndex(IGraphicalFeature next) {

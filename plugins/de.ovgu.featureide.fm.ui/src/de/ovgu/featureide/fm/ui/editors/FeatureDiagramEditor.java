@@ -182,7 +182,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOpe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -1057,13 +1061,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		switch (oldEvent.getEventType()) {
 		case MULTIPLE_CHANGES_OCCURRED:
+			// Mistreatment of ATTRIBUTE_CHANGED!
+			final String operationID = (((FeatureModelOperationEvent) oldEvent).getID());
+			if (operationID.equals(SetFeatureToAbstractOperation.ID) || operationID.equals(SetFeatureToMandatoryOperation.ID)) {
+				return;
+			}
 			// Repeat the single changes stored in newValue for the given source.
 			if (oldEvent.getNewValue() instanceof List<?>) {
 				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();
 				for (final Object obj : singleEvents) {
 					if (obj instanceof FeatureIDEEvent) {
 						final FeatureIDEEvent singleEvent = (FeatureIDEEvent) obj;
-						handleChangeInImportedModel(new FeatureIDEEvent(oldEvent.getSource(), EventType.IMPORTED_MODEL_CHANGED, null, singleEvent));
+						propertyChange(new FeatureIDEEvent(event.getSource(), EventType.IMPORTED_MODEL_CHANGED, null, singleEvent));
 					}
 				}
 			}
@@ -1078,7 +1087,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case GROUP_TYPE_CHANGED:
 			// Ask the current group type of the original feature.
-			final IFeature originalFeature = ((IFeature) oldEvent.getSource());
+			IFeature originalFeature = ((IFeature) oldEvent.getSource());
 			final int groupType = ChangeFeatureGroupTypeOperation.getGroupType(originalFeature);
 			// Run a new group type change operation for the referenced feature.
 			new ChangeFeatureGroupTypeOperation(groupType, modelAlias + originalFeature.getName(), fmManager).execute();
@@ -1162,6 +1171,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			new DeleteConstraintOperation(constraintToDelete, fmManager).execute();
 			break;
 		case STRUCTURE_CHANGED:
+			final FeatureOperationData data = (FeatureOperationData) oldEvent.getNewValue();
+			// Simple movements (without changing parent or position) are ignored.
+			final boolean usedAutoLayout = (Boolean) oldEvent.getOldValue();
+			if (!usedAutoLayout) {
+				break;
+			}
+			// For a moved feature, extract from the FeatureOperationData the features (old + new parent),
+			// and translate them to features in the composed model.
+			originalFeature = data.feature.getObject();
+			final IFeature referencedFeature = mfm.getFeature(modelAlias + originalFeature.getName());
+			originalParent = data.oldParent.getObject();
+			final IFeature referencedParent = mfm.getFeature(modelAlias + originalParent.getName());
+			final IFeature originalParent2 = data.newParent.getObject();
+			final IFeature newParent = mfm.getFeature(modelAlias + originalParent2.getName());
+
+			// Create and execute the appropriate GraphicalMoveFeatureOperation.
+			final FeatureOperationData newData = new FeatureOperationData(graphicalFeatureModel.getGraphicalFeature(referencedFeature),
+					graphicalFeatureModel.getGraphicalFeature(referencedParent), graphicalFeatureModel.getGraphicalFeature(newParent), data.oldIndex,
+					data.newIndex, data.or, data.alternative, data.reverse);
+			new GraphicalMoveFeatureOperation(graphicalFeatureModel, newData, null, null).execute();
+			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 		case FEATURE_ATTRIBUTE_CHANGED:
 		case LOCATION_CHANGED:
@@ -1171,14 +1201,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	/**
-	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that mfm imports. The imported model is stored in event.source.
+	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that mfm imports. The imported model is stored in
+	 * <code>event.source</code>
 	 *
 	 * @param event - {@link FeatureIDEEvent} A IMPORTED_MODEL_CHANGED event.
 	 * @param mfm - {@link MultiFeatureModel} The importing feature model.
 	 * @return String
 	 */
 	private String extractModelAlias(FeatureIDEEvent event, final MultiFeatureModel mfm) {
-		final IFeatureModel originalModel = (IFeatureModel) event.getSource();
+		// An IFeatureModel as source is its own element.
+		IFeatureModel originalModel;
+		if (event.getSource() instanceof IFeatureModel) {
+			originalModel = (IFeatureModel) event.getSource();
+		}
+		// For an IFeatureModelElement, ask about its model instead.
+		else if (event.getSource() instanceof IFeatureModelElement) {
+			final IFeatureModelElement element = (IFeatureModelElement) event.getSource();
+			originalModel = element.getFeatureModel();
+		} else {
+			return "";
+		}
+
 		final Path originalPath = originalModel.getSourceFile();
 		// Original Path -> remove the first segment for the project, then the file extension.
 		final String originalPathString = FeatureModelManager.getProject(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
