@@ -123,7 +123,7 @@ public class FeatureIDEEvent {
 		 */
 		ATTRIBUTE_CHANGED,
 		/**
-		 * A group type changed (e.g., from "or" to "xor").
+		 * A group type changed (e.g., from "or" to "alternative").
 		 */
 		GROUP_TYPE_CHANGED,
 		/**
@@ -135,7 +135,9 @@ public class FeatureIDEEvent {
 		 */
 		MANDATORY_CHANGED,
 		/**
-		 * The feature structure changed.
+		 * The feature structure changed, because a feature was moved, or changed its parent and/or position. <code>source</code> is the feature that was moved,
+		 * <code>oldValue</code> encodes whether manual layout was used (if not, the parent/position changes), and <code>newValue</code> contains the
+		 * FeatureOperationData for the movement.
 		 */
 		STRUCTURE_CHANGED,
 		/**

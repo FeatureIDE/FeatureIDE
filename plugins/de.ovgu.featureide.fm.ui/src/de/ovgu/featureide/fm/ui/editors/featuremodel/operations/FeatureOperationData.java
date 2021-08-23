@@ -23,95 +23,77 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
- * Contains all information needed to execute commands that move features
+ * Contains all information needed to execute commands that move features.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
 public class FeatureOperationData {
 
-	private IGraphicalFeature oldParent;
-	private IGraphicalFeature feature;
-	private IGraphicalFeature newParent;
-	private int newIndex;
-	private int oldIndex;
+	/**
+	 * <code>feature</code> is the graphical feature we just moved.
+	 */
+	public final IGraphicalFeature feature;
+	/**
+	 * <code>oldParent</code> is the parent feature that <code>feature</code> had before movement.
+	 */
+	public final IGraphicalFeature oldParent;
+	/**
+	 * <code>oldIndex</code> is the position <code>feature</code> had for <code>oldFeature</code>.
+	 */
+	public final int oldIndex;
+	/**
+	 * <code>newParent</code> is the parent feature <code>feature</code> will have after movement.
+	 */
+	public final IGraphicalFeature newParent;
+	/**
+	 * <code>newIndex</code> is the position <code>feature</code> will have for <code>newParent</code>.
+	 */
+	public final int newIndex;
+	/**
+	 * <code>or</code> encodes if <code>oldParent</code> had an or-group before movement.
+	 */
+	public final boolean or;
+	/**
+	 * <code>alternative</code> encodes if <code>oldParent</code> had an alternative-group before movement.
+	 */
+	public final boolean alternative;
+	/**
+	 * <code>reverse</code> encodes if this movement operation is a reversal of another operation.
+	 */
+	public final boolean reverse;
 
-	public FeatureOperationData(IGraphicalFeature feature, IGraphicalFeature oldParent, IGraphicalFeature newParent, int newIndex, int oldIndex) {
+	/**
+	 * Creates new {@link FeatureOperationData}.
+	 *
+	 * @param feature - {@link IGraphicalFeature}
+	 * @param oldParent - {@link IGraphicalFeature}
+	 * @param newParent - {@link IGraphicalFeature}
+	 * @param newIndex - int
+	 * @param oldIndex - int
+	 * @param or - boolean
+	 * @param alternative - boolean
+	 * @param reverse - boolean
+	 */
+	public FeatureOperationData(IGraphicalFeature feature, IGraphicalFeature oldParent, IGraphicalFeature newParent, int oldIndex, int newIndex, boolean or,
+			boolean alternative, boolean reverse) {
 		this.feature = feature;
 		this.newIndex = newIndex;
 		this.newParent = newParent;
 		this.oldIndex = oldIndex;
 		this.oldParent = oldParent;
+		this.or = or;
+		this.alternative = alternative;
+		this.reverse = reverse;
 	}
 
 	/**
-	 * @return the oldParent
+	 * Swaps <code>oldFeature</code> with <code>newFeature</code> and <code>oldIndex</code> with <code>newIndex</code> in order to undo the feature movement.
+	 *
+	 * @return new {@link FeatureOperationData}
 	 */
-	public IGraphicalFeature getOldParent() {
-		return oldParent;
+	public FeatureOperationData getInverseData() {
+		return new FeatureOperationData(feature, newParent, oldParent, newIndex, oldIndex, or, alternative, true);
 	}
-
-	/**
-	 * @param oldParent the oldParent to set
-	 */
-	public void setOldParent(IGraphicalFeature oldParent) {
-		this.oldParent = oldParent;
-	}
-
-	/**
-	 * @return the feature
-	 */
-	public IGraphicalFeature getFeature() {
-		return feature;
-	}
-
-	/**
-	 * @param feature the feature to set
-	 */
-	public void setFeature(IGraphicalFeature feature) {
-		this.feature = feature;
-	}
-
-	/**
-	 * @return the newParent
-	 */
-	public IGraphicalFeature getNewParent() {
-		return newParent;
-	}
-
-	/**
-	 * @param newParent the newParent to set
-	 */
-	public void setNewParent(IGraphicalFeature newParent) {
-		this.newParent = newParent;
-	}
-
-	/**
-	 * @return the newIndex
-	 */
-	public int getNewIndex() {
-		return newIndex;
-	}
-
-	/**
-	 * @param newIndex the newIndex to set
-	 */
-	public void setNewIndex(int newIndex) {
-		this.newIndex = newIndex;
-	}
-
-	/**
-	 * @return the oldIndex
-	 */
-	public int getOldIndex() {
-		return oldIndex;
-	}
-
-	/**
-	 * @param oldIndex the oldIndex to set
-	 */
-	public void setOldIndex(int oldIndex) {
-		this.oldIndex = oldIndex;
-	}
-
 }
