@@ -203,6 +203,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return graphicalFeature;
 	}
 
+	@Override
 	public IGraphicalFeature removeGraphicalFeature(IFeature feature) {
 		return features.remove(feature);
 	}
