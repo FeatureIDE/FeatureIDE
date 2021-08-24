@@ -130,6 +130,8 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	void writeFeature(final IGraphicalFeature graphicalFeature);
 
+	IGraphicalFeature removeGraphicalFeature(IFeature feature);
+
 	void readValues();
 
 	List<IGraphicalFeature> getVisibleRelations();

@@ -97,10 +97,13 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -179,6 +182,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOpe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteSlicingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
@@ -828,6 +832,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case FEATURE_DELETE:
 			final IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) source);
@@ -849,6 +854,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				viewer.refreshChildAll(root.getObject());
 			}
+			graphicalFeatureModel.removeGraphicalFeature(deletedFeature.getObject());
 			viewer.internRefresh(true);
 			viewer.deselectAll();
 			setDirty();
@@ -1034,10 +1040,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;
 		}
-//		TODO
-//		for (final IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
-//			page.propertyChange(event);
-//		}
 
 		if (!recentEvents.isEmpty()) {
 			final FeatureIDEEvent e = recentEvents.remove(0);
@@ -1045,6 +1047,51 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			graphicalFeatureModel.getFeatureModelManager().informImports(e2);
 		}
+	}
+
+	/**
+	 * Allows the user to rename the last added feature <code>newFeature</code> by opening a {@link FeatureLabelEditManager} for the associated
+	 * {@link FeatureEditPart}. We do not open a dialog when <code>newFeature</code> is an external feature, which then has already been named in another
+	 * editor.
+	 *
+	 * @param newFeature - {@link IFeature}
+	 */
+	private void showFirstNamingDialog(final IFeature newFeature) {
+		if ((newFeature instanceof MultiFeature) && (((MultiFeature) newFeature).isFromExtern())) {
+			return;
+		}
+		final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
+		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+		if (newEditPart != null) {// TODO move to FeatureEditPart
+			newEditPart.activate();
+			viewer.select(newEditPart);
+			// open the renaming command
+			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
+		}
+	}
+
+	/**
+	 * Generic handling method for whenever the feature name of a feature is changed.
+	 *
+	 * @param event - {@link FeatureIDEEvent}
+	 */
+	private void handleFeatureNameChanged(FeatureIDEEvent event) {
+		final String newValue = (String) event.getNewValue();
+		final IFeature feature = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeature(newValue);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		graphicalFeature.update(event);
+		final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
+		if (part != null) {// TODO move to FeatureEditPart
+			viewer.internRefresh(true);
+			viewer.deselectAll();
+			viewer.select(part);
+		} else {
+			FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
+		}
+		viewer.reload();
+		setDirty();
+		analyzeFeatureModel();
+		recentEvents.add(event);
 	}
 
 	/**
@@ -1194,6 +1241,65 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					data.newIndex, data.or, data.alternative, data.reverse);
 			new GraphicalMoveFeatureOperation(graphicalFeatureModel, newData, null, null).execute();
 			break;
+		case MODEL_DATA_CHANGED:
+			// Check that a DeleteSlicingOperation-FeatureModelOperationEvent occurs.
+			if (!(oldEvent instanceof FeatureModelOperationEvent) || !(((FeatureModelOperationEvent) oldEvent).getID()).equals(DeleteSlicingOperation.ID)) {
+				return;
+			}
+
+			// Copy the current feature model state.
+			final IFeatureModel copy = mfm.clone();
+			// Get the old feature model before slicing.
+			final IFeatureModel modelBeforeSlicing = (IFeatureModel) oldEvent.getOldValue();
+			// Remove the old constraints as they are in the referencing feature model.
+			for (final IConstraint oldConstraint : modelBeforeSlicing.getConstraints()) {
+				final Node referencingFormula = rewriteNodeImports(oldConstraint.getNode(), modelAlias);
+				final IConstraint referencedConstraint = findConstraint(mfm, referencingFormula, oldConstraint.getDescription());
+				mfm.removeConstraint(referencedConstraint);
+			}
+
+			// Find the root feature in this model, and remove it.
+			final IFeature rootFeature = modelBeforeSlicing.getStructure().getRoot().getFeature();
+			final IFeature referencedRootFeature = mfm.getFeature(modelAlias + rootFeature.getName());
+			final IFeatureStructure parentStructure = referencedRootFeature.getStructure().getParent();
+			index = parentStructure.getChildIndex(referencedRootFeature.getStructure());
+
+			// Remove all old features from the feature table, and from the feature ordering list.
+			final List<String> newFeatureOrder = new ArrayList<>(mfm.getFeatureOrderList());
+			for (final IFeature oldFeature : modelBeforeSlicing.getFeatures()) {
+				final String referencedFeatureName = modelAlias + oldFeature.getName();
+				newFeatureOrder.remove(referencedFeatureName);
+				mfm.deleteFeatureFromTable(mfm.getFeature(referencedFeatureName));
+			}
+
+			// From the feature model after slicing, copy the features, set the interface flag and correct their name.
+			// Afterwards, add them to the feature table, and the the end of the feature ordering list.
+			final IFeatureModel modelAfterSlicing = (IFeatureModel) oldEvent.getNewValue();
+			final MultiFeatureModelFactory factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(mfm);
+			for (final IFeature newFeature : modelAfterSlicing.getFeatures()) {
+				final String referencedName = modelAlias + newFeature.getName();
+				final MultiFeature referencedNewFeature = factory.createFeature(mfm, referencedName);
+				referencedNewFeature.setType(MultiFeature.TYPE_INTERFACE);
+				mfm.addFeature(referencedNewFeature);
+				newFeatureOrder.add(referencedName);
+			}
+			mfm.setFeatureOrderList(newFeatureOrder);
+
+			// Reconstruct the structure of the sliced feature model in the new feature model.
+			final IFeatureStructure reconstructedStructure = reconstructStructure(modelAfterSlicing.getStructure().getRoot(), modelAlias, mfm);
+			parentStructure.addChildAtPosition(index, reconstructedStructure);
+
+			// Rewrite the new constraint for the referencing model and add them.
+			for (final IConstraint newConstraint : modelAfterSlicing.getConstraints()) {
+				final Node referencingFormula = rewriteNodeImports(newConstraint.getNode(), modelAlias);
+				final IConstraint referencedConstraint = factory.createConstraint(mfm, referencingFormula);
+				referencedConstraint.setDescription(newConstraint.getDescription());
+				mfm.addConstraint(referencedConstraint);
+			}
+
+			// Propagate the MODEL_DATA_CHANGED-Event.
+			fmManager.fireEvent(new FeatureModelOperationEvent(DeleteSlicingOperation.ID, EventType.MODEL_DATA_CHANGED, mfm, copy, mfm));
+			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 		case FEATURE_ATTRIBUTE_CHANGED:
 			break;
@@ -1290,46 +1396,32 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	/**
-	 * Allows the user to rename the last added feature <code>newFeature</code> by opening a {@link FeatureLabelEditManager} for the associated
-	 * {@link FeatureEditPart}. We do not open a dialog when <code>newFeature</code> is an external feature, which then has already been named in another
-	 * editor.
+	 * Reconstructs the structure of an imported feature model, starting from the given <code>oldStructure</code>, for the referencing feature model
+	 * <code>mfm</code>, that knows the imported model under the alias <code>modelAlias</code>.
 	 *
-	 * @param newFeature - {@link IFeature}
+	 * @param oldStructure - {@link IFeatureStructure}
+	 * @param modelAlias - {@link String}
+	 * @param mfm - {@link MultiFeature}
+	 * @return new {@link IFeatureStructure}
 	 */
-	private void showFirstNamingDialog(final IFeature newFeature) {
-		if ((newFeature instanceof MultiFeature) && (((MultiFeature) newFeature).isFromExtern())) {
-			return;
+	private IFeatureStructure reconstructStructure(IFeatureStructure oldStructure, String modelAlias, MultiFeatureModel mfm) {
+		// Create the new FeatureStructure for the correct feature.
+		final FeatureStructure structure = new FeatureStructure(mfm.getFeature(modelAlias + oldStructure.getFeature().getName()));
+		// Copy mandatory, abstract and group type.
+		structure.setAbstract(oldStructure.isAbstract());
+		structure.setMandatory(oldStructure.isMandatory());
+		if (oldStructure.isAlternative()) {
+			structure.setAlternative();
+		} else if (oldStructure.isAnd()) {
+			structure.setAnd();
+		} else if (oldStructure.isOr()) {
+			structure.setOr();
 		}
-		final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
-		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-		if (newEditPart != null) {// TODO move to FeatureEditPart
-			newEditPart.activate();
-			viewer.select(newEditPart);
-			// open the renaming command
-			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
+		// Repeat for other children, then return the structure.
+		for (final IFeatureStructure child : oldStructure.getChildren()) {
+			structure.addChild(reconstructStructure(child, modelAlias, mfm));
 		}
-	}
-
-	/**
-	 * @param event
-	 */
-	private void handleFeatureNameChanged(FeatureIDEEvent event) {
-		final String newValue = (String) event.getNewValue();
-		final IFeature feature = graphicalFeatureModel.getFeatureModelManager().getSnapshot().getFeature(newValue);
-		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-		graphicalFeature.update(event);
-		final FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(graphicalFeature);
-		if (part != null) {// TODO move to FeatureEditPart
-			viewer.internRefresh(true);
-			viewer.deselectAll();
-			viewer.select(part);
-		} else {
-			FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
-		}
-		viewer.reload();
-		setDirty();
-		analyzeFeatureModel();
-		recentEvents.add(event);
+		return structure;
 	}
 
 	public List<FeatureIDEEvent> getRecentEvents() {

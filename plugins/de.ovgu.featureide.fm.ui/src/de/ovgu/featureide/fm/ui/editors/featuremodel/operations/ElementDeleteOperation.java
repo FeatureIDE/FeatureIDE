@@ -124,9 +124,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			if (feature != null) {
 				featuresToDelete.add(feature);
 
+				// Look up the constraints this feature is involved in.
 				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 					featureInConstraint = true;
 				}
+				// Test if the group of the feature and its parent are different
 				if (hasGroupDifference(feature)) {
 					featureHasGroupDifference = true;
 				}

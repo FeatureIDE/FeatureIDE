@@ -577,7 +577,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #setFeatureOrderListItem(int, String)
 	 * @see #setFeatureOrderUserDefined(boolean)
 	 *
-	 * @param featureOrderList the orderd list of feature names which provides the feature order. This parameter is assumed to be <i>non-null</i>
+	 * @param featureOrderList the ordered list of feature names which provides the feature order. This parameter is assumed to be <i>non-null</i>
 	 *
 	 * @since 3.0
 	 */
