@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IOperationHistoryListener;
@@ -598,17 +599,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	/**
-	 * @param path
-	 * @param mfm
-	 * @return
+	 * Returns a list of paths that correspond to files that the {@link MultiFeatureModel} <code>mfm</code> imports. These paths are relative to
+	 * <code>path</code>, i.e. the project root path in which the file for <code>mfm</code> is stored.
+	 *
+	 * @param path - {@link Path}
+	 * @param mfm - {@link MultiFeatureModel}
+	 * @return new {@link List}
 	 */
-	private List<Path> getImportPaths(final Path path, final MultiFeatureModel mfm) {
+	public static List<Path> getImportPaths(final Path path, final MultiFeatureModel mfm) {
 		final List<Path> importPaths = new ArrayList<>(mfm.getImports().size());
 
 		for (String importPathString : mfm.getImports()) {
 			// TODO Trennzeichen für Windows
 			importPathString = importPathString.replace("\\", ".");
-			final String[] paths = path.toString().split(File.separator);
+			final String[] paths = path.toString().split(Pattern.quote(File.separator));
 			paths[paths.length - 1] = "";
 			String s = String.join(File.separator, paths);
 			s += importPathString;

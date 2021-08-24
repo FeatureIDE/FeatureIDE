@@ -185,6 +185,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrderOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
@@ -1191,6 +1192,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final ConstraintDescription modifiedDescription = (ConstraintDescription) oldEvent.getNewValue();
 			final Node editedFormula = rewriteNodeImports(modifiedDescription.node, modelAlias);
 			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description).execute();
+			break;
 		case CONSTRAINT_ADD:
 			// For an added constraint, rewrite the formula contained in it.
 			IConstraint originalConstraint;
@@ -1230,7 +1232,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 		case FEATURE_ATTRIBUTE_CHANGED:
+			break;
 		case LOCATION_CHANGED:
+			// For a reversed constraint, execute a ModelReverseOrderOperation on its root.
+			originalFeature = (IFeature) oldEvent.getNewValue();
+			final IFeature newFeature = mfm.getFeature(modelAlias + originalFeature.getName());
+			new ModelReverseOrderOperation(newFeature).execute();
+			break;
 		default:
 			return;
 		}
