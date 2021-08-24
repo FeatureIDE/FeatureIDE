@@ -115,7 +115,7 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
-		 * The location of an object was changed.
+		 * The location of an object was changed, for example because the feature order was reversed.
 		 */
 		LOCATION_CHANGED,
 		/**
