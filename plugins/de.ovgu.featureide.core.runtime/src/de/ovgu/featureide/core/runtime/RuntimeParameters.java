@@ -484,7 +484,14 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			for (final CallLocation[] callLoc : callLocs) {
 				for (final CallLocation element : callLoc) {
 					// feature name = attribute of getProperty-call
-					featureName = element.getCallText().split("\"")[1];
+					
+					String[] callTextElements = element.getCallText().split("\"");
+					
+					if(callTextElements.length < 2) {
+						continue;
+					}
+					featureName = callTextElements[1];
+					
 					className = element.getMember().getParent().getElementName();
 					classFile = (IFile) element.getMember().getCompilationUnit().getCorrespondingResource();
 					compilationUnit = element.getMember().getCompilationUnit();
