@@ -72,6 +72,7 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		}
 
 		private static void printHead(StringBuilder str) {
+
 			str.append("%---required packages & variable definitions------------------------------------" + lnSep + "\\usepackage{forest}" + lnSep
 				+ "\\usepackage{xcolor}" + lnSep + "\\usetikzlibrary{angles}" + lnSep + "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep
 				+ "\\newcommand{\\circleSize}{0.25em}" + lnSep + "\\newcommand{\\angleSize}{0.8em}" + lnSep
@@ -80,11 +81,11 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				+ "	/tikz/mandatory/.style={" + lnSep + "		circle,fill=drawColor," + lnSep + "		draw=drawColor," + lnSep
 				+ "		inner sep=\\circleSize" + lnSep + "	}," + lnSep + "	/tikz/optional/.style={" + lnSep + "		circle," + lnSep + "		fill=white,"
 				+ lnSep + "		draw=drawColor," + lnSep + "		inner sep=\\circleSize" + lnSep + "	}," + lnSep + "	featureDiagram/.style={" + lnSep
-				+ "		for tree={" + lnSep + "			parent anchor = south," + lnSep + "			child anchor = north," + lnSep
-				+ "			draw = drawColor," + lnSep + "			edge = {draw=drawColor}," + lnSep + "		}" + lnSep + "	}," + lnSep
-				+ "	/tikz/abstract/.style={" + lnSep + "		fill = blue!85!cyan!5," + lnSep + "		draw = drawColor" + lnSep + "	}," + lnSep
-				+ "	/tikz/concrete/.style={" + lnSep + "		fill = blue!85!cyan!20," + lnSep + "		draw = drawColor" + lnSep + "	}," + lnSep
-				+ "	mandatory/.style={" + lnSep + "		edge label={node [mandatory] {} }" + lnSep + "	}," + lnSep + "	optional/.style={" + lnSep
+				+ "		for tree={" + lnSep + String.format("\t\t\t%s = %s,%n", "text depth", "0") + "			parent anchor = south," + lnSep
+				+ "			child anchor = north," + lnSep + "			draw = drawColor," + lnSep + "			edge = {draw=drawColor}," + lnSep + "		}"
+				+ lnSep + "	}," + lnSep + "	/tikz/abstract/.style={" + lnSep + "		fill = blue!85!cyan!5," + lnSep + "		draw = drawColor" + lnSep
+				+ "	}," + lnSep + "	/tikz/concrete/.style={" + lnSep + "		fill = blue!85!cyan!20," + lnSep + "		draw = drawColor" + lnSep + "	},"
+				+ lnSep + "	mandatory/.style={" + lnSep + "		edge label={node [mandatory] {} }" + lnSep + "	}," + lnSep + "	optional/.style={" + lnSep
 				+ "		edge label={node [optional] {} }" + lnSep + "	}," + lnSep + "	or/.style={" + lnSep + "		tikz+={" + lnSep
 				+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};"
 				+ lnSep + "		}	" + lnSep + "	}," + lnSep + "	/tikz/or/.style={" + lnSep + "	}," + lnSep + "	alternative/.style={" + lnSep
@@ -390,8 +391,9 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				check = true;
 				// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
 				// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
-				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
-					+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative Group] {}; \\\\");
+				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);"
+					+ lnSep + "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep
+					+ "		\\node [alternative,label=right:Alternative Group] {}; \\\\");
 				legend[5] = false;
 			}
 			if (legend[6]) {
