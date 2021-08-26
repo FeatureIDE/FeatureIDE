@@ -102,7 +102,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractGraphicalFeatureMo
 				} else {
 					gf.setCollapsed(false);
 					editor.propertyChange(new FeatureIDEEvent(null, EventType.FEATURE_COLLAPSED_ALL_CHANGED));
-					final boolean leftestChildIsOutOfSight = editor.getViewer().isNodeOutOfSight(leftestChild);
+					final boolean leftestChildIsOutOfSight = leftestChild != null ? editor.getViewer().isNodeOutOfSight(leftestChild) : false;
 					final int lastChildIndex = gf.getAllGraphicalChildren().size() - 1;
 					final boolean rightestChildIsOutOfSight;
 					if (lastChildIndex < 0) {
