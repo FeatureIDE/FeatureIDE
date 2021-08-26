@@ -159,6 +159,18 @@ public class MultiFeatureModel extends FeatureModel {
 		attributeConstraints.add(constraint);
 	}
 
+	@Override
+	public void addConstraint(IConstraint constraint) {
+		addOwnConstraint(constraint);
+		elements.put(constraint.getInternalId(), constraint);
+	}
+
+	@Override
+	public void addConstraint(IConstraint constraint, int index) {
+		addOwnConstraint(constraint);
+		elements.put(constraint.getInternalId(), constraint);
+	}
+
 	public void addOwnConstraint(final IConstraint constraint) {
 		ownConstraints.add(constraint);
 		constraints.add(constraint);
