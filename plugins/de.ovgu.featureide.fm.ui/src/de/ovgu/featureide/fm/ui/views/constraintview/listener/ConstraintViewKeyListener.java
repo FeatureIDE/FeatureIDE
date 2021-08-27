@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.listener;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintInViewAction;
@@ -41,7 +38,6 @@ public class ConstraintViewKeyListener implements KeyListener {
 
 	// integer values that are returned when pressing a special button (from keyListener)
 	private final int F_BUTTON_PRESSED = 102;
-	private final int Z_BUTTON_PRESSED = 122;
 
 	private final ConstraintViewController controller;
 	private final ConstraintView viewer;
@@ -62,20 +58,6 @@ public class ConstraintViewKeyListener implements KeyListener {
 		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
 			// pressing CTRL + F will get you in the search box
 			viewer.getSearchBox().setFocus();
-		} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == Z_BUTTON_PRESSED))) {
-			// pressing CTRL + Z will undo operations
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
-						null, null);
-				controller.getView().refresh();
-			} catch (final ExecutionException e1) {}
-		} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
-			// pressing CTRL + SHIFT + Z will redo undos
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) controller.getFeatureModelManager().getUndoContext(),
-						null, null);
-				controller.getView().refresh();
-			} catch (final ExecutionException e1) {}
 		} else if (e.keyCode == SWT.ESC) {
 			// pressing the escape button will remove the focus or current selection
 			viewer.getViewer().setSelection(null);
