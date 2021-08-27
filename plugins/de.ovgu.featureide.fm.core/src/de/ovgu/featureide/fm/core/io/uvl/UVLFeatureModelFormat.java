@@ -148,6 +148,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f, UVLModel submodel) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
 
+		boolean duplicateFeature = false;
+		// Add error in case of a duplicate feature name
+		if (fm.getFeatures().stream().anyMatch(feature -> feature.getName().equals(resolved.getName()))) {
+			pl.add(new Problem("Duplicate feature name " + resolved.getName(), 0, Severity.ERROR));
+			duplicateFeature = true;
+		}
+
 		// Validate imported feature
 		if ((root == null ? -1 : root.getName().lastIndexOf('.')) < resolved.getName().lastIndexOf('.')) {
 			// Update current submodel or add an error if the feature does not exist
@@ -182,7 +189,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root.getStructure().addChild(feature.getStructure());
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
-		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		if (!duplicateFeature) { // Don't process groups for duplicate feature names, as this can cause infinite recursion
+			Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		}
 		parseAttributes(resolved, fm);
 		return feature;
 	}
