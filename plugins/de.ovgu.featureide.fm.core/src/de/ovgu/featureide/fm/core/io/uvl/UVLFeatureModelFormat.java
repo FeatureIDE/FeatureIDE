@@ -135,6 +135,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root = parseFeature(fm, null, f, rootModel);
 		} else {
 			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
+			fm.addFeature(root);
 			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
 		}
 		fm.getStructure().setRoot(root.getStructure());
