@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -67,7 +65,6 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		return plugin;
 	}
 
-	@CheckForNull
 	public static IFolder createFolder(IProject project, String name) {
 		final IFolder folder = getFolder(project, name);
 		if ((folder != null) && !folder.exists()) {
@@ -80,7 +77,6 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		return folder;
 	}
 
-	@CheckForNull
 	public static IFolder getFolder(IProject project, String name) {
 		IFolder folder = null;
 		if ((name != null) && !name.trim().isEmpty()) {

@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IFF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +35,7 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.Operator;
 
 /**
  * provides proposals for content assist while typing constraints
@@ -41,15 +44,14 @@ import de.ovgu.featureide.fm.core.Features;
  * @author Fabian Benduhn
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Rahel Arens
+ * @author Johannes Herschel
  */
 public class ConstraintContentProposalProvider implements IContentProposalProvider {
 
-	static final int CURRENT = 0;
-	static final int LAST = 1;
 	private final Collection<String> features;
 
 	public ConstraintContentProposalProvider(Collection<String> featureNames) {
-		super();
 		features = featureNames;
 	}
 
@@ -63,29 +65,27 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 
-		final String[] words = getWords(contents, position);
+		final ProposalContext context = getProposalContext(contents, position);
 
-		final List<ContentProposal> proposalList = getProposalList(words, contents);
+		final List<ContentProposal> proposalList = getProposalList(context);
 
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
 	}
 
 	/**
-	 * @return all possible feature names or junctors.
-	 * @param words current and previous word of edited string
-	 * @param contents complete string being edited
-	 *
+	 * @param context context of proposal
+	 * @return List of proposals, only contains proposals consistent with previous and current word.
 	 */
-	private List<ContentProposal> getProposalList(String[] words, String contents) {
+	private List<ContentProposal> getProposalList(ProposalContext context) {
 		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
 
-		if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
-			proposalList = getProposalList(words[LAST], features);
+		if ("".equals(context.currentWord)) {
+			proposalList = getProposalList(context, features);
 		} else {
-			for (final ContentProposal proposal : getProposalList(words[LAST], features)) {
-				if ((proposal.getContent().length() > words[CURRENT].trim().length())
-					&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
+			for (final ContentProposal proposal : getProposalList(context, features)) {
+				if ((proposal.getContent().length() >= context.currentWord.length())
+					&& proposal.getContent().substring(0, context.currentWord.length()).equalsIgnoreCase(context.currentWord)) {
 					proposalList.add(proposal);
 				}
 			}
@@ -94,78 +94,63 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	}
 
 	/**
-	 * Returns the word that is being written and the word before it, given the current content and cursor position
-	 *
-	 * @param contents the content,i.e. the string which contains the text
+	 * @param contents the content, i.e. the string which contains the text
 	 * @param position current position of the cursor, first position is 0
-	 * @return Array with two elements: current word and the word before, words can be empty String, index: CURRENT, LAST
+	 * @return context of proposal
 	 */
-	static String[] getWords(String contents, int position) {
+	static ProposalContext getProposalContext(String contents, int position) {
 
-		final String[] words = new String[2];
+		// cut the rest of the string away
+		contents = contents.substring(0, position);
 
-		int posMarker = position - 1;
+		// cut away ( and ) because they do not change the last appearing word of the constraint but this way we can shorten the following code
+		contents = contents.replaceAll("\\(|\\)", " ");
+
 		if (position == 0) {
-			words[CURRENT] = "";
-			words[LAST] = "";
+			return new ProposalContext(false, "", false);
 		} else {
-			while ((posMarker > 0) && (contents.charAt(posMarker) != ' ')) {
-				posMarker--;
-			}
-			words[CURRENT] = contents.substring(posMarker, position);
+			int quotMarkCounter = 0;
 
-			while ((posMarker > 0) && (contents.charAt(posMarker) == ' ')) {
-				posMarker--;
-			}
-			int startBefore = posMarker;
-			while ((startBefore > 0) && (contents.charAt(startBefore) != ' ')) {
-				startBefore--;
-			}
-			if (posMarker == 0) {
-				if (contents.charAt(0) == '(') {
-					words[LAST] = "(";
-				} else {
-					words[LAST] = "";
+			// count number of quotation marks
+			for (int i = 0; i < contents.length(); i++) {
+				if (contents.charAt(i) == '\"') {
+					quotMarkCounter++;
 				}
+			}
+
+			// detect whether it is a feature with multiple words
+			final boolean quotationMark = (quotMarkCounter % 2) != 0;
+			final char separator = quotationMark ? '\"' : ' ';
+
+			// detect the position where the current feature starts
+			int posMarker = contents.lastIndexOf(separator) + 1;
+
+			// the current typed word
+			final String currentWord = contents.substring(posMarker);
+
+			if (quotationMark) {
+				posMarker--;
+			}
+			contents = contents.substring(0, posMarker);
+			contents = contents.trim();
+
+			// text before current word
+			if (contents.endsWith("\"")) {
+				return new ProposalContext(true, currentWord, quotationMark);
 			} else {
-				words[LAST] = contents.substring(startBefore, posMarker + 1);
+				final String lastWord = contents.substring(contents.lastIndexOf(' ') + 1);
+				return new ProposalContext(!Operator.isOperatorName(lastWord) && !lastWord.isEmpty(), currentWord, quotationMark);
 			}
-
 		}
-
-		if (words[LAST].trim().startsWith("(") && (words[LAST].length() > 1)) {
-			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
-
-		}
-		if (words[CURRENT].trim().startsWith("(")) {
-			words[CURRENT] = words[CURRENT].trim();
-			words[CURRENT] = words[CURRENT].substring(1);
-			words[LAST] = "(";
-		}
-		if (words[LAST].endsWith(")")) {
-			words[LAST] = ")";
-			if (contents.charAt(posMarker) == ')') {
-				words[LAST] = ") ";
-			}
-
-		}
-		if (words[CURRENT].endsWith(")")) {
-			words[LAST] = ")";
-			words[CURRENT] = "";
-
-		}
-
-		return words;
 	}
 
 	/**
-	 *
-	 * @param wordBefore
-	 *
-	 * @param features set of features
-	 * @return List of proposals, either operators or feature names
+	 * @param context context of proposal
+	 * @param features set of all features
+	 * @return List of proposals, either operators or feature names. Contains only proposals consistent with the previous text, but may contain proposals
+	 *         inconsistent with current word.
 	 */
-	private static List<ContentProposal> getProposalList(String wordBefore, Collection<String> features) {
+	private static List<ContentProposal> getProposalList(ProposalContext context, Collection<String> features) {
 
 		final ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		final ArrayList<String> featureList = new ArrayList<String>(features);
@@ -173,29 +158,71 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		final Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
 
-		// TODO: Add binary operators only iff their appearance makes sense in content proposal
-		// Example:
-		// Show "and" for "A |"
-		// Hide "and" for "A and |"
-		proposals.add(new ContentProposal("and"));
-		proposals.add(new ContentProposal(IFF));
-		proposals.add(new ContentProposal(IMPLIES));
-		proposals.add(new ContentProposal("or"));
+		if (context.featureBefore) {
+			if (!context.quotationMark) {
+				// Add binary operators only iff their appearance makes sense in content proposal
+				// Example:
+				// Show "and" for "A |"
+				// Hide "and" for "A and |"
+				proposals.add(new ContentProposal(AND.toLowerCase()));
+				proposals.add(new ContentProposal(IFF.toLowerCase()));
+				proposals.add(new ContentProposal(IMPLIES.toLowerCase()));
+				proposals.add(new ContentProposal(OR.toLowerCase()));
+			}
+		} else {
+			if (context.quotationMark) {
+				// Add features with spaces
+				for (final String s : featureList) {
+					if (s.contains(" ") || operatorNamesInFeatures.contains(s)) {
+						proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s) ? " " + Features.FEATURE_SUFFIX : "")));
+					}
+				}
+			} else {
+				// Add NOT only iff its appearance makes sense in content proposal
+				// Example:
+				// Show NOT for "A implies |"
+				// Hide NOT for "A |"
+				proposals.add(new ContentProposal(NOT.toLowerCase()));
 
-		// TODO: Add binary operators only iff their appearance makes sense in content proposal
-		// Example:
-		// Show NOT for "A implies |"
-		// Hide NOT for "A |"
-		proposals.add(new ContentProposal(NOT));
-
-		// TODO: Add features only iff a feature name is valid in context
-		// Example:
-		// Show feature for "A implies |"
-		// Hide features for "A |"
-		for (final String s : featureList) {
-			proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
+				// Add features only iff a feature name is valid in context
+				// Example:
+				// Show feature for "A implies |"
+				// Hide features for "A |"
+				for (final String s : featureList) {
+					proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
+				}
+			}
 		}
 
 		return proposals;
+	}
+
+	/**
+	 *
+	 * Summarizes necessary information about the current context of proposals, i.e. the currently typed word and the word before.
+	 *
+	 * @author Rahel Arens
+	 * @author Johannes Herschel
+	 */
+	static class ProposalContext {
+
+		/**
+		 * True iff the word before the current word is a feature name. False if the previous word is empty.
+		 */
+		final boolean featureBefore;
+		/**
+		 * Currently typed word, empty if a new word is started.
+		 */
+		final String currentWord;
+		/**
+		 * True iff the currently typed word is started with a quotation mark.
+		 */
+		final boolean quotationMark;
+
+		ProposalContext(boolean featureBefore, String currentWord, boolean quotationMark) {
+			this.featureBefore = featureBefore;
+			this.currentWord = currentWord;
+			this.quotationMark = quotationMark;
+		}
 	}
 }

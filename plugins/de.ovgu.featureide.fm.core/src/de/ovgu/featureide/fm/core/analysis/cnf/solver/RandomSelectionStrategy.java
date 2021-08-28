@@ -18,32 +18,49 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
-import org.eclipse.swt.widgets.FileDialog;
+import static org.sat4j.core.LiteralsUtils.negLit;
+import static org.sat4j.core.LiteralsUtils.posLit;
 
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMImportHandler;
+import java.util.Random;
+
+import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
 /**
- * Converts a GUIDSL feature model into our feature model format.
+ * Uses a sample of configurations to achieve a phase selection that corresponds to a uniform distribution of configurations in the configuration space.
  *
- * @author Dariusz Krolikowski
- * @author Maik Lampe
  * @author Sebastian Krieter
- * @author Marcus Pinnecke
  */
-public class ImportGUIDSLHandler extends AbstractFMImportHandler {
+public class RandomSelectionStrategy implements IPhaseSelectionStrategy {
+
+	private static final long serialVersionUID = 1L;
+
+	public final Random RAND = new Random(123456789);
 
 	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new GuidslFormat();
+	public void assignLiteral(int p) {}
+
+	@Override
+	public void init(int nlength) {}
+
+	@Override
+	public void init(int var, int p) {}
+
+	@Override
+	public int select(int var) {
+		return RAND.nextBoolean() ? posLit(var) : negLit(var);
 	}
 
 	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL" });
+	public void updateVar(int p) {}
+
+	@Override
+	public void updateVarAtDecisionLevel(int q) {}
+
+	@Override
+	public String toString() {
+		return "random phase selection";
 	}
+
 }

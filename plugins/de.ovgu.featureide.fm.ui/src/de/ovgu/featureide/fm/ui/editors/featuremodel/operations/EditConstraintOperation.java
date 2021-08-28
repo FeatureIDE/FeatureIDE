@@ -87,8 +87,8 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
-		constraint.setNode(newWrapper.getNode());
-		constraint.setDescription(newWrapper.getDescription());
+		constraint.setNode(oldWrapper.getNode());
+		constraint.setDescription(oldWrapper.getDescription());
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);
 	}
 

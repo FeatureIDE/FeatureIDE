@@ -245,73 +245,79 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			it = new MergeIterator3(t, util.getCnf().getVariables().size(), groupedPresenceConditions);
 		}
 		numberOfCombinations = it.size();
+		if (numberOfCombinations == 0) {
+			final LiteralSet[] solverSolutions = util.getSolverSolutions();
+			if ((solverSolutions.length > 0) && (solverSolutions[0] != null)) {
+				util.newConfiguration(solverSolutions[0]);
+			}
+		} else {
+			coveredCount = 0;
+			invalidCount = 0;
 
-		coveredCount = 0;
-		invalidCount = 0;
-
-		samplingMonitor = new MonitorThread(new SamplingMonitor(), 60_000);
-		try {
-			samplingMonitor.start();
-			final List<ClauseList> combinationListUncovered = new ArrayList<>();
-			count = coveredCount;
-			phaseCount++;
-			ICoverStrategy phase = phaseList.get(0);
-			while (true) {
-				final ClauseList combinedCondition = it.get();
-				if (combinedCondition == null) {
-					break;
-				}
-				if (combinedCondition.isEmpty()) {
-					invalidCount++;
-				} else {
-					final CombinationStatus covered = phase.cover(combinedCondition);
-					switch (covered) {
-					case NOT_COVERED:
-						combinationListUncovered.add(combinedCondition);
-						break;
-					case COVERED:
-						coveredCount++;
-						combinedCondition.clear();
-						break;
-					case INVALID:
-						invalidCount++;
-						combinedCondition.clear();
-						break;
-					default:
-						combinedCondition.clear();
+			samplingMonitor = new MonitorThread(new SamplingMonitor(), 60_000);
+			try {
+				samplingMonitor.start();
+				final List<ClauseList> combinationListUncovered = new ArrayList<>();
+				count = coveredCount;
+				phaseCount++;
+				ICoverStrategy phase = phaseList.get(0);
+				while (true) {
+					final ClauseList combinedCondition = it.get();
+					if (combinedCondition == null) {
 						break;
 					}
-				}
-				count++;
-			}
-
-			int coveredIndex = -1;
-			for (int j = 1; j < phaseList.size(); j++) {
-				phaseCount++;
-				phase = phaseList.get(j);
-				count = coveredCount + invalidCount;
-				for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
-					final ClauseList combination = combinationListUncovered.get(i);
-					final CombinationStatus covered = phase.cover(combination);
-					switch (covered) {
-					case COVERED:
-						Collections.swap(combinationListUncovered, i, ++coveredIndex);
-						coveredCount++;
-						break;
-					case NOT_COVERED:
-						break;
-					case INVALID:
-						Collections.swap(combinationListUncovered, i, ++coveredIndex);
+					if (combinedCondition.isEmpty()) {
 						invalidCount++;
-						break;
-					default:
-						break;
+					} else {
+						final CombinationStatus covered = phase.cover(combinedCondition);
+						switch (covered) {
+						case NOT_COVERED:
+							combinationListUncovered.add(combinedCondition);
+							break;
+						case COVERED:
+							coveredCount++;
+							combinedCondition.clear();
+							break;
+						case INVALID:
+							invalidCount++;
+							combinedCondition.clear();
+							break;
+						default:
+							combinedCondition.clear();
+							break;
+						}
 					}
 					count++;
 				}
+
+				int coveredIndex = -1;
+				for (int j = 1; j < phaseList.size(); j++) {
+					phaseCount++;
+					phase = phaseList.get(j);
+					count = coveredCount + invalidCount;
+					for (int i = coveredIndex + 1; i < combinationListUncovered.size(); i++) {
+						final ClauseList combination = combinationListUncovered.get(i);
+						final CombinationStatus covered = phase.cover(combination);
+						switch (covered) {
+						case COVERED:
+							Collections.swap(combinationListUncovered, i, ++coveredIndex);
+							coveredCount++;
+							break;
+						case NOT_COVERED:
+							break;
+						case INVALID:
+							Collections.swap(combinationListUncovered, i, ++coveredIndex);
+							invalidCount++;
+							break;
+						default:
+							break;
+						}
+						count++;
+					}
+				}
+			} finally {
+				samplingMonitor.finish();
 			}
-		} finally {
-			samplingMonitor.finish();
 		}
 
 		curResult = util.getResultList();

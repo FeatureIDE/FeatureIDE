@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="SvgMapApp">
+				<feature name="L2Build"/>
+				<and abstract="true" mandatory="true" name="Layers">
+					<feature name="ColorRegion"/>
+					<feature name="Relief"/>
+					<feature name="Rivers"/>
+					<feature name="Lakes"/>
+					<feature name="PopCircle"/>
+				</and>
+				<and abstract="true" mandatory="true" name="Legends">
+					<and abstract="true" name="Controls">
+						<feature name="Navigator"/>
+						<feature name="ReliefControls"/>
+						<feature name="RiverControls"/>
+						<feature name="LakeControls"/>
+						<feature name="PopCircleControls"/>
+						<feature name="CoordinateDisplay"/>
+					</and>
+					<and abstract="true" name="Stats1">
+						<feature name="AgeChart"/>
+						<feature name="StatsMedianAge"/>
+						<feature name="EthnicBarChart"/>
+						<feature name="EthnicPieChart"/>
+					</and>
+					<and abstract="true" name="Stats2">
+						<feature name="StatsSex"/>
+						<feature name="StatsHouseholds"/>
+						<feature name="StatsPopulation"/>
+					</and>
+					<feature hidden="true" name="Legend"/>
+				</and>
+				<feature hidden="true" mandatory="true" name="USStates"/>
+				<feature mandatory="true" name="Base"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>PopCircleControls</var>
+					<var>PopCircle</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ReliefControls</var>
+					<var>Relief</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>RiverControls</var>
+					<var>Rivers</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LakeControls</var>
+					<var>Lakes</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Controls</var>
+					<var>Legend</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Stats1</var>
+					<var>Legend</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Stats2</var>
+					<var>Legend</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>L2Build</var>
+					<not>
+						<var>EthnicBarChart</var>
+					</not>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments>
+			<c> this turns panel a off</c>
+			<c> this turns panel a off</c>
+			<c>Layers { tab }</c>
+			<c>Legends { out="" }</c>
+			<c>Controls { tab }</c>
+			<c>Stats1 { tab }</c>
+			<c>Stats2 { tab }</c>
+		</comments>
+		<featureOrder userDefined="false"/>
+	</featureModel>

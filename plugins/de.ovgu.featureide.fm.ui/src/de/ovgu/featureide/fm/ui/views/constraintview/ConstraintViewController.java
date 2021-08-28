@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -35,16 +36,22 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -81,6 +88,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	private FeatureModelEditor featureModelEditor;
 	private boolean featureDiagramPageVisible = false;
+
+	private FeatureModelAnalyzer analyzer;
 
 	/**
 	 * The constraint used to detect when the analysis is finished
@@ -255,6 +264,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		settingsMenu.setStateOfActions(constraintsListVisible && constraintsViewVisible);
 		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
+		updateUndoRedoActions();
 
 		if (constraintsViewVisible && constraintsListVisible) {
 			settingsMenu.setShowCollapsedConstraintsInViewActionImage(
@@ -273,6 +283,25 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				constraintView.getViewer().getTree().setHeaderVisible(false);
 			}
 		}
+	}
+
+	/**
+	 * Adds or removes action handlers for undo/redo actions depending on the current feature model editor.
+	 */
+	private void updateUndoRedoActions() {
+		final IActionBars actionBars = getViewSite().getActionBars();
+		UndoActionHandler undoActionHandler = null;
+		RedoActionHandler redoActionHandler = null;
+		if (featureModelEditor != null) {
+			final Object undoContext = featureModelEditor.getFeatureModelManager().getUndoContext();
+			if (undoContext instanceof IUndoContext) {
+				undoActionHandler = new UndoActionHandler(getSite(), (IUndoContext) undoContext);
+				redoActionHandler = new RedoActionHandler(getSite(), (IUndoContext) undoContext);
+			}
+		}
+		actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undoActionHandler);
+		actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), redoActionHandler);
+		actionBars.updateActionBars();
 	}
 
 	/**
@@ -307,6 +336,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		// add listeners, etc. to new FeatureModelEditor
 		if (newFeatureModelEditor != null) {
+			final Boolean isAutomaticCalculation =
+				FeatureModelProperty.getBooleanProperty(newFeatureModelEditor.getFeatureModelManager().getSnapshot().getProperty(),
+						FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+			if (isAutomaticCalculation == Boolean.TRUE) {
+				analyzer = newFeatureModelEditor.getFeatureModelManager().getVariableFormula().getAnalyzer();
+			}
+
 			newFeatureModelEditor.diagramEditor.addSelectionChangedListener(selectionListener);
 			newFeatureModelEditor.addPageChangedListener(pageChangeListener);
 			newFeatureModelEditor.addEventListener(eventListener);
@@ -439,4 +475,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		return featureModelEditor;
 	}
 
+	public FeatureModelAnalyzer getAnalyzer() {
+		return analyzer;
+	}
 }

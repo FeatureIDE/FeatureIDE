@@ -399,25 +399,26 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			if (configString.contains("\n")) {
 				configString = configString.substring(0, configString.lastIndexOf('\n'));
 			}
-			final InputStream inputStream = new ByteArrayInputStream(configString.getBytes(StandardCharsets.UTF_8));
+			final InputStream inputStream1 = new ByteArrayInputStream(configString.getBytes(StandardCharsets.UTF_8));
+			final InputStream inputStream2 = new ByteArrayInputStream(configString.getBytes(StandardCharsets.UTF_8));
 
 			if (fileProp.exists()) {
 				try {
-					fileProp.setContents(inputStream, IResource.FORCE, null);
+					fileProp.setContents(inputStream1, IResource.FORCE, null);
 				} catch (final CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
 			} else {
-				createFile(fileProp, inputStream);
+				createFile(fileProp, inputStream1);
 			}
 			if (filePropInBuild.exists()) {
 				try {
-					filePropInBuild.setContents(inputStream, IResource.FORCE, null);
+					filePropInBuild.setContents(inputStream2, IResource.FORCE, null);
 				} catch (final CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
 			} else {
-				createFile(filePropInBuild, inputStream);
+				createFile(filePropInBuild, inputStream2);
 			}
 
 		} else {

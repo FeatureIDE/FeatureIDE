@@ -28,8 +28,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTAR
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
@@ -80,7 +78,6 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 */
 	public int nr;
 
-	@CheckForNull
 	private JavaCompiler compiler;
 
 	private TestRunner testRunner;

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.fm.core.IExtension;
@@ -103,6 +101,5 @@ public interface IComposerExtensionBase extends IExtension {
 	 */
 	IStatus isComposable();
 
-	@CheckForNull
 	<T extends IComposerObject> T getComposerObjectInstance(Class<T> c);
 }

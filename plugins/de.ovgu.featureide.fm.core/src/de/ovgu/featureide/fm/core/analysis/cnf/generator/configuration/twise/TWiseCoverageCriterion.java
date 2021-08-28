@@ -35,15 +35,13 @@ import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
  *
  * @author Sebastian Krieter
  */
-public class TWiseConfigurationTester {
+public class TWiseCoverageCriterion implements CoverageCriterion {
 
 	private final TWiseConfigurationUtil util;
-
-	private List<LiteralSet> sample;
 	private PresenceConditionManager presenceConditionManager;
 	private int t;
 
-	public TWiseConfigurationTester(CNF cnf) {
+	public TWiseCoverageCriterion(CNF cnf, int t) {
 		if (!cnf.getClauses().isEmpty()) {
 			util = new TWiseConfigurationUtil(cnf, new AdvancedSatSolver(cnf));
 		} else {
@@ -54,6 +52,8 @@ public class TWiseConfigurationTester {
 		if (!cnf.getClauses().isEmpty()) {
 			util.computeMIG();
 		}
+		presenceConditionManager = new PresenceConditionManager(util, TWiseConfigurationGenerator.convertLiterals(cnf.getVariables().getLiterals()));
+		this.t = t;
 	}
 
 	public void setNodes(List<List<ClauseList>> expressions) {
@@ -64,29 +64,29 @@ public class TWiseConfigurationTester {
 		this.t = t;
 	}
 
-	public void setSample(List<LiteralSet> sample) {
-		this.sample = sample;
+	@Override
+	public double getCoverage(List<LiteralSet> sample) {
+		final TWiseConfigurationStatistic statistic = getStatistics(sample);
+		final long numberOfValidConditions = statistic.getNumberOfValidConditions();
+		final long numberOfCoveredConditions = statistic.getNumberOfCoveredConditions();
+		if (numberOfValidConditions == 0) {
+			return 1;
+		} else {
+			return (double) numberOfCoveredConditions / numberOfValidConditions;
+		}
 	}
 
 	/**
-	 * Creates statistic values about covered combinations.<br>
-	 * To get a percentage value of covered combinations use:<br>
-	 * <pre>{@code
+	 * Creates statistic values about covered combinations.<br> To get a percentage value of covered combinations use:<br> <pre>{@code
 	 * 	TWiseConfigurationStatistic coverage = getCoverage();
 	 * 	double covered = (double) coverage.getNumberOfCoveredConditions() / coverage.getNumberOfValidConditions();
 	 * }</pre>
 	 *
-
-	 * @return a statistic object containing multiple values:<br>
-	 *         <ul>
-	 *              <li>number of valid combinations
-	 *              <li>number of invalid combinations
-	 *              <li>number of covered combinations
-	 *              <li>number of uncovered combinations
-	 *              <li>value of each configuration
-	 *         </ul>
+	 *
+	 * @return a statistic object containing multiple values:<br> <ul> <li>number of valid combinations <li>number of invalid combinations <li>number of covered
+	 *         combinations <li>number of uncovered combinations <li>value of each configuration </ul>
 	 */
-	public TWiseConfigurationStatistic getCoverage() {
+	public TWiseConfigurationStatistic getStatistics(List<LiteralSet> sample) {
 		final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
 		statistic.setT(t);
 		statistic.setOnlyCoverage(true);
@@ -94,21 +94,21 @@ public class TWiseConfigurationTester {
 		return statistic;
 	}
 
-	public boolean hasUncoveredConditions() {
-		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
+	public boolean hasUncoveredConditions(List<LiteralSet> sample) {
+		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true, sample);
 		return !uncoveredConditions.isEmpty();
 	}
 
-	public ClauseList getFirstUncoveredCondition() {
-		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true);
+	public ClauseList getFirstUncoveredCondition(List<LiteralSet> sample) {
+		final List<ClauseList> uncoveredConditions = getUncoveredConditions(true, sample);
 		return uncoveredConditions.isEmpty() ? null : uncoveredConditions.get(0);
 	}
 
-	public List<ClauseList> getUncoveredConditions() {
-		return getUncoveredConditions(false);
+	public List<ClauseList> getUncoveredConditions(List<LiteralSet> sample) {
+		return getUncoveredConditions(false, sample);
 	}
 
-	private List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst) {
+	private List<ClauseList> getUncoveredConditions(boolean cancelAfterFirst, List<LiteralSet> sample) {
 		final ArrayList<ClauseList> uncoveredConditions = new ArrayList<>();
 		final TWiseCombiner combiner = new TWiseCombiner(util.getCnf().getVariables().size());
 		ClauseList combinedCondition = new ClauseList();
@@ -133,35 +133,6 @@ public class TWiseConfigurationTester {
 			}
 		}
 		return uncoveredConditions;
-	}
-
-	public boolean hasInvalidSolutions() {
-		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
-		return !invalidSolutions.isEmpty();
-	}
-
-	public LiteralSet getFirstInvalidSolution() {
-		final List<LiteralSet> invalidSolutions = getInvalidSolutions(true);
-		return invalidSolutions.isEmpty() ? null : invalidSolutions.get(0);
-	}
-
-	public List<LiteralSet> getInvalidSolutions() {
-		return getInvalidSolutions(false);
-	}
-
-	private List<LiteralSet> getInvalidSolutions(boolean cancelAfterFirst) {
-		final ArrayList<LiteralSet> invalidSolutions = new ArrayList<>();
-		configLoop: for (final LiteralSet solution : sample) {
-			for (final LiteralSet clause : util.getCnf().getClauses()) {
-				if (!solution.hasDuplicates(clause)) {
-					invalidSolutions.add(solution);
-					if (cancelAfterFirst) {
-						break configLoop;
-					}
-				}
-			}
-		}
-		return invalidSolutions;
 	}
 
 }

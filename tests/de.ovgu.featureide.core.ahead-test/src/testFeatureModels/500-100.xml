@@ -1,0 +1,1845 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="A1">
+				<description>
+					Rooooooooot
+					1
+					2
+					3
+					4
+					5
+					6
+					7
+					8
+					9
+					0
+				</description>
+				<and name="A2">
+					<and mandatory="true" name="A3">
+						<feature mandatory="true" name="C23"/>
+						<feature mandatory="true" name="C24"/>
+						<feature name="C25"/>
+						<feature mandatory="true" name="C26"/>
+						<and mandatory="true" name="A27">
+							<feature name="C302"/>
+							<feature name="C303"/>
+							<feature name="C304"/>
+							<feature name="C305"/>
+						</and>
+					</and>
+					<feature name="C4"/>
+					<and mandatory="true" name="A5">
+						<and mandatory="true" name="A50">
+							<feature mandatory="true" name="C269"/>
+							<feature mandatory="true" name="C270"/>
+							<feature name="C271"/>
+							<feature mandatory="true" name="C272"/>
+							<feature mandatory="true" name="C273"/>
+							<feature mandatory="true" name="C274"/>
+							<feature name="C275"/>
+							<feature mandatory="true" name="C276"/>
+							<feature mandatory="true" name="C277"/>
+							<feature mandatory="true" name="C278"/>
+						</and>
+						<feature mandatory="true" name="C51"/>
+						<and name="A52">
+							<feature name="C496"/>
+							<feature name="C497"/>
+							<feature name="C498"/>
+							<feature name="C499"/>
+						</and>
+						<feature mandatory="true" name="C53"/>
+						<and mandatory="true" name="A54">
+							<feature mandatory="true" name="C76"/>
+							<feature name="C77"/>
+							<feature name="C78"/>
+							<and mandatory="true" name="A79">
+								<feature name="C86"/>
+								<feature name="C87"/>
+								<and name="A88">
+									<feature mandatory="true" name="C102"/>
+									<feature mandatory="true" name="C103"/>
+									<feature name="C104"/>
+									<feature name="C105"/>
+									<feature mandatory="true" name="C106"/>
+								</and>
+								<feature name="C89"/>
+								<feature name="C90"/>
+								<and name="A91">
+									<feature mandatory="true" name="C107"/>
+									<feature name="C108"/>
+									<and name="A109">
+										<feature mandatory="true" name="C121"/>
+										<feature mandatory="true" name="C122"/>
+										<feature name="C123"/>
+										<and mandatory="true" name="A124">
+											<feature mandatory="true" name="C376"/>
+											<feature name="C377"/>
+											<feature name="C378"/>
+										</and>
+										<feature name="C125"/>
+										<feature name="C126"/>
+										<and name="A127">
+											<feature mandatory="true" name="C198"/>
+											<and mandatory="true" name="A199">
+												<feature name="C459"/>
+												<feature name="C460"/>
+												<feature name="C461"/>
+												<feature name="C462"/>
+												<feature name="C463"/>
+												<feature name="C464"/>
+												<feature name="C465"/>
+												<feature name="C466"/>
+												<feature name="C467"/>
+												<feature name="C468"/>
+											</and>
+										</and>
+										<feature name="C128"/>
+										<feature name="C129"/>
+										<alt mandatory="true" name="A130">
+											<feature name="C316"/>
+											<feature name="C317"/>
+											<feature name="C318"/>
+											<feature name="C319"/>
+											<feature name="C320"/>
+											<feature name="C321"/>
+											<feature name="C322"/>
+											<and name="A323">
+												<feature mandatory="true" name="C389"/>
+												<feature name="C390"/>
+												<feature mandatory="true" name="C391"/>
+											</and>
+											<and name="A324">
+												<feature mandatory="true" name="C444"/>
+												<alt mandatory="true" name="A445">
+													<feature name="C484"/>
+													<feature name="C485"/>
+													<feature name="C486"/>
+													<feature name="C487"/>
+												</alt>
+											</and>
+											<feature name="C325"/>
+										</alt>
+									</and>
+									<feature mandatory="true" name="C110"/>
+									<feature mandatory="true" name="C111"/>
+									<feature name="C112"/>
+									<feature name="C113"/>
+									<feature mandatory="true" name="C114"/>
+									<feature name="C115"/>
+									<feature mandatory="true" name="C116"/>
+								</and>
+								<alt name="A92">
+									<feature name="C328"/>
+									<feature name="C329"/>
+									<feature name="C330"/>
+									<feature name="C331"/>
+									<feature name="C332"/>
+								</alt>
+								<feature name="C93"/>
+							</and>
+							<and mandatory="true" name="A80">
+								<and mandatory="true" name="A117">
+									<and mandatory="true" name="A155">
+										<feature mandatory="true" name="C430"/>
+										<feature mandatory="true" name="C431"/>
+										<feature name="C432"/>
+										<feature name="C433"/>
+										<feature name="C434"/>
+									</and>
+									<feature mandatory="true" name="C156"/>
+									<feature name="C157"/>
+									<alt name="A158">
+										<feature name="C165"/>
+										<feature name="C166"/>
+										<feature name="C167"/>
+										<feature name="C168"/>
+										<feature name="C169"/>
+										<feature name="C170"/>
+										<feature name="C171"/>
+										<feature name="C172"/>
+										<feature name="C173"/>
+										<feature name="C174"/>
+									</alt>
+									<and mandatory="true" name="A159">
+										<feature name="C215"/>
+										<feature name="C216"/>
+										<feature name="C217"/>
+										<feature name="C218"/>
+									</and>
+									<feature name="C160"/>
+									<feature name="C161"/>
+									<and mandatory="true" name="A162">
+										<feature mandatory="true" name="C379"/>
+										<feature name="C380"/>
+										<feature mandatory="true" name="C381"/>
+										<feature name="C382"/>
+										<feature mandatory="true" name="C383"/>
+										<feature name="C384"/>
+										<feature mandatory="true" name="C385"/>
+										<feature mandatory="true" name="C386"/>
+										<feature mandatory="true" name="C387"/>
+										<feature mandatory="true" name="C388"/>
+									</and>
+									<feature name="C163"/>
+									<feature name="C164"/>
+								</and>
+								<feature mandatory="true" name="C118"/>
+								<and mandatory="true" name="A119">
+									<feature mandatory="true" name="C364"/>
+									<feature mandatory="true" name="C365"/>
+									<feature name="C366"/>
+									<feature name="C367"/>
+									<feature name="C368"/>
+									<feature name="C369"/>
+									<feature name="C370"/>
+									<feature name="C371"/>
+									<feature name="C372"/>
+									<feature mandatory="true" name="C373"/>
+								</and>
+								<and mandatory="true" name="A120">
+									<feature mandatory="true" name="C210"/>
+									<feature name="C211"/>
+									<and mandatory="true" name="A212">
+										<feature name="C237"/>
+										<feature name="C238"/>
+										<feature name="C239"/>
+										<feature name="C240"/>
+										<feature name="C241"/>
+									</and>
+									<feature mandatory="true" name="C213"/>
+								</and>
+							</and>
+							<feature name="C81"/>
+							<feature name="C82"/>
+						</and>
+						<and name="A55">
+							<alt name="A192">
+								<feature name="C259"/>
+								<feature name="C260"/>
+								<and name="A261">
+									<feature mandatory="true" name="C286"/>
+									<feature name="C287"/>
+									<feature name="C288"/>
+									<feature name="C289"/>
+								</and>
+								<feature name="C262"/>
+								<and name="A263">
+									<feature name="C279"/>
+								</and>
+								<feature name="C264"/>
+								<feature name="C265"/>
+								<feature name="C266"/>
+								<feature name="C267"/>
+							</alt>
+							<feature name="C193"/>
+							<alt name="A194">
+								<feature name="C226"/>
+								<feature name="C227"/>
+								<feature name="C228"/>
+								<feature name="C229"/>
+								<feature name="C230"/>
+								<feature name="C231"/>
+								<feature name="C232"/>
+							</alt>
+							<feature name="C195"/>
+							<feature name="C196"/>
+							<and name="A197">
+								<feature name="C344"/>
+								<feature name="C345"/>
+								<feature name="C346"/>
+								<feature name="C347"/>
+								<feature name="C348"/>
+							</and>
+						</and>
+						<feature mandatory="true" name="C56"/>
+						<feature mandatory="true" name="C57"/>
+					</and>
+					<feature mandatory="true" name="C6"/>
+					<and mandatory="true" name="A7">
+						<feature mandatory="true" name="C17">
+							<description>
+								Description 1
+								
+								Test
+								
+								Test   Test
+							</description>
+						</feature>
+						<feature mandatory="true" name="C18"/>
+						<alt name="A19">
+							<description>
+								Description -.,1234567890
+							</description>
+							<feature name="C99"/>
+							<and name="A100">
+								<feature mandatory="true" name="C135"/>
+								<and name="A136">
+									<feature name="C175"/>
+									<feature name="C176"/>
+									<feature name="C177"/>
+									<and name="A178">
+										<feature name="C360"/>
+										<feature name="C361"/>
+										<feature name="C362"/>
+										<feature name="C363"/>
+									</and>
+									<alt name="A179">
+										<feature name="C184"/>
+										<feature name="C185"/>
+										<feature name="C186"/>
+										<alt name="A187">
+											<feature name="C233"/>
+											<and name="A234">
+												<feature mandatory="true" name="C333"/>
+											</and>
+											<alt name="A235">
+												<feature name="C397"/>
+												<and name="A398">
+													<feature name="C412"/>
+													<feature name="C413"/>
+													<feature name="C414"/>
+													<feature name="C415"/>
+													<feature name="C416"/>
+													<feature name="C417"/>
+													<alt name="A418">
+														<feature name="C500"/>
+													</alt>
+													<alt name="A419">
+														<feature name="C447"/>
+														<feature name="C448"/>
+														<feature name="C449"/>
+													</alt>
+												</and>
+												<feature name="C399"/>
+												<feature name="C400"/>
+												<feature name="C401"/>
+												<feature name="C402"/>
+												<feature name="C403"/>
+												<feature name="C404"/>
+												<feature name="C405"/>
+												<feature name="C406"/>
+											</alt>
+											<feature name="C236"/>
+										</alt>
+										<feature name="C188"/>
+										<feature name="C189"/>
+										<feature name="C190"/>
+										<feature name="C191"/>
+									</alt>
+									<feature name="C180"/>
+									<feature name="C181"/>
+									<feature name="C182"/>
+									<feature name="C183"/>
+								</and>
+								<feature name="C137"/>
+								<feature mandatory="true" name="C138"/>
+							</and>
+							<feature name="C101"/>
+						</alt>
+						<feature name="C20"/>
+						<and name="A21">
+							<and mandatory="true" name="A41">
+								<feature mandatory="true" name="C65"/>
+								<and mandatory="true" name="A66">
+									<feature name="C145"/>
+									<feature name="C146"/>
+									<feature name="C147"/>
+									<feature name="C148"/>
+									<feature name="C149"/>
+									<feature name="C150"/>
+									<feature name="C151"/>
+									<feature name="C152"/>
+									<feature name="C153"/>
+									<alt name="A154">
+										<feature name="C250"/>
+										<feature name="C251"/>
+										<feature name="C252"/>
+										<feature name="C253"/>
+										<feature name="C254"/>
+										<alt name="A255">
+											<feature name="C450"/>
+											<feature name="C451"/>
+											<feature name="C452"/>
+											<feature name="C453"/>
+											<feature name="C454"/>
+											<feature name="C455"/>
+											<feature name="C456"/>
+											<feature name="C457"/>
+											<feature name="C458"/>
+										</alt>
+										<feature name="C256"/>
+										<feature name="C257"/>
+										<feature name="C258"/>
+									</alt>
+								</and>
+								<and mandatory="true" name="A67">
+									<feature mandatory="true" name="C327"/>
+								</and>
+								<and name="A68">
+									<feature mandatory="true" name="C219"/>
+									<alt name="A220">
+										<feature name="C242"/>
+										<feature name="C243"/>
+										<feature name="C244"/>
+										<feature name="C245"/>
+										<feature name="C246"/>
+										<feature name="C247"/>
+										<feature name="C248"/>
+										<feature name="C249"/>
+									</alt>
+									<feature name="C221"/>
+									<feature mandatory="true" name="C222"/>
+									<and mandatory="true" name="A223">
+										<feature name="C408"/>
+										<feature name="C409"/>
+										<feature name="C410"/>
+									</and>
+									<feature mandatory="true" name="C224"/>
+									<feature name="C225"/>
+								</and>
+							</and>
+							<feature name="C42"/>
+							<and mandatory="true" name="A43">
+								<and name="A349">
+									<feature name="C477"/>
+									<feature name="C478"/>
+									<feature name="C479"/>
+									<feature name="C480"/>
+									<feature name="C481"/>
+									<feature name="C482"/>
+								</and>
+								<feature name="C350"/>
+								<feature name="C351"/>
+								<feature name="C352"/>
+								<feature name="C353"/>
+								<feature name="C354"/>
+								<feature name="C355"/>
+							</and>
+							<feature name="C44"/>
+							<alt mandatory="true" name="A45">
+								<and name="A131">
+									<feature mandatory="true" name="C295"/>
+									<feature name="C296"/>
+									<and mandatory="true" name="A297">
+										<feature mandatory="true" name="C374"/>
+										<feature name="C375"/>
+									</and>
+									<feature mandatory="true" name="C298"/>
+									<feature name="C299"/>
+									<feature name="C300"/>
+									<feature name="C301"/>
+								</and>
+								<feature name="C132"/>
+								<feature name="C133"/>
+								<feature name="C134"/>
+							</alt>
+							<feature name="C46"/>
+							<feature name="C47"/>
+							<feature name="C48"/>
+							<feature mandatory="true" name="C49"/>
+						</and>
+						<feature name="C22"/>
+					</and>
+					<and name="A8">
+						<alt name="A10">
+							<alt name="A13">
+								<and name="A28">
+									<and mandatory="true" name="A69">
+										<feature mandatory="true" name="C214"/>
+									</and>
+									<feature name="C70"/>
+									<and name="A71">
+										<feature name="C334"/>
+										<feature name="C335"/>
+										<feature name="C336"/>
+										<feature name="C337"/>
+										<and name="A338">
+											<feature mandatory="true" name="C356"/>
+											<feature name="C357"/>
+											<feature name="C358"/>
+										</and>
+										<feature name="C339"/>
+										<feature name="C340"/>
+										<feature name="C341"/>
+										<feature name="C342"/>
+										<and name="A343">
+											<feature mandatory="true" name="C469"/>
+											<feature name="C470"/>
+											<feature name="C471"/>
+											<feature name="C472"/>
+											<feature name="C473"/>
+											<feature mandatory="true" name="C474"/>
+											<feature mandatory="true" name="C475"/>
+											<feature mandatory="true" name="C476"/>
+										</and>
+									</and>
+									<and name="A72">
+										<feature name="C139"/>
+										<feature name="C140"/>
+										<alt name="A141">
+											<feature name="C359"/>
+										</alt>
+										<feature name="C142"/>
+										<feature name="C143"/>
+										<feature name="C144"/>
+									</and>
+									<feature name="C73"/>
+									<feature name="C74"/>
+									<and mandatory="true" name="A75">
+										<feature mandatory="true" name="C83"/>
+										<feature mandatory="true" name="C84"/>
+										<feature mandatory="true" name="C85"/>
+									</and>
+								</and>
+								<feature name="C29"/>
+								<and name="A30">
+									<feature name="C58"/>
+									<feature name="C59"/>
+									<feature name="C60"/>
+									<feature name="C61"/>
+									<feature name="C62"/>
+									<feature name="C63"/>
+									<and name="A64">
+										<feature name="C280"/>
+										<feature name="C281"/>
+										<feature name="C282"/>
+										<feature name="C283"/>
+										<feature name="C284"/>
+										<feature name="C285"/>
+									</and>
+								</and>
+								<feature name="C31"/>
+								<feature name="C32"/>
+								<alt name="A33">
+									<feature name="C200"/>
+									<feature name="C201"/>
+									<feature name="C202"/>
+									<feature name="C203"/>
+									<feature name="C204"/>
+									<feature name="C205"/>
+									<feature name="C206"/>
+									<feature name="C207"/>
+									<feature name="C208"/>
+									<and name="A209">
+										<feature mandatory="true" name="C495"/>
+									</and>
+								</alt>
+								<and name="A34">
+									<and mandatory="true" name="A411">
+										<feature mandatory="true" name="C441"/>
+										<feature name="C442"/>
+										<and name="A443">
+											<feature mandatory="true" name="C488"/>
+											<feature mandatory="true" name="C489"/>
+											<feature mandatory="true" name="C490"/>
+											<feature mandatory="true" name="C491"/>
+											<feature name="C492"/>
+											<feature name="C493"/>
+											<feature name="C494"/>
+										</and>
+									</and>
+								</and>
+								<feature name="C35"/>
+								<and name="A36">
+									<feature name="C446"/>
+								</and>
+							</alt>
+							<feature name="C14"/>
+							<and name="A15">
+								<feature name="C37"/>
+							</and>
+							<feature name="C16"/>
+						</alt>
+						<and name="A11">
+							<and mandatory="true" name="A38">
+								<feature mandatory="true" name="C94"/>
+								<and name="A95">
+									<and mandatory="true" name="A268">
+										<feature mandatory="true" name="C407"/>
+									</and>
+								</and>
+								<and name="A96">
+									<and name="A306">
+										<feature mandatory="true" name="C435"/>
+										<feature name="C436"/>
+										<feature name="C437"/>
+										<feature mandatory="true" name="C438"/>
+										<feature name="C439"/>
+										<feature mandatory="true" name="C440"/>
+									</and>
+									<feature name="C307"/>
+									<and name="A308">
+										<feature name="C420"/>
+										<feature name="C421"/>
+										<feature name="C422"/>
+										<feature name="C423"/>
+										<feature name="C424"/>
+										<feature name="C425"/>
+										<feature name="C426"/>
+										<feature name="C427"/>
+										<feature name="C428"/>
+										<feature name="C429"/>
+									</and>
+									<feature name="C309"/>
+									<feature name="C310"/>
+									<and name="A311">
+										<and mandatory="true" name="A392">
+											<feature mandatory="true" name="C483"/>
+										</and>
+										<feature name="C393"/>
+										<feature name="C394"/>
+										<feature mandatory="true" name="C395"/>
+										<feature name="C396"/>
+									</and>
+									<feature name="C312"/>
+									<feature name="C313"/>
+									<feature name="C314"/>
+									<feature name="C315"/>
+								</and>
+								<and name="A97">
+									<feature mandatory="true" name="C326"/>
+								</and>
+								<feature mandatory="true" name="C98"/>
+							</and>
+							<feature mandatory="true" name="C39"/>
+							<and name="A40">
+								<feature mandatory="true" name="C290"/>
+								<feature mandatory="true" name="C291"/>
+								<feature mandatory="true" name="C292"/>
+								<feature mandatory="true" name="C293"/>
+								<feature mandatory="true" name="C294"/>
+							</and>
+						</and>
+						<feature name="C12"/>
+					</and>
+					<feature name="C9"/>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>C237</var>
+					<var>C320</var>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C93</var>
+					</not>
+					<disj>
+						<not>
+							<var>C106</var>
+						</not>
+						<disj>
+							<var>C387</var>
+							<var>C387</var>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<var>C269</var>
+					<var>C251</var>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<var>C138</var>
+					<not>
+						<var>C152</var>
+					</not>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C350</var>
+					<disj>
+						<var>C152</var>
+						<disj>
+							<not>
+								<var>A10</var>
+							</not>
+							<disj>
+								<not>
+									<var>C350</var>
+								</not>
+								<not>
+									<var>A10</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>A96</var>
+					</not>
+					<disj>
+						<var>C252</var>
+						<disj>
+							<var>A418</var>
+							<disj>
+								<var>C252</var>
+								<var>A418</var>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C489</var>
+					</not>
+					<disj>
+						<var>C473</var>
+						<disj>
+							<var>A154</var>
+							<disj>
+								<var>A154</var>
+								<disj>
+									<var>C489</var>
+									<disj>
+										<not>
+											<var>C280</var>
+										</not>
+										<disj>
+											<not>
+												<var>C473</var>
+											</not>
+											<not>
+												<var>C280</var>
+											</not>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C344</var>
+					</not>
+					<disj>
+						<var>C380</var>
+						<var>C57</var>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C397</var>
+					</not>
+					<disj>
+						<var>C250</var>
+						<disj>
+							<not>
+								<var>C99</var>
+							</not>
+							<disj>
+								<var>C250</var>
+								<not>
+									<var>C99</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C292</var>
+					</not>
+					<not>
+						<var>C126</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C4</var>
+					<disj>
+						<not>
+							<var>C355</var>
+						</not>
+						<disj>
+							<var>C488</var>
+							<disj>
+								<not>
+									<var>C355</var>
+								</not>
+								<disj>
+									<var>C488</var>
+									<disj>
+										<not>
+											<var>C355</var>
+										</not>
+										<disj>
+											<var>C488</var>
+											<disj>
+												<not>
+													<var>C4</var>
+												</not>
+												<disj>
+													<not>
+														<var>C408</var>
+													</not>
+													<disj>
+														<var>A235</var>
+														<var>C355</var>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>A297</var>
+					<disj>
+						<var>C485</var>
+						<var>C485</var>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C380</var>
+					<var>C58</var>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C260</var>
+					</not>
+					<disj>
+						<not>
+							<var>C272</var>
+						</not>
+						<disj>
+							<not>
+								<var>C272</var>
+							</not>
+							<disj>
+								<not>
+									<var>C272</var>
+								</not>
+								<not>
+									<var>C272</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<var>C182</var>
+						<disj>
+							<not>
+								<var>C331</var>
+							</not>
+							<var>C58</var>
+						</disj>
+					</disj>
+					<var>C32</var>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C32</var>
+					</not>
+					<disj>
+						<var>C105</var>
+						<disj>
+							<var>C35</var>
+							<disj>
+								<var>A343</var>
+								<disj>
+									<var>C467</var>
+									<disj>
+										<var>C105</var>
+										<disj>
+											<var>C35</var>
+											<disj>
+												<var>C32</var>
+												<disj>
+													<var>C467</var>
+													<disj>
+														<var>C105</var>
+														<disj>
+															<var>C35</var>
+															<disj>
+																<not>
+																	<var>C105</var>
+																</not>
+																<disj>
+																	<var>C467</var>
+																	<disj>
+																		<var>C105</var>
+																		<disj>
+																			<var>C35</var>
+																			<disj>
+																				<not>
+																					<var>C35</var>
+																				</not>
+																				<disj>
+																					<var>C467</var>
+																					<disj>
+																						<var>A343</var>
+																						<disj>
+																							<var>C467</var>
+																							<disj>
+																								<var>C32</var>
+																								<disj>
+																									<var>C467</var>
+																									<disj>
+																										<not>
+																											<var>C105</var>
+																										</not>
+																										<disj>
+																											<var>C467</var>
+																											<disj>
+																												<not>
+																													<var>C35</var>
+																												</not>
+																												<var>C467</var>
+																											</disj>
+																										</disj>
+																									</disj>
+																								</disj>
+																							</disj>
+																						</disj>
+																					</disj>
+																				</disj>
+																			</disj>
+																		</disj>
+																	</disj>
+																</disj>
+															</disj>
+														</disj>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C441</var>
+					</not>
+					<disj>
+						<not>
+							<var>C132</var>
+						</not>
+						<disj>
+							<not>
+								<var>C132</var>
+							</not>
+							<disj>
+								<var>C441</var>
+								<var>C334</var>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<not>
+						<var>C351</var>
+					</not>
+					<not>
+						<var>C366</var>
+					</not>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C219</var>
+					<disj>
+						<not>
+							<var>C460</var>
+						</not>
+						<not>
+							<var>C460</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>A92</var>
+					<disj>
+						<var>C157</var>
+						<disj>
+							<not>
+								<var>C399</var>
+							</not>
+							<disj>
+								<not>
+									<var>A92</var>
+								</not>
+								<not>
+									<var>C399</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C78</var>
+					</not>
+					<disj>
+						<var>C472</var>
+						<disj>
+							<var>C47</var>
+							<disj>
+								<var>C78</var>
+								<disj>
+									<var>C47</var>
+									<disj>
+										<var>C472</var>
+										<disj>
+											<var>C47</var>
+											<disj>
+												<var>C78</var>
+												<var>C47</var>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C161</var>
+					</not>
+					<disj>
+						<var>C86</var>
+						<disj>
+							<not>
+								<var>C452</var>
+							</not>
+							<disj>
+								<var>C86</var>
+								<disj>
+									<not>
+										<var>C452</var>
+									</not>
+									<disj>
+										<var>C86</var>
+										<disj>
+											<not>
+												<var>C452</var>
+											</not>
+											<disj>
+												<var>C161</var>
+												<disj>
+													<not>
+														<var>C344</var>
+													</not>
+													<disj>
+														<var>C415</var>
+														<not>
+															<var>C452</var>
+														</not>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C111</var>
+					<disj>
+						<var>C208</var>
+						<disj>
+							<var>C149</var>
+							<disj>
+								<not>
+									<var>C430</var>
+								</not>
+								<disj>
+									<not>
+										<var>C111</var>
+									</not>
+									<disj>
+										<var>C149</var>
+										<not>
+											<var>C430</var>
+										</not>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C250</var>
+					<disj>
+						<var>C46</var>
+						<disj>
+							<var>C322</var>
+							<disj>
+								<var>C46</var>
+								<disj>
+									<var>C322</var>
+									<disj>
+										<var>C46</var>
+										<var>C322</var>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>A179</var>
+					</not>
+					<disj>
+						<not>
+							<var>C356</var>
+						</not>
+						<disj>
+							<not>
+								<var>C361</var>
+							</not>
+							<disj>
+								<not>
+									<var>C463</var>
+								</not>
+								<disj>
+									<not>
+										<var>C356</var>
+									</not>
+									<disj>
+										<not>
+											<var>C361</var>
+										</not>
+										<not>
+											<var>C463</var>
+										</not>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C279</var>
+					</not>
+					<disj>
+						<var>C355</var>
+						<disj>
+							<not>
+								<var>A311</var>
+							</not>
+							<disj>
+								<var>C355</var>
+								<not>
+									<var>A311</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C107</var>
+					</not>
+					<disj>
+						<not>
+							<var>C56</var>
+						</not>
+						<disj>
+							<var>C132</var>
+							<disj>
+								<not>
+									<var>C56</var>
+								</not>
+								<disj>
+									<var>C132</var>
+									<disj>
+										<var>C107</var>
+										<disj>
+											<not>
+												<var>C337</var>
+											</not>
+											<var>C56</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C196</var>
+					</not>
+					<disj>
+						<var>C76</var>
+						<disj>
+							<var>C76</var>
+							<disj>
+								<var>C76</var>
+								<disj>
+									<var>C196</var>
+									<disj>
+										<var>C123</var>
+										<not>
+											<var>C276</var>
+										</not>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C176</var>
+					<disj>
+						<var>C404</var>
+						<disj>
+							<not>
+								<var>C352</var>
+							</not>
+							<disj>
+								<not>
+									<var>A141</var>
+								</not>
+								<disj>
+									<var>C111</var>
+									<disj>
+										<not>
+											<var>C176</var>
+										</not>
+										<disj>
+											<not>
+												<var>A141</var>
+											</not>
+											<disj>
+												<var>C111</var>
+												<disj>
+													<not>
+														<var>C404</var>
+													</not>
+													<disj>
+														<not>
+															<var>A141</var>
+														</not>
+														<var>C111</var>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<not>
+							<var>A199</var>
+						</not>
+						<disj>
+							<not>
+								<var>C322</var>
+							</not>
+							<not>
+								<var>A268</var>
+							</not>
+						</disj>
+					</disj>
+					<conj>
+						<disj>
+							<var>A268</var>
+							<var>A199</var>
+						</disj>
+						<conj>
+							<disj>
+								<var>A268</var>
+								<var>C322</var>
+							</disj>
+							<var>C431</var>
+						</conj>
+					</conj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C231</var>
+					</not>
+					<var>C110</var>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>A64</var>
+					<disj>
+						<var>C473</var>
+						<disj>
+							<var>A30</var>
+							<var>C138</var>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C170</var>
+					<disj>
+						<var>C339</var>
+						<disj>
+							<var>C252</var>
+							<disj>
+								<not>
+									<var>C59</var>
+								</not>
+								<disj>
+									<not>
+										<var>C170</var>
+									</not>
+									<disj>
+										<not>
+											<var>C59</var>
+										</not>
+										<disj>
+											<not>
+												<var>C339</var>
+											</not>
+											<disj>
+												<not>
+													<var>C59</var>
+												</not>
+												<disj>
+													<not>
+														<var>C170</var>
+													</not>
+													<disj>
+														<var>C252</var>
+														<disj>
+															<not>
+																<var>C170</var>
+															</not>
+															<disj>
+																<var>C170</var>
+																<disj>
+																	<var>C339</var>
+																	<disj>
+																		<not>
+																			<var>C339</var>
+																		</not>
+																		<disj>
+																			<var>C252</var>
+																			<disj>
+																				<not>
+																					<var>C339</var>
+																				</not>
+																				<disj>
+																					<var>C170</var>
+																					<disj>
+																						<var>C339</var>
+																						<disj>
+																							<not>
+																								<var>C252</var>
+																							</not>
+																							<disj>
+																								<var>C252</var>
+																								<disj>
+																									<not>
+																										<var>C252</var>
+																									</not>
+																									<disj>
+																										<var>C170</var>
+																										<var>C339</var>
+																									</disj>
+																								</disj>
+																							</disj>
+																						</disj>
+																					</disj>
+																				</disj>
+																			</disj>
+																		</disj>
+																	</disj>
+																</disj>
+															</disj>
+														</disj>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C414</var>
+					</not>
+					<disj>
+						<var>C51</var>
+						<disj>
+							<var>C204</var>
+							<disj>
+								<var>C51</var>
+								<disj>
+									<var>C204</var>
+									<disj>
+										<var>C414</var>
+										<disj>
+											<var>C328</var>
+											<not>
+												<var>C51</var>
+											</not>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<var>C110</var>
+					<not>
+						<var>A55</var>
+					</not>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C318</var>
+					<disj>
+						<var>C366</var>
+						<disj>
+							<var>A96</var>
+							<disj>
+								<var>C366</var>
+								<disj>
+									<var>A96</var>
+									<var>A96</var>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<var>C431</var>
+					<var>C51</var>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>A109</var>
+					<disj>
+						<not>
+							<var>C17</var>
+						</not>
+						<disj>
+							<var>C467</var>
+							<disj>
+								<not>
+									<var>C17</var>
+								</not>
+								<disj>
+									<not>
+										<var>A109</var>
+									</not>
+									<disj>
+										<not>
+											<var>A7</var>
+										</not>
+										<disj>
+											<not>
+												<var>C17</var>
+											</not>
+											<disj>
+												<var>C17</var>
+												<disj>
+													<not>
+														<var>C17</var>
+													</not>
+													<disj>
+														<var>C467</var>
+														<disj>
+															<not>
+																<var>C17</var>
+															</not>
+															<disj>
+																<not>
+																	<var>A109</var>
+																</not>
+																<disj>
+																	<not>
+																		<var>A7</var>
+																	</not>
+																	<disj>
+																		<not>
+																			<var>C17</var>
+																		</not>
+																		<disj>
+																			<var>C17</var>
+																			<disj>
+																				<var>C467</var>
+																				<disj>
+																					<not>
+																						<var>A109</var>
+																					</not>
+																					<disj>
+																						<not>
+																							<var>A7</var>
+																						</not>
+																						<var>C17</var>
+																					</disj>
+																				</disj>
+																			</disj>
+																		</disj>
+																	</disj>
+																</disj>
+															</disj>
+														</disj>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C486</var>
+					</not>
+					<disj>
+						<var>A28</var>
+						<disj>
+							<not>
+								<var>C448</var>
+							</not>
+							<not>
+								<var>C254</var>
+							</not>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C403</var>
+					</not>
+					<var>C490</var>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C219</var>
+					</not>
+					<var>C135</var>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C277</var>
+					<disj>
+						<not>
+							<var>C287</var>
+						</not>
+						<disj>
+							<not>
+								<var>C301</var>
+							</not>
+							<disj>
+								<var>A45</var>
+								<not>
+									<var>C289</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C193</var>
+					<not>
+						<var>C256</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C429</var>
+					</not>
+					<disj>
+						<not>
+							<var>A41</var>
+						</not>
+						<disj>
+							<not>
+								<var>C201</var>
+							</not>
+							<disj>
+								<var>C429</var>
+								<var>A41</var>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C175</var>
+					</not>
+					<not>
+						<var>C231</var>
+					</not>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>A34</var>
+					</not>
+					<disj>
+						<var>C230</var>
+						<disj>
+							<var>C230</var>
+							<disj>
+								<var>A34</var>
+								<not>
+									<var>C302</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>C126</var>
+					</not>
+					<disj>
+						<not>
+							<var>C341</var>
+						</not>
+						<not>
+							<var>C440</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>A15</var>
+					<disj>
+						<not>
+							<var>C424</var>
+						</not>
+						<disj>
+							<var>C320</var>
+							<disj>
+								<not>
+									<var>A15</var>
+								</not>
+								<disj>
+									<not>
+										<var>C282</var>
+									</not>
+									<disj>
+										<var>C104</var>
+										<disj>
+											<var>C320</var>
+											<disj>
+												<not>
+													<var>C424</var>
+												</not>
+												<disj>
+													<var>C320</var>
+													<disj>
+														<not>
+															<var>A15</var>
+														</not>
+														<disj>
+															<not>
+																<var>C282</var>
+															</not>
+															<disj>
+																<var>C104</var>
+																<disj>
+																	<var>C320</var>
+																	<disj>
+																		<not>
+																			<var>C424</var>
+																		</not>
+																		<disj>
+																			<var>C320</var>
+																			<disj>
+																				<not>
+																					<var>A15</var>
+																				</not>
+																				<disj>
+																					<not>
+																						<var>C282</var>
+																					</not>
+																					<disj>
+																						<var>C104</var>
+																						<disj>
+																							<var>C320</var>
+																							<disj>
+																								<not>
+																									<var>C424</var>
+																								</not>
+																								<disj>
+																									<var>C320</var>
+																									<disj>
+																										<not>
+																											<var>A15</var>
+																										</not>
+																										<disj>
+																											<not>
+																												<var>C282</var>
+																											</not>
+																											<disj>
+																												<var>C104</var>
+																												<var>C320</var>
+																											</disj>
+																										</disj>
+																									</disj>
+																								</disj>
+																							</disj>
+																						</disj>
+																					</disj>
+																				</disj>
+																			</disj>
+																		</disj>
+																	</disj>
+																</disj>
+															</disj>
+														</disj>
+													</disj>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>C424</var>
+					<disj>
+						<var>A92</var>
+						<not>
+							<var>C271</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>A8</var>
+					</not>
+					<disj>
+						<not>
+							<var>A130</var>
+						</not>
+						<disj>
+							<not>
+								<var>C474</var>
+							</not>
+							<disj>
+								<var>A8</var>
+								<not>
+									<var>C474</var>
+								</not>
+							</disj>
+						</disj>
+					</disj>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

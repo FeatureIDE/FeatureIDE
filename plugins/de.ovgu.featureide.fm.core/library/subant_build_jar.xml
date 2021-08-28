@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
-
+	
 	<!-- Set JAR name -->
-	<property name="build.jar.version" value="3.7.0" />
+	<property name="build.jar.version" value="3.7.2" />
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
 
 	<!-- Constants -->
@@ -22,6 +22,12 @@
 
 	<condition property="exist-custom-properties">
 		<available file="build_jar.properties" />
+	</condition>
+	
+	<condition property="not-exist-custom-properties">
+	    <not>
+			<available file="build_jar.properties" />
+	    </not>
 	</condition>
 
 	<target name="load-custom-properties" if="exist-custom-properties">
@@ -49,7 +55,7 @@
 
 		<!-- Get all libraries in lib folder -->
 		<path id="classpath">
-			<fileset dir="${lib.dir}" includes="*.jar" />
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
 		</path>
 		<pathconvert property="jar.class.path" pathsep=" ">
 			<path refid="classpath"/>
@@ -62,16 +68,9 @@
 		</pathconvert>
 		
 		<!-- Compile the src folder -->
-		<javac
-			srcdir="${src.dir}"
-			destdir="${build.bin.dir}"
-			classpathref="classpath"
-			excludesfile="${build.excludes.path}"
-			debug="on" includeantruntime="false" fork="yes"
-			source="1.8" target="1.8">
-			<compilerarg value="-Xlint" />
-		</javac>
-
+		<antcall target="custom-javac" />
+		<antcall target="default-javac" />
+		
 		<!-- Calculate checksum for .class files -->
 		<checksum algorithm="SHA-256" totalproperty="build.checksum" forceoverwrite="yes">
 			<fileset dir="${build.bin.dir}">
@@ -87,7 +86,39 @@
 
 		<!-- Create version file -->
 		<echo file="${build.version.path}" append="false">FeatureIDE Version:	${build.jar.version}${line.separator}Build Time:         ${timeStamp}${line.separator}Checksum (SHA-256): ${build.checksum}${line.separator}</echo>
-
+	</target>
+	
+	<target name="default-javac" if="not-exist-custom-properties">
+    	<echo>Using default JDK</echo>
+		<path id="classpath">
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</path>
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.bin.dir}"
+			classpathref="classpath"
+			excludesfile="${build.excludes.path}"
+			debug="on" includeantruntime="false" fork="yes"
+			source="1.8" target="1.8">
+			<compilerarg value="-Xlint" />
+		</javac>
+	</target>
+	
+	<target name="custom-javac" if="exist-custom-properties">
+    	<echo>Using custom JDK: ${bin.javac.path}</echo>
+		<path id="classpath">
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</path>
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.bin.dir}"
+			classpathref="classpath"
+			excludesfile="${build.excludes.path}"
+			debug="on" includeantruntime="false" fork="yes"
+			source="1.8" target="1.8"
+			executable="${bin.javac.path}">
+			<compilerarg value="-Xlint" />
+		</javac>
 	</target>
 
 	<!-- Build jar file, including source files and license file -->

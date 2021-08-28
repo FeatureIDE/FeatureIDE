@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.impl.FactoryManager;
@@ -87,13 +85,11 @@ public abstract class AbstractIO<T> {
 		return convert(inPath, outPath, format);
 	}
 
-	@CheckForNull
 	public final T load(Path path) {
 		final FileHandler<T> fileHandler = getFileHandler(path);
 		return ((fileHandler == null) || fileHandler.getLastProblems().containsError()) ? null : fileHandler.getObject();
 	}
 
-	@CheckForNull
 	public final T loadFromSource(CharSequence source, Path fileName) {
 		final IPersistentFormat<T> format = getFormatManager().getFormatByContent(source, fileName.toString());
 		try {

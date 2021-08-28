@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.properties;
 
 import java.util.LinkedList;
 
-import javax.annotation.CheckReturnValue;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.draw2d.Border;
@@ -52,7 +50,6 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-@CheckReturnValue
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
 
 	/*

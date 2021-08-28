@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 /**
  * Represents a class at the {@link FSTModel}.<br> Contains {@link FSTRole}s with their corresponding {@link FSTFeature}.
  *
@@ -49,7 +47,6 @@ public class FSTClass {
 		return name;
 	}
 
-	@Nonnull
 	public LinkedList<FSTRole> getRoles() {
 		return new LinkedList<FSTRole>(roles.values());
 	}

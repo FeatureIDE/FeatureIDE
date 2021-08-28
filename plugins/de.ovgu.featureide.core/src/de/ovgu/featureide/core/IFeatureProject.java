@@ -27,8 +27,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -178,7 +176,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	 * @return The composer, specified for this project or <code>null</code> if the composerID is unknown <br> - The composer is now a property of the project
 	 *         and not specified by the nature or builder (every project has the same nature and builder, which can be extended by other eclipse plug-ins)
 	 */
-	@CheckForNull
 	IComposerExtensionClass getComposer();
 
 	/**

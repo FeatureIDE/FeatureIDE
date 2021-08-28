@@ -29,8 +29,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -306,7 +304,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * @param project
 	 * @return The saved path or {@code null} if there is none.
 	 */
-	@CheckForNull
 	private String getPersitentModelFilePath(IProject project) {
 		try {
 			return project.getPersistentProperty(MODEL_PATH);

@@ -18,20 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.guidsl;
+package de.ovgu.featureide.ahead.io.guidsl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import de.ovgu.featureide.ahead.AheadLibrary;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 
 /**
  * Test class of the {@link GuidslReader}.
@@ -46,6 +52,12 @@ public class TGuidslReader {
 	protected static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
 
 	protected static String sep = System.getProperty("file.separator");
+
+	@Before
+	public void prepareWorkbench() {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		LibraryManager.registerLibrary(AheadLibrary.getInstance());
+	}
 
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {

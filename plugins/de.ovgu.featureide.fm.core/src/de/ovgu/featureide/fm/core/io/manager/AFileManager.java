@@ -34,8 +34,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
@@ -96,7 +94,6 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
 	 */
 	@SuppressWarnings("unchecked")
-	@CheckForNull
 	public static final <T, R extends IFileManager<T>> R removeInstance(Path identifier, Class<R> fileManagerClass) {
 		synchronized (pathMap) {
 			if (getInstance(identifier, fileManagerClass) != null) {
@@ -118,7 +115,6 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	 * @return The manager instance for the specified file, or {@code null} if no instance is available and no new instance could be created.
 	 */
 	@SuppressWarnings("unchecked")
-	@CheckForNull
 	protected static <T, R extends IFileManager<T>> R getOrCreateInstance(Path path, Class<R> fileManagerClass, IPersistentFormat<T> format) {
 		synchronized (pathMap) {
 			final IFileManager<?> instance = pathMap.get(path);

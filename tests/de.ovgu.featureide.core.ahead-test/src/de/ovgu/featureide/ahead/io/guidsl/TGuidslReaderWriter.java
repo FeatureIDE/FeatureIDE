@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.guidsl;
+package de.ovgu.featureide.ahead.io.guidsl;
 
 import static org.junit.Assert.assertTrue;
 
@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 
 /**
  * Test class for GuidslReader

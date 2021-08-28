@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -159,6 +157,18 @@ public class MultiFeatureModel extends FeatureModel {
 
 	public void addAttributeConstraint(final Equation constraint) {
 		attributeConstraints.add(constraint);
+	}
+
+	@Override
+	public void addConstraint(IConstraint constraint) {
+		addOwnConstraint(constraint);
+		elements.put(constraint.getInternalId(), constraint);
+	}
+
+	@Override
+	public void addConstraint(IConstraint constraint, int index) {
+		addOwnConstraint(constraint);
+		elements.put(constraint.getInternalId(), constraint);
 	}
 
 	public void addOwnConstraint(final IConstraint constraint) {
@@ -319,7 +329,6 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	@Override
-	@CheckForNull
 	public IFeature getFeature(CharSequence name) {
 		final IFeature feature = super.getFeature(name);
 		if (feature != null) {

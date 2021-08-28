@@ -24,8 +24,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import javax.annotation.CheckForNull;
-
 /**
  * A sorted list of literals. Can be used as a clause of a CNF or DNF.
  *
@@ -428,7 +426,6 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	 * @param unwantedVariables An array of variables that should be removed.
 	 * @return A new literal set or {@code null}, if the initial set contained a literal and its negation.
 	 */
-	@CheckForNull
 	public LiteralSet clean(int... unwantedVariables) {
 		final LinkedHashSet<Integer> newLiteralSet = new LinkedHashSet<>();
 

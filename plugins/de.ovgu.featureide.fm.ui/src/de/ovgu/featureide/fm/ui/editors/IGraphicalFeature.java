@@ -22,9 +22,6 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
@@ -52,10 +49,8 @@ public interface IGraphicalFeature extends IGraphicalElement {
 
 	CollapsedDecoration getCollapsedDecoration();
 
-	@CheckForNull
 	FeatureConnection getSourceConnection();
 
-	@Nonnull
 	List<FeatureConnection> getSourceConnectionAsList();
 
 	List<FeatureConnection> getTargetConnections();

@@ -33,8 +33,6 @@ import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -160,7 +158,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *
 	 * @return The first entry
 	 */
-	@CheckForNull
 	public synchronized BuilderConfiguration getConfiguration() {
 		return sorter.getConfiguration();
 	}

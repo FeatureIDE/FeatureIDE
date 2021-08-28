@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
  *
  * @author Sebastian Krieter
  */
-class TWiseConfigurationUtil {
+public class TWiseConfigurationUtil {
 
 	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
 
@@ -375,7 +375,7 @@ class TWiseConfigurationUtil {
 	}
 
 	public void newConfiguration(final LiteralSet literals) {
-		if (completeSolutionList.size() < maxSampleSize) {
+		if ((completeSolutionList.size() + incompleteSolutionList.size()) < maxSampleSize) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(this);
 			selectLiterals(configuration, Deduce.DP, literals);
 			configuration.updateSolverSolutions();

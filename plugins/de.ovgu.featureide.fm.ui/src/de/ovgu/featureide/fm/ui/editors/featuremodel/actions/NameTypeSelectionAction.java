@@ -31,26 +31,25 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectio
  * Action to select the name type (short or lang name) of the feature model.
  *
  * @author Reimar Schroeter
+ * @author Benedikt Jutz
  */
 public class NameTypeSelectionAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.nametypeselection";
 
-	private final int newNameType;
-	private final int oldNameType;
+	private final boolean useShortType;
 	private final IGraphicalFeatureModel featureModel;
 
-	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
-		super(FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
+	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, boolean useShortType) {
+		super(FeatureDiagramLayoutHelper.getNameTypeLabel(useShortType));
+		this.useShortType = useShortType;
 		this.featureModel = featureModel;
 		setId(ID);
 	}
 
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new NameTypeSelectionOperation(featureModel, newNameType, oldNameType));
+		FeatureModelOperationWrapper.run(new NameTypeSelectionOperation(featureModel, useShortType));
 	}
 
 }

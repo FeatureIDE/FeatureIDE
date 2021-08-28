@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.Features;
  *
  * @author David Broneske
  * @author Fabian Benduhn
+ * @author Rahel Arens
+ * @author Johannes Herschel
  */
 public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControlContentAdapter, IControlContentAdapter2 {
 
@@ -43,14 +45,17 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		INSERT_TEXT, REPLACE_TEXT, UNKNOWN
 	}
 
-	public enum InsertionMode {
-		SUBSTRING_PRESENT, JUST_INSERT, UNKNOWN
-	}
-
 	public static class InsertionResult {
 
-		Point selection;
-		String text;
+		/**
+		 * Selection after performing the insertion
+		 */
+		final Point selection;
+
+		/**
+		 * Resulting text after performing the insertion
+		 */
+		final String text;
 
 		public InsertionResult(Point selection, String text) {
 			this.selection = selection;
@@ -74,7 +79,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final Point selection = editor.getSelection();
 		final String currentText = editor.getText();
 
-		final boolean isFeature = !Arrays.asList(NodeReader.textualSymbols).contains(text);
+		final boolean isFeature = !Arrays.asList(NodeReader.textualSymbols).contains(" " + text + " ");
 		final InsertionResult result = performInsertion(currentText, selection, text, isFeature);
 
 		editor.setText(result.text);
@@ -82,9 +87,10 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	/**
-	 * @param currentText current text
-	 * @param selection selection point
-	 * @param textToInsert text to insert
+	 * @param currentText complete constraint text
+	 * @param selection caret position, beginning and end of selection if a substring is selected
+	 * @param textToInsert text to be inserted, without quotation marks
+	 * @param isFeature true iff the inserted text is a feature
 	 * @return return
 	 */
 	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert, final boolean isFeature) {
@@ -99,24 +105,9 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 		switch (getMode(selection)) {
 		case INSERT_TEXT: {
-
-			switch (getMode(currentText, selection.x)) {
-			case JUST_INSERT:
-				if (currentText.isEmpty()) {
-					return new InsertionResult(new Point(text.length(), text.length()), text);
-				} else {
-					before = currentText.substring(0, selection.x);
-					after = currentText.substring(selection.x, currentText.length());
-				}
-				break;
-			case SUBSTRING_PRESENT:
-				final int substringStartIndex = getSubStringStartIndex(currentText, selection.x);
-				before = currentText.substring(0, substringStartIndex);
-				after = currentText.substring(selection.x, currentText.length());
-				break;
-			default:
-				throw new UnsupportedOperationException();
-			}
+			final int substringStartIndex = getSubStringStartIndex(currentText, selection.x);
+			before = currentText.substring(0, substringStartIndex);
+			after = currentText.substring(selection.x);
 		}
 			break;
 		case REPLACE_TEXT:
@@ -131,7 +122,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			before += " ";
 		}
 
-		if (!before.isEmpty() && isFeature && !before.endsWith("(")) {
+		if (!before.isEmpty() && isFeature && !before.endsWith("(") && !before.endsWith(" ")) {
 			before += " ";
 		}
 
@@ -146,23 +137,30 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	private static int getSubStringStartIndex(final String currentText, final int x) {
 		int substringStartIndex = Math.max(0, x);
+
+		// count number of quotation marks
+		int quotMarkCounter = 0;
+		for (int i = 0; i < substringStartIndex; i++) {
+			if (currentText.charAt(i) == '\"') {
+				quotMarkCounter++;
+			}
+		}
+
+		final char separator = (quotMarkCounter % 2) != 0 ? '\"' : ' ';
+
+		// compute start index
 		for (; substringStartIndex > 0; substringStartIndex--) {
 			final char ch = currentText.charAt(substringStartIndex - 1);
-			if ((ch == ' ') || (ch == '(') || (ch == ')')) {
+			if ((ch == separator) || (ch == '(') || (ch == ')')) {
 				break;
 			}
 		}
-		return substringStartIndex;
-	}
 
-	private static InsertionMode getMode(final String text, final int selectionIndex) {
-		if (text.isEmpty() || ((selectionIndex - 1) < 0) || (text.charAt(selectionIndex - 1) == ' ')) {
-			return InsertionMode.JUST_INSERT;
-		} else if (!text.isEmpty() || (((selectionIndex - 1) >= 0) && (text.charAt(selectionIndex - 1) != ' '))) {
-			return InsertionMode.SUBSTRING_PRESENT;
-		} else {
-			return InsertionMode.UNKNOWN;
+		if (separator == '\"') {
+			substringStartIndex--;
 		}
+
+		return substringStartIndex;
 	}
 
 	private static TextChangeMode getMode(final Point selection) {

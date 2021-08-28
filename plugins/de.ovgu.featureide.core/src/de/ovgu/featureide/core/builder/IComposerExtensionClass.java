@@ -27,8 +27,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import javax.annotation.Nonnull;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -54,7 +52,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/** Defines the product-line implementation-mechanism of the composition tool **/
 	static enum Mechanism {
-	FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR
+		FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR
 	};
 
 	final static String PACKAGE_PATTERN = "#package#";
@@ -101,7 +99,6 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 *
 	 * @return a list of file extensions witch will be composed
 	 */
-	@Nonnull
 	LinkedHashSet<String> extensions();
 
 	/**
@@ -182,7 +179,6 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 *
 	 * @return the default configuration format. Extension can be extracted via getSuffix().
 	 */
-	@Nonnull
 	IConfigurationFormat getConfigurationFormat();
 
 	/**

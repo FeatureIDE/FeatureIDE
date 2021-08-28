@@ -41,12 +41,12 @@ public class ClonePercentageData implements IClonePercentageData {
 
 	public void setFeatureTotalLineCount(FeatureRootLocation feature, long lineCount) {
 		if (featureTotalLineCounts.containsKey(feature)) featureTotalLineCounts.remove(feature);
-		featureTotalLineCounts.put(feature, new Long(lineCount));
+		featureTotalLineCounts.put(feature, Long.valueOf(lineCount));
 	}
 
 	public void setFeatureTotalCloneLength(FeatureRootLocation feature, long lineCount) {
 		if (featureTotalCloneLength.containsKey(feature)) featureTotalCloneLength.remove(feature);
-		featureTotalCloneLength.put(feature, new Long(lineCount));
+		featureTotalCloneLength.put(feature, Long.valueOf(lineCount));
 	}
 
 	/*
@@ -111,7 +111,7 @@ public class ClonePercentageData implements IClonePercentageData {
 				for (short cloneCount : lines)
 					if (cloneCount > 0) count++;
 			}
-			clonedLineCount.put(feature, new Integer(count));
+			clonedLineCount.put(feature, Integer.valueOf(count));
 		}
 		final Integer result = clonedLineCount.get(feature);
 		return result == null ? -1 : result;

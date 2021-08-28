@@ -30,8 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
@@ -54,7 +52,6 @@ public class ModelReader {
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the MODEL CNF file format
 	 */
-	@Nonnull
 	public void read(Reader in) throws ParseException, IOException {
 		final HashSet<String> features = new HashSet<>();
 		final ArrayList<String> clausesString = new ArrayList<>();
@@ -144,7 +141,6 @@ public class ModelReader {
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the MODEL CNF file format
 	 */
-	@Nonnull
 	public void read(String in) throws ParseException, IOException {
 		read(new StringReader(in));
 	}
