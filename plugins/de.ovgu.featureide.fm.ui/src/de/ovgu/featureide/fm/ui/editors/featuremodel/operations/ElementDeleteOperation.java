@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -36,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -106,7 +108,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	/**
 	 * Creates the single delete operations which are part of this MultiFeatureModelOperation.
 	 *
-	 * @param featureModel The FeatureModel on which these operations take place
+	 * @param featureModel - {@link IFeatureModel} The feature model on which these operations take place
 	 */
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {
@@ -118,6 +120,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		boolean featureInConstraint = false;
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
+		boolean featuresInOtherModelConstraints = false;
 
 		for (final Object element : elements) {
 			final IFeature feature = getFeatureFromObject(element);
@@ -144,10 +147,34 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
+		// Find referencing models...
+		if (featureModel instanceof MultiFeatureModel) {
+			// by translation of the project-relative path...
+			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
+			final FeatureModelManager mfmManager = (FeatureModelManager) FeatureModelManager.getInstance(mfm);
+			final IPath eclipseRelativePath =
+				FeatureModelManager.getProjectRelativePath(mfmManager.getPath().toFile()).removeFirstSegments(1).removeTrailingSeparator();
+
+			// ... and find the project-relative alias.
+			for (final MultiFeatureModel referencingModel : featureModelManager.getReferencingFeatureModels()) {
+				final String modelAlias = referencingModel.getReference(eclipseRelativePath);
+				// Translate the feature names as they appear in referencingModel.
+				final Collection<String> referencedFeatureNames = featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).toList();
+
+				// Finally, find the selected feature names in imported constraints of the referer.
+				for (final IConstraint constraint : referencingModel.getOwnConstraints()) {
+					final Collection<String> constraintFeatureNames = constraint.getContainedFeatures().stream().map(con -> con.getName()).toList();
+					featuresInOtherModelConstraints =
+						featuresInOtherModelConstraints || referencedFeatureNames.stream().anyMatch(name -> constraintFeatureNames.contains(name));
+				}
+			}
+		}
+
+		if (featureInConstraint || featureHasGroupDifference || featureIsRoot || featuresInOtherModelConstraints) {
 			// the delete dialog needs to be shown
-			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featureHasGroupDifference, featureIsRoot);
-			final String[] dialogButtonLabels = getDialogButtonLabels(featureInConstraint, featureHasGroupDifference, featureIsRoot);
+			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featuresInOtherModelConstraints, featureHasGroupDifference, featureIsRoot);
+			final String[] dialogButtonLabels =
+				getDialogButtonLabels(featureInConstraint, featuresInOtherModelConstraints, featureHasGroupDifference, featureIsRoot);
 			final String dialogReturnLabel = openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, dialogButtonLabels);
 			handleDialogReturn(dialogReturnLabel, featuresToDelete, constraintsToDelete);
 		} else {
@@ -211,39 +238,49 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Gets the button labels for the DeleteDialog
+	 * Gets the button labels for the DeleteDialog.
 	 *
 	 * @param featureInConstraint <code>true</code> if any of the selected features is contained in a constraint, <code>false</code> if not
+	 * @param featureInOtherModelConstraints - <code>true</code> if any selected feature appears in an constraint of a {@link MultiFeatureModel} that imports
+	 *        this model, <code>false</code> otherwise. Currently, prevent deletion when it would affect other constraints in other models.
 	 * @param featureHasGroupDifference <code>true</code> if any of the selected features has a different group than its parent, <code>false</code> if not
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A String array with labels for the buttons of the DeleteDialog
 	 */
-	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureInOtherModelConstraints, boolean featureHasGroupDifference,
+			boolean featureIsRoot) {
 		final List<String> buttonLabels = new ArrayList<>();
-		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
-			buttonLabels.add(StringTable.DELETE_WITH_SLICING);
-		}
+		if (!featureInOtherModelConstraints) {
+			if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
+				buttonLabels.add(StringTable.DELETE_WITH_SLICING);
+			}
 
-		if (!featureInConstraint && !featureIsRoot) {
-			buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+			if (!featureInConstraint && !featureIsRoot) {
+				buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+			}
 		}
-
 		buttonLabels.add(StringTable.CANCEL);
 		return buttonLabels.toArray(new String[0]);
 	}
 
 	/**
-	 * Gets the reasons for the DeleteDialog
+	 * Gets the reasons for the DeleteDialog.
 	 *
 	 * @param featureInConstraint <code>true</code> if any of the selected features is contained in a constraint, <code>false</code> if not
+	 * @param featureInOtherModelConstraints - <code>true</code> if any selected feature appears in an constraint of a {@link MultiFeatureModel} that imports
+	 *        this model, <code>false</code> otherwise.
 	 * @param featureHasGroupDifference <code>true</code> if any of the selected features has a different group than its parent, <code>false</code> if not
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A List of Strings with reasons for the dialog. These are being displayed in the DeleteDialog
 	 */
-	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureInOtherModelConstraints, boolean featureHasGroupDifference,
+			boolean featureIsRoot) {
 		final List<String> dialogReasons = new ArrayList<>();
 		if (featureInConstraint) {
 			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS);
+		}
+		if (featureInOtherModelConstraints) {
+			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
 		}
 		if (featureHasGroupDifference) {
 			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT);

@@ -88,6 +88,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.ReferenceEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
@@ -110,7 +111,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  * @author Thomas Thuem
  * @author Christian Becker
  */
-public class FeatureModelEditor extends MultiPageEditorPart implements IEventListener, IResourceChangeListener {
+public class FeatureModelEditor extends MultiPageEditorPart implements ReferenceEventListener, IResourceChangeListener {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelEditor";
 
@@ -588,14 +589,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			setPartName(input.getName());
 		}
 		setTitleToolTip(input.getToolTipText());
-
 		notifyFMEditorOpened();
-
-		// TODO _Interfaces Removed Code
-		// FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
-		// FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
-
-		// featureModel.getColorschemeTable().readColorsFromFile(file.getProject());
 	}
 
 	/**
@@ -610,13 +604,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		final List<Path> importPaths = new ArrayList<>(mfm.getImports().size());
 
 		for (String importPathString : mfm.getImports()) {
-			// TODO Trennzeichen für Windows
 			importPathString = importPathString.replace("\\", ".");
 			final String[] paths = path.toString().split(Pattern.quote(File.separator));
 			paths[paths.length - 1] = "";
 			String s = String.join(File.separator, paths);
 			s += importPathString;
-			// "OperatingSystem.uvl"
 			importPaths.add(FileSystems.getDefault().getPath(s));
 		}
 		return importPaths;
@@ -741,6 +733,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 		diagramEditor.propertyChange(event);
+	}
+
+	@Override
+	public MultiFeatureModel getFeatureModel() {
+		final IFeatureModel fm = fmManager.getVarObject();
+		if ((fm != null) && (fm instanceof MultiFeatureModel)) {
+			return (MultiFeatureModel) fm;
+		}
+		return null;
 	}
 
 	public ProblemList checkModel(String source) {
