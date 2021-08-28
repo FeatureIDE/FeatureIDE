@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -40,8 +41,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.ReferenceEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
@@ -92,9 +95,10 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	protected Object undoContext = null;
 
 	/**
-	 * importers is a list of all listeners that need to be updated when the feature model managed through this model is changed.
+	 * importers is a list of all listeners that reference the stored feature model, and therefore need to be updated when the feature model managed through
+	 * this model is changed.
 	 */
-	private final List<IEventListener> importers;
+	private final List<ReferenceEventListener> importers;
 
 	protected FeatureModelManager(Path identifier) {
 		super(identifier, FMFormatManager.getInstance(), FMFactoryManager.getInstance());
@@ -202,19 +206,24 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	/**
 	 * Adds an listener <code>listener</code> that imports this feature model.
 	 *
-	 * @param listener - {@link IEventListener}
+	 * @param listener - {@link ReferenceEventListener}
 	 */
-	public void addImportListener(IEventListener listener) {
+	public void addImportListener(ReferenceEventListener listener) {
 		importers.add(listener);
 	}
 
 	/**
 	 * Removes the listener <code>listener/code> from the import list.
 	 *
-	 * @param listener - {@link IEventListener}
+	 * @param listener - {@link ReferenceEventListener}
 	 */
-	public void removeImportListener(IEventListener listener) {
+	public void removeImportListener(ReferenceEventListener listener) {
 		importers.remove(listener);
+	}
+
+	@Override
+	public Collection<MultiFeatureModel> getReferencingFeatureModels() {
+		return importers.stream().map(importer -> importer.getFeatureModel()).distinct().toList();
 	}
 
 	/**
@@ -227,7 +236,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	@Override
 	public void informImports(FeatureIDEEvent e) {
-		for (final IEventListener i : importers) {
+		for (final ReferenceEventListener i : importers) {
 			i.propertyChange(e);
 		}
 	}
@@ -239,7 +248,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 	 * @param file - {@link File}
 	 * @return an {@link IProject} for the project file is contained in, or null otherwise.
 	 */
-	public static IPath getProject(File file) {
+	public static IPath getProjectRelativePath(File file) {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		try {
 			final IPath path = org.eclipse.core.runtime.Path.fromOSString(file.getCanonicalPath());

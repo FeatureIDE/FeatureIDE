@@ -595,6 +595,13 @@ public final class FeatureUtils {
 		return Functional.toList(Functional.map(constraints, IConstraint::getNode));
 	}
 
+	/**
+	 * Convenience method to return the relevant constraints of <code>feature</code>.
+	 *
+	 * @see {@link IFeatureStructure#getRelevantConstraints()}
+	 * @param feature - {@link IFeature}
+	 * @return {@link Collection}
+	 */
 	public static final Collection<IConstraint> getRelevantConstraints(IFeature feature) {
 		requireNonNull(feature);
 

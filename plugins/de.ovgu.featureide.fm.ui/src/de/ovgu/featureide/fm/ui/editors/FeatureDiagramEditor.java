@@ -1338,7 +1338,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		final Path originalPath = originalModel.getSourceFile();
 		// Original Path -> remove the first segment for the project, then the file extension.
-		final String originalPathString = FeatureModelManager.getProject(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
+		final String originalPathString = FeatureModelManager.getProjectRelativePath(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
 		final String importedModelName = originalPathString.replace("/", ".");
 		String modelAlias = null;
 		for (final Entry<String, MultiFeatureModel.UsedModel> entry : mfm.getExternalModels().entrySet()) {

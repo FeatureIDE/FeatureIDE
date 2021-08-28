@@ -1139,7 +1139,8 @@ public class StringTable {
 	public static final String WIKI_DELETING_URL = "https://github.com/FeatureIDE/FeatureIDE/wiki/Feature-Model-Edit-Operations#deleting";
 	public static final String AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS = "at least one feature is contained in constraints";
 	public static final String AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT = "at least one feature has a different group than its parent";
-	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN = "a feature is the root of the feature diagram and has multiple children";
+	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN =
+		"a feature is the root of the feature diagram and has multiple children";
 	public static final String LIST_BULLET_DASH = "  - ";
 	public static final String DELETING_THIS_FEATURE_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting this feature may result in unwanted changes as";
 	public static final String DELETING_THESE_FEATURES_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting these features may result in unwanted changes as";
@@ -1151,4 +1152,6 @@ public class StringTable {
 	public static final String SHOW = "Show";
 	public static final String SHOW_ALL_LEVELS = "Show All Levels";
 	public static final String CREATE_FEATURE = "Create Feature";
+	public static final String AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL =
+		"At least one feature appears in a constraint in another feature model.\nCurrently, you need to delete these constraints manually before executing this delete operation.";
 }

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.CheckForNull;
 
@@ -210,23 +211,23 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	/**
-	 * Tests if the given path has a reference as a model this composed model uses.
+	 * Tests if the given path has a reference as a model this composed model uses. If so, returns the alias of this path.
 	 *
-	 * @param path - {@link IPath}
-	 * @return boolean
+	 * @param path - {@link IPath} - A project-relative Eclipse path.
+	 * @return {@link String}
 	 */
-	public boolean references(IPath path) {
+	public String getReference(IPath path) {
 		// Convert the project-relative path to a model reference.
 		String modelString = path.removeTrailingSeparator().toString();
 		modelString = modelString.split("\\.")[0];
 		modelString = modelString.replace('/', '.');
 
-		for (final UsedModel usedModel : usedModels.values()) {
-			if (usedModel.modelName.equals(modelString)) {
-				return true;
+		for (final Entry<String, UsedModel> entry : usedModels.entrySet()) {
+			if (entry.getValue().modelName.equals(modelString)) {
+				return entry.getKey();
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public List<Equation> getAttributConstraints() {

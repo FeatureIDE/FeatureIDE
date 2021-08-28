@@ -57,6 +57,11 @@ public interface IFeatureStructure {
 
 	IFeatureStructure getParent();
 
+	/**
+	 * Returns a collection of constraints the feature this structure manages is involved in.
+	 *
+	 * @return {@link Collection}
+	 */
 	Collection<IConstraint> getRelevantConstraints();
 
 	boolean hasChildren();
@@ -119,6 +124,9 @@ public interface IFeatureStructure {
 
 	void setParent(IFeatureStructure newParent);
 
+	/**
+	 * (Re)calculates the collection of constraints of the feature model that the feature this structure manages is involved in.
+	 */
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
