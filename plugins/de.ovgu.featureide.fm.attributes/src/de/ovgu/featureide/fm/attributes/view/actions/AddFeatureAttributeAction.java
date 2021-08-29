@@ -22,10 +22,10 @@ package de.ovgu.featureide.fm.attributes.view.actions;
 
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
@@ -59,7 +59,7 @@ public class AddFeatureAttributeAction extends Action {
 	}
 
 	private void addAttribute(IFeatureModel featureModel) {
-		final ExtendedFeature feature = (ExtendedFeature) featureModel.getFeature(featureName);
+		final IExtendedFeature feature = (IExtendedFeature) featureModel.getFeature(featureName);
 		final String name = getUniqueAttributeName(attributeType, feature);
 		final IFeatureAttribute attribute;
 		switch (attributeType) {
@@ -82,7 +82,7 @@ public class AddFeatureAttributeAction extends Action {
 		featureModel.fireEvent(new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature));
 	}
 
-	private String getUniqueAttributeName(String type, ExtendedFeature feature) {
+	private String getUniqueAttributeName(String type, IExtendedFeature feature) {
 		int amountOfAttributes = 0;
 		while (true) {
 			boolean isUnique = true;

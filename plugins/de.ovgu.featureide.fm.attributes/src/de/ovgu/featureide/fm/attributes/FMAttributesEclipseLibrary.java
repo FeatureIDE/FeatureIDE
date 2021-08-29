@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.attributes;
 
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedConfigurationFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory;
+import de.ovgu.featureide.fm.attributes.format.UVLExtendedFeatureModelFormat;
 import de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat;
 import de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
@@ -51,7 +53,9 @@ public class FMAttributesEclipseLibrary implements ILibrary {
 	@Override
 	public void install() {
 		FMFormatManager.getInstance().addExtension(new XmlExtendedFeatureModelFormat());
+		FMFormatManager.getInstance().addExtension(new UVLExtendedFeatureModelFormat());
 		FMFactoryManager.getInstance().addExtension(ExtendedFeatureModelFactory.getInstance());
+		FMFactoryManager.getInstance().addExtension(ExtendedMultiFeatureModelFactory.getInstance());
 		ConfigFormatManager.getInstance().addExtension(new XmlExtendedConfFormat());
 		ConfigurationFactoryManager.getInstance().addExtension(ExtendedConfigurationFactory.getInstance());
 	}

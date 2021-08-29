@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.core.io.uvl;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -61,6 +62,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -78,9 +80,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_NAME = "namespace";
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
 
+	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
+
 	private UVLModel rootModel;
-	private ProblemList pl;
+	protected ProblemList pl;
 	private IFeatureModel fm;
+	protected MultiFeatureModelFactory factory;
 
 	@Override
 	public String getName() {
@@ -127,6 +132,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
+		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
 		Arrays.stream(rootModel.getImports()).forEach(i -> parseImport(fm, i));
 		IFeature root;
@@ -134,7 +140,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f, rootModel);
 		} else {
-			root = MultiFeatureModelFactory.getInstance().createFeature(fm, "Root");
+			root = factory.createFeature(fm, "Root");
 			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
 		}
 		fm.getStructure().setRoot(root.getStructure());
@@ -172,7 +178,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 		final UVLModel finalSubmodel = submodel;
 
-		final MultiFeature feature = MultiFeatureModelFactory.getInstance().createFeature(fm, resolved.getName());
+		final MultiFeature feature = factory.createFeature(fm, resolved.getName());
+
 		if (resolved.getName().contains(".")) {
 			feature.setType(MultiFeature.TYPE_INTERFACE);
 		}
@@ -181,8 +188,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root.getStructure().addChild(feature.getStructure());
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
+
 		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
-		parseAttributes(resolved, fm);
+		parseAttributes(fm, feature, resolved);
+
 		return feature;
 	}
 
@@ -223,16 +232,25 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
-	private void parseAttributes(Feature f, MultiFeatureModel fm) {
-		UVLParser.getAttributes(f).entrySet().stream().filter(e -> e.getKey().equals("constraint") || e.getKey().equals("constraints"))
-				.forEach(e -> parseAttribute(fm, e.getValue()));
+	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature f) {
+		UVLParser.getAttributes(f).entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
 	}
 
-	private void parseAttribute(MultiFeatureModel fm, Object value) {
-		if (value instanceof List<?>) {
-			((List<?>) value).forEach(v -> parseConstraint(fm, v));
-		} else {
-			parseConstraint(fm, value);
+	/**
+	 * This method parses an attribute that is contained in UVL under a feature to an attribute/constraint in the feature model.
+	 *
+	 * @param fm the featuremodel that is parsed from UVL
+	 * @param feature the feature that contains the attribute that is parsed
+	 * @param attributeKey the name of the attribute that is parsed
+	 * @param attributeValue the value of the attribute that is parsed
+	 */
+	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
+		if (attributeKey.equals("constraint") || attributeKey.equals("constraints")) {
+			if (attributeValue instanceof List<?>) {
+				((List<?>) attributeValue).forEach(v -> parseConstraint(fm, v));
+			} else {
+				parseConstraint(fm, attributeValue);
+			}
 		}
 	}
 
@@ -248,7 +266,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		try {
 			final Node constraint = parseConstraint(c);
 			if (constraint != null) {
-				final MultiConstraint newConstraint = MultiFeatureModelFactory.getInstance().createConstraint(fm, constraint);
+				final MultiConstraint newConstraint = factory.createConstraint(fm, constraint);
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
@@ -331,12 +349,24 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final Feature f = new Feature();
 		f.setName(feature.getName());
 		if (!f.getName().contains(".")) { // exclude references
-			if (feature.getStructure().isAbstract()) {
-				f.setAttributes(Collections.singletonMap("abstract", true));
-			}
+			f.setAttributes(printAttributes(feature));
 			f.setGroups(printGroups(feature));
 		}
 		return f;
+	}
+
+	/**
+	 * This method writes all attributes of the specified feature to a map that can be converted to UVL.
+	 *
+	 * @param feature the feature whose attributes are written
+	 * @return a map containing the attributes
+	 */
+	protected Map<String, Object> printAttributes(IFeature feature) {
+		final Map<String, Object> attributes = new TreeMap<>();
+		if (feature.getStructure().isAbstract()) {
+			attributes.put("abstract", true);
+		}
+		return attributes;
 	}
 
 	private Group constructGroup(IFeatureStructure fs, String type, Predicate<IFeatureStructure> pred) {
@@ -402,6 +432,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean supportsWrite() {
 		return true;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return !content.toString().contains(EXTENDED_ATTRIBUTE_NAME);
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return supportsContent((CharSequence) reader);
 	}
 
 	@Override

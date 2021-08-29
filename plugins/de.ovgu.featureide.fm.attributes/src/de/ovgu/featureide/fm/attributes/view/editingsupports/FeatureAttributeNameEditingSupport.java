@@ -26,8 +26,8 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -58,9 +58,9 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
+		IExtendedFeature feat = (IExtendedFeature) ((IFeatureAttribute) element).getFeature();
 		for (IFeature f : feat.getFeatureModel().getFeatures()) {
-			ExtendedFeature ext = (ExtendedFeature) f;
+			IExtendedFeature ext = (IExtendedFeature) f;
 			for (IFeatureAttribute att : ext.getAttributes()) {
 				if (att.getName().equals(value.toString()) && !((IFeatureAttribute) element).getType().equals(att.getType())) {
 					MessageDialog.openError(null, "Invalid input", "The inserted attribute name is used on a different attribute type");
