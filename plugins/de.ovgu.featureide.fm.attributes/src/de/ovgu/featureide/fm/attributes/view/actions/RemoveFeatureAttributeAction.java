@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -64,7 +64,7 @@ public class RemoveFeatureAttributeAction extends Action {
 			if (attribute.isRecursive()) {
 				if (attribute.isHeadOfRecursiveAttribute()) {
 					for (final IFeature feature : featureModel.getFeatures()) {
-						ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+						IExtendedFeature extendedFeature = (IExtendedFeature) feature;
 						for (IFeatureAttribute localAttribute : extendedFeature.getAttributes()) {
 							if (attribute.getName().equals(localAttribute.getName())) {
 								extendedFeature.removeAttribute(localAttribute);
@@ -74,7 +74,7 @@ public class RemoveFeatureAttributeAction extends Action {
 				}
 			} else {
 				for (final IFeature feature : featureModel.getFeatures()) {
-					ExtendedFeature extendedFeature = (ExtendedFeature) feature;
+					IExtendedFeature extendedFeature = (IExtendedFeature) feature;
 					if (extendedFeature.getAttributes().contains(attribute)) {
 						extendedFeature.removeAttribute(attribute);
 					}

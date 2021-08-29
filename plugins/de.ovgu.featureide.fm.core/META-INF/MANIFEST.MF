@@ -17,7 +17,8 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
-Export-Package: de.neominik.uvl,
+Export-Package: clojure.lang,
+ de.neominik.uvl,
  de.neominik.uvl.ast,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.core.analysis,
