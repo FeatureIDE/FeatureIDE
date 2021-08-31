@@ -29,6 +29,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
