@@ -395,6 +395,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return new Group[] {};
 	}
 
+	/**
+	 * a method to create a group for uvl starting with a feature that is either mandatory or optional and adding all features with the same property until a
+	 * feature with a different property comes in order
+	 *
+	 * @param feat the first feature of a new group
+	 * @param pos the position of the feature in the list of children of the parent feature
+	 * @return the new group with the given feature as start feature
+	 */
 	private Group getGroup(IFeatureStructure feat, int pos) {
 		final List<IFeatureStructure> featuresInGroup = new LinkedList<IFeatureStructure>();
 		featuresInGroup.add(feat);
