@@ -24,7 +24,8 @@ Release 3.8.0 (August 2021)
 * Undo and Redo now working as expected (#1026)
 * Improvements to the configuration editor under Linux (#1055)
 * Fixed a breaking bug in runtime variability feature models (#1094)
-* Small fixes and enhancements (#934, #981, #1105, #1108, #1110, #1116, #1130)
+* Removed outdated support for Fuji and corresponding functionality (#936, #1106)
+* Small fixes and enhancements (#844, #934, #981, #1105, #1108, #1110, #1116, #1130)
 
 Release 3.7.2 (July 2021)
 * Hotfix containing only bugfixes and code quality improvements over v3.7.1
