@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.ui-test;singleton:=true
-Bundle-Version: 3.7.2.qualifier
+Bundle-Version: 3.8.0.qualifier
 Fragment-Host: de.ovgu.featureide.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extended Feature Model Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.fm.attributes-test;singleton:=true
-Bundle-Version: 3.7.2.qualifier
+Bundle-Version: 3.8.0.qualifier
 Bundle-Vendor: University of Magdeburg
 Fragment-Host: de.ovgu.featureide.fm.attributes
 Automatic-Module-Name: de.ovgu.featureide.fm.attributes-test
