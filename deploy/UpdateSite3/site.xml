@@ -891,6 +891,39 @@
    <feature url="features/de.ovgu.featureide.munge.android_3.7.2.202107160918.jar" id="de.ovgu.featureide.munge.android" version="3.7.2.202107160918">
       <category name="FeatureIDE 3.7"/>
    </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.202108311440.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.8.0.202108311440.jar" id="de.ovgu.featureide" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.8.0.202108311440.jar" id="de.ovgu.featureide.ahead" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.8.0.202108311440.jar" id="de.ovgu.featureide.antenna" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.8.0.202108311440.jar" id="de.ovgu.featureide.aspectj" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.8.0.202108311440.jar" id="de.ovgu.featureide.exampleprojects" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.8.0.202108311440.jar" id="de.ovgu.featureide.featurecpp" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.8.0.202108311440.jar" id="de.ovgu.featureide.featurehouse" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.8.0.202108311440.jar" id="de.ovgu.featureide.featuremodeling" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.8.0.202108311440.jar" id="de.ovgu.featureide.munge" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.8.0.202108311440.jar" id="de.ovgu.featureide.munge.android" version="3.8.0.202108311440">
+      <category name="FeatureIDE 3.8"/>
+   </feature>
    <archive path="FeatureIDE v2.5 and earlier versions" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>
    <archive path="FeatureIDE v2.6 and v2.7" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/"/>
    <category-def name="FeatureIDE 3.0" label="FeatureIDE 3.0"/>
@@ -901,4 +934,5 @@
    <category-def name="FeatureIDE 3.5" label="FeatureIDE 3.5"/>
    <category-def name="FeatureIDE 3.6" label="FeatureIDE 3.6"/>
    <category-def name="FeatureIDE 3.7" label="FeatureIDE 3.7"/>
+   <category-def name="FeatureIDE 3.8" label="FeatureIDE 3.8"/>
 </site>
