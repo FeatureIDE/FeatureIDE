@@ -616,7 +616,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 						setFeatureProject(newProject);
 						isNew = true;
 					} else if ((newProject == null) && (newEditor instanceof FeatureModelEditor)) {
-						//if there was a project opened in a featuremodeleditor that is not a featureide project
+						// if there was a project opened in a featuremodeleditor that is not a featureide project
 						openedFileNotFeatureProject = true;
 						if (newProject != featureProject) {
 							setFeatureProject(newProject);
@@ -637,8 +637,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				}
 			}
 		} else {
-			//refresh configuration map when closig all editors
-			setFeatureProject(null);
+			// refresh configuration map when closig all editors
+			if (null != featureProject) {
+				setFeatureProject(null);
+			} else {
+				updateElements();
+			}
 			refresh();
 		}
 
