@@ -731,7 +731,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			doSave((IProgressMonitor) event.getSource());
 			return;
-<<<<<<< HEAD
 		}
 		diagramEditor.propertyChange(event);
 	}
@@ -742,18 +741,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 		if ((fm != null) && (fm instanceof MultiFeatureModel)) {
 			return (MultiFeatureModel) fm;
 		}
-=======
-		}
-		diagramEditor.propertyChange(event);
-	}
-
-	@Override
-	public MultiFeatureModel getFeatureModel() {
-		final IFeatureModel fm = fmManager.getVarObject();
-		if ((fm != null) && (fm instanceof MultiFeatureModel)) {
-			return (MultiFeatureModel) fm;
-		}
->>>>>>> cd8f909410e20911bebf8e17124cfde895ae5e61
 		return null;
 	}
 
