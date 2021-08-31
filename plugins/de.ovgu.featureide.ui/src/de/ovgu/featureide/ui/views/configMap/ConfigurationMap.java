@@ -69,6 +69,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.io.ConfigurationLoader;
 import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.configMap.actions.ConfigMapFilterMenuAction;
@@ -114,6 +115,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private int gridColumns;
 	private int selectedColumnIndex;
 	private boolean configUpdateNecessary;
+	private boolean openedFileNotFeatureProject = false;
 
 	private ConfigurationMapTreeContentProvider treeViewerContentProvider;
 	private ConfigurationMapLabelProvider labelProvider;
@@ -613,6 +615,16 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 					if ((newProject != null) && !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
 						isNew = true;
+					} else if ((newProject == null) && (newEditor instanceof FeatureModelEditor)) {
+						//if there was a project opened in a featuremodeleditor that is not a featureide project
+						openedFileNotFeatureProject = true;
+						if (newProject != featureProject) {
+							setFeatureProject(newProject);
+							refresh();
+						} else {
+							updateElements();
+						}
+						openedFileNotFeatureProject = false;
 					}
 				}
 				final Object[] expandedElements = tree.getExpandedElements();
@@ -624,6 +636,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 					tree.expandAll();
 				}
 			}
+		} else {
+			//refresh configuration map when closig all editors
+			setFeatureProject(null);
+			refresh();
 		}
 
 		currentEditor = newEditor;
@@ -717,5 +733,9 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public List<IConfigurationMapFilter> getFilters() {
 		return filters;
+	}
+
+	public boolean openedFileNotFeatureProject() {
+		return openedFileNotFeatureProject;
 	}
 }

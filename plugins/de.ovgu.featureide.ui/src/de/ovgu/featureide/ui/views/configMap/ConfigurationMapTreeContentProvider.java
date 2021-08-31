@@ -94,7 +94,11 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	public void updateElements() {
 		if (featureProject == null) {
-			featureRoots = emptyRoot;
+			if (configurationMap.openedFileNotFeatureProject()) {
+				featureRoots = new Object[] { "Please open a FeatureIDE Project." };
+			} else {
+				featureRoots = emptyRoot;
+			}
 			return;
 		}
 
