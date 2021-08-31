@@ -18,6 +18,7 @@ de/ovgu/featureide/fm/attributes/statistics/ExtendedFMOutlineProvider.java
 de/ovgu/featureide/fm/attributes/statistics/ExtendedFMTreeContentProvider.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeContentProvider.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeView.java
+de/ovgu/featureide/fm/attributes/view/FeatureAttributeViewAdder.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeViewSelectionFilter.java
 de/ovgu/featureide/fm/attributes/view/actions/AddFeatureAttributeAction.java
 de/ovgu/featureide/fm/attributes/view/actions/CollapseAllButFirstLevel.java
