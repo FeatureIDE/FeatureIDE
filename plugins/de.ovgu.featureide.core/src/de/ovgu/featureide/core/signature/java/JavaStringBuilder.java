@@ -116,7 +116,6 @@ public class JavaStringBuilder {
 						sb.append(" {");
 						sb.append(LINE_SEPARATOR);
 
-						// TODO MPL: use Fuji
 						if (method.isConstructor()) {
 							sb.append("\t\tsuper();");
 						}

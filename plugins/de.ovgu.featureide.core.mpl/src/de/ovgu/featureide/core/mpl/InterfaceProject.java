@@ -161,16 +161,6 @@ public class InterfaceProject {
 		return featureNames.length;
 	}
 
-	// public void loadSignatures(boolean again) {
-	// if (loadJob == null) {
-	// loadJob = new CreateFujiSignaturesJob();
-	// loadJob.setProject(projectReference);
-	// JobManager.addJob(projectReference, loadJob);
-	// } else if (again) {
-	// loadAgain = true;
-	// }
-	// }
-
 	public ProjectSignatures getProjectSignatures() {
 		return projectSignatures;
 	}

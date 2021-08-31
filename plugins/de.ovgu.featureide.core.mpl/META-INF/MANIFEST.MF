@@ -22,6 +22,5 @@ Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.signature.filter,
  de.ovgu.featureide.core.mpl.util
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/fuji.jar,
- .
+Bundle-ClassPath: .
 Automatic-Module-Name: de.ovgu.featureide.core.mpl

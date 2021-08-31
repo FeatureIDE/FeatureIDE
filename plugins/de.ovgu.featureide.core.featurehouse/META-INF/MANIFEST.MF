@@ -15,7 +15,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/FeatureHouse.jar,
- lib/fuji.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
@@ -27,8 +26,6 @@ Export-Package: cide.features,
  de.ovgu.featureide.featurehouse.meta.featuremodel,
  de.ovgu.featureide.featurehouse.model,
  de.ovgu.featureide.featurehouse.signature.documentation,
- de.ovgu.featureide.featurehouse.signature.fuji,
  de.ovgu.featureide.featurehouse.ui.handlers,
- de.ovgu.featureide.featurehouse.ui.handlers.toggle,
- fuji
+ de.ovgu.featureide.featurehouse.ui.handlers.toggle
 Automatic-Module-Name: de.ovgu.featureide.core.featurehouse

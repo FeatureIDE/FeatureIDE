@@ -63,7 +63,7 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 
 		if (featureProject != null) {
 			if (featureProject.getProjectSignatures() == null) {
-				return new String[] { "No signature found - Use Fuji typecheck" };
+				return new String[] { "No signature found" };
 			}
 			final String featureName = featureProject.getFeatureName(inputFile);
 			final String filename = (inputFile).getName();

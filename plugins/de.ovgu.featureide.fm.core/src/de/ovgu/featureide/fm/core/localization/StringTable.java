@@ -177,7 +177,6 @@ public class StringTable {
 	public static final String PROPAGATE_MARKERS_FOR = "Propagate markers for";
 	public static final String THE_IMPORT = "The import";
 	public static final String LOADING_SIGNATURES_FOR = "Loading Signatures for ";
-	public static final String FUJI_SIGNATURES_LOADED_ = "Fuji signatures loaded.";
 	public static final String NO_FSTMODEL_PROVIDED_ = "No FSTModel provided.";
 	public static final String COMPOSITION_ERRORS = "Composition errors";
 	public static final String NONE = "none";
@@ -920,7 +919,6 @@ public class StringTable {
 	public static final String AN_OUTLINE_IS_NOT_AVAILABLE_ = "An outline is not available.";
 	public static final String THIS_IS_NO_FEATURE_PROJECT = "Not a FeatureIDE project";
 	public static final String FEATURE_CONTEXT_OUTLINE = "Feature Context Outline";
-	public static final String NO_SIGNATURE_FOUND___USE_FUJI_TYPECHECK = "No signature found - Use Fuji typecheck";
 	public static final String LOADING___ = "loading...";
 	public static final String NO_FEATURE_PROJECT = "no feature project";// TODO redundant to THIS_IS_NO_FEATURE_PROJECT?
 	public static final String NO_CHILDREN = "No Children";
@@ -1074,9 +1072,6 @@ public class StringTable {
 	public static final String SHOW_NESTED_CLASSES = "Show Nested Classes";
 	public static final String FEATUREMODUL = "Featuremodul";
 	public static final String POSSIBILY_ILLEGITIMATELY_REDEFINED_WITH_KEYWORD = " possibily illegitimately redefined with keyword ";
-	public static final String WITH_FUJI = " with fuji";
-	public static final String FUJI_TYPECHECKER_IS_CURRENTLY_NOT_SUPPORTED_FOR_JAVA_1_8_RUNTIME_ =
-		"Fuji Typechecker is currently not supported for Java 1.8 runtime.";
 	public static final String LIGHTGREEN = "lightgreen";
 	public static final String SUMME = "Summe";
 	public static final String CYAN = "cyan";
@@ -1139,7 +1134,8 @@ public class StringTable {
 	public static final String WIKI_DELETING_URL = "https://github.com/FeatureIDE/FeatureIDE/wiki/Feature-Model-Edit-Operations#deleting";
 	public static final String AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS = "at least one feature is contained in constraints";
 	public static final String AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT = "at least one feature has a different group than its parent";
-	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN = "a feature is the root of the feature diagram and has multiple children";
+	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN =
+		"a feature is the root of the feature diagram and has multiple children";
 	public static final String LIST_BULLET_DASH = "  - ";
 	public static final String DELETING_THIS_FEATURE_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting this feature may result in unwanted changes as";
 	public static final String DELETING_THESE_FEATURES_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting these features may result in unwanted changes as";
