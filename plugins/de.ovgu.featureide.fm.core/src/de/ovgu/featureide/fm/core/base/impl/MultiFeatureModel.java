@@ -29,11 +29,10 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 
@@ -177,7 +176,12 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	public void addOwnConstraint(final IConstraint constraint) {
-		ownConstraints.add(constraint);
+		if (constraint instanceof MultiConstraint) {
+			final MultiConstraint multiConstraint = (MultiConstraint) constraint;
+			if (!multiConstraint.isFromExtern()) {
+				ownConstraints.add(constraint);
+			}
+		}
 		constraints.add(constraint);
 	}
 
@@ -189,15 +193,15 @@ public class MultiFeatureModel extends FeatureModel {
 	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
 	public boolean addInterface(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INTERFACE);
+		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INTERFACE);
 	}
 
 	public boolean addInstance(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INSTANCE);
+		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INSTANCE);
 	}
 
 	public boolean addInheritance(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INHERITED);
+		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INHERITED);
 	}
 
 	public boolean addExternalModel(final UsedModel model) {

@@ -42,15 +42,24 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * <code>node</code> holds the boolean formula of the constraint.
+	 */
 	private final Node node;
+	/**
+	 * <code>description</code> holds the constraint's description.
+	 */
 	private final String description;
-
+	/**
+	 * <code>constraintCount</code> saves the location the constraint was inserted at.
+	 */
 	private int constraintCount = -1;
+	private final int type = 0;
 
 	/**
-	 * @param node the node representing the constraint to be added
-	 * @param featureModel model that will be used to add the constraint
-	 * @param description description
+	 * @param node - {@link Node} representing the constraint to be added.
+	 * @param featureModelManager - {@link IFeatureModelManager} The manager for the model to add the constraint to.
+	 * @param description - {@link String} Textual description.
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModelManager featureModelManager, String description) {
 		super(featureModelManager, CREATE_CONSTRAINT);

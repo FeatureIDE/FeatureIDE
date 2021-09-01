@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
- * {@link MultiFeatureModelOperation} extends {@link AbstractFeatureModelOperation} with the Composite pattern in order to run an operation that consists of
+ * {@link ComposedFeatureModelOperation} extends {@link AbstractFeatureModelOperation} with the Composite pattern in order to run an operation that consists of
  * multiple other operations in the correct order.
  *
  * @author Sebastian Krieter
@@ -44,10 +44,10 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Tobias Heß
  * @author Benedikt Jutz (Documentation)
  */
-public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
+public abstract class ComposedFeatureModelOperation extends AbstractFeatureModelOperation {
 
 	/**
-	 * <code>operations</code> is a double-ended queue to store the single operations required to execute this {@link MultiFeatureModelOperation}.
+	 * <code>operations</code> is a double-ended queue to store the single operations required to execute this {@link ComposedFeatureModelOperation}.
 	 */
 	protected final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
 	/**
@@ -60,13 +60,13 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 	private String commonAncestor;
 
 	/**
-	 * Creates a new {@link MultiFeatureModelOperation}.
+	 * Creates a new {@link ComposedFeatureModelOperation}.
 	 *
 	 * @param featureModelManager - {@link IFeatureModelManager}
 	 * @param name - {@link String}
 	 * @param featureNames - {@link List}
 	 */
-	public MultiFeatureModelOperation(IFeatureModelManager featureModelManager, String name, List<String> featureNames) {
+	public ComposedFeatureModelOperation(IFeatureModelManager featureModelManager, String name, List<String> featureNames) {
 		super(featureModelManager, name);
 		this.featureNames = featureNames;
 	}
@@ -79,7 +79,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 	protected abstract void createSingleOperations(IFeatureModel featureModel);
 
 	/**
-	 * Returns the identifier of the concrete {@link MultiFeatureModelOperation}. This identifier is also stored in the {@link FeatureModelOperationEvent}s that
+	 * Returns the identifier of the concrete {@link ComposedFeatureModelOperation}. This identifier is also stored in the {@link FeatureModelOperationEvent}s that
 	 * are fired.
 	 *
 	 * @return {@link String}
@@ -132,7 +132,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 	 * with the {@link EventType#MULTIPLE_CHANGES_OCCURRED} event type, and the events in-order.
 	 *
 	 * @see {@link AbstractFeatureModelOperation#operation(IFeatureModel)}
-	 * @see {@link MultiFeatureModelOperation#firstOperation(IFeatureModel)}
+	 * @see {@link ComposedFeatureModelOperation#firstOperation(IFeatureModel)}
 	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {

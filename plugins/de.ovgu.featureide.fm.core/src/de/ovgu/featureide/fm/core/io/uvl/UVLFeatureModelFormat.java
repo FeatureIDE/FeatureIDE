@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -181,7 +182,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final MultiFeature feature = factory.createFeature(fm, resolved.getName());
 
 		if (resolved.getName().contains(".")) {
-			feature.setType(MultiFeature.TYPE_INTERFACE);
+			feature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
 		fm.addFeature(feature);
 		if (root != null) {
@@ -270,7 +271,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
-					newConstraint.setType(MultiFeature.TYPE_INTERFACE);
+					newConstraint.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 					fm.addConstraint(newConstraint);
 				}
 			}
@@ -324,13 +325,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel fm) {
-		return deconstructFeatureModel(fm).toString();
+		// UVL stores MultiFeatureModels, so this cast is acceptable
+		return deconstructFeatureModel((MultiFeatureModel) fm).toString();
 	}
 
-	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
+	/**
+	 * Deconstructs the given {@link MultiFeatureModel} into an {@link UVLModel} to output.
+	 *
+	 * @param fm - {@link MultiFeatureModel}
+	 * @return new {@link UVLModel}
+	 */
+	private UVLModel deconstructFeatureModel(MultiFeatureModel fm) {
 		final UVLModel model = new UVLModel();
 		String namespace = fm.getStructure().getRoot().getFeature().getName();
-		List<IConstraint> constraints = fm.getConstraints();
+		List<IConstraint> constraints = fm.getOwnConstraints();
 		if (fm instanceof MultiFeatureModel) {
 			final MultiFeatureModel mfm = (MultiFeatureModel) fm;
 			final FeatureAttribute<String> nsAttribute = mfm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);

@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATUR
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -71,7 +72,7 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 		if (createAsImport) {
 			// Finally mark the feature as imported from an interface.
 			final MultiFeature multiFeature = (MultiFeature) newFeature;
-			multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+			multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
 	}

@@ -71,14 +71,15 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -159,13 +160,13 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			final LinkedList<MultiFeatureModel.UsedModel> interfaceModels = new LinkedList<>();
 			for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 				switch (usedModel.getType()) {
-				case MultiFeature.TYPE_INHERITED:
+				case IMultiFeatureModelElement.TYPE_INHERITED:
 					inheritedModels.add(usedModel);
 					break;
-				case MultiFeature.TYPE_INSTANCE:
+				case IMultiFeatureModelElement.TYPE_INSTANCE:
 					instanceModels.add(usedModel);
 					break;
-				case MultiFeature.TYPE_INTERFACE:
+				case IMultiFeatureModelElement.TYPE_INTERFACE:
 					interfaceModels.add(usedModel);
 					break;
 				}
@@ -212,7 +213,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 
 			for (final IConstraint constraint : object.getConstraints()) {
-				if (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERN) {
+				if (((MultiConstraint) constraint).getType() == IMultiFeatureModelElement.TYPE_INTERN) {
 					sb.append("\tconstraint ");
 					sb.append(constraint.getNode().toString(SYMBOLS));
 					sb.append(";");
@@ -303,7 +304,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		if (feature instanceof MultiFeature) {
 			final MultiFeature extFeature = (MultiFeature) feature;
 
-			if ((extFeature.getType() == MultiFeature.TYPE_INSTANCE) || (extFeature.getType() == MultiFeature.TYPE_INTERFACE)) {
+			if ((extFeature.getType() == IMultiFeatureModelElement.TYPE_INSTANCE) || (extFeature.getType() == IMultiFeatureModelElement.TYPE_INTERFACE)) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
 					writeTab(depth);
 					sb.append(USE);
@@ -311,7 +312,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 					sb.append(";");
 					sb.append(NEWLINE);
 				}
-			} else if (extFeature.getType() == MultiFeature.TYPE_INTERN) {
+			} else if (extFeature.getType() == IMultiFeatureModelElement.TYPE_INTERN) {
 				writeFeature(child2, 1);
 			}
 		}
@@ -1142,7 +1143,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
-			addExternalFeatures(fm, parentModelName, extFeatureModel.getStructure().getRoot(), MultiFeature.TYPE_INHERITED);
+			addExternalFeatures(fm, parentModelName, extFeatureModel.getStructure().getRoot(), IMultiFeatureModelElement.TYPE_INHERITED);
 		}
 	}
 
@@ -1161,7 +1162,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		final IFeatureStructure instanceRoot = sourceModel.getStructure().getRoot();
 
 		String connectorName = "";
-		if (type == MultiFeature.TYPE_INHERITED) {
+		if (type == IMultiFeatureModelElement.TYPE_INHERITED) {
 			connectorName = targetParentFeature.getFeature().getName();
 		} else {
 			connectorName = (targetParentFeature.isRoot() && targetParentFeature.getFeature().getName().equals(sourceModelName))
@@ -1263,7 +1264,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			}
 
 			for (final Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
-				if (parameter.getValue().getType() == MultiFeature.TYPE_INTERFACE) {
+				if (parameter.getValue().getType() == IMultiFeatureModelElement.TYPE_INTERFACE) {
 					final IFeatureStructure parameterFeature = mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 					parameterFeature.setOr();
 					parameterFeature.setAbstract(true);
@@ -1311,19 +1312,19 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 		}
 
 		switch (usedModel.getType()) {
-		case MultiFeature.TYPE_INTERFACE:
+		case IMultiFeatureModelElement.TYPE_INTERFACE:
 			final IFeatureModel interfaceModel = getInterfaceFeatureModel(usedModel.getModelName(), useNameNode);
 			if (interfaceModel == null) {
 				return;
 			}
-			addExternalFeatures(interfaceModel, varName, parent.getStructure(), MultiFeature.TYPE_INTERFACE);
+			addExternalFeatures(interfaceModel, varName, parent.getStructure(), IMultiFeatureModelElement.TYPE_INTERFACE);
 			break;
-		case MultiFeature.TYPE_INSTANCE:
+		case IMultiFeatureModelElement.TYPE_INSTANCE:
 			final IFeatureModel instanceModel = getExternalFeatureModel(usedModel.getModelName(), useNameNode);
 			if (instanceModel == null) {
 				return;
 			}
-			addExternalFeatures(instanceModel, varName, parent.getStructure(), MultiFeature.TYPE_INSTANCE);
+			addExternalFeatures(instanceModel, varName, parent.getStructure(), IMultiFeatureModelElement.TYPE_INSTANCE);
 			break;
 		default:
 			reportWarning(useNameNode, format("The variable with the name %s is no interface or instance.", varName));

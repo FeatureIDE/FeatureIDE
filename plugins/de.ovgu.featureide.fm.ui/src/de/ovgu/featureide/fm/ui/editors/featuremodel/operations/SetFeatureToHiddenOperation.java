@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Paul Westphal
  * @author Chico Sundermann
  */
-public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
+public class SetFeatureToHiddenOperation extends ComposedFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToHiddenOperation";
 

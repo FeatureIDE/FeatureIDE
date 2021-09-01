@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -114,7 +115,7 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 				// set MultiFeature as interface
 				if (createAsImport) {
 					final MultiFeature multiFeature = (MultiFeature) newFeature;
-					multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+					multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 				}
 				return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent, newFeature);
 			}

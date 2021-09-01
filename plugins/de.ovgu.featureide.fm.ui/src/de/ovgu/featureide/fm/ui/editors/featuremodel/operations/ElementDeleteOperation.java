@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  * @author Soeren Viegener
  * @author Philipp Vulpius
  */
-public class ElementDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
+public class ElementDeleteOperation extends ComposedFeatureModelOperation implements GUIDefaults {
 
 	public static final String ID = ID_PREFIX + "ElementDeleteOperation";
 

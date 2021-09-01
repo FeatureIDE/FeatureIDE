@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -118,7 +119,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, featureName);
 		if (createAsImport) {
 			final MultiFeature multiFeature = (MultiFeature) newFeature;
-			multiFeature.setType(MultiFeature.TYPE_INTERFACE);
+			multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
 		final IFeature child = featureModel.getFeature(childName);
 

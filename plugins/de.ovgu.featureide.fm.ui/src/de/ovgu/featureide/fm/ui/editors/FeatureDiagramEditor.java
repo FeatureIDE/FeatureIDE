@@ -93,6 +93,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
@@ -100,6 +101,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
@@ -639,7 +641,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return (T) adapter.cast(getViewer());
+			return adapter.cast(getViewer());
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());
@@ -1302,7 +1304,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			for (final IFeature newFeature : modelAfterSlicing.getFeatures()) {
 				final String referencedName = modelAlias + newFeature.getName();
 				final MultiFeature referencedNewFeature = factory.createFeature(mfm, referencedName);
-				referencedNewFeature.setType(MultiFeature.TYPE_INTERFACE);
+				referencedNewFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 				mfm.addFeature(referencedNewFeature);
 				newFeatureOrder.add(referencedName);
 			}
@@ -1658,6 +1660,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return legendMenu;
 	}
 
+	/**
+	 * Tests if the context menu to be seen should be for constraints. In that case, <code>selection</code> needs to contain {@link ConstraintEditPart}s only.
+	 *
+	 * @param selection - {@link IStructuredSelection}
+	 * @return {@link Boolean}
+	 */
 	private boolean isConstraintMenu(IStructuredSelection selection) {
 		boolean constraintMenu = !selection.toList().isEmpty();
 		for (final Object obj : selection.toList()) {
@@ -1666,6 +1674,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		}
 		return constraintMenu;
+	}
+
+	/**
+	 * Tests if the constraint menu should allow deletion or editing of the constraints in <code>structuredSelection</code>. Deletion should only be possible
+	 * for own constraints, and also editing.
+	 *
+	 * @param selection - {@link IStructuredSelection}
+	 * @return {@link Boolean}
+	 * @see {@link FeatureDiagramEditor#isConstraintMenu(IStructuredSelection)}
+	 */
+	private boolean allowDeletionOrEditing(IStructuredSelection selection) {
+		final List<ConstraintEditPart> editParts =
+			selection.toList().stream().filter(obj -> (obj instanceof ConstraintEditPart)).map(obj -> (ConstraintEditPart) obj).toList();
+		final List<MultiConstraint> multiConstraints =
+			editParts.stream().map(editPart -> editPart.getModel()).map(graphicalConstraint -> (MultiConstraint) graphicalConstraint.getObject()).toList();
+		for (final MultiConstraint constraint : multiConstraints) {
+			if (constraint.isFromExtern()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private boolean isConnectionMenu(IStructuredSelection selection) {
@@ -1685,6 +1714,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
 			menuManager.add(createNameTypeMenuManager());
 		}
+		// Construct Feature Menu
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
 			menuManager.add(createFeatureBelowAction);
@@ -1714,12 +1744,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else if (isLegendMenu(selection)) {
 			menuManager.add(legendLayoutAction);
 			menuManager.add(legendAction);
-		} else if (isConstraintMenu(selection)) {
+		}
+		// Construct Constraint Menu - Do not allow Deletion or Editing of imported Constraints.
+		else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
 			menuManager.add(focusOnExplanationAction);
-			menuManager.add(editConstraintAction);
-			menuManager.add(deleteAction);
+			if (allowDeletionOrEditing(selection)) {
+				menuManager.add(editConstraintAction);
+				menuManager.add(deleteAction);
+			}
 		} else if (isConnectionMenu(selection)) {
 			connectionEntries(menuManager);
 		} else {

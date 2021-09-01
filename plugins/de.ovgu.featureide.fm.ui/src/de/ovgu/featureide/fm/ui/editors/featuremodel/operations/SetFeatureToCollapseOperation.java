@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Chico Sundermann
  * @author Paul Westphal
  */
-public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
+public class SetFeatureToCollapseOperation extends ComposedFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToCollapseOperation";
 
