@@ -20,37 +20,54 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
- * TODO description
+ * {@link ExternalFeatureModelOperation} is an abstract subclass for operations that add new features or constraints in {@link MultiFeatureModel}s. These
+ * operations need to set the new {@link IMultiFeatureModelElement}'s type correctly, depending on how they are imported.
  *
  * @author Benedikt Jutz
  */
 public abstract class ExternalFeatureModelOperation extends AbstractFeatureModelOperation {
 
 	/**
-	 *
+	 * <code>type</code> stores the type of the newly added element.
 	 */
 	protected final int type;
 
 	/**
-	 * @param featureModelManager
-	 * @param title
+	 * Reusable default constructor for when the type is irrelevant.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param title - {@link String}
 	 */
 	public ExternalFeatureModelOperation(IFeatureModelManager featureModelManager, String title) {
-		this(featureModelManager, title, 0);
+		this(featureModelManager, title, IMultiFeatureModelElement.TYPE_INTERN);
 	}
 
 	/**
+	 * Creates a new {@link ExternalFeatureModelOperation}.
 	 *
-	 * @param featureModelManager
-	 * @param title
-	 * @param type
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param title - {@link String}
+	 * @param type - int
 	 */
 	public ExternalFeatureModelOperation(IFeatureModelManager featureModelManager, String title, int type) {
 		super(featureModelManager, title);
 		this.type = type;
 	}
 
+	/**
+	 * Assigns the correct type to <code>element</code>. Does nothing for normal {@link IFeatureModelElement}s.
+	 *
+	 * @param element - {@link IFeatureModelElement}
+	 */
+	protected void setType(IFeatureModelElement element) {
+		if (element instanceof IMultiFeatureModelElement) {
+			((IMultiFeatureModelElement) element).setType(type);
+		}
+	}
 }

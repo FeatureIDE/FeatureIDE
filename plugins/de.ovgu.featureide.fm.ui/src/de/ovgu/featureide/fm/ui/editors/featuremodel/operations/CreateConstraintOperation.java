@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Marlen Bernier
  * @author Dawid Szczepanski
  */
-public class CreateConstraintOperation extends AbstractFeatureModelOperation {
+public class CreateConstraintOperation extends ExternalFeatureModelOperation {
 
 	/**
 	 * <code>node</code> holds the boolean formula of the constraint.
@@ -54,9 +54,10 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 * <code>constraintCount</code> saves the location the constraint was inserted at.
 	 */
 	private int constraintCount = -1;
-	private final int type = 0;
 
 	/**
+	 * The standard {@link CreateConstraintOperation} constructor.
+	 *
 	 * @param node - {@link Node} representing the constraint to be added.
 	 * @param featureModelManager - {@link IFeatureModelManager} The manager for the model to add the constraint to.
 	 * @param description - {@link String} Textual description.
@@ -67,11 +68,18 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 		this.description = description;
 	}
 
+	public CreateConstraintOperation(Node node, IFeatureModelManager featureModelManager, String description, int type) {
+		super(featureModelManager, CREATE_CONSTRAINT, type);
+		this.node = node;
+		this.description = description;
+	}
+
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		constraintCount = featureModel.getConstraintCount();
 		final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).createConstraint(featureModel, node);
 		constraint.setDescription(description);
+		setType(constraint);
 		featureModel.addConstraint(constraint, constraintCount);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}

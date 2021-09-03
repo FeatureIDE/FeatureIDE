@@ -1235,7 +1235,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			originalConstraint = (IConstraint) oldEvent.getNewValue();
 			newFormula = rewriteNodeImports(originalConstraint.getNode(), modelAlias);
 			// Execute the appropriate CreateConstraintOperation.
-			new CreateConstraintOperation(newFormula, fmManager, originalConstraint.getDescription()).execute();
+			new CreateConstraintOperation(newFormula, fmManager, originalConstraint.getDescription(), IMultiFeatureModelElement.TYPE_INTERFACE).execute();
 			break;
 		case CONSTRAINT_DELETE:
 			// For an deleted constraint, first clone it and rewrite its formula, so that a delete succeeds.
