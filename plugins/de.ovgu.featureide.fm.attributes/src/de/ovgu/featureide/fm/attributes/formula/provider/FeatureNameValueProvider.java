@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.attributes.AttributeUtils;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
@@ -46,7 +46,7 @@ public class FeatureNameValueProvider implements FormulaValueProvider {
 	public Map<String, Double> getValues(Object obj, String[] values) {
 		Set<String> keySet = new HashSet<>(Arrays.asList(values));
 		String name = (String) obj;
-		ExtendedFeature ext = (ExtendedFeature) model.getFeature(name);
+		IExtendedFeature ext = (IExtendedFeature) model.getFeature(name);
 		Map<String, Double> result = new HashMap<>();
 		for (String key : keySet) {
 			result.put(key, defaultValue);
@@ -68,7 +68,7 @@ public class FeatureNameValueProvider implements FormulaValueProvider {
 	public Map<String, String> getUnits(Object obj, String[] values) {
 		Set<String> keySet = new HashSet<>(Arrays.asList(values));
 		String name = (String) obj;
-		ExtendedFeature ext = (ExtendedFeature) model.getFeature(name);
+		IExtendedFeature ext = (IExtendedFeature) model.getFeature(name);
 		Map<String, String> result = new HashMap<>();
 		for (IFeatureAttribute att : ext.getAttributes()) {
 			if (keySet.contains(att.getName())) {

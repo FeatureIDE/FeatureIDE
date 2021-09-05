@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
@@ -30,11 +30,11 @@ public class CountAttributeComputation implements IOutlineEntry {
 
 	private int calculateCount() {
 		int count = 0;
-		if (config.getFeatureModel() instanceof ExtendedFeatureModel) {
-			ExtendedFeatureModel fm = (ExtendedFeatureModel) config.getFeatureModel();
+		if (config.getFeatureModel() instanceof IExtendedFeatureModel) {
+			IExtendedFeatureModel fm = (IExtendedFeatureModel) config.getFeatureModel();
 			for (IFeature feat : fm.getFeatures()) {
-				if (feat instanceof ExtendedFeature) {
-					ExtendedFeature efeat = (ExtendedFeature) feat;
+				if (feat instanceof IExtendedFeature) {
+					IExtendedFeature efeat = (IExtendedFeature) feat;
 					if (efeat.isContainingAttribute(attribute)) {
 						count++;
 					}

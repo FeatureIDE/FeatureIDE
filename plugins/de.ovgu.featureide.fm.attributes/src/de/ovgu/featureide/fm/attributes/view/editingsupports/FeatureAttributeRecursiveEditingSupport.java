@@ -26,8 +26,8 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -92,7 +92,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
-			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
+			IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
 			if (feat.isContainingAttribute(attribute)) {
 				return false;
 			}

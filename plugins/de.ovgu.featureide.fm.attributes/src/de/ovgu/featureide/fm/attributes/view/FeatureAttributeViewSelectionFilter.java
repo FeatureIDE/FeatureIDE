@@ -26,9 +26,9 @@ import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView.FeatureAttributeOperationMode;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -80,7 +80,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	 * @return
 	 */
 	private int createConfigurableDependencyMap(Configuration config, SelectableFeature feature) {
-		if (!(feature.getFeature().getFeatureModel() instanceof ExtendedFeatureModel)) {
+		if (!(feature.getFeature().getFeatureModel() instanceof IExtendedFeatureModel)) {
 			return 0;
 		}
 		int numberOfConfigurableAttributes = 0;
@@ -89,7 +89,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 		}
 
 		if (feature.getSelection() == Selection.SELECTED) {
-			ExtendedFeature extFeature = (ExtendedFeature) feature.getFeature();
+			IExtendedFeature extFeature = (IExtendedFeature) feature.getFeature();
 			numberOfConfigurableAttributes += extFeature.getAttributes().stream().filter(att -> att.isConfigurable()).count();
 
 			if (numberOfConfigurableAttributes > 0) {
@@ -126,7 +126,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 		if (element.equals(faView.getMode().getMessage())) {
 			return manager.getVarObject().getFeatureModel().getFeatures().stream().filter(this::isConfigurableFeature).count() <= 0;
 		} else if (element instanceof IFeature) {
-			ExtendedFeature feat = (ExtendedFeature) element;
+			IExtendedFeature feat = (IExtendedFeature) element;
 			if (manager.getVarObject().getSelectableFeature(feat).getSelection() == Selection.SELECTED) {
 				return hasConfigurableDependency(feat);
 			} else {
@@ -143,7 +143,7 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 	}
 
 	private boolean isConfigurableFeature(IFeature feat) {
-		ExtendedFeature ext = (ExtendedFeature) feat;
+		IExtendedFeature ext = (IExtendedFeature) feat;
 		return ext.getAttributes().stream().filter(this::isConfigurableAttribute).count() > 0;
 	}
 
