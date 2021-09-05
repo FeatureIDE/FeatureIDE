@@ -81,6 +81,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
+	private static final String MULTI_ROOT_PREFIX = "Abstract_";
 
 	private UVLModel rootModel;
 	protected ProblemList pl;
@@ -140,7 +141,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f, rootModel);
 		} else {
-			root = factory.createFeature(fm, "Root");
+			String rootName = MULTI_ROOT_PREFIX + 0;
+			for (int i = 1; rootModel.getAllFeatures().keySet().contains(rootName); i++) {
+				rootName = MULTI_ROOT_PREFIX + i;
+			}
+			root = factory.createFeature(fm, rootName);
+			root.getStructure().setAbstract(true);
 			fm.addFeature(root);
 			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
 		}
