@@ -148,7 +148,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			root = factory.createFeature(fm, rootName);
 			root.getStructure().setAbstract(true);
 			fm.addFeature(root);
-			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
+			Arrays.stream(rootModel.getRootFeatures()).forEachOrdered(f -> parseFeature(fm, root, f, rootModel));
+			root.getStructure().getChildren().forEach(fs -> fs.setMandatory(true));
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
