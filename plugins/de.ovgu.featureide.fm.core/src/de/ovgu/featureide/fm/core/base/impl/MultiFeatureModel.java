@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,13 +29,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
+import org.prop4j.Literal;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Adds attributes and attribute constraints to a feature model.
@@ -141,6 +148,11 @@ public class MultiFeatureModel extends FeatureModel {
 
 	public List<String> getImports() {
 		return imports;
+	}
+
+	public void setImports(List<String> imports) {
+		this.imports.clear();
+		imports.stream().forEach(importPath -> this.imports.add(importPath));
 	}
 
 	public void addImport(String imp) {
@@ -266,6 +278,11 @@ public class MultiFeatureModel extends FeatureModel {
 		return Collections.unmodifiableList(ownConstraints);
 	}
 
+	public void setOwnConstraints(List<IConstraint> ownConstraints) {
+		this.ownConstraints.clear();
+		ownConstraints.stream().forEach(constraint -> this.ownConstraints.add(constraint));
+	}
+
 	public boolean isMultiProductLineModel() {
 		return !usedModels.isEmpty();
 	}
@@ -350,6 +367,13 @@ public class MultiFeatureModel extends FeatureModel {
 		return Collections.unmodifiableMap(usedModels);
 	}
 
+	public void setExternalModels(Map<String, UsedModel> usedModels) {
+		this.usedModels.clear();
+		for (final Entry<String, UsedModel> entry : usedModels.entrySet()) {
+			this.usedModels.put(entry.getKey(), new UsedModel(entry.getValue(), ""));
+		}
+	}
+
 	/**
 	 * @param mappingModel the mappingModel to set
 	 */
@@ -384,4 +408,120 @@ public class MultiFeatureModel extends FeatureModel {
 		return new MultiFeatureModel(this, null);
 	}
 
+	/**
+	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that this model imports. This imported model is either stored
+	 * directly in <code>event.source</code>, or can be found in the {@link IFeatureModelElement}
+	 *
+	 * @param event - {@link FeatureIDEEvent} A IMPORTED_MODEL_CHANGED event.
+	 * @return String
+	 */
+	public String extractModelAlias(FeatureIDEEvent event) {
+		// An IFeatureModel as source is its own element.
+		IFeatureModel originalModel;
+		if (event.getSource() instanceof IFeatureModel) {
+			originalModel = (IFeatureModel) event.getSource();
+		}
+		// For an IFeatureModelElement, ask about its model instead.
+		else if (event.getSource() instanceof IFeatureModelElement) {
+			final IFeatureModelElement element = (IFeatureModelElement) event.getSource();
+			originalModel = element.getFeatureModel();
+		} else {
+			return "";
+		}
+
+		final Path originalPath = originalModel.getSourceFile();
+		// Original Path -> remove the first segment for the project, then the file extension.
+		final String originalPathString =
+			FeatureModelManager.getProjectRelativePath(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
+		final String importedModelName = originalPathString.replace("/", ".");
+		String modelAlias = null;
+		for (final Entry<String, UsedModel> entry : getExternalModels().entrySet()) {
+			if (entry.getValue().getModelName().equals(importedModelName)) {
+				modelAlias = entry.getKey() + ".";
+				break;
+			}
+		}
+		return modelAlias;
+	}
+
+	/**
+	 * Rewrites the literals in the given {@link Node} <code>oldNode</code> as to append <code>modelAlias</code> to the literals/feature names. This way, we
+	 * rewrite an imported constraint's formula whenever we create, remove or change it.
+	 *
+	 * @param oldNode - {@link Node}
+	 * @param modelAlias - {@link String}
+	 * @return new {@link Node}
+	 */
+	public Node rewriteNodeImports(Node oldNode, String modelAlias) {
+		if (oldNode instanceof Literal) {
+			final Literal literal = (Literal) oldNode;
+			final String oldFeatureName = literal.getUniqueContainedFeatures().iterator().next();
+			final String newFeatureName = modelAlias + oldFeatureName;
+			return new Literal(newFeatureName, literal.positive);
+		} else {
+			final Node clonedNode = oldNode.clone();
+			final Node[] oldChildren = clonedNode.getChildren();
+			final Node[] newChildren = new Node[oldChildren.length];
+			for (int iN = 0; iN < newChildren.length; iN++) {
+				newChildren[iN] = rewriteNodeImports(oldChildren[iN], modelAlias);
+			}
+			clonedNode.setChildren(newChildren);
+			return clonedNode;
+		}
+	}
+
+	/**
+	 * Reconstructs the structure of an imported feature model, starting from the given <code>oldStructure</code>, for this given feature model, that knows the
+	 * imported model under the alias <code>modelAlias</code>.
+	 *
+	 * @param oldStructure - {@link IFeatureStructure}
+	 * @param modelAlias - {@link String}
+	 * @return new {@link IFeatureStructure}
+	 */
+	public IFeatureStructure reconstructStructure(IFeatureStructure oldStructure, String modelAlias) {
+		// Create the new FeatureStructure for the correct feature.
+		final IFeatureStructure structure = getFeature(modelAlias + oldStructure.getFeature().getName()).getStructure();
+		// Copy mandatory, abstract and group type.
+		structure.setAbstract(oldStructure.isAbstract());
+		structure.setMandatory(oldStructure.isMandatory());
+		if (oldStructure.isAlternative()) {
+			structure.setAlternative();
+		} else if (oldStructure.isAnd()) {
+			structure.setAnd();
+		} else if (oldStructure.isOr()) {
+			structure.setOr();
+		}
+		// Repeat for other children, then return the structure.
+		for (final IFeatureStructure child : oldStructure.getChildren()) {
+			structure.addChild(reconstructStructure(child, modelAlias));
+		}
+		return structure;
+	}
+
+	/**
+	 * Returns the constraint from the constraint list of this feature model that has the same propositional formula as <code>node</code>, and the same
+	 * description text as <code>description</code>. This method is used to delete/modify imported constraints, because comparison by their ID does not work.
+	 *
+	 * @param newFormula - {@link Node}
+	 * @param description - {@link String}
+	 * @return c - {@link IConstraint}
+	 */
+	public IConstraint findConstraint(Node newFormula, String description) {
+		for (final IConstraint constraint : getConstraints()) {
+			if (newFormula.equals(constraint.getNode()) && description.equals(constraint.getDescription())) {
+				return constraint;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param mfm - {@link MultiFeatureModel}
+	 * @param mfmReplacement - {@link MultiFeatureModel}
+	 */
+	public void setMultiFeatureModelProperties(final MultiFeatureModel mfmReplacement) {
+		setImports(mfmReplacement.getImports());
+		setExternalModels(mfmReplacement.getExternalModels());
+
+	}
 }

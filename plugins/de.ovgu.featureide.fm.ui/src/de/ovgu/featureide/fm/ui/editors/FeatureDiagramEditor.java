@@ -39,7 +39,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.operations.IUndoContext;
@@ -79,7 +78,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
@@ -98,14 +96,10 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
-import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -113,7 +107,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -305,6 +298,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		createActions();
 
 		FeatureColorManager.addListener(this);
+	}
+
+	@Override
+	public String toString() {
+		return "Feature Diagram Editor for " + fmManager.getObject().getSourceFile().toString();
 	}
 
 	private void createActions() {
@@ -806,6 +804,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			for (final FeatureIDEEvent singleEvent : singleEvents) {
 				propertyChange(singleEvent);
 			}
+			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
@@ -869,6 +868,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.deselectAll();
 			setDirty();
 			analyzeFeatureModel();
+			recentEvents.add(event);
 			break;
 		case MODEL_DATA_SAVED:
 			recentEvents.add(event);
@@ -1009,7 +1009,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Activate the new active explanation.
 			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
-				// Notify each element affected by the new active explanation of its new active reasons.
+				// Notify each element affected by the new active explanation of its new ative reasons.
 				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
@@ -1128,7 +1128,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private void handleChangeInImportedModel(FeatureIDEEvent event) {
 		final MultiFeatureModel mfm = (MultiFeatureModel) graphicalFeatureModel.getFeatureModelManager().getVarObject();
 		// Construct the original model name from originalPath.
-		final String modelAlias = extractModelAlias(event, mfm);
+		final String modelAlias = mfm.extractModelAlias(event);
 		// Extract the old event.
 		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
 
@@ -1222,26 +1222,26 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			Node newFormula;
 			// For an modified constraint, extract the old constraint description, and find the constraint to replace.
 			final ConstraintDescription originalDescription = (ConstraintDescription) oldEvent.getOldValue();
-			newFormula = rewriteNodeImports(originalDescription.node, modelAlias);
-			final IConstraint constraintToModify = findConstraint(mfm, newFormula, originalDescription.description);
+			newFormula = mfm.rewriteNodeImports(originalDescription.node, modelAlias);
+			final IConstraint constraintToModify = mfm.findConstraint(newFormula, originalDescription.description);
 			// Execute the appropriate EditConstraintOperation.
 			final ConstraintDescription modifiedDescription = (ConstraintDescription) oldEvent.getNewValue();
-			final Node editedFormula = rewriteNodeImports(modifiedDescription.node, modelAlias);
+			final Node editedFormula = mfm.rewriteNodeImports(modifiedDescription.node, modelAlias);
 			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description).execute();
 			break;
 		case CONSTRAINT_ADD:
 			// For an added constraint, rewrite the formula contained in it.
 			IConstraint originalConstraint;
 			originalConstraint = (IConstraint) oldEvent.getNewValue();
-			newFormula = rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			newFormula = mfm.rewriteNodeImports(originalConstraint.getNode(), modelAlias);
 			// Execute the appropriate CreateConstraintOperation.
 			new CreateConstraintOperation(newFormula, fmManager, originalConstraint.getDescription(), IMultiFeatureModelElement.TYPE_INTERFACE).execute();
 			break;
 		case CONSTRAINT_DELETE:
 			// For an deleted constraint, first clone it and rewrite its formula, so that a delete succeeds.
 			originalConstraint = (IConstraint) oldEvent.getOldValue();
-			newFormula = rewriteNodeImports(originalConstraint.getNode(), modelAlias);
-			final IConstraint constraintToDelete = findConstraint(mfm, newFormula, originalConstraint.getDescription());
+			newFormula = mfm.rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			final IConstraint constraintToDelete = mfm.findConstraint(newFormula, originalConstraint.getDescription());
 			new DeleteConstraintOperation(constraintToDelete, fmManager).execute();
 			break;
 		case STRUCTURE_CHANGED:
@@ -1271,59 +1271,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			if (!(oldEvent instanceof FeatureModelOperationEvent) || !(((FeatureModelOperationEvent) oldEvent).getID()).equals(DeleteSlicingOperation.ID)) {
 				return;
 			}
-
-			// Copy the current feature model state.
-			final IFeatureModel copy = mfm.clone();
-			// Get the old feature model before slicing.
-			final IFeatureModel modelBeforeSlicing = (IFeatureModel) oldEvent.getOldValue();
-			// Remove the old constraints as they are in the referencing feature model.
-			for (final IConstraint oldConstraint : modelBeforeSlicing.getConstraints()) {
-				final Node referencingFormula = rewriteNodeImports(oldConstraint.getNode(), modelAlias);
-				final IConstraint referencedConstraint = findConstraint(mfm, referencingFormula, oldConstraint.getDescription());
-				mfm.removeConstraint(referencedConstraint);
-			}
-
-			// Find the root feature in this model, and remove it.
-			final IFeature rootFeature = modelBeforeSlicing.getStructure().getRoot().getFeature();
-			final IFeature referencedRootFeature = mfm.getFeature(modelAlias + rootFeature.getName());
-			final IFeatureStructure parentStructure = referencedRootFeature.getStructure().getParent();
-			index = parentStructure.getChildIndex(referencedRootFeature.getStructure());
-
-			// Remove all old features from the feature table, and from the feature ordering list.
-			final List<String> newFeatureOrder = new ArrayList<>(mfm.getFeatureOrderList());
-			for (final IFeature oldFeature : modelBeforeSlicing.getFeatures()) {
-				final String referencedFeatureName = modelAlias + oldFeature.getName();
-				newFeatureOrder.remove(referencedFeatureName);
-				mfm.deleteFeatureFromTable(mfm.getFeature(referencedFeatureName));
-			}
-
-			// From the feature model after slicing, copy the features, set the interface flag and correct their name.
-			// Afterwards, add them to the feature table, and the the end of the feature ordering list.
-			final IFeatureModel modelAfterSlicing = (IFeatureModel) oldEvent.getNewValue();
-			final MultiFeatureModelFactory factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(mfm);
-			for (final IFeature newFeature : modelAfterSlicing.getFeatures()) {
-				final String referencedName = modelAlias + newFeature.getName();
-				final MultiFeature referencedNewFeature = factory.createFeature(mfm, referencedName);
-				referencedNewFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
-				mfm.addFeature(referencedNewFeature);
-				newFeatureOrder.add(referencedName);
-			}
-			mfm.setFeatureOrderList(newFeatureOrder);
-
-			// Reconstruct the structure of the sliced feature model in the new feature model.
-			final IFeatureStructure reconstructedStructure = reconstructStructure(modelAfterSlicing.getStructure().getRoot(), modelAlias, mfm);
-			parentStructure.addChildAtPosition(index, reconstructedStructure);
-
-			// Rewrite the new constraint for the referencing model and add them.
-			for (final IConstraint newConstraint : modelAfterSlicing.getConstraints()) {
-				final Node referencingFormula = rewriteNodeImports(newConstraint.getNode(), modelAlias);
-				final IConstraint referencedConstraint = factory.createConstraint(mfm, referencingFormula);
-				referencedConstraint.setDescription(newConstraint.getDescription());
-				mfm.addConstraint(referencedConstraint);
-			}
-
-			// Propagate the MODEL_DATA_CHANGED-Event.
-			fmManager.fireEvent(new FeatureModelOperationEvent(DeleteSlicingOperation.ID, EventType.MODEL_DATA_CHANGED, mfm, copy, mfm));
+			// Rerun the DeleteSlicingOperation, now changing the variable model.
+			new DeleteSlicingOperation(fmManager, oldEvent, modelAlias).execute();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 		case FEATURE_ATTRIBUTE_CHANGED:
@@ -1337,117 +1286,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		default:
 			return;
 		}
-	}
-
-	/**
-	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that mfm imports. The imported model is stored in
-	 * <code>event.source</code>
-	 *
-	 * @param event - {@link FeatureIDEEvent} A IMPORTED_MODEL_CHANGED event.
-	 * @param mfm - {@link MultiFeatureModel} The importing feature model.
-	 * @return String
-	 */
-	private String extractModelAlias(FeatureIDEEvent event, final MultiFeatureModel mfm) {
-		// An IFeatureModel as source is its own element.
-		IFeatureModel originalModel;
-		if (event.getSource() instanceof IFeatureModel) {
-			originalModel = (IFeatureModel) event.getSource();
-		}
-		// For an IFeatureModelElement, ask about its model instead.
-		else if (event.getSource() instanceof IFeatureModelElement) {
-			final IFeatureModelElement element = (IFeatureModelElement) event.getSource();
-			originalModel = element.getFeatureModel();
-		} else {
-			return "";
-		}
-
-		final Path originalPath = originalModel.getSourceFile();
-		// Original Path -> remove the first segment for the project, then the file extension.
-		final String originalPathString =
-			FeatureModelManager.getProjectRelativePath(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
-		final String importedModelName = originalPathString.replace("/", ".");
-		String modelAlias = null;
-		for (final Entry<String, MultiFeatureModel.UsedModel> entry : mfm.getExternalModels().entrySet()) {
-			if (entry.getValue().getModelName().equals(importedModelName)) {
-				modelAlias = entry.getKey() + ".";
-				break;
-			}
-		}
-		return modelAlias;
-	}
-
-	/**
-	 * Rewrites the literals in the given {@link Node} <code>oldNode</code> as to append <code>modelAlias</code> to the literals/feature names. This way, we
-	 * rewrite an imported constraint's formula whenever we create, remove or change it.
-	 *
-	 * @param oldNode - {@link Node}
-	 * @param modelAlias - {@link String}
-	 * @return new {@link Node}
-	 */
-	private Node rewriteNodeImports(Node oldNode, String modelAlias) {
-		if (oldNode instanceof Literal) {
-			final Literal literal = (Literal) oldNode;
-			final String oldFeatureName = literal.getUniqueContainedFeatures().iterator().next();
-			final String newFeatureName = modelAlias + oldFeatureName;
-			return new Literal(newFeatureName, literal.positive);
-		} else {
-			final Node clonedNode = oldNode.clone();
-			final Node[] oldChildren = clonedNode.getChildren();
-			final Node[] newChildren = new Node[oldChildren.length];
-			for (int iN = 0; iN < newChildren.length; iN++) {
-				newChildren[iN] = rewriteNodeImports(oldChildren[iN], modelAlias);
-			}
-			clonedNode.setChildren(newChildren);
-			return clonedNode;
-		}
-	}
-
-	/**
-	 * Returns the constraint from the constraint list of the feature model <code>mfm</code> that has the same propositional formula as <code>node</code>, and
-	 * the same description text as <code>description</code>. This method is used to delete/modify imported constraints, because comparison by their ID does not
-	 * work.
-	 *
-	 * @param mfm - {@link MultiFeatureModel}
-	 * @param newFormula - {@link Node}
-	 * @param description - {@link String}
-	 * @return c - {@link IConstraint}
-	 */
-	private IConstraint findConstraint(MultiFeatureModel mfm, Node newFormula, String description) {
-		for (final IConstraint constraint : mfm.getConstraints()) {
-			if (newFormula.equals(constraint.getNode()) && description.equals(constraint.getDescription())) {
-				return constraint;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Reconstructs the structure of an imported feature model, starting from the given <code>oldStructure</code>, for the referencing feature model
-	 * <code>mfm</code>, that knows the imported model under the alias <code>modelAlias</code>.
-	 *
-	 * @param oldStructure - {@link IFeatureStructure}
-	 * @param modelAlias - {@link String}
-	 * @param mfm - {@link MultiFeature}
-	 * @return new {@link IFeatureStructure}
-	 */
-	private IFeatureStructure reconstructStructure(IFeatureStructure oldStructure, String modelAlias, MultiFeatureModel mfm) {
-		// Create the new FeatureStructure for the correct feature.
-		final FeatureStructure structure = new FeatureStructure(mfm.getFeature(modelAlias + oldStructure.getFeature().getName()));
-		// Copy mandatory, abstract and group type.
-		structure.setAbstract(oldStructure.isAbstract());
-		structure.setMandatory(oldStructure.isMandatory());
-		if (oldStructure.isAlternative()) {
-			structure.setAlternative();
-		} else if (oldStructure.isAnd()) {
-			structure.setAnd();
-		} else if (oldStructure.isOr()) {
-			structure.setOr();
-		}
-		// Repeat for other children, then return the structure.
-		for (final IFeatureStructure child : oldStructure.getChildren()) {
-			structure.addChild(reconstructStructure(child, modelAlias, mfm));
-		}
-		return structure;
 	}
 
 	public List<FeatureIDEEvent> getRecentEvents() {
@@ -1487,8 +1325,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		});
 		viewer.setContextMenu(menuManager);
-		// the following line adds package explorer entries into our context menu
-		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	public void createKeyBindings() {

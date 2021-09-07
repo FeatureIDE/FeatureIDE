@@ -250,15 +250,14 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureInOtherModelConstraints, boolean featureHasGroupDifference,
 			boolean featureIsRoot) {
 		final List<String> buttonLabels = new ArrayList<>();
-		if (!featureInOtherModelConstraints) {
-			if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
-				buttonLabels.add(StringTable.DELETE_WITH_SLICING);
-			}
-
-			if (!featureInConstraint && !featureIsRoot) {
-				buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
-			}
+		if (featureInConstraint || featureHasGroupDifference || featureIsRoot || featureInOtherModelConstraints) {
+			buttonLabels.add(StringTable.DELETE_WITH_SLICING);
 		}
+
+		if (!featureInConstraint && !featureIsRoot) {
+			buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+		}
+
 		buttonLabels.add(StringTable.CANCEL);
 		return buttonLabels.toArray(new String[0]);
 	}

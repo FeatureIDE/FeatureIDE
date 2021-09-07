@@ -99,6 +99,13 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
 		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
+		for (final IConstraint c : featureModel.getConstraints()) {
+			for (final String feat : c.getNode().getContainedFeatures()) {
+				if (!removeFeatures.contains(feat)) {
+					removeFeatures.add(feat);
+				}
+			}
+		}
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
@@ -310,6 +317,14 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 		final CNF featureTreeCNF = CNFCreator.createNodes(featureTree);
 		final IVariables variables = featureTreeCNF.getVariables();
+		final List<String> variableNames = new ArrayList<>(variables.size());
+		for (int i = 0; i < variables.size(); i++) {
+			if (variables.getName(i) != null) {
+				variableNames.add(variables.getName(i));
+			} else {
+				variableNames.add("");
+			}
+		}
 		final List<LiteralSet> children = slicedFeatureModelCNF.adaptClauseList(variables);
 		monitor.setRemainingWork(children.size() + 1);
 

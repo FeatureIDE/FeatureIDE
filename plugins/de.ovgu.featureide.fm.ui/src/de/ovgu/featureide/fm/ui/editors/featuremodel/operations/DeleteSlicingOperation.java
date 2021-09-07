@@ -22,18 +22,28 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -49,30 +59,127 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "DeleteSlicingOperation";
 
+	/**
+	 * Stores the old feature model before slicing.
+	 */
 	private IFeatureModel oldModel;
 	private final Collection<String> notSelectedFeatureNames;
 	private final Object viewer;
+	/**
+	 * Stores the new feature model after either slicing this model directly, or propagating the results upward.
+	 */
+	private IFeatureModel newModel;
+	private final FeatureIDEEvent previousSlicingEvent;
+	private final String modelAlias;
 
+	/**
+	 * Creates a new {@link DeleteSlicingOperation} for directly slicing the model in <code>featureModelManager</code>, leaving only the features in
+	 * <code>notSelectedFeatureNames</code>.
+	 *
+	 * @param viewer - {@link Object}
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param notSelectedFeatureNames - {@link Collection}
+	 */
 	public DeleteSlicingOperation(Object viewer, IFeatureModelManager featureModelManager, Collection<String> notSelectedFeatureNames) {
 		super(featureModelManager, DELETE_CONSTRAINT);
 		this.notSelectedFeatureNames = notSelectedFeatureNames;
 		this.viewer = viewer;
+		modelAlias = null;
+		previousSlicingEvent = null;
+	}
+
+	public DeleteSlicingOperation(IFeatureModelManager featureModelManager, FeatureIDEEvent previousSlicingEvent, String oldAlias) {
+		super(featureModelManager, DELETE_CONSTRAINT);
+		notSelectedFeatureNames = new ArrayList<>();
+		viewer = null;
+		modelAlias = oldAlias;
+		this.previousSlicingEvent = previousSlicingEvent;
+	}
+
+	/**
+	 * Reconstructs the feature model <code>mfm</code> after a slicing operation that occurred in a referenced model.
+	 *
+	 * @param mfm - {@link MultiFeatureModel}
+	 * @param modelAlias
+	 * @param oldEvent
+	 * @return new {@link MultiFeatureModel}
+	 */
+	private MultiFeatureModel reconstructModelAfterSlicing(final MultiFeatureModel mfm, final String modelAlias, final FeatureIDEEvent oldEvent) {
+		int index;
+		// Copy the current feature model state.
+		final MultiFeatureModel copy = (MultiFeatureModel) mfm.clone();
+		// Get the old feature model before slicing.
+		final IFeatureModel modelBeforeSlicing = (IFeatureModel) oldEvent.getOldValue();
+		// Remove the old constraints as they are in the referencing feature model.
+		for (final IConstraint oldConstraint : modelBeforeSlicing.getConstraints()) {
+			final Node referencingFormula = copy.rewriteNodeImports(oldConstraint.getNode(), modelAlias);
+			final IConstraint referencedConstraint = copy.findConstraint(referencingFormula, oldConstraint.getDescription());
+			copy.removeConstraint(referencedConstraint);
+		}
+
+		// Find the root feature in this model, and remove it.
+		final IFeature rootFeature = modelBeforeSlicing.getStructure().getRoot().getFeature();
+		final IFeature referencedRootFeature = copy.getFeature(modelAlias + rootFeature.getName());
+		final IFeatureStructure parentStructure = referencedRootFeature.getStructure().getParent();
+		index = parentStructure.getChildIndex(referencedRootFeature.getStructure());
+
+		// Remove all old features from the feature table, and from the feature ordering list.
+		final List<String> newFeatureOrder = new ArrayList<>(copy.getFeatureOrderList());
+		for (final IFeature oldFeature : modelBeforeSlicing.getFeatures()) {
+			final String referencedFeatureName = modelAlias + oldFeature.getName();
+			newFeatureOrder.remove(referencedFeatureName);
+			copy.deleteFeatureFromTable(copy.getFeature(referencedFeatureName));
+		}
+
+		// From the feature model after slicing, copy the features, set the interface flag and correct their name.
+		// Afterwards, add them to the feature table, and the the end of the feature ordering list.
+		final IFeatureModel modelAfterSlicing = (IFeatureModel) oldEvent.getNewValue();
+		final MultiFeatureModelFactory factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(copy);
+		for (final IFeature newFeature : modelAfterSlicing.getFeatures()) {
+			final String referencedName = modelAlias + newFeature.getName();
+			final MultiFeature referencedNewFeature = factory.createFeature(copy, referencedName);
+			referencedNewFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
+			copy.addFeature(referencedNewFeature);
+			newFeatureOrder.add(referencedName);
+		}
+		copy.setFeatureOrderList(newFeatureOrder);
+
+		// Reconstruct the structure of the sliced feature model in the new feature model.
+		final IFeatureStructure reconstructedStructure = copy.reconstructStructure(modelAfterSlicing.getStructure().getRoot(), modelAlias);
+		parentStructure.replaceChild(referencedRootFeature.getStructure(), reconstructedStructure);
+
+		// Rewrite the new constraint for the referencing model and add them.
+		for (final IConstraint newConstraint : modelAfterSlicing.getConstraints()) {
+			final Node referencingFormula = copy.rewriteNodeImports(newConstraint.getNode(), modelAlias);
+			final IConstraint referencedConstraint = factory.createConstraint(copy, referencingFormula);
+			referencedConstraint.setDescription(newConstraint.getDescription());
+			copy.addConstraint(referencedConstraint);
+		}
+		return copy;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 
 		// remove the selection
-		if (viewer instanceof GraphicalViewerImpl) {
+		if ((viewer != null) && (viewer instanceof GraphicalViewerImpl)) {
 			((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection());
 		}
 
+		// Replace the old feature model.
 		oldModel = featureModel.clone();
-
-		final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, true, false);
-		final IFeatureModel slicingModel = LongRunningWrapper.runMethod(method);
-
-		replaceFeatureModel(featureModel, slicingModel);
+		if (previousSlicingEvent == null) {
+			final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, true, false);
+			newModel = LongRunningWrapper.runMethod(method);
+		} else {
+			newModel = reconstructModelAfterSlicing((MultiFeatureModel) featureModel, modelAlias, previousSlicingEvent);
+			notSelectedFeatureNames.clear();
+			newModel.getFeatures().stream().forEach(feature -> notSelectedFeatureNames.add(feature.getName()));
+			final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(newModel, notSelectedFeatureNames, true, false);
+			newModel = LongRunningWrapper.runMethod(method);
+			((MultiFeatureModel) newModel).setMultiFeatureModelProperties((MultiFeatureModel) oldModel);
+		}
+		replaceFeatureModel(featureModel, newModel);
 
 		if (featureModel.getStructure().getRoot().getChildren().size() == 1) {
 			// The new root has only one child and can be removed
@@ -107,6 +214,13 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 		if (featureModel instanceof FeatureModel) {
 			((FeatureModel) featureModel).updateNextElementId();
+		}
+
+		// Update elements of MultiFeatureModels
+		if (featureModel instanceof MultiFeatureModel) {
+			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
+			final MultiFeatureModel mfmReplacement = (MultiFeatureModel) replacementModel;
+			mfm.setMultiFeatureModelProperties(mfmReplacement);
 		}
 	}
 }
