@@ -317,14 +317,6 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 		final CNF featureTreeCNF = CNFCreator.createNodes(featureTree);
 		final IVariables variables = featureTreeCNF.getVariables();
-		final List<String> variableNames = new ArrayList<>(variables.size());
-		for (int i = 0; i < variables.size(); i++) {
-			if (variables.getName(i) != null) {
-				variableNames.add(variables.getName(i));
-			} else {
-				variableNames.add("");
-			}
-		}
 		final List<LiteralSet> children = slicedFeatureModelCNF.adaptClauseList(variables);
 		monitor.setRemainingWork(children.size() + 1);
 

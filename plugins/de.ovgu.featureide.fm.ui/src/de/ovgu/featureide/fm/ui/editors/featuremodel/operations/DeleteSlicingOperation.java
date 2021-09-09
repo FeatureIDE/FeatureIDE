@@ -105,7 +105,6 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 	 * @return new {@link MultiFeatureModel}
 	 */
 	private MultiFeatureModel reconstructModelAfterSlicing(final MultiFeatureModel mfm, final String modelAlias, final FeatureIDEEvent oldEvent) {
-		int index;
 		// Copy the current feature model state.
 		final MultiFeatureModel copy = (MultiFeatureModel) mfm.clone();
 		// Get the old feature model before slicing.
@@ -121,7 +120,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 		final IFeature rootFeature = modelBeforeSlicing.getStructure().getRoot().getFeature();
 		final IFeature referencedRootFeature = copy.getFeature(modelAlias + rootFeature.getName());
 		final IFeatureStructure parentStructure = referencedRootFeature.getStructure().getParent();
-		index = parentStructure.getChildIndex(referencedRootFeature.getStructure());
+		parentStructure.getChildIndex(referencedRootFeature.getStructure());
 
 		// Remove all old features from the feature table, and from the feature ordering list.
 		final List<String> newFeatureOrder = new ArrayList<>(copy.getFeatureOrderList());
@@ -173,11 +172,6 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 			newModel = LongRunningWrapper.runMethod(method);
 		} else {
 			newModel = reconstructModelAfterSlicing((MultiFeatureModel) featureModel, modelAlias, previousSlicingEvent);
-			notSelectedFeatureNames.clear();
-			newModel.getFeatures().stream().forEach(feature -> notSelectedFeatureNames.add(feature.getName()));
-			final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(newModel, notSelectedFeatureNames, true, false);
-			newModel = LongRunningWrapper.runMethod(method);
-			((MultiFeatureModel) newModel).setMultiFeatureModelProperties((MultiFeatureModel) oldModel);
 		}
 		replaceFeatureModel(featureModel, newModel);
 
