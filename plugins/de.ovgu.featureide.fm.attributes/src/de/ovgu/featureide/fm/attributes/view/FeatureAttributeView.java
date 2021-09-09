@@ -25,6 +25,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -62,6 +63,9 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
@@ -533,6 +537,13 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			manager.removeListener(this);
 			manager = null;
 		}
+
+		// Remove undo/redo handlers
+		final IActionBars actionBars = getViewSite().getActionBars();
+		actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), null);
+		actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), null);
+		actionBars.updateActionBars();
+
 		return;
 	}
 
@@ -566,6 +577,16 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				treeViewer.setInput("");
 			}
 		}
+
+		// Add undo/redo handlers
+		final IActionBars actionBars = getViewSite().getActionBars();
+		final Object undoContext = editor.getFeatureModelManager().getUndoContext();
+		if (undoContext instanceof IUndoContext) {
+			actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), new UndoActionHandler(getSite(), (IUndoContext) undoContext));
+			actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), new RedoActionHandler(getSite(), (IUndoContext) undoContext));
+			actionBars.updateActionBars();
+		}
+
 		repackAllColumns();
 	}
 
