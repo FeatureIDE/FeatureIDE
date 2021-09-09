@@ -136,6 +136,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 	private final List<Action> actions = new ArrayList<>(4);
 
 	@Override
+	public String toString() {
+		return "Feature Model Editor for " + fmManager.getAbsolutePath();
+	}
+
+	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 

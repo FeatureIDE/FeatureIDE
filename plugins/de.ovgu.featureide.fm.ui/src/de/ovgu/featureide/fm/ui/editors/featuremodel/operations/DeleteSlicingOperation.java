@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
@@ -147,11 +148,12 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 		final IFeatureStructure reconstructedStructure = copy.reconstructStructure(modelAfterSlicing.getStructure().getRoot(), modelAlias);
 		parentStructure.replaceChild(referencedRootFeature.getStructure(), reconstructedStructure);
 
-		// Rewrite the new constraint for the referencing model and add them.
+		// Rewrite the new constraints for the referencing model and add them. Mark these constraints as external.
 		for (final IConstraint newConstraint : modelAfterSlicing.getConstraints()) {
 			final Node referencingFormula = copy.rewriteNodeImports(newConstraint.getNode(), modelAlias);
-			final IConstraint referencedConstraint = factory.createConstraint(copy, referencingFormula);
+			final MultiConstraint referencedConstraint = (MultiConstraint) factory.createConstraint(copy, referencingFormula);
 			referencedConstraint.setDescription(newConstraint.getDescription());
+			referencedConstraint.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 			copy.addConstraint(referencedConstraint);
 		}
 		return copy;
