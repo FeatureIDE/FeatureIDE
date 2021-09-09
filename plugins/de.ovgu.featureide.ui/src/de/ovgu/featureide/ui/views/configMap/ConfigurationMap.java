@@ -115,7 +115,6 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private int gridColumns;
 	private int selectedColumnIndex;
 	private boolean configUpdateNecessary;
-	private boolean openedFileNotFeatureProject = false;
 
 	private ConfigurationMapTreeContentProvider treeViewerContentProvider;
 	private ConfigurationMapLabelProvider labelProvider;
@@ -617,14 +616,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 						isNew = true;
 					} else if ((newProject == null) && (newEditor instanceof FeatureModelEditor)) {
 						// if there was a project opened in a featuremodeleditor that is not a featureide project
-						openedFileNotFeatureProject = true;
 						if (newProject != featureProject) {
 							setFeatureProject(newProject);
 							refresh();
-						} else {
-							updateElements();
 						}
-						openedFileNotFeatureProject = false;
 					}
 				}
 				final Object[] expandedElements = tree.getExpandedElements();
@@ -638,11 +633,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			}
 		} else {
 			// refresh configuration map when closig all editors
-			if (null != featureProject) {
-				setFeatureProject(null);
-			} else {
-				updateElements();
-			}
+			setFeatureProject(null);
 			refresh();
 		}
 
@@ -737,9 +728,5 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public List<IConfigurationMapFilter> getFilters() {
 		return filters;
-	}
-
-	public boolean openedFileNotFeatureProject() {
-		return openedFileNotFeatureProject;
 	}
 }
