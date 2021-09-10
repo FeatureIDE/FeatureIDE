@@ -54,8 +54,6 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 	public boolean isLegendEntry = false;
 
-	private Dimension dimension = new Dimension(0, 0);
-
 	public CollapsedDecoration(IGraphicalFeature parent) {
 		super();
 		graphicalFeature = parent;
@@ -65,6 +63,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		graphicalFeature.setCollapsedDecoration(this);
 
 		childrenCount.setFont(DEFAULT_FONT);
+		childrenCount.setLocation(new Point(0, 0));
 		setOpaque(true);
 		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
 		add(childrenCount);
@@ -83,6 +82,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 		setOpaque(true);
 		childrenCount.setFont(DEFAULT_FONT);
+		childrenCount.setLocation(new Point(0, 0));
 		setDecoratorText("");
 		childrenCount.setText("");
 		add(childrenCount);
@@ -141,25 +141,12 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		}
 		childrenCount.setText(newText);
 
-		final Dimension labelSize = childrenCount.getPreferredSize();
-		minSize = labelSize;
-
+		final Dimension labelSize = childrenCount.getTextBounds().getSize();
+		labelSize.expand(GUIDefaults.COLLAPSED_DECORATOR_X_SPACE * 2, GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE * 2);
 		if (!labelSize.equals(childrenCount.getSize())) {
-			childrenCount.setBounds(
-					new Rectangle(GUIDefaults.COLLAPSED_DECORATOR_X_SPACE, GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE, labelSize.width, labelSize.height));
-
-			final Rectangle bounds = getBounds();
-			labelSize.width += GUIDefaults.COLLAPSED_DECORATOR_X_SPACE * 2;
-			labelSize.height += GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE * 2;
-			bounds.setSize(labelSize);
-
-			final Dimension oldSize = getSize();
-			if (!oldSize.equals(0, 0)) {
-				bounds.x += (oldSize.width - bounds.width) >> 1;
-			}
-			setBounds(bounds);
+			childrenCount.setSize(labelSize);
+			setSize(labelSize);
 		}
-		dimension = bounds.getSize();
 	}
 
 	@Override
@@ -190,10 +177,6 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 		graphics.fillRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
-	}
-
-	public Dimension getDimension() {
-		return dimension;
 	}
 
 	public void refresh() {
