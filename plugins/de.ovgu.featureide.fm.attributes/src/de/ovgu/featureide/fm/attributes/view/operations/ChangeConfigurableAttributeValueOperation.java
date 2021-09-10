@@ -31,22 +31,25 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(att.getFeature());
 		firstOverwrite = selectableFeat.hasAttributeWithConfiguredValue(att);
 		oldValue = selectableFeat.getAttributeValue(att);
-		selectableFeat.addConfigurableAttribute(att.getName(), value.toString());
-		return new FeatureIDEEvent(selectableFeat, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED, oldValue, value.toString());
+		if (value != null) {
+			selectableFeat.addConfigurableAttribute(att.getName(), value.toString());
+		} else {
+			selectableFeat.removeConfigurableAttribute(att);
+		}
+		return new FeatureIDEEvent(selectableFeat, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED, oldValue, value != null ? value.toString() : null);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(Configuration config) {
 		ExtendedConfiguration extConfig = (ExtendedConfiguration) config;
 		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(att.getFeature());
-		oldValue = selectableFeat.getAttributeValue(att);
 		// Case: switch back to default value from model
 		if (firstOverwrite) {
 			selectableFeat.removeConfigurableAttribute(att);
 		} else {
 			selectableFeat.addConfigurableAttribute(att.getName(), oldValue.toString());
 		}
-		return new FeatureIDEEvent(selectableFeat, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED, value.toString(), oldValue);
+		return new FeatureIDEEvent(selectableFeat, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED, value != null ? value.toString() : null, oldValue);
 	}
 
 	@Override
