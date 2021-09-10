@@ -27,8 +27,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeUnitOperation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the unit column of the {@link FeatureAttributeView}.
@@ -67,8 +68,8 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setUnit(value.toString());
-		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
+		FeatureModelOperationWrapper
+				.run(new ChangeAttributeUnitOperation((IFeatureModelManager) view.getManager(), (IFeatureAttribute) element, value.toString()));
 		getViewer().update(element, null);
 		view.repackAllColumns();
 	}
