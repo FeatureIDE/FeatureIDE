@@ -157,26 +157,14 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 
 	@Override
 	protected void outlineShape(Graphics graphics) {
-		if (isLegendEntry) {
-			graphics.setLineWidth(1);
-			graphics.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
-			graphics.fillRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
-			graphics.drawRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
-			return;
-		}
-		final int x = getBounds().x + 1;
-		final int y = getBounds().y + 1;
-		int width = getBounds().width - 2;
-		if ((width % 2) == 1) {
-			width += 1;
-			setBounds(new Rectangle(getBounds().x, getBounds().y, getBounds().width + 1, getBounds().height));
-		}
-		final int height = getBounds().height - 2;
+		final Rectangle bounds = new Rectangle(getBounds()); // Create copy of bounds, so original bounds are not modified
+		bounds.width--;
+		bounds.height--;
+
 		graphics.setLineWidth(1);
 		graphics.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
-
-		graphics.fillRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
-		graphics.drawRoundRectangle(new Rectangle(x, y, width, height), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+		graphics.fillRoundRectangle(bounds, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
+		graphics.drawRoundRectangle(bounds, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 	}
 
 	public void refresh() {
