@@ -118,7 +118,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 					break;
 				}
 			} else {
-				if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
+				if (graphicalFeature.getGraphicalModel().getLayout().hasVerticalLayout()) {
 					// left to right layout
 					super.setLocation(super.getLocation().translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
 							(-getBounds().height / 2) + 1));
