@@ -22,18 +22,22 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.filters;
 
 import java.util.function.Predicate;
 
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
- * Checks whether a graphical feature is hidden.
+ * Checks whether a graphical feature is optional.
  *
  * @author Christopher Sontag
+ * @author Johannes Herschel
  */
 public class OptionalGraphicalFeatureFilter implements Predicate<IGraphicalFeature> {
 
 	@Override
 	public boolean test(IGraphicalFeature object) {
-		return !object.getObject().getStructure().isMandatory();
+		final IFeatureStructure structure = object.getObject().getStructure();
+		final IFeatureStructure parent = structure.getParent();
+		return (parent != null) && parent.isAnd() && !structure.isMandatory();
 	}
 
 }
