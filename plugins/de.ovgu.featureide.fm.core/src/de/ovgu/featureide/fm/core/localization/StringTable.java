@@ -1150,4 +1150,6 @@ public class StringTable {
 	public static final String CREATE_FEATURE = "Create Feature";
 	public static final String AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL =
 		"At least one feature appears in a constraint in another feature model.\nCurrently, you need to delete these constraints manually before executing this delete operation.";
+	public static final String MANDATORY_UPPERCASE = "Mandatory";
+	public static final String ABSTRACT_ACTION = "Abstract";
 }

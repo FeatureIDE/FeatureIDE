@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
@@ -30,7 +33,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 
 /**
  * Tests that the UVL model changes are propagated correctly from submodels. Uses the Universal-Variability-Language-Multi example. Provides (GUI) tests for
@@ -56,7 +61,7 @@ public class UVLChangeListenersTest {
 	/**
 	 * Editor for the FileSystem model in "submodels/FileSystem.uvl".
 	 */
-	private static SWTBotGefEditor fileSystemEditor;
+	private static SWTBotGefEditor fsEditor;
 
 	/**
 	 * For setup, open a new FeatureIDE instance, and then import the Universal-Variability-Language-Multi example. Open all three model files:
@@ -72,7 +77,7 @@ public class UVLChangeListenersTest {
 		final SWTBotView projectExplorer = bot.viewByTitle("Project Explorer");
 		serverEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "Server.uvl");
 		osEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "OperatingSystem.uvl");
-		fileSystemEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "submodels", "FileSystem.uvl");
+		fsEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "submodels", "FileSystem.uvl");
 	}
 
 	/**
@@ -110,8 +115,8 @@ public class UVLChangeListenersTest {
 	 */
 	@Test
 	public void featureAddBelowTest() {
-		final SWTBotGefEditPart fileSystemPart = SWTBotCommons.getFeaturePart(fileSystemEditor, "FileSystem");
-		SWTBotCommons.createFeatureBelow(fileSystemEditor, "Options", fileSystemPart);
+		final SWTBotGefEditPart fileSystemPart = SWTBotCommons.getFeaturePart(fsEditor, "FileSystem");
+		SWTBotCommons.createFeatureBelow(fsEditor, "Options", fileSystemPart);
 
 		SWTBotCommons.checkParentChildRelation(SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem"),
 				SWTBotCommons.getFeaturePart(serverEditor, "fs.Options"));
@@ -126,8 +131,8 @@ public class UVLChangeListenersTest {
 	 */
 	@Test
 	public void featureAddSiblingTest() {
-		final SWTBotGefEditPart ext4Part = SWTBotCommons.getFeaturePart(fileSystemEditor, "EXT4");
-		SWTBotCommons.createFeatureSibling(fileSystemEditor, "ZFS", ext4Part);
+		final SWTBotGefEditPart ext4Part = SWTBotCommons.getFeaturePart(fsEditor, "EXT4");
+		SWTBotCommons.createFeatureSibling(fsEditor, "ZFS", ext4Part);
 
 		SWTBotCommons.checkParentChildRelation(SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem"),
 				SWTBotCommons.getFeaturePart(serverEditor, "fs.EXT4"), SWTBotCommons.getFeaturePart(serverEditor, "fs.ZFS"));
@@ -135,17 +140,71 @@ public class UVLChangeListenersTest {
 		bot.menu("Edit").menu("Undo " + StringTable.CREATE_SIBLING).click();
 	}
 
+	/**
+	 * Test feature group changes: <br> Mark the "FileSystem"-Group as Alternative; assert the "fs.FileSystem"-Group also is an alternative.
+	 */
 	@Test
-	public void changeGroupAlternativeTest() {}
+	public void changeGroupAlternativeTest() {
+		final SWTBotGefEditPart fsPart = SWTBotCommons.getFeaturePart(fsEditor, "FileSystem");
+		SWTBotCommons.changeGroupType(fsEditor, fsPart, ChangeFeatureGroupTypeOperation.ALTERNATIVE);
 
-	@Test
-	public void changeGroupOrTest() {}
+		final SWTBotGefEditPart fsImportPart = SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem");
+		assertTrue(SWTBotCommons.extractFeature(fsImportPart).getStructure().isAlternative());
+		bot.menu("Edit").menu("Undo " + StringTable.CHANGE_GROUP_TYPE).click();
+	}
 
+	/**
+	 * Test feature group changes: <br> Mark the "OperatingSystem"-Group as Or; assert the "fs.FileSystem"-Group also is an or.
+	 */
 	@Test
-	public void changeMandatoryTest() {}
+	public void changeGroupOrTest() {
+		final SWTBotGefEditPart osPart = SWTBotCommons.getFeaturePart(osEditor, "OperatingSystem");
+		SWTBotCommons.changeGroupType(osEditor, osPart, ChangeFeatureGroupTypeOperation.OR);
 
+		final SWTBotGefEditPart osImportPart = SWTBotCommons.getFeaturePart(serverEditor, "os.OperatingSystem");
+		assertTrue(SWTBotCommons.extractFeature(osImportPart).getStructure().isOr());
+		bot.menu("Edit").menu("Undo " + StringTable.CHANGE_GROUP_TYPE).click();
+	}
+
+	/**
+	 * Test mandatory property: <br> Mark the "OperatingSystem"-Group as And; then mark "Windows" as mandatory, then not.
+	 */
 	@Test
-	public void changeAlternativeTest() {}
+	public void changeMandatoryTest() {
+		final SWTBotGefEditPart osGroup = SWTBotCommons.getFeaturePart(osEditor, "OperatingSystem");
+		final SWTBotGefEditPart windowsPart = SWTBotCommons.getFeaturePart(osEditor, "Windows");
+		final IFeatureStructure windowsImportStructure = SWTBotCommons.extractStructure(SWTBotCommons.getFeaturePart(serverEditor, "os.Windows"));
+
+		SWTBotCommons.changeGroupType(osEditor, osGroup, ChangeFeatureGroupTypeOperation.AND);
+		SWTBotCommons.markFeature(osEditor, windowsPart, StringTable.MANDATORY_UPPERCASE, true);
+		assertTrue(windowsImportStructure.isMandatory());
+		SWTBotCommons.markFeature(osEditor, windowsPart, StringTable.MANDATORY_UPPERCASE, false);
+		assertFalse(windowsImportStructure.isMandatory());
+
+		osEditor.show();
+		bot.menu("Edit").menu("Undo " + StringTable.MANDATORY_OPERATION).click();
+		bot.menu("Edit").menu("Undo " + StringTable.MANDATORY_OPERATION).click();
+		bot.menu("Edit").menu("Undo " + StringTable.CHANGE_GROUP_TYPE).click();
+	}
+
+	/**
+	 * Test abstract property: <br> Mark "FileSystem" as concrete and "OperatingSystem" as abstract; check property propagation in Server, then reset values.
+	 */
+	@Test
+	public void changeAbstractTest() {
+		final SWTBotGefEditPart fsPart = SWTBotCommons.getFeaturePart(fsEditor, "FileSystem");
+		SWTBotCommons.markFeature(fsEditor, fsPart, StringTable.ABSTRACT_ACTION, true);
+		assertTrue(SWTBotCommons.extractStructure(SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem")).isAbstract());
+
+		final SWTBotGefEditPart osPart = SWTBotCommons.getFeaturePart(osEditor, "OperatingSystem");
+		SWTBotCommons.markFeature(osEditor, osPart, StringTable.ABSTRACT_ACTION, false);
+		assertFalse(SWTBotCommons.extractStructure(SWTBotCommons.getFeaturePart(serverEditor, "os.OperatingSystem")).isAbstract());
+
+		fsEditor.show();
+		bot.menu("Edit").menu("Undo " + StringTable.ABSTRACT_OPERATION).click();
+		osEditor.show();
+		bot.menu("Edit").menu("Undo " + StringTable.ABSTRACT_OPERATION).click();
+	}
 
 	@Test
 	public void addAndDeleteConstraintTest() {}

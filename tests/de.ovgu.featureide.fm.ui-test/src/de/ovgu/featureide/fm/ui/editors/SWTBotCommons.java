@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -35,8 +36,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
@@ -184,6 +187,10 @@ public class SWTBotCommons {
 		return ((FeatureEditPart) featureEditPart.part()).getModel().getObject();
 	}
 
+	public static IFeatureStructure extractStructure(SWTBotGefEditPart featureEditPart) {
+		return extractFeature(featureEditPart).getStructure();
+	}
+
 	/**
 	 * @param editor
 	 * @param featureName
@@ -210,6 +217,63 @@ public class SWTBotCommons {
 		final IFeature siblingFeature = extractFeature(siblingPart);
 		final SWTBotGefEditPart parentPart = getFeaturePart(editor, siblingFeature.getStructure().getParent().getFeature().getName());
 		checkParentChildRelation(parentPart, newEditPart, siblingPart);
+	}
+
+	public static void markFeature(SWTBotGefEditor editor, SWTBotGefEditPart featurePart, String property, boolean value) {
+		editor.select(featurePart);
+		if (!property.equals(StringTable.ABSTRACT_ACTION) && !property.equals(StringTable.MANDATORY_UPPERCASE)) {
+			fail("Cannot test property " + property);
+		}
+		editor.clickContextMenu(property);
+
+		final IFeatureStructure structure = extractStructure(featurePart);
+		boolean actualValue;
+		if (property.equals(StringTable.ABSTRACT_ACTION)) {
+			actualValue = structure.isAbstract();
+		} else {
+			actualValue = structure.isMandatory();
+		}
+		assertEquals(value, actualValue);
+	}
+
+	/**
+	 * @param editor
+	 * @param editPart
+	 * @param type
+	 */
+	public static void changeGroupType(SWTBotGefEditor editor, SWTBotGefEditPart editPart, int type) {
+		editor.select(editPart);
+		String command = null;
+		switch (type) {
+		case ChangeFeatureGroupTypeOperation.ALTERNATIVE:
+			command = StringTable.ALTERNATIVE;
+			break;
+		case ChangeFeatureGroupTypeOperation.AND:
+			command = StringTable.AND;
+			break;
+		case ChangeFeatureGroupTypeOperation.OR:
+			command = StringTable.OR;
+			break;
+		default:
+			fail("No allowed group type specified!");
+		}
+
+		editor.clickContextMenu(command);
+		final IFeatureStructure structure = extractFeature(editPart).getStructure();
+
+		switch (type) {
+		case ChangeFeatureGroupTypeOperation.ALTERNATIVE:
+			assertTrue(structure.isAlternative());
+			return;
+		case ChangeFeatureGroupTypeOperation.AND:
+			assertTrue(structure.isAnd());
+			return;
+		// Default case intercepted previously
+		case ChangeFeatureGroupTypeOperation.OR:
+		default:
+			assertTrue(structure.isOr());
+			return;
+		}
 	}
 
 }

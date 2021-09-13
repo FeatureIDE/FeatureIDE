@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 
@@ -36,7 +37,7 @@ public class AbstractAction extends MultipleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.abstract";
 
 	public AbstractAction(Object viewer, IFeatureModelManager featureModelManager) {
-		super("Abstract", viewer, ID, featureModelManager);
+		super(StringTable.ABSTRACT_ACTION, viewer, ID, featureModelManager);
 	}
 
 	@Override
