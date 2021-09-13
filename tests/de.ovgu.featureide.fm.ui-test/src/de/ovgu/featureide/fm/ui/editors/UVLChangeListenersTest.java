@@ -25,11 +25,12 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Tests that the UVL model changes are propagated correctly from submodels. Uses the Universal-Variability-Language-Multi example. Provides (GUI) tests for
@@ -52,6 +53,10 @@ public class UVLChangeListenersTest {
 	 * Editor for the OperatingSystem model in "OperatingSystem.uvl".
 	 */
 	private static SWTBotGefEditor osEditor;
+	/**
+	 * Editor for the FileSystem model in "submodels/FileSystem.uvl".
+	 */
+	private static SWTBotGefEditor fileSystemEditor;
 
 	/**
 	 * For setup, open a new FeatureIDE instance, and then import the Universal-Variability-Language-Multi example. Open all three model files:
@@ -67,6 +72,7 @@ public class UVLChangeListenersTest {
 		final SWTBotView projectExplorer = bot.viewByTitle("Project Explorer");
 		serverEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "Server.uvl");
 		osEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "OperatingSystem.uvl");
+		fileSystemEditor = SWTBotCommons.openFile(bot, projectExplorer, "Universal-Variability-Language-Multi", "submodels", "FileSystem.uvl");
 	}
 
 	/**
@@ -77,19 +83,57 @@ public class UVLChangeListenersTest {
 		final SWTBotGefEditPart windowsPart = SWTBotCommons.getFeaturePart(osEditor, "Windows");
 		SWTBotCommons.renameFeature(osEditor, windowsPart, "Windows_10");
 		SWTBotCommons.getFeaturePart(serverEditor, "os.Windows_10");
+		bot.menu("Edit").menu("Undo " + StringTable.RENAME_FEATURE).click();
+
 	}
 
 	/**
-	 * Test feature creation above: <br> Select features "Debian" and "macOS"; then create a new feature called "Unix" above.
+	 * Test feature creation above: <br> Select features "Debian" and "macOS"; then create a new feature called "Unix" above. Assert these features also appear
+	 * with the "os."-alias in the server model.
 	 */
 	@Test
-	public void featureAddAboveTest() {}
+	public void featureAddAboveTest() {
+		final SWTBotGefEditPart macOsPart = SWTBotCommons.getFeaturePart(osEditor, "macOS");
+		final SWTBotGefEditPart debianPart = SWTBotCommons.getFeaturePart(osEditor, "Debian");
+		SWTBotCommons.createFeatureAbove(osEditor, "Unix", macOsPart, debianPart);
 
-	@Test
-	public void featureAddBelowTest() {}
+		final SWTBotGefEditPart macOsImport = SWTBotCommons.getFeaturePart(serverEditor, "os.macOS");
+		final SWTBotGefEditPart debianImport = SWTBotCommons.getFeaturePart(serverEditor, "os.Debian");
+		SWTBotCommons.checkParentChildRelation(SWTBotCommons.getFeaturePart(serverEditor, "os.Unix"), macOsImport, debianImport);
+		bot.menu("Edit").menu("Undo " + StringTable.RENAME_FEATURE).click();
+		bot.menu("Edit").menu("Undo " + StringTable.CREATE_FEATURE_ABOVE).click();
 
+	}
+
+	/**
+	 * Test feature creation below: <br> Create the "Options" feature in FileSystem; assert it to appear as child "fs.Options" of "fs.FileSystem".
+	 */
 	@Test
-	public void featureAddSiblingTest() {}
+	public void featureAddBelowTest() {
+		final SWTBotGefEditPart fileSystemPart = SWTBotCommons.getFeaturePart(fileSystemEditor, "FileSystem");
+		SWTBotCommons.createFeatureBelow(fileSystemEditor, "Options", fileSystemPart);
+
+		SWTBotCommons.checkParentChildRelation(SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem"),
+				SWTBotCommons.getFeaturePart(serverEditor, "fs.Options"));
+
+		bot.menu("Edit").menu("Undo " + StringTable.RENAME_FEATURE).click();
+		bot.menu("Edit").menu("Undo " + StringTable.CREATE_FEATURE_BELOW).click();
+	}
+
+	/**
+	 * Test feature creation as sibling: <br> Create the "ZFS" feature in FileSystem as sibling for "EXT4", assert it to appear alongside "fs.EXT4" in the
+	 * Server editor.
+	 */
+	@Test
+	public void featureAddSiblingTest() {
+		final SWTBotGefEditPart ext4Part = SWTBotCommons.getFeaturePart(fileSystemEditor, "EXT4");
+		SWTBotCommons.createFeatureSibling(fileSystemEditor, "ZFS", ext4Part);
+
+		SWTBotCommons.checkParentChildRelation(SWTBotCommons.getFeaturePart(serverEditor, "fs.FileSystem"),
+				SWTBotCommons.getFeaturePart(serverEditor, "fs.EXT4"), SWTBotCommons.getFeaturePart(serverEditor, "fs.ZFS"));
+		bot.menu("Edit").menu("Undo " + StringTable.RENAME_FEATURE).click();
+		bot.menu("Edit").menu("Undo " + StringTable.CREATE_SIBLING).click();
+	}
 
 	@Test
 	public void changeGroupAlternativeTest() {}
@@ -128,18 +172,10 @@ public class UVLChangeListenersTest {
 	public void propagateInTextEditorTest() {}
 
 	/**
-	 * Presses CTRL+Z to undo the previous command. Asserts that the underlying models of all editors are all as they were previously.
-	 */
-	@After
-	public void undoChange() {
-
-	}
-
-	/**
 	 * Closes the IDE.
 	 */
 	@AfterClass
 	public static void cleanup() {
-		bot.menu("File").menu("Exit").click();
+		// bot.menu("File").menu("Exit").click();
 	}
 }

@@ -34,6 +34,7 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
@@ -44,6 +45,34 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author Benedikt Jutz
  */
 public class SWTBotCommons {
+
+	/**
+	 * @author Benedikt Jutz
+	 */
+	private static final class WaitRenameCondition extends DefaultCondition {
+
+		private final FeatureEditPart featurePart;
+		private final String newName;
+
+		/**
+		 * @param featurePart
+		 * @param newName
+		 */
+		private WaitRenameCondition(FeatureEditPart featurePart, String newName) {
+			this.featurePart = featurePart;
+			this.newName = newName;
+		}
+
+		@Override
+		public boolean test() throws Exception {
+			return featurePart.getModel().getObject().getName().equals(newName);
+		}
+
+		@Override
+		public String getFailureMessage() {
+			return "Feature Name didn't change in time.";
+		}
+	}
 
 	/**
 	 * Instructs <code>bot</code> to open the example <code>project</code> as part of the given <code>category</code>.
@@ -75,10 +104,13 @@ public class SWTBotCommons {
 	 * @param fileName - {@link String}
 	 * @return new {@link SWTBotGefEditor}
 	 */
-	public static SWTBotGefEditor openFile(SWTWorkbenchBot bot, SWTBotView projectExplorer, String project, String fileName) {
+	public static SWTBotGefEditor openFile(SWTWorkbenchBot bot, SWTBotView projectExplorer, String project, String... fileNames) {
 		projectExplorer.setFocus();
-		final SWTBotTreeItem projectItem = new SWTBot(projectExplorer.getWidget()).tree(0).getTreeItem(project);
-		projectItem.expand().getNode(fileName).doubleClick();
+		SWTBotTreeItem item = new SWTBot(projectExplorer.getWidget()).tree(0).getTreeItem(project);
+		for (final String fileName : fileNames) {
+			item = item.expand().getNode(fileName);
+		}
+		item.doubleClick();
 
 		for (final SWTBotShell shell : bot.shells()) {
 			if (shell.getText().equals(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE)) {
@@ -86,17 +118,19 @@ public class SWTBotCommons {
 				bot.button("Yes").click();
 			}
 		}
-		return new SWTBotGefEditor(bot.editorByTitle(fileName + " (" + project + ")").getReference(), bot);
+		return new SWTBotGefEditor(bot.editorByTitle(fileNames[fileNames.length - 1] + " (" + project + ")").getReference(), bot);
 	}
 
 	/**
-	 * @param osEditor
-	 * @param name
-	 * @return
+	 * Looks up and returns the feature edit part named <code>name</code> as {@link SWTBotGefEditPart} in <code>editor</code>.
+	 *
+	 * @param editor - {@link SWTBotGefEditor}
+	 * @param name - {@link String}
+	 * @return {@link SWTBotGefEditPart}
 	 */
-	public static SWTBotGefEditPart getFeaturePart(SWTBotGefEditor osEditor, String name) {
-		osEditor.setFocus();
-		final SWTBotGefEditPart editPart = osEditor.getEditPart(name);
+	public static SWTBotGefEditPart getFeaturePart(SWTBotGefEditor editor, String name) {
+		editor.setFocus();
+		final SWTBotGefEditPart editPart = editor.getEditPart(name);
 		assertTrue(editPart.part() instanceof FeatureEditPart);
 		return editPart;
 	}
@@ -116,20 +150,66 @@ public class SWTBotCommons {
 		editor.clickContextMenu(StringTable.RENAME + " (F2)");
 		final SWTBot bot = editor.bot();
 		bot.text(oldName).setText(newName).pressShortcut(Keystrokes.create(SWT.CR));
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return featurePart.getModel().getObject().getName().equals(newName);
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "Feature Name didn't change in time.";
-			}
-		}, 100);
+		bot.waitUntil(new WaitRenameCondition(featurePart, newName), 100);
 
 		assertEquals(newName, featurePart.getModel().getObject().getName());
+	}
+
+	/**
+	 * @param editor - {@link SWTBotGefEditor}
+	 * @param featureName - {@link String}
+	 * @param editParts - {@link SWTBotGefEditPart}
+	 */
+	public static void createFeatureAbove(SWTBotGefEditor editor, String featureName, SWTBotGefEditPart... editParts) {
+		editor.select(editParts);
+		editor.clickContextMenu(StringTable.CREATE_FEATURE_ABOVE);
+		final SWTBotGefEditPart newFeaturePart = editor.getEditPart(StringTable.DEFAULT_FEATURE_LAYER_CAPTION);
+		renameFeature(editor, newFeaturePart, featureName);
+		checkParentChildRelation(newFeaturePart, editParts);
+	}
+
+	/**
+	 * @param parentPart
+	 * @param childParts
+	 */
+	public static void checkParentChildRelation(final SWTBotGefEditPart parentPart, SWTBotGefEditPart... childParts) {
+		final IFeature newFeature = extractFeature(parentPart);
+
+		for (final SWTBotGefEditPart editPart : childParts) {
+			assertTrue(extractFeature(editPart).getStructure().getParent().getFeature().equals(newFeature));
+		}
+	}
+
+	public static IFeature extractFeature(SWTBotGefEditPart featureEditPart) {
+		return ((FeatureEditPart) featureEditPart.part()).getModel().getObject();
+	}
+
+	/**
+	 * @param editor
+	 * @param featureName
+	 * @param parentPart
+	 */
+	public static void createFeatureBelow(SWTBotGefEditor editor, String featureName, SWTBotGefEditPart parentPart) {
+		editor.select(parentPart);
+		editor.clickContextMenu(StringTable.CREATE_FEATURE_BELOW + " (Ins)");
+		final SWTBotGefEditPart newEditPart = editor.getEditPart(StringTable.DEFAULT_FEATURE_LAYER_CAPTION);
+		renameFeature(editor, newEditPart, featureName);
+		checkParentChildRelation(parentPart, newEditPart);
+	}
+
+	/**
+	 * @param editor
+	 * @param string
+	 * @param ext4Part
+	 */
+	public static void createFeatureSibling(SWTBotGefEditor editor, String featureName, SWTBotGefEditPart siblingPart) {
+		editor.select(siblingPart);
+		editor.clickContextMenu(StringTable.CREATE_SIBLING);
+		final SWTBotGefEditPart newEditPart = editor.getEditPart(StringTable.DEFAULT_FEATURE_LAYER_CAPTION);
+		renameFeature(editor, newEditPart, featureName);
+		final IFeature siblingFeature = extractFeature(siblingPart);
+		final SWTBotGefEditPart parentPart = getFeaturePart(editor, siblingFeature.getStructure().getParent().getFeature().getName());
+		checkParentChildRelation(parentPart, newEditPart, siblingPart);
 	}
 
 }
