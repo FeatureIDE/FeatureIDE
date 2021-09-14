@@ -498,6 +498,7 @@ public class StringTable {
 	public static final String VOID_FEATURE_MODEL = "Void Feature Model";
 	public static final String SAVE_IMAGE = "Save image";
 	public static final String UNKNOWN_IMAGE_FILE_FORMAT = "Unknown image file format ";
+	public static final String SET_MANUAL_LAYOUT = "Set Manual Layout";
 	public static final String MANUAL_LAYOUT = "Manual Layout";
 	public static final String DELETE_CONSTRAINT = "Delete Constraint";
 	public static final String MOVE_CONSTRAINT = "Move Constraint";
@@ -1152,4 +1153,6 @@ public class StringTable {
 		"At least one feature appears in a constraint in another feature model.\nCurrently, you need to delete these constraints manually before executing this delete operation.";
 	public static final String MANDATORY_UPPERCASE = "Mandatory";
 	public static final String ABSTRACT_ACTION = "Abstract";
+	public static final String DELETE_SHORTCUT = "Delete (Del)";
+	public static final String UPDATE_CONSTRAINT = "Update Constraint";
 }

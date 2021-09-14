@@ -181,7 +181,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-		ERROR, WARNING, INFO, NONE
+			ERROR, WARNING, INFO, NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -603,7 +603,7 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
 
-		okButton = new Button(lastComposite, SWT.NONE);
+		okButton = new Button(lastComposite, SWT.NONE | SWT.PUSH);
 		autoSetOkButtonText();
 		final FormData formDataOk = new FormData();
 		formDataOk.width = 130;

@@ -21,9 +21,17 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.gef.EditPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -34,10 +42,18 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.prop4j.NodeReader;
+import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
@@ -45,11 +61,13 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 /**
  * Common static methods for SWTBot tests.
  *
+ * @author Kevin Jedelhauser
  * @author Benedikt Jutz
  */
 public class SWTBotCommons {
 
 	/**
+	 * @author Kevin Jedelhauser
 	 * @author Benedikt Jutz
 	 */
 	private static final class WaitRenameCondition extends DefaultCondition {
@@ -118,7 +136,7 @@ public class SWTBotCommons {
 		for (final SWTBotShell shell : bot.shells()) {
 			if (shell.getText().equals(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE)) {
 				bot.shell(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE).setFocus();
-				bot.button("Yes").click();
+				bot.button("No").click();
 			}
 		}
 		return new SWTBotGefEditor(bot.editorByTitle(fileNames[fileNames.length - 1] + " (" + project + ")").getReference(), bot);
@@ -144,7 +162,6 @@ public class SWTBotCommons {
 	 * @param string
 	 */
 	public static void renameFeature(SWTBotGefEditor editor, SWTBotGefEditPart editPart, String newName) {
-		// TODO Auto-generated method stub
 		assertTrue(editPart.part() instanceof FeatureEditPart);
 		final FeatureEditPart featurePart = (FeatureEditPart) editPart.part();
 		final String oldName = featurePart.getModel().getObject().getName();
@@ -168,6 +185,7 @@ public class SWTBotCommons {
 		editor.clickContextMenu(StringTable.CREATE_FEATURE_ABOVE);
 		final SWTBotGefEditPart newFeaturePart = editor.getEditPart(StringTable.DEFAULT_FEATURE_LAYER_CAPTION);
 		renameFeature(editor, newFeaturePart, featureName);
+
 		checkParentChildRelation(newFeaturePart, editParts);
 	}
 
@@ -191,17 +209,22 @@ public class SWTBotCommons {
 		return extractFeature(featureEditPart).getStructure();
 	}
 
+	public static IConstraint extractConstraint(SWTBotGefEditPart constraintEditPart) {
+		return ((ConstraintEditPart) constraintEditPart.part()).getModel().getObject();
+	}
+
 	/**
 	 * @param editor
 	 * @param featureName
 	 * @param parentPart
 	 */
-	public static void createFeatureBelow(SWTBotGefEditor editor, String featureName, SWTBotGefEditPart parentPart) {
+	public static SWTBotGefEditPart createFeatureBelow(SWTBotGefEditor editor, String featureName, SWTBotGefEditPart parentPart) {
 		editor.select(parentPart);
 		editor.clickContextMenu(StringTable.CREATE_FEATURE_BELOW + " (Ins)");
 		final SWTBotGefEditPart newEditPart = editor.getEditPart(StringTable.DEFAULT_FEATURE_LAYER_CAPTION);
 		renameFeature(editor, newEditPart, featureName);
 		checkParentChildRelation(parentPart, newEditPart);
+		return getFeaturePart(editor, featureName);
 	}
 
 	/**
@@ -276,4 +299,207 @@ public class SWTBotCommons {
 		}
 	}
 
+	/**
+	 * @param editor - {@link SWTBotGefEditor}
+	 * @param formula - {@link String}
+	 * @return {@link SWTBotGefEditPart}
+	 */
+	public static SWTBotGefEditPart createConstraint(SWTBotGefEditor editor, String formula) {
+		return openConstraintDialog(editor, "", formula);
+	}
+
+	/**
+	 * Opens the constraint dialog for the given model <code>editor</code> and rewrites <code>oldFormula</code> to <code>newFormula</code>. Tests if there
+	 * exists a new {@link ConstraintEditPart} with <code>newFormula</code> afterwards. If <code>oldFormula</code> is empty, creates a new constraint instead.
+	 *
+	 * @param editor - {@link SWTBotGefEditor}
+	 * @param oldFormula - {@link String}
+	 * @param newFormula - {@link String}
+	 * @return new {@link SWTBotGefEditPart}
+	 */
+	public static SWTBotGefEditPart openConstraintDialog(SWTBotGefEditor editor, String oldFormula, String newFormula) {
+		if (oldFormula.equals("")) {
+			editor.click(1, 1);
+			editor.clickContextMenu(StringTable.CREATE_CONSTRAINT);
+		} else {
+			getConstraintPart(editor, oldFormula).select();
+			editor.clickContextMenu(StringTable.EDIT_CONSTRAINT);
+		}
+
+		final SWTBotShell sh = editor.bot().shell(StringTable.CONSTRAINT_DIALOG);
+		sh.activate();
+
+		if (oldFormula.equals("")) {
+			sh.bot().styledText(1).setText(newFormula);
+			sh.bot().button(StringTable.CREATE_CONSTRAINT).click();
+		} else {
+			sh.bot().styledText(oldFormula, 0).setText(newFormula);
+			sh.bot().button(StringTable.UPDATE_CONSTRAINT).click();
+		}
+
+		return getConstraintPart(editor, newFormula);
+	}
+
+	/**
+	 * @param editor - {@link SWTBotGefEditor}
+	 * @param formula - {@link String}
+	 * @return {@link SWTBotGefEditPart}
+	 */
+	public static SWTBotGefEditPart getConstraintPart(SWTBotGefEditor editor, final String formula) {
+		editor.setFocus();
+		@SuppressWarnings("unchecked")
+		final List<SWTBotGefEditPart> matchingParts = editor.editParts(new BaseMatcher<EditPart>() {
+
+			@Override
+			public boolean matches(Object item) {
+				if (!(item instanceof ConstraintEditPart)) {
+					return false;
+				}
+				final ConstraintEditPart consPart = (ConstraintEditPart) item;
+				final IConstraint cons = consPart.getModel().getObject();
+				return cons.getNode().toString(NodeWriter.textualSymbols).equals(formula);
+			}
+
+			@Override
+			public void describeTo(Description description) {}
+		});
+
+		if (matchingParts.isEmpty()) {
+			fail("Did not find a suitable ConstraintEditPart!");
+		}
+		return matchingParts.get(0);
+	}
+
+	public static SWTBotGefEditPart prependModelName(SWTBotGefEditor editor, String modelName, String formula) {
+		final String[] formulaParts = formula.split(" ");
+
+		final List<String> symbols = Arrays.asList(NodeWriter.textualSymbols);
+
+		for (int iS = 0; iS < formulaParts.length; iS++) {
+			if (!symbols.contains(formulaParts[iS])) {
+				formulaParts[iS] = modelName + "." + formulaParts[iS];
+			}
+		}
+		final String newFormula = String.join(" ", formulaParts);
+
+		return getConstraintPart(editor, newFormula);
+	}
+
+	/**
+	 * @param formula
+	 * @return
+	 */
+	public static String getDisplayedFormula(String formula) {
+		return new NodeReader().stringToNode(formula).toString(NodeWriter.logicalSymbols);
+	}
+
+	/**
+	 * @param editor
+	 * @param constraintPart
+	 */
+	public static void deleteConstraint(SWTBotGefEditor editor, SWTBotGefEditPart constraintPart) {
+		editor.setFocus();
+		constraintPart.select();
+		final IConstraint constraint = extractConstraint(constraintPart);
+		editor.clickContextMenu(StringTable.DELETE_SHORTCUT);
+		assertEquals(-1, constraint.getFeatureModel().getConstraintIndex(constraint));
+	}
+
+	/**
+	 * @param editor
+	 * @param featurePart
+	 */
+	public static void deleteFeature(SWTBotGefEditor editor, SWTBotGefEditPart featurePart) {
+		featurePart.select();
+		final IFeature feature = extractFeature(featurePart);
+		editor.clickContextMenu(StringTable.DELETE_SHORTCUT);
+
+		assertFalse(feature.getFeatureModel().getFeatures().contains(feature));
+	}
+
+	/**
+	 * @param editor
+	 * @param featurePart
+	 * @param allowWithSlicing
+	 * @param allowWithoutSlicing
+	 */
+	public static IFeatureModel checkDeleteWithSlicingOptions(SWTBotGefEditor editor, SWTBotGefEditPart featurePart, boolean allowWithSlicing,
+			boolean allowWithoutSlicing) {
+		// Select feature part, and click "Delete (Del)" context menu entry.
+		featurePart.select();
+		editor.clickContextMenu(StringTable.DELETE_SHORTCUT);
+		// Get the dialog named "Delete Warning". (see openConstraintDialog)
+		final SWTBotShell sh = editor.bot().shell(StringTable.DELETE_WARNING).activate();
+		final SWTBot bot = sh.bot();
+		// If allowWithSlicing = true, check for "Delete With Slicing" option button existence.
+		if (allowWithSlicing) {
+			bot.button(StringTable.DELETE_WITH_SLICING).click();
+		}
+		// If allowWithoutSlicing = true, check for "Delete Without Slicing" option button existence.
+		else if (allowWithoutSlicing) {
+			bot.button(StringTable.DELETE_WITHOUT_SLICING).isVisible();
+		}
+		// Check for "Cancel" button, then click it.
+		else {
+			bot.button(StringTable.CANCEL).click();
+		}
+		// Return the feature model the feature that featurePart represents belongs to.
+		return extractFeature(featurePart).getFeatureModel();
+	}
+
+	/**
+	 * Returns the position of a {@link FeatureEditPart} stored in featurePart.
+	 *
+	 * @param featurePart - {@link SWTBotGefEditPart}
+	 * @return {@link Point}
+	 */
+	public static Point extractPosition(SWTBotGefEditPart featurePart) {
+		return ((GraphicalFeature) featurePart.part().getModel()).getLocation();
+	}
+
+	/**
+	 * @param editor
+	 * @param featurePart
+	 * @param newParentPart
+	 * @param automaticLayout
+	 */
+	public static void moveBelow(SWTBotGefEditor editor, SWTBotGefEditPart featurePart, SWTBotGefEditPart newParentPart, boolean automaticLayout) {
+		final Point oldPos = extractPosition(featurePart);
+		final Point newPos = extractPosition(newParentPart);
+
+		final IFeature feature = extractFeature(featurePart);
+		final IFeature oldParent = feature.getStructure().getParent().getFeature();
+
+		featurePart.select();
+		editor.drag(featurePart, newPos.x, newPos.y + 100);
+		editor.bot().waitUntil(new DefaultCondition() {
+
+			@Override
+			public boolean test() throws Exception {
+				return !extractPosition(featurePart).equals(oldPos);
+			}
+
+			@Override
+			public String getFailureMessage() {
+				return "Feature was not moved in time.";
+			}
+		}, 50);
+		if (automaticLayout) {
+			checkParentChildRelation(newParentPart, featurePart);
+			assertEquals(-1, oldParent.getStructure().getChildIndex(feature.getStructure()));
+		} else {
+			checkParentChildRelation(getFeaturePart(editor, oldParent.getName()), featurePart);
+			assertNotEquals(-1, oldParent.getStructure().getChildIndex(feature.getStructure()));
+		}
+	}
+
+	/**
+	 * Extracts the children features from the feature structure of <code>feature</code>.
+	 *
+	 * @param feature - {@link IFeature}
+	 * @return {@link List}
+	 */
+	public static List<IFeature> getChildrenFeatures(IFeature feature) {
+		return new ArrayList<IFeature>(feature.getStructure().getChildren().stream().map(struct -> struct.getFeature()).toList());
+	}
 }
