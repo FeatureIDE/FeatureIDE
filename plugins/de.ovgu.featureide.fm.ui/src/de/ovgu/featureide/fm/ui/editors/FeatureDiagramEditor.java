@@ -137,7 +137,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnDeadFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnFalseOptionalFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -198,7 +200,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private ExpandAllAction expandAllAction;
+
+	/**
+	 * This action focuses on the explanations for the selected feature.
+	 */
 	private FocusOnExplanationAction focusOnExplanationAction;
+	/**
+	 * This action focuses on all dead features.
+	 */
+	private FocusOnDeadFeaturesAction focusOnDeadFeaturesAction;
+	/**
+	 * This action focuses on all false-optional features.
+	 */
+	private FocusOnFalseOptionalFeaturesAction focusOnFalseOptionalFeaturesAction;
+
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
@@ -292,6 +307,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		collapseFeaturesAction = addAction(new CollapseSiblingsAction(viewer, graphicalFeatureModel));
 		collapseAllAction = addAction(new CollapseAllAction(graphicalFeatureModel));
 		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
+		focusOnDeadFeaturesAction = addAction(new FocusOnDeadFeaturesAction(getGraphicalFeatureModel()));
+		focusOnFalseOptionalFeaturesAction = addAction(new FocusOnFalseOptionalFeaturesAction(getGraphicalFeatureModel()));
 		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
 		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
 		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
@@ -1231,6 +1248,29 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	/**
+	 * Creates a MenuManager with the different anomaly types to focus on.
+	 *
+	 * @return new {@link MenuManager}
+	 */
+	private MenuManager createAnomaliesFocusMenuManager() {
+		final MenuManager manager = new MenuManager("Focus on Anomalies");
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener() {
+
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				// Feature section
+				manager.add(new Separator());
+				manager.add(focusOnDeadFeaturesAction);
+				manager.add(focusOnFalseOptionalFeaturesAction);
+				// Constraint section
+				manager.add(new Separator());
+			}
+		});
+		return manager;
+	}
+
 	private boolean isFeatureMenu(IStructuredSelection selection) {
 		boolean featureMenu = !selection.toList().isEmpty();
 		for (final Object obj : selection.toList()) {
@@ -1325,6 +1365,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createCalculationsMenuManager(true));
+			menuManager.add(createAnomaliesFocusMenuManager());
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			// only show the "Show Collapsed Constraints"-entry when the constraints are visible in the diagram editor

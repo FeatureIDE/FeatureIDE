@@ -20,13 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -48,9 +51,14 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 */
 	private final FeatureModelAnalyzer analyzer;
 	/**
-	 * <code>anomalies</code> stores the possible status types of features to focus on.
+	 * <code>featureAnomalies</code> stores the possible status types of features to focus on.
 	 */
-	private final FeatureStatus[] anomalies;
+	private final FeatureStatus[] featureAnomalies;
+	private final FeatureStatus[] noAnomalies;
+	/**
+	 * <code>constraintAnomalies</code> stores the possible constraint anomalies. We want to focus on the features involved with these constraints.
+	 */
+	private final ConstraintStatus[] constraintAnomalies;
 
 	/**
 	 * Returns a new operation to focus on dead constraints.
@@ -59,7 +67,8 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * @return new {@link FocusOnAnomaliesOperation}
 	 */
 	public static FocusOnAnomaliesOperation createDeadFeaturesFocusOperation(IGraphicalFeatureModel model) {
-		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_DEAD_FEATURES, new FeatureStatus[] { FeatureStatus.DEAD });
+		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_DEAD_FEATURES, new FeatureStatus[] { FeatureStatus.DEAD }, new FeatureStatus[] {},
+				new ConstraintStatus[] {});
 	}
 
 	/**
@@ -69,7 +78,19 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * @return new {@link FocusOnAnomaliesOperation}
 	 */
 	public static FocusOnAnomaliesOperation createFalseOptionalFeaturesFocusOperation(IGraphicalFeatureModel model) {
-		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_FALSE_OPTIONAL_FEATURES, new FeatureStatus[] { FeatureStatus.FALSE_OPTIONAL });
+		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_FALSE_OPTIONAL_FEATURES, new FeatureStatus[] { FeatureStatus.FALSE_OPTIONAL },
+				new FeatureStatus[] { FeatureStatus.DEAD }, new ConstraintStatus[] {});
+	}
+
+	/**
+	 * Returns a new operation to focus on redundant constraints.
+	 *
+	 * @param model - {@link IGraphicalFeatureModel}
+	 * @return new {@link FocusOnAnomaliesOperation}
+	 */
+	public static FocusOnAnomaliesOperation createRedundandConstraintsFocusOperation(IGraphicalFeatureModel model) {
+		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_REDUNDANT_CONSTRAINTS, new FeatureStatus[] {}, new FeatureStatus[] {},
+				new ConstraintStatus[] { ConstraintStatus.REDUNDANT });
 	}
 
 	/**
@@ -80,7 +101,8 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 */
 	public static FocusOnAnomaliesOperation createAllAnomaliesFocusOperation(IGraphicalFeatureModel model) {
 		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_ALL_ANOMALIES,
-				new FeatureStatus[] { FeatureStatus.DEAD, FeatureStatus.FALSE_OPTIONAL });
+				new FeatureStatus[] { FeatureStatus.DEAD, FeatureStatus.FALSE_OPTIONAL }, new FeatureStatus[] {},
+				new ConstraintStatus[] { ConstraintStatus.REDUNDANT });
 	}
 
 	/**
@@ -88,12 +110,16 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 *
 	 * @param graphicalFeatureModel - {@link GraphicalFeatureModel}
 	 * @param label - {@link String}
-	 * @param anomalies - {@link FeatureStatus}
+	 * @param featureAnomalies - {@link FeatureStatus}[]
+	 * @param constraintAnomalies - {@link ConstraintStatus}[]
 	 */
-	private FocusOnAnomaliesOperation(IGraphicalFeatureModel graphicalFeatureModel, String label, FeatureStatus[] anomalies) {
+	private FocusOnAnomaliesOperation(IGraphicalFeatureModel graphicalFeatureModel, String label, FeatureStatus[] featureAnomalies, FeatureStatus[] noAnomalies,
+			ConstraintStatus[] constraintAnomalies) {
 		super(graphicalFeatureModel, label);
 		analyzer = graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getAnalyzer();
-		this.anomalies = anomalies;
+		this.featureAnomalies = featureAnomalies;
+		this.noAnomalies = noAnomalies;
+		this.constraintAnomalies = constraintAnomalies;
 	}
 
 	/**
@@ -108,20 +134,34 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
 		graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
 
-		// Collect all features that have at least one anomaly type.
-		final Set<IFeature> featuresToFocus = new HashSet<>(numFeatures);
-		for (final FeatureStatus status : anomalies) {
+		// Collect all features that have at leaast one wanted anomaly type.
+		Set<IFeature> featuresToFocus = new HashSet<>(numFeatures);
+		for (final FeatureStatus status : featureAnomalies) {
 			featuresToFocus.addAll(graphicalFeatureModel.getAllFeatures().stream().map(graphicalFeature -> graphicalFeature.getObject())
 					.filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+		}
+		for (final FeatureStatus status : noAnomalies) {
+			featuresToFocus = new HashSet<>(featuresToFocus.stream().filter(feature -> !analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+		}
+		// Collect the features contained in a constraint for which at least anomaly type applies.
+		final Collection<IConstraint> allConstraints =
+			graphicalFeatureModel.getConstraints().stream().map(graphicalConstraint -> graphicalConstraint.getObject()).toList();
+		for (final ConstraintStatus status : constraintAnomalies) {
+			for (final IConstraint constraint : allConstraints) {
+				if (analyzer.getConstraintProperties(constraint).hasStatus(status)) {
+					featuresToFocus.addAll(constraint.getContainedFeatures());
+				}
+			}
 		}
 
 		// Expand the collected features and their parents.
 		for (final IFeature anomalousFeat : featuresToFocus) {
 			IFeature featureToExpand = anomalousFeat;
-			while (featureToExpand != null) {
+			while (!featureToExpand.getStructure().isRoot()) {
+				featureToExpand = featureToExpand.getStructure().getParent().getFeature();
 				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureToExpand);
 				expandedFeatures.put(graphicalFeature, false);
-				featureToExpand = featureToExpand.getStructure().getParent().getFeature();
+
 			}
 		}
 		return expandedFeatures;

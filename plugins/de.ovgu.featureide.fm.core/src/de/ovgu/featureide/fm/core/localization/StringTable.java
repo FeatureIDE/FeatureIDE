@@ -1150,4 +1150,5 @@ public class StringTable {
 	public static final String FOCUS_ON_ALL_ANOMALIES = "Focus on All Anomalies";
 	public static final String FOCUS_ON_FALSE_OPTIONAL_FEATURES = "Focus on False-Optional Features";
 	public static final String FOCUS_ON_DEAD_FEATURES = "Focus on Dead Features";
+	public static final String FOCUS_ON_REDUNDANT_CONSTRAINTS = "Focus on Redundant Constraints";
 }
