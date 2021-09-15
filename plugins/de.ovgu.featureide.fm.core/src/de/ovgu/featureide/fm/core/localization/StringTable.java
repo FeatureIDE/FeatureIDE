@@ -816,6 +816,7 @@ public class StringTable {
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
 	public static final String SUCCESS = "Success";
 	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
+	public static final String PLEASE_OPEN_A_FEATUREIDE_PROJECT = "Please open a FeatureIDE project.";
 	public static final String MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL =
 		"The open feature model does not support attributes. To use attributes convert your feature model to an extended feature model.";
 	public static final String CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG =
