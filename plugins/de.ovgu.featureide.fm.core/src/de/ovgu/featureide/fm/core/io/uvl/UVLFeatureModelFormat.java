@@ -23,11 +23,12 @@ package de.ovgu.featureide.fm.core.io.uvl;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -379,15 +380,48 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			return new Group[] {};
 		}
 		if (fs.isAnd()) {
-			final Group m = constructGroup(fs, "mandatory", c -> c.isMandatory());
-			final Group o = constructGroup(fs, "optional", c -> !c.isMandatory());
-			return Stream.of(m, o).filter(g -> g.getChildren().length > 0).toArray(Group[]::new);
+			final List<Group> groups = new LinkedList<Group>();
+			for (int i = 0; i < fs.getChildrenCount(); i++) {
+				final Group group = getGroup(fs.getChildren().get(i), i);
+				groups.add(group);
+				i = (i + group.getChildren().length) - 1;
+			}
+			final Group[] groupArray = new Group[groups.size()];
+			for (int i = 0; i < groups.size(); i++) {
+				groupArray[i] = groups.get(i);
+			}
+			return groupArray;
 		} else if (fs.isOr()) {
 			return new Group[] { constructGroup(fs, "or", x -> true) };
 		} else if (fs.isAlternative()) {
 			return new Group[] { constructGroup(fs, "alternative", x -> true) };
 		}
 		return new Group[] {};
+	}
+
+	/**
+	 * a method to create a group for uvl starting with a feature that is either mandatory or optional and adding all features with the same property until a
+	 * feature with a different property comes in order
+	 *
+	 * @param feat the first feature of a new group
+	 * @param pos the position of the feature in the list of children of the parent feature
+	 * @return the new group with the given feature as start feature
+	 */
+	private Group getGroup(IFeatureStructure feat, int pos) {
+		final List<IFeatureStructure> featuresInGroup = new LinkedList<IFeatureStructure>();
+		featuresInGroup.add(feat);
+		for (int i = pos + 1; i < feat.getParent().getChildrenCount(); i++) {
+			if (feat.getParent().getChildren().get(i).isMandatory() == feat.isMandatory()) {
+				featuresInGroup.add(feat.getParent().getChildren().get(i));
+			} else {
+				break;
+			}
+		}
+		if (feat.isMandatory()) {
+			return constructGroup(feat.getParent(), "mandatory", c -> featuresInGroup.contains(c));
+		} else {
+			return constructGroup(feat.getParent(), "optional", c -> featuresInGroup.contains(c));
+		}
 	}
 
 	private Object printConstraint(IConstraint constraint) {
