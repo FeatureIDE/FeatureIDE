@@ -63,6 +63,20 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 		return false;
 	}
 
+//	@Override
+//	public void run() {
+//		System.out.println();
+//		final IFeature feature = featureModelManager.getSnapshot().getFeature(featureArray.get(0));
+//		deleteAllChildFeatures(feature);
+//	}
+//
+//	private void deleteAllChildFeatures(IFeature feature) {
+//		for (final IFeatureStructure childFeature : feature.getStructure().getChildren()) {
+//			deleteAllChildFeatures(childFeature.getFeature());
+//		}
+//		FeatureModelOperationWrapper.run(new DeleteFeatureOperation(featureModelManager, feature.getName()));
+//	}
+
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		if (super.isValidSelection(selection)) {
