@@ -40,6 +40,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.CellEditorActionHandler;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -126,6 +127,8 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	private FeatureDiagramLayoutManager layoutManager;
 
 	private boolean openConstraintViewDecisionDialogAlreadySpawned = false;
+
+	private CellEditorActionHandler cellEditorActionHandler;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -426,6 +429,14 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void setZoomManager(ZoomManager zoomManager) {
 		this.zoomManager = zoomManager;
+	}
+
+	public CellEditorActionHandler getCellEditorActionHandler() {
+		return cellEditorActionHandler;
+	}
+
+	public void setCellEditorActionHandler(CellEditorActionHandler cellEditorActionHandler) {
+		this.cellEditorActionHandler = cellEditorActionHandler;
 	}
 
 	public void createMouseHandlers() {
