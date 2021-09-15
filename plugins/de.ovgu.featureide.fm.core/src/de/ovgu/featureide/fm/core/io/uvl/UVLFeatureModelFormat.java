@@ -386,7 +386,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				groups.add(group);
 				i = (i + group.getChildren().length) - 1;
 			}
-			return groups.toArray(Group[]::new);
+			final Group[] groupArray = new Group[groups.size()];
+			for (int i = 0; i < groups.size(); i++) {
+				groupArray[i] = groups.get(i);
+			}
+			return groupArray;
 		} else if (fs.isOr()) {
 			return new Group[] { constructGroup(fs, "or", x -> true) };
 		} else if (fs.isAlternative()) {
