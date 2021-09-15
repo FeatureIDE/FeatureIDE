@@ -133,6 +133,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteSubmodelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
@@ -207,6 +208,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	private DeleteSubmodelAction deleteSubmodelAction;
 
 	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
@@ -286,6 +288,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		moveDownAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.DOWN));
 		moveLeftAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.LEFT));
 		reverseOrderAction = addAction(new ReverseOrderAction(viewer, graphicalFeatureModel));
+		deleteSubmodelAction = addAction(new DeleteSubmodelAction(viewer, graphicalFeatureModel));
 
 		// Collapse/Expand actions
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
@@ -1277,6 +1280,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
 			menuManager.add(createNameTypeMenuManager());
+			menuManager.add(deleteSubmodelAction);
 		}
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
