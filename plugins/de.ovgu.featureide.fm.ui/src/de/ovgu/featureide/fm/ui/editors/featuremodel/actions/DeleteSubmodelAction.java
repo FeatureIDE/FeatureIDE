@@ -22,7 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_SUBMODEL;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -30,6 +33,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteSubmodelOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Deletes the Subtree of a selected Feature incl the feature. Supposed to be used for the root feature of a submodel in a {@link MultiFeatureModel}
@@ -39,9 +44,11 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class DeleteSubmodelAction extends MultipleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.deletesubmodel";
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	public DeleteSubmodelAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(DELETE_SUBMODEL, viewer, ID, graphicalFeatureModel.getFeatureModelManager());
+		setImageDescriptor(deleteImage);
 	}
 
 	@Override
@@ -63,19 +70,10 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 		return false;
 	}
 
-//	@Override
-//	public void run() {
-//		System.out.println();
-//		final IFeature feature = featureModelManager.getSnapshot().getFeature(featureArray.get(0));
-//		deleteAllChildFeatures(feature);
-//	}
-//
-//	private void deleteAllChildFeatures(IFeature feature) {
-//		for (final IFeatureStructure childFeature : feature.getStructure().getChildren()) {
-//			deleteAllChildFeatures(childFeature.getFeature());
-//		}
-//		FeatureModelOperationWrapper.run(new DeleteFeatureOperation(featureModelManager, feature.getName()));
-//	}
+	@Override
+	public void run() {
+		FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
+	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
