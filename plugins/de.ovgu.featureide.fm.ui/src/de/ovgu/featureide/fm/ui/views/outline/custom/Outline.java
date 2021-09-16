@@ -476,7 +476,9 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 									viewer.setContentProvider(provider.getTreeProvider());
 									viewer.setLabelProvider(provider.getLabelProvider());
 									if (iFile != null) {
-										viewer.setInput(iFile);
+										if (viewer.getInput() != iFile) {
+											viewer.setInput(iFile);
+										}
 										provider.handleUpdate(viewer, iFile);
 										fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
 										fillContextMenu();
@@ -484,7 +486,6 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 									viewer.getControl().setRedraw(true);
 									viewer.getControl().setEnabled(true);
 									viewer.refresh();
-									viewer.expandAll();
 								}
 							}
 							return Status.OK_STATUS;

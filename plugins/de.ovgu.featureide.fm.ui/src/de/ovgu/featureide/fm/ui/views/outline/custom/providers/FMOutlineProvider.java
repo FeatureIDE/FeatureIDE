@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -132,6 +133,13 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
 		syncCollapsedStateAction = new SyncCollapsedStateAction();
+		syncCollapsedStateAction.addPropertyChangeListener(new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				setExpandedElements();
+			}
+		});
 		syncCollapsedStateAction.setEnabled(true);
 		manager.add(syncCollapsedStateAction);
 	}
@@ -142,14 +150,16 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	}
 
 	private void setExpandedElements() {
-		final ArrayList<Object> expandedElements = new ArrayList<>();
-		for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
-			if (!f.isCollapsed()) {
-				expandedElements.add(f);
+		if (syncCollapsedStateAction.isChecked()) {
+			final ArrayList<Object> expandedElements = new ArrayList<>();
+			for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
+				if (!f.isCollapsed()) {
+					expandedElements.add(f.getObject());
+				}
 			}
+			expandedElements.add("Constraints");
+			viewer.setExpandedElements(expandedElements.toArray());
 		}
-		expandedElements.add("Constraints");
-		viewer.setExpandedElements(expandedElements.toArray());
 	}
 
 	@Override
