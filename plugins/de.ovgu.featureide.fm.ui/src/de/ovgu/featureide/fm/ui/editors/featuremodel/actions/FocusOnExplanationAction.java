@@ -69,10 +69,9 @@ public class FocusOnExplanationAction extends Action {
 
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
-				if (event.getEventType() != EventType.ACTIVE_EXPLANATION_CHANGED) {
-					return;
+				if (event.getEventType() == EventType.ACTIVE_EXPLANATION_CHANGED) {
+					setExplanation((FeatureModelExplanation<?>) event.getNewValue());
 				}
-				setExplanation((FeatureModelExplanation<?>) event.getNewValue());
 			}
 		});
 	}

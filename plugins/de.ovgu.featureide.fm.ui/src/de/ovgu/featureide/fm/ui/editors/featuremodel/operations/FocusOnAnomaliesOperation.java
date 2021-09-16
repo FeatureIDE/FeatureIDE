@@ -54,6 +54,9 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * <code>featureAnomalies</code> stores the possible status types of features to focus on.
 	 */
 	private final FeatureStatus[] featureAnomalies;
+	/**
+	 * <code>noAnomalies</code> stores the status types of features that should be ignored.
+	 */
 	private final FeatureStatus[] noAnomalies;
 	/**
 	 * <code>constraintAnomalies</code> stores the possible constraint anomalies. We want to focus on the features involved with these constraints.
@@ -88,7 +91,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * @param model - {@link IGraphicalFeatureModel}
 	 * @return new {@link FocusOnAnomaliesOperation}
 	 */
-	public static FocusOnAnomaliesOperation createRedundandConstraintsFocusOperation(IGraphicalFeatureModel model) {
+	public static FocusOnAnomaliesOperation createRedundantConstraintsFocusOperation(IGraphicalFeatureModel model) {
 		return new FocusOnAnomaliesOperation(model, StringTable.FOCUS_ON_REDUNDANT_CONSTRAINTS, new FeatureStatus[] {}, new FeatureStatus[] {},
 				new ConstraintStatus[] { ConstraintStatus.REDUNDANT });
 	}
@@ -111,6 +114,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * @param graphicalFeatureModel - {@link GraphicalFeatureModel}
 	 * @param label - {@link String}
 	 * @param featureAnomalies - {@link FeatureStatus}[]
+	 * @param noAnomalies - {@link FeatureStatus}[]
 	 * @param constraintAnomalies - {@link ConstraintStatus}[]
 	 */
 	private FocusOnAnomaliesOperation(IGraphicalFeatureModel graphicalFeatureModel, String label, FeatureStatus[] featureAnomalies, FeatureStatus[] noAnomalies,
@@ -129,12 +133,14 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 */
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
+		// Test if automatic calculations are enabled. If they are not; have the analyzer calculate all anomalies.
+
 		// Initially mark all features as collapsed.
 		final int numFeatures = graphicalFeatureModel.getAllFeatures().size();
 		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
 		graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
 
-		// Collect all features that have at leaast one wanted anomaly type.
+		// Collect all features that have at least one wanted anomaly type, and no unwanted one.
 		Set<IFeature> featuresToFocus = new HashSet<>(numFeatures);
 		for (final FeatureStatus status : featureAnomalies) {
 			featuresToFocus.addAll(graphicalFeatureModel.getAllFeatures().stream().map(graphicalFeature -> graphicalFeature.getObject())
@@ -154,7 +160,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 			}
 		}
 
-		// Expand the collected features and their parents.
+		// Collapse the features with anomalies, and expand their parents.
 		for (final IFeature anomalousFeat : featuresToFocus) {
 			IFeature featureToExpand = anomalousFeat;
 			while (!featureToExpand.getStructure().isRoot()) {

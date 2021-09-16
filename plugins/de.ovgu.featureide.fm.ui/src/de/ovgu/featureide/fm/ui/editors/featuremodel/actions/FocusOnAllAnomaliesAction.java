@@ -20,49 +20,30 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import org.eclipse.jface.action.Action;
-
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnAnomaliesOperation;
 
 /**
- * The {@link FocusOnAnomaliesAction} collapses all features but those affected by a given feature model anomaly type.
+ * {@link FocusOnAllAnomaliesAction} extends {@link FocusOnAnomaliesAction} to focus on all features involved in some anomaly.
  *
  * @author Benedikt Jutz
  */
-public abstract class FocusOnAnomaliesAction extends Action {
+public class FocusOnAllAnomaliesAction extends FocusOnAnomaliesAction {
 
-	/**
-	 * <code>fm</code> stores the graphical feature model whose features we expand or collapse.
-	 */
-	protected final IGraphicalFeatureModel fm;
+	public static final String ID = "de.ovgu.featureide.collapseallbotanomalous";
 
-	/**
-	 * Creates a new {@link FocusOnAnomaliesAction}
-	 *
-	 * @param fm - {@link IGraphicalFeatureModel}
-	 * @param name - {@link String}
-	 */
-	protected FocusOnAnomaliesAction(IGraphicalFeatureModel fm, String name) {
-		super(name);
-		this.fm = fm;
+	public FocusOnAllAnomaliesAction(IGraphicalFeatureModel fm) {
+		super(fm, StringTable.FOCUS_ON_ALL_ANOMALIES);
 	}
 
-	/**
-	 * Executes the appropriate {@link FocusOnAnomaliesOperation}.
-	 *
-	 * @see {@link Action#run}
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnAnomaliesAction#getAnomalyFocusOperation()
 	 */
 	@Override
-	public void run() {
-		FeatureModelOperationWrapper.run(getAnomalyFocusOperation());
+	protected FocusOnAnomaliesOperation getAnomalyFocusOperation() {
+		return FocusOnAnomaliesOperation.createAllAnomaliesFocusOperation(fm);
 	}
 
-	/**
-	 * Returns the appropriate {@link FocusOnAnomaliesAction} that specifies on which anomalies we focus on.
-	 *
-	 * @return new {@link FocusOnAnomaliesOperation}
-	 */
-	protected abstract FocusOnAnomaliesOperation getAnomalyFocusOperation();
 }
