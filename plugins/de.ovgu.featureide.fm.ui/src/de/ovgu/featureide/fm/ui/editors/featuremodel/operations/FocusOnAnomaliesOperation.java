@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -133,7 +134,10 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 */
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
-		// Test if automatic calculations are enabled. If they are not; have the analyzer calculate all anomalies.
+		// Test if automatic calculations are enabled for this feature model (both features and constraints).
+		final IFeatureModel model = graphicalFeatureModel.getFeatureModelManager().getObject();
+		final boolean automaticCalculations = FeatureModelProperty.isRunCalculationAutomatically(model);
+		final boolean featureCalculations = automaticCalculations && FeatureModelProperty.isCalculateFeatures(model);
 
 		// Initially mark all features as collapsed.
 		final int numFeatures = graphicalFeatureModel.getAllFeatures().size();
@@ -141,23 +145,38 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
 
 		// Collect all features that have at least one wanted anomaly type, and no unwanted one.
-		Set<IFeature> featuresToFocus = new HashSet<>(numFeatures);
+		// If required, manually annotate features.
+		final Set<IFeature> featuresToFocus = new HashSet<>(numFeatures);
 		for (final FeatureStatus status : featureAnomalies) {
-			featuresToFocus.addAll(graphicalFeatureModel.getAllFeatures().stream().map(graphicalFeature -> graphicalFeature.getObject())
-					.filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+			if (featureCalculations) {
+				featuresToFocus.addAll(graphicalFeatureModel.getAllFeatures().stream().map(graphicalFeature -> graphicalFeature.getObject())
+						.filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+			} else {
+				featuresToFocus.addAll(analyzer.annotateFeatures(status, null));
+			}
 		}
+		// Remove unwanted anomaly types.
 		for (final FeatureStatus status : noAnomalies) {
-			featuresToFocus = new HashSet<>(featuresToFocus.stream().filter(feature -> !analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+			if (featureCalculations) {
+				featuresToFocus.removeAll(featuresToFocus.stream().filter(feature -> !analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+			} else {
+				featuresToFocus.removeAll(analyzer.annotateFeatures(status, null));
+			}
 		}
+
 		// Collect the features contained in a constraint for which at least anomaly type applies.
 		final Collection<IConstraint> allConstraints =
 			graphicalFeatureModel.getConstraints().stream().map(graphicalConstraint -> graphicalConstraint.getObject()).toList();
+		final boolean constraintCalculations = automaticCalculations && FeatureModelProperty.isCalculateConstraints(model);
+
 		for (final ConstraintStatus status : constraintAnomalies) {
-			for (final IConstraint constraint : allConstraints) {
-				if (analyzer.getConstraintProperties(constraint).hasStatus(status)) {
-					featuresToFocus.addAll(constraint.getContainedFeatures());
-				}
+			final Collection<IConstraint> anomalousConstraints;
+			if (constraintCalculations) {
+				anomalousConstraints = allConstraints.stream().filter(constraint -> analyzer.getConstraintProperties(constraint).hasStatus(status)).toList();
+			} else {
+				anomalousConstraints = analyzer.annotateConstraints(status, null);
 			}
+			anomalousConstraints.forEach(constraint -> featuresToFocus.addAll(constraint.getContainedFeatures()));
 		}
 
 		// Collapse the features with anomalies, and expand their parents.

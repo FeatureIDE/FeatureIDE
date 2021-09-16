@@ -1272,13 +1272,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
+				// All anomalies at once
 				manager.add(focusOnAllAnomaliesAction);
-				// Feature section
+				// Single anomaly types
 				manager.add(new Separator());
 				manager.add(focusOnDeadFeaturesAction);
 				manager.add(focusOnFalseOptionalFeaturesAction);
-				// Constraint section
-				manager.add(new Separator());
 				manager.add(focusOnRedundantConstraintAction);
 			}
 		});
