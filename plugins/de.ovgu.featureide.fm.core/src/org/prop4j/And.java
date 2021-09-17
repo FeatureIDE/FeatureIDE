@@ -156,4 +156,35 @@ public class And extends Node {
 		return true;
 	}
 
+	@Override
+	public Node simplifyNode() {
+		super.simplifyNode();
+
+		final HashSet<Node> childrenToRemoveSet = new HashSet<>();
+
+		for (int i = 0; i < children.length; i++) {
+			final Node node = children[i];
+
+			if (node instanceof True) {
+				childrenToRemoveSet.add(node);
+			} else if (node instanceof False) {
+				return new False();
+			}
+
+			for (int j = i + 1; j < children.length; j++) {
+				final Node siblingNode = children[j];
+
+				if (siblingNode.equals(node)) {
+					childrenToRemoveSet.add(node);
+				} else if (siblingNode.equals(new Not(node)) || node.equals(new Not(siblingNode))) {
+					return new False();
+				}
+			}
+		}
+
+		removeChildren(childrenToRemoveSet);
+
+		return this;
+	}
+
 }

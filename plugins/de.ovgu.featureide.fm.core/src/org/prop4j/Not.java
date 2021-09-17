@@ -132,4 +132,24 @@ public class Not extends Node implements Cloneable {
 		return this;
 	}
 
+	@Override
+	public Node simplifyNode() {
+		super.simplifyNode();
+
+		final Node node = children[0];
+
+		if (node instanceof Not) {
+			return node.getChildren()[0];
+		} else if (node instanceof Literal) {
+			((Literal) node).flip();
+			return node;
+		} else if (node instanceof True) {
+			return new False();
+		} else if (node instanceof False) {
+			return new True();
+		}
+
+		return this;
+	}
+
 }

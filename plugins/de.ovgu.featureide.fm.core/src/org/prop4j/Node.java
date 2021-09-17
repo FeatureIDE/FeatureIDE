@@ -838,4 +838,27 @@ public abstract class Node {
 		}
 		return null;
 	}
+
+	public Node simplifyNode() {
+		for (int i = 0; i < children.length; i++) {
+			children[i].simplifyNode();
+		}
+
+		return this;
+	}
+
+	public void removeChildren(HashSet<Node> childrenToRemoveSet) {
+
+		if (childrenToRemoveSet.size() > 0) {
+			final Node[] newChildren = new Node[children.length - childrenToRemoveSet.size()];
+			int i = 0;
+			for (final Node child : children) {
+				if (!childrenToRemoveSet.contains(child)) {
+					newChildren[i++] = child;
+				}
+			}
+			children = newChildren;
+		}
+
+	}
 }
