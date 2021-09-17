@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 /**
  * Basic implementation for actions on constraints.
@@ -80,7 +81,9 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isEnabled() {
-		if (selection.toList().stream().filter(o -> o instanceof MultiConstraint).anyMatch(c -> ((MultiConstraint) c).isFromExtern())) {
+		if (selection.toList().stream().filter(o -> o instanceof ConstraintEditPart)
+				.filter(o -> ((ConstraintEditPart) o).getModel().getObject() instanceof MultiConstraint)
+				.anyMatch(c -> ((MultiConstraint) ((ConstraintEditPart) c).getModel().getObject()).isFromExtern())) {
 			return false;
 		}
 		return super.isEnabled();
