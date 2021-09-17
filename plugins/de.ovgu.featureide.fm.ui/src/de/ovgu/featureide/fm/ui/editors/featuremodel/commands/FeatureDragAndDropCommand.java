@@ -110,11 +110,20 @@ public class FeatureDragAndDropCommand extends Command {
 			}
 
 			// no moving of feature from external submodel
-			if ((feature != null) && (feature.getObject() instanceof MultiFeature) && ((MultiFeature) feature.getObject()).isFromExtern()) {
+			if (isFeatureFromSubmodel(feature) && ((MultiFeature) feature.getObject().getStructure().getParent().getFeature()).isFromExtern()) {
+				return false;
+			}
+
+			// no moving under a feature from external submodel
+			if (isFeatureFromSubmodel(newParent)) {
 				return false;
 			}
 		}
 		return true;
+	}
+
+	private boolean isFeatureFromSubmodel(IGraphicalFeature feature) {
+		return (feature != null) && (feature.getObject() instanceof MultiFeature) && ((MultiFeature) feature.getObject()).isFromExtern();
 	}
 
 	@Override
