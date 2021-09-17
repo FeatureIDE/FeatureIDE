@@ -1280,7 +1280,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
 			menuManager.add(createNameTypeMenuManager());
-			menuManager.add(deleteSubmodelAction);
 		}
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
@@ -1291,6 +1290,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
+			if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
+				menuManager.add(deleteSubmodelAction);
+			}
 			menuManager.add(new Separator());
 			connectionEntries(menuManager);
 			menuManager.add(mandatoryAction);
