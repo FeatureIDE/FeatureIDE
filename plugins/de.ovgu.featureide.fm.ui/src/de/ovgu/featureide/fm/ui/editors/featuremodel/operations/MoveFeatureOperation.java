@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -37,6 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Johannes Herschel
  */
 public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation {
 
@@ -53,77 +55,77 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 		this.oldPos = oldPos;
 	}
 
-	public void newInnerOrder(Point newPos) {
-		data.getFeature().setLocation(newPos);
-	}
-
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IGraphicalFeature feature = data.getFeature();
-		final IGraphicalFeature oldParent = data.getOldParent();
-		if (!feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
-			newInnerOrder(newPos);
+		final IFeature feature = featureModel.getFeature(data.getFeatureName());
+		final IGraphicalFeature featureGraphical = graphicalFeatureModel.getGraphicalFeature(feature);
+		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
+			featureGraphical.setLocation(newPos);
 		} else {
-			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+			final IFeature oldParent = featureModel.getFeature(data.getOldParentName());
+			final IGraphicalFeature oldParentGraphical = graphicalFeatureModel.getGraphicalFeature(oldParent);
+			final IFeatureStructure featureStructure = feature.getStructure();
 
-			or = oldParent.getObject().getStructure().isOr();
-			alternative = oldParent.getObject().getStructure().isAlternative();
-			oldParent.getObject().getStructure().removeChild(featureStructure);
+			or = oldParent.getStructure().isOr();
+			alternative = oldParent.getStructure().isAlternative();
+			oldParent.getStructure().removeChild(featureStructure);
 
-			final IGraphicalFeature newParent = data.getNewParent();
+			final IFeature newParent = featureModel.getFeature(data.getNewParentName());
+			final IGraphicalFeature newParentGraphical = graphicalFeatureModel.getGraphicalFeature(newParent);
 
-			if (newParent.isCollapsed()) {
-				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount() + 1, featureStructure);
+			if (newParentGraphical.isCollapsed()) {
+				newParent.getStructure().addChildAtPosition(newParent.getStructure().getChildrenCount() + 1, featureStructure);
 
-				for (final IFeatureStructure fs : newParent.getObject().getStructure().getChildren()) {
+				for (final IFeatureStructure fs : newParent.getStructure().getChildren()) {
 					if (fs != featureStructure) {
-						final IGraphicalFeature graphicalFS = feature.getGraphicalModel().getGraphicalFeature(fs.getFeature());
+						final IGraphicalFeature graphicalFS = graphicalFeatureModel.getGraphicalFeature(fs.getFeature());
 						graphicalFS.setCollapsed(true);
 					}
 				}
 			} else {
-				newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+				newParent.getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
 			}
 
 			if (oldParent != newParent) {
-				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
-				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				oldParentGraphical.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				newParentGraphical.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			}
 
-			if (newParent.isCollapsed()) {
-				newParent.setCollapsed(false);
-				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.FEATURE_COLLAPSED_CHANGED, null, null));
+			if (newParentGraphical.isCollapsed()) {
+				newParentGraphical.setCollapsed(false);
+				featureModel.fireEvent(new FeatureIDEEvent(newParent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
+			}
+
+			// If there is only one child left, set the old parent group type to and
+			if (oldParent.getStructure().getChildrenCount() == 1) {
+				oldParent.getStructure().changeToAnd();
 			}
 		}
-		// If there is only one child left, set the old parent group type to and
-		if (oldParent != null) {
-			if (oldParent.getObject().getStructure().getChildrenCount() == 1) {
-				oldParent.getObject().getStructure().changeToAnd();
-			}
-		}
-		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
+		return new FeatureIDEEvent(featureGraphical, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
-			newInnerOrder(oldPos);
+		final IFeature feature = featureModel.getFeature(data.getFeatureName());
+		final IGraphicalFeature featureGraphical = graphicalFeatureModel.getGraphicalFeature(feature);
+		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
+			featureGraphical.setLocation(oldPos);
 		} else {
-			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
-			data.getNewParent().getObject().getStructure().removeChild(structure2);
-			if (data.getOldParent() != null) {
-				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
-				structure.addChildAtPosition(data.getOldIndex(), structure2);
-			}
+			final IFeature oldParent = featureModel.getFeature(data.getOldParentName());
+			final IFeature newParent = featureModel.getFeature(data.getNewParentName());
+			final IFeatureStructure structure2 = feature.getStructure();
 
+			newParent.getStructure().removeChild(structure2);
+			oldParent.getStructure().addChildAtPosition(data.getOldIndex(), structure2);
+
+			// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
+			if (or) {
+				oldParent.getStructure().changeToOr();
+			} else if (alternative) {
+				oldParent.getStructure().changeToAlternative();
+			}
 		}
-		// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
-		if ((data.getOldParent() != null) && or) {
-			data.getOldParent().getObject().getStructure().changeToOr();
-		} else if ((data.getOldParent() != null) && alternative) {
-			data.getOldParent().getObject().getStructure().changeToAlternative();
-		}
-		return new FeatureIDEEvent(data.getFeature(), EventType.STRUCTURE_CHANGED);
+		return new FeatureIDEEvent(featureGraphical, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
