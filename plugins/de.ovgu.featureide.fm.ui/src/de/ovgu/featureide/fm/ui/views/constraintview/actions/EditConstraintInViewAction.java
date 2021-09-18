@@ -66,7 +66,7 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		if ((selection != null) && (selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
 			constraint = (IConstraint) selection.getFirstElement();
-			return true;
+			return !isMultiConstraintFromExtern(constraint);
 		}
 		return false;
 	}

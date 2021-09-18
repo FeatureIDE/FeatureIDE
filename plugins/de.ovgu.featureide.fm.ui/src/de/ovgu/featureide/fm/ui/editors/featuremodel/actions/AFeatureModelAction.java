@@ -26,10 +26,13 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -80,6 +83,20 @@ public abstract class AFeatureModelAction extends Action {
 				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
 					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
 					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	protected boolean hasExternalConstraint(IStructuredSelection selection) {
+		for (final Object selectedElement : selection.toArray()) {
+			if (selectedElement instanceof ConstraintEditPart) {
+				if (((ConstraintEditPart) selectedElement).getModel().getObject() instanceof IConstraint) {
+					final IConstraint constraint = (IConstraint) ((ConstraintEditPart) selectedElement).getModel().getObject();
+					if ((constraint instanceof MultiConstraint) && ((MultiConstraint) constraint).isFromExtern()) {
 						return true;
 					}
 				}
