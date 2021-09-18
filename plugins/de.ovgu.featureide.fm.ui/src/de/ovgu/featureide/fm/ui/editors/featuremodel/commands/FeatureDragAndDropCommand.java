@@ -115,7 +115,8 @@ public class FeatureDragAndDropCommand extends Command {
 	public void execute() {
 		final String oldParentName = oldParent != null ? oldParent.getObject().getName() : null;
 		final String newParentName = newParent != null ? newParent.getObject().getName() : null;
-		final FeatureOperationData data = new FeatureOperationData(feature.getObject().getName(), oldParentName, newParentName, newIndex, oldIndex);
+		final int adjustedNewIndex = (newParent != null) && newParent.isCollapsed() ? newParent.getObject().getStructure().getChildrenCount() : newIndex;
+		final FeatureOperationData data = new FeatureOperationData(feature.getObject().getName(), oldParentName, newParentName, adjustedNewIndex, oldIndex);
 		FeatureModelOperationWrapper.run(new MoveFeatureOperation(featureModel, data, newLocation, feature.getLocation().getCopy()));
 	}
 

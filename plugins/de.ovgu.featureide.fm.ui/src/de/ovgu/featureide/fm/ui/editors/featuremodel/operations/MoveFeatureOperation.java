@@ -73,17 +73,14 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 			final IFeature newParent = featureModel.getFeature(data.getNewParentName());
 			final IGraphicalFeature newParentGraphical = graphicalFeatureModel.getGraphicalFeature(newParent);
 
+			newParent.getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
 			if (newParentGraphical.isCollapsed()) {
-				newParent.getStructure().addChildAtPosition(newParent.getStructure().getChildrenCount() + 1, featureStructure);
-
 				for (final IFeatureStructure fs : newParent.getStructure().getChildren()) {
 					if (fs != featureStructure) {
 						final IGraphicalFeature graphicalFS = graphicalFeatureModel.getGraphicalFeature(fs.getFeature());
 						graphicalFS.setCollapsed(true);
 					}
 				}
-			} else {
-				newParent.getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
 			}
 
 			if (oldParent != newParent) {
