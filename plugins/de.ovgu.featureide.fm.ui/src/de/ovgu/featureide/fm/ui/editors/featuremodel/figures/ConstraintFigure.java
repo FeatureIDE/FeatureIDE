@@ -46,6 +46,8 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -121,6 +123,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
+		final IConstraint constraint = graphicalConstraint.getObject();
 
 		// Check if automatic calculations are nessecary (propetries are only available when anaylses are activated)
 		if (FeatureModelProperty.isRunCalculationAutomatically(graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVarObject())
@@ -185,6 +188,14 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			toolTipContent.add(new Label(description));
 		} else {
 			toolTipContent.add(new Label("No Description"));
+		}
+
+		if (constraint instanceof MultiConstraint) {
+			final MultiConstraint multiConst = (MultiConstraint) constraint;
+
+			if (multiConst.getType() == MultiFeature.TYPE_INTERFACE) {
+				setBorder(FMPropertyManager.getInterfacedFeatureBorder());
+			}
 		}
 
 		if (getActiveReason() != null) {
