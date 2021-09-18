@@ -27,7 +27,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
 /**
  * Creates a new propositional constraint below the feature diagram.
@@ -51,8 +53,14 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction imple
 		setImageDescriptor(createImage);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
+		if (selection.toList().stream().filter(o -> o instanceof ConstraintEditPart)
+				.filter(o -> ((ConstraintEditPart) o).getModel().getObject() instanceof MultiConstraint)
+				.anyMatch(c -> ((MultiConstraint) ((ConstraintEditPart) c).getModel().getObject()).isFromExtern())) {
+			return false;
+		}
 		return true;
 	}
 

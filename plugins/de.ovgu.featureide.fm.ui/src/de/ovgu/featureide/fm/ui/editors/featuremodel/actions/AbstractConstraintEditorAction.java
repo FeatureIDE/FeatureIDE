@@ -89,4 +89,8 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 		return super.isEnabled();
 	}
 
+	protected boolean isMultiConstraintFromExtern(IConstraint constraint) {
+		return (constraint != null) && (constraint instanceof MultiConstraint) && ((MultiConstraint) constraint).isFromExtern();
+	}
+
 }
