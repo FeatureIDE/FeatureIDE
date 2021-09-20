@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,36 +18,27 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.fm;
+package de.ovgu.featureide.fm.core.explanations.fm.impl.composite;
+
+import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 
 /**
- * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
+ * Implements {@link MultipleAnomaliesExplanationCreator} through composition.
  *
- * @param <S> subject
- * @param <E> explanation
- * @author Timo G&uuml;nther
  * @author Benedikt Jutz
- * @see DeadFeatureExplanationCreator
- * @see FalseOptionalFeatureExplanationCreator
- * @see RedundantConstraintExplanationCreator
- * @see MultipleAnomaliesExplanationWriter
  */
-public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
+public class CompositeMultipleAnomaliesExplanationCreator
+		extends CompositeFeatureModelExplanationCreator<IFeatureModel, MultipleAnomaliesExplanation, MultipleAnomaliesExplanationCreator>
+		implements MultipleAnomaliesExplanationCreator {
 
 	/**
-	 * Returns the feature model context.
-	 *
-	 * @return the feature model context
+	 * @param composites - {@link Collection}
 	 */
-	public IFeatureModel getFeatureModel();
-
-	/**
-	 * Sets the feature model context.
-	 *
-	 * @param fm the feature model context
-	 */
-	public void setFeatureModel(IFeatureModel fm);
+	public CompositeMultipleAnomaliesExplanationCreator(Collection<MultipleAnomaliesExplanationCreator> composites) {
+		super(composites);
+	}
 }

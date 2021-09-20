@@ -409,8 +409,7 @@ public class AnalysesCollection {
 				constraintVoidAnalysis, constraintTautologyAnalysis, constraintRedundancyAnalysis, constraintAnomaliesAnalysis);
 
 	<D extends IFeatureModelElement> Explanation<?> createExplanation(ExplanationCreator<D, ?> creator, D element, FeatureModelFormula formula) {
-		creator.setSubject(element);
-		return creator.getExplanation();
+		return creator.getExplanationFor(element);
 	}
 
 	void reset(FeatureModelFormula formula) {

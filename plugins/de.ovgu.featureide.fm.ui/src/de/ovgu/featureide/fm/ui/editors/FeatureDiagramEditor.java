@@ -485,7 +485,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * Sets the active explanation depending on the current selection.
 	 */
 	protected void setActiveExplanation() {
-		// skip when automated analyses are deactivated
+		// skip when automated analyzes are deactivated
 		if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
 			|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
 			return;
@@ -506,8 +506,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(null);
 			return;
 		}
-		final FeatureModelAnalyzer analyser = getFeatureModel().getVariableFormula().getAnalyzer();
-		setActiveExplanation(analyser.isValid(null) ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
+		final FeatureModelAnalyzer analyzer = getFeatureModel().getVariableFormula().getAnalyzer();
+		setActiveExplanation(analyzer.isValid(null) ? analyzer.getExplanation(primary.getModel().getObject()) : analyzer.getVoidFeatureModelExplanation());
 	}
 
 	/**
@@ -903,7 +903,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case FEATURE_COLLAPSED_CHANGED:
-			// Reload editpart to notify the diagramm that the IGraphicalModel has changed
+			// Reload edit part to notify the diagram that the IGraphicalFeatureModel has changed
 			viewer.reload();
 			if (event.getNewValue() == null) {
 				final IFeature selectedFeature = (IFeature) source;

@@ -98,6 +98,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 		analysesCollection.reset(formula);
 	}
 
+	/**
+	 * Tests if <code>featureModel</code> is valid.
+	 *
+	 * @param monitor - {@link IMonitor}
+	 * @return {@link Boolean}
+	 */
 	public boolean isValid(IMonitor<Boolean> monitor) {
 		final Boolean result = analysesCollection.validAnalysis.getResult(monitor);
 		return result == null ? false : result;
@@ -742,8 +748,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			creator = analysesCollection.explanationCreatorFactory.getDeadFeatureExplanationCreator();
 			creator.setFeatureModel(fm);
 		}
-		creator.setSubject(feature);
-		analysesCollection.deadFeatureExplanations.put(feature, creator.getExplanation());
+		analysesCollection.deadFeatureExplanations.put(feature, creator.getExplanationFor(feature));
 	}
 
 	/**
@@ -784,8 +789,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			creator = analysesCollection.explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator();
 			creator.setFeatureModel(fm);
 		}
-		creator.setSubject(feature);
-		analysesCollection.falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
+		analysesCollection.falseOptionalFeatureExplanations.put(feature, creator.getExplanationFor(feature));
 	}
 
 	/**

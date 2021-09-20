@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -21,33 +21,12 @@
 package de.ovgu.featureide.fm.core.explanations.fm;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 
 /**
- * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
+ * {@link MultipleAnomaliesExplanationCreator} provides an interface for creators of {@link MultipleAnomaliesExplanation}.
  *
- * @param <S> subject
- * @param <E> explanation
- * @author Timo G&uuml;nther
  * @author Benedikt Jutz
- * @see DeadFeatureExplanationCreator
- * @see FalseOptionalFeatureExplanationCreator
- * @see RedundantConstraintExplanationCreator
- * @see MultipleAnomaliesExplanationWriter
  */
-public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
+public interface MultipleAnomaliesExplanationCreator extends FeatureModelExplanationCreator<IFeatureModel, MultipleAnomaliesExplanation> {
 
-	/**
-	 * Returns the feature model context.
-	 *
-	 * @return the feature model context
-	 */
-	public IFeatureModel getFeatureModel();
-
-	/**
-	 * Sets the feature model context.
-	 *
-	 * @param fm the feature model context
-	 */
-	public void setFeatureModel(IFeatureModel fm);
 }

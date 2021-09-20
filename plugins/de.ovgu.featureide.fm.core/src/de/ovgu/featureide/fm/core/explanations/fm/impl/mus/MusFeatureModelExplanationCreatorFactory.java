@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 
 /**
@@ -71,6 +72,11 @@ public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplan
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
 		return new MusRedundantConstraintExplanationCreator(solverFactory);
+	}
+
+	@Override
+	public MultipleAnomaliesExplanationCreator getMultipleAnomaliesExplanationCreator() {
+		return null;
 	}
 
 }
