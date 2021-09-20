@@ -56,6 +56,11 @@ public class FeatureProperties {
 	 */
 	private Explanation<?> falseOptionalExplanation;
 
+	@Override
+	public String toString() {
+		return "FeatureProperties for " + feature.getName() + " " + featureStatus.toString();
+	}
+
 	public FeatureProperties(IFeature feature) {
 		this.feature = feature;
 	}

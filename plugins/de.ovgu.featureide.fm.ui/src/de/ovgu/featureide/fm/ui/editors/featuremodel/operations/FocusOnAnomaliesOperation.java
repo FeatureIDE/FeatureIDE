@@ -141,8 +141,6 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 
 		// Initially mark all features as collapsed.
 		final int numFeatures = graphicalFeatureModel.getAllFeatures().size();
-		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
-		graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
 
 		// Collect all features that have at least one wanted anomaly type, and no unwanted one.
 		// If required, manually annotate features.
@@ -158,7 +156,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		// Remove unwanted anomaly types.
 		for (final FeatureStatus status : noAnomalies) {
 			if (featureCalculations) {
-				featuresToFocus.removeAll(featuresToFocus.stream().filter(feature -> !analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+				featuresToFocus.removeAll(featuresToFocus.stream().filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
 			} else {
 				featuresToFocus.removeAll(analyzer.annotateFeatures(status, null));
 			}
@@ -179,14 +177,22 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 			anomalousConstraints.forEach(constraint -> featuresToFocus.addAll(constraint.getContainedFeatures()));
 		}
 
-		// Collapse the features with anomalies, and expand their parents.
-		for (final IFeature anomalousFeat : featuresToFocus) {
-			IFeature featureToExpand = anomalousFeat;
-			while (!featureToExpand.getStructure().isRoot()) {
-				featureToExpand = featureToExpand.getStructure().getParent().getFeature();
-				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureToExpand);
-				expandedFeatures.put(graphicalFeature, false);
+		// Should the feature model be free of the requested anomalies, expand all features.
+		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
 
+		if (featuresToFocus.isEmpty()) {
+			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, feature.isCollapsed()));
+		} else {
+			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
+			// Collapse the features with anomalies, and expand their parents.
+			for (final IFeature anomalousFeat : featuresToFocus) {
+				IFeature featureToExpand = anomalousFeat;
+				while (!featureToExpand.getStructure().isRoot()) {
+					featureToExpand = featureToExpand.getStructure().getParent().getFeature();
+					final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureToExpand);
+					expandedFeatures.put(graphicalFeature, false);
+
+				}
 			}
 		}
 		return expandedFeatures;
