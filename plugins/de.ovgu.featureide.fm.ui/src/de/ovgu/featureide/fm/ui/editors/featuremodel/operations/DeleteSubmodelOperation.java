@@ -27,13 +27,14 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * TODO description
+ * Operation with functionality to delete a submodel from a {@link MultiFeatureModel}
  *
- * @author rahel
+ * @author Rahel Arens
  */
 public class DeleteSubmodelOperation extends ElementDeleteOperation {
 
@@ -61,6 +62,7 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 			featuresToDelete.add(selectedFeature);
 		}
 
+		// Not allowed to delete submodels that have features contained in a constraint
 		for (final IFeature feature : featuresToDelete) {
 			if (feature != null) {
 				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
@@ -77,10 +79,6 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 		addDeleteFeatureOperations(featuresToDelete);
 	}
 
-	/**
-	 * @param selectedFeature
-	 * @return
-	 */
 	private List<IFeature> getAllChildren(IFeature selectedFeature) {
 		final List<IFeature> childFeatures = new ArrayList<>();
 
