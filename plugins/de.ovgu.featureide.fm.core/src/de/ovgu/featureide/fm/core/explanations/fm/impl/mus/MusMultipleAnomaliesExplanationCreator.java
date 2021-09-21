@@ -26,6 +26,10 @@ import java.util.List;
 
 import org.prop4j.explain.solvers.SatSolverFactory;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -37,6 +41,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * {@link MusMultipleAnomaliesExplanationCreator} creates combined {@link MultipleAnomaliesExplanation}s with all anomaly types.
@@ -64,6 +69,7 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 	public MultipleAnomaliesExplanation getExplanation() throws IllegalStateException {
 		final IFeatureModel featureModel = getFeatureModel();
 		final Collection<IFeature> features = featureModel.getFeatures();
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
 		final List<FeatureModelExplanation<? extends IFeatureModelElement>> exps = new ArrayList<>((2 * features.size()) + featureModel.getConstraintCount());
 		final FeatureModelExplanationCreatorFactory creatorFactory = MusFeatureModelExplanationCreatorFactory.getDefault();
 
@@ -77,11 +83,18 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 		final RedundantConstraintExplanationCreator redundantConsExpCreator = creatorFactory.getRedundantConstraintExplanationCreator();
 		redundantConsExpCreator.setFeatureModel(featureModel);
 		for (final IFeature feature : features) {
-			exps.add(deadFeatExpCreator.getExplanationFor(feature));
-			exps.add(falseOptFeatExpCreator.getExplanationFor(feature));
+			final FeatureProperties properties = analyzer.getFeatureProperties(feature);
+			if (properties.hasStatus(FeatureStatus.DEAD)) {
+				exps.add(deadFeatExpCreator.getExplanationFor(feature));
+			}
+			if (properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+				exps.add(falseOptFeatExpCreator.getExplanationFor(feature));
+			}
 		}
 		for (final IConstraint constraint : featureModel.getConstraints()) {
-			exps.add(redundantConsExpCreator.getExplanationFor(constraint));
+			if (analyzer.getConstraintProperties(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
+				exps.add(redundantConsExpCreator.getExplanationFor(constraint));
+			}
 		}
 
 		return new MultipleAnomaliesExplanation(featureModel, exps);

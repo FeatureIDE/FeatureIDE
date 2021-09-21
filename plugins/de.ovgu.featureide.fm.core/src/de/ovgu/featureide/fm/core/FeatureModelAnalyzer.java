@@ -55,6 +55,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
@@ -65,7 +67,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
- * A collection of methods for working with {@link IFeatureModel} will replace the corresponding methods in {@link IFeatureModel}
+ * A collection of methods for working with {@link IFeatureModel}s.
  *
  * @author Soenke Holthusen
  * @author Florian Proksch
@@ -611,6 +613,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 			Explanation<?> explanation = null;
 			final FeatureProperties featureProperties = getFeatureProperties(feature);
 			if (featureProperties != null) {
+				// Test if feature is the root feature; in that case return the MultipleAnomaliesException.
+				if (FeatureUtils.isRoot(feature)) {
+					explanation = getMultipleAnomaliesExplanation();
+				}
 				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 					explanation = featureProperties.getDeadExplanation();
 					if (explanation == null) {
@@ -834,6 +840,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 		creator.setSubject(constraint);
 		analysesCollection.redundantConstraintExplanations.put(constraint, creator.getExplanation());
+	}
+
+	/**
+	 * Returns an combined explanation for all feature model anomalies.
+	 *
+	 * @return a {@link MultipleAnomaliesExplanation} for <code>featureModel</code>, or null if none can be found.
+	 */
+	public MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
+		MultipleAnomaliesExplanation explanation = analysesCollection.getMultipleAnomaliesExplanation();
+		if (explanation == null) {
+			final MultipleAnomaliesExplanationCreator creator = analysesCollection.multipleAnomaliesExplanationCreator;
+			explanation = creator.getExplanation();
+			analysesCollection.setMultipleAnomaliesExplanation(explanation);
+		}
+		return explanation;
 	}
 
 	public AnalysesCollection getAnalysesCollection() {

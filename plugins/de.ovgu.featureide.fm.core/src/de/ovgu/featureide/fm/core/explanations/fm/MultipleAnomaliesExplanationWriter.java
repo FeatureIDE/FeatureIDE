@@ -45,7 +45,7 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	protected String getSubjectString() {
-		return "Feature Model";
+		return "This feature model";
 	}
 
 	/*
@@ -54,7 +54,15 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	protected String getAttributeString() {
-		return "Anomalies";
+		return "anomalies";
+	}
+
+	/**
+	 * Returns the circumstances string as introduction.
+	 */
+	@Override
+	public String getIntroductionString() {
+		return getCircumstanceString();
 	}
 
 	/**
@@ -64,7 +72,7 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	public String getCircumstanceString() {
-		return String.format("%s has the following %s", getSubjectString(), getAttributeString());
+		return String.format("%s has the following %s:", getSubjectString(), getAttributeString());
 	}
 
 	/**
@@ -74,9 +82,9 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	public String getReasonsString() {
-		final StringBuilder reasonBuilder = new StringBuilder("\n");
+		final StringBuilder reasonBuilder = new StringBuilder();
 		for (final FeatureModelExplanation<? extends IFeatureModelElement> singleExplanation : getExplanation().getSingleExplanations()) {
-			reasonBuilder.append("---\n");
+			reasonBuilder.append("\n---\n");
 			reasonBuilder.append(singleExplanation.getWriter().getString());
 		}
 		return reasonBuilder.toString();

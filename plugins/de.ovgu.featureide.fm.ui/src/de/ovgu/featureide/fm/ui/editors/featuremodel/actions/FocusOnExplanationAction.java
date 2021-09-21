@@ -58,54 +58,20 @@ public class FocusOnExplanationAction extends Action {
 		super(FOCUS_ON_EXPLANATION);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.fm = fm;
-		addActiveExplanationListener();
-	}
-
-	/**
-	 * Adds a listener that updates the active explanation.
-	 */
-	private void addActiveExplanationListener() {
+		// Add a listener that updates the active explanation.
 		fm.getFeatureModelManager().addListener(new IEventListener() {
 
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
 				if (event.getEventType() == EventType.ACTIVE_EXPLANATION_CHANGED) {
-					setExplanation((FeatureModelExplanation<?>) event.getNewValue());
+					explanation = (FeatureModelExplanation<?>) event.getNewValue();
 				}
 			}
 		});
 	}
 
-	/**
-	 * Returns the graphical feature model context.
-	 *
-	 * @return the graphical feature model context
-	 */
-	public IGraphicalFeatureModel getGraphicalFeatureModel() {
-		return fm;
-	}
-
-	/**
-	 * Returns the currently active explanation.
-	 *
-	 * @return the currently active explanation.
-	 */
-	public FeatureModelExplanation<?> getExplanation() {
-		return explanation;
-	}
-
-	/**
-	 * Sets the currently active explanation.
-	 *
-	 * @param explanation the new active explanation
-	 */
-	public void setExplanation(FeatureModelExplanation<?> explanation) {
-		this.explanation = explanation;
-		setEnabled(explanation != null);
-	}
-
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(getGraphicalFeatureModel(), getExplanation()));
+		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(fm, explanation));
 	}
 }

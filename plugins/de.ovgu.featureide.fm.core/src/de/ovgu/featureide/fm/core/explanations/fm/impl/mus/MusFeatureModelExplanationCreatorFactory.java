@@ -76,7 +76,7 @@ public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplan
 
 	@Override
 	public MultipleAnomaliesExplanationCreator getMultipleAnomaliesExplanationCreator() {
-		return null;
+		return new MusMultipleAnomaliesExplanationCreator(solverFactory);
 	}
 
 }

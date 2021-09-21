@@ -62,11 +62,11 @@ public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 			FeatureUIHelper.getGraphicalFeatures(FeatureUtils.getParents(explanation.getAffectedFeatures()), graphicalFeatureModel);
 		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModelManager.getSnapshot().getNumberOfFeatures());
 		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
-			final boolean collapse = !expandedFeatures.contains(feature);
-			if (feature.isCollapsed() == collapse) { // already in the target state, therefore no change necessary
+			final boolean collapsed = !expandedFeatures.contains(feature);
+			if (feature.isCollapsed() == collapsed) { // already in the target state, therefore no change necessary
 				continue;
 			}
-			targets.put(feature, collapse);
+			targets.put(feature, collapsed);
 		}
 		return targets;
 	}
