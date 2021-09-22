@@ -195,8 +195,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void refreshProperties(IFeatureModelManager featureModelManager) {
-		// TODO get variable analyzer
-
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 
 		// Retrieve visible features
@@ -223,6 +221,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 
+		// TODO account for manual calculations
 		// skip when automated analyses are deactivated
 		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())) {

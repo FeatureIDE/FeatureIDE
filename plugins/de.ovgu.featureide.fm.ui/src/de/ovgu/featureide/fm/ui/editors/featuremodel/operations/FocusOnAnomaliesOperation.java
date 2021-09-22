@@ -135,7 +135,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
 		// Test if automatic calculations are enabled for this feature model (both features and constraints).
-		final IFeatureModel model = graphicalFeatureModel.getFeatureModelManager().getObject();
+		final IFeatureModel model = graphicalFeatureModel.getFeatureModelManager().getVarObject();
 		final boolean automaticCalculations = FeatureModelProperty.isRunCalculationAutomatically(model);
 		final boolean featureCalculations = automaticCalculations && FeatureModelProperty.isCalculateFeatures(model);
 
@@ -191,7 +191,6 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 					featureToExpand = featureToExpand.getStructure().getParent().getFeature();
 					final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureToExpand);
 					expandedFeatures.put(graphicalFeature, false);
-
 				}
 			}
 		}

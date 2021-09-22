@@ -57,6 +57,7 @@ public abstract class FocusOnAnomaliesAction extends Action {
 	@Override
 	public void run() {
 		FeatureModelOperationWrapper.run(getAnomalyFocusOperation());
+		fm.getFeatureModelManager().getVarObject().handleModelDataChanged();
 	}
 
 	/**

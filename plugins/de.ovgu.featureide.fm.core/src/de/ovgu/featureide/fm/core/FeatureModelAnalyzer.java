@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
@@ -518,36 +519,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	// TODO implement as analysis
 	public int countConcreteFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			if (feature.getStructure().isConcrete()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> structure.isConcrete());
 	}
 
 	// TODO implement as analysis
 	public int countHiddenFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			final IFeatureStructure structure = feature.getStructure();
-			if (structure.isHidden() || structure.hasHiddenParent()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> structure.isHidden() || structure.hasHiddenParent());
 	}
 
 	// TODO implement as analysis
 	public int countTerminalFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			if (!feature.getStructure().hasChildren()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> !structure.hasChildren());
+	}
+
+	private int countFeaturesWhere(Predicate<IFeatureStructure> predicate) {
+		return featureModel.getFeatures().stream().filter(feature -> predicate.test(feature.getStructure())).toList().size();
 	}
 
 	/**

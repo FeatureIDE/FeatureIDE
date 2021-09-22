@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
@@ -70,8 +71,20 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 		final IFeatureModel featureModel = getFeatureModel();
 		final Collection<IFeature> features = featureModel.getFeatures();
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
+
+		// Creator factory and explanations to combine.
 		final List<FeatureModelExplanation<? extends IFeatureModelElement>> exps = new ArrayList<>((2 * features.size()) + featureModel.getConstraintCount());
 		final FeatureModelExplanationCreatorFactory creatorFactory = MusFeatureModelExplanationCreatorFactory.getDefault();
+
+		// If automatic calculations are disabled, manually calculate all anomaly types.
+		final boolean automaticCalculationsEnabled = FeatureModelProperty.isRunCalculationAutomatically(featureModel);
+		if (!automaticCalculationsEnabled || !FeatureModelProperty.isCalculateFeatures(featureModel)) {
+			analyzer.annotateFeatures(FeatureStatus.DEAD, null);
+			analyzer.annotateFeatures(FeatureStatus.FALSE_OPTIONAL, null);
+		}
+		if (!automaticCalculationsEnabled || !FeatureModelProperty.isCalculateConstraints(featureModel)) {
+			analyzer.annotateConstraints(ConstraintStatus.REDUNDANT, null);
+		}
 
 		// Get all Dead Feature explanations.
 		final DeadFeatureExplanationCreator deadFeatExpCreator = creatorFactory.getDeadFeatureExplanationCreator();
