@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnAnomaliesOperation;
@@ -57,7 +59,7 @@ public abstract class FocusOnAnomaliesAction extends Action {
 	@Override
 	public void run() {
 		FeatureModelOperationWrapper.run(getAnomalyFocusOperation());
-		fm.getFeatureModelManager().getVarObject().handleModelDataChanged();
+		fm.getFeatureModelManager().getVarObject().fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
 	}
 
 	/**

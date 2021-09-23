@@ -315,7 +315,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
 			// Forces the features figure to remove the cached tooltip which was generated before.
-			getFigure().ResetTooltip();
+			getFigure().resetTooltip();
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " @ " + getModel() + " not handled.");

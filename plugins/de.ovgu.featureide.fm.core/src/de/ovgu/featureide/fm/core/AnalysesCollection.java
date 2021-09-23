@@ -468,7 +468,7 @@ public class AnalysesCollection {
 	}
 
 	/**
-	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints a also NOT analyzed.
+	 * Defines whether features should be included into calculations. To analyze constraints, features also need to be analyzed,
 	 */
 	public boolean isCalculateFeatures() {
 		return FeatureModelProperty.isCalculateFeatures(formula.getFeatureModel());

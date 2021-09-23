@@ -58,6 +58,8 @@ public class FocusOnExplanationAction extends Action {
 		super(FOCUS_ON_EXPLANATION);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.fm = fm;
+		setEnabled(false);
+
 		// Add a listener that updates the active explanation.
 		fm.getFeatureModelManager().addListener(new IEventListener() {
 
@@ -65,6 +67,7 @@ public class FocusOnExplanationAction extends Action {
 			public void propertyChange(FeatureIDEEvent event) {
 				if (event.getEventType() == EventType.ACTIVE_EXPLANATION_CHANGED) {
 					explanation = (FeatureModelExplanation<?>) event.getNewValue();
+					setEnabled(explanation != null);
 				}
 			}
 		});

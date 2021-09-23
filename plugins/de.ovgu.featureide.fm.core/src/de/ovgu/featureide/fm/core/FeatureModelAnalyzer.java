@@ -294,6 +294,32 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return analysesCollection.featurePropertiesMap.get(feature);
 	}
 
+	public boolean hasDeadFeatures(Collection<IFeature> features) {
+		return hasFeatureWithStatus(FeatureStatus.DEAD, features);
+	}
+
+	public boolean hasFalseOptionalFeatures(Collection<IFeature> features) {
+		return hasFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL, features);
+	}
+
+	private boolean hasFeatureWithStatus(FeatureStatus status, Collection<IFeature> features) {
+		return analysesCollection.featurePropertiesMap.entrySet().stream()
+				.filter(entry -> features.contains(entry.getKey()) && entry.getValue().hasStatus(status)).count() > 0;
+	}
+
+	public boolean hasRedundantConstraints(Collection<IConstraint> constraints) {
+		return hasConstraintsWithStatus(ConstraintStatus.REDUNDANT, constraints);
+	}
+
+	public boolean hasTautologyConstraints(Collection<IConstraint> constraints) {
+		return hasConstraintsWithStatus(ConstraintStatus.TAUTOLOGY, constraints);
+	}
+
+	private boolean hasConstraintsWithStatus(ConstraintStatus status, Collection<IConstraint> constraints) {
+		return analysesCollection.constraintPropertiesMap.entrySet().stream()
+				.filter(entry -> constraints.contains(entry.getKey()) && entry.getValue().hasStatus(status)).count() > 0;
+	}
+
 	public ConstraintProperties getConstraintProperties(IConstraint constraint) {
 		return analysesCollection.constraintPropertiesMap.get(constraint);
 	}

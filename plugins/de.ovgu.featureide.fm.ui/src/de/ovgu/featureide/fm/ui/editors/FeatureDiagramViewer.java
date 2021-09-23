@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
@@ -272,8 +273,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void reload() {// TODO do not layout twice
 		// internRefresh(true);
-		final Map<?, ?> editPartRegistry = getEditPartRegistry();
-		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) editPartRegistry.get(graphicalFeatureModel);
+		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel);
 		abstractGraphicalEditPart.refresh();
 		internRefresh(true);
 	}
@@ -312,6 +312,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	/**
+	 * Removes all edit parts associated with the features and constraints of <code>graphicalFeatureModel</code>.
+	 */
 	public void deregisterEditParts() {
 		final Map<?, ?> registry = getEditPartRegistry();
 		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -323,15 +326,24 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	/**
+	 * Removes the {@link FeatureEditPart} associated with <code>feature</code>.
+	 *
+	 * @param feature - {@link IGraphicalFeature}
+	 */
 	public void deregisterEditParts(IGraphicalFeature feature) {
 		final Map<?, ?> registry = getEditPartRegistry();
 		registry.remove(feature);
 		registry.remove(feature.getSourceConnection());
 	}
 
+	/**
+	 * Removes the {@link ConstraintEditPart} associated with <code>constraint</code>.
+	 *
+	 * @param constraint - {@link IGraphicalConstraint}
+	 */
 	public void deregisterEditParts(IGraphicalConstraint constraint) {
-		final Map<?, ?> registry = getEditPartRegistry();
-		registry.remove(constraint);
+		getEditPartRegistry().remove(constraint);
 	}
 
 	/**

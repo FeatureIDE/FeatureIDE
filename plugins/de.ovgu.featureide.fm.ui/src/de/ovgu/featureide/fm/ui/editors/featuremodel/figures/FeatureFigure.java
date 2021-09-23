@@ -166,14 +166,14 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		final Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
-		ResetTooltip();
+		resetTooltip();
 
 	}
 
 	/**
 	 * Resets the current tooltip. Should be called when the properties of a feature are changed and the old generated tooltip is obsolete.
 	 */
-	public void ResetTooltip() {
+	public void resetTooltip() {
 		toolTipFigure = null;
 	}
 
@@ -284,7 +284,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		} else {
 			label.setIcon(null);
 		}
-
 		setName(label.getText());
 	}
 

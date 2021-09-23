@@ -491,12 +491,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * Sets the active explanation depending on the current selection.
 	 */
 	protected void setActiveExplanation() {
-		// skip when automated analyzes are deactivated
-		if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
-			|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
-			return;
-		}
-
 		ModelElementEditPart primary = null;
 		for (final Object selected : viewer.getSelectedEditParts()) {
 			if (!(selected instanceof ModelElementEditPart)) {
@@ -840,10 +834,14 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// clear registry
 			viewer.deregisterEditParts();
 			graphicalFeatureModel.init();
+
+			// update labels, colors
+			refreshGraphics(graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection());
 			viewer.setContents(graphicalFeatureModel);
 			viewer.internRefresh(true);
 			setDirty();
 			analyzeFeatureModel();
+
 			break;
 		case FEATURE_DELETE:
 			final IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) source);
@@ -900,9 +898,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature) source).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
-			viewer.reload(); // reload need to be called afterwards so that the events can apply to the to be hidden features. reload would remove the editparts
-							 // that
-			// leads to errors.
+			viewer.reload(); // reload need to be called afterwards so that the events can apply to the to be hidden features. reload would remove the edit
+							 // parts that lead to errors.
 			viewer.refreshChildAll((IFeature) source);
 			setDirty();
 			viewer.internRefresh(true);
@@ -938,6 +935,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			// redraw the explanation after collapse
 			setActiveExplanation(activeExplanation);
+
 			break;
 		case FEATURE_COLOR_CHANGED:
 			if (source instanceof List) {

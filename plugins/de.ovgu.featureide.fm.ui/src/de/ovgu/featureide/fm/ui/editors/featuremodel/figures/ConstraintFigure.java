@@ -112,7 +112,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	}
 
 	/**
-	 * Sets the properties <i>icon, border and tooltips</i> of the {@link ConstraintFigure}.
+	 * Configures <i>icon, border and tooltips</i> of this {@link ConstraintFigure}.
 	 */
 	@Override
 	public void updateProperties() {
@@ -123,6 +123,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
 				.getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
+
 		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
 			label.setIcon(null);
 		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {

@@ -26,6 +26,8 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -70,7 +72,7 @@ public class FocusOnAllExplanationsAction extends Action {
 	@Override
 	public void run() {
 		final IGraphicalFeatureModel gfm = viewer.getGraphicalFeatureModel();
-		final IFeatureModel featureModel = gfm.getFeatureModelManager().getObject();
+		final IFeatureModel featureModel = gfm.getFeatureModelManager().getVarObject();
 
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
 		final MultipleAnomaliesExplanation explanation = analyzer.getMultipleAnomaliesExplanation();
@@ -82,5 +84,6 @@ public class FocusOnAllExplanationsAction extends Action {
 		viewer.getSelectionManager().deselectAll();
 		rootPart.setSelected(EditPart.SELECTED_PRIMARY);
 		viewer.getSelectionManager().appendSelection(rootPart);
+		featureModel.fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
 	}
 }
