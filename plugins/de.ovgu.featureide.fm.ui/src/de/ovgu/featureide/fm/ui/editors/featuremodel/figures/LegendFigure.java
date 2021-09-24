@@ -248,12 +248,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		implicitConst = isImplicit(graphicalFeatureModel);
 
 		if (featureModel instanceof MultiFeatureModel) {
-			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
 			interfaced = Functional.toList(Functional.filter(graphicalVisibleFeatures, new InterfaceFeatureFilter())).size() > 0;
 			// interfaces hide other features
 			imported = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new ImportedFeatureFilter())).size() > 0);
 			inherited = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new InheritedFeatureFilter())).size() > 0);
-
 		}
 
 		language = FMPropertyManager.getLanguage();

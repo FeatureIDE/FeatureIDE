@@ -121,37 +121,37 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 
-		final ConstraintProperties constraintProperties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
+		final ConstraintProperties properties = graphicalConstraint.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
 				.getAnalysesCollection().getConstraintProperty(graphicalConstraint.getObject());
 
-		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
+		if (properties.hasStatus(ConstraintStatus.SATISFIABLE)) {
 			label.setIcon(null);
-		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID)) {
+		} else if (properties.hasStatus(ConstraintStatus.VOID)) {
 			label.setIcon(FM_ERROR);
 			add(label);
 			toolTipContent.add(new Label(VOID_MODEL));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
+		} else if (properties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
 			label.setIcon(FM_ERROR);
 			toolTipContent.add(new Label(UNSATISFIABLE));
 		}
 
-		if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
+		if (properties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
 			label.setIcon(FM_WARNING);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT)) {
+		} else if (properties.hasStatus(ConstraintStatus.REDUNDANT)) {
 			label.setIcon(FM_INFO);
 			add(label);
 			toolTipContent.add(new Label(REDUNDANCE));
-		} else if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
+		} else if (properties.hasStatus(ConstraintStatus.IMPLICIT)) {
 			setBorder(new LineBorder(GUIDefaults.IMPLICIT_CONSTRAINT, 3));
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			add(label);
 			toolTipContent.add(new Label(REDUNDANCE));
 		}
 
-		if (!constraintProperties.getDeadFeatures().isEmpty()) {
-			final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+		final List<String> deadFeatures = Functional.mapToList(properties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+		if (!deadFeatures.isEmpty()) {
 			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
 			String s = DEAD_FEATURE;
@@ -161,9 +161,8 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			toolTipContent.add(new Label(s));
 		}
 
-		if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-			final List<String> falseOptionalFeatures =
-				Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+		final List<String> falseOptionalFeatures = Functional.mapToList(properties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+		if (!falseOptionalFeatures.isEmpty()) {
 			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
 
 			String s = FALSE_OPTIONAL;

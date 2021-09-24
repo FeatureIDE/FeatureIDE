@@ -42,7 +42,6 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
@@ -189,11 +188,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 			final StringBuilder toolTip = new StringBuilder();
 
-			// Check if automatic calculations are nessecary
-			AnalysesCollection properties = null;
-
-			final FeatureModelFormula variableFormula = this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
-			properties = variableFormula.getAnalyzer().getAnalysesCollection();
+			// Check if automatic calculations are necessary
+			final AnalysesCollection properties =
+				this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection();
 
 			if (properties == null) {
 				toolTip.append(createTooltip());

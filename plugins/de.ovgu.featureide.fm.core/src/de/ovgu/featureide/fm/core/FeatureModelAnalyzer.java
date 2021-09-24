@@ -626,7 +626,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final FeatureProperties featureProperties = getFeatureProperties(feature);
 			if (featureProperties != null) {
 				// Test if feature is the root feature; in that case return the MultipleAnomaliesException.
-				if (FeatureUtils.isRoot(feature)) {
+				if (FeatureUtils.isRoot(feature) && (getMultipleAnomaliesExplanation() != null)) {
 					explanation = getMultipleAnomaliesExplanation();
 				}
 				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
@@ -860,6 +860,15 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @return a {@link MultipleAnomaliesExplanation} for <code>featureModel</code>, or null if none can be found.
 	 */
 	public MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
+		return analysesCollection.getMultipleAnomaliesExplanation();
+	}
+
+	/**
+	 * Creates the {@link MultipleAnomaliesExplanation} for <code>featureModel</code> at the user's request.
+	 *
+	 * @return new {@link MultipleAnomaliesExplanation}
+	 */
+	public MultipleAnomaliesExplanation addMultipleAnomaliesExplanation() {
 		MultipleAnomaliesExplanation explanation = analysesCollection.getMultipleAnomaliesExplanation();
 		if (explanation == null) {
 			final MultipleAnomaliesExplanationCreator creator = analysesCollection.multipleAnomaliesExplanationCreator;

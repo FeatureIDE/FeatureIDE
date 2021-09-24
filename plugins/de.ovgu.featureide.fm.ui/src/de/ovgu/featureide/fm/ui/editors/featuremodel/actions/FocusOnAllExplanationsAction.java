@@ -50,7 +50,7 @@ public class FocusOnAllExplanationsAction extends Action {
 	public static final String ID = "de.ovgu.featureide.focusonallexplanations";
 
 	/**
-	 * The graphical feature model.
+	 * The feature diagram viewer.
 	 */
 	private final FeatureDiagramViewer viewer;
 
@@ -75,7 +75,7 @@ public class FocusOnAllExplanationsAction extends Action {
 		final IFeatureModel featureModel = gfm.getFeatureModelManager().getVarObject();
 
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
-		final MultipleAnomaliesExplanation explanation = analyzer.getMultipleAnomaliesExplanation();
+		final MultipleAnomaliesExplanation explanation = analyzer.addMultipleAnomaliesExplanation();
 		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(gfm, explanation));
 
 		final IFeature root = featureModel.getStructure().getRoot().getFeature();

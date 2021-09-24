@@ -321,16 +321,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
 		collapseFeaturesAction = addAction(new CollapseSiblingsAction(viewer, graphicalFeatureModel));
 		collapseAllAction = addAction(new CollapseAllAction(graphicalFeatureModel));
+		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
+		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
+		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
+		showCollapsedConstraintsAction = addAction(new ShowCollapsedConstraintsAction(viewer, graphicalFeatureModel));
+
+		// Focus on Explanations/Anomalies actions
 		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
 		focusOnDeadFeaturesAction = addAction(new FocusOnDeadFeaturesAction(getGraphicalFeatureModel()));
 		focusOnFalseOptionalFeaturesAction = addAction(new FocusOnFalseOptionalFeaturesAction(getGraphicalFeatureModel()));
 		focusOnRedundantConstraintAction = addAction(new FocusOnRedundantConstraintsAction(getGraphicalFeatureModel()));
 		focusOnAllAnomaliesAction = addAction(new FocusOnAllAnomaliesAction(getGraphicalFeatureModel()));
 		focusOnAllExplanationsAction = addAction(new FocusOnAllExplanationsAction(viewer));
-		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
-		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
-		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
-		showCollapsedConstraintsAction = addAction(new ShowCollapsedConstraintsAction(viewer, graphicalFeatureModel));
 
 		// Feature property actions
 		mandatoryAction = addAction(new MandatoryAction(viewer, featureModelManager));
