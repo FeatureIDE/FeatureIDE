@@ -97,10 +97,13 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		}
 
 		if (graphicalFeature != null) {
+			// Calculate layout direction
 			final FeatureModelLayout layout = graphicalFeature.getGraphicalModel().getLayout();
 			final Configuration.Location rootPosition = layout.isUsesAbegoTreeLayout() ? layout.getAbegoRootposition()
 				: (layout.hasVerticalLayout() ? Configuration.Location.Left : Configuration.Location.Top);
 
+			// Apply offset to center the decoration box along the appropriate edge of the graphical feature and take
+			// GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE into account
 			switch (rootPosition) {
 			case Top:
 				super.setLocation(p.translate(-getBounds().width / 2, GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
