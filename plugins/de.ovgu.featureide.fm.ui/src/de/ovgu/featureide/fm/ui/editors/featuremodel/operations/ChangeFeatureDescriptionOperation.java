@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
@@ -59,5 +60,10 @@ public class ChangeFeatureDescriptionOperation extends AbstractFeatureModelOpera
 		final IFeature feature = featureModel.getFeature(featureName);
 		feature.getProperty().setDescription(oldDescription);
 		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_MODEL_PROPERTY;
 	}
 }
