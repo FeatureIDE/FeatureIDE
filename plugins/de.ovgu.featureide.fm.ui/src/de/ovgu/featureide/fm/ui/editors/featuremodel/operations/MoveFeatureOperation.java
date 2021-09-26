@@ -22,6 +22,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -45,8 +48,17 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 	private final FeatureOperationData data;
 	private final Point newPos;
 	private final Point oldPos;
+
 	private boolean or = false;
 	private boolean alternative = false;
+	/**
+	 * True iff the new parent was collapsed before the operation.
+	 */
+	private boolean collapsedNewParent = false;
+	/**
+	 * The names of the children of the new parent that were collapsed by the operation.
+	 */
+	private final List<String> collapsedChildrenNames = new ArrayList<>();
 
 	public MoveFeatureOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureOperationData data, Point newPos, Point oldPos) {
 		super(graphicalFeatureModel, MOVE_FEATURE);
@@ -74,23 +86,30 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 			final IGraphicalFeature newParentGraphical = graphicalFeatureModel.getGraphicalFeature(newParent);
 
 			newParent.getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
-			if (newParentGraphical.isCollapsed()) {
-				for (final IFeatureStructure fs : newParent.getStructure().getChildren()) {
-					if (fs != featureStructure) {
-						final IGraphicalFeature graphicalFS = graphicalFeatureModel.getGraphicalFeature(fs.getFeature());
-						graphicalFS.setCollapsed(true);
-					}
-				}
-			}
-
 			if (oldParent != newParent) {
 				oldParentGraphical.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 				newParentGraphical.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			}
 
-			if (newParentGraphical.isCollapsed()) {
+			// Handle collapsed new parent
+			collapsedNewParent = newParentGraphical.isCollapsed();
+			collapsedChildrenNames.clear();
+			if (collapsedNewParent) {
+				// Collapse children of new parent
+				for (final IFeatureStructure childStructure : newParent.getStructure().getChildren()) {
+					if (childStructure != featureStructure) {
+						final IFeature child = childStructure.getFeature();
+						final IGraphicalFeature childGraphical = graphicalFeatureModel.getGraphicalFeature(child);
+						if (!childGraphical.isCollapsed()) {
+							collapsedChildrenNames.add(child.getName());
+							childGraphical.setCollapsed(true);
+						}
+					}
+				}
+
+				// Expand new parent
 				newParentGraphical.setCollapsed(false);
-				featureModel.fireEvent(new FeatureIDEEvent(newParent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
+				featureModel.fireEvent(new FeatureIDEEvent(newParent, EventType.FEATURE_COLLAPSED_CHANGED));
 			}
 
 			// If there is only one child left, set the old parent group type to and
@@ -110,10 +129,25 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 		} else {
 			final IFeature oldParent = featureModel.getFeature(data.getOldParentName());
 			final IFeature newParent = featureModel.getFeature(data.getNewParentName());
-			final IFeatureStructure structure2 = feature.getStructure();
+			final IGraphicalFeature newParentGraphical = graphicalFeatureModel.getGraphicalFeature(newParent);
+			final IFeatureStructure featureStructure = feature.getStructure();
 
-			newParent.getStructure().removeChild(structure2);
-			oldParent.getStructure().addChildAtPosition(data.getOldIndex(), structure2);
+			newParent.getStructure().removeChild(featureStructure);
+			oldParent.getStructure().addChildAtPosition(data.getOldIndex(), featureStructure);
+
+			// Handle previously collapsed new parent
+			if (collapsedNewParent) {
+				// Expand children of new parent that have been collapsed by the operation
+				for (final String collapsedChildName : collapsedChildrenNames) {
+					final IFeature child = featureModel.getFeature(collapsedChildName);
+					final IGraphicalFeature childGraphical = graphicalFeatureModel.getGraphicalFeature(child);
+					childGraphical.setCollapsed(false);
+				}
+
+				// Collapse new parent as it has been expanded by the operation
+				newParentGraphical.setCollapsed(true);
+				featureModel.fireEvent(new FeatureIDEEvent(newParent, EventType.FEATURE_COLLAPSED_CHANGED));
+			}
 
 			// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
 			if (or) {
@@ -129,5 +163,4 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 	protected int getChangeIndicator() {
 		return FeatureModelManager.CHANGE_DEPENDENCIES;
 	}
-
 }
