@@ -76,7 +76,7 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	}
 
 	/**
-	 * Returns the single explanations strings, separated by "---".
+	 * Returns the single explanations separated by "---".
 	 *
 	 * @see de.ovgu.featureide.fm.core.explanations.ExplanationWriter#getReasonsString()
 	 */

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.prop4j.And;
@@ -29,7 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 
 /**
- * {@link MultipleAnomaliesExplanation} can compose multiple {@link FeatureModelExplanation}s of {@link IFeatureModelElement}s into a single explanation for a
+ * {@link MultipleAnomaliesExplanation} composes multiple {@link FeatureModelExplanation}s of {@link IFeatureModelElement}s into a single explanation for a
  * given {@link IFeatureModel} they belong to.
  *
  * @author Benedikt Jutz
@@ -42,10 +43,12 @@ public class MultipleAnomaliesExplanation extends FeatureModelExplanation<IFeatu
 	private final List<FeatureModelExplanation<? extends IFeatureModelElement>> singleExplanations;
 
 	/**
+	 * Returns the single explanations in an unmodifiable {@link List}.
+	 *
 	 * @return <code>singleExplanations</code> - {@link List}
 	 */
 	public List<FeatureModelExplanation<? extends IFeatureModelElement>> getSingleExplanations() {
-		return singleExplanations;
+		return Collections.unmodifiableList(singleExplanations);
 	}
 
 	/**

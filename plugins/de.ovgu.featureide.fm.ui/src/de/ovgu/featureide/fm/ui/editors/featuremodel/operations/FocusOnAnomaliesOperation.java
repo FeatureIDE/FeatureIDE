@@ -29,6 +29,7 @@ import java.util.Set;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -138,8 +139,6 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		final IFeatureModel model = graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getFeatureModel();
 		final boolean automaticCalculations = FeatureModelProperty.isRunCalculationAutomatically(model);
 		final boolean featureCalculations = automaticCalculations && FeatureModelProperty.isCalculateFeatures(model);
-
-		// Initially mark all features as collapsed.
 		final int numFeatures = graphicalFeatureModel.getAllFeatures().size();
 
 		// Collect all features that have at least one wanted anomaly type, and no unwanted one.
@@ -177,28 +176,22 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 			anomalousConstraints.forEach(constraint -> featuresToFocus.addAll(constraint.getContainedFeatures()));
 		}
 
-		// Should the feature model be free of the requested anomalies, expand all features.
+		// Should the feature model be free of the requested anomalies, do not change anything.
 		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
-
 		if (featuresToFocus.isEmpty()) {
 			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, feature.isCollapsed()));
-		} else {
+		}
+		// Otherwise expand all graphical features along with their parents.
+		else {
 			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
-			// Collapse the features with anomalies, and expand their parents.
-			for (final IFeature anomalousFeat : featuresToFocus) {
-				IFeature featureToExpand = anomalousFeat;
-				while (!featureToExpand.getStructure().isRoot()) {
-					featureToExpand = featureToExpand.getStructure().getParent().getFeature();
-					final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(featureToExpand);
-					expandedFeatures.put(graphicalFeature, false);
-				}
-			}
+			featuresToFocus.addAll(FeatureUtils.getParents(featuresToFocus));
+			featuresToFocus.forEach(feature -> expandedFeatures.put(graphicalFeatureModel.getGraphicalFeature(feature), false));
 		}
 		return expandedFeatures;
 	}
 
 	/**
-	 * Collapse all features but those with the specified anomalies, and inform listeners about {@link EventType#FEATURE_COLLAPSED_ALL_CHANGED}.
+	 * Collapses all features but those with the specified anomalies, and informs listeners about {@link EventType#FEATURE_COLLAPSED_ALL_CHANGED}.
 	 *
 	 * @see AbstractCollapseOperation#operation(de.ovgu.featureide.fm.core.base.IFeatureModel)
 	 */
@@ -209,7 +202,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	}
 
 	/**
-	 * Undo the previous collapse operation.
+	 * Undoes the previous collapse operation.
 	 *
 	 * @see AbstractCollapseOperation#inverseOperation(de.ovgu.featureide.fm.core.base.IFeatureModel)
 	 */

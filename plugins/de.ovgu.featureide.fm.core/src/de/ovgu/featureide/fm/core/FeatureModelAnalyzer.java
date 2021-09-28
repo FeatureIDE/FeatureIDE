@@ -493,11 +493,15 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 	}
 
-	// annotation method for given status (applies on what features)?
-	// monitor without cancelling, need not be set.
-	// all features are common
-	// root features, mandatory children of and-groups are mandatory.
-	// non-root features, non-optional children of or-groups are optional.
+	/**
+	 * Annotates the features of <code>featureModelFormula</code> with the given status, i.e. checks if they are common, mandatory, optional features, belong to
+	 * a group, or are dead, false optional or indeterminate. The latter three analyzes require the <code>monitor</code> object, though a monitor is not
+	 * necessary. Afterwards returns the annotated features.
+	 *
+	 * @param status - {@link FeatureStatus}
+	 * @param monitor - {@link IMonitor}
+	 * @return new {@link Collection}
+	 */
 	public Collection<IFeature> annotateFeatures(FeatureStatus status, IMonitor<Boolean> monitor) {
 		if (monitor == null) {
 			monitor = new NullMonitor<>();
@@ -540,7 +544,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 
 		annotatedFeatures.forEach(feature -> getFeatureProperties(feature).setStatus(status));
-		return annotatedFeatures;
+		return new ArrayList<>(annotatedFeatures);
 	}
 
 	// TODO implement as analysis

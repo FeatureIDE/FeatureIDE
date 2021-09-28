@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanationOperation;
 
 /**
- * Action that calculates all explanations and marks all relevant features.
+ * Action that calculates all explanations and then marks all relevant features.
  *
  * @author Benedikt Jutz
  */
@@ -66,7 +66,7 @@ public class FocusOnAllExplanationsAction extends Action {
 	}
 
 	/**
-	 * Creates or loads a previously saved full explanation for all feature models, then focuses on its elements. Select the feature diagram root to sho the
+	 * Creates or loads a previously saved full explanation for all feature models, then focuses on its elements. Select the feature diagram root to show the
 	 * explanations.
 	 */
 	@Override

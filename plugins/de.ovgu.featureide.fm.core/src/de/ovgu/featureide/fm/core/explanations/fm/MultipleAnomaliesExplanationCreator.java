@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.explanations.fm;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * {@link MultipleAnomaliesExplanationCreator} provides an interface for creators of {@link MultipleAnomaliesExplanation}.
+ * {@link MultipleAnomaliesExplanationCreator} provides an interface for creators of {@link MultipleAnomaliesExplanation}s.
  *
  * @author Benedikt Jutz
  */

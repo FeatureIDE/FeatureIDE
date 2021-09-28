@@ -52,7 +52,7 @@ public abstract class FocusOnAnomaliesAction extends Action {
 	}
 
 	/**
-	 * Executes the appropriate {@link FocusOnAnomaliesOperation}.
+	 * Executes the appropriate {@link FocusOnAnomaliesOperation}, then redraws the feature diagram.
 	 *
 	 * @see {@link Action#run}
 	 */

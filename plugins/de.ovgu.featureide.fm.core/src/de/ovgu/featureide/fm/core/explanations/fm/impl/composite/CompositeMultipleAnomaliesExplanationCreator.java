@@ -36,6 +36,8 @@ public class CompositeMultipleAnomaliesExplanationCreator
 		implements MultipleAnomaliesExplanationCreator {
 
 	/**
+	 * Constructs a new {@link CompositeMultipleAnomaliesExplanationCreator} instance.
+	 *
 	 * @param composites - {@link Collection}
 	 */
 	public CompositeMultipleAnomaliesExplanationCreator(Collection<MultipleAnomaliesExplanationCreator> composites) {

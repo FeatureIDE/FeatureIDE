@@ -411,7 +411,7 @@ public class AnalysesCollection {
 		new ConstraintAnalysisWrapper<>(ContradictionAnalysis.class, new FeatureTreeCNFCreator());
 	final CauseAnalysisWrapper constraintAnomaliesAnalysis = new CauseAnalysisWrapper(CauseAnalysis.class, coreDeadAnalysis, foAnalysis);
 
-	private final List<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> list =
+	private final List<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> analysesList =
 		Arrays.asList(validAnalysis, atomicSetAnalysis, coreDeadAnalysis, foAnalysis, determinedAnalysis, constraintContradictionAnalysis,
 				constraintVoidAnalysis, constraintTautologyAnalysis, constraintRedundancyAnalysis, constraintAnomaliesAnalysis);
 
@@ -421,7 +421,8 @@ public class AnalysesCollection {
 
 	void reset(FeatureModelFormula formula) {
 		this.formula = formula;
-		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
+		final IFeatureModel featureModel = formula.getFeatureModel();
+		for (final AnalysisWrapper<?, ?> analysisWrapper : analysesList) {
 			analysisWrapper.reset();
 			analysisWrapper.setFormula(formula);
 		}
@@ -429,17 +430,16 @@ public class AnalysesCollection {
 		falseOptionalFeatureExplanations.clear();
 		redundantConstraintExplanations.clear();
 		multipleAnomaliesExplanation = null;
-		multipleAnomaliesExplanationCreator.setFeatureModel(formula.getFeatureModel());
 
 		featurePropertiesMap.clear();
 		constraintPropertiesMap.clear();
 
-		for (final IFeature feature : formula.getFeatureModel().getFeatures()) {
+		for (final IFeature feature : featureModel.getFeatures()) {
 			final FeatureProperties featureProperties = new FeatureProperties(feature);
 			featurePropertiesMap.put(feature, featureProperties);
 			elementPropertiesMap.put(feature, featureProperties);
 		}
-		for (final IConstraint constraint : formula.getFeatureModel().getConstraints()) {
+		for (final IConstraint constraint : featureModel.getConstraints()) {
 			final ConstraintProperties constraintProperties = new ConstraintProperties(constraint);
 			constraintPropertiesMap.put(constraint, constraintProperties);
 			elementPropertiesMap.put(constraint, constraintProperties);
@@ -450,18 +450,19 @@ public class AnalysesCollection {
 
 	void init(FeatureModelFormula formula) {
 		this.formula = formula;
-		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
+		for (final AnalysisWrapper<?, ?> analysisWrapper : analysesList) {
 			analysisWrapper.setFormula(formula);
 		}
 
 		deadFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		falseOptionalFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		redundantConstraintExplanationCreator.setFeatureModel(formula.getFeatureModel());
+		multipleAnomaliesExplanationCreator.setFeatureModel(formula.getFeatureModel());
 	}
 
 	public void inheritSettings(AnalysesCollection otherCollection) {
-		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> thisAnalysesIterator = list.iterator();
-		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> otherAnalysesIterator = otherCollection.list.iterator();
+		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> thisAnalysesIterator = analysesList.iterator();
+		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> otherAnalysesIterator = otherCollection.analysesList.iterator();
 		while (thisAnalysesIterator.hasNext()) {
 			thisAnalysesIterator.next().setEnabled(otherAnalysesIterator.next().isEnabled());
 		}

@@ -35,13 +35,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
-import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
-import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -72,9 +68,8 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 		final Collection<IFeature> features = featureModel.getFeatures();
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
 
-		// Creator factory and explanations to combine.
+		// List explanations to combine.
 		final List<FeatureModelExplanation<? extends IFeatureModelElement>> exps = new ArrayList<>((2 * features.size()) + featureModel.getConstraintCount());
-		final FeatureModelExplanationCreatorFactory creatorFactory = MusFeatureModelExplanationCreatorFactory.getDefault();
 
 		// If automatic calculations are disabled, manually calculate all anomaly types.
 		final boolean automaticCalculationsEnabled = FeatureModelProperty.isRunCalculationAutomatically(featureModel);
@@ -86,27 +81,18 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 			analyzer.annotateConstraints(ConstraintStatus.REDUNDANT, null);
 		}
 
-		// Get all Dead Feature explanations.
-		final DeadFeatureExplanationCreator deadFeatExpCreator = creatorFactory.getDeadFeatureExplanationCreator();
-		deadFeatExpCreator.setFeatureModel(featureModel);
-		// Get all False-Optional Feature explanations.
-		final FalseOptionalFeatureExplanationCreator falseOptFeatExpCreator = creatorFactory.getFalseOptionalFeatureExplanationCreator();
-		falseOptFeatExpCreator.setFeatureModel(featureModel);
-		// Get all Redundant-Constraint explanations.
-		final RedundantConstraintExplanationCreator redundantConsExpCreator = creatorFactory.getRedundantConstraintExplanationCreator();
-		redundantConsExpCreator.setFeatureModel(featureModel);
 		for (final IFeature feature : features) {
 			final FeatureProperties properties = analyzer.getFeatureProperties(feature);
 			if (properties.hasStatus(FeatureStatus.DEAD)) {
-				exps.add(deadFeatExpCreator.getExplanationFor(feature));
+				exps.add(analyzer.getDeadFeatureExplanation(featureModel, feature));
 			}
 			if (properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-				exps.add(falseOptFeatExpCreator.getExplanationFor(feature));
+				exps.add(analyzer.getFalseOptionalFeatureExplanation(featureModel, feature));
 			}
 		}
 		for (final IConstraint constraint : featureModel.getConstraints()) {
 			if (analyzer.getConstraintProperties(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
-				exps.add(redundantConsExpCreator.getExplanationFor(constraint));
+				exps.add(analyzer.getRedundantConstraintExplanation(featureModel, constraint));
 			}
 		}
 
