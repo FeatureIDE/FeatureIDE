@@ -91,6 +91,13 @@ public abstract class AFeatureModelAction extends Action {
 		return false;
 	}
 
+	/**
+	 * method to check if the selection in the editor includes a constraint from an external submodel
+	 *
+	 * @param selection the selection from the editor
+	 *
+	 * @return true if there is a constraint from an external submodel, false otherwise
+	 */
 	protected boolean hasExternalConstraint(IStructuredSelection selection) {
 		for (final Object selectedElement : selection.toArray()) {
 			if (selectedElement instanceof ConstraintEditPart) {
