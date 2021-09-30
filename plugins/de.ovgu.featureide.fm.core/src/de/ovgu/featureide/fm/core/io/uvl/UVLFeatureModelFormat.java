@@ -147,6 +147,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			}
 			root = factory.createFeature(fm, rootName);
 			root.getStructure().setAbstract(true);
+			root.getProperty().setImplicit(true);
 			fm.addFeature(root);
 			Arrays.stream(rootModel.getRootFeatures()).forEachOrdered(f -> parseFeature(fm, root, f, rootModel));
 			root.getStructure().getChildren().forEach(fs -> fs.setMandatory(true));
@@ -357,7 +358,15 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			model.setImports(new Import[0]);
 		}
 		model.setNamespace(namespace);
-		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
+		final IFeatureStructure root = fm.getStructure().getRoot();
+		if (root.getFeature().getProperty().isImplicit() && root.isAnd() && root.hasChildren()
+			&& root.getChildren().stream().allMatch(IFeatureStructure::isMandatory) && root.getRelevantConstraints().isEmpty()) {
+			// Remove implicit root feature, use children as root features
+			model.setRootFeatures(root.getChildren().stream().map(child -> printFeature(child.getFeature())).toArray(Feature[]::new));
+		} else {
+			// Use single root feature
+			model.setRootFeatures(new Feature[] { printFeature(root.getFeature()) });
+		}
 		model.setConstraints(constraints.stream().map(this::printConstraint).toArray());
 		return model;
 	}

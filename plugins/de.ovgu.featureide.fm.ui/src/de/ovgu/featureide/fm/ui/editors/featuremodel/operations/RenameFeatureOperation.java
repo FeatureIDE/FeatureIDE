@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -39,6 +40,11 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	private final String oldName;
 	private final String newName;
 
+	/**
+	 * Whether the feature was implicit before the operation.
+	 */
+	private boolean implicitFeature = false;
+
 	public RenameFeatureOperation(IFeatureModelManager featureModelManager, String oldName, String newName) {
 		super(featureModelManager, RENAME_FEATURE);
 		this.oldName = oldName;
@@ -47,6 +53,9 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		final IFeature oldFeature = featureModel.getFeature(oldName);
+		implicitFeature = oldFeature.getProperty().isImplicit();
+		oldFeature.getProperty().setImplicit(false);
 		featureModel.getRenamingsManager().renameFeature(oldName, newName);
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_NAME_CHANGED, oldName, newName);
 	}
@@ -54,6 +63,7 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		featureModel.getRenamingsManager().renameFeature(newName, oldName);
+		featureModel.getFeature(oldName).getProperty().setImplicit(implicitFeature);
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_NAME_CHANGED, newName, oldName);
 	}
 

@@ -40,6 +40,11 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 
 	private final ArrayList<FeatureColor> oldColor = new ArrayList<>();
+	/**
+	 * Implicit property for each feature of this operation, before the operation is applied.
+	 */
+	private boolean[] implicitFeatures;
+
 	private final FeatureColor newColor;
 	private final List<String> featureNameList;
 
@@ -52,12 +57,18 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		oldColor.clear();
+		implicitFeatures = new boolean[featureNameList.size()];
 		final ArrayList<IFeature> featureList = new ArrayList<>(featureNameList.size());
-		for (final String name : featureNameList) {
-			final IFeature feature = featureModel.getFeature(name);
+		for (int i = 0; i < featureNameList.size(); i++) {
+			final IFeature feature = featureModel.getFeature(featureNameList.get(i));
 			oldColor.add(FeatureColorManager.getColor(feature));
 			featureList.add(feature);
 			FeatureColorManager.setColor(feature, newColor);
+			implicitFeatures[i] = feature.getProperty().isImplicit();
+			if (implicitFeatures[i]) {
+				feature.getProperty().setImplicit(false);
+				featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
+			}
 		}
 		FeatureColorManager.notifyColorChange(featureList);
 		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
@@ -70,6 +81,10 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 			final IFeature feature = featureModel.getFeature(featureNameList.get(i));
 			featureList.add(feature);
 			FeatureColorManager.setColor(feature, oldColor.get(i));
+			if (implicitFeatures[i]) {
+				feature.getProperty().setImplicit(implicitFeatures[i]);
+				featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
+			}
 		}
 		FeatureColorManager.notifyColorChange(featureList);
 		return new FeatureIDEEvent(featureNameList, EventType.FEATURE_COLOR_CHANGED);
