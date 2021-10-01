@@ -263,7 +263,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		final boolean constraintsListVisible = isConstraintsListVisible();
 
 		settingsMenu.setStateOfActions(constraintsListVisible && constraintsViewVisible);
-		setConstraintsHidden(featureModelEditor, constraintsViewVisible);
 		updateUndoRedoActions();
 
 		if (constraintsViewVisible && constraintsListVisible) {
@@ -322,7 +321,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		// remove listeners from previous FeatureModelEditor
 		if (featureModelEditor != null) {
-			setConstraintsHidden(featureModelEditor, false);
 			if (featureModelEditor.diagramEditor != null) {
 				featureModelEditor.diagramEditor.removeSelectionChangedListener(selectionListener);
 			}
@@ -417,24 +415,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	@Override
 	public void setFocus() {
 		constraintView.getViewer().getTree().setFocus();
-	}
-
-	/**
-	 * Sets the constraints to be hidden or shown below the diagram of a FeatureModelEditor.
-	 *
-	 * @param featureModelEditor The FeatureModelEditor which contains the FeatureDiagramEditor in which the constraints are either hidden or not.
-	 * @param hideConstraints True if the constraints are to be hidden. False if the constraints are to be visible.
-	 */
-	public void setConstraintsHidden(FeatureModelEditor featureModelEditor, boolean hideConstraints) {
-		if (featureModelEditor != null) {
-			final IGraphicalFeatureModel graphicalFeatureModel = featureModelEditor.diagramEditor.getGraphicalFeatureModel();
-
-			// only update the model if the new state of hideConstraint is different from the current state
-			if (graphicalFeatureModel.getConstraintsHidden() != hideConstraints) {
-				graphicalFeatureModel.setConstraintsHidden(hideConstraints);
-				graphicalFeatureModel.redrawDiagram();
-			}
-		}
 	}
 
 	/**
