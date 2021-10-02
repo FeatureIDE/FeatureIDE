@@ -317,7 +317,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void checkReferenceValid(String name) {
-		if (fm.getFeature(name) == null) {
+		final IFeature f = fm.getFeature(name);
+		if ((f == null) || f.getProperty().isImplicit()) {
 			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0, Severity.ERROR));
 			throw new RuntimeException("Invalid reference");
 		}
