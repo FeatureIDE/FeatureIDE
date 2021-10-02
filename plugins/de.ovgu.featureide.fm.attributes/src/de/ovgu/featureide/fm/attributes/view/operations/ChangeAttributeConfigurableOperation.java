@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -34,14 +36,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureM
  */
 public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOperation {
 
-	private final IFeatureAttribute attribute;
+	/**
+	 * The name of the feature containing the attribute to be modified.
+	 */
+	private final String featureName;
+	/**
+	 * The name of the attribute to be modified.
+	 */
+	private final String attributeName;
 	private final boolean value;
 
 	private final boolean oldValue;
 
 	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean value) {
 		super(featureModelManager, "Set Attribute Configurable");
-		this.attribute = attribute;
+		featureName = attribute.getFeature().getName();
+		attributeName = attribute.getName();
 		this.value = value;
 
 		oldValue = attribute.isConfigurable();
@@ -49,13 +59,29 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		attribute.setConfigurable(value);
-		return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
+		IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) {
+			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
+			if (attribute != null) {
+				attribute.setConfigurable(value);
+				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
+			}
+		}
+		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		attribute.setConfigurable(oldValue);
-		return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
+		IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) {
+			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
+			if (attribute != null) {
+				attribute.setConfigurable(oldValue);
+				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
+			}
+		}
+		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 }

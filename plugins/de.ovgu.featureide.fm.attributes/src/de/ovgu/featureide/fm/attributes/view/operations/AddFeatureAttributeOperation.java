@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -44,7 +45,10 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 	private final String featureName;
 	private final String attributeType;
 
-	private IFeatureAttribute attribute;
+	/**
+	 * The name of the created attribute.
+	 */
+	private String attributeName;
 
 	public AddFeatureAttributeOperation(IFeatureModelManager featureModelManager, String featureName, String attributeType, String title) {
 		super(featureModelManager, title);
@@ -58,26 +62,33 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 	}
 
 	private FeatureIDEEvent addAttribute(IFeatureModel featureModel) {
-		final IExtendedFeature feature = (IExtendedFeature) featureModel.getFeature(featureName);
-		final String name = getUniqueAttributeName(attributeType, feature);
-		switch (attributeType) {
-		case FeatureAttribute.BOOLEAN:
-			attribute = new BooleanFeatureAttribute(feature, name, "", null, false, false);
-			break;
-		case FeatureAttribute.DOUBLE:
-			attribute = new DoubleFeatureAttribute(feature, name, "", null, false, false);
-			break;
-		case FeatureAttribute.LONG:
-			attribute = new LongFeatureAttribute(feature, name, "", null, false, false);
-			break;
-		case FeatureAttribute.STRING:
-			attribute = new StringFeatureAttribute(feature, name, "", null, false, false);
-			break;
-		default:
-			return null;
+		final IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) {
+			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			if (attributeName == null) {
+				attributeName = getUniqueAttributeName(attributeType, extendedFeature);
+			}
+			IFeatureAttribute attribute;
+			switch (attributeType) {
+			case FeatureAttribute.BOOLEAN:
+				attribute = new BooleanFeatureAttribute(extendedFeature, attributeName, "", null, false, false);
+				break;
+			case FeatureAttribute.DOUBLE:
+				attribute = new DoubleFeatureAttribute(extendedFeature, attributeName, "", null, false, false);
+				break;
+			case FeatureAttribute.LONG:
+				attribute = new LongFeatureAttribute(extendedFeature, attributeName, "", null, false, false);
+				break;
+			case FeatureAttribute.STRING:
+				attribute = new StringFeatureAttribute(extendedFeature, attributeName, "", null, false, false);
+				break;
+			default:
+				return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
+			}
+			extendedFeature.addAttribute(attribute);
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
 		}
-		feature.addAttribute(attribute);
-		return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature);
+		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
 	private String getUniqueAttributeName(String type, IExtendedFeature feature) {
@@ -104,8 +115,13 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 	}
 
 	private FeatureIDEEvent removeAttribute(IFeatureModel featureModel) {
-		final IExtendedFeature feature = (IExtendedFeature) featureModel.getFeature(featureName);
-		feature.removeAttribute(attribute);
-		return new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, feature);
+		final IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) {
+			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			final IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
+			extendedFeature.removeAttribute(attribute);
+			return new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
+		}
+		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 }

@@ -1,5 +1,6 @@
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
 import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
@@ -11,9 +12,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractConfigur
 
 public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfigurationOperation {
 
-	private D value;
+	/**
+	 * The name of the feature containing the attribute to be modified.
+	 */
+	private final String featureName;
+	/**
+	 * The name of the attribute to be modified.
+	 */
+	private final String attributeName;
 
-	private IFeatureAttribute att;
+	private D value;
 
 	private Object oldValue;
 
@@ -21,18 +29,20 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 
 	public ChangeConfigurableAttributeValueOperation(ConfigurationManager configurationManager, IFeatureAttribute att, D value) {
 		super(configurationManager, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED.toString());
-		this.att = att;
+		featureName = att.getFeature().getName();
+		attributeName = att.getName();
 		this.value = value;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(Configuration config) {
 		ExtendedConfiguration extConfig = (ExtendedConfiguration) config;
-		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(att.getFeature());
+		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(featureName);
+		IFeatureAttribute att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
 		firstOverwrite = selectableFeat.hasAttributeWithConfiguredValue(att);
 		oldValue = selectableFeat.getAttributeValue(att);
 		if (value != null) {
-			selectableFeat.addConfigurableAttribute(att.getName(), value.toString());
+			selectableFeat.addConfigurableAttribute(attributeName, value.toString());
 		} else {
 			selectableFeat.removeConfigurableAttribute(att);
 		}
@@ -42,12 +52,13 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	@Override
 	protected FeatureIDEEvent inverseOperation(Configuration config) {
 		ExtendedConfiguration extConfig = (ExtendedConfiguration) config;
-		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(att.getFeature());
+		ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(featureName);
+		IFeatureAttribute att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
 		// Case: switch back to default value from model
 		if (firstOverwrite) {
 			selectableFeat.removeConfigurableAttribute(att);
 		} else {
-			selectableFeat.addConfigurableAttribute(att.getName(), oldValue.toString());
+			selectableFeat.addConfigurableAttribute(attributeName, oldValue.toString());
 		}
 		return new FeatureIDEEvent(selectableFeat, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED, value != null ? value.toString() : null, oldValue);
 	}
@@ -56,5 +67,4 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	protected int getChangeIndicator() {
 		return ConfigurationManager.CHANGE_CONFIGURABLE_ATTRIBUTE;
 	}
-
 }
