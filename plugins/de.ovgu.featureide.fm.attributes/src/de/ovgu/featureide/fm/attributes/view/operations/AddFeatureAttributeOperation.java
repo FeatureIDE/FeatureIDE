@@ -58,10 +58,6 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		return featureModelManager.processObject(this::addAttribute, FeatureModelManager.CHANGE_ATTRIBUTES);
-	}
-
-	private FeatureIDEEvent addAttribute(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
 		if (feature instanceof IExtendedFeature) {
 			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
@@ -111,10 +107,6 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		return featureModelManager.processObject(this::removeAttribute, FeatureModelManager.CHANGE_ATTRIBUTES);
-	}
-
-	private FeatureIDEEvent removeAttribute(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
 		if (feature instanceof IExtendedFeature) {
 			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
@@ -123,5 +115,10 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 			return new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
+	}
+
+	@Override
+	protected int getChangeIndicator() {
+		return FeatureModelManager.CHANGE_ATTRIBUTES;
 	}
 }
