@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -29,4 +31,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public interface MultipleAnomaliesExplanationCreator extends FeatureModelExplanationCreator<IFeatureModel, MultipleAnomaliesExplanation> {
 
+	/**
+	 * Configures the anomaly types to find explanations for.
+	 *
+	 * @param featureStatuses - {@link FeatureStatus}[]
+	 * @param constraintStatuses - {@link ConstraintStatus}[]
+	 */
+	void setAnomalyTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses);
 }

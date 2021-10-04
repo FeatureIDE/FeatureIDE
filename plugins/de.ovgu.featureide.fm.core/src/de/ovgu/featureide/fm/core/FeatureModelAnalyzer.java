@@ -858,6 +858,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 		analysesCollection.redundantConstraintExplanations.put(constraint, creator.getExplanation());
 	}
 
+	public void setMultipleAnomalyExplanationTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses) {
+		analysesCollection.setMultipleAnomaliesExplanation(null);
+		analysesCollection.multipleAnomaliesExplanationCreator.setAnomalyTypes(featureStatuses, constraintStatuses);
+	}
+
 	/**
 	 * Returns an combined explanation for all feature model anomalies.
 	 *

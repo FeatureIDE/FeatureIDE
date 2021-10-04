@@ -138,7 +138,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnAllAnomaliesAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnAllExplanationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnDeadFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnFalseOptionalFeaturesAction;
@@ -224,10 +223,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * This action focuses on features in any anomaly.
 	 */
 	private FocusOnAllAnomaliesAction focusOnAllAnomaliesAction;
-	/**
-	 * This action focuses on all explanations for the feature model.
-	 */
-	private FocusOnAllExplanationsAction focusOnAllExplanationsAction;
 
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
@@ -326,13 +321,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
 		showCollapsedConstraintsAction = addAction(new ShowCollapsedConstraintsAction(viewer, graphicalFeatureModel));
 
-		// Focus on Explanations/Anomalies actions
+		// Focus on Anomalies & Explanations actions
 		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
-		focusOnDeadFeaturesAction = addAction(new FocusOnDeadFeaturesAction(getGraphicalFeatureModel()));
-		focusOnFalseOptionalFeaturesAction = addAction(new FocusOnFalseOptionalFeaturesAction(getGraphicalFeatureModel()));
-		focusOnRedundantConstraintAction = addAction(new FocusOnRedundantConstraintsAction(getGraphicalFeatureModel()));
-		focusOnAllAnomaliesAction = addAction(new FocusOnAllAnomaliesAction(getGraphicalFeatureModel()));
-		focusOnAllExplanationsAction = addAction(new FocusOnAllExplanationsAction(viewer));
+		focusOnDeadFeaturesAction = addAction(new FocusOnDeadFeaturesAction(viewer));
+		focusOnFalseOptionalFeaturesAction = addAction(new FocusOnFalseOptionalFeaturesAction(viewer));
+		focusOnRedundantConstraintAction = addAction(new FocusOnRedundantConstraintsAction(viewer));
+		focusOnAllAnomaliesAction = addAction(new FocusOnAllAnomaliesAction(viewer));
 
 		// Feature property actions
 		mandatoryAction = addAction(new MandatoryAction(viewer, featureModelManager));
@@ -1278,11 +1272,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				// All anomalies/explanations at once
+				// All anomalies at once
 				manager.add(focusOnAllAnomaliesAction);
-				manager.add(focusOnAllExplanationsAction);
 				// Single anomaly types
-				manager.add(new Separator());
 				manager.add(focusOnDeadFeaturesAction);
 				manager.add(focusOnFalseOptionalFeaturesAction);
 				manager.add(focusOnRedundantConstraintAction);

@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import de.ovgu.featureide.fm.core.localization.StringTable;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnAnomaliesOperation;
 
 /**
@@ -33,8 +33,8 @@ public class FocusOnDeadFeaturesAction extends FocusOnAnomaliesAction {
 
 	public static final String ID = "de.ovgu.featureide.collapseallbutdead";
 
-	public FocusOnDeadFeaturesAction(IGraphicalFeatureModel fm) {
-		super(fm, StringTable.FOCUS_ON_DEAD_FEATURES);
+	public FocusOnDeadFeaturesAction(FeatureDiagramViewer viewer) {
+		super(viewer, StringTable.FOCUS_ON_DEAD_FEATURES);
 	}
 
 	/*

@@ -20,46 +20,78 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.gef.EditPart;
 import org.eclipse.jface.action.Action;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnAnomaliesOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanationOperation;
 
 /**
- * The {@link FocusOnAnomaliesAction} collapses all features but those affected by a given feature model anomaly type.
+ * The {@link FocusOnAnomaliesAction} collapses all features but those affected by a given feature model anomaly type. It also produces the combined
+ * {@link MultipleAnomaliesExplanation} for the affected features.
  *
  * @author Benedikt Jutz
  */
 public abstract class FocusOnAnomaliesAction extends Action {
 
 	/**
-	 * <code>fm</code> stores the graphical feature model whose features we expand or collapse.
+	 * <code>viewer</code> contains the diagram viewer with the graphical feature model whose features we expand or collapse.
+	 */
+	protected final FeatureDiagramViewer viewer;
+	/**
+	 * <code>fm</code> contains the actual graphical model.
 	 */
 	protected final IGraphicalFeatureModel fm;
 
 	/**
 	 * Creates a new {@link FocusOnAnomaliesAction}
 	 *
-	 * @param fm - {@link IGraphicalFeatureModel}
+	 * @param viewer - {@link FeatureDiagramViewer}
 	 * @param name - {@link String}
 	 */
-	protected FocusOnAnomaliesAction(IGraphicalFeatureModel fm, String name) {
+	protected FocusOnAnomaliesAction(FeatureDiagramViewer viewer, String name) {
 		super(name);
-		this.fm = fm;
+		this.viewer = viewer;
+		fm = viewer.getGraphicalFeatureModel();
 	}
 
 	/**
-	 * Executes the appropriate {@link FocusOnAnomaliesOperation}, then redraws the feature diagram.
+	 * Executes the appropriate {@link FocusOnAnomaliesOperation} to focus on the correct features, then gets the necessary explanations and focuses on the
+	 * feature model root to show them.
 	 *
 	 * @see {@link Action#run}
 	 */
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(getAnomalyFocusOperation());
+		// First focus on the anomalous features...
+		final FocusOnAnomaliesOperation anomalyFocusOperation = getAnomalyFocusOperation();
+		FeatureModelOperationWrapper.run(anomalyFocusOperation);
 		fm.getFeatureModelManager().getVarObject().fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
+
+		// ... then get an explanation from them. Configure the anomaly types to get explanations for before that.
+		final IFeatureModel featureModel = fm.getFeatureModelManager().getVarObject();
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
+		analyzer.setMultipleAnomalyExplanationTypes(anomalyFocusOperation.featureAnomalies, anomalyFocusOperation.constraintAnomalies);
+		final MultipleAnomaliesExplanation explanation = analyzer.addMultipleAnomaliesExplanation();
+		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(fm, explanation));
+
+		// Select the graphical root feature.
+		final IFeature root = featureModel.getStructure().getRoot().getFeature();
+		final FeatureEditPart rootPart = (FeatureEditPart) viewer.getEditPartRegistry().get(fm.getGraphicalFeature(root));
+		viewer.getSelectionManager().deselectAll();
+		rootPart.setSelected(EditPart.SELECTED_PRIMARY);
+		viewer.getSelectionManager().appendSelection(rootPart);
 	}
 
 	/**

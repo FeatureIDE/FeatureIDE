@@ -55,7 +55,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	/**
 	 * <code>featureAnomalies</code> stores the possible status types of features to focus on.
 	 */
-	private final FeatureStatus[] featureAnomalies;
+	public final FeatureStatus[] featureAnomalies;
 	/**
 	 * <code>noAnomalies</code> stores the status types of features that should be ignored.
 	 */
@@ -63,7 +63,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	/**
 	 * <code>constraintAnomalies</code> stores the possible constraint anomalies. We want to focus on the features involved with these constraints.
 	 */
-	private final ConstraintStatus[] constraintAnomalies;
+	public final ConstraintStatus[] constraintAnomalies;
 
 	/**
 	 * Returns a new operation to focus on dead constraints.

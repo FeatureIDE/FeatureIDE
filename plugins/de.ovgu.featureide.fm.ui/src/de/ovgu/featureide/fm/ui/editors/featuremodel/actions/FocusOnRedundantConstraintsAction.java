@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import de.ovgu.featureide.fm.core.localization.StringTable;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnAnomaliesOperation;
 
 /**
@@ -33,8 +33,8 @@ public class FocusOnRedundantConstraintsAction extends FocusOnAnomaliesAction {
 
 	public static final String ID = "de.ovgu.featureide.collapseallbutredundant";
 
-	public FocusOnRedundantConstraintsAction(IGraphicalFeatureModel fm) {
-		super(fm, StringTable.FOCUS_ON_REDUNDANT_CONSTRAINTS);
+	public FocusOnRedundantConstraintsAction(FeatureDiagramViewer viewer) {
+		super(viewer, StringTable.FOCUS_ON_REDUNDANT_CONSTRAINTS);
 	}
 
 	/*

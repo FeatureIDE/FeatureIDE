@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.composite;
 
 import java.util.Collection;
 
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
@@ -42,5 +44,16 @@ public class CompositeMultipleAnomaliesExplanationCreator
 	 */
 	public CompositeMultipleAnomaliesExplanationCreator(Collection<MultipleAnomaliesExplanationCreator> composites) {
 		super(composites);
+	}
+
+	/**
+	 * Sets the anomaly types of the other creators.
+	 *
+	 * @see de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator#setAnomalyTypes(de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus[],
+	 *      de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus[])
+	 */
+	@Override
+	public void setAnomalyTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses) {
+		getComposites().forEach(creator -> creator.setAnomalyTypes(featureStatuses, constraintStatuses));
 	}
 }

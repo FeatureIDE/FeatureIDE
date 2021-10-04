@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.fm;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Node;
@@ -60,6 +61,14 @@ public class MultipleAnomaliesExplanation extends FeatureModelExplanation<IFeatu
 		super(subject);
 		this.singleExplanations = singleExplanations;
 		this.singleExplanations.forEach(exp -> exp.getReasonCounts().keySet().forEach(reason -> addReason(reason)));
+	}
+
+	/**
+	 * Adds all subjects for each explanation in <code>singleExplanation</code>.
+	 */
+	@Override
+	protected void addSubjects(final Set<IFeatureModelElement> affectedElements) {
+		singleExplanations.forEach(explanation -> explanation.addSubjects(affectedElements));
 	}
 
 	/*

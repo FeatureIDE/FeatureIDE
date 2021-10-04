@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.prop4j.explain.solvers.SatSolverFactory;
@@ -34,19 +35,27 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
- * {@link MusMultipleAnomaliesExplanationCreator} creates combined {@link MultipleAnomaliesExplanation}s with all anomaly types.
+ * {@link MusMultipleAnomaliesExplanationCreator} creates combined {@link MultipleAnomaliesExplanation}s for all previously calculated anomalies.
  *
  * @author Benedikt Jutz
  */
 public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExplanationCreator<IFeatureModel, MultipleAnomaliesExplanation>
 		implements MultipleAnomaliesExplanationCreator {
+
+	/**
+	 * <code>featureStatuses</code> contains the single feature anomaly types to find explanations for.
+	 */
+	private final EnumSet<FeatureStatus> featureStatuses = EnumSet.noneOf(FeatureStatus.class);
+	/**
+	 * <code>constraintStatuses</code> contains the constraint anomaly types to find explanations for.
+	 */
+	private final EnumSet<ConstraintStatus> constraintStatuses = EnumSet.noneOf(ConstraintStatus.class);
 
 	/**
 	 * Creates a new {@link MusMultipleAnomaliesExplanationCreator} with the given <code>satSolverFactory</code>.
@@ -57,10 +66,22 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 		super(solverFactory);
 	}
 
+	@Override
+	public void setAnomalyTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses) {
+		this.featureStatuses.clear();
+		this.constraintStatuses.clear();
+		for (final FeatureStatus fs : featureStatuses) {
+			this.featureStatuses.add(fs);
+		}
+		for (final ConstraintStatus cs : constraintStatuses) {
+			this.constraintStatuses.add(cs);
+		}
+	}
+
 	/**
-	 * Creates dead, false-optional and redundancy explanations, then combines them to a single one and returns it.
+	 * Looks up current dead, false-optional and redundancy explanations, then combines them to a single one and returns it.
 	 *
-	 * @see de de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator#getExplanation()
+	 * @see de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator#getExplanation()
 	 */
 	@Override
 	public MultipleAnomaliesExplanation getExplanation() throws IllegalStateException {
@@ -68,31 +89,31 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 		final Collection<IFeature> features = featureModel.getFeatures();
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
 
-		// List explanations to combine.
-		final List<FeatureModelExplanation<? extends IFeatureModelElement>> exps = new ArrayList<>((2 * features.size()) + featureModel.getConstraintCount());
+		// List explanations to combine. Calculate their maximum number, then query what statuses we are looking for.
+		final List<FeatureModelExplanation<? extends IFeatureModelElement>> exps =
+			new ArrayList<>((featureStatuses.size() * features.size()) + (constraintStatuses.size() * featureModel.getConstraintCount()));
+		final boolean lookForDeadFeatures = featureStatuses.contains(FeatureStatus.DEAD);
+		final boolean lookForFalseOptionalFeatures = featureStatuses.contains(FeatureStatus.FALSE_OPTIONAL);
+		final boolean lookForRedundantConstraints = constraintStatuses.contains(ConstraintStatus.REDUNDANT);
 
-		// If automatic calculations are disabled, manually calculate all anomaly types.
-		final boolean automaticCalculationsEnabled = FeatureModelProperty.isRunCalculationAutomatically(featureModel);
-		if (!automaticCalculationsEnabled || !FeatureModelProperty.isCalculateFeatures(featureModel)) {
-			analyzer.annotateFeatures(FeatureStatus.DEAD, null);
-			analyzer.annotateFeatures(FeatureStatus.FALSE_OPTIONAL, null);
-		}
-		if (!automaticCalculationsEnabled || !FeatureModelProperty.isCalculateConstraints(featureModel)) {
-			analyzer.annotateConstraints(ConstraintStatus.REDUNDANT, null);
-		}
-
-		for (final IFeature feature : features) {
-			final FeatureProperties properties = analyzer.getFeatureProperties(feature);
-			if (properties.hasStatus(FeatureStatus.DEAD)) {
-				exps.add(analyzer.getDeadFeatureExplanation(featureModel, feature));
-			}
-			if (properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-				exps.add(analyzer.getFalseOptionalFeatureExplanation(featureModel, feature));
+		// Find explanations for dead and/or false-optional features, if desired by the user.
+		if (lookForDeadFeatures || lookForFalseOptionalFeatures) {
+			for (final IFeature feature : features) {
+				final FeatureProperties properties = analyzer.getFeatureProperties(feature);
+				if (lookForDeadFeatures && properties.hasStatus(FeatureStatus.DEAD)) {
+					exps.add(analyzer.getDeadFeatureExplanation(featureModel, feature));
+				}
+				if (lookForFalseOptionalFeatures && properties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+					exps.add(analyzer.getFalseOptionalFeatureExplanation(featureModel, feature));
+				}
 			}
 		}
-		for (final IConstraint constraint : featureModel.getConstraints()) {
-			if (analyzer.getConstraintProperties(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
-				exps.add(analyzer.getRedundantConstraintExplanation(featureModel, constraint));
+		// Find explanations for redundant constraints, if desired by the user.
+		if (lookForRedundantConstraints) {
+			for (final IConstraint constraint : featureModel.getConstraints()) {
+				if (analyzer.getConstraintProperties(constraint).hasStatus(ConstraintStatus.REDUNDANT)) {
+					exps.add(analyzer.getRedundantConstraintExplanation(featureModel, constraint));
+				}
 			}
 		}
 
