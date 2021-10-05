@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
@@ -74,17 +75,25 @@ public abstract class FocusOnAnomaliesAction extends Action {
 	 */
 	@Override
 	public void run() {
+		final IFeatureModel featureModel = fm.getFeatureModelManager().getVarObject();
 		// First focus on the anomalous features...
 		final FocusOnAnomaliesOperation anomalyFocusOperation = getAnomalyFocusOperation();
+		final boolean hasAnomalies = anomalyFocusOperation.findAnomalousElements();
 		FeatureModelOperationWrapper.run(anomalyFocusOperation);
-		fm.getFeatureModelManager().getVarObject().fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
 
 		// ... then get an explanation from them. Configure the anomaly types to get explanations for before that.
-		final IFeatureModel featureModel = fm.getFeatureModelManager().getVarObject();
+		// Also don't create explanations if no anomalies exist, and handle void feature models.
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
-		analyzer.setMultipleAnomalyExplanationTypes(anomalyFocusOperation.featureAnomalies, anomalyFocusOperation.constraintAnomalies);
-		final MultipleAnomaliesExplanation explanation = analyzer.addMultipleAnomaliesExplanation();
-		FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(fm, explanation));
+		if (hasAnomalies) {
+			analyzer.setMultipleAnomalyExplanationTypes(anomalyFocusOperation.featureAnomalies, anomalyFocusOperation.constraintAnomalies);
+			final FeatureModelExplanation explanation;
+			if (analyzer.isValid(null)) {
+				explanation = analyzer.getMultipleAnomaliesExplanation();
+			} else {
+				explanation = analyzer.getVoidFeatureModelExplanation();
+			}
+			FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(fm, explanation));
+		}
 
 		// Select the graphical root feature.
 		final IFeature root = featureModel.getStructure().getRoot().getFeature();
@@ -92,6 +101,7 @@ public abstract class FocusOnAnomaliesAction extends Action {
 		viewer.getSelectionManager().deselectAll();
 		rootPart.setSelected(EditPart.SELECTED_PRIMARY);
 		viewer.getSelectionManager().appendSelection(rootPart);
+		fm.getFeatureModelManager().getVarObject().fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
 	}
 
 	/**

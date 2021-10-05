@@ -109,7 +109,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 */
 	public boolean isValid(IMonitor<Boolean> monitor) {
 		final Boolean result = analysesCollection.validAnalysis.getResult(monitor);
-		return result == null ? false : result;
+		if (result == null) {
+			return false;
+		}
+		if (!result) {
+			getFeatureModelProperties().setStatus(FeatureModelStatus.VOID);
+		}
+		return result;
 	}
 
 	public List<IFeature> getCoreFeatures(IMonitor<LiteralSet> monitor) {
@@ -869,7 +875,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @return a {@link MultipleAnomaliesExplanation} for <code>featureModel</code>, or null if none can be found.
 	 */
 	public MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
-		return analysesCollection.getMultipleAnomaliesExplanation();
+		return addMultipleAnomaliesExplanation();
 	}
 
 	/**

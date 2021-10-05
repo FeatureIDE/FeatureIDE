@@ -83,6 +83,7 @@ import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -502,8 +503,17 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(null);
 			return;
 		}
+
+		// Retrieve a void feature model explanation, if it exists (either automatic calculations are enabled, or they are disabled, and the result previously
+		// calculated).
+		final boolean autoCalculateFeatures =
+			FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject()) && FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject());
 		final FeatureModelAnalyzer analyzer = getFeatureModel().getVariableFormula().getAnalyzer();
-		setActiveExplanation(analyzer.isValid(null) ? analyzer.getExplanation(primary.getModel().getObject()) : analyzer.getVoidFeatureModelExplanation());
+		if ((autoCalculateFeatures && !analyzer.isValid(null)) || analyzer.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
+			setActiveExplanation(analyzer.getVoidFeatureModelExplanation());
+		} else {
+			setActiveExplanation(analyzer.getExplanation(primary.getModel().getObject()));
+		}
 	}
 
 	/**

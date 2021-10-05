@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -64,6 +65,10 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	 * <code>constraintAnomalies</code> stores the possible constraint anomalies. We want to focus on the features involved with these constraints.
 	 */
 	public final ConstraintStatus[] constraintAnomalies;
+	/**
+	 * <code>expandedFeatures</code> stores the features to expand or collapse.
+	 */
+	private Map<IGraphicalFeature, Boolean> expandedFeatures;
 
 	/**
 	 * Returns a new operation to focus on dead constraints.
@@ -129,17 +134,38 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 	}
 
 	/**
-	 * Looks up all features that are involved in at least one anomaly; then collapses their successors.
+	 * Calls <code>findAnomalousObjects</code> if required to expand all anomalous features, then returns <code>expandedFeatures</code>.
 	 *
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractCollapseOperation#createTargets()
 	 */
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
+		if (expandedFeatures == null) {
+			findAnomalousElements();
+		}
+		return expandedFeatures;
+	}
+
+	/**
+	 * Looks up all features that are involved in at least one anomaly; then collapses their successors. The results are stored in
+	 * <code>featuresToCollapse</code>. <br> If no features are involved in an anomaly, the collapsed selection remains the same. If the model is invalid
+	 * instead, all features are collapsed.
+	 *
+	 * @return {@link Boolean} - <code>true</code> iff at least one feature is involved in an anomaly.
+	 */
+	public boolean findAnomalousElements() {
 		// Test if automatic calculations are enabled for this feature model (both features and constraints).
 		final IFeatureModel model = graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getFeatureModel();
 		final boolean automaticCalculations = FeatureModelProperty.isRunCalculationAutomatically(model);
 		final boolean featureCalculations = automaticCalculations && FeatureModelProperty.isCalculateFeatures(model);
 		final int numFeatures = graphicalFeatureModel.getAllFeatures().size();
+
+		// Test if the feature model is void, when required. Collapse all features then.
+		if (!automaticCalculations && analyzer.hasDeadFeatures(Collections.singletonList(model.getStructure().getRoot().getFeature()))) {
+			expandedFeatures = new HashMap<>(numFeatures);
+			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, true));
+			return true;
+		}
 
 		// Collect all features that have at least one wanted anomaly type, and no unwanted one.
 		// If required, manually annotate features.
@@ -176,8 +202,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 			anomalousConstraints.forEach(constraint -> featuresToFocus.addAll(constraint.getContainedFeatures()));
 		}
 
-		// Should the feature model be free of the requested anomalies, do not change anything.
-		final Map<IGraphicalFeature, Boolean> expandedFeatures = new HashMap<>(numFeatures);
+		expandedFeatures = new HashMap<>(numFeatures);
 		if (featuresToFocus.isEmpty()) {
 			graphicalFeatureModel.getAllFeatures().forEach(feature -> expandedFeatures.put(feature, feature.isCollapsed()));
 		}
@@ -187,7 +212,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 			featuresToFocus.addAll(FeatureUtils.getParents(featuresToFocus));
 			featuresToFocus.forEach(feature -> expandedFeatures.put(graphicalFeatureModel.getGraphicalFeature(feature), false));
 		}
-		return expandedFeatures;
+		return !featuresToFocus.isEmpty();
 	}
 
 	/**
