@@ -36,8 +36,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -181,7 +183,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-		ERROR, WARNING, INFO, NONE
+			ERROR, WARNING, INFO, NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -418,6 +420,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private String initialConstraint;
 	private Group featureGroup;
 	private Group descriptionGroup;
+	private Group tagGroup;
 	private StyledText searchFeatureText;
 	private final SashForm sashForm;
 	private Text constraintDescriptionText;
@@ -474,20 +477,31 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 	};
 
+	/**
+	 * Create a new {@link ConstraintDialog} for the feature model managed by <code>featureModelManager</code>. <br> <br> <code>constraint</code> may either be
+	 * null, in which case this dialog creates a new constraint, or be an existing constraint the user wants to edit.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param constraint - {@link IConstraint}
+	 */
 	public ConstraintDialog(final IFeatureModelManager featureModelManager, final IConstraint constraint) {
 		this.featureModelManager = featureModelManager;
 		featureNamesList = FeatureUtils.getFeatureNamesList(featureModelManager.getSnapshot());
 		this.constraint = constraint;
 
 		final String constraintDescriptionText;
+		final Set<String> constraintTags;
+
 		if (constraint == null) {
 			constraintDescriptionText = "";
+			constraintTags = new HashSet<>();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
 			initialConstraint = "";
 			mode = Mode.CREATE;
 		} else {
 			constraintDescriptionText = constraint.getDescription();
+			constraintTags = constraint.getTags();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
@@ -507,6 +521,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		initFeatureGroup();
 		initConstraintDescriptionText(constraintDescriptionText);
+		initTagGroup(constraintTags);
 		initButtonGroup();
 		initConstraintText();
 		initBottom();
@@ -547,10 +562,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * closes the shell and adds new constraint to the feature model if possible
-	 *
-	 * @param featureModelManager
-	 * @param constraint
+	 * Closes the shell and adds new constraint to the feature model respectively updates the existing constraint, if possible.
 	 */
 	private void closeShell() {
 		final String input = constraintText.getText().trim();
@@ -733,7 +745,9 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * Initializes the text containing the descriptions.
+	 * Initializes the text field containing the description.
+	 *
+	 * @param description - {@link String}
 	 */
 	private void initConstraintDescriptionText(String description) {
 
@@ -750,6 +764,26 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintDescriptionText.setLayoutData(gridData);
 		constraintDescriptionText.setText(description);
 
+	}
+
+	/**
+	 * Initializes the group containing the tags.
+	 *
+	 * @param tags - {@link Set}
+	 */
+	private void initTagGroup(Set<String> tags) {
+		// Create the tag group, and configure its layout.
+		tagGroup = new Group(sashForm, SWT.NONE);
+		tagGroup.setText("Tags");
+
+		// Give an overview of the constraint's current tags in <code>tags</code>.
+		// Add an button that allows the deletion of existing tags.
+
+		// Create a TextField below that allows the entry of new or existing tags.
+		final Text tagEntryText = new Text(tagGroup, SWT.SINGLE);
+		tagEntryText.setText("");
+
+		// Also create a drop-down menu for tags as there already exists for features.
 	}
 
 	/**
