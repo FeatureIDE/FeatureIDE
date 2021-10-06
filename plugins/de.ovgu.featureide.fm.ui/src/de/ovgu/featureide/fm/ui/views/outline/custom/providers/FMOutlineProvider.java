@@ -44,15 +44,14 @@ import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
@@ -240,24 +239,14 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 	@Override
 	public void handleExpandAll(PropertyChangeEvent event) {
 		if (syncCollapsedStateAction.isChecked()) {
-			final IFeatureModel featureModel = featureModelManager.getSnapshot();
-			for (final IFeature f : featureModel.getFeatures()) {
-				graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(false);
-			}
-			featureModelManager.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+			FeatureModelOperationWrapper.run(new CollapseAllOperation(graphicalFeatureModel, false));
 		}
 	}
 
 	@Override
 	public void handleCollapseAll(PropertyChangeEvent event) {
 		if (syncCollapsedStateAction.isChecked()) {
-			final IFeatureModel featureModel = featureModelManager.getSnapshot();
-			for (final IFeature f : featureModel.getFeatures()) {
-				if (!f.getStructure().isRoot()) {
-					graphicalFeatureModel.getGraphicalFeature(f).setCollapsed(true);
-				}
-			}
-			featureModelManager.fireEvent(new FeatureIDEEvent(featureModel.getFeatures().iterator(), EventType.FEATURE_COLLAPSED_ALL_CHANGED));
+			FeatureModelOperationWrapper.run(new CollapseAllOperation(graphicalFeatureModel, true));
 		}
 	}
 
