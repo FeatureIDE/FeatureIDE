@@ -42,8 +42,12 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.jface.databinding.viewers.IViewerUpdater;
+import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -60,6 +64,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -117,6 +123,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Sebastian Krieter
  */
 public class ConstraintDialog implements GUIDefaults {
+
+	/**
+	 *
+	 */
+	private static final String ENTER_A_NEW_OR_EXISTING_TAG_NAME = "enter a new or existing tag name";
 
 	/**
 	 * Data class
@@ -420,7 +431,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private String initialConstraint;
 	private Group featureGroup;
 	private Group descriptionGroup;
-	private Group tagGroup;
+
 	private StyledText searchFeatureText;
 	private final SashForm sashForm;
 	private Text constraintDescriptionText;
@@ -478,6 +489,15 @@ public class ConstraintDialog implements GUIDefaults {
 	};
 
 	/**
+	 * <code>tagGroup</code> holds the elements for the constraint tags section.
+	 */
+	private Group tagGroup;
+	/**
+	 * <code>tagEntryText</code> contains a text field to enter new tag names.
+	 */
+	private StyledText tagEntryText;
+
+	/**
 	 * Create a new {@link ConstraintDialog} for the feature model managed by <code>featureModelManager</code>. <br> <br> <code>constraint</code> may either be
 	 * null, in which case this dialog creates a new constraint, or be an existing constraint the user wants to edit.
 	 *
@@ -531,7 +551,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.open();
 
 		update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
-		// Only create validator when autmated analyses are enabled
+		// Only use validator when automated constraint analyses are enabled.
 		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateConstraints(featureModelManager.getVarObject())) {
@@ -578,6 +598,45 @@ public class ConstraintDialog implements GUIDefaults {
 		FeatureModelOperationWrapper.run(op);
 
 		shell.dispose();
+	}
+
+	/**
+	 * Creates a {@link StyledText} field that displays <code>defaultText</code> when unselected for the given <code>parent</code> composite.
+	 *
+	 * @param defaultText - {@link String}
+	 * @param parent - {@link Composite}
+	 * @return new {@link StyledText}
+	 */
+	private StyledText createTextField(String defaultText, Composite parent) {
+		final StyledText text = new StyledText(parent, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		text.setText(defaultText);
+		text.setMargins(3, 5, 3, 5);
+		text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		text.addListener(SWT.FocusOut, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (text.getText().isEmpty()) {
+					text.setText(defaultText);
+					text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+
+				}
+
+			}
+		});
+		text.addListener(SWT.FocusIn, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (defaultText.equals(text.getText())) {
+					text.setText("");
+				}
+				text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+			}
+
+		});
+		return text;
 	}
 
 	/**
@@ -775,15 +834,64 @@ public class ConstraintDialog implements GUIDefaults {
 		// Create the tag group, and configure its layout.
 		tagGroup = new Group(sashForm, SWT.NONE);
 		tagGroup.setText("Tags");
+		tagGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		final GridLayout tagGroupLayout = new GridLayout(2, false);
+		tagGroup.setLayout(tagGroupLayout);
 
-		// Give an overview of the constraint's current tags in <code>tags</code>.
-		// Add an button that allows the deletion of existing tags.
-
-		// Create a TextField below that allows the entry of new or existing tags.
-		final Text tagEntryText = new Text(tagGroup, SWT.SINGLE);
-		tagEntryText.setText("");
+		// Configure tagEntryText.
+		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagGroup);
 
 		// Also create a drop-down menu for tags as there already exists for features.
+
+		// Give an overview of the constraint's current tags in <code>tags</code>.
+		final Composite tableComposite = new Composite(tagGroup, SWT.NONE);
+		tableComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
+		final TableViewer tagTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		final Table tagTable = tagTableViewer.getTable();
+		final ObservableSetContentProvider<String> provider = new ObservableSetContentProvider<>(new IViewerUpdater<String>() {
+
+			@Override
+			public void insert(String element, int position) {}
+
+			@Override
+			public void remove(String element, int position) {}
+
+			@Override
+			public void replace(String oldElement, String newElement, int position) {}
+
+			@Override
+			public void move(String element, int oldPosition, int newPosition) {}
+
+			@Override
+			public void add(String[] elements) {}
+
+			@Override
+			public void remove(String[] elements) {}
+		});
+
+		tagTableViewer.setContentProvider(provider);
+		final IObservableSet<String> observableTags = new WritableSet<>(tags, String.class);
+		tagTableViewer.setInput(observableTags);
+
+		// Add an button that allows the addition of existing tags.
+		final Button addTagButton = new Button(tagGroup, SWT.NONE);
+		addTagButton.setText("Add Tag");
+		// When pressing addTagButton, add the new tag to tags.
+		addTagButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				final String newTagText = tagEntryText.getText();
+				if (!newTagText.isEmpty() && !newTagText.equals(ENTER_A_NEW_OR_EXISTING_TAG_NAME)) {
+					final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
+					newTagSet.add(newTagText);
+					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
+					observableTags.add(newTagText);
+					tagEntryText.setText(ENTER_A_NEW_OR_EXISTING_TAG_NAME);
+				}
+			}
+		});
 	}
 
 	/**
@@ -802,12 +910,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		featureGroup.setLayout(featureGroupLayout);
 
-		searchFeatureText = new StyledText(featureGroup, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		searchFeatureText.setText(FILTERTEXT);
-		searchFeatureText.setMargins(3, 5, 3, 5);
-		searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		searchFeatureText.setLayoutData(gridData);
+		searchFeatureText = createTextField(FILTERTEXT, featureGroup);
 
 		final Composite tableComposite = new Composite(featureGroup, SWT.NONE);
 		gridData = new GridData(SWT.FILL, 200, true, true);
@@ -856,30 +959,6 @@ public class ConstraintDialog implements GUIDefaults {
 					featureTableViewer.addFilter(searchFilter);
 
 				}
-			}
-
-		});
-
-		searchFeatureText.addListener(SWT.FocusOut, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (searchFeatureText.getText().isEmpty()) {
-					searchFeatureText.setText(FILTERTEXT);
-					searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-
-				}
-
-			}
-		});
-		searchFeatureText.addListener(SWT.FocusIn, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (FILTERTEXT.equals(searchFeatureText.getText())) {
-					searchFeatureText.setText("");
-				}
-				searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			}
 
 		});
