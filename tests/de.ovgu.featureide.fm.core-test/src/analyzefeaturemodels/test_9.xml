@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<calculations key="tautology" value="true"/>
+		<calculations key="auto" value="true"/>
+		<graphics key="legendposition" value="732,52"/>
+		<graphics key="legendautolayout" value="false"/>
+		<calculations key="redundant" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<calculations key="constraints" value="true"/>
+		<graphics key="layoutalgorithm" value="1"/>
+		<calculations key="features" value="true"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Root">
+			<alt name="Parent">
+				<feature name="A"/>
+				<feature name="B"/>
+			</alt>
+			<feature name="Why Dead"/>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<eq>
+				<conj>
+					<disj>
+						<var>A</var>
+						<var>B</var>
+					</disj>
+					<disj>
+						<var>A</var>
+						<var>B</var>
+					</disj>
+				</conj>
+				<var>Why Dead</var>
+			</eq>
+		</rule>
+	</constraints>
+</featureModel>
