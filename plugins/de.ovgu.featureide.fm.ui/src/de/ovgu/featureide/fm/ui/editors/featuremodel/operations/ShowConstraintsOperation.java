@@ -41,6 +41,7 @@ public class ShowConstraintsOperation extends AbstractGraphicalFeatureModelOpera
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		graphicalFeatureModel.setConstraintsHidden(!graphicalFeatureModel.getConstraintsHidden());
+		graphicalFeatureModel.getLayout().showConstraints(graphicalFeatureModel.getConstraintsHidden());
 		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_LAYOUT_CHANGED);
 	}
 

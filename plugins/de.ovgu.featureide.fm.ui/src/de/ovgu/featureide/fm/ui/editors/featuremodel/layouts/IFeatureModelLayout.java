@@ -26,6 +26,10 @@ public interface IFeatureModelLayout {
 
 	public boolean hasLegendAutoLayout();
 
+	public boolean showConstraints();
+
+	public void showConstraints(boolean b);
+
 	public boolean showCollapsedConstraints();
 
 	public void showCollapsedConstraints(boolean b);
