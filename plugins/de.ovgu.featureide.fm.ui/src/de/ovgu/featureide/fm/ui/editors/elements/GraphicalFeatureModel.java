@@ -387,7 +387,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		getLayout().showCollapsedConstraints(colapsedConstraints != null ? colapsedConstraints : true);
 
 		final Boolean showConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_CONSTRAINTS);
-		setConstraintsHidden(showConstraints);
+		setConstraintsHidden(showConstraints != null ? showConstraints : false);
 
 		final Boolean legendHidden = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_HIDDEN);
 		setLegendHidden(legendHidden != null ? legendHidden : false);
