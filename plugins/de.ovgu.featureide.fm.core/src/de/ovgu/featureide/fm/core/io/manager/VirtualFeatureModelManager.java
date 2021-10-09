@@ -81,9 +81,7 @@ public class VirtualFeatureModelManager extends VirtualManager<IFeatureModel> im
 	}
 
 	@Override
-	public void informImports(FeatureIDEEvent e) {
-		// TODO
-	}
+	public void informImports(FeatureIDEEvent e) {}
 
 	/**
 	 * @see de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager#getReferencingFeatureModels()

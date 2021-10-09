@@ -154,7 +154,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
 			fmManager.removeListener(diagramEditor);
-			// TODO de-register from imported feature models; also de-register all importers.
+
+			// Deregister all importers.
 			final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
 				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
@@ -741,7 +742,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 	}
 
 	@Override
-	public MultiFeatureModel getFeatureModel() {
+	public MultiFeatureModel getMultiFeatureModel() {
 		final IFeatureModel fm = fmManager.getVarObject();
 		if ((fm != null) && (fm instanceof MultiFeatureModel)) {
 			return (MultiFeatureModel) fm;

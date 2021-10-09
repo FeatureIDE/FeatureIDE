@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -159,11 +160,13 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 			for (final MultiFeatureModel referencingModel : featureModelManager.getReferencingFeatureModels()) {
 				final String modelAlias = referencingModel.getReference(eclipseRelativePath);
 				// Translate the feature names as they appear in referencingModel.
-				final Collection<String> referencedFeatureNames = featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).toList();
+				final Collection<String> referencedFeatureNames =
+					featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).collect(Collectors.toList());
 
 				// Finally, find the selected feature names in imported constraints of the referer.
 				for (final IConstraint constraint : referencingModel.getOwnConstraints()) {
-					final Collection<String> constraintFeatureNames = constraint.getContainedFeatures().stream().map(con -> con.getName()).toList();
+					final Collection<String> constraintFeatureNames =
+						constraint.getContainedFeatures().stream().map(con -> con.getName()).collect(Collectors.toList());
 					featuresInOtherModelConstraints =
 						featuresInOtherModelConstraints || referencedFeatureNames.stream().anyMatch(name -> constraintFeatureNames.contains(name));
 				}

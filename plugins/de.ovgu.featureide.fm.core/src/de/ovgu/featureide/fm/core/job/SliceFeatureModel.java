@@ -99,13 +99,6 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
 		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
-		for (final IConstraint c : featureModel.getConstraints()) {
-			for (final String feat : c.getNode().getContainedFeatures()) {
-				if (!removeFeatures.contains(feat)) {
-					removeFeatures.add(feat);
-				}
-			}
-		}
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}

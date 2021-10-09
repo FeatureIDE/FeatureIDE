@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1009,7 +1011,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Activate the new active explanation.
 			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
-				// Notify each element affected by the new active explanation of its new ative reasons.
+				// Notify each element affected by the new active explanation of its new active reasons.
 				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
@@ -1176,7 +1178,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_ADD:
-			// Index variable.
 			int index;
 			// The previous parent of an added feature.
 			IFeature originalParent;
@@ -1521,10 +1522,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @see {@link FeatureDiagramEditor#isConstraintMenu(IStructuredSelection)}
 	 */
 	private boolean allowDeletionOrEditing(IStructuredSelection selection) {
-		final List<ConstraintEditPart> editParts =
-			selection.toList().stream().filter(obj -> (obj instanceof ConstraintEditPart)).map(obj -> (ConstraintEditPart) obj).toList();
-		final List<MultiConstraint> multiConstraints =
-			editParts.stream().map(editPart -> editPart.getModel()).map(graphicalConstraint -> (MultiConstraint) graphicalConstraint.getObject()).toList();
+		final Stream<ConstraintEditPart> editPartStream =
+			selection.toList().stream().filter(obj -> (obj instanceof ConstraintEditPart)).map(obj -> (ConstraintEditPart) obj);
+		final List<ConstraintEditPart> editParts = editPartStream.collect(Collectors.toList());
+		final List<MultiConstraint> multiConstraints = editParts.stream().map(editPart -> editPart.getModel())
+				.map(graphicalConstraint -> (MultiConstraint) graphicalConstraint.getObject()).collect(Collectors.toList());
 		for (final MultiConstraint constraint : multiConstraints) {
 			if (constraint.isFromExtern()) {
 				return false;

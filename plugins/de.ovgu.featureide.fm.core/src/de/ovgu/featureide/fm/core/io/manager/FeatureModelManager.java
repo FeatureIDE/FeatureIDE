@@ -26,12 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -226,7 +221,7 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	@Override
 	public Collection<MultiFeatureModel> getReferencingFeatureModels() {
-		return importers.stream().map(importer -> importer.getFeatureModel()).distinct().toList();
+		return importers.stream().map(importer -> importer.getMultiFeatureModel()).distinct().collect(Collectors.toList());
 	}
 
 	/**

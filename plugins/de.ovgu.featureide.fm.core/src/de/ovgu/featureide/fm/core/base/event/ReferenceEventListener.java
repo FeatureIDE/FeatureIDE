@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
  * {@link ReferenceEventListener} provides an extension to {@link IEventListener} that allows direct access to a {@link MultiFeatureModel} it manages. This
  * might be useful for propagating updates that occur in a referenced model, for example.
  *
+ * @author Kevin Jedelhauser
  * @author Benedikt Jutz
  */
 public interface ReferenceEventListener extends IEventListener {
@@ -35,5 +36,5 @@ public interface ReferenceEventListener extends IEventListener {
 	 *
 	 * @return {@link MultiFeatureModel}
 	 */
-	MultiFeatureModel getFeatureModel();
+	MultiFeatureModel getMultiFeatureModel();
 }

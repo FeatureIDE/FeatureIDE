@@ -603,7 +603,7 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
 
-		okButton = new Button(lastComposite, SWT.NONE | SWT.PUSH);
+		okButton = new Button(lastComposite, SWT.NONE);
 		autoSetOkButtonText();
 		final FormData formDataOk = new FormData();
 		formDataOk.width = 130;

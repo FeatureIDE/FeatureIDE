@@ -6,13 +6,6 @@ Bundle-Version: 3.7.2.qualifier
 Fragment-Host: de.ovgu.featureide.fm.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.swtbot.eclipse.finder,
- org.eclipse.swtbot.junit4_x,
- org.hamcrest.library,
- org.apache.log4j,
- org.junit,
- org.eclipse.swtbot.eclipse.gef.finder;bundle-version="3.0.0"
+Require-Bundle: org.junit
 Automatic-Module-Name: de.ovgu.featureide.fm.ui-test
 Import-Package: de.ovgu.featureide.fm.core.base
