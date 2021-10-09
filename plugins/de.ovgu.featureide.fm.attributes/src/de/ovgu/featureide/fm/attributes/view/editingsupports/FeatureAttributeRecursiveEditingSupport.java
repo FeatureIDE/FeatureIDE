@@ -29,10 +29,11 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeRecursiveOperation;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the recursive column of the {@link FeatureAttributeView}. The boolean value of the column is shown as checkbox.
@@ -74,20 +75,15 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	@Override
 	protected void setValue(Object element, Object value) {
 		IFeatureAttribute attribute = (IFeatureAttribute) element;
+		IFeature feature = attribute.getFeature();
 		Boolean newRecursive = (Boolean) value;
-		attribute.setRecursive(newRecursive);
-		IFeature feat = attribute.getFeature();
-		if (newRecursive) {
-			if (!isNameUnique(attribute, feat)) {
-				MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
-				attribute.setRecursive(false);
-				return;
-			}
-			attribute.recurseAttribute(feat);
-		} else {
-			attribute.deleteRecursiveAttributes(feat);
+
+		if (newRecursive && !isNameUnique(attribute, feature)) {
+			MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
+			return;
 		}
-		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+
+		FeatureModelOperationWrapper.run(new ChangeAttributeRecursiveOperation((IFeatureModelManager) view.getManager(), attribute, newRecursive));
 	}
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
