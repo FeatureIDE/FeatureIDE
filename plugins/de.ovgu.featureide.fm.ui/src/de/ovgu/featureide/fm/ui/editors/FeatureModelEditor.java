@@ -27,13 +27,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
-import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IOperationHistoryListener;
@@ -156,10 +153,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 			fmManager.removeListener(diagramEditor);
 
 			// Deregister all importers.
-			final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
 				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-				final List<Path> importPaths = getImportPaths(path, mfm);
+				final List<Path> importPaths = mfm.getImportPaths();
 				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).removeImportListener(this));
 			}
 
@@ -578,8 +574,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 
 			// Register for imported feature models here.
 			if (fmManager.getObject() instanceof MultiFeatureModel) {
-				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-				final List<Path> importPaths = getImportPaths(path, mfm);
+				final MultiFeatureModel mfm = getMultiFeatureModel();
+				final List<Path> importPaths = mfm.getImportPaths();
 				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).addImportListener(this));
 			}
 
@@ -596,28 +592,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 		}
 		setTitleToolTip(input.getToolTipText());
 		notifyFMEditorOpened();
-	}
-
-	/**
-	 * Returns a list of paths that correspond to files that the {@link MultiFeatureModel} <code>mfm</code> imports. These paths are relative to
-	 * <code>path</code>, i.e. the project root path in which the file for <code>mfm</code> is stored.
-	 *
-	 * @param path - {@link Path}
-	 * @param mfm - {@link MultiFeatureModel}
-	 * @return new {@link List}
-	 */
-	public static List<Path> getImportPaths(final Path path, final MultiFeatureModel mfm) {
-		final List<Path> importPaths = new ArrayList<>(mfm.getImports().size());
-
-		for (String importPathString : mfm.getImports()) {
-			importPathString = importPathString.replace("\\", ".");
-			final String[] paths = path.toString().split(Pattern.quote(File.separator));
-			paths[paths.length - 1] = "";
-			String s = String.join(File.separator, paths);
-			s += importPathString;
-			importPaths.add(FileSystems.getDefault().getPath(s));
-		}
-		return importPaths;
 	}
 
 	private void createModelFileMarkers(ProblemList warnings) {

@@ -20,13 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
@@ -41,7 +45,6 @@ import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Adds attributes and attribute constraints to a feature model.
@@ -58,6 +61,7 @@ public class MultiFeatureModel extends FeatureModel {
 		private final int type;
 
 		private String prefix;
+		private Path systemPath;
 
 		public UsedModel(UsedModel usedModel, String parentName) {
 			modelName = usedModel.modelName;
@@ -91,9 +95,17 @@ public class MultiFeatureModel extends FeatureModel {
 			this.prefix = prefix;
 		}
 
+		public Path getSystemPath() {
+			return systemPath;
+		}
+
+		public void setSystemPath(Path systemPath) {
+			this.systemPath = systemPath;
+		}
+
 		@Override
 		public String toString() {
-			return modelName + " " + varName;
+			return modelName + " " + varName + " [Path: " + systemPath + "]";
 		}
 	}
 
@@ -236,26 +248,6 @@ public class MultiFeatureModel extends FeatureModel {
 
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
-	}
-
-	/**
-	 * Tests if the given path has a reference as a model this composed model uses. If so, returns the alias of this path.
-	 *
-	 * @param path - {@link IPath} - A project-relative Eclipse path.
-	 * @return {@link String}
-	 */
-	public String getReference(IPath path) {
-		// Convert the project-relative path to a model reference.
-		String modelString = path.removeTrailingSeparator().toString();
-		modelString = modelString.split("\\.")[0];
-		modelString = modelString.replace('/', '.');
-
-		for (final Entry<String, UsedModel> entry : usedModels.entrySet()) {
-			if (entry.getValue().modelName.equals(modelString)) {
-				return entry.getKey();
-			}
-		}
-		return null;
 	}
 
 	public List<Equation> getAttributConstraints() {
@@ -409,6 +401,55 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	/**
+	 * Returns a list of paths that correspond to files that this {@link MultiFeatureModel} imports. These paths are relative to getSourceFile(), i.e. the
+	 * project root path in which the file for this model is stored. <br> Also assigns model paths to the used models.
+	 *
+	 * @param path - {@link Path}
+	 * @return new {@link List}
+	 */
+	public List<Path> getImportPaths() {
+		// Separate the path string, and cut off the file ending. for the absolute directory path.
+		final String[] pathStringParts = getSourceFile().toString().split(Pattern.quote(File.separator));
+		pathStringParts[pathStringParts.length - 1] = "";
+		final String directoryString = String.join(File.separator, pathStringParts);
+
+		// Create the import paths like this:
+		final List<Path> importPaths = new ArrayList<>(getImports().size());
+		for (String importString : getImports()) {
+			// Construct the model name from the import string by converting "\" and "/" to ".", then cutting of the file ending.
+			final String[] modelNameParts = importString.replace("\\", ".").replace("/", ".").split("\\.");
+			modelNameParts[modelNameParts.length - 1] = "";
+			String modelName = String.join(".", modelNameParts);
+			modelName = modelName.substring(0, modelName.length() - 1);
+
+			// Turn the import string into a relative path, and cut off the file part again.
+			importString = importString.replace("\\", ".");
+			final String[] importStringParts = importString.split(Pattern.quote(File.separator));
+			importStringParts[importStringParts.length - 1] = "";
+			final String importDirectoryString = String.join(File.separator, importStringParts);
+
+			// Remove the shared suffix, and add the relative import string for the actual path.
+			String importPathString = directoryString;
+			if (directoryString.endsWith(importDirectoryString)) {
+				importPathString = importPathString.substring(0, importPathString.length() - importDirectoryString.length());
+			}
+			importPathString += importString;
+			// Construct the Java path, and add it to the path list.
+			final Path importPath = FileSystems.getDefault().getPath(importPathString);
+			importPaths.add(importPath);
+
+			// Map the model name to the import path.
+			for (final UsedModel model : usedModels.values()) {
+				if (model.modelName.equals(modelName)) {
+					model.setSystemPath(importPath);
+					break;
+				}
+			}
+		}
+		return importPaths;
+	}
+
+	/**
 	 * Extracts the model alias (key of a {@link UsedModel}) for an {@link MultiFeatureModel} that this model imports. This imported model is either stored
 	 * directly in <code>event.source</code>, or can be found in the {@link IFeatureModelElement}
 	 *
@@ -429,19 +470,36 @@ public class MultiFeatureModel extends FeatureModel {
 			return "";
 		}
 
-		final Path originalPath = originalModel.getSourceFile();
-		// Original Path -> remove the first segment for the project, then the file extension.
-		final String originalPathString =
-			FeatureModelManager.getProjectRelativePath(originalPath.toFile()).removeFirstSegments(1).removeFileExtension().toString();
-		final String importedModelName = originalPathString.replace("/", ".");
+		// Look up the model alias by the path of the source model.
+		final Path importedModelPath = originalModel.getSourceFile();
 		String modelAlias = null;
 		for (final Entry<String, UsedModel> entry : getExternalModels().entrySet()) {
-			if (entry.getValue().getModelName().equals(importedModelName)) {
+			if (entry.getValue().getSystemPath().equals(importedModelPath)) {
 				modelAlias = entry.getKey() + ".";
 				break;
 			}
 		}
 		return modelAlias;
+	}
+
+	/**
+	 * Tests if the given path has a reference as a model this composed model uses. If so, returns the alias of this path.
+	 *
+	 * @param path - {@link IPath} - A project-relative Eclipse path.
+	 * @return {@link String}
+	 */
+	public String getReference(IPath path) {
+		// Convert the project-relative path to a model reference.
+		String modelString = path.removeTrailingSeparator().toString();
+		modelString = modelString.split("\\.")[0];
+		modelString = modelString.replace('/', '.');
+
+		for (final Entry<String, UsedModel> entry : usedModels.entrySet()) {
+			if (entry.getValue().modelName.equals(modelString)) {
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 
 	/**
