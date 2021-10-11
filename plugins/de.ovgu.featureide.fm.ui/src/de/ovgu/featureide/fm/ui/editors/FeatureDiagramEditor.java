@@ -152,7 +152,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
@@ -325,7 +325,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		calculationActions.add(addAction(new AutomatedCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 		calculationActions.add(addAction(new RunManualCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(graphicalFeatureModel.getFeatureModelManager())));
-		calculationActions.add(addAction(new ConstrainsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new ConstraintsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 
 		// Zoom actions
 		zoomIn = addAction(new ZoomInAction(viewer.getZoomManager()));
@@ -927,7 +927,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_COLLAPSED_CHANGED:
-			// Reload editpart to notify the diagramm that the IGraphicalModel has changed
+			// Reload edit part to notify the diagram that the IGraphicalFeatureModel has changed
 			viewer.reload();
 			if (event.getNewValue() == null) {
 				final IFeature selectedFeature = (IFeature) source;
