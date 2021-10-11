@@ -890,6 +890,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			graphicalFeatureModel.writeValues();
 			viewer.setLayout();
 			viewer.reload();
+			setDirty();
 			break;
 		case REDRAW_DIAGRAM:
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
