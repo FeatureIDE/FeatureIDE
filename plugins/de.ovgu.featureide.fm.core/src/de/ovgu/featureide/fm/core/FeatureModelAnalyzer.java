@@ -422,6 +422,15 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 	}
 
+	/**
+	 * Annotates the constraints in <code>constraints</code> with <code>status</code>, which might either {@link ConstraintStatus#REDUNDANT} or
+	 * {@link ConstraintStatus#TAUTOLOGY} (as redundant constraints or tautologies). This triggers a constraint analysis using the given <code>monitor</code>.
+	 * For any other status, this method returns an empty list.
+	 *
+	 * @param status - {@link ConstraintStatus}
+	 * @param monitor - {@link IMonitor} <code>monitor</code> may also be null, in which case a {@link NullMonitor} is used.
+	 * @return new {@link Collection}
+	 */
 	public Collection<IConstraint> annotateConstraints(ConstraintStatus status, IMonitor<Boolean> monitor) {
 		if (monitor == null) {
 			monitor = new NullMonitor<>();

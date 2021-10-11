@@ -84,23 +84,31 @@ public abstract class FocusOnAnomaliesAction extends Action {
 		// ... then get an explanation from them. Configure the anomaly types to get explanations for before that.
 		// Also don't create explanations if no anomalies exist, and handle void feature models.
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getInstance(featureModel).getVariableFormula().getAnalyzer();
+		// The subject of explanation is either an IFeatureModel or IFeature, who only share the IEventManager type. It is pointless to parameterize explanation
+		// in this context.
+		@SuppressWarnings("rawtypes")
+		final FeatureModelExplanation explanation;
 		if (hasAnomalies) {
 			analyzer.setMultipleAnomalyExplanationTypes(anomalyFocusOperation.featureAnomalies, anomalyFocusOperation.constraintAnomalies);
-			final FeatureModelExplanation explanation;
 			if (analyzer.isValid(null)) {
 				explanation = analyzer.getMultipleAnomaliesExplanation();
 			} else {
 				explanation = analyzer.getVoidFeatureModelExplanation();
 			}
 			FeatureModelOperationWrapper.run(new FocusOnExplanationOperation(fm, explanation));
+		} else {
+			explanation = null;
 		}
 
-		// Select the graphical root feature.
-		final IFeature root = featureModel.getStructure().getRoot().getFeature();
-		final FeatureEditPart rootPart = (FeatureEditPart) viewer.getEditPartRegistry().get(fm.getGraphicalFeature(root));
-		viewer.getSelectionManager().deselectAll();
-		rootPart.setSelected(EditPart.SELECTED_PRIMARY);
-		viewer.getSelectionManager().appendSelection(rootPart);
+		// Should an explanation exist, it belongs to the root feature, so we need to select it.
+		if (explanation != null) {
+			final IFeature root = featureModel.getStructure().getRoot().getFeature();
+			final FeatureEditPart rootPart = (FeatureEditPart) viewer.getEditPartRegistry().get(fm.getGraphicalFeature(root));
+			viewer.getSelectionManager().deselectAll();
+			rootPart.setSelected(EditPart.SELECTED_PRIMARY);
+			viewer.getSelectionManager().appendSelection(rootPart);
+		}
+		// Finally, request a redraw of the the feature diagram, thus updating the layout and shown anomalies.
 		fm.getFeatureModelManager().getVarObject().fireEvent(FeatureIDEEvent.getDefault(EventType.REDRAW_DIAGRAM));
 	}
 

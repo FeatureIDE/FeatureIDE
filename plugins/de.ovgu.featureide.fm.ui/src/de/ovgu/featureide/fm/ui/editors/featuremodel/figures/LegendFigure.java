@@ -219,9 +219,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 
-		// TODO account for manual calculations
-		// skip when automated analyses are deactivated
-
 		final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
 		final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
 

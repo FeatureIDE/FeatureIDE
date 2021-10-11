@@ -54,7 +54,10 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	protected String getAttributeString() {
-		return "anomalies";
+		if (getExplanation().getSingleExplanations().size() != 1) {
+			return "anomalies";
+		}
+		return "anomaly";
 	}
 
 	/**
@@ -72,7 +75,7 @@ public class MultipleAnomaliesExplanationWriter extends FeatureModelExplanationW
 	 */
 	@Override
 	public String getCircumstanceString() {
-		return String.format("%s has the following %s:", getSubjectString(), getAttributeString());
+		return String.format("%s contains the following %s:", getSubjectString(), getAttributeString());
 	}
 
 	/**

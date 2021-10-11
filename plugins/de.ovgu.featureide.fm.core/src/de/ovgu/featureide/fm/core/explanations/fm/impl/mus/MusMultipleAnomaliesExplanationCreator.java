@@ -117,6 +117,10 @@ public class MusMultipleAnomaliesExplanationCreator extends MusFeatureModelExpla
 			}
 		}
 
+		// Only return an explanation if there actually exist anomalies.
+		if (exps.isEmpty()) {
+			return null;
+		}
 		return new MultipleAnomaliesExplanation(featureModel, exps);
 	}
 
