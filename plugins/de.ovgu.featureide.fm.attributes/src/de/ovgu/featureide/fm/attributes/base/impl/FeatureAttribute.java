@@ -84,6 +84,26 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.configureable = configureable;
 	}
 
+	/**
+	 * Copy constructor. Constructs a new <code>FeatureAttribute</code> instance from the given attribute and the new corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The feature to contain this attribute
+	 */
+	protected FeatureAttribute(FeatureAttribute oldAttribute, IFeature feature) {
+		this.feature = feature;
+		name = oldAttribute.name;
+		unit = oldAttribute.unit;
+		recursive = oldAttribute.recursive;
+		configureable = oldAttribute.configureable;
+		attributeType = oldAttribute.attributeType;
+
+		savedRecursiveValues = new HashMap<>(oldAttribute.savedRecursiveValues.size());
+		for (Map.Entry<IExtendedFeature, Object> e : oldAttribute.savedRecursiveValues.entrySet()) {
+			savedRecursiveValues.put(e.getKey(), e.getValue());
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getName()

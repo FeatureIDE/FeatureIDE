@@ -50,6 +50,11 @@ public class LongFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.LONG;
 	}
 
+	public LongFeatureAttribute(LongFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public Long getValue() {
 		return value;
@@ -75,7 +80,7 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new LongFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new LongFeatureAttribute(this, feature);
 	}
 
 	/**

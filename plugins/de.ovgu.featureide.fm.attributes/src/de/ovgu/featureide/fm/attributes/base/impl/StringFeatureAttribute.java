@@ -50,6 +50,11 @@ public class StringFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.STRING;
 	}
 
+	public StringFeatureAttribute(StringFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public String getValue() {
 		return value;
@@ -73,7 +78,7 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new StringFeatureAttribute(this, feature);
 	}
 
 	/**

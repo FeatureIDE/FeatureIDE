@@ -50,6 +50,11 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.DOUBLE;
 	}
 
+	public DoubleFeatureAttribute(DoubleFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public Double getValue() {
 		return value;
@@ -75,7 +80,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new DoubleFeatureAttribute(this, feature);
 	}
 
 	/**
