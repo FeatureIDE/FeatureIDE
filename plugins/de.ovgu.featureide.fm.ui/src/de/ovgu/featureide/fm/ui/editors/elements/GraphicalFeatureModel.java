@@ -39,7 +39,9 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -273,29 +275,30 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	/**
-	 * Creates HashMaps containing GraphicalConstraints and GraphicalFeatures for the given FeatureModel
+	 * Creates two {@link HashMap}s containing {@link GraphicalConstraint}s and {@link GraphicalFeature}s for the given {@link FeatureModel}.
 	 *
 	 * @param featureModel FeatureModel from which to get Features and Constraints
 	 * @return Pair of two HashMaps. First HashMap contains Features and their corresponding GraphicalFeatures. Second HashMap contains Constraints and their
 	 *         corresponding GraphicalConstraints.
 	 */
 	private Pair<Map<IFeature, IGraphicalFeature>, Map<IConstraint, IGraphicalConstraint>> initFeaturesAndConstraints(IFeatureModel featureModel) {
-		Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<>();
-		Map<IFeature, IGraphicalFeature> features = new HashMap<>();
+		Map<IConstraint, IGraphicalConstraint> newConstraints = new HashMap<>();
+		Map<IFeature, IGraphicalFeature> newFeatures = new HashMap<>();
 
 		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
-			constraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
+			newConstraints = new HashMap<>((int) (featureModel.getConstraintCount() * 1.5));
 			for (final IConstraint constraint : featureModel.getConstraints()) {
-				constraints.put(constraint, new GraphicalConstraint(constraint, this));
+				newConstraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
 
-			features = new HashMap<>((int) (featureModel.getNumberOfFeatures() * 1.5));
+			// Re-create graphical features.
+			newFeatures = new HashMap<>((int) (featureModel.getNumberOfFeatures() * 1.5));
 			for (final IFeature feature : featureModel.getVisibleFeatures()) {
-				features.put(feature, new GraphicalFeature(feature, this));
+				newFeatures.put(feature, new GraphicalFeature(feature, this));
 			}
 		}
-		return new Pair<>(features, constraints);
+		return new Pair<>(newFeatures, newConstraints);
 	}
 
 	@Override
@@ -364,6 +367,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	private static final String TYPE_GRAPHICS = "graphics";
 
+	/**
+	 * Reads additional values and configures this {@link GraphicalFeatureModel}: <ol> <li>Configure the model layout.</li> <li>Show short names for
+	 * {@link MultiFeatureModel}s, when so configured.</li> <li>Hide collapsed constraints, when so configured.</li> <li>Hide the legend, when so configured,
+	 * and layout it.</li> <li>Collapse any features marked as collapsed.</li> <li>If the feature model uses manual layout, manually set the position of all
+	 * features, constraints and the legend.</li> </ol>
+	 */
 	@Override
 	public void readValues() {
 		final IFeatureModel fm = featureModelManager.getSnapshot();
@@ -380,21 +389,24 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			getLayout().setVerticalLayout(false);
 		}
 
+		// Configure short names
 		final Boolean shortNames = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_SHORT_NAMES);
 		getLayout().setShowShortNames(shortNames != null ? shortNames : false);
 
-		final Boolean colapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
-		getLayout().showCollapsedConstraints(colapsedConstraints != null ? colapsedConstraints : true);
+		// Configure collapsing of constraints
+		final Boolean collapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
+		getLayout().showCollapsedConstraints(collapsedConstraints != null ? collapsedConstraints : true);
 
 		final Boolean autoLayoutConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, AUTO_LAYOUT_CONSTRAINTS);
 		getLayout().setAutoLayoutConstraints((autoLayoutConstraints != null ? autoLayoutConstraints : false));
 
+		// Configure whether to show the legend
 		final Boolean legendHidden = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_HIDDEN);
 		setLegendHidden(legendHidden != null ? legendHidden : false);
 
+		// Configure whether to auto-layout the legend. Should we use manual layouting for the legend, position it accordlingly.
 		final Boolean legendAutoLayout = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_AUTO_LAYOUT);
 		getLayout().setLegendAutoLayout(legendAutoLayout != null ? legendAutoLayout : true);
-
 		if (!getLayout().hasLegendAutoLayout()) {
 			final Point legendPos = new Point();
 			final int[] coordinates = convertCoordinatesString(fm.getProperty().get(LEGEND_POSITION, TYPE_GRAPHICS, "0,0"), 2);
@@ -431,6 +443,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 				}
 			}
 		}
+
+		// Manually layout constraints, if required.
 		for (final IGraphicalConstraint constr : getConstraints()) {
 			final IConstraint constraint = constr.getObject();
 			if (constraint != null) {

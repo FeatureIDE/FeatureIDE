@@ -474,7 +474,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowRedundantConst(int row) {
-		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
+		createSymbol(row, REDUNDANT, false, REDUNDANT_TOOLTIP);
 		final Label labelIndetHidden = createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}

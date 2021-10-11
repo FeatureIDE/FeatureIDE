@@ -660,20 +660,22 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		} else if (event.getEventType() == EventType.STRUCTURE_CHANGED) {
 			if (event.getSource() instanceof GraphicalFeature) {
 				GraphicalFeature graphFeat = (GraphicalFeature) event.getSource();
-				IExtendedFeature feat = (IExtendedFeature) graphFeat.getObject();
-				for (IFeatureAttribute att : feat.getAttributes()) {
-					if (att.isRecursive() && !((IExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
-						feat.removeAttribute(att);
-					}
-				}
-				for (IFeatureAttribute att : ((IExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
-					if (att.isRecursive()) {
-						if (!feat.isContainingAttribute(att)) {
-							feat.addAttribute(att.cloneRecursive(feat));
+				if (graphFeat.getObject() instanceof IExtendedFeature) {
+					IExtendedFeature feat = (IExtendedFeature) graphFeat.getObject();
+					for (IFeatureAttribute att : feat.getAttributes()) {
+						if (att.isRecursive() && !((IExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
+							feat.removeAttribute(att);
 						}
 					}
+					for (IFeatureAttribute att : ((IExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
+						if (att.isRecursive()) {
+							if (!feat.isContainingAttribute(att)) {
+								feat.addAttribute(att.cloneRecursive(feat));
+							}
+						}
+					}
+					treeViewer.refresh();
 				}
-				treeViewer.refresh();
 			}
 		} else if (event.getEventType() == EventType.FEATURE_COLOR_CHANGED) {
 			treeViewer.refresh();
