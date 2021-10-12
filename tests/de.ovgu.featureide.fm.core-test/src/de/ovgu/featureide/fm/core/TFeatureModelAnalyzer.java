@@ -130,7 +130,6 @@ public class TFeatureModelAnalyzer {
 		FM8_DATA = FeatureModelManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
 		FM9_DATA = FeatureModelManager.getAnalyzer(FM_test_9).analyzeFeatureModel(null);
 		FM10_DATA = FeatureModelManager.getAnalyzer(FM_test_10).analyzeFeatureModel(null);
-
 	}
 
 	@Test
@@ -317,4 +316,5 @@ public class TFeatureModelAnalyzer {
 	public void TDeadFeatures_FM10() {
 		assertTrue(!FM10_DATA.getFeatureModelProperties().hasDeadFeatures());
 	}
+
 }

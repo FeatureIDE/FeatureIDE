@@ -77,7 +77,7 @@ public class Or extends Node implements Cloneable {
 		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausifyCNF(simplify);
 		}
-		return this;
+		return simplifyNode();
 	}
 
 	@Override
@@ -116,7 +116,10 @@ public class Or extends Node implements Cloneable {
 	@Override
 	public Node simplify() {
 		super.simplify();
+		return simplifyNode();
+	}
 
+	private Node simplifyNode() {
 		int count = children.length;
 		boolean canBeSimplified = false;
 		for (final Node child : children) {
