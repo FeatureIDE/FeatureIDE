@@ -360,6 +360,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	private static final String LAYOUT = "layout";
 	private static final String POSITION = "position";
 	private static final String COLLAPSED = "collapsed";
+	private static final String AUTO_LAYOUT_CONSTRAINTS = "autolayoutconstraints";
 
 	private static final String VALUE_VERTICAL = "vertical";
 	private static final String VALUE_HORIZONTAL = "horizontal";
@@ -396,6 +397,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		// Configure collapsing of constraints
 		final Boolean collapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
 		getLayout().showCollapsedConstraints(collapsedConstraints != null ? collapsedConstraints : true);
+
+		final Boolean autoLayoutConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, AUTO_LAYOUT_CONSTRAINTS);
+		getLayout().setAutoLayoutConstraints((autoLayoutConstraints != null ? autoLayoutConstraints : false));
 
 		// Configure whether to show the legend
 		final Boolean legendHidden = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, LEGEND_HIDDEN);
@@ -538,6 +542,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
 			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
+		}
+		if (getLayout().isAutoLayoutConstraints()) {
+			fm.getProperty().set(AUTO_LAYOUT_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		} else {
+			fm.getProperty().set(AUTO_LAYOUT_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 	}
 
