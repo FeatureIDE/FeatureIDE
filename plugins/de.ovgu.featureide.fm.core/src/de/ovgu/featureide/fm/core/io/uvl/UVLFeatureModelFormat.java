@@ -82,6 +82,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
+	private static final String MULTI_ROOT_PREFIX = "Abstract_";
 
 	private UVLModel rootModel;
 	protected ProblemList pl;
@@ -141,8 +142,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f, rootModel);
 		} else {
-			root = factory.createFeature(fm, "Root");
-			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
+			String rootName = MULTI_ROOT_PREFIX + 0;
+			for (int i = 1; rootModel.getAllFeatures().keySet().contains(rootName); i++) {
+				rootName = MULTI_ROOT_PREFIX + i;
+			}
+			root = factory.createFeature(fm, rootName);
+			root.getStructure().setAbstract(true);
+			root.getProperty().setImplicit(true);
+			fm.addFeature(root);
+			Arrays.stream(rootModel.getRootFeatures()).forEachOrdered(f -> parseFeature(fm, root, f, rootModel));
+			root.getStructure().getChildren().forEach(fs -> fs.setMandatory(true));
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
@@ -153,6 +162,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f, UVLModel submodel) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
+
+		boolean duplicateFeature = false;
+		// Add error in case of a duplicate feature name
+		if (fm.getFeatures().stream().anyMatch(feature -> feature.getName().equals(resolved.getName()))) {
+			pl.add(new Problem("Duplicate feature name " + resolved.getName(), 0, Severity.ERROR));
+			duplicateFeature = true;
+		}
 
 		// Validate imported feature
 		if ((root == null ? -1 : root.getName().lastIndexOf('.')) < resolved.getName().lastIndexOf('.')) {
@@ -190,7 +206,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
 
-		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		if (!duplicateFeature) { // Don't process groups for duplicate feature names, as this can cause infinite recursion
+			Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		}
 		parseAttributes(fm, feature, resolved);
 
 		return feature;
@@ -300,7 +318,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void checkReferenceValid(String name) {
-		if (fm.getFeature(name) == null) {
+		final IFeature f = fm.getFeature(name);
+		if ((f == null) || f.getProperty().isImplicit()) {
 			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0, Severity.ERROR));
 			throw new RuntimeException("Invalid reference");
 		}
@@ -341,7 +360,15 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			model.setImports(new Import[0]);
 		}
 		model.setNamespace(namespace);
-		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
+		final IFeatureStructure root = fm.getStructure().getRoot();
+		if (root.getFeature().getProperty().isImplicit() && root.isAnd() && root.hasChildren()
+			&& root.getChildren().stream().allMatch(IFeatureStructure::isMandatory) && root.getRelevantConstraints().isEmpty()) {
+			// Remove implicit root feature, use children as root features
+			model.setRootFeatures(root.getChildren().stream().map(child -> printFeature(child.getFeature())).toArray(Feature[]::new));
+		} else {
+			// Use single root feature
+			model.setRootFeatures(new Feature[] { printFeature(root.getFeature()) });
+		}
 		model.setConstraints(constraints.stream().map(this::printConstraint).toArray());
 		return model;
 	}

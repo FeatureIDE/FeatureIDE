@@ -490,6 +490,7 @@ public class StringTable {
 	public static final String TOOLTIP_HIDDEN = " hidden";
 	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
+	public static final String TOOLTIP_IMPLICIT = "(implicit) ";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228

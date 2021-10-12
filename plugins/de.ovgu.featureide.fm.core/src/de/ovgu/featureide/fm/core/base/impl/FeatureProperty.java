@@ -34,15 +34,18 @@ public class FeatureProperty implements IFeatureProperty {
 	protected final IFeature correspondingFeature;
 
 	protected String description;
+	protected boolean implicit;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 		description = oldProperty.description.toString();
+		implicit = oldProperty.implicit;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 		description = "";
+		implicit = false;
 	}
 
 	@Override
@@ -87,4 +90,13 @@ public class FeatureProperty implements IFeatureProperty {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
+	@Override
+	public boolean isImplicit() {
+		return implicit;
+	}
+
+	@Override
+	public void setImplicit(boolean implicit) {
+		this.implicit = implicit;
+	}
 }
