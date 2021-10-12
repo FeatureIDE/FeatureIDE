@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,8 +154,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private static final String NO_AUTOMATIC_EXPAND_TOOL_TIP = "Does Not Expand Automatically";
 	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
-
-	private static final String EXPAND_PREFERENCE = "configurationexpandpreference";
 
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
@@ -475,7 +472,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final IProject project = EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
 
-		final int index = store.getInt(EXPAND_PREFERENCE);
+		final int index = store.getInt(IConfigurationEditor.EXPAND_PREFERENCE);
 
 		final MenuItem defaultItem = menu.getItem(index);
 
@@ -623,14 +620,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (configurationEditor.getExpandAlgorithm() != algorithm) {
 					configurationEditor.setExpandAlgorithm(algorithm);
-					final int index = menu.indexOf(menuItem);
-					final IProject project =
-						EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
-					final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
-					store.setValue(EXPAND_PREFERENCE, index);
-					try {
-						store.save();
-					} catch (final IOException e1) {}
+					configurationEditor.saveExpansionAlgorithm();
 					if (useGroups) {
 						curGroup = 0;
 					}
@@ -819,14 +809,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * Manually expands the tree to show the next open clause.
 	 */
 	private void expandToOpenClause() {
-		switch (configurationEditor.getExpandAlgorithm()) {
-		case ALL_SELECTED_OPEN_CLAUSE:
+		if (configurationEditor.getExpandAlgorithm() == ExpandAlgorithm.ALL_SELECTED_OPEN_CLAUSE) {
 			levelExpand();
 			groupExpand(false);
-			break;
-		default:
+		} else {
 			groupExpand(true);
-			break;
 		}
 	}
 

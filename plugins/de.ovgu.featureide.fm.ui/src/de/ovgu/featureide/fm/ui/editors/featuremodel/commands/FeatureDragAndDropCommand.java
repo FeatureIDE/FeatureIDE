@@ -24,6 +24,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -107,8 +108,22 @@ public class FeatureDragAndDropCommand extends Command {
 			if (FeatureUIHelper.isAncestorOf(newParent, feature)) {
 				return false;
 			}
+
+			// no moving of feature from external submodel
+			if (isFeatureFromSubmodel(feature) && ((MultiFeature) feature.getObject().getStructure().getParent().getFeature()).isFromExtern()) {
+				return false;
+			}
+
+			// no moving under a feature from external submodel
+			if (isFeatureFromSubmodel(newParent)) {
+				return false;
+			}
 		}
 		return true;
+	}
+
+	private boolean isFeatureFromSubmodel(IGraphicalFeature feature) {
+		return (feature != null) && (feature.getObject() instanceof MultiFeature) && ((MultiFeature) feature.getObject()).isFromExtern();
 	}
 
 	@Override

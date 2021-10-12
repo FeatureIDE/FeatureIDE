@@ -31,11 +31,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
-public class ConstrainsCalculationsAction extends AFeatureModelAction {
+public class ConstraintsCalculationsAction extends AFeatureModelAction {
 
 	public static final String ID = "de.ovgu.featureide.constraintscalculations";
 
-	public ConstrainsCalculationsAction(IFeatureModelManager featureModelManager) {
+	public ConstraintsCalculationsAction(IFeatureModelManager featureModelManager) {
 		super(CALCULATE_CONSTRAINT_ERRORS, ID, featureModelManager);
 	}
 

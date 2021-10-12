@@ -43,6 +43,11 @@ public class HideFeatureOperation extends AbstractFeatureModelOperation {
 
 	private final String featureName;
 
+	/**
+	 * Whether the feature was implicit before the operation.
+	 */
+	private boolean implicitFeature = false;
+
 	public HideFeatureOperation(String featureName, IFeatureModelManager featureModelManager) {
 		super(featureModelManager, HIDE_OPERATION);
 		this.featureName = featureName;
@@ -51,14 +56,22 @@ public class HideFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
-		final IFeatureStructure structure = feature.getStructure();
-		structure.setHidden(!structure.isHidden());
-		return new FeatureModelOperationEvent(ID, EventType.FEATURE_HIDDEN_CHANGED, feature, null, null);
+		implicitFeature = feature.getProperty().isImplicit();
+		feature.getProperty().setImplicit(false);
+		return changeHidden(feature);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		return operation(featureModel);
+		final IFeature feature = featureModel.getFeature(featureName);
+		feature.getProperty().setImplicit(implicitFeature);
+		return changeHidden(feature);
+	}
+
+	private FeatureIDEEvent changeHidden(IFeature feature) {
+		final IFeatureStructure structure = feature.getStructure();
+		structure.setHidden(!structure.isHidden());
+		return new FeatureModelOperationEvent(ID, EventType.FEATURE_HIDDEN_CHANGED, feature, null, null);
 	}
 
 	@Override

@@ -490,6 +490,7 @@ public class StringTable {
 	public static final String TOOLTIP_HIDDEN = " hidden";
 	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
+	public static final String TOOLTIP_IMPLICIT = "(implicit) ";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
@@ -1148,4 +1149,5 @@ public class StringTable {
 	public static final String SHOW = "Show";
 	public static final String SHOW_ALL_LEVELS = "Show All Levels";
 	public static final String SHA_256_DIGEST_ALGORITHM = "SHA-256";
+	public static final String DELETE_SUBMODEL = "Delete Submodel";
 }

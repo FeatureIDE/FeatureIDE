@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * Responsible to load and save all information for a feature model instance.
+ * Responsible to load and save all information for a feature model configuration instance.
  *
  * @author Sebastian Krieter
  */
