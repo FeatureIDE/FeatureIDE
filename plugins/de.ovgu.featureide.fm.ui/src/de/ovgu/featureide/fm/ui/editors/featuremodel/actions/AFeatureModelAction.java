@@ -63,7 +63,7 @@ public abstract class AFeatureModelAction extends Action {
 		return Collections.emptyList();
 	}
 
-	private boolean isExternalFeature(IFeature feature) {
+	protected boolean isExternalFeature(IFeature feature) {
 		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
 	}
 
