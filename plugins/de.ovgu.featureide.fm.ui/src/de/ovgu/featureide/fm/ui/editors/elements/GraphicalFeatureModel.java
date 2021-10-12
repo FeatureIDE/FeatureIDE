@@ -383,6 +383,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		switch (fm.getProperty().get(LAYOUT, TYPE_GRAPHICS, VALUE_HORIZONTAL)) {
 		case VALUE_VERTICAL:
 			getLayout().setVerticalLayout(true);
+			break;
 		case VALUE_HORIZONTAL:
 		default:
 			getLayout().setVerticalLayout(false);

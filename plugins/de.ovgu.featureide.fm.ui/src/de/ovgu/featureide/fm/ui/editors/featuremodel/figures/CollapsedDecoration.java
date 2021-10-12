@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import org.abego.treelayout.Configuration;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
@@ -95,34 +96,27 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 			return;
 		}
 
-		super.setLocation(p.translate(-(getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
-
 		if (graphicalFeature != null) {
+			// Calculate layout direction
 			final FeatureModelLayout layout = graphicalFeature.getGraphicalModel().getLayout();
-			// set Collapse position for abego treeLayout
-			if (layout.isUsesAbegoTreeLayout()) {
-				switch (layout.getAbegoRootposition()) {
-				case Left:
-					super.setLocation(super.getLocation().translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
-							(-getBounds().height / 2) + 1));
-					break;
-				case Right:
-					super.setLocation(super.getLocation().translate((-getBounds().width / 2) - GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
-							(-getBounds().height / 2) + 1));
-					break;
-				case Bottom:
-					super.setLocation(super.getLocation().translate(0, (-getBounds().height) + 1));
-					break;
-				default:
-					// Same as default
-					break;
-				}
-			} else {
-				if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
-					// left to right layout
-					super.setLocation(super.getLocation().translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
-							(-getBounds().height / 2) + 1));
-				}
+			final Configuration.Location rootPosition = layout.isUsesAbegoTreeLayout() ? layout.getAbegoRootposition()
+				: (layout.hasVerticalLayout() ? Configuration.Location.Left : Configuration.Location.Top);
+
+			// Apply offset to center the decoration box along the appropriate edge of the graphical feature and take
+			// GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE into account
+			switch (rootPosition) {
+			case Top:
+				super.setLocation(p.translate(-getBounds().width / 2, GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+				break;
+			case Left:
+				super.setLocation(p.translate(GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
+				break;
+			case Right:
+				super.setLocation(p.translate(-getBounds().width - GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
+				break;
+			case Bottom:
+				super.setLocation(p.translate(-getBounds().width / 2, -getBounds().height - GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+				break;
 			}
 		}
 	}
