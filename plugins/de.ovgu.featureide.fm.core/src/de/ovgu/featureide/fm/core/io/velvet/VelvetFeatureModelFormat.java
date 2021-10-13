@@ -72,13 +72,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -1138,7 +1138,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 				return;
 			}
 
-			if (!extFeatureModel.addInheritance(parentModelName, parentModelName)) {
+			if (!extFeatureModel.addInheritance(parentModelName, parentModelName, null)) {
 				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
@@ -1197,7 +1197,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			final String varName = nameNode.getText();
 
 			if (checkInterfaceModelFile(idNode)) {
-				if (!extFeatureModel.addInterface(interfaceName, varName)) {
+				if (!extFeatureModel.addInterface(interfaceName, varName, null)) {
 					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
@@ -1214,7 +1214,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			final String varName = nameNode.getText();
 
 			if (checkExternalModelFile(idNode)) {
-				if (!extFeatureModel.addInstance(interfaceName, varName)) {
+				if (!extFeatureModel.addInstance(interfaceName, varName, null)) {
 					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}

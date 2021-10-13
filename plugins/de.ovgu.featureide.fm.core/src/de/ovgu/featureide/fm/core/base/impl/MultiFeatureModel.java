@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,6 +45,10 @@ public class MultiFeatureModel extends FeatureModel {
 
 		private final String modelName;
 		private final String varName;
+		/**
+		 * The absolute path of the used model.
+		 */
+		private final Path path;
 		private final int type;
 
 		private String prefix;
@@ -51,12 +56,14 @@ public class MultiFeatureModel extends FeatureModel {
 		public UsedModel(UsedModel usedModel, String parentName) {
 			modelName = usedModel.modelName;
 			varName = parentName + usedModel.varName;
+			path = null;
 			type = usedModel.type;
 		}
 
-		public UsedModel(String modelName, String varName, int type) {
+		public UsedModel(String modelName, String varName, Path path, int type) {
 			this.modelName = modelName;
 			this.varName = varName;
+			this.path = path;
 			this.type = type;
 		}
 
@@ -66,6 +73,13 @@ public class MultiFeatureModel extends FeatureModel {
 
 		public String getVarName() {
 			return varName;
+		}
+
+		/**
+		 * @return The absolute path of the used model
+		 */
+		public Path getPath() {
+			return path;
 		}
 
 		public int getType() {
@@ -181,18 +195,19 @@ public class MultiFeatureModel extends FeatureModel {
 	 *
 	 * @param varType the name of the interface that shall be bound to the variable
 	 * @param varName the name of the variable an interface shall be bound to
+	 * @param path
 	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
-	public boolean addInterface(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INTERFACE);
+	public boolean addInterface(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INTERFACE);
 	}
 
-	public boolean addInstance(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INSTANCE);
+	public boolean addInstance(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INSTANCE);
 	}
 
-	public boolean addInheritance(final String varType, final String varName) {
-		return addModel(varType, varName, MultiFeature.TYPE_INHERITED);
+	public boolean addInheritance(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INHERITED);
 	}
 
 	public boolean addExternalModel(final UsedModel model) {
@@ -204,11 +219,11 @@ public class MultiFeatureModel extends FeatureModel {
 		}
 	}
 
-	private boolean addModel(final String varType, final String varName, int modelType) {
+	private boolean addModel(final String varType, final String varName, final Path path, int modelType) {
 		if (usedModels.containsKey(varName)) {
 			return false;
 		} else {
-			usedModels.put(varName, new UsedModel(varType, varName, modelType));
+			usedModels.put(varName, new UsedModel(varType, varName, path, modelType));
 			return true;
 		}
 	}

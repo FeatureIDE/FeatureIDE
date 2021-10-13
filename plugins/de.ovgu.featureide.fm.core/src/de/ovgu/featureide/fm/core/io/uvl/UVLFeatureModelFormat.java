@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.core.resources.IProject;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -63,6 +65,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
@@ -326,7 +329,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		fm.addInstance(i.getNamespace(), i.getAlias());
+		final IProject project = EclipseFileSystem.getResource(fm.getSourceFile()).getProject();
+		// Local path of imported model (as given in importing model)
+		final String modelPath = i.getNamespace().replace(".", "/") + "." + FILE_EXTENSION;
+		// Resolved path (import relative to project root)
+		Path path = project.getFile(modelPath).getLocation().toFile().toPath();
+		if (!Files.exists(path)) {
+			// Import relative to importing model
+			path = fm.getSourceFile().resolveSibling(modelPath);
+		}
+		fm.addInstance(i.getNamespace(), i.getAlias(), path);
 	}
 
 	/**
