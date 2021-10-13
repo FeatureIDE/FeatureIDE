@@ -304,7 +304,13 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @return true, if attribute is head of recursive attributes.
 	 */
 	public boolean isHeadOfRecursiveAttribute() {
-		return getFeature().getStructure().isRoot() || (!((IExtendedFeature) getFeature().getStructure().getParent().getFeature()).isContainingAttribute(this));
+		if (getFeature().getStructure().isRoot()) {
+			return true;
+		} else {
+			// Check parent feature/attribute if not root
+			IFeatureAttribute parentAttribute = ((IExtendedFeature) getFeature().getStructure().getParent().getFeature()).getAttribute(getName());
+			return parentAttribute == null || !parentAttribute.isRecursive();
+		}
 	}
 
 	/*
