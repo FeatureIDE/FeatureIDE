@@ -47,10 +47,13 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -448,9 +451,13 @@ public class ConstraintDialog implements GUIDefaults {
 	private Button cancelButton;
 
 	/**
-	 * Content proposal pop up.
+	 * Content proposal pop up for the formula of the constraint.
 	 */
-	private ContentProposalAdapter adapter;
+	private ContentProposalAdapter constraintFormulaProposalAdapter;
+	/**
+	 * Content proposal pop up for existing constraint tags of a feature model.
+	 */
+	private ContentProposalAdapter existingTagsAdapter;
 
 	private final Consumer<ValidationMessage> onUpdate = new Consumer<ValidationMessage>() {
 
@@ -749,7 +756,8 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintTextComposite.setLayout(constraintTextLayout);
 		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER, Operator.NAMES);
 
-		setupContentProposal();
+		setupContentProposal(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(featureNamesList),
+				new ConstraintProposalLabelProvider());
 
 		final FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
@@ -1035,7 +1043,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void handleEvent(Event event) {
-				if ((event.detail == SWT.TRAVERSE_ESCAPE) && !adapter.isProposalPopupOpen()) {
+				if ((event.detail == SWT.TRAVERSE_ESCAPE) && !constraintFormulaProposalAdapter.isProposalPopupOpen()) {
 
 					cancelButtonPressEvent();
 
@@ -1064,7 +1072,8 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setSelection(constrainText.length());
 	}
 
-	private void setupContentProposal() {
+	private void setupContentProposal(Control control, IControlContentAdapter contentAdapter, IContentProposalProvider proposalProvider,
+			ILabelProvider labelProvider) {
 		try {
 			final KeyStroke keyStroke = KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
 
@@ -1073,13 +1082,10 @@ public class ConstraintDialog implements GUIDefaults {
 				autoActivationCharacters[c] = c;
 			}
 
-			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(),
-					new ConstraintContentProposalProvider(featureNamesList), keyStroke, autoActivationCharacters);
-
-			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
-			adapter.setPopupSize(new Point(250, 85));
-
-			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
+			constraintFormulaProposalAdapter = new ContentProposalAdapter(control, contentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
+			constraintFormulaProposalAdapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
+			constraintFormulaProposalAdapter.setPopupSize(new Point(250, 85));
+			constraintFormulaProposalAdapter.setLabelProvider(labelProvider);
 
 		} catch (final ParseException e) {
 			FMUIPlugin.getDefault().logError(e);
