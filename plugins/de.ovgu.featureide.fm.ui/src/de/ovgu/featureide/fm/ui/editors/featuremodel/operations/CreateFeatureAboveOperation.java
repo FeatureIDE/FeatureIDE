@@ -76,6 +76,18 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	 * Stores whether the parent of the feature <code>childName</code> has an alternative group.
 	 */
 	private boolean parentAlternative = false;
+	/**
+	 * Stores whether the
+	 */
+	private boolean needToUpdateMandatory = false;
+
+	// 1. Importierte Feature f
+	// 2. isRoot(f) (im Import)
+	// 3. isMandatory(f) (im Obermodell)
+
+	// 4. neue Root f' einfügen
+	// 5. f auf optional
+	// 6. f' auf mandatory
 
 	/**
 	 * Creates a new {@link CreateFeatureAboveOperation}.
@@ -96,13 +108,16 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	 * @param featureModelManager - {@link IFeatureModelManager}
 	 * @param selectedFeatureNames - {@link List}
 	 * @param featureName - {@link String}
+	 * @param needToUpdateMandatory - {@link Boolean}
 	 */
-	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatureNames, String featureName) {
+	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatureNames, String featureName,
+			boolean needToUpdateMandatory) {
 		super(featureModelManager, "Add Feature");
 		this.selectedFeatureNames = selectedFeatureNames;
 		childName = selectedFeatureNames.get(0);
 		createAsImport = true;
 		this.featureName = featureName;
+		this.needToUpdateMandatory = needToUpdateMandatory;
 	}
 
 	/**
@@ -121,9 +136,10 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			final MultiFeature multiFeature = (MultiFeature) newFeature;
 			multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
-		final IFeature child = featureModel.getFeature(childName);
 
+		final IFeature child = featureModel.getFeature(childName);
 		final IFeatureStructure parent = child.getStructure().getParent();
+
 		if (parent != null) {
 			parentOr = parent.isOr();
 			parentAlternative = parent.isAlternative();
@@ -146,8 +162,14 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 				newFeature.getStructure().changeToAlternative();
 			} else {
 				newFeature.getStructure().changeToAnd();
+				if (needToUpdateMandatory) {
+					newFeature.getStructure().setMandatory(true);
+				}
 			}
 			parent.changeToAnd();
+			if (needToUpdateMandatory) {
+				child.getStructure().setMandatory(false);
+			}
 			featureModel.addFeature(newFeature);
 		} else {
 			newFeature.getStructure().addChild(child.getStructure());
@@ -184,6 +206,9 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 				parent.changeToAlternative();
 			} else {
 				parent.changeToAnd();
+				if (needToUpdateMandatory) {
+					child.getStructure().setMandatory(true);
+				}
 			}
 			return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, parent.getFeature(), null);
 		} else {

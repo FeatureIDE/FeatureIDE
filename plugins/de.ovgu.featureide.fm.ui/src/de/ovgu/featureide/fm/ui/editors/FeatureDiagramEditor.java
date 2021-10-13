@@ -709,7 +709,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				analyzeFeatureModel();
 			}
 			recentEvents.add(event);
-
 			break;
 		case FEATURE_ADD_SIBLING:
 			// Update the Edit part registry; try to make the edit part for the sibling feature available.
@@ -1191,7 +1190,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Deals with a change that occurred in an imported feature model that can be found under event.getSource(). The original event to process is in
-	 * event.getNewValue.
+	 * <code>event.newValue</code>.
 	 *
 	 * @param event - {@link FeatureIDEEvent}
 	 */
@@ -1230,7 +1229,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case GROUP_TYPE_CHANGED:
 			// Ask the current group type of the original feature.
-			IFeature originalFeature = ((IFeature) oldEvent.getSource());
+			final IFeature originalFeature = ((IFeature) oldEvent.getSource());
 			final int groupType = ChangeFeatureGroupTypeOperation.getGroupType(originalFeature);
 			// Run a new group type change operation for the referenced feature.
 			new ChangeFeatureGroupTypeOperation(groupType, modelAlias + originalFeature.getName(), fmManager).execute();
@@ -1258,6 +1257,26 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final String newChildName = modelAlias + originalChild.getName();
 			index = originalParent.getStructure().getChildIndex(originalChild.getStructure());
 			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
+
+			// Further handle the cases where the new feature was created as part of a reversed DeleteFeatureOperation.
+			if (oldEvent instanceof FeatureModelOperationEvent) {
+				final FeatureModelOperationEvent oldModelEvent = (FeatureModelOperationEvent) oldEvent;
+				if (oldModelEvent.getID().equals(DeleteFeatureOperation.ID)) {
+					// In that case, update the mandatory and abstract properties of the imported feature.
+					final IFeature importedFeature = (IFeature) oldModelEvent.getNewValue();
+					final IFeature newChildFeature = mfm.getFeature(newChildName);
+					if (importedFeature.getStructure().isAbstract() != newChildFeature.getStructure().isAbstract()) {
+						new AbstractFeatureOperation(newChildName, fmManager).execute();
+					}
+					if (importedFeature.getStructure().isMandatory() != newChildFeature.getStructure().isMandatory()) {
+						new MandatoryFeatureOperation(newChildName, fmManager).execute();
+					}
+
+					// Also change the group type of the parent, when necessary (group types don't match, and more than one child).
+					final IFeatureStructure parentStructure = ((IFeature) oldModelEvent.getOldValue()).getStructure();
+					if (parentStructure.getChildrenCount() > 1) {}
+				}
+			}
 			break;
 		case FEATURE_ADD_ABOVE:
 			// For a feature added above other ones, first get the new parent,
@@ -1267,8 +1286,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final List<String> oldSelectedNames = (List<String>) oldValues[1];
 			final List<String> newSelectedNames = new ArrayList<>(oldSelectedNames.size());
 			oldSelectedNames.forEach(oldName -> newSelectedNames.add(modelAlias + oldName));
+			// Test if we created a new parent for the previous root in the imported model, and if we marked this root as mandatory in this model.
+			final boolean wasOldRoot = FeatureUtils.isRoot(originalParent);
+			final boolean isMandatory = mfm.getFeature(newSelectedNames.get(0)).getStructure().isMandatory();
 			// Rerun the CreateFeatureAboveOperation.
-			new CreateFeatureAboveOperation(fmManager, newSelectedNames, modelAlias + originalParent.getName()).execute();
+			new CreateFeatureAboveOperation(fmManager, newSelectedNames, modelAlias + originalParent.getName(), wasOldRoot && isMandatory).execute();
 			break;
 		case FEATURE_ADD_SIBLING:
 			// For a sibling feature, get the added feature and its parent.
@@ -1285,7 +1307,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Extract the name of the deleted feature, and rewrite it for this model.
 			final IFeature originalFeatureToDelete = ((IFeature) oldEvent.getSource());
 			final String featureToDeleteName = modelAlias + originalFeatureToDelete.getName();
-			new DeleteFeatureOperation(fmManager, featureToDeleteName).execute();
+			new DeleteFeatureOperation(fmManager, featureToDeleteName, mfm.getFeature(featureToDeleteName).getStructure().isMandatory()).execute();
 			break;
 		case CONSTRAINT_MODIFY:
 			Node newFormula;

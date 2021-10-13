@@ -79,8 +79,8 @@ public abstract class ComposedFeatureModelOperation extends AbstractFeatureModel
 	protected abstract void createSingleOperations(IFeatureModel featureModel);
 
 	/**
-	 * Returns the identifier of the concrete {@link ComposedFeatureModelOperation}. This identifier is also stored in the {@link FeatureModelOperationEvent}s that
-	 * are fired.
+	 * Returns the identifier of the concrete {@link ComposedFeatureModelOperation}. This identifier is also stored in the {@link FeatureModelOperationEvent}s
+	 * that are fired.
 	 *
 	 * @return {@link String}
 	 */
@@ -120,7 +120,7 @@ public abstract class ComposedFeatureModelOperation extends AbstractFeatureModel
 	 * Looks up and returns the feature named <code>commonAncestor</code> in the given <code>featureModel</code>. If <code>commonAncestor</code> is
 	 * null/unknown, return null instead.
 	 *
-	 * @param featureModel - {@link IFeatureModel}t
+	 * @param featureModel - {@link IFeatureModel}
 	 * @return {@link IFeatureModel}
 	 */
 	private IFeature getFeature(IFeatureModel featureModel) {
@@ -152,10 +152,10 @@ public abstract class ComposedFeatureModelOperation extends AbstractFeatureModel
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final List<FeatureModelOperationEvent> events = new ArrayList<>(operations.size());
-		final ArrayList<AbstractFeatureModelOperation> copiedList = new ArrayList<>(operations);
-		Collections.reverse(copiedList);
+		final ArrayList<AbstractFeatureModelOperation> reversedList = new ArrayList<>(operations);
+		Collections.reverse(reversedList);
 
-		for (final AbstractFeatureModelOperation operation : operations) {
+		for (final AbstractFeatureModelOperation operation : reversedList) {
 			events.add((FeatureModelOperationEvent) operation.inverseOperation(featureModel));
 		}
 		return new FeatureModelOperationEvent(getID(), EventType.MULTIPLE_CHANGES_OCCURRED, featureModel, getFeature(featureModel), events);

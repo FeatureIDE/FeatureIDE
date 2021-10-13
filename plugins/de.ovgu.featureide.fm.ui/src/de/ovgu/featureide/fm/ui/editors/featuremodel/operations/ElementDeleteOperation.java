@@ -301,7 +301,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	 */
 	protected void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
 		for (final IFeature feature : featuresToDelete) {
-			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName()));
+			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName(), false));
 		}
 	}
 

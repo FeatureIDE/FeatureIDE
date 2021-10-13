@@ -60,8 +60,11 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	private boolean or;
 	private boolean alternative;
 
-	public DeleteFeatureOperation(IFeatureModelManager featureModelManger, String featureName) {
+	private boolean isMandatory;
+
+	public DeleteFeatureOperation(IFeatureModelManager featureModelManger, String featureName, boolean isMandatory) {
 		this(featureModelManger, featureName, null);
+		this.isMandatory = isMandatory;
 	}
 
 	public DeleteFeatureOperation(IFeatureModelManager featureModelManger, String featureName, String replacementName) {
@@ -89,6 +92,9 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 		// Should oldFeature be the (former) root feature, replace it with its last child.
 		if (oldFeature.getStructure().isRoot()) {
+			if (oldFeature.getStructure().getChildrenCount() == 1) {
+				oldFeature.getStructure().getChildren().get(0).setMandatory(isMandatory);
+			}
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
 		} else {
