@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -148,10 +147,6 @@ public abstract class SingleSelectionAction extends AFeatureModelAction implemen
 			}
 		}
 		return false;
-	}
-
-	private boolean isExternalFeature(IFeature feature) {
-		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
 	}
 
 	public boolean isConnectionSelected() {

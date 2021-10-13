@@ -490,6 +490,7 @@ public class StringTable {
 	public static final String TOOLTIP_HIDDEN = " hidden";
 	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
+	public static final String TOOLTIP_IMPLICIT = "(implicit) ";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
@@ -817,6 +818,7 @@ public class StringTable {
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
 	public static final String SUCCESS = "Success";
 	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
+	public static final String PLEASE_OPEN_A_FEATUREIDE_PROJECT = "Please open a FeatureIDE project.";
 	public static final String MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL =
 		"The open feature model does not support attributes. To use attributes convert your feature model to an extended feature model.";
 	public static final String CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG =
@@ -1155,4 +1157,5 @@ public class StringTable {
 	public static final String ABSTRACT_ACTION = "Abstract";
 	public static final String DELETE_SHORTCUT = "Delete (Del)";
 	public static final String UPDATE_CONSTRAINT = "Update Constraint";
+	public static final String DELETE_SUBMODEL = "Delete Submodel";
 }

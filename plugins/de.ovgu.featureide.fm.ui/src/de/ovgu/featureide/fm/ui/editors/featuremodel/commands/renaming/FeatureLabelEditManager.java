@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.ui.part.CellEditorActionHandler;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
@@ -40,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IManager;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -54,11 +56,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 
 	private final IManager<IFeatureModel> featureModelManager;
+	private final FeatureEditPart editPart;
 
-	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator,
+	public FeatureLabelEditManager(FeatureEditPart editPart, Class<?> editorType, FeatureCellEditorLocator locator,
 			IManager<IFeatureModel> featureModelManager) {
-		super(editpart, editorType, locator);
+		super(editPart, editorType, locator);
 		this.featureModelManager = featureModelManager;
+		this.editPart = editPart;
 	}
 
 	@Override
@@ -66,9 +70,14 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 		final CellEditor cellEditor = getCellEditor();
 		final Control control = cellEditor.getControl();
 		final String oldValue = ((FeatureEditPart) getEditPart()).getModel().getObject().getName();
+		final CellEditorActionHandler ceah = ((FeatureDiagramViewer) editPart.getViewer()).getCellEditorActionHandler();
 
 		control.setFont(DEFAULT_FONT);
 		cellEditor.setValue(oldValue);
+
+		if (ceah != null) {
+			ceah.addCellEditor(cellEditor);
+		}
 
 		cellEditor.addListener(new ICellEditorListener() {
 

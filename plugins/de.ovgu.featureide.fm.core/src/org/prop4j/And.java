@@ -77,7 +77,7 @@ public class And extends Node {
 		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausifyDNF(simplify);
 		}
-		return this;
+		return simplifyNode();
 	}
 
 	@Override
@@ -115,7 +115,10 @@ public class And extends Node {
 	@Override
 	public Node simplify() {
 		super.simplify();
+		return simplifyNode();
+	}
 
+	private Node simplifyNode() {
 		int count = children.length;
 		boolean canBeSimplified = false;
 		for (final Node child : children) {

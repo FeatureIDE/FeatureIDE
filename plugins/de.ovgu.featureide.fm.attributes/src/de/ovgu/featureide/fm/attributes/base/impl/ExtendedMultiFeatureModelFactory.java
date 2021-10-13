@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -37,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
  */
 public class ExtendedMultiFeatureModelFactory extends MultiFeatureModelFactory {
 
-	public static final String ID = FMAttributesPlugin.PLUGIN_ID + ".base.impl.ExtendedMultiFeatureModelFactory";
+	public static final String ID = "de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory";
 
 	public static ExtendedMultiFeatureModelFactory getInstance() {
 		return new ExtendedMultiFeatureModelFactory();

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<calculations key="tautology" value="true"/>
+		<calculations key="auto" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<calculations key="redundant" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<calculations key="constraints" value="true"/>
+		<graphics key="layoutalgorithm" value="1"/>
+		<calculations key="features" value="true"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Root">
+			<alt mandatory="true" name="ABCD">
+				<graphics key="collapsed" value="false"/>
+				<feature name="A"/>
+				<feature name="B"/>
+				<feature name="C"/>
+				<feature name="D"/>
+			</alt>
+			<alt name="EF">
+				<graphics key="collapsed" value="false"/>
+				<feature name="E"/>
+				<feature name="F"/>
+			</alt>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<eq>
+				<conj>
+					<disj>
+						<var>A</var>
+						<disj>
+							<not>
+								<var>Root</var>
+							</not>
+							<var>B</var>
+						</disj>
+					</disj>
+					<disj>
+						<not>
+							<var>Root</var>
+						</not>
+						<disj>
+							<var>C</var>
+							<disj>
+								<var>A</var>
+								<disj>
+									<var>B</var>
+									<var>D</var>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</conj>
+				<var>F</var>
+			</eq>
+		</rule>
+	</constraints>
+</featureModel>

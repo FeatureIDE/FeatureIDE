@@ -228,7 +228,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	 * @param dialogButtonLabels A String array with labels for the buttons of the DeleteDialog
 	 * @return A String containing the label of the button that was pressed in the DeleteDialog or <code>null</code> if the dialog was closed differently
 	 */
-	private String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
+	protected String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
 		final MessageDialog dialog = new DeleteDialog(null, multiple, dialogReasons, dialogButtonLabels, dialogButtonLabels.length - 1);
 		dialog.open();
 		final int dialogReturn = dialog.getReturnCode();
@@ -299,7 +299,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	 *
 	 * @param featuresToDelete A List of all the features that need to be deleted
 	 */
-	private void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
+	protected void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
 		for (final IFeature feature : featuresToDelete) {
 			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName()));
 		}
@@ -338,7 +338,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	 * @param element - {@link Object} The Object that needs to be casted to a feature.
 	 * @return {@link IFeature} of the object, or <code>null</code> if it can't be casted.
 	 */
-	private IFeature getFeatureFromObject(Object element) {
+	public IFeature getFeatureFromObject(Object element) {
 		IFeature feature = null;
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
@@ -353,7 +353,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	 *
 	 * @return The current selection of the viewer
 	 */
-	private IStructuredSelection getSelection() {
+	protected IStructuredSelection getSelection() {
 		if (viewer instanceof GraphicalViewerImpl) {
 			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 		} else {

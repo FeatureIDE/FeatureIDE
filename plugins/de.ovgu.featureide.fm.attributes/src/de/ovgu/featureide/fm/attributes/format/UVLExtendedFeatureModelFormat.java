@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import clojure.lang.Symbol;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
@@ -162,12 +163,14 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	@Override
 	protected Map<String, Object> printAttributes(IFeature feature) {
 		Map<String, Object> attributes = super.printAttributes(feature);
-		ExtendedMultiFeature extendedFeature = (ExtendedMultiFeature) feature;
 		if (feature.getStructure().isRoot()) {
 			attributes.put(EXTENDED_ATTRIBUTE_NAME, true);
 		}
-		for (IFeatureAttribute attr : extendedFeature.getAttributes()) {
-			attributes.put(attr.getName(), printAttribute(attr));
+		if (feature instanceof IExtendedFeature) {
+			for (IFeatureAttribute attr : ((IExtendedFeature) feature).getAttributes()) {
+				attributes.put(attr.getName(), printAttribute(attr));
+			}
+
 		}
 		return attributes;
 	}
