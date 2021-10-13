@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME;
+
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -50,7 +52,7 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 	private final boolean oldValue;
 
 	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean value) {
-		super(featureModelManager, "Set Attribute Configurable");
+		super(featureModelManager, CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
 		this.value = value;

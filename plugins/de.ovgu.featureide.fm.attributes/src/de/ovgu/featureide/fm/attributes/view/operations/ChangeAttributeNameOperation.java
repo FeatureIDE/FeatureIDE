@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_NAME_OPERATION_NAME;
+
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -51,7 +53,7 @@ public class ChangeAttributeNameOperation extends AbstractFeatureModelOperation 
 	private final String newName;
 
 	public ChangeAttributeNameOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, String newName) {
-		super(featureModelManager, "Edit Attribute Name");
+		super(featureModelManager, CHANGE_ATTRIBUTE_NAME_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
 		this.newName = newName;

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME;
+
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -56,7 +58,7 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 	private final boolean oldRecursive;
 
 	public ChangeAttributeRecursiveOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newRecursive) {
-		super(featureModelManager, "Set Attribute Recursive");
+		super(featureModelManager, CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
 		this.newRecursive = newRecursive;

@@ -1,5 +1,7 @@
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME;
+
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -26,7 +28,7 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	private Object oldValue;
 
 	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute att, D value) {
-		super(fmManager, "Edit Attribute Value");
+		super(fmManager, CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME);
 		featureName = att.getFeature().getName();
 		attributeName = att.getName();
 		this.value = value;

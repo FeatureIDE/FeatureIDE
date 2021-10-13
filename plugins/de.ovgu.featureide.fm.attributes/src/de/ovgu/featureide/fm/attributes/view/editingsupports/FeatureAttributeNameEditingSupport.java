@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_ATTRIBUTE_NAME_ERROR_TITLE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -71,12 +76,12 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 
 		// Check for name conflicts
 		if (feature.getAttribute(newName) != null) {
-			MessageDialog.openError(null, "Invalid attribute name", "Please insert a unique attribute name.");
+			MessageDialog.openError(null, INVALID_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE);
 			return;
 		}
 		if (attribute.isRecursive()) {
 			if (AttributeUtils.getChildAttribute(feature, newName) != null) {
-				MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
+				MessageDialog.openError(null, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE);
 				return;
 			}
 		}

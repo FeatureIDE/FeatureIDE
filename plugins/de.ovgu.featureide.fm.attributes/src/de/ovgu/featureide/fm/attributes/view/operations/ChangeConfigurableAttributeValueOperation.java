@@ -1,5 +1,7 @@
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_CONFIGURABLE_ATTRIBUTE_VALUE_OPERATION_NAME;
+
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
@@ -28,7 +30,7 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	private boolean firstOverwrite = true;
 
 	public ChangeConfigurableAttributeValueOperation(ConfigurationManager configurationManager, IFeatureAttribute att, D value) {
-		super(configurationManager, EventType.CONFIGURABLE_ATTRIBUTE_CHANGED.toString());
+		super(configurationManager, CHANGE_CONFIGURABLE_ATTRIBUTE_VALUE_OPERATION_NAME);
 		featureName = att.getFeature().getName();
 		attributeName = att.getName();
 		this.value = value;

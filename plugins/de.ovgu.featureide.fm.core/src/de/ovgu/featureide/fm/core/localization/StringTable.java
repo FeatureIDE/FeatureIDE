@@ -1115,6 +1115,17 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String REMOVE_ATTRIBUTE_OPERATION_NAME = "Remove Attribute";
+	public static final String CHANGE_ATTRIBUTE_NAME_OPERATION_NAME = "Rename Attribute";
+	public static final String CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME = "Set Attribute Recursive";
+	public static final String CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME = "Set Attribute Configurable";
+	public static final String CHANGE_ATTRIBUTE_UNIT_OPERATION_NAME = "Change Attribute Unit";
+	public static final String CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME = "Change Attribute Value";
+	public static final String CHANGE_CONFIGURABLE_ATTRIBUTE_VALUE_OPERATION_NAME = "Change Configurable Attribute Value";
+	public static final String INVALID_ATTRIBUTE_NAME_ERROR_TITLE = "Invalid attribute name";
+	public static final String INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE = "Please insert a unique attribute name.";
+	public static final String INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE = "Invalid recursive attribute name";
+	public static final String INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE = "Please ensure the name is not used by an attribute of a child feature.";
 	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
 	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
 	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Open the Constraint View?";

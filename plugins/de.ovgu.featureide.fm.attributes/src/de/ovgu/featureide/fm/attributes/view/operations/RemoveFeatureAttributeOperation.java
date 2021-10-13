@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_ATTRIBUTE_OPERATION_NAME;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +67,7 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 	private final Map<IFeatureAttribute, String> removedAttributes;
 
 	public RemoveFeatureAttributeOperation(IFeatureModelManager featureModelManager, List<IFeatureAttribute> attributes) {
-		super(featureModelManager, "Remove Attribute");
+		super(featureModelManager, REMOVE_ATTRIBUTE_OPERATION_NAME);
 
 		this.attributes = new ArrayList<>(attributes.size());
 		for (IFeatureAttribute a : attributes) {
