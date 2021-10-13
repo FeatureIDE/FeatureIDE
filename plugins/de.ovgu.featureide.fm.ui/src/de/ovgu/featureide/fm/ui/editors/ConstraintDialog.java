@@ -46,8 +46,6 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
-import org.eclipse.jface.databinding.viewers.IViewerUpdater;
-import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -497,6 +495,8 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private StyledText tagEntryText;
 
+	private IObservableSet<String> observableTags;
+
 	/**
 	 * Create a new {@link ConstraintDialog} for the feature model managed by <code>featureModelManager</code>. <br> <br> <code>constraint</code> may either be
 	 * null, in which case this dialog creates a new constraint, or be an existing constraint the user wants to edit.
@@ -590,9 +590,10 @@ public class ConstraintDialog implements GUIDefaults {
 		nodeReader.setFeatureNames(featureNamesList);
 		final Node propNode = nodeReader.stringToNode(input);
 		final String constraintDescription = constraintDescriptionText.getText().trim();
+		final Set<String> constraintTags = new HashSet<>(observableTags);
 
 		final AbstractFeatureModelOperation op =
-			(constraint != null) ? new EditConstraintOperation(featureModelManager, constraint, propNode, constraintDescription)
+			(constraint != null) ? new EditConstraintOperation(featureModelManager, constraint, propNode, constraintDescription, constraintTags)
 				: new CreateConstraintOperation(propNode, featureModelManager, constraintDescription);
 
 		FeatureModelOperationWrapper.run(op);
@@ -834,50 +835,54 @@ public class ConstraintDialog implements GUIDefaults {
 		// Create the tag group, and configure its layout.
 		tagGroup = new Group(sashForm, SWT.NONE);
 		tagGroup.setText("Tags");
-		tagGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		final GridLayout tagGroupLayout = new GridLayout(2, false);
+		final GridData tagGroupLayoutData = new GridData(GridData.FILL);
+		tagGroupLayoutData.grabExcessHorizontalSpace = true;
+		tagGroupLayoutData.grabExcessVerticalSpace = true;
+		tagGroup.setLayoutData(tagGroupLayoutData);
+		final GridLayout tagGroupLayout = new GridLayout(1, true);
 		tagGroup.setLayout(tagGroupLayout);
 
-		// Configure tagEntryText.
-		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagGroup);
+		// Set up a row that contains tagEntryText, and addTagButton.
+		final Composite tagInputRow = new Composite(tagGroup, SWT.NONE);
+		tagInputRow.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		tagInputRow.setLayout(new GridLayout(2, false));
 
-		// Also create a drop-down menu for tags as there already exists for features.
+		// Configure tagEntryText.
+		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagInputRow);
+
+		// TODO Create a drop-down menu for tags that shows all tags this feature model contains.
 
 		// Give an overview of the constraint's current tags in <code>tags</code>.
 		final Composite tableComposite = new Composite(tagGroup, SWT.NONE);
 		tableComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-
+		// Configure the column layout.
 		final TableViewer tagTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TableColumnLayout tagTableLayout = new TableColumnLayout();
+		tableComposite.setLayout(tagTableLayout);
+		final TableViewerColumn viewerNameColumn = new TableViewerColumn(tagTableViewer, SWT.NONE);
+		tagTableLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, true));
+
 		final Table tagTable = tagTableViewer.getTable();
-		final ObservableSetContentProvider<String> provider = new ObservableSetContentProvider<>(new IViewerUpdater<String>() {
+		// Configure the label and content provider. Set the contents of observableTags as input.
+		final ArrayContentProvider provider = new ArrayContentProvider();
+		tagTableViewer.setContentProvider(provider);
+		tagTableViewer.setLabelProvider(new CellLabelProvider() {
 
 			@Override
-			public void insert(String element, int position) {}
-
-			@Override
-			public void remove(String element, int position) {}
-
-			@Override
-			public void replace(String oldElement, String newElement, int position) {}
-
-			@Override
-			public void move(String element, int oldPosition, int newPosition) {}
-
-			@Override
-			public void add(String[] elements) {}
-
-			@Override
-			public void remove(String[] elements) {}
+			public void update(ViewerCell cell) {
+				cell.setText(cell.getElement().toString());
+			}
 		});
 
-		tagTableViewer.setContentProvider(provider);
-		final IObservableSet<String> observableTags = new WritableSet<>(tags, String.class);
+		observableTags = new WritableSet<>(tags, String.class);
 		tagTableViewer.setInput(observableTags);
 
 		// Add an button that allows the addition of existing tags.
-		final Button addTagButton = new Button(tagGroup, SWT.NONE);
+		final Button addTagButton = new Button(tagInputRow, SWT.NONE);
 		addTagButton.setText("Add Tag");
-		// When pressing addTagButton, add the new tag to tags.
+
+		// When pressing addTagButton, add the new tag to tags. Update the table viewer and content provider to show the new tag,
+		// and reset the entry text.
 		addTagButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -888,10 +893,14 @@ public class ConstraintDialog implements GUIDefaults {
 					newTagSet.add(newTagText);
 					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
 					observableTags.add(newTagText);
-					tagEntryText.setText(ENTER_A_NEW_OR_EXISTING_TAG_NAME);
+					tagTableViewer.refresh();
+					tagEntryText.setText("");
+					tagEntryText.notifyListeners(SWT.FocusOut, new Event());
 				}
 			}
 		});
+
+		// TODO When the user presses enter while typing a new tag, do the same thing.
 	}
 
 	/**
@@ -968,7 +977,6 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessVerticalSpace = true;
 		featureTable.setLayoutData(gridData);
-
 		featureTable.addListener(SWT.MouseDoubleClick, new Listener() {
 
 			@Override
