@@ -374,7 +374,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	 * @return The first constraint in the FeatureModel
 	 */
 	private IConstraint getUpdateConstraint(FeatureModelEditor featureModelEditor) {
-		final List<IConstraint> graphicalConstraints = featureModelEditor.getFeatureModelManager().getVariableFormula().getFeatureModel().getConstraints();
+		final List<IConstraint> graphicalConstraints = featureModelEditor.getFeatureModelManager().getVarObject().getConstraints();
+
 		if (!graphicalConstraints.isEmpty()) {
 			return graphicalConstraints.get(0);
 		}
