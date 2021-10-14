@@ -1229,7 +1229,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case GROUP_TYPE_CHANGED:
 			// Ask the current group type of the original feature.
-			final IFeature originalFeature = ((IFeature) oldEvent.getSource());
+			IFeature originalFeature = ((IFeature) oldEvent.getSource());
 			final int groupType = ChangeFeatureGroupTypeOperation.getGroupType(originalFeature);
 			// Run a new group type change operation for the referenced feature.
 			new ChangeFeatureGroupTypeOperation(groupType, modelAlias + originalFeature.getName(), fmManager).execute();
@@ -1273,8 +1273,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					}
 
 					// Also change the group type of the parent, when necessary (group types don't match, and more than one child).
-					final IFeatureStructure parentStructure = ((IFeature) oldModelEvent.getOldValue()).getStructure();
-					if (parentStructure.getChildrenCount() > 1) {}
+					final IFeature parent = ((IFeature) oldModelEvent.getOldValue());
+					final int importedGroupType = ChangeFeatureGroupTypeOperation.getGroupType(parent);
+					if ((mfm.getFeature(newParentName).getStructure().getChildrenCount() > 1)
+						&& (ChangeFeatureGroupTypeOperation.getGroupType(newChildFeature) != importedGroupType)) {
+						new ChangeFeatureGroupTypeOperation(importedGroupType, newParentName, fmManager).execute();
+					}
 				}
 			}
 			break;
