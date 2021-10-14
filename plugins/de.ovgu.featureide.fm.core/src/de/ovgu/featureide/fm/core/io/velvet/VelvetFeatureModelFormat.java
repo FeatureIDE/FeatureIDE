@@ -1139,7 +1139,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 				return;
 			}
 
-			if (!extFeatureModel.addInheritance(parentModelName, parentModelName)) {
+			if (!extFeatureModel.addInheritance(parentModelName, parentModelName, null)) {
 				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
@@ -1150,7 +1150,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 	private void addExternalFeatures(IFeatureModel sourceModel, String sourceModelName, IFeatureStructure targetParentFeature, int type) {
 		if (sourceModel instanceof MultiFeatureModel) {
 			for (final UsedModel usedModel : ((MultiFeatureModel) sourceModel).getExternalModels().values()) {
-				extFeatureModel.addExternalModel(new UsedModel(usedModel, sourceModelName));
+				extFeatureModel.addExternalModel(new UsedModel(usedModel, sourceModelName, null));
 			}
 		}
 
@@ -1198,7 +1198,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			final String varName = nameNode.getText();
 
 			if (checkInterfaceModelFile(idNode)) {
-				if (!extFeatureModel.addInterface(interfaceName, varName)) {
+				if (!extFeatureModel.addInterface(interfaceName, varName, null)) {
 					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
@@ -1215,7 +1215,7 @@ public class VelvetFeatureModelFormat extends AFeatureModelFormat {
 			final String varName = nameNode.getText();
 
 			if (checkExternalModelFile(idNode)) {
-				if (!extFeatureModel.addInstance(interfaceName, varName)) {
+				if (!extFeatureModel.addInstance(interfaceName, varName, null)) {
 					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}

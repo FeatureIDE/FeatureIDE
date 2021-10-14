@@ -20,17 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
@@ -41,7 +38,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
@@ -58,20 +54,25 @@ public class MultiFeatureModel extends FeatureModel {
 
 		private final String modelName;
 		private final String varName;
+		/**
+		 * The absolute path of the used model.
+		 */
+		private final Path path;
 		private final int type;
 
 		private String prefix;
-		private Path systemPath;
 
-		public UsedModel(UsedModel usedModel, String parentName) {
+		public UsedModel(UsedModel usedModel, String parentName, Path path) {
 			modelName = usedModel.modelName;
 			varName = parentName + usedModel.varName;
+			this.path = path;
 			type = usedModel.type;
 		}
 
-		public UsedModel(String modelName, String varName, int type) {
+		public UsedModel(String modelName, String varName, Path path, int type) {
 			this.modelName = modelName;
 			this.varName = varName;
+			this.path = path;
 			this.type = type;
 		}
 
@@ -81,6 +82,13 @@ public class MultiFeatureModel extends FeatureModel {
 
 		public String getVarName() {
 			return varName;
+		}
+
+		/**
+		 * @return The absolute path of the used model
+		 */
+		public Path getPath() {
+			return path;
 		}
 
 		public int getType() {
@@ -95,17 +103,9 @@ public class MultiFeatureModel extends FeatureModel {
 			this.prefix = prefix;
 		}
 
-		public Path getSystemPath() {
-			return systemPath;
-		}
-
-		public void setSystemPath(Path systemPath) {
-			this.systemPath = systemPath;
-		}
-
 		@Override
 		public String toString() {
-			return modelName + " " + varName + " [Path: " + systemPath + "]";
+			return modelName + " " + varName + " [Path: " + path + "]"; // TODO #1250
 		}
 	}
 
@@ -214,18 +214,19 @@ public class MultiFeatureModel extends FeatureModel {
 	 *
 	 * @param varType the name of the interface that shall be bound to the variable
 	 * @param varName the name of the variable an interface shall be bound to
+	 * @param path
 	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
-	public boolean addInterface(final String varType, final String varName) {
-		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INTERFACE);
+	public boolean addInterface(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INTERFACE);
 	}
 
-	public boolean addInstance(final String varType, final String varName) {
-		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INSTANCE);
+	public boolean addInstance(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INSTANCE);
 	}
 
-	public boolean addInheritance(final String varType, final String varName) {
-		return addModel(varType, varName, IMultiFeatureModelElement.TYPE_INHERITED);
+	public boolean addInheritance(final String varType, final String varName, final Path path) {
+		return addModel(varType, varName, path, MultiFeature.TYPE_INHERITED);
 	}
 
 	public boolean addExternalModel(final UsedModel model) {
@@ -237,11 +238,11 @@ public class MultiFeatureModel extends FeatureModel {
 		}
 	}
 
-	private boolean addModel(final String varType, final String varName, int modelType) {
+	private boolean addModel(final String varType, final String varName, final Path path, int modelType) {
 		if (usedModels.containsKey(varName)) {
 			return false;
 		} else {
-			usedModels.put(varName, new UsedModel(varType, varName, modelType));
+			usedModels.put(varName, new UsedModel(varType, varName, path, modelType));
 			return true;
 		}
 	}
@@ -362,7 +363,7 @@ public class MultiFeatureModel extends FeatureModel {
 	public void setExternalModels(Map<String, UsedModel> usedModels) {
 		this.usedModels.clear();
 		for (final Entry<String, UsedModel> entry : usedModels.entrySet()) {
-			this.usedModels.put(entry.getKey(), new UsedModel(entry.getValue(), ""));
+			this.usedModels.put(entry.getKey(), new UsedModel(entry.getValue(), "", entry.getValue().path));
 		}
 	}
 
@@ -401,52 +402,12 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	/**
-	 * Returns a list of paths that correspond to files that this {@link MultiFeatureModel} imports. These paths are relative to getSourceFile(), i.e. the
-	 * project root path in which the file for this model is stored. <br> Also assigns model paths to the used models.
+	 * Returns all paths of imported submodels.
 	 *
-	 * @param path - {@link Path}
 	 * @return new {@link List}
 	 */
 	public List<Path> getImportPaths() {
-		// Separate the path string, and cut off the file ending. for the absolute directory path.
-		final String[] pathStringParts = getSourceFile().toString().split(Pattern.quote(File.separator));
-		pathStringParts[pathStringParts.length - 1] = "";
-		final String directoryString = String.join(File.separator, pathStringParts);
-
-		// Create the import paths like this:
-		final List<Path> importPaths = new ArrayList<>(getImports().size());
-		for (String importString : getImports()) {
-			// Construct the model name from the import string by converting "\" and "/" to ".", then cutting of the file ending.
-			final String[] modelNameParts = importString.replace("\\", ".").replace("/", ".").split("\\.");
-			modelNameParts[modelNameParts.length - 1] = "";
-			String modelName = String.join(".", modelNameParts);
-			modelName = modelName.substring(0, modelName.length() - 1);
-
-			// Turn the import string into a relative path, and cut off the file part again.
-			importString = importString.replace("\\", ".");
-			final String[] importStringParts = importString.split(Pattern.quote(File.separator));
-			importStringParts[importStringParts.length - 1] = "";
-			final String importDirectoryString = String.join(File.separator, importStringParts);
-
-			// Remove the shared suffix, and add the relative import string for the actual path.
-			String importPathString = directoryString;
-			if (directoryString.endsWith(importDirectoryString)) {
-				importPathString = importPathString.substring(0, importPathString.length() - importDirectoryString.length());
-			}
-			importPathString += importString;
-			// Construct the Java path, and add it to the path list.
-			final Path importPath = FileSystems.getDefault().getPath(importPathString);
-			importPaths.add(importPath);
-
-			// Map the model name to the import path.
-			for (final UsedModel model : usedModels.values()) {
-				if (model.modelName.equals(modelName)) {
-					model.setSystemPath(importPath);
-					break;
-				}
-			}
-		}
-		return importPaths;
+		return usedModels.values().stream().map(model -> model.getPath()).collect(Collectors.toList());
 	}
 
 	/**
@@ -474,7 +435,7 @@ public class MultiFeatureModel extends FeatureModel {
 		final Path importedModelPath = originalModel.getSourceFile();
 		String modelAlias = null;
 		for (final Entry<String, UsedModel> entry : getExternalModels().entrySet()) {
-			if (entry.getValue().getSystemPath().equals(importedModelPath)) {
+			if (entry.getValue().getPath().equals(importedModelPath)) {
 				modelAlias = entry.getKey() + ".";
 				break;
 			}
