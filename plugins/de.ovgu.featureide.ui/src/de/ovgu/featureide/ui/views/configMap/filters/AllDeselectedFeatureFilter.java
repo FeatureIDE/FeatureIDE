@@ -45,9 +45,11 @@ public class AllDeselectedFeatureFilter extends ConfigurationMapFilter {
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
 		boolean addFeature = true;
-		for (final Configuration iConf : configurationMap.getConfigurations()) {
-			if (iConf.getSelectedFeatures().contains(feature)) {
-				addFeature = false;
+		if (configurationMap.getConfigurations() != null) {
+			for (final Configuration iConf : configurationMap.getConfigurations()) {
+				if (iConf.getSelectedFeatures().contains(feature)) {
+					addFeature = false;
+				}
 			}
 		}
 		return addFeature;
