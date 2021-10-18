@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -77,21 +78,23 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		IFeatureAttribute attribute = (IFeatureAttribute) element;
-		IFeature feature = attribute.getFeature();
-		Boolean newRecursive = (Boolean) value;
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeature feature = attribute.getFeature();
+		final Boolean newRecursive = (Boolean) value;
 
+		// Check for name conflicts
 		if (newRecursive && !isNameUnique(attribute, feature)) {
 			MessageDialog.openError(null, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE);
 			return;
 		}
 
+		// Apply operation
 		FeatureModelOperationWrapper.run(new ChangeAttributeRecursiveOperation((IFeatureModelManager) view.getManager(), attribute, newRecursive));
 	}
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
-			IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
+			final IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
 			if (feat.isContainingAttribute(attribute)) {
 				return false;
 			}

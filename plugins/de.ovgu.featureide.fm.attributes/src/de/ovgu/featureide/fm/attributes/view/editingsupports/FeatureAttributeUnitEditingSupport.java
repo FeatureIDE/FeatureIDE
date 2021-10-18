@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -68,10 +69,10 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		FeatureModelOperationWrapper
-				.run(new ChangeAttributeUnitOperation((IFeatureModelManager) view.getManager(), (IFeatureAttribute) element, value.toString()));
-		getViewer().update(element, null);
-		view.repackAllColumns();
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final String newUnit = value.toString();
+		if (!attribute.getUnit().equals(newUnit)) {
+			FeatureModelOperationWrapper.run(new ChangeAttributeUnitOperation((IFeatureModelManager) view.getManager(), attribute, newUnit));
+		}
 	}
-
 }

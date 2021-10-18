@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * 
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class RemoveFeatureAttributeAction extends Action {
 
@@ -55,7 +56,6 @@ public class RemoveFeatureAttributeAction extends Action {
 
 	@Override
 	public boolean isEnabled() {
-		return attributes.size() > 0;
+		return attributes.stream().anyMatch(a -> !a.isRecursive() || a.isHeadOfRecursiveAttribute());
 	}
-
 }

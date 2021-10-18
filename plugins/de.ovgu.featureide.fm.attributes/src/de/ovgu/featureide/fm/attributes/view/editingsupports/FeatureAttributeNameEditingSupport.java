@@ -88,7 +88,5 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 
 		// Apply operation
 		FeatureModelOperationWrapper.run(new ChangeAttributeNameOperation((IFeatureModelManager) view.getManager(), attribute, newName));
-		getViewer().update(element, null);
-		view.repackAllColumns();
 	}
 }

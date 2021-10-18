@@ -50,6 +50,12 @@ public class StringFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.STRING;
 	}
 
+	/**
+	 * Copy constructor. Constructs a new {@link StringFeatureAttribute} from an existing instance and a corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The containing feature of the new instance
+	 */
 	public StringFeatureAttribute(StringFeatureAttribute oldAttribute, IFeature feature) {
 		super(oldAttribute, feature);
 		value = oldAttribute.value;

@@ -129,6 +129,24 @@ public class AttributeUtils {
 	}
 
 	/**
+	 * Returns the attribute with the given attribute name of the feature with the given feature name.
+	 * 
+	 * @param featureModel The model in which to look up the feature and attribute
+	 * @param featureName The name of the containing feature
+	 * @param attributeName The name of the attribute
+	 * @return The attribute, or null if the feature or attribute cannot be found
+	 */
+	public static IFeatureAttribute getAttribute(IFeatureModel featureModel, String featureName, String attributeName) {
+		final IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) { // Also checks that feature != null
+			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			return extendedFeature.getAttribute(attributeName);
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns an attribute of the given feature or one of its children with the given name.
 	 * 
 	 * @param feature

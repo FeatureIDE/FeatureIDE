@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.attributes.view.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME;
 
-import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -33,7 +32,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to change whether a feature attribute is recursive.
+ * Operation to change whether a feature attribute is recursive. Enables undo/redo functionality.
  * 
  * @author Johannes Herschel
  */
@@ -72,19 +71,15 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 		}
 
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setRecursive(newRecursive);
-				if (newRecursive) {
-					attribute.addRecursiveAttributes();
-				} else {
-					attribute.deleteRecursiveAttributes();
-				}
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setRecursive(newRecursive);
+			if (newRecursive) {
+				attribute.addRecursiveAttributes();
+			} else {
+				attribute.deleteRecursiveAttributes();
 			}
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
@@ -95,19 +90,15 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 		}
 
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setRecursive(oldRecursive);
-				if (oldRecursive) {
-					attribute.addRecursiveAttributes();
-				} else {
-					attribute.deleteRecursiveAttributes();
-				}
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setRecursive(oldRecursive);
+			if (oldRecursive) {
+				attribute.addRecursiveAttributes();
+			} else {
+				attribute.deleteRecursiveAttributes();
 			}
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}

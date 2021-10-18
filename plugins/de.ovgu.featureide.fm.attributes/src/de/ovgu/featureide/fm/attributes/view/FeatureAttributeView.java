@@ -665,6 +665,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				if ((Boolean) event.getOldValue()) {
 					if (!treeViewer.getControl().isDisposed()) {
 						treeViewer.refresh((IFeature) event.getNewValue());
+						repackAllColumns();
 					}
 				}
 			}

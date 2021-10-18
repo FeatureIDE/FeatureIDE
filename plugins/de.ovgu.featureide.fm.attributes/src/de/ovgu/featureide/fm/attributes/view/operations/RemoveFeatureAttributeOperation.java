@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -39,12 +40,17 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to remove feature attributes.
+ * Operation to remove feature attributes. Enables undo/redo functionality.
  * 
  * @author Johannes Herschel
  */
 public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * Pair of feature name and attribute name.
+	 * 
+	 * @author Johannes Herschel
+	 */
 	private static class FeatureAttributeDescriptor {
 
 		public final String featureName;
@@ -80,22 +86,19 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		removedAttributes.clear();
-		for (FeatureAttributeDescriptor attributeDescriptor : attributes) {
-			IFeature feature = featureModel.getFeature(attributeDescriptor.featureName);
-			if (feature instanceof IExtendedFeature) {
-				IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-				IFeatureAttribute attribute = extendedFeature.getAttribute(attributeDescriptor.attributeName);
-				if (attribute != null) {
-					if (attribute.isRecursive()) {
-						if (attribute.isHeadOfRecursiveAttribute()) {
-							attribute.deleteRecursiveAttributes();
-							removedAttributes.put(attribute, attributeDescriptor.featureName);
-							extendedFeature.removeAttribute(attribute);
-						}
-					} else {
+		for (final FeatureAttributeDescriptor attributeDescriptor : attributes) {
+			final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, attributeDescriptor.featureName, attributeDescriptor.attributeName);
+			if (attribute != null) {
+				final IExtendedFeature extendedFeature = (IExtendedFeature) attribute.getFeature();
+				if (attribute.isRecursive()) {
+					if (attribute.isHeadOfRecursiveAttribute()) {
+						attribute.deleteRecursiveAttributes(); // Saves values of descendants in the attribute
 						removedAttributes.put(attribute, attributeDescriptor.featureName);
 						extendedFeature.removeAttribute(attribute);
 					}
+				} else {
+					removedAttributes.put(attribute, attributeDescriptor.featureName);
+					extendedFeature.removeAttribute(attribute);
 				}
 			}
 		}
@@ -104,14 +107,14 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		for (Map.Entry<IFeatureAttribute, String> attribute : removedAttributes.entrySet()) {
-			IFeature feature = featureModel.getFeature(attribute.getValue());
+		for (final Map.Entry<IFeatureAttribute, String> removedAttribute : removedAttributes.entrySet()) {
+			final IFeature feature = featureModel.getFeature(removedAttribute.getValue());
 			if (feature instanceof IExtendedFeature) {
-				IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-				IFeatureAttribute clonedAttribute = attribute.getKey().cloneAtt(extendedFeature);
-				extendedFeature.addAttribute(clonedAttribute);
-				if (clonedAttribute.isRecursive()) {
-					clonedAttribute.addRecursiveAttributes();
+				final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+				final IFeatureAttribute attribute = removedAttribute.getKey().cloneAtt(extendedFeature);
+				extendedFeature.addAttribute(attribute);
+				if (attribute.isRecursive()) {
+					attribute.addRecursiveAttributes(); // Restores values of descendants
 				}
 			}
 		}

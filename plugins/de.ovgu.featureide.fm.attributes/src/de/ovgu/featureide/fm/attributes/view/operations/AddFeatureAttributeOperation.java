@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
@@ -36,13 +37,19 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to create an attribute.
+ * Operation to create an attribute. Enables undo/redo functionality.
  * 
  * @author Johannes Herschel
  */
 public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * The name of the feature to contain the new attribute.
+	 */
 	private final String featureName;
+	/**
+	 * The type of the new attribute.
+	 */
 	private final String attributeType;
 
 	/**
@@ -87,19 +94,19 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
+	/**
+	 * Creates a unique name for an attribute of the given type contained in the given feature.
+	 * 
+	 * @param type The type of the attribute
+	 * @param feature The containing feature of the attribute
+	 * @return A unique name for an attribute of the given type contained in the given feature
+	 */
 	private String getUniqueAttributeName(String type, IExtendedFeature feature) {
-		int amountOfAttributes = 0;
-		while (true) {
-			boolean isUnique = true;
-			String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
-			String attributeName = capitalizedType + "Attribute" + amountOfAttributes++;
-			for (IFeatureAttribute att : feature.getAttributes()) {
-				if (att.getName().equals(attributeName)) {
-					isUnique = false;
-					break;
-				}
-			}
-			if (isUnique) {
+		final String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
+		final String attributePrefix = capitalizedType + "Attribute";
+		for (int i = 0;; i++) {
+			final String attributeName = attributePrefix + i;
+			if (feature.getAttribute(attributeName) == null) {
 				return attributeName;
 			}
 		}
@@ -107,10 +114,9 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			final IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			final IExtendedFeature extendedFeature = (IExtendedFeature) attribute.getFeature();
 			extendedFeature.removeAttribute(attribute);
 			return new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
 		}

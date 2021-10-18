@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.attributes.view.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_UNIT_OPERATION_NAME;
 
-import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -33,7 +32,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to edit the unit of a feature attribute.
+ * Operation to change the unit of a feature attribute. Enables undo/redo functionality.
  * 
  * @author Johannes Herschel
  */
@@ -47,43 +46,41 @@ public class ChangeAttributeUnitOperation extends AbstractFeatureModelOperation 
 	 * The name of the attribute to be modified.
 	 */
 	private final String attributeName;
-	private final String value;
+	/**
+	 * The new unit of the attribute after the operation.
+	 */
+	private final String newUnit;
 
-	private final String oldValue;
+	/**
+	 * The old unit of the attribute before the operation.
+	 */
+	private final String oldUnit;
 
-	public ChangeAttributeUnitOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, String value) {
+	public ChangeAttributeUnitOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, String newUnit) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_UNIT_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
-		this.value = value;
+		this.newUnit = newUnit;
 
-		oldValue = attribute.getUnit();
+		oldUnit = attribute.getUnit();
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setUnit(value);
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
-			}
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setUnit(newUnit);
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setUnit(oldValue);
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
-			}
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setUnit(oldUnit);
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}

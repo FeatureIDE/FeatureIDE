@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.attributes.view.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME;
 
-import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -33,7 +32,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to change whether a feature attribute is configurable.
+ * Operation to change whether a feature attribute is configurable. Enables undo/redo functionality.
  * 
  * @author Johannes Herschel
  */
@@ -47,43 +46,41 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 	 * The name of the attribute to be modified.
 	 */
 	private final String attributeName;
-	private final boolean value;
+	/**
+	 * Whether the attribute is configurable after the operation.
+	 */
+	private final boolean newConfigurable;
 
-	private final boolean oldValue;
+	/**
+	 * Whether the attribute is configurable before the operation.
+	 */
+	private final boolean oldConfigurable;
 
-	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean value) {
+	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newConfigurable) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
-		this.value = value;
+		this.newConfigurable = newConfigurable;
 
-		oldValue = attribute.isConfigurable();
+		oldConfigurable = attribute.isConfigurable();
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setConfigurable(value);
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
-			}
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setConfigurable(newConfigurable);
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		IFeature feature = featureModel.getFeature(featureName);
-		if (feature instanceof IExtendedFeature) {
-			IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-			IFeatureAttribute attribute = extendedFeature.getAttribute(attributeName);
-			if (attribute != null) {
-				attribute.setConfigurable(oldValue);
-				return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, extendedFeature);
-			}
+		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		if (attribute != null) {
+			attribute.setConfigurable(oldConfigurable);
+			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}

@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeConfigureableEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -70,11 +71,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		FeatureModelOperationWrapper
-				.run(new ChangeAttributeConfigurableOperation((IFeatureModelManager) view.getManager(), (IFeatureAttribute) element, (Boolean) value));
-		if (((IFeatureAttribute) element).isRecursive()) {
-			getViewer().refresh();
-		}
-		getViewer().update(element, null);
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		FeatureModelOperationWrapper.run(new ChangeAttributeConfigurableOperation((IFeatureModelManager) view.getManager(), attribute, (Boolean) value));
 	}
 }
