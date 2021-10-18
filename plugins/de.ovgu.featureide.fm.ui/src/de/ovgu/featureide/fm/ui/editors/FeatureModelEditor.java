@@ -151,14 +151,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
 			fmManager.removeListener(diagramEditor);
-
-			// Deregister all importers.
-			if (fmManager.getObject() instanceof MultiFeatureModel) {
-				final MultiFeatureModel mfm = (MultiFeatureModel) fmManager.getObject();
-				final List<Path> importPaths = mfm.getImportPaths();
-				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).removeImportListener(this));
-			}
-
+			deregisterImporters();
 			fmManager.overwrite();
 		}
 		super.dispose();
@@ -573,11 +566,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 			FMPropertyManager.registerEditor(this);
 
 			// Register for imported feature models here.
-			if (fmManager.getObject() instanceof MultiFeatureModel) {
-				final MultiFeatureModel mfm = getMultiFeatureModel();
-				final List<Path> importPaths = mfm.getImportPaths();
-				importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).addImportListener(this));
-			}
+			registerImporters();
 
 			final IFile modelFile = getModelFile();
 			final String modelFileName = modelFile.getName();
@@ -722,6 +711,28 @@ public class FeatureModelEditor extends MultiPageEditorPart implements Reference
 			return (MultiFeatureModel) fm;
 		}
 		return null;
+	}
+
+	/**
+	 * If this editor is for a {@link MultiFeatureModel}, deregister all feature models that are currently imported.
+	 */
+	public void deregisterImporters() {
+		if (fmManager.getObject() instanceof MultiFeatureModel) {
+			final MultiFeatureModel mfm = getMultiFeatureModel();
+			final List<Path> importPaths = mfm.getImportPaths();
+			importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).removeImportListener(this));
+		}
+	}
+
+	/**
+	 * If this editor is for a {@link MultiFeatureModel}, register all feature models that are currently imported.
+	 */
+	public void registerImporters() {
+		if (fmManager.getObject() instanceof MultiFeatureModel) {
+			final MultiFeatureModel mfm = getMultiFeatureModel();
+			final List<Path> importPaths = mfm.getImportPaths();
+			importPaths.forEach(importPath -> FeatureModelManager.getInstance(importPath).addImportListener(this));
+		}
 	}
 
 	public ProblemList checkModel(String source) {

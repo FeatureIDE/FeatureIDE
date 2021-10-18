@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Paul Westphal
  * @author Chico Sundermann
  */
-public class SetFeatureToAbstractOperation extends ComposedFeatureModelOperation {
+public class SetFeatureToAbstractOperation extends MultiFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "SetFeatureToAbstractOperation";
 

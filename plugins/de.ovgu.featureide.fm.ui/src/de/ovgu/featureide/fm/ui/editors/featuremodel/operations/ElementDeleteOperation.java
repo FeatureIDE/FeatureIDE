@@ -38,6 +38,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -57,7 +59,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  * @author Soeren Viegener
  * @author Philipp Vulpius
  */
-public class ElementDeleteOperation extends ComposedFeatureModelOperation implements GUIDefaults {
+public class ElementDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
 	public static final String ID = ID_PREFIX + "ElementDeleteOperation";
 
@@ -71,6 +73,19 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	@Override
 	protected String getID() {
 		return ID;
+	}
+
+	/**
+	 * Creates a copy of <code>featureModel</code> and then undoes this {@link ElementDeleteOperation}. The returned {@link FeatureModelOperationEvent} has this
+	 * copy as <code>oldValue</code>. This allows to propagate the reverse operation to importing {@link MultiFeatureModel}s.
+	 *
+	 * @see {@link MultiFeatureModelOperation#inverseOperation(IFeatureModel)}
+	 */
+	@Override
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeatureModel oldModel = featureModel.clone();
+		final FeatureModelOperationEvent event = (FeatureModelOperationEvent) super.inverseOperation(featureModel);
+		return new FeatureModelOperationEvent(event.getID(), event.getEventType(), event.getSource(), oldModel, event.getNewValue());
 	}
 
 	/**
@@ -109,7 +124,7 @@ public class ElementDeleteOperation extends ComposedFeatureModelOperation implem
 	/**
 	 * Creates the single delete operations which are part of this MultiFeatureModelOperation.
 	 *
-	 * @param featureModel - {@link IFeatureModel} The feature model on which these operations take place
+	 * @param featureModel - {@link IFeatureModel} The feature model on which these operations take place.
 	 */
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {

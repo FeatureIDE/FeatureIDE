@@ -97,6 +97,7 @@ import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent.ExecutionType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
@@ -183,6 +184,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOpe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteSlicingOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
@@ -1205,6 +1207,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		switch (oldEvent.getEventType()) {
 		case MULTIPLE_CHANGES_OCCURRED:
+			// Handle the case where we undo a Delete without Slicing-Operation in an imported model.
+			final FeatureModelOperationEvent modelEvent = (FeatureModelOperationEvent) oldEvent;
+			if ((modelEvent.getExecutionType() == ExecutionType.UNDO) && modelEvent.getID().equals(ElementDeleteOperation.ID)) {
+				final FeatureIDEEvent replaceModelEvent = new FeatureModelOperationEvent(DeleteSlicingOperation.ID, EventType.MODEL_DATA_CHANGED,
+						event.getSource(), modelEvent.getOldValue(), event.getSource());
+				new DeleteSlicingOperation(fmManager, replaceModelEvent, modelAlias).execute();
+				return;
+			}
+
 			// Repeat the single changes stored in newValue for the given source.
 			if (oldEvent.getNewValue() instanceof List<?>) {
 				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();

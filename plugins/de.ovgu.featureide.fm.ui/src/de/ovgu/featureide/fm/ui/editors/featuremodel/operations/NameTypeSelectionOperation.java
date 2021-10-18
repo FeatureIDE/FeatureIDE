@@ -46,7 +46,7 @@ public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	/**
-	 * Sets the short labels property of the garphical feature model to useShortLabels, and then returns an ALL_FEATURES_CHANGED_NAME_TYPE event to trigger the
+	 * Sets the short labels property of the graphical feature model to useShortLabels, and then returns an ALL_FEATURES_CHANGED_NAME_TYPE event to trigger the
 	 * display of the new names.
 	 *
 	 * @see {@link AbstractFeatureModelOperation#operation(IFeatureModel)}
@@ -58,7 +58,7 @@ public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	/**
-	 * Works like inverseOperation, but setw the short labels property to !useShortLabels.
+	 * Works like inverseOperation, but sets the short labels property to !useShortLabels.
 	 *
 	 * @see {@link AbstractFeatureModelOperation#inverseOperation(IFeatureModel)}
 	 */
