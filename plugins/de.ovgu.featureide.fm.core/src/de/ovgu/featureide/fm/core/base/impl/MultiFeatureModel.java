@@ -535,7 +535,8 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	/**
-	 * @param mfm - {@link MultiFeatureModel}
+	 * Updates the import lists and external model information with the values in <code>mfmReplacement</code>.
+	 *
 	 * @param mfmReplacement - {@link MultiFeatureModel}
 	 */
 	public void setMultiFeatureModelProperties(final MultiFeatureModel mfmReplacement) {

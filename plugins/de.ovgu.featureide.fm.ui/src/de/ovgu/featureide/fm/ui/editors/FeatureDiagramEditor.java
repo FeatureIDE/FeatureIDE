@@ -188,8 +188,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperation
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrderOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -661,7 +659,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		propertyChange(event, true);
+		propertyChange(event, true, true);
 	}
 
 	/**
@@ -671,9 +669,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param event The {@link FeatureIDEEvent}.
 	 * @param refresh True if the event is a standalone event, false if the event was encapsulated in a {@link FeatureIDEEvent.EventType#STRUCTURE_CHANGED
 	 *        STRUCTURE_CHANGED} event.
+	 * @param propagate - boolean true if <code>event</code> should be propagated to other feature models immediately.
 	 */
 	@SuppressWarnings("unchecked")
-	private void propertyChange(FeatureIDEEvent event, boolean refresh) {
+	private void propertyChange(FeatureIDEEvent event, boolean refresh, boolean propagate) {
 		final EventType prop = event.getEventType();
 		final Object source = event.getSource();
 		switch (prop) {
@@ -693,7 +692,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				if (oldParent != null) {
 					final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
 					parent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
-					// new Feature is not root so update all childs from old Parent, which include the new feature and his children
+					// new Feature is not root so update all children from old Parent, which include the new feature and his children
 					viewer.refreshChildAll(oldParent);
 				} else {
 					// new Feature is root so update all childs from root
@@ -857,8 +856,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Deal with the single event changes.
 			final List<FeatureIDEEvent> singleEvents = (List<FeatureIDEEvent>) event.getNewValue();
 			for (final FeatureIDEEvent singleEvent : singleEvents) {
-				propertyChange(singleEvent);
+				propertyChange(singleEvent, refresh, false);
 			}
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
@@ -873,13 +873,14 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			recentEvents.add(event);
 			break;
 		case STRUCTURE_CHANGED:
 			if (source instanceof ArrayList) {
 				final ArrayList<?> sList = (ArrayList<?>) source;
 				for (final Object object : sList) {
 					if (object instanceof FeatureModelOperationEvent) {
-						propertyChange((FeatureModelOperationEvent) object, false);
+						propertyChange((FeatureModelOperationEvent) object, refresh, false);
 					}
 				}
 			}
@@ -1146,9 +1147,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		if (!recentEvents.isEmpty()) {
 			final FeatureIDEEvent e = recentEvents.remove(0);
-			final FeatureIDEEvent e2 = new FeatureIDEEvent(fmManager.getObject(), EventType.IMPORTED_MODEL_CHANGED, null, e);
-
-			graphicalFeatureModel.getFeatureModelManager().informImports(e2);
+			if (propagate) {
+				final FeatureIDEEvent e2 = new FeatureIDEEvent(fmManager.getObject(), EventType.IMPORTED_MODEL_CHANGED, null, e);
+				graphicalFeatureModel.getFeatureModelManager().informImports(e2);
+			}
 		}
 	}
 
@@ -1203,11 +1205,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		switch (oldEvent.getEventType()) {
 		case MULTIPLE_CHANGES_OCCURRED:
-			// Mistreatment of ATTRIBUTE_CHANGED!
-			final String operationID = (((FeatureModelOperationEvent) oldEvent).getID());
-			if (operationID.equals(SetFeatureToAbstractOperation.ID) || operationID.equals(SetFeatureToMandatoryOperation.ID)) {
-				return;
-			}
 			// Repeat the single changes stored in newValue for the given source.
 			if (oldEvent.getNewValue() instanceof List<?>) {
 				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();

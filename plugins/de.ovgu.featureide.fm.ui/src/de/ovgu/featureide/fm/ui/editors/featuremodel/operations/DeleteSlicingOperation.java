@@ -101,15 +101,13 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 	 * Reconstructs the feature model <code>mfm</code> after a slicing operation that occurred in a referenced model.
 	 *
 	 * @param mfm - {@link MultiFeatureModel}
-	 * @param modelAlias
-	 * @param oldEvent
 	 * @return new {@link MultiFeatureModel}
 	 */
-	private MultiFeatureModel reconstructModelAfterSlicing(final MultiFeatureModel mfm, final String modelAlias, final FeatureIDEEvent oldEvent) {
+	private MultiFeatureModel reconstructModelAfterSlicing(final MultiFeatureModel mfm) {
 		// Copy the current feature model state.
 		final MultiFeatureModel copy = (MultiFeatureModel) mfm.clone();
 		// Get the old feature model before slicing.
-		final IFeatureModel modelBeforeSlicing = (IFeatureModel) oldEvent.getOldValue();
+		final IFeatureModel modelBeforeSlicing = (IFeatureModel) previousSlicingEvent.getOldValue();
 		// Remove the old constraints as they are in the referencing feature model.
 		for (final IConstraint oldConstraint : modelBeforeSlicing.getConstraints()) {
 			final Node referencingFormula = copy.rewriteNodeImports(oldConstraint.getNode(), modelAlias);
@@ -133,7 +131,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 		// From the feature model after slicing, copy the features, set the interface flag and correct their name.
 		// Afterwards, add them to the feature table, and the the end of the feature ordering list.
-		final IFeatureModel modelAfterSlicing = (IFeatureModel) oldEvent.getNewValue();
+		final IFeatureModel modelAfterSlicing = (IFeatureModel) previousSlicingEvent.getNewValue();
 		final MultiFeatureModelFactory factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(copy);
 		for (final IFeature newFeature : modelAfterSlicing.getFeatures()) {
 			final String referencedName = modelAlias + newFeature.getName();
@@ -173,7 +171,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 			final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, true, false);
 			newModel = LongRunningWrapper.runMethod(method);
 		} else {
-			newModel = reconstructModelAfterSlicing((MultiFeatureModel) featureModel, modelAlias, previousSlicingEvent);
+			newModel = reconstructModelAfterSlicing((MultiFeatureModel) featureModel);
 		}
 		replaceFeatureModel(featureModel, newModel);
 
@@ -196,8 +194,8 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 	/**
 	 * Replaces the content of one feature model (features, constraints) with the content of another feature model.
 	 *
-	 * @param featureModel The feature model to be replaced
-	 * @param replacementModel The feature model to replace
+	 * @param featureModel - {@link IFeatureModel} The feature model to be replaced.
+	 * @param replacementModel - {@link IFeatureModel} The feature model that replaces <code>featureModel</code>.
 	 */
 	private void replaceFeatureModel(IFeatureModel featureModel, IFeatureModel replacementModel) {
 		featureModel.reset();
@@ -212,7 +210,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 			((FeatureModel) featureModel).updateNextElementId();
 		}
 
-		// Update elements of MultiFeatureModels
+		// Update elements of MultiFeatureModels. Required to maintain imports.
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
 			final MultiFeatureModel mfmReplacement = (MultiFeatureModel) replacementModel;
