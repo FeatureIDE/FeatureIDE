@@ -264,13 +264,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
 		final List<String> dialogReasons = new ArrayList<>();
 		if (featureInConstraint) {
-			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_CONSTRAINTS);
 		}
 		if (featureHasGroupDifference) {
-			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_GROUP_DIFFERENCE);
 		}
 		if (featureIsRoot) {
-			dialogReasons.add(StringTable.A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_ROOT);
 		}
 		return dialogReasons;
 	}
