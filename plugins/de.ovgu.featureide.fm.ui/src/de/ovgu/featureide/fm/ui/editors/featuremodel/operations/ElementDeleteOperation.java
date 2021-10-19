@@ -136,7 +136,6 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		boolean featureInConstraint = false;
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
-		boolean featuresInOtherModelConstraints = false;
 
 		for (final Object element : elements) {
 			final IFeature feature = getFeatureFromObject(element);
@@ -163,30 +162,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		// Find referencing models...
-		if (featureModel instanceof MultiFeatureModel) {
-			// by translation of the project-relative path...
-			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
-			final FeatureModelManager mfmManager = (FeatureModelManager) FeatureModelManager.getInstance(mfm);
-			final IPath eclipseRelativePath =
-				FeatureModelManager.getProjectRelativePath(mfmManager.getPath().toFile()).removeFirstSegments(1).removeTrailingSeparator();
-
-			// ... and find the project-relative alias.
-			for (final MultiFeatureModel referencingModel : featureModelManager.getReferencingFeatureModels()) {
-				final String modelAlias = referencingModel.getReference(eclipseRelativePath);
-				// Translate the feature names as they appear in referencingModel.
-				final Collection<String> referencedFeatureNames =
-					featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).collect(Collectors.toList());
-
-				// Finally, find the selected feature names in imported constraints of the referer.
-				for (final IConstraint constraint : referencingModel.getOwnConstraints()) {
-					final Collection<String> constraintFeatureNames =
-						constraint.getContainedFeatures().stream().map(con -> con.getName()).collect(Collectors.toList());
-					featuresInOtherModelConstraints =
-						featuresInOtherModelConstraints || referencedFeatureNames.stream().anyMatch(name -> constraintFeatureNames.contains(name));
-				}
-			}
-		}
+		final boolean featuresInOtherModelConstraints = testForFeatureReferences(featureModelManager, featureModel, featuresToDelete);
 
 		if (featureInConstraint || featureHasGroupDifference || featureIsRoot || featuresInOtherModelConstraints) {
 			// the delete dialog needs to be shown
@@ -200,6 +176,43 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			addDeleteConstraintOperations(constraintsToDelete);
 			addDeleteFeatureOperations(featuresToDelete);
 		}
+	}
+
+	/**
+	 * Tests if at least one feature of <code>featureModel</code> in <code>featuresToDelete</code> is referenced by another model that imports that feature. In
+	 * that case, deleting those features needs to be prevented, as there might otherwise be problems.
+	 *
+	 * @param featureModel - {@link IFeatureModel}
+	 * @param featuresToDelete - {@link List}
+	 * @return boolean
+	 */
+	public static boolean testForFeatureReferences(IFeatureModelManager manager, IFeatureModel featureModel, final List<IFeature> featuresToDelete) {
+		boolean featuresInOtherModelConstraints = false;
+		// Find referencing models...
+		if (featureModel instanceof MultiFeatureModel) {
+			// by translation of the project-relative path...
+			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
+			final FeatureModelManager mfmManager = (FeatureModelManager) FeatureModelManager.getInstance(mfm);
+			final IPath eclipseRelativePath =
+				FeatureModelManager.getProjectRelativePath(mfmManager.getPath().toFile()).removeFirstSegments(1).removeTrailingSeparator();
+
+			// ... and find the project-relative alias.
+			for (final MultiFeatureModel referencingModel : manager.getReferencingFeatureModels()) {
+				final String modelAlias = referencingModel.getReference(eclipseRelativePath);
+				// Translate the feature names as they appear in referencingModel.
+				final Collection<String> referencedFeatureNames =
+					featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).collect(Collectors.toList());
+
+				// Finally, look up the selected feature names in imported constraints of the referer.
+				for (final IConstraint constraint : referencingModel.getOwnConstraints()) {
+					final Collection<String> constraintFeatureNames =
+						constraint.getContainedFeatures().stream().map(con -> con.getName()).collect(Collectors.toList());
+					featuresInOtherModelConstraints =
+						featuresInOtherModelConstraints || referencedFeatureNames.stream().anyMatch(name -> constraintFeatureNames.contains(name));
+				}
+			}
+		}
+		return featuresInOtherModelConstraints;
 	}
 
 	/**

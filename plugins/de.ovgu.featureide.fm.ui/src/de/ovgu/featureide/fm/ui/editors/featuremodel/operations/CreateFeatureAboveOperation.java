@@ -81,14 +81,6 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	 */
 	private boolean needToUpdateMandatory = false;
 
-	// 1. Importierte Feature f
-	// 2. isRoot(f) (im Import)
-	// 3. isMandatory(f) (im Obermodell)
-
-	// 4. neue Root f' einfügen
-	// 5. f auf optional
-	// 6. f' auf mandatory
-
 	/**
 	 * Creates a new {@link CreateFeatureAboveOperation}.
 	 *

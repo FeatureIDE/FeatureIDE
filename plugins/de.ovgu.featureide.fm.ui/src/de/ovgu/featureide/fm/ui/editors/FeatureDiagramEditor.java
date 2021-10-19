@@ -754,18 +754,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					fm.fireEvent(new FeatureIDEEvent(parent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 				}
 				// Draws the connections
-				if (parent.getStructure().hasChildren()) {
-					for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
-						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-					}
-				}
+				redrawConnections(newFeature, parent);
 				graphicalFeatureModel.getGraphicalFeature(parent).update(new FeatureIDEEvent(newFeature, EventType.CHILDREN_CHANGED));
 			} else if ((parent != null) && (parent == newFeature)) {
-				if (parent.getStructure().hasChildren()) {
-					for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
-						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-					}
-				}
+				redrawConnections(newFeature, parent);
+			} else {
+				redrawConnections(newFeature, newFeature);
 			}
 			openRenameEditor(newFeature);
 			if (refresh) {
@@ -1157,6 +1151,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	/**
+	 * Triggers the connections of <code>parent</code> to the children of <code>newFeture</code> to be redrawn.
+	 *
+	 * @param newFeature - {@link IFeature}
+	 * @param parent - {@link IFeature}
+	 */
+	private void redrawConnections(final IFeature newFeature, final IFeature parent) {
+		if (parent.getStructure().hasChildren()) {
+			for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
+				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			}
+		}
+	}
+
+	/**
 	 * Updates the feature name representations, both for features in the diagram and for all cross-tree-constraints they appear in.
 	 */
 	private void updateFeatureNameTypes() {
@@ -1211,7 +1219,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final FeatureModelOperationEvent modelEvent = (FeatureModelOperationEvent) oldEvent;
 			if ((modelEvent.getExecutionType() == ExecutionType.UNDO) && modelEvent.getID().equals(ElementDeleteOperation.ID)) {
 				final FeatureIDEEvent replaceModelEvent = new FeatureModelOperationEvent(DeleteSlicingOperation.ID, EventType.MODEL_DATA_CHANGED,
-						event.getSource(), modelEvent.getOldValue(), event.getSource());
+						modelEvent.getSource(), modelEvent.getOldValue(), modelEvent.getSource());
 				new DeleteSlicingOperation(fmManager, replaceModelEvent, modelAlias).execute();
 				return;
 			}
