@@ -96,6 +96,8 @@ public class TFeatureModelAnalyzer {
 
 	private static IFeatureModel FM_test_9 = init("test_9.xml");
 
+	private static IFeatureModel FM_test_10 = init("test_10.xml");
+
 	private static final IFeatureModel init(String name) {
 		IFeatureModel fm = null;
 		for (final File f : MODEL_FILE_FOLDER.listFiles(filter)) {
@@ -116,6 +118,7 @@ public class TFeatureModelAnalyzer {
 	private static AnalysesCollection FM7_DATA;
 	private static AnalysesCollection FM8_DATA;
 	private static AnalysesCollection FM9_DATA;
+	private static AnalysesCollection FM10_DATA;
 
 	@BeforeClass
 	public static void analyseModels() {
@@ -126,6 +129,7 @@ public class TFeatureModelAnalyzer {
 		FM7_DATA = FeatureModelManager.getAnalyzer(FM_test_7).analyzeFeatureModel(null);
 		FM8_DATA = FeatureModelManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
 		FM9_DATA = FeatureModelManager.getAnalyzer(FM_test_9).analyzeFeatureModel(null);
+		FM10_DATA = FeatureModelManager.getAnalyzer(FM_test_10).analyzeFeatureModel(null);
 	}
 
 	@Test
@@ -306,5 +310,10 @@ public class TFeatureModelAnalyzer {
 	@Test
 	public void TDeadFeatures_FM9() {
 		assertTrue(!FM9_DATA.getFeatureModelProperties().hasDeadFeatures());
+	}
+
+	@Test
+	public void TDeadFeatures_FM10() {
+		assertTrue(!FM10_DATA.getFeatureModelProperties().hasDeadFeatures());
 	}
 }
