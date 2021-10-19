@@ -1208,8 +1208,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 */
 	private void handleChangeInImportedModel(FeatureIDEEvent event) {
 		final MultiFeatureModel mfm = (MultiFeatureModel) graphicalFeatureModel.getFeatureModelManager().getVarObject();
-		// Construct the original model name from originalPath.
+		// Retrieve the original model name from originalPath.
 		final String modelAlias = mfm.extractModelAlias(event);
+		// Ignore the event if the original model is not added in the feature structure.
+		if (!mfm.isActuallyImported(modelAlias)) {
+			return;
+		}
 		// Extract the old event.
 		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
 

@@ -444,6 +444,28 @@ public class MultiFeatureModel extends FeatureModel {
 	}
 
 	/**
+	 * Tests if this feature model actually imports the given feature model with <code>reference</code>. In that case, one of its root features needs to appear
+	 * in the feature model structure.
+	 *
+	 * @param reference - {@link String}
+	 * @return boolean
+	 */
+	public boolean isActuallyImported(String reference) {
+		return isActuallyImported(reference, getStructure().getRoot());
+	}
+
+	private boolean isActuallyImported(String reference, IFeatureStructure root) {
+		return root.getChildren().stream().anyMatch(structure -> {
+			final MultiFeature feature = (MultiFeature) structure.getFeature();
+			if (!feature.isFromExtern()) {
+				return isActuallyImported(reference, feature.getStructure());
+			} else {
+				return feature.getName().startsWith(reference);
+			}
+		});
+	}
+
+	/**
 	 * Tests if the given path has a reference as a model this composed model uses. If so, returns the alias of this path.
 	 *
 	 * @param path - {@link IPath} - A project-relative Eclipse path.
