@@ -87,6 +87,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.prop4j.NodeWriter;
@@ -175,6 +176,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 	private static final Image IMAGE_RESOLVE = FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif").createImage();
 	protected static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
+	private static final Image IMAGE_RESET_SELECTION = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
 
 	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
 
@@ -398,6 +400,22 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
+		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(IMAGE_RESET_SELECTION);
+		item.setToolTipText("Reset Manual Selection");
+		item.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				resetManualSelection();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
 		resolveButton = new ToolItem(toolbar, SWT.PUSH);
 		resolveButton.setImage(IMAGE_RESOLVE);
 		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
@@ -417,7 +435,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
-		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(IMAGE_COLLAPSE);
 		item.setToolTipText("Collapse All Features");
 		item.addSelectionListener(new SelectionListener() {
@@ -797,6 +815,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			break;
 		default:
 			throw new AssertionError(manualSelection);
+		}
+	}
+
+	/**
+	 * Resets all manual selections.
+	 */
+	private void resetManualSelection() {
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null) {
+			configurationManager.editObject(configuration -> {
+				for (final SelectableFeature feature : configuration.getFeatures()) {
+					if (feature.getManual() != Selection.UNDEFINED) {
+						feature.setManual(Selection.UNDEFINED);
+					}
+				}
+			}, ConfigurationManager.CHANGE_ALL);
+			computeTree(UpdateStrategy.UPDATE);
+			setDirty();
 		}
 	}
 
