@@ -42,8 +42,8 @@ public class MultiFeature extends Feature {
 		super(featureModel, name);
 	}
 
-	public MultiFeature(MultiFeature extendedFeature, IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		super(extendedFeature, newFeatureModel, newStructure);
+	public MultiFeature(MultiFeature extendedFeature, IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		super(extendedFeature, newFeatureModel, copyId, newStructure);
 		type = extendedFeature.type;
 		externalModelName = extendedFeature.externalModelName;
 		newDefined = extendedFeature.newDefined;
@@ -95,8 +95,8 @@ public class MultiFeature extends Feature {
 	}
 
 	@Override
-	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new MultiFeature(this, newFeatureModel, newStructure);
+	public IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		return new MultiFeature(this, newFeatureModel, copyId, newStructure);
 	}
 
 }

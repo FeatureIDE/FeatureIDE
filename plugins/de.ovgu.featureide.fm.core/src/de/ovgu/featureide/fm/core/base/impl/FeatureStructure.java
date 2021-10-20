@@ -55,13 +55,13 @@ public class FeatureStructure implements IFeatureStructure {
 	protected IFeatureStructure parent = null;
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 
-	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
-		this(oldStructure, newFeatureModel, false);
+	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel, boolean copyId) {
+		this(oldStructure, newFeatureModel, copyId, false);
 	}
 
-	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel, boolean copySubtree) {
+	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel, boolean copyId, boolean copySubtree) {
 		if (newFeatureModel != null) {
-			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
+			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, copyId, this);
 			if (copySubtree) {
 				newFeatureModel.addFeature(correspondingFeature);
 			}
@@ -77,7 +77,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 		if (copySubtree) {
 			for (final IFeatureStructure child : oldStructure.children) {
-				addNewChild(child.cloneSubtree(newFeatureModel));
+				addNewChild(child.cloneSubtree(newFeatureModel, copyId));
 			}
 		}
 	}
@@ -141,13 +141,13 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel) {
-		return new FeatureStructure(this, newFeatureModel, true);
+	public IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel, boolean copyId) {
+		return new FeatureStructure(this, newFeatureModel, copyId, true);
 	}
 
 	@Override
-	public IFeatureStructure clone(IFeatureModel newFeatureModel) {
-		return new FeatureStructure(this, newFeatureModel, false);
+	public IFeatureStructure clone(IFeatureModel newFeatureModel, boolean copyId) {
+		return new FeatureStructure(this, newFeatureModel, copyId, false);
 	}
 
 	protected void fireAttributeChanged() {

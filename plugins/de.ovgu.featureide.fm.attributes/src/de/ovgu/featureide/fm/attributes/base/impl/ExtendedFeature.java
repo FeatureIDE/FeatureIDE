@@ -42,8 +42,8 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 	protected List<IFeatureAttribute> attributes;
 
-	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
-		super(copyFeature, featureModel, newFeatrureStructure);
+	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatrureStructure) {
+		super(copyFeature, featureModel, copyId, newFeatrureStructure);
 
 		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
@@ -75,8 +75,8 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 	}
 
 	@Override
-	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new ExtendedFeature(this, newFeatureModel, newStructure);
+	public IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		return new ExtendedFeature(this, newFeatureModel, copyId, newStructure);
 	}
 
 	@Override

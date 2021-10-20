@@ -37,8 +37,8 @@ public class MultiConstraint extends Constraint {
 		super(featureModel, propNode);
 	}
 
-	public MultiConstraint(MultiConstraint extendedConstraint, IFeatureModel newFeatureModel) {
-		super(extendedConstraint, newFeatureModel);
+	public MultiConstraint(MultiConstraint extendedConstraint, IFeatureModel newFeatureModel, boolean copyId) {
+		super(extendedConstraint, newFeatureModel, copyId);
 		type = extendedConstraint.type;
 	}
 
@@ -55,8 +55,8 @@ public class MultiConstraint extends Constraint {
 	}
 
 	@Override
-	public IConstraint clone(IFeatureModel newFeatureModel) {
-		return new MultiConstraint(this, newFeatureModel);
+	public IConstraint clone(IFeatureModel newFeatureModel, boolean copyId) {
+		return new MultiConstraint(this, newFeatureModel, copyId);
 	}
 
 }

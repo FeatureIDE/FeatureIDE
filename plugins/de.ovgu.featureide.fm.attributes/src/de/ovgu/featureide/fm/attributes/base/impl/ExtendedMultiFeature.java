@@ -48,8 +48,8 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 	}
 
-	protected ExtendedMultiFeature(ExtendedMultiFeature copyFeature, IFeatureModel featureModel, IFeatureStructure featureStructure) {
-		super(copyFeature, featureModel, featureStructure);
+	protected ExtendedMultiFeature(ExtendedMultiFeature copyFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure featureStructure) {
+		super(copyFeature, featureModel, copyId, featureStructure);
 
 		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
@@ -79,8 +79,8 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 	}
 
 	@Override
-	public ExtendedMultiFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new ExtendedMultiFeature(this, newFeatureModel, newStructure);
+	public ExtendedMultiFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		return new ExtendedMultiFeature(this, newFeatureModel, copyId, newStructure);
 	}
 
 	@Override

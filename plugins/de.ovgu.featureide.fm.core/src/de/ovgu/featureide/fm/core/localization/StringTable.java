@@ -656,6 +656,8 @@ public class StringTable {
 	public static final String EXPAND_ALL = "Expand All";
 	public static final String FOCUS_ON_EXPLANATION = "Focus on Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
+	public static final String ADD_IMPORTED_FEATURES = "Add Imported Features";
+	public static final String ADD_IMPORTED_FEATURES_ALREADY_IMPORTED_WARNING = "At least one of the selected features is already imported.";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";
 	public static final String CHOOSE_FEATURE = "Choose Feature";

@@ -23,6 +23,7 @@ package org.prop4j;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -119,6 +120,11 @@ public class Literal extends Node implements Cloneable {
 			list.add(this);
 		}
 		return list;
+	}
+
+	@Override
+	public void modifyFeatureNames(UnaryOperator<String> f) {
+		var = f.apply(String.valueOf(var));
 	}
 
 	@Override

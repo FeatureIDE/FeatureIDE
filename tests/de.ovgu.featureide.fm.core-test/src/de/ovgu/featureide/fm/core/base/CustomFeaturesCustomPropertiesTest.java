@@ -50,7 +50,7 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
-		public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		public IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
 			throw new RuntimeException();
 		}
 	}

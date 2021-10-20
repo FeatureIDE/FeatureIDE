@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -33,6 +34,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
@@ -630,6 +632,21 @@ public final class FeatureUtils {
 			return root.getFeature();
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the root features of the given model, primarily used for models with multiple root features.
+	 *
+	 * @param featureModel The feature model
+	 * @return The root feature of the given model if it is not implicit, or its children otherwise.
+	 */
+	public static final List<IFeature> getRoots(IFeatureModel featureModel) {
+		final IFeatureStructure root = featureModel.getStructure().getRoot();
+		if (root.getFeature().getProperty().isImplicit()) {
+			return root.getChildren().stream().map(IFeatureStructure::getFeature).collect(Collectors.toList());
+		} else {
+			return Arrays.asList(root.getFeature());
+		}
 	}
 
 	public static final void handleModelDataChanged(IFeatureModel featureModel) {

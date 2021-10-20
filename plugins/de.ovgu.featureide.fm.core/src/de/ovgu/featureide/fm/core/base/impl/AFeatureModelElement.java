@@ -44,9 +44,9 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	protected final IFeatureModel featureModel;
 	protected final IEventManager eventManager = new DefaultEventManager();
 
-	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
+	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel, boolean copyId) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
-		id = oldElement.id;
+		id = copyId ? oldElement.id : featureModel.getNextElementId();
 		name = (oldElement.name == null) ? null : new String(oldElement.name);
 	}
 

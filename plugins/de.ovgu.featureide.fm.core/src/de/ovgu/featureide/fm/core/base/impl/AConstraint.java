@@ -52,8 +52,8 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	boolean isImplicit;
 	protected String description;
 
-	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
-		super(oldConstraint, featureModel);
+	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
+		super(oldConstraint, featureModel, copyId);
 		setNode(oldConstraint.propNode.clone());
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
