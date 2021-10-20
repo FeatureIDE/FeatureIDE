@@ -1331,7 +1331,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Extract the name of the deleted feature, and rewrite it for this model.
 			final IFeature originalFeatureToDelete = ((IFeature) oldEvent.getSource());
 			final String featureToDeleteName = modelAlias + originalFeatureToDelete.getName();
+
+			// Test if the feature formerly was root of an imported feature, and if it was mandatory.
+			final boolean wasRoot = FeatureUtils.isRoot(originalFeatureToDelete);
+			final boolean mandatory = FeatureUtils.isMandatory(mfm.getFeature(featureToDeleteName));
+
+			// Delete the imported feature.
 			new DeleteFeatureOperation(fmManager, featureToDeleteName, mfm.getFeature(featureToDeleteName).getStructure().isMandatory()).execute();
+			// Restore the mandatory property.
+			if (wasRoot && mandatory) {
+				final String updatedRoot = FeatureUtils.getRoot(originalFeatureToDelete.getFeatureModel()).getName();
+				final String importedUpdatedRoot = modelAlias + updatedRoot;
+				new MandatoryFeatureOperation(importedUpdatedRoot, fmManager).execute();
+			}
 			break;
 		case CONSTRAINT_MODIFY:
 			Node newFormula;

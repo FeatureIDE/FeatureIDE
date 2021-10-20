@@ -158,7 +158,9 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 					newFeature.getStructure().setMandatory(true);
 				}
 			}
-			parent.changeToAnd();
+			if (!createAsImport) {
+				parent.changeToAnd();
+			}
 			if (needToUpdateMandatory) {
 				child.getStructure().setMandatory(false);
 			}
