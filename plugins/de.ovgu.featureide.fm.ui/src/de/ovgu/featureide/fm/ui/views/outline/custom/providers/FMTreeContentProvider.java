@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_IMPORTS;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -33,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IManager;
@@ -73,14 +76,16 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		Object[] elements;
 		if (featureModelManager != null) {
 			final IFeatureModel fModel = featureModelManager.getSnapshot();
 			if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
-				elements = new Object[2];
-				elements[0] = fModel.getStructure().getRoot().getFeature();
-				elements[1] = CONSTRAINTS;
-				return elements;
+				final List<Object> elements = new ArrayList<>();
+				elements.add(fModel.getStructure().getRoot().getFeature());
+				elements.add(CONSTRAINTS);
+				if (fModel instanceof MultiFeatureModel) {
+					elements.add(OUTLINE_IMPORTS);
+				}
+				return elements.toArray();
 			}
 		}
 
@@ -102,6 +107,14 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 				elements[i] = cList.get(i);
 			}
 			return elements;
+		}
+
+		if ((parentElement instanceof String) && OUTLINE_IMPORTS.equals(parentElement)) {
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
+			if (fModel instanceof MultiFeatureModel) {
+				return ((MultiFeatureModel) fModel).getExternalModels().values().toArray();
+			}
+			return null;
 		}
 
 		// we store the group stage into an extra object in order to be able to
@@ -142,6 +155,8 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return ((IFeature) element).getStructure().getParent();
 		} else if (element instanceof IConstraint) {
 			return CONSTRAINTS;
+		} else if (element instanceof MultiFeatureModel.UsedModel) {
+			return OUTLINE_IMPORTS;
 		} else if (element instanceof FmOutlineGroupStateStorage) {
 			return ((FmOutlineGroupStateStorage) element).getFeature();
 		}
@@ -155,10 +170,11 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return ((IFeature) element).getStructure().hasChildren();
 		} else if (element instanceof FmOutlineGroupStateStorage) {
 			return true;
-		} else if (element instanceof String) {
-			if (CONSTRAINTS.equals(element)) {
-				return featureModelManager.getSnapshot().getConstraintCount() > 0;
-			}
+		} else if ((element instanceof String) && CONSTRAINTS.equals(element)) {
+			return featureModelManager.getSnapshot().getConstraintCount() > 0;
+		} else if ((element instanceof String) && OUTLINE_IMPORTS.equals(element)) {
+			final IFeatureModel fModel = featureModelManager.getSnapshot();
+			return (fModel instanceof MultiFeatureModel) && !((MultiFeatureModel) fModel).getExternalModels().isEmpty();
 		}
 
 		return false;

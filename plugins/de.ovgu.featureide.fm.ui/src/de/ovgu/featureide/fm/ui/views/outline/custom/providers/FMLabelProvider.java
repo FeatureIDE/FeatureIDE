@@ -29,6 +29,7 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -99,6 +100,13 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 			return ((IConstraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		} else if (element instanceof FmOutlineGroupStateStorage) {
 			return "";
+		} else if (element instanceof MultiFeatureModel.UsedModel) {
+			final MultiFeatureModel.UsedModel usedModel = (MultiFeatureModel.UsedModel) element;
+			if (usedModel.getModelName().equals(usedModel.getVarName())) {
+				return usedModel.getModelName();
+			} else {
+				return usedModel.getModelName() + " (" + usedModel.getVarName() + ")";
+			}
 		}
 
 		return element.toString();

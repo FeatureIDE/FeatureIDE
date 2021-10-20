@@ -913,6 +913,7 @@ public class StringTable {
 	public static final String NO_FILE_FOUND = "no file found";
 	public static final String COLLABORATION_MODEL_NOT_FOUND = "Collaboration model not found";
 	public static final String FEATURE_MODEL_OUTLINE = "Feature-Model Outline";
+	public static final String OUTLINE_IMPORTS = "Imports";
 	public static final String OUTLINE_SELECTION = "Outline Selection";
 	public static final String UPDATE_OUTLINE_VIEW = "Update Outline View";
 	public static final String HIDE_FIELDS = "Hide Fields";
