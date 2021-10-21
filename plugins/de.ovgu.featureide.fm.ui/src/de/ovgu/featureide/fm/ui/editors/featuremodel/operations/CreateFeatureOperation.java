@@ -81,7 +81,7 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	/**
-	 * Disallow <code>inverseOperation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
+	 * Disallows <code>inverseOperation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
 	 */
 	@Override
 	protected Optional<String> approveUndo() {

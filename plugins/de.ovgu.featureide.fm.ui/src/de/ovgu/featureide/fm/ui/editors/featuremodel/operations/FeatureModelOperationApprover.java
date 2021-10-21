@@ -44,14 +44,16 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class FeatureModelOperationApprover implements IOperationApprover2 {
 
 	/**
-	 * Approves the redo of any {@link AbstractFeatureModelOperation}.
+	 * Approves the redo of an {@link AbstractFeatureModelOperation}. In case of disapproval, this method returns a {@link Status.error} object that stores the
+	 * error message to show to the user.
 	 *
 	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory, org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	public IStatus proceedRedoing(IUndoableOperation operation, IOperationHistory history, IAdaptable info) {
-		return Status.OK_STATUS;
+		return testOperation(operation, false, info, StringTable.REDO_OPERATION_NOT_PERMITTED,
+				StringTable.THIS_REDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON);
 	}
 
 	/**
@@ -64,29 +66,8 @@ public class FeatureModelOperationApprover implements IOperationApprover2 {
 	 */
 	@Override
 	public IStatus proceedUndoing(IUndoableOperation operation, IOperationHistory history, IAdaptable info) {
-		if (!(operation instanceof FeatureModelOperationWrapper)) {
-			return Status.OK_STATUS;
-		}
-		final AbstractFeatureModelOperation wrappedOperation = ((FeatureModelOperationWrapper) operation).operation;
-		final Optional<String> approval = wrappedOperation.approveUndo();
-		// Approval given, return OK.
-		if (approval.isEmpty()) {
-			return Status.OK_STATUS;
-		}
-		// No approval given; use info (if available) to show an error pop-up.
-		if (info != null) {
-			final Shell shell = info.getAdapter(Shell.class);
-			shell.getDisplay().syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					MessageDialog.openError(shell, StringTable.UNDO_OPERATION_NOT_PERMITTED,
-							StringTable.THIS_UNDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON + approval.get());
-				}
-			});
-		}
-		// Return an error status for the UI plugin with the actual error message.
-		return new Status(Status.ERROR, FMUIPlugin.PLUGIN_ID, approval.get());
+		return testOperation(operation, true, info, StringTable.UNDO_OPERATION_NOT_PERMITTED,
+				StringTable.THIS_UNDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON);
 	}
 
 	/**
@@ -98,5 +79,49 @@ public class FeatureModelOperationApprover implements IOperationApprover2 {
 	@Override
 	public IStatus proceedExecuting(IUndoableOperation operation, IOperationHistory history, IAdaptable info) {
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * This is the actual testing operation.
+	 *
+	 * @param operation - {@link IUndoableOperation} - Approval is given for all operations that are not {@link FeatureModelOperationWrapper}.
+	 * @param info - {@link IAdaptable} - An {@link IAdaptable} that may provide a shell for a {@link MessageDialog}.
+	 * @param testUndo - boolean - true if undo needs to be tested, false for redo.
+	 * @param title - {@link String} - The title of the error message.
+	 * @param reason - {@link String} - The first line of the error message.
+	 * @return {@link IStatus}
+	 */
+	private IStatus testOperation(IUndoableOperation operation, boolean testUndo, IAdaptable info, String title, String reason) {
+		// Skip other operations then FeatureModelOperationWrapper.
+		if (!(operation instanceof FeatureModelOperationWrapper)) {
+			return Status.OK_STATUS;
+		}
+		final AbstractFeatureModelOperation wrappedOperation = ((FeatureModelOperationWrapper) operation).operation;
+
+		// Query the appropriate approval function.
+		final Optional<String> approval;
+		if (testUndo) {
+			approval = wrappedOperation.approveUndo();
+		} else {
+			approval = wrappedOperation.approveRedo();
+		}
+		// Approval given, return OK.
+		if (approval.isEmpty()) {
+			return Status.OK_STATUS;
+		}
+		// No approval given; use info (if available) to show an error pop-up with title and reason.
+		final String error = approval.get();
+		if (info != null) {
+			final Shell shell = info.getAdapter(Shell.class);
+			shell.getDisplay().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(shell, title, reason + error);
+				}
+			});
+		}
+		// Return an error status for the UI plugin with the actual error message.
+		return new Status(Status.ERROR, FMUIPlugin.PLUGIN_ID, error);
 	}
 }

@@ -22,7 +22,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -36,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -71,6 +74,21 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		super(featureModelManger, DELETE);
 		this.featureName = featureName;
 		this.replacementName = replacementName;
+	}
+
+	/**
+	 * Disallow <code>operation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#approveRedo()}
+	 */
+	@Override
+	protected Optional<String> approveRedo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		if (ElementDeleteOperation.testForFeatureReferences(featureModelManager, model, Collections.singletonList(model.getFeature(featureName)))) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override

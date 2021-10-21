@@ -25,7 +25,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
@@ -33,6 +36,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -73,6 +77,52 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	@Override
 	protected String getID() {
 		return ID;
+	}
+
+	/**
+	 * Disapproves the undo of this {@link ElementDeleteOperation} if at least one constraint contains a feature that wouldn't exist in the feature model after
+	 * executing inverseOperation. In that case, we also provide the affected feature names for the user.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		// Collect the feature names after the undo operation.
+		final Set<String> featureNamesAfterUndo = featureModelManager.getVarObject().getFeatures().stream().map(IFeature::getName).collect(Collectors.toSet());
+		featureNamesAfterUndo.addAll(featureNames);
+		// Collect all feature names in the constraints to restore.
+		final List<IConstraint> constraintsToAdd = operations.stream().filter(operation -> operation instanceof DeleteConstraintOperation)
+				.map(operation -> (DeleteConstraintOperation) operation).map(DeleteConstraintOperation::getOldConstraint).collect(Collectors.toList());
+		final Set<String> featureNamesInAddedConstraints = new HashSet<>(featureNamesAfterUndo.size());
+		constraintsToAdd.stream().map(IConstraint::getNode).map(Node::getUniqueContainedFeatures)
+				.forEach(names -> featureNamesInAddedConstraints.addAll(names));
+		// Collect all features missing after the undo.
+		final List<String> missingFeatures =
+			featureNamesInAddedConstraints.stream().filter(name -> !featureNamesAfterUndo.contains(name)).collect(Collectors.toList());
+
+		if (!missingFeatures.isEmpty()) {
+			String errorMessage = StringTable.THE_FOLLOWING_FEATURES_OF_DELETED_CONSTRAINTS_HAVE_BEEN_DELETED;
+			for (final String feature : missingFeatures) {
+				errorMessage += feature + "\n";
+			}
+			return Optional.of(errorMessage + StringTable.YOU_NEED_TO_RESTORE_THESE_FEATURES_FIRST);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Disallows <code>operation</code>/deletion of the selected elements if any feature to be deleted would appear in a constraint in another model.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#approveRedo()}
+	 */
+	@Override
+	protected Optional<String> approveRedo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		final List<IFeature> featuresToDelete = featureNames.stream().map(name -> model.getFeature(name)).collect(Collectors.toList());
+		if (testForFeatureReferences(featureModelManager, model, featuresToDelete)) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	/**

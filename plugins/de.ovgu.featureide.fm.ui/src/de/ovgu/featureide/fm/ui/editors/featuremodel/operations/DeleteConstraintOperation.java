@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
 
+import java.util.Optional;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -30,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Operation to delete a constraint.
@@ -49,6 +52,10 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 		oldConstraint = constraint;
 	}
 
+	public IConstraint getOldConstraint() {
+		return oldConstraint;
+	}
+
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		oldConstraintIndex = featureModel.getConstraintIndex(oldConstraint);
@@ -56,6 +63,20 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 			featureModel.removeConstraint(oldConstraint);
 		}
 		return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_DELETE, featureModel, oldConstraint, null);
+	}
+
+	/**
+	 * Disallows <code>inverseOperation</code>/adding <code>oldConstraint</code> back to the feature model if at least one feature in its formula doesn't appear
+	 * in the feature model any more.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		if (oldConstraint.getNode().getUniqueContainedFeatures().stream().anyMatch(name -> model.getFeature(name) == null)) {
+			return Optional.of(StringTable.ONE_OR_MORE_FEATURES_OF_THIS_CONSTRAINT_HAVE_BEEN_DELETED);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override

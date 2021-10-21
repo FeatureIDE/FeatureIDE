@@ -1160,4 +1160,9 @@ public class StringTable {
 	public static final String DELETE_SUBMODEL = "Delete Submodel";
 	public static final String THIS_UNDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON = "This Undo Operation is not permitted for the following reason:\n\n";
 	public static final String UNDO_OPERATION_NOT_PERMITTED = "Undo Operation not Permitted";
+	public static final String THIS_REDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON = "This Redo operation is not permitted for the following reason:\n\n";
+	public static final String REDO_OPERATION_NOT_PERMITTED = "Redo Operation not Permitted";
+	public static final String ONE_OR_MORE_FEATURES_OF_THIS_CONSTRAINT_HAVE_BEEN_DELETED = "One or more features of this constraint have been deleted.";
+	public static final String THE_FOLLOWING_FEATURES_OF_DELETED_CONSTRAINTS_HAVE_BEEN_DELETED = "The following feature(s) of deleted constraints have been deleted:\n";
+	public static final String YOU_NEED_TO_RESTORE_THESE_FEATURES_FIRST = "You need to restore these features first.";
 }
