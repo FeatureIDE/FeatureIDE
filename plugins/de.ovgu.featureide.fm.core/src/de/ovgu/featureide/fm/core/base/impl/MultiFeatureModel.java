@@ -228,6 +228,10 @@ public class MultiFeatureModel extends FeatureModel {
 		}
 	}
 
+	public void removeExternalModel(final String varName) {
+		usedModels.remove(varName);
+	}
+
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
 	}

@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.ImportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.SyncCollapsedStateAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
@@ -146,6 +147,9 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
+		final ImportFeatureModelAction importFeatureModelAction = new ImportFeatureModelAction(featureModelManager);
+		manager.add(importFeatureModelAction);
+
 		syncCollapsedStateAction = new SyncCollapsedStateAction();
 		syncCollapsedStateAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
