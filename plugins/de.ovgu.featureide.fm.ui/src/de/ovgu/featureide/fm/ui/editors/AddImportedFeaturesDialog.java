@@ -279,7 +279,7 @@ public class AddImportedFeaturesDialog extends Dialog {
 						addedSets.add(RootFeatureSet.find(f.feature, rootSets.get(f.importedModel)));
 					}
 				}
-				final Set<IFeature> addedFeatures = addedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toSet());
+				final List<IFeature> addedFeatures = addedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toList());
 
 				// Newly deselected root sets/features
 				final Set<RootFeatureSet> removedSets = new HashSet<>();
@@ -291,7 +291,7 @@ public class AddImportedFeaturesDialog extends Dialog {
 						}
 					}
 				}
-				final Set<IFeature> removedFeatures = removedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toSet());
+				final List<IFeature> removedFeatures = removedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toList());
 
 				// If any changes occurred, update the selection based on constraints. This triggers a second pass of this listener where no changes are
 				// detected; this is handled by the else case, where the remaining dialog is updated.
@@ -300,12 +300,13 @@ public class AddImportedFeaturesDialog extends Dialog {
 					final Set<TreePath> newSelection = Arrays.stream(((ITreeSelection) event.getStructuredSelection()).getPaths()).collect(Collectors.toSet());
 
 					// Add newly selected features
-					newSelection.addAll(importedFeatures.values().stream().flatMap(List::stream).filter(f -> addedFeatures.contains(f.feature))
-							.map(f -> new TreePath(new Object[] { f.importedModel, f })).collect(Collectors.toList()));
+					newSelection.addAll(importedFeatures.values().stream().flatMap(List::stream)
+							.filter(imported -> addedFeatures.stream().anyMatch(f -> f == imported.feature))
+							.map(imported -> new TreePath(new Object[] { imported.importedModel, imported })).collect(Collectors.toList()));
 
 					// Remove deselected features
 					newSelection.removeIf(path -> (path.getLastSegment() instanceof ImportedFeature)
-						&& removedFeatures.contains(((ImportedFeature) path.getLastSegment()).feature));
+						&& removedFeatures.stream().anyMatch(f -> f == ((ImportedFeature) path.getLastSegment()).feature));
 
 					// Store selection for next listener pass
 					lastSelectedFeatures.addAll(addedSets);
