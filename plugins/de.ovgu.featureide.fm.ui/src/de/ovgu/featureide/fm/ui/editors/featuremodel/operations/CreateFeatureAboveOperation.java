@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATUR
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -38,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo functionality.
@@ -173,6 +175,19 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE,
 				new Object[] { parent != null ? parent.getFeature() : null, selectedFeatureNames }, newFeature);
+	}
+
+	/**
+	 * Disallow <code>inverseOperation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		if (ElementDeleteOperation.testForFeatureReferences(featureModelManager, model, Collections.singletonList(model.getFeature(featureName)))) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	/**

@@ -1158,4 +1158,6 @@ public class StringTable {
 	public static final String DELETE_SHORTCUT = "Delete (Del)";
 	public static final String UPDATE_CONSTRAINT = "Update Constraint";
 	public static final String DELETE_SUBMODEL = "Delete Submodel";
+	public static final String THIS_UNDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON = "This Undo Operation is not permitted for the following reason:\n\n";
+	public static final String UNDO_OPERATION_NOT_PERMITTED = "Undo Operation not Permitted";
 }

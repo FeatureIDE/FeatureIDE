@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.draw2d.geometry.Point;
 
@@ -121,6 +122,11 @@ public class CreateGraphicalSiblingOperation extends AbstractGraphicalFeatureMod
 			}
 		}
 		return null;
+	}
+
+	@Override
+	protected Optional<String> approveUndo() {
+		return (createFeatureOperation != null) ? createFeatureOperation.approveUndo() : Optional.empty();
 	}
 
 	@Override

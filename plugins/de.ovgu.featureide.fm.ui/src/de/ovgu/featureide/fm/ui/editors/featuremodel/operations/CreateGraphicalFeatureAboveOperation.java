@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.draw2d.geometry.Point;
 
@@ -127,6 +128,11 @@ public class CreateGraphicalFeatureAboveOperation extends AbstractGraphicalFeatu
 			return event;
 		}
 		return null;
+	}
+
+	@Override
+	protected Optional<String> approveUndo() {
+		return (newFeatureName != null) ? createFeatureOperation.approveUndo() : Optional.empty();
 	}
 
 	@Override

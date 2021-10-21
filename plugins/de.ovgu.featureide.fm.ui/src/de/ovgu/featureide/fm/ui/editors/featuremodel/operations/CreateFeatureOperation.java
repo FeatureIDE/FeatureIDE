@@ -22,6 +22,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
+import java.util.Collections;
+import java.util.Optional;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -75,6 +78,19 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 			multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
+	}
+
+	/**
+	 * Disallow <code>inverseOperation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		if (ElementDeleteOperation.testForFeatureReferences(featureModelManager, model, Collections.singletonList(model.getFeature(newFeatureName)))) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override

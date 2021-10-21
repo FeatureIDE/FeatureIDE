@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.Optional;
+
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -45,6 +47,17 @@ public abstract class AbstractFeatureModelOperation {
 	public AbstractFeatureModelOperation(IFeatureModelManager featureModelManager, String title) {
 		this.featureModelManager = featureModelManager;
 		this.title = title;
+	}
+
+	/**
+	 * Tests if this operation can be undone in the current feature model states without causing problems. This method must to be called before running
+	 * {@link AbstractFeatureModelOperation#inverseOperation}. <br> If the undo operation would succeed, this method returns {@link Optional#empty()}. In case
+	 * of failure instead, the return value wraps an error string to show to the user.
+	 *
+	 * @return new {@link Optional} - By default, this method returns {@link Optional#empty()} as we assume no problems would occur.
+	 */
+	protected Optional<String> approveUndo() {
+		return Optional.empty();
 	}
 
 	protected abstract FeatureIDEEvent operation(IFeatureModel featureModel);
