@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * {@link FeatureModelOperationApprover} implements {@link IOperationApprover2} to disapprove any undo operations of {@link AbstractFeatureModelOperation}s,
@@ -84,7 +85,8 @@ public class FeatureModelOperationApprover implements IOperationApprover2 {
 				}
 			});
 		}
-		return Status.error(approval.get());
+		// Return an error status for the UI plugin with the actual error message.
+		return new Status(Status.ERROR, FMUIPlugin.PLUGIN_ID, approval.get());
 	}
 
 	/**
