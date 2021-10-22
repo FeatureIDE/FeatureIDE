@@ -54,6 +54,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -857,6 +858,16 @@ public class ConstraintDialog implements GUIDefaults {
 
 		// Configure tagEntryText.
 		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagInputRow);
+
+		final Set<String> allTags = new HashSet<>();
+
+		for (final IConstraint constraint : featureModelManager.getVarObject().getConstraints()) {
+			allTags.addAll(constraint.getTags());
+		}
+
+		allTags.removeAll(tags);
+
+		setupContentProposal(tagEntryText, new ConstrantTagContentAdapter(), new ConstraintTagContentProposalProvider(allTags), new LabelProvider());
 
 		// TODO Create a drop-down menu for tags that shows all tags this feature model contains.
 
