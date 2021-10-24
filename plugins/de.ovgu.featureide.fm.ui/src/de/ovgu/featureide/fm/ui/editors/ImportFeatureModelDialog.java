@@ -26,10 +26,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_DIALOG_TEXT;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -37,8 +39,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.fm.core.ExternalModelUtil;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.ExternalModelUtil.InvalidImportException;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * A dialog to select a feature model to import.
@@ -48,15 +51,42 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  */
 public class ImportFeatureModelDialog extends Dialog {
 
-	private static final Point DIALOG_SIZE = new Point(400, 300);
+	/**
+	 * Initial and minimum dialog size.
+	 */
+	private static final Point DIALOG_SIZE = new Point(400, 270);
 
+	/**
+	 * The feature model manager of the importing model.
+	 */
 	private final IFeatureModelManager featureModelManager;
 
+	/**
+	 * Text field for the import path.
+	 */
 	private Text pathText;
+	/**
+	 * Text field for the alias of the import.
+	 */
 	private Text aliasText;
 
+	/**
+	 * The entered path.
+	 */
 	private String relativePath;
+	/**
+	 * The entered alias.
+	 */
 	private String alias;
+
+	/**
+	 * Composite for warning icon and text.
+	 */
+	private Composite warningLabel;
+	/**
+	 * Text label of the warning.
+	 */
+	private Label warningText;
 
 	public ImportFeatureModelDialog(Shell parentShell, IFeatureModelManager featureModelManager) {
 		super(parentShell);
@@ -66,33 +96,84 @@ public class ImportFeatureModelDialog extends Dialog {
 	}
 
 	@Override
+	protected Control createContents(Composite parent) {
+		final Control contents = super.createContents(parent);
+
+		// Call update after entire dialog contents have been created
+		update();
+
+		return contents;
+	}
+
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		final Composite composite = (Composite) super.createDialogArea(parent);
 
-		final Label label = new Label(composite, SWT.WRAP);
-		label.setText(IMPORT_FEATURE_MODEL_DIALOG_TEXT);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-		final Composite container = new Composite(composite, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		container.setLayout(new GridLayout(2, false));
-
-		final Label pathLabel = new Label(container, SWT.NONE);
-		pathLabel.setText(IMPORT_FEATURE_MODEL_DIALOG_PATH);
-		pathText = new Text(container, SWT.BORDER);
-		pathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		final Label aliasLabel = new Label(container, SWT.NONE);
-		aliasLabel.setText(IMPORT_FEATURE_MODEL_DIALOG_ALIAS);
-		aliasText = new Text(container, SWT.BORDER);
-		aliasText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		createTopLabel(composite);
+		createInputArea(composite);
+		createWarningLabel(composite);
 
 		return composite;
+	}
+
+	/**
+	 * Creates the label at the top of the dialog and adds it to the given composite.
+	 *
+	 * @param parent The parent composite of the label
+	 */
+	private void createTopLabel(Composite parent) {
+		final Label label = new Label(parent, SWT.WRAP);
+		label.setText(IMPORT_FEATURE_MODEL_DIALOG_TEXT);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+	}
+
+	/**
+	 * Creates the input area consisting of the text fields and corresponding labels in the center of the dialog and adds it to the given composite.
+	 *
+	 * @param parent The parent composite of the input area
+	 */
+	private void createInputArea(Composite parent) {
+		final Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		composite.setLayout(new GridLayout(2, false));
+
+		final Label pathLabel = new Label(composite, SWT.NONE);
+		pathLabel.setText(IMPORT_FEATURE_MODEL_DIALOG_PATH);
+		pathText = new Text(composite, SWT.BORDER);
+		pathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		pathText.addModifyListener(e -> update());
+
+		final Label aliasLabel = new Label(composite, SWT.NONE);
+		aliasLabel.setText(IMPORT_FEATURE_MODEL_DIALOG_ALIAS);
+		aliasText = new Text(composite, SWT.BORDER);
+		aliasText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		aliasText.addModifyListener(e -> update());
+	}
+
+	/**
+	 * Creates the warning label of the dialog and adds it to the given composite.
+	 *
+	 * @param parent The parent composite of the warning label
+	 */
+	private void createWarningLabel(Composite parent) {
+		warningLabel = new Composite(parent, SWT.NONE);
+		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		warningLabel.setLayout(new GridLayout(2, false));
+		warningLabel.setVisible(false);
+
+		final Label icon = new Label(warningLabel, SWT.NONE);
+		icon.setImage(GUIDefaults.FM_WARNING);
+		icon.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
+
+		warningText = new Label(warningLabel, SWT.WRAP);
+		warningText.setText("");
+		warningText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 	}
 
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
+		// Dialog title and minimum size
 		newShell.setText(IMPORT_FEATURE_MODEL);
 		newShell.setMinimumSize(DIALOG_SIZE);
 	}
@@ -104,19 +185,61 @@ public class ImportFeatureModelDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		relativePath = pathText.getText();
-		alias = aliasText.getText();
-		final MultiFeatureModel.UsedModel importedModel =
-			ExternalModelUtil.resolveImport(featureModelManager.getVarObject().getSourceFile(), relativePath, alias);
-		if (importedModel != null) {
+		if (update()) {
+			// Only proceed if import is valid
 			super.okPressed();
 		}
 	}
 
+	/**
+	 * Stores the current input values, checks whether the input is valid and updates the warning label and ok button.
+	 *
+	 * @return True iff the input is valid
+	 */
+	private boolean update() {
+		// Store dialog input
+		if ((pathText == null) || (aliasText == null)) {
+			return false;
+		}
+		relativePath = pathText.getText();
+		alias = aliasText.getText();
+
+		// Validate import
+		boolean valid;
+		try {
+			// Throws if import is invalid
+			ExternalModelUtil.resolveImport(featureModelManager.getVarObject(), relativePath, alias);
+			valid = true;
+		} catch (final InvalidImportException e) {
+			if (warningText != null) {
+				warningText.setText(e.getMessage());
+				warningText.requestLayout();
+			}
+			valid = false;
+		}
+
+		// Update warning label and ok button
+		if (warningLabel != null) {
+			warningLabel.setVisible(!valid && (!relativePath.isEmpty() || !alias.isEmpty()));
+		}
+		final Button button = getButton(IDialogConstants.OK_ID);
+		if (button != null) {
+			button.setEnabled(valid);
+		}
+
+		return valid;
+	}
+
+	/**
+	 * @return The path entered in the dialog.
+	 */
 	public String getRelativePath() {
 		return relativePath;
 	}
 
+	/**
+	 * @return The alias entered in the dialog.
+	 */
 	public String getAlias() {
 		return alias;
 	}

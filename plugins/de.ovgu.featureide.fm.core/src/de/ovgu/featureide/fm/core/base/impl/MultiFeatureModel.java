@@ -228,10 +228,19 @@ public class MultiFeatureModel extends FeatureModel {
 		}
 	}
 
+	/**
+	 * Removes the external model with the given name from this feature model.
+	 *
+	 * @param varName The name of the model to be removed
+	 */
 	public void removeExternalModel(final String varName) {
 		usedModels.remove(varName);
 	}
 
+	/**
+	 * @param varName The name of an external model.
+	 * @return This feature model's external model with the given name, or null if no such model exists.
+	 */
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
 	}

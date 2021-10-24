@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL;
 
 import de.ovgu.featureide.fm.core.ExternalModelUtil;
+import de.ovgu.featureide.fm.core.ExternalModelUtil.InvalidImportException;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -37,8 +38,19 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  */
 public class ImportFeatureModelOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * The path of the model to be imported, relative either to the importing model or to its project.
+	 */
 	private final String relativePath;
+	/**
+	 * The alias to be used for the imported model. An empty string indicates no alias.
+	 */
 	private final String alias;
+
+	/**
+	 * The alias of the imported model, or its name if the alias is empty.
+	 */
+	private String importName;
 
 	public ImportFeatureModelOperation(IFeatureModelManager featureModelManager, String relativePath, String alias) {
 		super(featureModelManager, IMPORT_FEATURE_MODEL);
@@ -50,10 +62,11 @@ public class ImportFeatureModelOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel multiFeatureModel = (MultiFeatureModel) featureModel;
-			final MultiFeatureModel.UsedModel model = ExternalModelUtil.resolveImport(featureModel.getSourceFile(), relativePath, alias);
-			if (model != null) {
+			try {
+				final MultiFeatureModel.UsedModel model = ExternalModelUtil.resolveImport(featureModel, relativePath, alias);
+				importName = model.getVarName();
 				multiFeatureModel.addExternalModel(model);
-			}
+			} catch (final InvalidImportException e) {}
 		}
 		return FeatureIDEEvent.getDefault(EventType.STRUCTURE_CHANGED);
 	}
@@ -62,7 +75,7 @@ public class ImportFeatureModelOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel multiFeatureModel = (MultiFeatureModel) featureModel;
-			multiFeatureModel.removeExternalModel(alias);
+			multiFeatureModel.removeExternalModel(importName);
 		}
 		return FeatureIDEEvent.getDefault(EventType.STRUCTURE_CHANGED);
 	}

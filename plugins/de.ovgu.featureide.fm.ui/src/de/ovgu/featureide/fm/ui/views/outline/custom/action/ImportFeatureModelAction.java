@@ -42,6 +42,9 @@ public class ImportFeatureModelAction extends Action {
 
 	private static ImageDescriptor icon = FMUIPlugin.getDefault().getImageDescriptor("icons/import_wiz.gif");
 
+	/**
+	 * The feature model manager of the importing model.
+	 */
 	private final IFeatureModelManager featureModelManager;
 
 	public ImportFeatureModelAction(IFeatureModelManager featureModelManager) {
