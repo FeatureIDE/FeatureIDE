@@ -44,8 +44,16 @@ public class ConstraintTagContentProposalProvider implements IContentProposalPro
 	public IContentProposal[] getProposals(String contents, int position) {
 		final List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
 
-		for (final String tag : constraintTags) {
-			proposalList.add(new ContentProposal(tag));
+		if ("".equals(contents)) {
+			for (final String tag : constraintTags) {
+				proposalList.add(new ContentProposal(tag));
+			}
+		} else {
+			for (final String tag : constraintTags) {
+				if ((tag.length() >= contents.length()) && tag.substring(0, contents.length()).equalsIgnoreCase(contents)) {
+					proposalList.add(new ContentProposal(tag));
+				}
+			}
 		}
 
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);

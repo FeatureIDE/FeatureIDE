@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Control;
  *
  * @author rahel
  */
-public class ConstrantTagContentAdapter implements IControlContentAdapter {
+public class ConstraintTagContentAdapter implements IControlContentAdapter {
 
 	@Override
 	public void insertControlContents(Control control, String contents, int cursorPosition) {
@@ -84,7 +84,6 @@ public class ConstrantTagContentAdapter implements IControlContentAdapter {
 	@Override
 	public void setCursorPosition(Control control, int index) {
 		((StyledText) control).setSelection(new Point(index, index));
-
 	}
 
 }

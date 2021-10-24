@@ -80,6 +80,7 @@ public interface XMLFeatureModelTags {
 	static final String ATTRIBUTE_VALUE = "value";
 	static final String ATTRIBUTE_RECURSIVE = "recursive";
 	static final String ATTRIBUTE_CONFIGURABLE = "configurable";
+	static final String TAGS = "tags";
 
 	static final String KEY = "key";
 	static final String VALUE = "value";

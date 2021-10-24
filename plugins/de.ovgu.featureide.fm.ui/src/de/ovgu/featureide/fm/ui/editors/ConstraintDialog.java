@@ -54,6 +54,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -68,6 +69,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -94,6 +96,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
@@ -854,7 +858,7 @@ public class ConstraintDialog implements GUIDefaults {
 		// Set up a row that contains tagEntryText, and addTagButton.
 		final Composite tagInputRow = new Composite(tagGroup, SWT.NONE);
 		tagInputRow.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		tagInputRow.setLayout(new GridLayout(2, false));
+		tagInputRow.setLayout(new GridLayout(3, false));
 
 		// Configure tagEntryText.
 		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagInputRow);
@@ -867,9 +871,18 @@ public class ConstraintDialog implements GUIDefaults {
 
 		allTags.removeAll(tags);
 
-		setupContentProposal(tagEntryText, new ConstrantTagContentAdapter(), new ConstraintTagContentProposalProvider(allTags), new LabelProvider());
+		setupContentProposal(tagEntryText, new ConstraintTagContentAdapter(), new ConstraintTagContentProposalProvider(allTags), new LabelProvider() {
 
-		// TODO Create a drop-down menu for tags that shows all tags this feature model contains.
+			@Override
+			public String getText(Object element) {
+
+				if (element instanceof ContentProposal) {
+					return ((ContentProposal) element).getContent();
+				}
+				return element.toString();
+			}
+
+		});
 
 		// Give an overview of the constraint's current tags in <code>tags</code>.
 		final Composite tableComposite = new Composite(tagGroup, SWT.NONE);
@@ -919,7 +932,25 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		});
 
-		// TODO When the user presses enter while typing a new tag, do the same thing.
+		final Button button = new Button(tagInputRow, SWT.NONE);
+		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
+		button.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final IStructuredSelection selectio = (IStructuredSelection) tagTableViewer.getSelection();
+				final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
+				newTagSet.remove(selectio.getFirstElement().toString());
+				provider.inputChanged(tagTableViewer, observableTags, newTagSet);
+				observableTags.remove(selectio.getFirstElement().toString());
+				tagTableViewer.refresh();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+
+		// TODO When the user presses enter while typing a new tag, add the tag.
 	}
 
 	/**
@@ -1035,7 +1066,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.SHEET);
 		shell.setText(DEFAULT_DIALOG_TITLE);
 		shell.setImage(FEATURE_SYMBOL);
-		shell.setSize(500, 585);
+		shell.setSize(650, 585);
 		shell.setMinimumSize(280, 575);
 
 		final GridLayout shellLayout = new GridLayout();

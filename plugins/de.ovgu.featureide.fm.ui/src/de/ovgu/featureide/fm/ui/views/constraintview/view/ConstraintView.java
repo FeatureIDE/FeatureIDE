@@ -182,11 +182,10 @@ public class ConstraintView implements GUIDefaults {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO
-//				comparator.setColumn(ConstraintViewComparator.DESCRIPTION_COLUMN);
-//				treeViewer.getTree().setSortDirection(comparator.getDirection());
-//				treeViewer.getTree().setSortColumn(tagColumn.getColumn());
-//				refresh();
+				comparator.setColumn(ConstraintViewComparator.TAG_COLUMN);
+				treeViewer.getTree().setSortDirection(comparator.getDirection());
+				treeViewer.getTree().setSortColumn(tagColumn.getColumn());
+				refresh();
 			}
 		});
 
