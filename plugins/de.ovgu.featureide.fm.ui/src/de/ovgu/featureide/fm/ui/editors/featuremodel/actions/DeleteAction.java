@@ -120,7 +120,7 @@ public class DeleteAction extends AFeatureModelAction {
 			return false;
 		}
 
-		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeatureModelElement(selection)) {
 			return true;
 		}
 
