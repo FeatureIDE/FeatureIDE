@@ -85,8 +85,14 @@ public class ConstraintViewComparator extends ViewerComparator {
 	}
 
 	private int compareTags(IConstraint constraint1, IConstraint constraint2) {
-		final String constraint1FirstTag = constraint1.getTags().iterator().next();
-		final String constraint2FirstTag = constraint2.getTags().iterator().next();
+		String constraint1FirstTag = "";
+		if (!constraint1.getTags().isEmpty()) {
+			constraint1FirstTag = constraint1.getTags().iterator().next();
+		}
+		String constraint2FirstTag = "";
+		if (!constraint2.getTags().isEmpty()) {
+			constraint2FirstTag = constraint2.getTags().iterator().next();
+		}
 		int diff = constraint1FirstTag.compareTo(constraint2FirstTag);
 		if (diff == 0) {
 			diff = Math.abs(constraint1.getTags().size() - constraint2.getTags().size());
