@@ -62,9 +62,9 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	private final ConstraintDescription oldWrapper;
 	/**
-	 * <code>constraintIndex</code> contains the index of <code>oldConstraint</code>.
+	 * <code>constraintIndex</code> contains the internal ID of <code>oldConstraint</code>.
 	 */
-	private final int constraintIndex;
+	private final long constraintID;
 	/**
 	 * <code>newWrapper</code> holds the new constraint data we replace <code>oldWrapper</code> with.
 	 */
@@ -82,7 +82,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 		super(featureModelManager, EDIT_CONSTRAINT);
 		oldWrapper = new ConstraintDescription(constraint.getNode(), constraint.getDescription());
 		newWrapper = new ConstraintDescription(propNode, description);
-		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
+		constraintID = constraint.getInternalId();
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
+		final IConstraint constraint = (IConstraint) featureModel.getElement(constraintID);
 		constraint.setNode(newWrapper.node);
 		constraint.setDescription(newWrapper.description);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldWrapper, newWrapper);
@@ -103,7 +103,7 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
+		final IConstraint constraint = (IConstraint) featureModel.getElement(constraintID);
 		constraint.setNode(oldWrapper.node);
 		constraint.setDescription(oldWrapper.description);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);

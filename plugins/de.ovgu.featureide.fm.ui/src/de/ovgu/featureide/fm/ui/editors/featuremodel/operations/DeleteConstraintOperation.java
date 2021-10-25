@@ -44,9 +44,21 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 
 	public static final String ID = ID_PREFIX + "DeleteConstraintOperation";
 
+	/**
+	 * <code>oldConstraint</code> stores the constraint to delete.
+	 */
 	private final IConstraint oldConstraint;
+	/**
+	 * <code>oldConstraintIndex</code> stores the position of <code>oldConstraint</code> in the feature model.
+	 */
 	private int oldConstraintIndex;
 
+	/**
+	 * Creates a new {@link DeleteConstraintOperation}.
+	 *
+	 * @param constraint - {@link IConstraint}
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 */
 	public DeleteConstraintOperation(IConstraint constraint, IFeatureModelManager featureModelManager) {
 		super(featureModelManager, DELETE_CONSTRAINT);
 		oldConstraint = constraint;
@@ -56,6 +68,9 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 		return oldConstraint;
 	}
 
+	/**
+	 * Deletes <code>oldConstraint</code> and saves its index.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		oldConstraintIndex = featureModel.getConstraintIndex(oldConstraint);
@@ -79,10 +94,17 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 		}
 	}
 
+	/**
+	 * Creates a copy of <code>oldConstraint</code> and adds it to <code>featureModel</code>. Updates <code>oldConstraintIndex</code>, when required (for
+	 * example, if the old index would exceed the last saved constraint count).
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (oldConstraintIndex != -1) {
 			final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).copyConstraint(featureModel, oldConstraint);
+			if (oldConstraintIndex > featureModel.getConstraintCount()) {
+				oldConstraintIndex = featureModel.getConstraintCount();
+			}
 			featureModel.addConstraint(constraint, oldConstraintIndex);
 			return new FeatureModelOperationEvent(ID, EventType.CONSTRAINT_ADD, featureModel, null, constraint);
 		}

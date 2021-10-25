@@ -26,6 +26,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -47,13 +48,17 @@ public class CreateConstraintOperation extends ExternalFeatureModelOperation {
 	 */
 	private final Node node;
 	/**
-	 * <code>description</code> holds the constraint's description.
+	 * <code>description</code> holds the constraints description.
 	 */
 	private final String description;
 	/**
-	 * <code>constraintCount</code> saves the location the constraint was inserted at.
+	 * <code>constraintID</code> saves the index the constraint was given.
 	 */
-	private int constraintCount = -1;
+	private long constraintID = -1;
+	/**
+	 * <code>createdConstraint</code> stores the created constraint for REDO operations.
+	 */
+	private IConstraint createdConstraint;
 
 	/**
 	 * The standard {@link CreateConstraintOperation} constructor.
@@ -74,20 +79,36 @@ public class CreateConstraintOperation extends ExternalFeatureModelOperation {
 		this.description = description;
 	}
 
+	/**
+	 * Adds a new constraint to <code>featureModel</code> and stores its ID. Assigns a description and external model type, if required, and stores its ID for
+	 * deletion. <br> For a redo, this method clones <code>createdConstraint</code> instead.
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		constraintCount = featureModel.getConstraintCount();
-		final IConstraint constraint = FMFactoryManager.getInstance().getFactory(featureModel).createConstraint(featureModel, node);
-		constraint.setDescription(description);
-		setType(constraint);
+		final int constraintCount = featureModel.getConstraintCount();
+		final IFeatureModelFactory featureModelFactory = FMFactoryManager.getInstance().getFactory(featureModel);
+		final IConstraint constraint;
+
+		if (createdConstraint == null) {
+			createdConstraint = featureModelFactory.createConstraint(featureModel, node);
+			constraint = createdConstraint;
+			constraintID = constraint.getInternalId();
+			constraint.setDescription(description);
+			setType(constraint);
+		} else {
+			constraint = featureModelFactory.copyConstraint(featureModel, createdConstraint);
+		}
 		featureModel.addConstraint(constraint, constraintCount);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_ADD, null, constraint);
 	}
 
+	/**
+	 * Deletes the constraint identified by <code>constraintID</code>.
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IConstraint constraint = featureModel.getConstraints().get(constraintCount);
-		featureModel.removeConstraint(constraintCount);
+		final IConstraint constraint = (IConstraint) featureModel.getElement(constraintID);
+		featureModel.removeConstraint(constraint);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
 	}
 
