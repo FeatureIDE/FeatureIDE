@@ -248,7 +248,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			}
 
 			tautologyConst = analysisResults.isCalculateTautologyConstraints() && containsAny(visibleConstraints, tautologyConstraints);
-			redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints);
+			redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints)
+				&& !tautologyConstraints.containsAll(redundantConstraints);
 
 			explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 		} else {
