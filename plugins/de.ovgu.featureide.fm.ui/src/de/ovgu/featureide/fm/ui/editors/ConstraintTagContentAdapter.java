@@ -27,9 +27,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
 /**
+ * ContentAdapter for content assist while typing constraint tags
  *
- *
- * @author rahel
+ * @author Rahel Arens
  */
 public class ConstraintTagContentAdapter implements IControlContentAdapter {
 
@@ -38,37 +38,21 @@ public class ConstraintTagContentAdapter implements IControlContentAdapter {
 		((StyledText) control).setText(contents);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents(org.eclipse.swt.widgets.Control, java.lang.String, int)
-	 */
 	@Override
 	public void setControlContents(Control control, String contents, int cursorPosition) {
 		((StyledText) control).setText(contents);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getControlContents(org.eclipse.swt.widgets.Control)
-	 */
 	@Override
 	public String getControlContents(Control control) {
 		return ((StyledText) control).getText();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition(org.eclipse.swt.widgets.Control)
-	 */
 	@Override
 	public int getCursorPosition(Control control) {
-		return 0;
+		return ((StyledText) control).getText().length();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds(org.eclipse.swt.widgets.Control)
-	 */
 	@Override
 	public Rectangle getInsertionBounds(Control control) {
 		final StyledText text = (StyledText) control;
@@ -77,10 +61,6 @@ public class ConstraintTagContentAdapter implements IControlContentAdapter {
 		return new Rectangle(caretOrigin.x + text.getClientArea().x, caretOrigin.y + text.getClientArea().y + 3, 1, text.getLineHeight());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition(org.eclipse.swt.widgets.Control, int)
-	 */
 	@Override
 	public void setCursorPosition(Control control, int index) {
 		((StyledText) control).setSelection(new Point(index, index));

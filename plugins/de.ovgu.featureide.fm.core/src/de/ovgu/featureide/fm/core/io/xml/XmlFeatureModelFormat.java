@@ -304,6 +304,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
+	/**
+	 * Adds the tags of a constraint to the xml file
+	 */
 	private void addTags(Document doc, Set<String> tags, Element fnod) {
 		if ((tags != null) && !tags.isEmpty()) {
 			final Element tag = doc.createElement(TAGS);
@@ -453,6 +456,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		return description;
 	}
 
+	/**
+	 * Reads the tag string from the xml file into a set of tags for a constraint
+	 */
 	protected Set<String> getTags(final Node e) {
 		final String tags = e.getTextContent();
 		final String[] tagArray = tags.split(",");

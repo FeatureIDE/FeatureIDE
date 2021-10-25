@@ -84,6 +84,9 @@ public class ConstraintViewComparator extends ViewerComparator {
 		return constraint1.getDescription().compareTo(constraint2.getDescription());
 	}
 
+	/**
+	 * Compare tags first by the String of the first constraint and if that is equal by the amount of tags for ordering of tags
+	 */
 	private int compareTags(IConstraint constraint1, IConstraint constraint2) {
 		String constraint1FirstTag = "";
 		if (!constraint1.getTags().isEmpty()) {

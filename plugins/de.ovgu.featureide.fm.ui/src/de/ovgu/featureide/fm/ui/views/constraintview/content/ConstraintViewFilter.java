@@ -119,6 +119,11 @@ public class ConstraintViewFilter extends ViewerFilter {
 		return true;
 	}
 
+	/**
+	 *
+	 * @param constraint which is checked for the containment of a tag that equals/contains the searchText
+	 * @return true if the constraint contains such a tag. False otherwise.
+	 */
 	private boolean constraintTagInSearch(IConstraint constraint) {
 		if (searchText.startsWith("#")) {
 			final Set<String> constraintTags = constraint.getTags();

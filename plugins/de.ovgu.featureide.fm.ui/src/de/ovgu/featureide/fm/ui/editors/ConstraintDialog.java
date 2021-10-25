@@ -129,6 +129,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Marlen Bernier
  * @author Dawid Szczepanski
  * @author Sebastian Krieter
+ * @author Benedikt Jutz
+ * @author Rahel Arens
  */
 public class ConstraintDialog implements GUIDefaults {
 
@@ -870,6 +872,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				// manage tooltip for commas in tagEntryText
 				final String tagText = tagEntryText.getText();
 				closeTooltip();
 				if (tagText.contains(",")) {
@@ -879,25 +882,22 @@ public class ConstraintDialog implements GUIDefaults {
 
 		});
 
+		// get all tags that exist for all constraints
 		final Set<String> allTags = new HashSet<>();
-
 		for (final IConstraint constraint : featureModelManager.getVarObject().getConstraints()) {
 			allTags.addAll(constraint.getTags());
 		}
-
 		allTags.removeAll(tags);
 
 		setupContentProposal(tagEntryText, new ConstraintTagContentAdapter(), new ConstraintTagContentProposalProvider(allTags), new LabelProvider() {
 
 			@Override
 			public String getText(Object element) {
-
 				if (element instanceof ContentProposal) {
 					return ((ContentProposal) element).getContent();
 				}
 				return element.toString();
 			}
-
 		});
 
 		// Give an overview of the constraint's current tags in <code>tags</code>.
@@ -910,7 +910,6 @@ public class ConstraintDialog implements GUIDefaults {
 		final TableViewerColumn viewerNameColumn = new TableViewerColumn(tagTableViewer, SWT.NONE);
 		tagTableLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, true));
 
-		final Table tagTable = tagTableViewer.getTable();
 		// Configure the label and content provider. Set the contents of observableTags as input.
 		final ArrayContentProvider provider = new ArrayContentProvider();
 		tagTableViewer.setContentProvider(provider);
@@ -929,8 +928,8 @@ public class ConstraintDialog implements GUIDefaults {
 		final Button addTagButton = new Button(tagInputRow, SWT.NONE);
 		addTagButton.setText("Add Tag");
 
-		// When pressing addTagButton, add the new tag to tags. Update the table viewer and content provider to show the new tag,
-		// and reset the entry text.
+		// When pressing addTagButton, add the new tag to tags (only if there is an entered text that does not containt a comma). Update the table viewer and
+		// content provider to show the new tag, and reset the entry text.
 		addTagButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -948,18 +947,21 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		});
 
-		final Button button = new Button(tagInputRow, SWT.NONE);
-		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
-		button.addSelectionListener(new SelectionListener() {
+		// When pressing deleteTagButton, delete the selected tag (if there is a selection)
+		final Button deleteTagButton = new Button(tagInputRow, SWT.NONE);
+		deleteTagButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
+		deleteTagButton.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final IStructuredSelection selectio = (IStructuredSelection) tagTableViewer.getSelection();
-				final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
-				newTagSet.remove(selectio.getFirstElement().toString());
-				provider.inputChanged(tagTableViewer, observableTags, newTagSet);
-				observableTags.remove(selectio.getFirstElement().toString());
-				tagTableViewer.refresh();
+				final IStructuredSelection tagSelection = (IStructuredSelection) tagTableViewer.getSelection();
+				if (tagSelection != null) {
+					final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
+					newTagSet.remove(tagSelection.getFirstElement().toString());
+					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
+					observableTags.remove(tagSelection.getFirstElement().toString());
+					tagTableViewer.refresh();
+				}
 			}
 
 			@Override
@@ -968,6 +970,9 @@ public class ConstraintDialog implements GUIDefaults {
 
 	}
 
+	/**
+	 * Creates the tooltip to tell the user, that a comma is not allowed , when he types a comma in the tag
+	 */
 	private void createTooltip(Composite tagInputRow) {
 		tooltip = new ToolTip(tagInputRow.getShell(), SWT.ICON_ERROR);
 		tooltip.setAutoHide(false);
@@ -977,6 +982,9 @@ public class ConstraintDialog implements GUIDefaults {
 		tooltip.setVisible(true);
 	}
 
+	/**
+	 * Lets the tooltip for the forbidden use of a comma disappear
+	 */
 	private void closeTooltip() {
 		if (tooltip != null) {
 			tooltip.setVisible(false);

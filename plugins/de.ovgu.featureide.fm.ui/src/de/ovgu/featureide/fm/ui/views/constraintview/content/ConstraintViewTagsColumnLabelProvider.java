@@ -27,9 +27,9 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
+ * This class is the label provider for the tags. It displays the given tags for the corresponding constraint and adds a comma between the different tags.
  *
- *
- * @author rahel
+ * @author Rahel Arens
  */
 public class ConstraintViewTagsColumnLabelProvider extends ColumnLabelProvider {
 

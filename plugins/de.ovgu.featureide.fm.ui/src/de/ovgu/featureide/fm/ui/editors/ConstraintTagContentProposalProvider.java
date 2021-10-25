@@ -28,9 +28,9 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
 /**
+ * Provides proposals for content assist while typing constraint tags
  *
- *
- * @author rahel
+ * @author Rahel Arens
  */
 public class ConstraintTagContentProposalProvider implements IContentProposalProvider {
 
@@ -44,11 +44,13 @@ public class ConstraintTagContentProposalProvider implements IContentProposalPro
 	public IContentProposal[] getProposals(String contents, int position) {
 		final List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
 
+		// if nothing is entered yet, propose all tags that does not yet exist for this constraint
 		if ("".equals(contents)) {
 			for (final String tag : constraintTags) {
 				proposalList.add(new ContentProposal(tag));
 			}
 		} else {
+			// filter proposal to only propose tags that still match the entered string
 			for (final String tag : constraintTags) {
 				if ((tag.length() >= contents.length()) && tag.substring(0, contents.length()).equalsIgnoreCase(contents)) {
 					proposalList.add(new ContentProposal(tag));
