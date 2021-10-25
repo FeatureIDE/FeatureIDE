@@ -232,6 +232,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			case CONSTRAINT_ADD:
 			case FEATURE_COLLAPSED_CHANGED:
 			case FEATURE_COLLAPSED_ALL_CHANGED:
+			case IMPORTS_CHANGED:
 				contentProvider.inputChanged(viewer, null, file);
 				break;
 			default:

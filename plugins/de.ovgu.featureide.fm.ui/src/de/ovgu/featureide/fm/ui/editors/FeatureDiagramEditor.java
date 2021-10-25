@@ -836,6 +836,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				analyzeFeatureModel();
 			}
 			break;
+		case IMPORTS_CHANGED:
+			if (refresh) {
+				setDirty();
+			}
+			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
 

@@ -418,6 +418,18 @@ public final class FeatureUtils {
 		return featureModel.getFeature(name.toString());
 	}
 
+	/**
+	 * @param featureModel A feature model
+	 * @param featureName The name of a feature
+	 * @return True iff the given feature model contains a feature with the given name
+	 */
+	public static final boolean containsFeature(IFeatureModel featureModel, CharSequence featureName) {
+		requireNonNull(featureModel);
+		requireNonNull(featureName);
+
+		return featureModel.getFeature(featureName) != null;
+	}
+
 	public static final IFeatureModel getFeatureModel(IConstraint constraint) {
 		requireNonNull(constraint);
 

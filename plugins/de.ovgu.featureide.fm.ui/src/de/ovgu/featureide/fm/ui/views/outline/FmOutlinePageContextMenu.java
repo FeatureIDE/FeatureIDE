@@ -23,6 +23,9 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
+import java.util.Spliterator;
+import java.util.stream.StreamSupport;
+
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -34,6 +37,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -44,11 +48,13 @@ import org.eclipse.ui.part.IPageSite;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.RemoveImportedFeatureModelsAction;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -68,6 +74,7 @@ public class FmOutlinePageContextMenu {
 	private final IFeatureModelManager fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
+	private RemoveImportedFeatureModelsAction removeImportedFeatureModelsAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	private boolean syncCollapsedFeatures = false;
@@ -142,6 +149,8 @@ public class FmOutlinePageContextMenu {
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 
+		removeImportedFeatureModelsAction = new RemoveImportedFeatureModelsAction(viewer, fInput);
+
 		collapseAllAction = new Action() {
 
 			@Override
@@ -215,11 +224,14 @@ public class FmOutlinePageContextMenu {
 	 * @param manager given manager
 	 */
 	public void fillContextMenu(IMenuManager manager) {
-		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+		final ITreeSelection selection = viewer.getStructuredSelection();
 
-		if (sel instanceof IFeature) {
-
+		if (!selection.isEmpty() && StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(element -> element instanceof IFeature)) {
 			manager.add(setFeatureColorAction);
+		}
+		if (!selection.isEmpty()
+			&& StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(element -> element instanceof MultiFeatureModel.UsedModel)) {
+			manager.add(removeImportedFeatureModelsAction);
 		}
 	}
 

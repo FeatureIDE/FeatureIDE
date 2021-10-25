@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_IMPORTED_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_IMPORTED_FEATURE_MODELS;
 
-import de.ovgu.featureide.fm.core.ExternalModelUtil;
-import de.ovgu.featureide.fm.core.ExternalModelUtil.InvalidImportException;
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -31,42 +32,30 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
 /**
- * Operation to import a feature model. Enables undo/redo functionality.
+ * Operation to remove imported feature models. Enables undo/redo functionality.
  *
  * @author Kevin Jedelhauser
  * @author Johannes Herschel
  */
-public class ImportFeatureModelOperation extends AbstractFeatureModelOperation {
+public class RemoveImportedFeatureModelsOperation extends AbstractFeatureModelOperation {
 
 	/**
-	 * The path of the model to be imported, relative either to the importing model or to its project.
+	 * The models to be removed.
 	 */
-	private final String relativePath;
-	/**
-	 * The alias to be used for the imported model. An empty string indicates no alias.
-	 */
-	private final String alias;
+	private final List<MultiFeatureModel.UsedModel> removedModels;
 
-	/**
-	 * The alias of the imported model, or its name if the alias is empty.
-	 */
-	private String importName;
-
-	public ImportFeatureModelOperation(IFeatureModelManager featureModelManager, String relativePath, String alias) {
-		super(featureModelManager, IMPORT_FEATURE_MODEL);
-		this.relativePath = relativePath;
-		this.alias = alias;
+	public RemoveImportedFeatureModelsOperation(IFeatureModelManager featureModelManager, List<MultiFeatureModel.UsedModel> removedModels) {
+		super(featureModelManager, removedModels.size() > 1 ? REMOVE_IMPORTED_FEATURE_MODELS : REMOVE_IMPORTED_FEATURE_MODEL);
+		this.removedModels = removedModels;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel multiFeatureModel = (MultiFeatureModel) featureModel;
-			try {
-				final MultiFeatureModel.UsedModel model = ExternalModelUtil.resolveImport(featureModel, relativePath, alias);
-				importName = model.getVarName();
-				multiFeatureModel.addExternalModel(model);
-			} catch (final InvalidImportException e) {}
+			for (final MultiFeatureModel.UsedModel removedModel : removedModels) {
+				multiFeatureModel.removeExternalModel(removedModel.getVarName());
+			}
 		}
 		return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
 	}
@@ -75,7 +64,9 @@ public class ImportFeatureModelOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		if (featureModel instanceof MultiFeatureModel) {
 			final MultiFeatureModel multiFeatureModel = (MultiFeatureModel) featureModel;
-			multiFeatureModel.removeExternalModel(importName);
+			for (final MultiFeatureModel.UsedModel removedModel : removedModels) {
+				multiFeatureModel.addExternalModel(removedModel);
+			}
 		}
 		return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
 	}
