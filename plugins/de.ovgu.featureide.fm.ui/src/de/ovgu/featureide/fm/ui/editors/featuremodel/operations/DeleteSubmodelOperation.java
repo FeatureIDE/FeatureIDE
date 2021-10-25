@@ -67,7 +67,7 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 			if (feature != null) {
 				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 					final List<String> dialogReasons = new ArrayList<>();
-					dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS);
+					dialogReasons.add(StringTable.DELETE_FEATURE_REASON_CONSTRAINTS);
 					final List<String> buttonLabels = new ArrayList<>();
 					buttonLabels.add(StringTable.CANCEL);
 					openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, buttonLabels.toArray(new String[0]));
