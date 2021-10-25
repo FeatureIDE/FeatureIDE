@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_NEW_CON
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_PROPOSITIONAL_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_PROPOSITIONAL_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_YOUR_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPERATORS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_INSERT_A_CONSTRAINT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE;
@@ -96,6 +97,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
@@ -454,6 +456,8 @@ public class ConstraintDialog implements GUIDefaults {
 	private String defaultHeaderText;
 
 	private Button cancelButton;
+
+	private ToolTip tooltip;
 
 	/**
 	 * Content proposal pop up for the formula of the constraint.
@@ -862,6 +866,18 @@ public class ConstraintDialog implements GUIDefaults {
 
 		// Configure tagEntryText.
 		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagInputRow);
+		tagEntryText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				final String tagText = tagEntryText.getText();
+				closeTooltip();
+				if (tagText.contains(",")) {
+					createTooltip(tagInputRow);
+				}
+			}
+
+		});
 
 		final Set<String> allTags = new HashSet<>();
 
@@ -920,7 +936,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				final String newTagText = tagEntryText.getText();
-				if (!newTagText.isEmpty() && !newTagText.equals(ENTER_A_NEW_OR_EXISTING_TAG_NAME)) {
+				if (!newTagText.isEmpty() && !newTagText.equals(ENTER_A_NEW_OR_EXISTING_TAG_NAME) && !newTagText.contains(",")) {
 					final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
 					newTagSet.add(newTagText);
 					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
@@ -950,7 +966,22 @@ public class ConstraintDialog implements GUIDefaults {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
-		// TODO When the user presses enter while typing a new tag, add the tag.
+	}
+
+	private void createTooltip(Composite tagInputRow) {
+		tooltip = new ToolTip(tagInputRow.getShell(), SWT.ICON_ERROR);
+		tooltip.setAutoHide(false);
+		tooltip.setLocation(tagInputRow.toDisplay(tagInputRow.getSize().x / 2, tagInputRow.getSize().y + 5));
+		tooltip.setText(INVALID_NAME);
+		tooltip.setMessage("The character , is not allowed in a Constraint Tag");
+		tooltip.setVisible(true);
+	}
+
+	private void closeTooltip() {
+		if (tooltip != null) {
+			tooltip.setVisible(false);
+			tooltip = null;
+		}
 	}
 
 	/**
