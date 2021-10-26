@@ -275,23 +275,23 @@ public class AddImportedFeaturesDialog extends Dialog {
 				// Newly selected root sets/features
 				final Set<RootFeatureSet> addedSets = new HashSet<>();
 				for (final ImportedFeature f : selectedFeatures) {
-					if (lastSelectedFeatures.stream().noneMatch(rs -> rs.getRootFeatures().contains(f.feature))) {
-						addedSets.add(RootFeatureSet.find(f.feature, rootSets.get(f.importedModel)));
+					final RootFeatureSet rootSet = getRootFeatureSet(f);
+					if (!lastSelectedFeatures.contains(rootSet)) {
+						addedSets.add(rootSet);
 					}
 				}
-				final List<IFeature> addedFeatures = addedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toList());
 
 				// Newly deselected root sets/features
 				final Set<RootFeatureSet> removedSets = new HashSet<>();
 				for (final RootFeatureSet rs : lastSelectedFeatures) {
+					final MultiFeatureModel.UsedModel usedModel = getUsedModel(rs);
 					for (final IFeature f : rs.getRootFeatures()) {
-						if (selectedFeatures.stream().noneMatch(imported -> imported.feature == f)) {
+						if (selectedFeatures.stream().noneMatch(imported -> (imported.importedModel == usedModel) && (imported.feature == f))) {
 							removedSets.add(rs);
 							break;
 						}
 					}
 				}
-				final List<IFeature> removedFeatures = removedSets.stream().flatMap(rs -> rs.getRootFeatures().stream()).collect(Collectors.toList());
 
 				// If any changes occurred, update the selection based on constraints. This triggers a second pass of this listener where no changes are
 				// detected; this is handled by the else case, where the remaining dialog is updated.
@@ -300,13 +300,13 @@ public class AddImportedFeaturesDialog extends Dialog {
 					final Set<TreePath> newSelection = Arrays.stream(((ITreeSelection) event.getStructuredSelection()).getPaths()).collect(Collectors.toSet());
 
 					// Add newly selected features
-					newSelection.addAll(importedFeatures.values().stream().flatMap(List::stream)
-							.filter(imported -> addedFeatures.stream().anyMatch(f -> f == imported.feature))
-							.map(imported -> new TreePath(new Object[] { imported.importedModel, imported })).collect(Collectors.toList()));
+					newSelection
+							.addAll(importedFeatures.values().stream().flatMap(List::stream).filter(imported -> addedSets.contains(getRootFeatureSet(imported)))
+									.map(imported -> new TreePath(new Object[] { imported.importedModel, imported })).collect(Collectors.toList()));
 
 					// Remove deselected features
 					newSelection.removeIf(path -> (path.getLastSegment() instanceof ImportedFeature)
-						&& removedFeatures.stream().anyMatch(f -> f == ((ImportedFeature) path.getLastSegment()).feature));
+						&& removedSets.contains(getRootFeatureSet((ImportedFeature) path.getLastSegment())));
 
 					// Store selection for next listener pass
 					lastSelectedFeatures.addAll(addedSets);
@@ -342,6 +342,22 @@ public class AddImportedFeaturesDialog extends Dialog {
 
 		applyDialogFont(composite);
 		return composite;
+	}
+
+	/**
+	 * @param imported An {@link ImportedFeature} of the tree viewer
+	 * @return The {@link RootFeatureSet} the given feature belongs to
+	 */
+	private RootFeatureSet getRootFeatureSet(ImportedFeature imported) {
+		return RootFeatureSet.find(imported.feature, rootSets.get(imported.importedModel));
+	}
+
+	/**
+	 * @param rootFeatureSet A {@link RootFeatureSet}
+	 * @return The {@link MultiFeatureModel.UsedModel} the given set belongs to
+	 */
+	private MultiFeatureModel.UsedModel getUsedModel(RootFeatureSet rootFeatureSet) {
+		return rootSets.entrySet().stream().filter(entry -> entry.getValue().contains(rootFeatureSet)).findFirst().get().getKey();
 	}
 
 	private void createWarningLabel(Composite parent) {
