@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.ui.views.outline;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_IMPORTS;
 
 import java.util.Spliterator;
+import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 import org.eclipse.gef.EditPart;
@@ -54,6 +56,7 @@ import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.ImportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.RemoveImportedFeatureModelsAction;
 
 /**
@@ -74,6 +77,7 @@ public class FmOutlinePageContextMenu {
 	private final IFeatureModelManager fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
+	private ImportFeatureModelAction importFeatureModelAction;
 	private RemoveImportedFeatureModelsAction removeImportedFeatureModelsAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
@@ -149,6 +153,7 @@ public class FmOutlinePageContextMenu {
 	private void initActions() {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 
+		importFeatureModelAction = new ImportFeatureModelAction(fInput);
 		removeImportedFeatureModelsAction = new RemoveImportedFeatureModelsAction(viewer, fInput);
 
 		collapseAllAction = new Action() {
@@ -219,20 +224,31 @@ public class FmOutlinePageContextMenu {
 	}
 
 	/**
-	 * fills the ContextMenu depending on the current selection
+	 * Fills the context menu depending on the current selection.
 	 *
-	 * @param manager given manager
+	 * @param manager The menu manager of the context menu to be filled
 	 */
 	public void fillContextMenu(IMenuManager manager) {
 		final ITreeSelection selection = viewer.getStructuredSelection();
 
-		if (!selection.isEmpty() && StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(element -> element instanceof IFeature)) {
+		if (isValidSelection(selection, element -> element instanceof IFeature)) {
 			manager.add(setFeatureColorAction);
 		}
-		if (!selection.isEmpty()
-			&& StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(element -> element instanceof MultiFeatureModel.UsedModel)) {
+		if (isValidSelection(selection, element -> (element instanceof String) && element.equals(OUTLINE_IMPORTS))) {
+			manager.add(importFeatureModelAction);
+		}
+		if (isValidSelection(selection, element -> element instanceof MultiFeatureModel.UsedModel)) {
 			manager.add(removeImportedFeatureModelsAction);
 		}
+	}
+
+	/**
+	 * @param selection The selection to be tested
+	 * @param p The condition tested for each selected element
+	 * @return True iff the selection is not empty and all selected elements satisfy the given predicate
+	 */
+	private boolean isValidSelection(ITreeSelection selection, Predicate<Object> p) {
+		return !selection.isEmpty() && StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(p);
 	}
 
 	public void addToolbar(IToolBarManager iToolBarManager) {
