@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.prop4j.Node;
 
@@ -309,5 +310,19 @@ public interface IConstraint extends IFeatureModelElement {
 	 * @return the description
 	 */
 	String getDescription();
+
+	/**
+	 * Returns the set of tags this constraint has. Tags can be used to group multiple constraints.
+	 *
+	 * @return {@link Collection}
+	 */
+	Set<String> getTags();
+
+	/**
+	 * Sets the set of tags.
+	 *
+	 * @param tags - {@link Collection}
+	 */
+	void setTags(Set<String> tags);
 
 }
