@@ -24,7 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CO
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
@@ -178,13 +180,15 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	private void setExpandedElements() {
 		if (syncCollapsedStateAction.isChecked()) {
-			final ArrayList<Object> expandedElements = new ArrayList<>();
+			// Expand all elements which are already expanded and which are not features
+			final ArrayList<Object> expandedElements =
+				Arrays.stream(viewer.getExpandedElements()).filter(element -> !(element instanceof IFeature)).collect(Collectors.toCollection(ArrayList::new));
+			// Expand all features which are expanded in the diagram
 			for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
 				if (!f.isCollapsed()) {
 					expandedElements.add(f.getObject());
 				}
 			}
-			expandedElements.add("Constraints");
 			viewer.setExpandedElements(expandedElements.toArray());
 		}
 	}
