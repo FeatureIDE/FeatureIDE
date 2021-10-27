@@ -24,14 +24,15 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 
 /**
- *
  * @author Sebastian Krieter
+ * @author Benedikt Jutz
  */
-public class MultiConstraint extends Constraint {
+public class MultiConstraint extends Constraint implements IMultiFeatureModelElement {
 
-	private int type = MultiFeature.TYPE_INTERN;
+	private int type = IMultiFeatureModelElement.TYPE_INTERN;
 
 	public MultiConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel, propNode);
@@ -42,16 +43,14 @@ public class MultiConstraint extends Constraint {
 		type = extendedConstraint.type;
 	}
 
+	@Override
 	public int getType() {
 		return type;
 	}
 
+	@Override
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	public boolean isFromExtern() {
-		return type != MultiFeature.TYPE_INTERN;
 	}
 
 	@Override

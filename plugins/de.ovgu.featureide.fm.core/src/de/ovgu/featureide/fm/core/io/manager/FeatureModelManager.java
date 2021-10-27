@@ -20,14 +20,30 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.ReferenceEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
@@ -76,8 +92,15 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	protected Object undoContext = null;
 
+	/**
+	 * importers is a list of all listeners that reference the stored feature model, and therefore need to be updated when the feature model managed through
+	 * this model is changed.
+	 */
+	private final List<ReferenceEventListener> importers;
+
 	protected FeatureModelManager(Path identifier) {
 		super(identifier, FMFormatManager.getInstance(), FMFactoryManager.getInstance());
+		importers = new ArrayList<>();
 	}
 
 	@Override
@@ -176,6 +199,66 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> implements 
 
 	public static FeatureModelAnalyzer getAnalyzer(IFeatureModel fm) {
 		return new FeatureModelAnalyzer(new FeatureModelFormula(fm));
+	}
+
+	/**
+	 * Adds an listener <code>listener</code> that imports this feature model.
+	 *
+	 * @param listener - {@link ReferenceEventListener}
+	 */
+	public void addImportListener(ReferenceEventListener listener) {
+		importers.add(listener);
+	}
+
+	/**
+	 * Removes the listener <code>listener/code> from the import list.
+	 *
+	 * @param listener - {@link ReferenceEventListener}
+	 */
+	public void removeImportListener(ReferenceEventListener listener) {
+		importers.remove(listener);
+	}
+
+	@Override
+	public Collection<MultiFeatureModel> getReferencingFeatureModels() {
+		return importers.stream().map(importer -> importer.getMultiFeatureModel()).distinct().collect(Collectors.toList());
+	}
+
+	/**
+	 * Removes all listeners from the import list. Call this method when the feature model is closed and its changes need not to be propagated to (still opened)
+	 * importers anymore.
+	 */
+	public void removeAllListeners() {
+		importers.clear();
+	}
+
+	@Override
+	public void informImports(FeatureIDEEvent e) {
+		for (final ReferenceEventListener i : importers) {
+			i.propertyChange(e);
+		}
+	}
+
+	/**
+	 * Looks up the project-relative Eclipse path for the given Java file <code>file</code>. With this method, we may get the project of a feature model file,
+	 * for example.
+	 *
+	 * @param file - {@link File}
+	 * @return an {@link IProject} for the project file is contained in, or null otherwise.
+	 */
+	public static IPath getProjectRelativePath(File file) {
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		try {
+			final IPath path = org.eclipse.core.runtime.Path.fromOSString(file.getCanonicalPath());
+			final IFile fileForPath = workspace.getRoot().getFileForLocation(path);
+			if ((null == fileForPath) || !fileForPath.exists()) {
+				return null;
+			}
+			return fileForPath.getFullPath();
+		} catch (final IOException e) {
+			Logger.logError(e);
+			return null;
+		}
 	}
 
 }

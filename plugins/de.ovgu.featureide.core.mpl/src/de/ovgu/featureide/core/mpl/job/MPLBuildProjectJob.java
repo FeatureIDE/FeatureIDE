@@ -41,8 +41,8 @@ import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -204,7 +204,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 
 		// build instances
 		for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-			if (usedModel.getType() == MultiFeature.TYPE_INSTANCE) {
+			if (usedModel.getType() == IMultiFeatureModelElement.TYPE_INSTANCE) {
 				final String projectName = usedModel.getModelName();
 				final String configName = usedModel.getVarName();
 

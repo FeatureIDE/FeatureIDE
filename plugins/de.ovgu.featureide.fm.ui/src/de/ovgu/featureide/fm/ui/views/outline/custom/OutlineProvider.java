@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewSite;
 
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
@@ -40,6 +41,8 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  * {@link OutlineProvider#isSupported} method.
  *
  * @author Christopher Sontag
+ * @author Kevin Jedelhauser
+ * @author Johannes Herschel
  */
 
 public abstract class OutlineProvider implements ISelectionChangedListener, ITreeViewerListener {
@@ -59,6 +62,13 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 
 	/**
+	 * Called when the active editor has changed.
+	 *
+	 * @param part The new active editor, null if there is no active editor
+	 */
+	public void setActiveEditor(IEditorPart part) {}
+
+	/**
 	 * Populates the context menu of the outline provider.
 	 *
 	 * @param manager
@@ -71,6 +81,13 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	 * @param manager
 	 */
 	protected abstract void initToolbarActions(IToolBarManager manager);
+
+	/**
+	 * Populates the global actions of the outline provider.
+	 *
+	 * @param actionBars
+	 */
+	protected void initGlobalActions(IViewSite site) {}
 
 	/**
 	 * Initalizes a list of {@link IOutlineFilter}} which populate the filter menu. NOTE: The menu is only shown if the filter list is not empty.

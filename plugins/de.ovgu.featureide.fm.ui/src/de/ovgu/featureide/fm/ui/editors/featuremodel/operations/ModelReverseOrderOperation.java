@@ -26,38 +26,73 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to reverse the feature model layout order. Enables undo/redo functionality.
+ * Operation with functionality to reverse the feature model layout order from a given root. Enables undo/redo functionality.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
-public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOperation {
+public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
+	/**
+	 * The string label for this operation.
+	 */
 	private static final String LABEL = REVERSE_LAYOUT_ORDER;
+	/**
+	 * The root feature from which to reverse.
+	 */
+	private final IFeature rootFeature;
 
+	/**
+	 * Creates a new {@link ModelReverseOrderOperation} for the given root of <code>featureModel</code>.
+	 *
+	 * @param featureModel - {@link IGraphicalFeatureModel}
+	 */
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
-		super(featureModel, LABEL);
+		super(featureModel.getFeatureModelManager(), LABEL);
+		rootFeature = FeatureUIHelper.getGraphicalRootFeature(featureModel).getObject();
 	}
 
+	/**
+	 * Creates a new {@link ModelReverseOrderOperation} for <code>rootFeature</code>.
+	 *
+	 * @param rootFeature - {@link IFeature}
+	 */
+	public ModelReverseOrderOperation(IFeature rootFeature) {
+		super(FeatureModelManager.getInstance(rootFeature.getFeatureModel()), LABEL);
+		this.rootFeature = rootFeature;
+	}
+
+	/**
+	 * Reverses the children of all compound features that are reachable from <code>rootStructure</code>, and then returns a {@link FeatureIDEEvent} with the
+	 * <code>LOCATION_CHANGED</code>, <code>featureModel</code> as source, and <code>rootStructure</code> as new value.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#operation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
-		final IFeatureStructure rootStructure = root.getObject().getStructure();
+		final IFeatureStructure rootStructure = rootFeature.getStructure();
 		for (final IFeatureStructure feature : Features.getCompoundFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
 			Collections.reverse(feature.getChildren());
 		}
-		return FeatureIDEEvent.getDefault(FeatureIDEEvent.EventType.LOCATION_CHANGED);
+		return new FeatureIDEEvent(featureModel, EventType.LOCATION_CHANGED, null, rootFeature);
 	}
 
+	/**
+	 * Executes the operation again, thus reversing it.
+	 *
+	 * @see {@link AbstractFeatureModelOperation#inverseOperation(IFeatureModel)}
+	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		return operation(featureModel);

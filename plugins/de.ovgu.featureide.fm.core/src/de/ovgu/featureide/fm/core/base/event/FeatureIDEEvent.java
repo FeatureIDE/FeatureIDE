@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
@@ -50,11 +52,11 @@ public class FeatureIDEEvent {
 		 */
 		CONSTRAINT_MODIFY,
 		/**
-		 * A constraint was deleted.
+		 * A constraint c was deleted. c can be found in oldValue.
 		 */
 		CONSTRAINT_DELETE,
 		/**
-		 * A constraint was added.
+		 * A constraint c was added. c can be found in newValue.
 		 */
 		CONSTRAINT_ADD,
 		/**
@@ -62,11 +64,13 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_DELETE,
 		/**
-		 * A feature was added above another feature.
+		 * A feature was added above other features. <code>oldEvent</code> stores both the names of the existing features in a {@link List}
+		 * (<code>oldEvent[0]</code>), as well as their previous parent in <code>oldEvent[1]</code>. <code>newEvent</code> then contains the newly created
+		 * feature.
 		 */
 		FEATURE_ADD_ABOVE,
 		/**
-		 * A feature was added.
+		 * A feature was added below another feature.
 		 */
 		FEATURE_ADD,
 		/**
@@ -77,6 +81,16 @@ public class FeatureIDEEvent {
 		 * A feature's name was changed.
 		 */
 		FEATURE_NAME_CHANGED,
+		/**
+		 * A change occurred in an imported model. <code>source</code> is the imported model that has been changed, and <code>newValue</code> contains the
+		 * original {@link FeatureIDEEvent} that occurred for source.
+		 */
+		IMPORTED_MODEL_CHANGED,
+		/**
+		 * Multiple changes occurred in a single model. <code>newValue</code> is a {@link List} that stores the single {@link FeatureIDEEvent}s, and
+		 * <code>source</code> is the feature model those changes occurred in.
+		 */
+		MULTIPLE_CHANGES_OCCURRED,
 		/**
 		 * A feature's name was changed and persistently saved.
 		 */
@@ -102,7 +116,7 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
-		 * The location of an object was changed.
+		 * The location of an object was changed, for example because the feature order was reversed.
 		 */
 		LOCATION_CHANGED,
 		/**
@@ -110,7 +124,7 @@ public class FeatureIDEEvent {
 		 */
 		ATTRIBUTE_CHANGED,
 		/**
-		 * A group type changed (e.g., from "or" to "xor").
+		 * A group type changed (e.g., from "or" to "alternative").
 		 */
 		GROUP_TYPE_CHANGED,
 		/**
@@ -122,7 +136,9 @@ public class FeatureIDEEvent {
 		 */
 		MANDATORY_CHANGED,
 		/**
-		 * The feature structure changed.
+		 * The feature structure changed, because a feature was moved, or changed its parent and/or position. <code>source</code> is the feature that was moved,
+		 * <code>oldValue</code> encodes whether manual layout was used (if not, the parent/position changes), and <code>newValue</code> contains the
+		 * FeatureOperationData for the movement.
 		 */
 		STRUCTURE_CHANGED,
 		/**
