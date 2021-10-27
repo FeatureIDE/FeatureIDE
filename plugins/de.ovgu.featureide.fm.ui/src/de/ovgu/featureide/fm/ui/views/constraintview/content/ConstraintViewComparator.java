@@ -24,6 +24,7 @@ public class ConstraintViewComparator extends ViewerComparator {
 
 	public static final int CONSTRAINT_COLUMN = 0;
 	public static final int DESCRIPTION_COLUMN = 1;
+	public static final int TAG_COLUMN = 2;
 	public static final int ASCENDING = 0;
 	public static final int DESCENDING = 1;
 
@@ -57,6 +58,9 @@ public class ConstraintViewComparator extends ViewerComparator {
 		case DESCRIPTION_COLUMN:
 			diff = compareDescription(constraint1, constraint2);
 			break;
+		case TAG_COLUMN:
+			diff = compareTags(constraint1, constraint2);
+			break;
 		}
 
 		if (direction == DESCENDING) {
@@ -78,5 +82,24 @@ public class ConstraintViewComparator extends ViewerComparator {
 			return 1;
 		}
 		return constraint1.getDescription().compareTo(constraint2.getDescription());
+	}
+
+	/**
+	 * Compare tags first by the String of the first constraint and if that is equal by the amount of tags for ordering of tags
+	 */
+	private int compareTags(IConstraint constraint1, IConstraint constraint2) {
+		String constraint1FirstTag = "";
+		if (!constraint1.getTags().isEmpty()) {
+			constraint1FirstTag = constraint1.getTags().iterator().next();
+		}
+		String constraint2FirstTag = "";
+		if (!constraint2.getTags().isEmpty()) {
+			constraint2FirstTag = constraint2.getTags().iterator().next();
+		}
+		int diff = constraint1FirstTag.compareTo(constraint2FirstTag);
+		if (diff == 0) {
+			diff = Math.abs(constraint1.getTags().size() - constraint2.getTags().size());
+		}
+		return diff;
 	}
 }

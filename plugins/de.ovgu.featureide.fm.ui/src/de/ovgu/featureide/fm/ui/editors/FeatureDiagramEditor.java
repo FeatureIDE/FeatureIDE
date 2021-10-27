@@ -1354,7 +1354,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// Execute the appropriate EditConstraintOperation.
 			final ConstraintDescription modifiedDescription = (ConstraintDescription) oldEvent.getNewValue();
 			final Node editedFormula = mfm.rewriteNodeImports(modifiedDescription.node, modelAlias);
-			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description).execute();
+			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description, modifiedDescription.tags).execute();
 			break;
 		case CONSTRAINT_ADD:
 			// For an added constraint, rewrite the formula contained in it.

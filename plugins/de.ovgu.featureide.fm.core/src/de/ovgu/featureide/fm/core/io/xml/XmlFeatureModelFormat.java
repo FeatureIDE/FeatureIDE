@@ -29,8 +29,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.prop4j.And;
@@ -147,6 +149,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				constraints.appendChild(rule);
 				addDescription(doc, constraint.getDescription(), rule);
 				addProperties(doc, constraint.getCustomProperties(), rule);
+				addTags(doc, constraint.getTags(), rule);
 				createPropositionalConstraints(doc, rule, constraint.getNode());
 			}
 		}
@@ -302,6 +305,25 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * Adds the tags of a constraint to the xml file
+	 */
+	private void addTags(Document doc, Set<String> tags, Element fnod) {
+		if ((tags != null) && !tags.isEmpty()) {
+			final Element tag = doc.createElement(TAGS);
+			String finalTags = "";
+			for (final String tagString : tags) {
+				if (finalTags.equals("")) {
+					finalTags += tagString;
+					continue;
+				}
+				finalTags += "," + tagString;
+			}
+			tag.setTextContent(finalTags);
+			fnod.appendChild(tag);
+		}
+	}
+
+	/**
 	 * Parses the comment section.
 	 */
 	protected void parseComments(List<Element> elements) throws UnsupportedModelException {
@@ -410,6 +432,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
 				break;
+			case TAGS:
+				if (parent != null) {
+					parent.setTags(getTags(e));
+				} else {
+					throwWarning("Misplaced description element", e);
+				}
+				break;
 			default:
 				throwWarning("Unknown constraint type: " + nodeName, e);
 			}
@@ -425,6 +454,20 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			description = description.replaceAll("(\r\n|\r|\n)\\s*", "\n").replaceAll("\\A\n|\n\\Z", "");
 		}
 		return description;
+	}
+
+	/**
+	 * Reads the tag string from the xml file into a set of tags for a constraint
+	 */
+	protected Set<String> getTags(final Node e) {
+		final String tags = e.getTextContent();
+		final String[] tagArray = tags.split(",");
+		final Set<String> tagSet = new HashSet<>();
+
+		for (final String tag : tagArray) {
+			tagSet.add(tag);
+		}
+		return tagSet;
 	}
 
 	/**
