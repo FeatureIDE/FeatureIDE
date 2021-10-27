@@ -50,6 +50,17 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.DOUBLE;
 	}
 
+	/**
+	 * Copy constructor. Constructs a new {@link DoubleFeatureAttribute} from an existing instance and a corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The containing feature of the new instance
+	 */
+	public DoubleFeatureAttribute(DoubleFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public Double getValue() {
 		return value;
@@ -75,7 +86,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new DoubleFeatureAttribute(this, feature);
 	}
 
 	/**

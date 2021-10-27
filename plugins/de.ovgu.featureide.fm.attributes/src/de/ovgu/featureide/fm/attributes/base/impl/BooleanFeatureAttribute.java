@@ -50,6 +50,17 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.BOOLEAN;
 	}
 
+	/**
+	 * Copy constructor. Constructs a new {@link BooleanFeatureAttribute} from an existing instance and a corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The containing feature of the new instance
+	 */
+	public BooleanFeatureAttribute(BooleanFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public Boolean getValue() {
 		return value;
@@ -68,7 +79,7 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new BooleanFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new BooleanFeatureAttribute(this, feature);
 	}
 
 	/**

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME;
 
 import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -32,13 +32,11 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to change the value of a feature attribute. Enables undo/redo functionality.
+ * Operation to change whether a feature attribute is recursive. Enables undo/redo functionality.
  * 
- * @author Joshua Sprey
- * @author Chico Sundermann
  * @author Johannes Herschel
  */
-public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperation {
+public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOperation {
 
 	/**
 	 * The name of the feature containing the attribute to be modified.
@@ -49,28 +47,38 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	 */
 	private final String attributeName;
 	/**
-	 * The new value of the attribute after the operation. May be null to indicate no value.
+	 * Whether the attribute is recursive after the operation.
 	 */
-	private final D newValue;
+	private final boolean newRecursive;
 
 	/**
-	 * The old value of the attribute before the operation.
+	 * Whether the attribute is recursive before the operation.
 	 */
-	private Object oldValue;
+	private final boolean oldRecursive;
 
-	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute att, D newValue) {
-		super(fmManager, CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME);
-		featureName = att.getFeature().getName();
-		attributeName = att.getName();
-		this.newValue = newValue;
+	public ChangeAttributeRecursiveOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newRecursive) {
+		super(featureModelManager, CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME);
+		featureName = attribute.getFeature().getName();
+		attributeName = attribute.getName();
+		this.newRecursive = newRecursive;
+
+		oldRecursive = attribute.isRecursive();
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
+		if (newRecursive == oldRecursive) {
+			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
+		}
+
 		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
-			oldValue = attribute.getValue();
-			attribute.setValue(newValue);
+			attribute.setRecursive(newRecursive);
+			if (newRecursive) {
+				attribute.addRecursiveAttributes();
+			} else {
+				attribute.deleteRecursiveAttributes();
+			}
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
@@ -78,9 +86,18 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		if (newRecursive == oldRecursive) {
+			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
+		}
+
 		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
-			attribute.setValue(oldValue);
+			attribute.setRecursive(oldRecursive);
+			if (oldRecursive) {
+				attribute.addRecursiveAttributes();
+			} else {
+				attribute.deleteRecursiveAttributes();
+			}
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
