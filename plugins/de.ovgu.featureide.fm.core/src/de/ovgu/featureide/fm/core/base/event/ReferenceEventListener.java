@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,40 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.core.base.event;
+
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
- * Manages all additional properties of a feature.
+ * {@link ReferenceEventListener} provides an extension to {@link IEventListener} that allows direct access to a {@link MultiFeatureModel} it manages. This
+ * might be useful for propagating updates that occur in a referenced model, for example.
  *
- * @author Sebastian Krieter
+ * @author Kevin Jedelhauser
+ * @author Benedikt Jutz
  */
-public interface IFeatureProperty {
-
-	IFeatureProperty clone(IFeature newFeature);
-
-	String getDescription();
-
-	@Deprecated
-	String getDisplayName();
-
-	IFeature getFeature();
-
-	void setDescription(CharSequence description);
-
-	@Deprecated
-	void setDisplayName(CharSequence name);
-
-	boolean isConstraintSelected();
-
-	boolean selectConstraint(boolean state);
+public interface ReferenceEventListener extends IEventListener {
 
 	/**
-	 * Implicit features can be used to represent features that exist only for technical reasons, such as the implicit root feature of UVL models with multiple
-	 * actual root features.
+	 * Returns the managed {@link MultiFeatureModel} of this object.
 	 *
-	 * @return Whether the corresponding feature is implicit.
+	 * @return {@link MultiFeatureModel}
 	 */
-	boolean isImplicit();
-
-	void setImplicit(boolean implicit);
+	MultiFeatureModel getMultiFeatureModel();
 }

@@ -24,17 +24,16 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 
 /**
  * Feature for the {@link MultiFeatureModel}.
  *
  * @author Sebastian Krieter
  */
-public class MultiFeature extends Feature {
+public class MultiFeature extends Feature implements IMultiFeatureModelElement {
 
-	public static final int TYPE_INTERN = 0, TYPE_INHERITED = 1, TYPE_INTERFACE = 2, TYPE_INSTANCE = 3;
-
-	private int type = TYPE_INTERN;
+	private int type = IMultiFeatureModelElement.TYPE_INTERN;
 	private String externalModelName = null;
 	private boolean newDefined = false;
 
@@ -54,26 +53,12 @@ public class MultiFeature extends Feature {
 		return new MultiFeatureProperty(this);
 	}
 
+	@Override
 	public int getType() {
 		return type;
 	}
 
-	public boolean isInherited() {
-		return type == TYPE_INHERITED;
-	}
-
-	public boolean isInterface() {
-		return type == TYPE_INTERFACE;
-	}
-
-	public boolean isInstance() {
-		return type == TYPE_INSTANCE;
-	}
-
-	public boolean isFromExtern() {
-		return type != TYPE_INTERN;
-	}
-
+	@Override
 	public void setType(int type) {
 		this.type = type;
 	}

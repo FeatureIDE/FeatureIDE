@@ -20,10 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public interface IConfigurationEditor {
+
+	String EXPAND_PREFERENCE = "configurationexpandpreference";
 
 	ConfigurationManager getConfigurationManager();
 
@@ -41,12 +44,29 @@ public interface IConfigurationEditor {
 
 	boolean isReadFeatureModelError();
 
+	/**
+	 * The {@link ExpandAlgorithm} enum declares the possible expansion types for open clauses of a {@link Configuration}.
+	 *
+	 * @author Benedikt Jutz
+	 */
 	enum ExpandAlgorithm {
-		NONE, CURRENTLY_SELECTED, ALL_SELECTED, OPEN_CLAUSES, ALL_SELECTED_OPEN_CLAUSE
+		NONE, ALL_SELECTED, CURRENTLY_SELECTED, OPEN_CLAUSES, ALL_SELECTED_OPEN_CLAUSE
 	}
 
 	ExpandAlgorithm getExpandAlgorithm();
 
 	void setExpandAlgorithm(ExpandAlgorithm expandAlgorithm);
+
+	/**
+	 * Saves the current expansion algorithm to the project info file of the associated feature model.
+	 */
+	void saveExpansionAlgorithm();
+
+	/**
+	 * Reads and returns the expansion algorithm from the configuration file of the project the associated feature model belongs to. The default value is 0.
+	 *
+	 * @return {@link ExpandAlgorithm}
+	 */
+	ExpandAlgorithm readExpansionAlgorithm();
 
 }

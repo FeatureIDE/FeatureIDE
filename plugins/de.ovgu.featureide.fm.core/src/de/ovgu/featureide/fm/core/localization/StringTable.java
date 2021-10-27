@@ -490,6 +490,7 @@ public class StringTable {
 	public static final String TOOLTIP_HIDDEN = " hidden";
 	public static final String TOOLTIP_FEATURE = " feature ";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
+	public static final String TOOLTIP_IMPLICIT = "(implicit) ";
 	public static final String IS_DEAD = "is dead ";
 	public static final String IS_FALSE_OPTIONAL = "is false optional ";
 	public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
@@ -498,6 +499,7 @@ public class StringTable {
 	public static final String VOID_FEATURE_MODEL = "Void Feature Model";
 	public static final String SAVE_IMAGE = "Save image";
 	public static final String UNKNOWN_IMAGE_FILE_FORMAT = "Unknown image file format ";
+	public static final String SET_MANUAL_LAYOUT = "Set Manual Layout";
 	public static final String MANUAL_LAYOUT = "Manual Layout";
 	public static final String DELETE_CONSTRAINT = "Delete Constraint";
 	public static final String MOVE_CONSTRAINT = "Move Constraint";
@@ -816,6 +818,7 @@ public class StringTable {
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
 	public static final String SUCCESS = "Success";
 	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
+	public static final String PLEASE_OPEN_A_FEATUREIDE_PROJECT = "Please open a FeatureIDE project.";
 	public static final String MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL =
 		"The open feature model does not support attributes. To use attributes convert your feature model to an extended feature model.";
 	public static final String CONFIG_NOT_SUPPORTED_PLEASE_CREATE_EXTENDED_CONFIG =
@@ -1152,4 +1155,19 @@ public class StringTable {
 	public static final String FOCUS_ON_DEAD_FEATURES = "Focus on Dead Features";
 	public static final String FOCUS_ON_REDUNDANT_CONSTRAINTS = "Focus on Redundant Constraints";
 	public static final String FOCUS_ON_ALL_EXPLANATIONS = "Focus on All Explanations";
+	public static final String CREATE_FEATURE = "Create Feature";
+	public static final String AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL =
+		"At least one feature appears in a constraint in another feature model.\nCurrently, you need to delete these constraints manually before executing this delete operation.";
+	public static final String MANDATORY_UPPERCASE = "Mandatory";
+	public static final String ABSTRACT_ACTION = "Abstract";
+	public static final String DELETE_SHORTCUT = "Delete (Del)";
+	public static final String UPDATE_CONSTRAINT = "Update Constraint";
+	public static final String DELETE_SUBMODEL = "Delete Submodel";
+	public static final String THIS_UNDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON = "This Undo Operation is not permitted for the following reason:\n\n";
+	public static final String UNDO_OPERATION_NOT_PERMITTED = "Undo Operation not Permitted";
+	public static final String THIS_REDO_OPERATION_IS_NOT_PERMITTED_FOR_THE_FOLLOWING_REASON = "This Redo operation is not permitted for the following reason:\n\n";
+	public static final String REDO_OPERATION_NOT_PERMITTED = "Redo Operation not Permitted";
+	public static final String ONE_OR_MORE_FEATURES_OF_THIS_CONSTRAINT_HAVE_BEEN_DELETED = "One or more features of this constraint have been deleted.";
+	public static final String THE_FOLLOWING_FEATURES_OF_DELETED_CONSTRAINTS_HAVE_BEEN_DELETED = "The following feature(s) of deleted constraints have been deleted:\n";
+	public static final String YOU_NEED_TO_RESTORE_THESE_FEATURES_FIRST = "You need to restore these features first.";
 }

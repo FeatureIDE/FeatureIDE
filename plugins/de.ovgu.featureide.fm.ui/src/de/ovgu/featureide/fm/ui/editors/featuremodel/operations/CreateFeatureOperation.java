@@ -22,14 +22,20 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
+import java.util.Collections;
+import java.util.Optional;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Operation with functionality to create a layer feature. Enables undo/redo functionality.
@@ -41,22 +47,50 @@ public class CreateFeatureOperation extends AbstractFeatureModelOperation {
 
 	private final String parentName;
 	private String newFeatureName;
+	private final boolean createAsImport;
 	private final int index;
 
 	public CreateFeatureOperation(String parentName, int index, IFeatureModelManager featureModelManager) {
-		super(featureModelManager, "Create Feature");
+		super(featureModelManager, StringTable.CREATE_FEATURE);
 		this.parentName = parentName;
 		this.index = index;
+		createAsImport = false;
+	}
+
+	public CreateFeatureOperation(String parentName, String childName, int index, IFeatureModelManager manager) {
+		super(manager, StringTable.CREATE_FEATURE);
+		this.parentName = parentName;
+		newFeatureName = childName;
+		this.index = index;
+		createAsImport = true;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		newFeatureName = FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION);
+		newFeatureName = (newFeatureName == null) ? FeatureUtils.getFeatureName(featureModel, DEFAULT_FEATURE_LAYER_CAPTION) : newFeatureName;
 		final IFeature newFeature = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, newFeatureName);
 		featureModel.addFeature(newFeature);
 		final IFeature parent = featureModel.getFeature(parentName);
 		parent.getStructure().addChildAtPosition(index, newFeature.getStructure());
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
+		if (createAsImport) {
+			// Finally mark the feature as imported from an interface.
+			final MultiFeature multiFeature = (MultiFeature) newFeature;
+			multiFeature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
+		}
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, parent, newFeature);
+	}
+
+	/**
+	 * Disallows <code>inverseOperation</code>/deletion of <code>featureName</code> if it appears in an constraint of another model.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		if (ElementDeleteOperation.testForFeatureReferences(featureModelManager, model, Collections.singletonList(model.getFeature(newFeatureName)))) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override

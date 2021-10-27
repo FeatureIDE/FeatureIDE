@@ -21,12 +21,14 @@
 package de.ovgu.featureide.fm.ui;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.init.ILibrary;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
 import de.ovgu.featureide.fm.ui.editors.EclipseExternalChangeListener;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormatManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationApprover;
 
 /**
  * The library object for the fm.ui plug-in when using the Eclipse platform.
@@ -47,14 +49,18 @@ public class FMUIEclipseLibrary implements ILibrary {
 	private FMUIEclipseLibrary() {}
 
 	private EclipseExternalChangeListener eclipseExternalChangeListener;
+	private FeatureModelOperationApprover featureModelOperationApprover;
 
 	@Override
 	public void install() {
 		GraphicalFeatureModelFormatManager.getInstance().addExtension(new GraphicalFeatureModelFormat());
 
-		final EclipseExternalChangeListener eclipseExternalChangeListener = new EclipseExternalChangeListener();
+		eclipseExternalChangeListener = new EclipseExternalChangeListener();
 		ExternalChangeListener.listener = eclipseExternalChangeListener;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(eclipseExternalChangeListener);
+
+		featureModelOperationApprover = new FeatureModelOperationApprover();
+		PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().addOperationApprover(featureModelOperationApprover);
 	}
 
 	@Override
@@ -62,6 +68,10 @@ public class FMUIEclipseLibrary implements ILibrary {
 		if (eclipseExternalChangeListener != null) {
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(eclipseExternalChangeListener);
 			eclipseExternalChangeListener = null;
+		}
+		if (featureModelOperationApprover != null) {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().removeOperationApprover(featureModelOperationApprover);
+			featureModelOperationApprover = null;
 		}
 	}
 

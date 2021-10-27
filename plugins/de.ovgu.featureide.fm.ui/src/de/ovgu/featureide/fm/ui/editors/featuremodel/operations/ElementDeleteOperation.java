@@ -25,17 +25,26 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -71,10 +80,69 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Gets the names of all selected features in a viewer
+	 * Disapproves the undo of this {@link ElementDeleteOperation} if at least one constraint contains a feature that wouldn't exist in the feature model after
+	 * executing inverseOperation. In that case, we also provide the affected feature names for the user.
+	 */
+	@Override
+	protected Optional<String> approveUndo() {
+		// Collect the feature names after the undo operation.
+		final Set<String> featureNamesAfterUndo = featureModelManager.getVarObject().getFeatures().stream().map(IFeature::getName).collect(Collectors.toSet());
+		featureNamesAfterUndo.addAll(featureNames);
+		// Collect all feature names in the constraints to restore.
+		final List<IConstraint> constraintsToAdd = operations.stream().filter(operation -> operation instanceof DeleteConstraintOperation)
+				.map(operation -> (DeleteConstraintOperation) operation).map(DeleteConstraintOperation::getOldConstraint).collect(Collectors.toList());
+		final Set<String> featureNamesInAddedConstraints = new HashSet<>(featureNamesAfterUndo.size());
+		constraintsToAdd.stream().map(IConstraint::getNode).map(Node::getUniqueContainedFeatures)
+				.forEach(names -> featureNamesInAddedConstraints.addAll(names));
+		// Collect all features missing after the undo.
+		final List<String> missingFeatures =
+			featureNamesInAddedConstraints.stream().filter(name -> !featureNamesAfterUndo.contains(name)).collect(Collectors.toList());
+
+		if (!missingFeatures.isEmpty()) {
+			String errorMessage = StringTable.THE_FOLLOWING_FEATURES_OF_DELETED_CONSTRAINTS_HAVE_BEEN_DELETED;
+			for (final String feature : missingFeatures) {
+				errorMessage += feature + "\n";
+			}
+			return Optional.of(errorMessage + StringTable.YOU_NEED_TO_RESTORE_THESE_FEATURES_FIRST);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Disallows <code>operation</code>/deletion of the selected elements if any feature to be deleted would appear in a constraint in another model.
 	 *
-	 * @param viewer The viewer with the selection
-	 * @return String List of the names of all the selected features in the viewer
+	 * @see {@link AbstractFeatureModelOperation#approveRedo()}
+	 */
+	@Override
+	protected Optional<String> approveRedo() {
+		final IFeatureModel model = featureModelManager.getVarObject();
+		final List<IFeature> featuresToDelete = featureNames.stream().map(name -> model.getFeature(name)).collect(Collectors.toList());
+		if (testForFeatureReferences(featureModelManager, model, featuresToDelete)) {
+			return Optional.of(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Creates a copy of <code>featureModel</code> and then undoes this {@link ElementDeleteOperation}. The returned {@link FeatureModelOperationEvent} has this
+	 * copy as <code>oldValue</code>. This allows to propagate the reverse operation to importing {@link MultiFeatureModel}s.
+	 *
+	 * @see {@link MultiFeatureModelOperation#inverseOperation(IFeatureModel)}
+	 */
+	@Override
+	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
+		final IFeatureModel oldModel = featureModel.clone();
+		final FeatureModelOperationEvent event = (FeatureModelOperationEvent) super.inverseOperation(featureModel);
+		return new FeatureModelOperationEvent(event.getID(), event.getEventType(), event.getSource(), oldModel, event.getNewValue());
+	}
+
+	/**
+	 * Gets the names of all selected features in a viewer.
+	 *
+	 * @param viewer - {@link Object} The viewer with the selection
+	 * @return {@link List} of the names of all the selected features in the viewer
 	 */
 	public static List<String> getFeatureNames(Object viewer) {
 		final IStructuredSelection selection;
@@ -104,9 +172,9 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Creates the single delete operations which are part of this MultiFeatureModelOperation
+	 * Creates the single delete operations which are part of this MultiFeatureModelOperation.
 	 *
-	 * @param featureModel The FeatureModel on which these operations take place
+	 * @param featureModel - {@link IFeatureModel} The feature model on which these operations take place.
 	 */
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {
@@ -124,9 +192,11 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			if (feature != null) {
 				featuresToDelete.add(feature);
 
+				// Look up the constraints this feature is involved in.
 				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 					featureInConstraint = true;
 				}
+				// Test if the group of the feature and its parent are different
 				if (hasGroupDifference(feature)) {
 					featureHasGroupDifference = true;
 				}
@@ -142,10 +212,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
+		final boolean featuresInOtherModelConstraints = testForFeatureReferences(featureModelManager, featureModel, featuresToDelete);
+
+		if (featureInConstraint || featureHasGroupDifference || featureIsRoot || featuresInOtherModelConstraints) {
 			// the delete dialog needs to be shown
-			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featureHasGroupDifference, featureIsRoot);
-			final String[] dialogButtonLabels = getDialogButtonLabels(featureInConstraint, featureHasGroupDifference, featureIsRoot);
+			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featuresInOtherModelConstraints, featureHasGroupDifference, featureIsRoot);
+			final String[] dialogButtonLabels =
+				getDialogButtonLabels(featureInConstraint, featuresInOtherModelConstraints, featureHasGroupDifference, featureIsRoot);
 			final String dialogReturnLabel = openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, dialogButtonLabels);
 			handleDialogReturn(dialogReturnLabel, featuresToDelete, constraintsToDelete);
 		} else {
@@ -153,6 +226,43 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			addDeleteConstraintOperations(constraintsToDelete);
 			addDeleteFeatureOperations(featuresToDelete);
 		}
+	}
+
+	/**
+	 * Tests if at least one feature of <code>featureModel</code> in <code>featuresToDelete</code> is referenced by another model that imports that feature. In
+	 * that case, deleting those features needs to be prevented, as there might otherwise be problems.
+	 *
+	 * @param featureModel - {@link IFeatureModel}
+	 * @param featuresToDelete - {@link List}
+	 * @return boolean
+	 */
+	public static boolean testForFeatureReferences(IFeatureModelManager manager, IFeatureModel featureModel, final List<IFeature> featuresToDelete) {
+		boolean featuresInOtherModelConstraints = false;
+		// Find referencing models...
+		if (featureModel instanceof MultiFeatureModel) {
+			// by translation of the project-relative path...
+			final MultiFeatureModel mfm = (MultiFeatureModel) featureModel;
+			final FeatureModelManager mfmManager = (FeatureModelManager) FeatureModelManager.getInstance(mfm);
+			final IPath eclipseRelativePath =
+				FeatureModelManager.getProjectRelativePath(mfmManager.getPath().toFile()).removeFirstSegments(1).removeTrailingSeparator();
+
+			// ... and find the project-relative alias.
+			for (final MultiFeatureModel referencingModel : manager.getReferencingFeatureModels()) {
+				final String modelAlias = referencingModel.getReference(eclipseRelativePath);
+				// Translate the feature names as they appear in referencingModel.
+				final Collection<String> referencedFeatureNames =
+					featuresToDelete.stream().map(feature -> modelAlias + "." + feature.getName()).collect(Collectors.toList());
+
+				// Finally, look up the selected feature names in imported constraints of the referer.
+				for (final IConstraint constraint : referencingModel.getOwnConstraints()) {
+					final Collection<String> constraintFeatureNames =
+						constraint.getContainedFeatures().stream().map(con -> con.getName()).collect(Collectors.toList());
+					featuresInOtherModelConstraints =
+						featuresInOtherModelConstraints || referencedFeatureNames.stream().anyMatch(name -> constraintFeatureNames.contains(name));
+				}
+			}
+		}
+		return featuresInOtherModelConstraints;
 	}
 
 	/**
@@ -196,7 +306,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param dialogButtonLabels A String array with labels for the buttons of the DeleteDialog
 	 * @return A String containing the label of the button that was pressed in the DeleteDialog or <code>null</code> if the dialog was closed differently
 	 */
-	private String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
+	protected String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
 		final MessageDialog dialog = new DeleteDialog(null, multiple, dialogReasons, dialogButtonLabels, dialogButtonLabels.length - 1);
 		dialog.open();
 		final int dialogReturn = dialog.getReturnCode();
@@ -209,39 +319,49 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Gets the button labels for the DeleteDialog
+	 * Gets the button labels for the DeleteDialog.
 	 *
 	 * @param featureInConstraint <code>true</code> if any of the selected features is contained in a constraint, <code>false</code> if not
+	 * @param featureInOtherModelConstraints - <code>true</code> if any selected feature appears in an constraint of a {@link MultiFeatureModel} that imports
+	 *        this model, <code>false</code> otherwise. Currently, prevent deletion when it would affect other constraints in other models.
 	 * @param featureHasGroupDifference <code>true</code> if any of the selected features has a different group than its parent, <code>false</code> if not
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A String array with labels for the buttons of the DeleteDialog
 	 */
-	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureInOtherModelConstraints, boolean featureHasGroupDifference,
+			boolean featureIsRoot) {
 		final List<String> buttonLabels = new ArrayList<>();
-		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
-			buttonLabels.add(StringTable.DELETE_WITH_SLICING);
-		}
+		if (!featureInOtherModelConstraints) {
+			if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
+				buttonLabels.add(StringTable.DELETE_WITH_SLICING);
+			}
 
-		if (!featureInConstraint && !featureIsRoot) {
-			buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+			if (!featureInConstraint && !featureIsRoot) {
+				buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+			}
 		}
-
 		buttonLabels.add(StringTable.CANCEL);
 		return buttonLabels.toArray(new String[0]);
 	}
 
 	/**
-	 * Gets the reasons for the DeleteDialog
+	 * Gets the reasons for the DeleteDialog.
 	 *
 	 * @param featureInConstraint <code>true</code> if any of the selected features is contained in a constraint, <code>false</code> if not
+	 * @param featureInOtherModelConstraints - <code>true</code> if any selected feature appears in an constraint of a {@link MultiFeatureModel} that imports
+	 *        this model, <code>false</code> otherwise.
 	 * @param featureHasGroupDifference <code>true</code> if any of the selected features has a different group than its parent, <code>false</code> if not
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A List of Strings with reasons for the dialog. These are being displayed in the DeleteDialog
 	 */
-	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureInOtherModelConstraints, boolean featureHasGroupDifference,
+			boolean featureIsRoot) {
 		final List<String> dialogReasons = new ArrayList<>();
 		if (featureInConstraint) {
 			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS);
+		}
+		if (featureInOtherModelConstraints) {
+			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_APPEARS_IN_A_CONSTRAINT_IN_ANOTHER_FEATURE_MODEL);
 		}
 		if (featureHasGroupDifference) {
 			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT);
@@ -257,9 +377,9 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 *
 	 * @param featuresToDelete A List of all the features that need to be deleted
 	 */
-	private void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
+	protected void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
 		for (final IFeature feature : featuresToDelete) {
-			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName()));
+			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName(), false));
 		}
 	}
 
@@ -291,12 +411,12 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Casts an object to a feature
+	 * Casts the object <code>element</code> to a feature.
 	 *
-	 * @param element Object that needs to be casted to a feature
-	 * @return Feature of the object or <code>null</code> if it can't be casted
+	 * @param element - {@link Object} The Object that needs to be casted to a feature.
+	 * @return {@link IFeature} of the object, or <code>null</code> if it can't be casted.
 	 */
-	private IFeature getFeatureFromObject(Object element) {
+	public IFeature getFeatureFromObject(Object element) {
 		IFeature feature = null;
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
@@ -311,7 +431,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 *
 	 * @return The current selection of the viewer
 	 */
-	private IStructuredSelection getSelection() {
+	protected IStructuredSelection getSelection() {
 		if (viewer instanceof GraphicalViewerImpl) {
 			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 		} else {

@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -78,6 +80,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -91,11 +94,15 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent.ExecutionType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
@@ -134,6 +141,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveA
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteSubmodelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
@@ -157,10 +165,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.AutomatedCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstrainsCalculationsAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.ConstraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.FeaturesOnlyCalculationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -169,7 +178,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateGraphicalSiblingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteSlicingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation.ConstraintDescription;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.GraphicalMoveFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrderOperation;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -233,6 +258,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	private DeleteSubmodelAction deleteSubmodelAction;
 
 	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
@@ -281,6 +307,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	/**
+	 * recentEvents holds all events that occurred on this feature model after its last save. These can be used by other feature models that reference this
+	 * model to update themselves.
+	 */
+	private final List<FeatureIDEEvent> recentEvents;
+
+	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
 	 * @param fmManager feature model file manager
@@ -292,9 +324,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		graphicalFeatureModel = gfm;
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
 		fmManager.addListener(this);
+		recentEvents = new ArrayList<>();
 		createActions();
 
 		FeatureColorManager.addListener(this);
+	}
+
+	@Override
+	public String toString() {
+		return "Feature Diagram Editor for " + fmManager.getObject().getSourceFile().toString();
 	}
 
 	private void createActions() {
@@ -312,6 +350,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		moveDownAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.DOWN));
 		moveLeftAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.LEFT));
 		reverseOrderAction = addAction(new ReverseOrderAction(viewer, graphicalFeatureModel));
+		deleteSubmodelAction = addAction(new DeleteSubmodelAction(viewer, graphicalFeatureModel));
 
 		// Collapse/Expand actions
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
@@ -357,7 +396,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		calculationActions.add(addAction(new AutomatedCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 		calculationActions.add(addAction(new RunManualCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 		calculationActions.add(addAction(new FeaturesOnlyCalculationAction(graphicalFeatureModel.getFeatureModelManager())));
-		calculationActions.add(addAction(new ConstrainsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
+		calculationActions.add(addAction(new ConstraintsCalculationsAction(graphicalFeatureModel.getFeatureModelManager())));
 
 		// Zoom actions
 		zoomIn = addAction(new ZoomInAction(viewer.getZoomManager()));
@@ -594,6 +633,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		}, ANALYZE_FEATURE_MODEL);
 		analyzeJob.setPriority(Job.LONG);
 		LongRunningWrapper.startJob(analysisToken, analyzeJob);
+
 	}
 
 	/**
@@ -640,7 +680,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return (T) adapter.cast(getViewer());
+			return adapter.cast(getViewer());
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());
@@ -655,11 +695,27 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
+		propertyChange(event, true, true);
+	}
+
+	/**
+	 * Implementation of propertyChange to avoid multiple updates, e.g. analyses and graphical updates, when handling groups of events
+	 * ({@link FeatureIDEEvent.EventType#STRUCTURE_CHANGED STRUCTURE_CHANGED}).
+	 *
+	 * @param event The {@link FeatureIDEEvent}.
+	 * @param refresh True if the event is a standalone event, false if the event was encapsulated in a {@link FeatureIDEEvent.EventType#STRUCTURE_CHANGED
+	 *        STRUCTURE_CHANGED} event.
+	 * @param propagate - boolean true if <code>event</code> should be propagated to other feature models immediately.
+	 */
+	@SuppressWarnings("unchecked")
+	private void propertyChange(FeatureIDEEvent event, boolean refresh, boolean propagate) {
 		final EventType prop = event.getEventType();
 		final Object source = event.getSource();
 		switch (prop) {
+		case IMPORTED_MODEL_CHANGED:
+			handleChangeInImportedModel(event);
+			break;
 		case FEATURE_ADD_ABOVE:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			IFeature newCompound = null;
@@ -668,11 +724,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final IGraphicalFeature child : graphicalFeatureModel.getGraphicalFeature(newCompound).getGraphicalChildren()) {
 					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				}
-				final IFeature oldParent = (IFeature) event.getOldValue();
+				final Object[] oldValues = (Object[]) event.getOldValue();
+				final IFeature oldParent = (IFeature) oldValues[0];
 				if (oldParent != null) {
 					final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
 					parent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
-					// new Feature is not root so update all childs from old Parent, which include the new feature and his children
+					// new Feature is not root so update all children from old Parent, which include the new feature and his children
 					viewer.refreshChildAll(oldParent);
 				} else {
 					// new Feature is root so update all childs from root
@@ -681,9 +738,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 				openRenameEditor(newCompound);
 			}
-			viewer.internRefresh(true);
-			setDirty();
-			analyzeFeatureModel();
+
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_ADD_SIBLING:
 			// Update the Edit part registry; try to make the edit part for the sibling feature available.
@@ -699,13 +760,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				final IFeature siblingFeature = (IFeature) event.getNewValue();
 				openRenameEditor(siblingFeature);
 			}
-			setDirty();
-			viewer.internRefresh(true);
-			analyzeFeatureModel();
+
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_ADD:
+			// At this point, refresh creates new FeatureEditParts for features that we added.
+			// but if we import a feature, this doesn't work (why?).
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
-			setDirty();
 			final IFeature newFeature = (IFeature) event.getNewValue();
 			final IFeature parent = (IFeature) event.getOldValue();
 			final IFeatureModel fm = (IFeatureModel) source;
@@ -723,23 +789,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					fm.fireEvent(new FeatureIDEEvent(parent, EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 				}
 				// Draws the connections
-				if (parent.getStructure().hasChildren()) {
-					for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
-						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-					}
-				}
+				redrawConnections(newFeature, parent);
 				graphicalFeatureModel.getGraphicalFeature(parent).update(new FeatureIDEEvent(newFeature, EventType.CHILDREN_CHANGED));
 			} else if ((parent != null) && (parent == newFeature)) {
-				if (parent.getStructure().hasChildren()) {
-					for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
-						child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
-					}
-				}
+				redrawConnections(newFeature, parent);
+			} else {
+				redrawConnections(newFeature, newFeature);
 			}
-
 			openRenameEditor(newFeature);
-			viewer.internRefresh(true);
-			analyzeFeatureModel();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_NAME_CHANGED:
 			final String newValue = (String) event.getNewValue();
@@ -755,72 +818,111 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			viewer.reload();
-			setDirty();
-			analyzeFeatureModel();
+			if (refresh) {
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			updateFeatureNameTypes();
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
-			setDirty();
-			analyzeFeatureModel();
+			if (refresh) {
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case GROUP_TYPE_CHANGED:
 			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) source, graphicalFeatureModel)) {
 				f.update(event);
 			}
-			setDirty();
-			analyzeFeatureModel();
+
+			if (refresh) {
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
-			setDirty();
-			viewer.internRefresh(false);
+			if (refresh) {
+				viewer.internRefresh(false);
+				setDirty();
+			}
+			recentEvents.add(event);
 			break;
 		case LOCATION_CHANGED:
-			viewer.internRefresh(true);
-			setDirty();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+			}
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_MOVE:
 		case CONSTRAINT_MOVE_LOCATION:
-			viewer.internRefresh(true);
-			setDirty();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+			}
 			break;
 		case CONSTRAINT_MODIFY:
 			final IConstraint c = (IConstraint) source;
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
-			viewer.internRefresh(true);
-			setDirty();
-			analyzeFeatureModel();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			recentEvents.add(event);
+			break;
+		case MULTIPLE_CHANGES_OCCURRED:
+			// Deal with the single event changes.
+			final List<FeatureIDEEvent> singleEvents = (List<FeatureIDEEvent>) event.getNewValue();
+			for (final FeatureIDEEvent singleEvent : singleEvents) {
+				propertyChange(singleEvent, refresh, false);
+			}
+			recentEvents.add(event);
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
+			viewer.reload();
+			viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
+				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+			}
+			recentEvents.add(event);
+			break;
 		case STRUCTURE_CHANGED:
 			if (source instanceof ArrayList) {
 				final ArrayList<?> sList = (ArrayList<?>) source;
 				for (final Object object : sList) {
 					if (object instanceof FeatureModelOperationEvent) {
-
-						propertyChange((FeatureModelOperationEvent) object);
+						propertyChange((FeatureModelOperationEvent) object, refresh, false);
 					}
 				}
 			}
-
 			viewer.reload();
-			analyzeFeatureModel();
 			viewer.refreshChildAll(fmManager.getSnapshot().getStructure().getRoot().getFeature());
-			viewer.internRefresh(true);
-			setDirty();
-			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
-				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
-				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
 			}
+			recentEvents.add(event);
 			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
@@ -833,8 +935,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			});
 			FeatureModelOperationWrapper.clearHistory((IUndoContext) fmManager.getUndoContext());
-			setDirty();
-			analyzeFeatureModel();
+			if (refresh) {
+				setDirty();
+				analyzeFeatureModel();
+			}
 			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
@@ -844,10 +948,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// update labels, colors
 			refreshGraphics(graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection());
 			viewer.setContents(graphicalFeatureModel);
-			viewer.internRefresh(true);
-			setDirty();
-			analyzeFeatureModel();
-
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_DELETE:
 			final IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) source);
@@ -869,17 +975,22 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				root.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 				viewer.refreshChildAll(root.getObject());
 			}
-			viewer.internRefresh(true);
 			viewer.deselectAll();
-			setDirty();
-			analyzeFeatureModel();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
+			recentEvents.add(event);
 			break;
 		case MODEL_DATA_SAVED:
+			recentEvents.add(event);
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			graphicalFeatureModel.writeValues();
 			viewer.setLayout();
 			viewer.reload();
+			setDirty();
 			break;
 		case REDRAW_DIAGRAM:
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
@@ -896,8 +1007,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			graphicalFeatureModel.writeFeatureModel();
-			setDirty();
-			viewer.internRefresh(false);
+			if (refresh) {
+				viewer.internRefresh(false);
+				setDirty();
+			}
 			break;
 		case FEATURE_HIDDEN_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) source, graphicalFeatureModel).update(event);
@@ -907,9 +1020,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.reload(); // reload need to be called afterwards so that the events can apply to the to be hidden features. reload would remove the edit
 							 // parts that lead to errors.
 			viewer.refreshChildAll((IFeature) source);
-			setDirty();
-			viewer.internRefresh(true);
-			analyzeFeatureModel();
+			if (refresh) {
+				viewer.internRefresh(true);
+				setDirty();
+				analyzeFeatureModel();
+			}
 			break;
 		case FEATURE_COLLAPSED_CHANGED:
 			// Reload edit part to notify the diagram that the IGraphicalFeatureModel has changed
@@ -919,8 +1034,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(selectedFeature);
 				graphicalFeatureModel.writeFeature(graphicalFeatureModel.getGraphicalFeature(selectedFeature));
 			}
-			viewer.internRefresh(false);
-			setDirty();
+			if (refresh) {
+				viewer.internRefresh(false);
+				setDirty();
+			}
 			// Center collapsed feature after operation
 			if (source instanceof IFeature) {
 				viewer.centerPointOnScreen((IFeature) source);
@@ -932,9 +1049,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case FEATURE_COLLAPSED_ALL_CHANGED:
 			viewer.reload();
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModelManager().getSnapshot().getStructure().getRoot().getFeature());
-			viewer.internRefresh(false);
+			if (refresh) {
+				viewer.internRefresh(false);
+				setDirty();
+			}
 			graphicalFeatureModel.writeValues();
-			setDirty();
 
 			// Center root feature after operation
 			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModelManager().getSnapshot().getStructure().getRoot().getFeature());
@@ -976,9 +1095,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			viewer.reload();
 			refreshGraphics(null);
+			recentEvents.add(event);
 			break;
 		case DEPENDENCY_CALCULATED:
-			setDirty();
+			if (refresh) {
+				setDirty();
+			}
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			// Deactivate the old active explanation.
@@ -1035,20 +1157,46 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			if (!graphicalFeatureModel.isLegendHidden()) {
 				viewer.layoutLegendOnIntersect();
 			}
+			recentEvents.add(event);
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
-			setDirty();
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
 				final IFeature attributeChangedFeature = (IFeature) event.getNewValue();
 				final IGraphicalFeature graphicalAttributeChangedFeature = graphicalFeatureModel.getGraphicalFeature(attributeChangedFeature);
 				graphicalAttributeChangedFeature.update(event);
 			}
+			if (refresh) {
+				setDirty();
+			}
+			recentEvents.add(event);
 			break;
 		case DEFAULT:
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");
 			break;
+		}
+
+		if (!recentEvents.isEmpty()) {
+			final FeatureIDEEvent e = recentEvents.remove(0);
+			if (propagate) {
+				final FeatureIDEEvent e2 = new FeatureIDEEvent(fmManager.getObject(), EventType.IMPORTED_MODEL_CHANGED, null, e);
+				graphicalFeatureModel.getFeatureModelManager().informImports(e2);
+			}
+		}
+	}
+
+	/**
+	 * Triggers the connections of <code>parent</code> to the children of <code>newFeture</code> to be redrawn.
+	 *
+	 * @param newFeature - {@link IFeature}
+	 * @param parent - {@link IFeature}
+	 */
+	private void redrawConnections(final IFeature newFeature, final IFeature parent) {
+		if (parent.getStructure().hasChildren()) {
+			for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
+				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			}
 		}
 	}
 
@@ -1068,20 +1216,243 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	/**
-	 * Opens the {@link FeatureLabelEditManager} for a given added feature newFeature so that it can be renamed immediately.
+	 * Allows the user to rename the last added feature <code>newFeature</code> by opening a {@link FeatureLabelEditManager} for the associated
+	 * {@link FeatureEditPart}. We do not open a dialog when <code>newFeature</code> is an external feature, which then has already been named in another
+	 * editor.
 	 *
 	 * @param newFeature - {@link IFeature}
 	 */
 	private void openRenameEditor(final IFeature newFeature) {
+		if ((newFeature instanceof MultiFeature) && (((MultiFeature) newFeature).isFromExtern())) {
+			return;
+		}
 		final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-
 		if (newEditPart != null) {// TODO move to FeatureEditPart
 			newEditPart.activate();
 			viewer.select(newEditPart);
 			// open the renaming command
 			new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
 		}
+	}
+
+	/**
+	 * Deals with a change that occurred in an imported feature model that can be found under event.getSource(). The original event to process is in
+	 * <code>event.newValue</code>.
+	 *
+	 * @param event - {@link FeatureIDEEvent}
+	 */
+	private void handleChangeInImportedModel(FeatureIDEEvent event) {
+		final MultiFeatureModel mfm = (MultiFeatureModel) graphicalFeatureModel.getFeatureModelManager().getVarObject();
+		// Retrieve the original model name from originalPath.
+		final String modelAlias = mfm.extractModelAlias(event);
+		// Ignore the event if the original model is not added in the feature structure.
+		if (!mfm.isActuallyImported(modelAlias)) {
+			return;
+		}
+		// Extract the old event.
+		final FeatureIDEEvent oldEvent = (FeatureIDEEvent) event.getNewValue();
+
+		switch (oldEvent.getEventType()) {
+		case MULTIPLE_CHANGES_OCCURRED:
+			// Handle the case where we undo a Delete without Slicing-Operation in an imported model.
+			final FeatureModelOperationEvent modelEvent = (FeatureModelOperationEvent) oldEvent;
+			if ((modelEvent.getExecutionType() == ExecutionType.UNDO) && modelEvent.getID().equals(ElementDeleteOperation.ID)) {
+				final FeatureIDEEvent replaceModelEvent = new FeatureModelOperationEvent(DeleteSlicingOperation.ID, EventType.MODEL_DATA_CHANGED,
+						modelEvent.getSource(), modelEvent.getOldValue(), modelEvent.getSource());
+				new DeleteSlicingOperation(fmManager, replaceModelEvent, modelAlias).execute();
+				return;
+			}
+
+			// Repeat the single changes stored in newValue for the given source.
+			if (oldEvent.getNewValue() instanceof List<?>) {
+				final List<?> singleEvents = (List<?>) oldEvent.getNewValue();
+				for (final Object obj : singleEvents) {
+					if (obj instanceof FeatureIDEEvent) {
+						final FeatureIDEEvent singleEvent = (FeatureIDEEvent) obj;
+						propertyChange(new FeatureIDEEvent(event.getSource(), EventType.IMPORTED_MODEL_CHANGED, null, singleEvent));
+					}
+				}
+			}
+			break;
+		case FEATURE_NAME_CHANGED:
+			// Rerun feature renamings in the imported model, now with modelAlias appended for the new name.
+			new FeatureRenamingCommand(fmManager, modelAlias + oldEvent.getOldValue().toString(), modelAlias + oldEvent.getNewValue().toString()).execute();
+			break;
+		case MANDATORY_CHANGED:
+			// When the mandatory status of a feature changed, run another MandatoryFeatureOperation for the corresponding feature.
+			new MandatoryFeatureOperation(modelAlias + ((IFeature) oldEvent.getSource()).getName(), fmManager).execute();
+			break;
+		case GROUP_TYPE_CHANGED:
+			// Ask the current group type of the original feature.
+			IFeature originalFeature = ((IFeature) oldEvent.getSource());
+			final int groupType = ChangeFeatureGroupTypeOperation.getGroupType(originalFeature);
+			// Run a new group type change operation for the referenced feature.
+			new ChangeFeatureGroupTypeOperation(groupType, modelAlias + originalFeature.getName(), fmManager).execute();
+			break;
+		case ATTRIBUTE_CHANGED:
+			// Handle an change in the abstract value of a feature
+			// (stored in a FeatureModelOperationEvent).
+			if (oldEvent instanceof FeatureModelOperationEvent) {
+				final FeatureModelOperationEvent fmOp = (FeatureModelOperationEvent) oldEvent;
+				if (fmOp.getID().equals(AbstractFeatureOperation.ID)) {
+					new AbstractFeatureOperation(modelAlias + ((IFeature) oldEvent.getSource()).getName(), fmManager).execute();
+				}
+			}
+			break;
+		case FEATURE_ADD:
+			int index;
+			// The previous parent of an added feature.
+			IFeature originalParent;
+
+			// For an added feature, find the added feature names,
+			originalParent = ((IFeature) oldEvent.getOldValue());
+			final IFeature originalChild = ((IFeature) oldEvent.getNewValue());
+			// ... then translate the names and execute the insertion operation.
+			final String newParentName = modelAlias + originalParent.getName();
+			final String newChildName = modelAlias + originalChild.getName();
+			index = originalParent.getStructure().getChildIndex(originalChild.getStructure());
+			new CreateFeatureOperation(newParentName, newChildName, index, fmManager).execute();
+
+			// Further handle the cases where the new feature was created as part of a reversed DeleteFeatureOperation.
+			if (oldEvent instanceof FeatureModelOperationEvent) {
+				final FeatureModelOperationEvent oldModelEvent = (FeatureModelOperationEvent) oldEvent;
+				if (oldModelEvent.getID().equals(DeleteFeatureOperation.ID)) {
+					// In that case, update the mandatory and abstract properties of the imported feature.
+					final IFeature importedFeature = (IFeature) oldModelEvent.getNewValue();
+					final IFeature newChildFeature = mfm.getFeature(newChildName);
+					if (importedFeature.getStructure().isAbstract() != newChildFeature.getStructure().isAbstract()) {
+						new AbstractFeatureOperation(newChildName, fmManager).execute();
+					}
+					if (importedFeature.getStructure().isMandatory() != newChildFeature.getStructure().isMandatory()) {
+						new MandatoryFeatureOperation(newChildName, fmManager).execute();
+					}
+
+					// Also change the group type of the parent, when necessary (group types don't match, and more than one child).
+					final IFeature parent = ((IFeature) oldModelEvent.getOldValue());
+					final int importedGroupType = ChangeFeatureGroupTypeOperation.getGroupType(parent);
+					if ((mfm.getFeature(newParentName).getStructure().getChildrenCount() > 1)
+						&& (ChangeFeatureGroupTypeOperation.getGroupType(newChildFeature) != importedGroupType)) {
+						new ChangeFeatureGroupTypeOperation(importedGroupType, newParentName, fmManager).execute();
+					}
+				}
+			}
+			break;
+		case FEATURE_ADD_ABOVE:
+			// For a feature added above other ones, first get the new parent,
+			originalParent = (IFeature) oldEvent.getNewValue();
+			// then translate the old feature names into new ones.
+			final Object[] oldValues = (Object[]) oldEvent.getOldValue();
+			final List<String> oldSelectedNames = (List<String>) oldValues[1];
+			final List<String> newSelectedNames = new ArrayList<>(oldSelectedNames.size());
+			oldSelectedNames.forEach(oldName -> newSelectedNames.add(modelAlias + oldName));
+			// Test if we created a new parent for the previous root in the imported model, and if we marked this root as mandatory in this model.
+			final boolean wasOldRoot = FeatureUtils.isRoot(originalParent);
+			final boolean isMandatory = mfm.getFeature(newSelectedNames.get(0)).getStructure().isMandatory();
+			// Rerun the CreateFeatureAboveOperation.
+			new CreateFeatureAboveOperation(fmManager, newSelectedNames, modelAlias + originalParent.getName(), wasOldRoot && isMandatory).execute();
+			break;
+		case FEATURE_ADD_SIBLING:
+			// For a sibling feature, get the added feature and its parent.
+			final IFeature originalSibling = ((IFeature) oldEvent.getNewValue());
+			originalParent = ((IFeature) oldEvent.getOldValue());
+			// Ask the index of the sibling. The previous child was the sibling we created the feature for.
+			index = originalParent.getStructure().getChildIndex(originalSibling.getStructure()) - 1;
+			// ask the siblings name.
+			final String selectedFeatureName = modelAlias + originalParent.getStructure().getChildren().get(index).getFeature().toString();
+			final String siblingName = modelAlias + originalSibling.getName();
+			new CreateGraphicalSiblingOperation(graphicalFeatureModel, selectedFeatureName, siblingName).execute();
+			break;
+		case FEATURE_DELETE:
+			// Extract the name of the deleted feature, and rewrite it for this model.
+			final IFeature originalFeatureToDelete = ((IFeature) oldEvent.getSource());
+			final String featureToDeleteName = modelAlias + originalFeatureToDelete.getName();
+
+			// Test if the feature formerly was root of an imported feature, and if it was mandatory.
+			final boolean wasRoot = FeatureUtils.isRoot(originalFeatureToDelete);
+			final boolean mandatory = FeatureUtils.isMandatory(mfm.getFeature(featureToDeleteName));
+
+			// Delete the imported feature.
+			new DeleteFeatureOperation(fmManager, featureToDeleteName, mfm.getFeature(featureToDeleteName).getStructure().isMandatory()).execute();
+			// Restore the mandatory property.
+			if (wasRoot && mandatory) {
+				final String updatedRoot = FeatureUtils.getRoot(originalFeatureToDelete.getFeatureModel()).getName();
+				final String importedUpdatedRoot = modelAlias + updatedRoot;
+				new MandatoryFeatureOperation(importedUpdatedRoot, fmManager).execute();
+			}
+			break;
+		case CONSTRAINT_MODIFY:
+			Node newFormula;
+			// For an modified constraint, extract the old constraint description, and find the constraint to replace.
+			final ConstraintDescription originalDescription = (ConstraintDescription) oldEvent.getOldValue();
+			newFormula = mfm.rewriteNodeImports(originalDescription.node, modelAlias);
+			final IConstraint constraintToModify = mfm.findConstraint(newFormula, originalDescription.description);
+			// Execute the appropriate EditConstraintOperation.
+			final ConstraintDescription modifiedDescription = (ConstraintDescription) oldEvent.getNewValue();
+			final Node editedFormula = mfm.rewriteNodeImports(modifiedDescription.node, modelAlias);
+			new EditConstraintOperation(fmManager, constraintToModify, editedFormula, modifiedDescription.description, modifiedDescription.tags).execute();
+			break;
+		case CONSTRAINT_ADD:
+			// For an added constraint, rewrite the formula contained in it.
+			IConstraint originalConstraint;
+			originalConstraint = (IConstraint) oldEvent.getNewValue();
+			newFormula = mfm.rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			// Execute the appropriate CreateConstraintOperation.
+			new CreateConstraintOperation(newFormula, fmManager, originalConstraint.getDescription(), IMultiFeatureModelElement.TYPE_INTERFACE).execute();
+			break;
+		case CONSTRAINT_DELETE:
+			// For an deleted constraint, first clone it and rewrite its formula, so that a delete succeeds.
+			originalConstraint = (IConstraint) oldEvent.getOldValue();
+			newFormula = mfm.rewriteNodeImports(originalConstraint.getNode(), modelAlias);
+			final IConstraint constraintToDelete = mfm.findConstraint(newFormula, originalConstraint.getDescription());
+			new DeleteConstraintOperation(constraintToDelete, fmManager).execute();
+			break;
+		case STRUCTURE_CHANGED:
+			final FeatureOperationData data = (FeatureOperationData) oldEvent.getNewValue();
+			// Simple movements (without changing parent or position) are ignored.
+			final boolean usedAutoLayout = (Boolean) oldEvent.getOldValue();
+			if (!usedAutoLayout) {
+				break;
+			}
+			// For a moved feature, extract from the FeatureOperationData the features (old + new parent),
+			// and translate them to features in the composed model.
+			originalFeature = data.feature.getObject();
+			final IFeature referencedFeature = mfm.getFeature(modelAlias + originalFeature.getName());
+			originalParent = data.oldParent.getObject();
+			final IFeature referencedParent = mfm.getFeature(modelAlias + originalParent.getName());
+			final IFeature originalParent2 = data.newParent.getObject();
+			final IFeature newParent = mfm.getFeature(modelAlias + originalParent2.getName());
+
+			// Create and execute the appropriate GraphicalMoveFeatureOperation.
+			final FeatureOperationData newData = new FeatureOperationData(graphicalFeatureModel.getGraphicalFeature(referencedFeature),
+					graphicalFeatureModel.getGraphicalFeature(referencedParent), graphicalFeatureModel.getGraphicalFeature(newParent), data.oldIndex,
+					data.newIndex, data.or, data.alternative, data.reverse);
+			new GraphicalMoveFeatureOperation(graphicalFeatureModel, newData, null, null).execute();
+			break;
+		case MODEL_DATA_CHANGED:
+			// Check that a DeleteSlicingOperation-FeatureModelOperationEvent occurs.
+			if (!(oldEvent instanceof FeatureModelOperationEvent) || !(((FeatureModelOperationEvent) oldEvent).getID()).equals(DeleteSlicingOperation.ID)) {
+				return;
+			}
+			// Rerun the DeleteSlicingOperation, now changing the variable model.
+			new DeleteSlicingOperation(fmManager, oldEvent, modelAlias).execute();
+			break;
+		case ACTIVE_EXPLANATION_CHANGED:
+		case FEATURE_ATTRIBUTE_CHANGED:
+			break;
+		case LOCATION_CHANGED:
+			// For a reversed constraint, execute a ModelReverseOrderOperation on its root.
+			originalFeature = (IFeature) oldEvent.getNewValue();
+			final IFeature newFeature = mfm.getFeature(modelAlias + originalFeature.getName());
+			new ModelReverseOrderOperation(newFeature).execute();
+			break;
+		default:
+			return;
+		}
+	}
+
+	public List<FeatureIDEEvent> getRecentEvents() {
+		return recentEvents;
 	}
 
 	@Override
@@ -1117,8 +1488,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		});
 		viewer.setContextMenu(menuManager);
-		// the following line adds package explorer entries into our context menu
-		// getSite().registerContextMenu(menu, graphicalViewer);
 	}
 
 	public void createKeyBindings() {
@@ -1313,6 +1682,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return legendMenu;
 	}
 
+	/**
+	 * Tests if the context menu to be seen should be for constraints. In that case, <code>selection</code> needs to contain {@link ConstraintEditPart}s only.
+	 *
+	 * @param selection - {@link IStructuredSelection}
+	 * @return {@link Boolean}
+	 */
 	private boolean isConstraintMenu(IStructuredSelection selection) {
 		boolean constraintMenu = !selection.toList().isEmpty();
 		for (final Object obj : selection.toList()) {
@@ -1321,6 +1696,28 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 		}
 		return constraintMenu;
+	}
+
+	/**
+	 * Tests if the constraint menu should allow deletion or editing of the constraints in <code>structuredSelection</code>. Deletion should only be possible
+	 * for own constraints, and also editing.
+	 *
+	 * @param selection - {@link IStructuredSelection}
+	 * @return {@link Boolean}
+	 * @see {@link FeatureDiagramEditor#isConstraintMenu(IStructuredSelection)}
+	 */
+	private boolean allowDeletionOrEditing(IStructuredSelection selection) {
+		final Stream<ConstraintEditPart> editPartStream =
+			selection.toList().stream().filter(obj -> (obj instanceof ConstraintEditPart)).map(obj -> (ConstraintEditPart) obj);
+		final List<ConstraintEditPart> editParts = editPartStream.collect(Collectors.toList());
+		final List<MultiConstraint> multiConstraints = editParts.stream().map(editPart -> editPart.getModel())
+				.map(graphicalConstraint -> (MultiConstraint) graphicalConstraint.getObject()).collect(Collectors.toList());
+		for (final MultiConstraint constraint : multiConstraints) {
+			if (constraint.isFromExtern()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private boolean isConnectionMenu(IStructuredSelection selection) {
@@ -1340,6 +1737,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
 			menuManager.add(createNameTypeMenuManager());
 		}
+		// Construct Feature Menu
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
 			menuManager.add(createFeatureBelowAction);
@@ -1349,6 +1747,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
+			if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
+				menuManager.add(deleteSubmodelAction);
+			}
 			menuManager.add(new Separator());
 			connectionEntries(menuManager);
 			menuManager.add(mandatoryAction);
@@ -1369,12 +1770,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else if (isLegendMenu(selection)) {
 			menuManager.add(legendLayoutAction);
 			menuManager.add(legendAction);
-		} else if (isConstraintMenu(selection)) {
+		}
+		// Construct Constraint Menu - Do not allow Deletion or Editing of imported Constraints.
+		else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
 			menuManager.add(focusOnExplanationAction);
-			menuManager.add(editConstraintAction);
-			menuManager.add(deleteAction);
+			if (allowDeletionOrEditing(selection)) {
+				menuManager.add(editConstraintAction);
+				menuManager.add(deleteAction);
+			}
 		} else if (isConnectionMenu(selection)) {
 			connectionEntries(menuManager);
 		} else {

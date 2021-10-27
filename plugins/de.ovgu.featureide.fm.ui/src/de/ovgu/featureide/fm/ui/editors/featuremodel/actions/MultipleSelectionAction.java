@@ -181,7 +181,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 		}
 
 		// check whether the selection includes no feature from an external submodel
-		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeatureModelElement(selection)) {
 			return true;
 		}
 

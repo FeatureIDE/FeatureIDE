@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -33,20 +34,19 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to move features. Provides redo/undo support.
+ * Operation with functionality to move features graphically. Provides redo/undo support.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
-public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation {
+public class GraphicalMoveFeatureOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private final FeatureOperationData data;
 	private final Point newPos;
 	private final Point oldPos;
-	private boolean or = false;
-	private boolean alternative = false;
 
-	public MoveFeatureOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureOperationData data, Point newPos, Point oldPos) {
+	public GraphicalMoveFeatureOperation(IGraphicalFeatureModel graphicalFeatureModel, FeatureOperationData data, Point newPos, Point oldPos) {
 		super(graphicalFeatureModel, MOVE_FEATURE);
 		this.data = data;
 		this.newPos = newPos;
@@ -54,35 +54,38 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 	}
 
 	public void newInnerOrder(Point newPos) {
-		data.getFeature().setLocation(newPos);
+		data.feature.setLocation(newPos);
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IGraphicalFeature feature = data.getFeature();
-		final IGraphicalFeature oldParent = data.getOldParent();
-		if (!feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+		final IGraphicalFeature feature = data.feature;
+		final IGraphicalFeature oldParent = data.oldParent;
+		final IFeature oldParentObject = oldParent.getObject();
+		final IFeatureStructure oldParentStructure = oldParentObject.getStructure();
+
+		final boolean usingAutoLayout = graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
+		if (!usingAutoLayout) {
 			newInnerOrder(newPos);
 		} else {
-			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+			final IFeature featureObject = feature.getObject();
+			final IFeatureStructure featureStructure = featureObject.getStructure();
+			oldParentStructure.removeChild(featureStructure);
 
-			or = oldParent.getObject().getStructure().isOr();
-			alternative = oldParent.getObject().getStructure().isAlternative();
-			oldParent.getObject().getStructure().removeChild(featureStructure);
+			final IGraphicalFeature newParent = data.newParent;
 
-			final IGraphicalFeature newParent = data.getNewParent();
-
+			final IFeatureStructure newParentStructure = newParent.getObject().getStructure();
 			if (newParent.isCollapsed()) {
-				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount() + 1, featureStructure);
+				newParentStructure.addChildAtPosition(newParentStructure.getChildrenCount() + 1, featureStructure);
 
-				for (final IFeatureStructure fs : newParent.getObject().getStructure().getChildren()) {
+				for (final IFeatureStructure fs : newParentStructure.getChildren()) {
 					if (fs != featureStructure) {
-						final IGraphicalFeature graphicalFS = feature.getGraphicalModel().getGraphicalFeature(fs.getFeature());
+						final IGraphicalFeature graphicalFS = graphicalFeatureModel.getGraphicalFeature(fs.getFeature());
 						graphicalFS.setCollapsed(true);
 					}
 				}
 			} else {
-				newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+				newParentStructure.addChildAtPosition(data.newIndex, featureStructure);
 			}
 
 			if (oldParent != newParent) {
@@ -94,36 +97,46 @@ public class MoveFeatureOperation extends AbstractGraphicalFeatureModelOperation
 				newParent.setCollapsed(false);
 				featureModel.fireEvent(new FeatureIDEEvent(newParent.getObject(), EventType.FEATURE_COLLAPSED_CHANGED, null, null));
 			}
-		}
-		// If there is only one child left, set the old parent group type to and
-		if (oldParent != null) {
-			if (oldParent.getObject().getStructure().getChildrenCount() == 1) {
-				oldParent.getObject().getStructure().changeToAnd();
+
+			if (data.reverse) {
+				if (data.or) {
+					newParentStructure.setOr();
+				}
+				if (data.alternative) {
+					newParentStructure.setAlternative();
+				}
 			}
 		}
-		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
+		// If only one child remains, set the old parent's group to and.
+		if (oldParent != null) {
+			if (oldParentStructure.getChildrenCount() == 1) {
+				oldParentStructure.changeToAnd();
+			}
+		}
+		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED, usingAutoLayout, data);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+		final boolean useAutoLayout = graphicalFeatureModel.getLayout().hasFeaturesAutoLayout();
+		if (!useAutoLayout) {
 			newInnerOrder(oldPos);
 		} else {
-			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
-			data.getNewParent().getObject().getStructure().removeChild(structure2);
-			if (data.getOldParent() != null) {
-				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
-				structure.addChildAtPosition(data.getOldIndex(), structure2);
+			final IFeatureStructure structure2 = data.feature.getObject().getStructure();
+			data.newParent.getObject().getStructure().removeChild(structure2);
+			if (data.oldParent != null) {
+				final IFeatureStructure structure = data.oldParent.getObject().getStructure();
+				structure.addChildAtPosition(data.oldIndex, structure2);
 			}
 
 		}
 		// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
-		if ((data.getOldParent() != null) && or) {
-			data.getOldParent().getObject().getStructure().changeToOr();
-		} else if ((data.getOldParent() != null) && alternative) {
-			data.getOldParent().getObject().getStructure().changeToAlternative();
+		if ((data.oldParent != null) && data.or) {
+			data.oldParent.getObject().getStructure().changeToOr();
+		} else if ((data.oldParent != null) && data.alternative) {
+			data.oldParent.getObject().getStructure().changeToAlternative();
 		}
-		return new FeatureIDEEvent(data.getFeature(), EventType.STRUCTURE_CHANGED);
+		return new FeatureIDEEvent(data.feature, EventType.STRUCTURE_CHANGED, useAutoLayout, data.getInverseData());
 	}
 
 	@Override

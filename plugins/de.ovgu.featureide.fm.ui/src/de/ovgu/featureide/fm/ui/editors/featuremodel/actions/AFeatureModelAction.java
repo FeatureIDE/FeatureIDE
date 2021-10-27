@@ -27,10 +27,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 
 /**
  * Abstract action for modifying a feature model.
@@ -63,23 +67,25 @@ public abstract class AFeatureModelAction extends Action {
 		return Collections.emptyList();
 	}
 
-	private boolean isExternalFeature(IFeature feature) {
+	protected boolean isExternalFeature(IFeature feature) {
 		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
 	}
 
 	/**
-	 * method to check if the selection in the editor includes a feature from an external submodel
+	 * Tests if the selection in the editor includes an {@link IFeatureModelElement} from an external submodel.
 	 *
-	 * @param selection the selection from the editor
+	 * @param selection - {@link IStructuredSelection} The selection from the editor.
 	 *
-	 * @return true if there is a feature from an external submodel, false otherwise
+	 * @return boolean - true if selection is a {@link MultiFeature} or {@link MultiConstraint} from an external submodel, false otherwise.
 	 */
-	protected boolean hasExternalFeature(IStructuredSelection selection) {
+	protected boolean hasExternalFeatureModelElement(IStructuredSelection selection) {
 		for (final Object selectedElement : selection.toArray()) {
-			if (selectedElement instanceof FeatureEditPart) {
-				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
-					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
-					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
+			if ((selectedElement instanceof FeatureEditPart) || (selectedElement instanceof ConstraintEditPart)) {
+				final ModelElementEditPart editPart = (ModelElementEditPart) selectedElement;
+				final IFeatureModelElement element = editPart.getModel().getObject();
+				if (element instanceof IMultiFeatureModelElement) {
+					final IMultiFeatureModelElement multiElement = (IMultiFeatureModelElement) element;
+					if (multiElement.isFromExtern()) {
 						return true;
 					}
 				}

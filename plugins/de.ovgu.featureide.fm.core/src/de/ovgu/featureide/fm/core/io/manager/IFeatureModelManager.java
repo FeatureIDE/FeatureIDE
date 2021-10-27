@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.util.Collection;
+
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
@@ -66,5 +70,19 @@ public interface IFeatureModelManager extends IManager<IFeatureModel> {
 	FeatureModelFormula getPersistentFormula();
 
 	FeatureModelFormula getVariableFormula();
+
+	/**
+	 * Inform all feature models that import the current feature model that the event <code>e</code> occurred.
+	 *
+	 * @param e - {@link FeatureIDEEvent}
+	 */
+	void informImports(FeatureIDEEvent e);
+
+	/**
+	 * Returns a duplicate-free collection of all {@link MultiFeatureModel}s that reference the managed feature model.
+	 *
+	 * @return {@link Collection}
+	 */
+	Collection<MultiFeatureModel> getReferencingFeatureModels();
 
 }

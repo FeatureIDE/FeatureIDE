@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -121,7 +122,9 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		}
 
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
-			showRenameManager();
+			if (!((feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern())) {
+				showRenameManager();
+			}
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
 			FeatureModelOperationWrapper.run(new CollapseFeatureOperation(feature.getName(), featureModel, COLLAPSE_OPERATION));
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
