@@ -529,16 +529,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 			break;
 		case MANDATORY:
 			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
-					.filter(structure -> structure.isRoot() || (structure.isMandatorySet() && structure.getParent().isAnd())).map(s -> s.getFeature()).toList();
+					.filter(structure -> structure.isRoot() || (structure.isMandatorySet() && structure.getParent().isAnd())).map(s -> s.getFeature())
+					.collect(Collectors.toList());
 			break;
 		case OPTIONAL:
 			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
 					.filter(structure -> !structure.isRoot() && !structure.isMandatorySet() && structure.getParent().isAnd())
-					.map(structure -> structure.getFeature()).toList();
+					.map(structure -> structure.getFeature()).collect(Collectors.toList());
 			break;
 		case GROUP:
 			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
-					.filter(structure -> !structure.isRoot() && !structure.isAnd()).map(structure -> structure.getFeature()).toList();
+					.filter(structure -> !structure.isRoot() && !structure.isAnd()).map(structure -> structure.getFeature()).collect(Collectors.toList());
 			break;
 		case DEAD:
 			if (getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
@@ -578,7 +579,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	private int countFeaturesWhere(Predicate<IFeatureStructure> predicate) {
-		return featureModel.getFeatures().stream().filter(feature -> predicate.test(feature.getStructure())).toList().size();
+		return featureModel.getFeatures().stream().filter(feature -> predicate.test(feature.getStructure())).collect(Collectors.toList()).size();
 	}
 
 	/**
