@@ -106,7 +106,7 @@ public class FeatureModelOperationApprover implements IOperationApprover2 {
 			approval = wrappedOperation.approveRedo();
 		}
 		// Approval given, return OK.
-		if (approval.isEmpty()) {
+		if (!approval.isPresent()) {
 			return Status.OK_STATUS;
 		}
 		// No approval given; use info (if available) to show an error pop-up with title and reason.
