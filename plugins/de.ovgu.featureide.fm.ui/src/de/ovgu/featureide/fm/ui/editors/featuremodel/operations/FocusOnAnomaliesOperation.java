@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
@@ -173,7 +174,7 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		for (final FeatureStatus status : featureAnomalies) {
 			if (featureCalculations) {
 				featuresToFocus.addAll(graphicalFeatureModel.getAllFeatures().stream().map(graphicalFeature -> graphicalFeature.getObject())
-						.filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+						.filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).collect(Collectors.toList()));
 			} else {
 				featuresToFocus.addAll(analyzer.annotateFeatures(status, null));
 			}
@@ -181,7 +182,8 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 		// Remove unwanted anomaly types.
 		for (final FeatureStatus status : noAnomalies) {
 			if (featureCalculations) {
-				featuresToFocus.removeAll(featuresToFocus.stream().filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).toList());
+				featuresToFocus.removeAll(
+						featuresToFocus.stream().filter(feature -> analyzer.getFeatureProperties(feature).hasStatus(status)).collect(Collectors.toList()));
 			} else {
 				featuresToFocus.removeAll(analyzer.annotateFeatures(status, null));
 			}
@@ -189,13 +191,14 @@ public class FocusOnAnomaliesOperation extends AbstractCollapseOperation {
 
 		// Collect the features contained in a constraint for which at least anomaly type applies.
 		final Collection<IConstraint> allConstraints =
-			graphicalFeatureModel.getConstraints().stream().map(graphicalConstraint -> graphicalConstraint.getObject()).toList();
+			graphicalFeatureModel.getConstraints().stream().map(graphicalConstraint -> graphicalConstraint.getObject()).collect(Collectors.toList());
 		final boolean constraintCalculations = automaticCalculations && FeatureModelProperty.isCalculateConstraints(model);
 
 		for (final ConstraintStatus status : constraintAnomalies) {
 			final Collection<IConstraint> anomalousConstraints;
 			if (constraintCalculations) {
-				anomalousConstraints = allConstraints.stream().filter(constraint -> analyzer.getConstraintProperties(constraint).hasStatus(status)).toList();
+				anomalousConstraints =
+					allConstraints.stream().filter(constraint -> analyzer.getConstraintProperties(constraint).hasStatus(status)).collect(Collectors.toList());
 			} else {
 				anomalousConstraints = analyzer.annotateConstraints(status, null);
 			}
