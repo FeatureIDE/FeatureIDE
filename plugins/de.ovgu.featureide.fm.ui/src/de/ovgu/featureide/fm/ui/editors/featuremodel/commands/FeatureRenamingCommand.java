@@ -34,7 +34,10 @@ import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOperation;
 
@@ -76,6 +79,12 @@ public class FeatureRenamingCommand extends Command {
 				final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(sourceUri)[0];
 				if (sourceFile != null) {
 					final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(sourceFile.getProject());
+					if (featureModelManager instanceof IFileManager) {
+						final IPersistentFormat<?> format = ((IFileManager<?>) featureModelManager).getFormat();
+						if ((format instanceof IFeatureModelFormat) && !((IFeatureModelFormat) format).isValidFeatureName(newName)) {
+							return false;
+						}
+					}
 					return (fmComposerExtension != null) && fmComposerExtension.isValidFeatureName(newName);
 				}
 			}

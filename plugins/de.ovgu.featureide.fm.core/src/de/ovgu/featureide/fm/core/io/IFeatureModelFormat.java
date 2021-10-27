@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
+public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel>, IFeatureNameValidator {
 
 	public static String extensionPointID = "FMFormat";
 
@@ -39,5 +39,10 @@ public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
 	void setFeatureNameValidator(IFeatureNameValidator validator);
 
 	IFeatureNameValidator getFeatureNameValidator();
+	
+	@Override
+	default boolean isValidFeatureName(String featureName) {
+		return true;
+	}
 
 }
