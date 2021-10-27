@@ -66,6 +66,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
@@ -114,6 +116,10 @@ public class AnalysesCollection {
 	 * Remembers explanations for redundant constraints.
 	 */
 	final Map<IConstraint, RedundantConstraintExplanation> redundantConstraintExplanations = new HashMap<>();
+	/**
+	 * Remembers the collected explanation for all anomalies.
+	 */
+	private MultipleAnomaliesExplanation multipleAnomaliesExplanation;
 
 	/**
 	 * Used for creating explanation creators.
@@ -131,6 +137,7 @@ public class AnalysesCollection {
 	 * Creates explanations for redundant constraints. Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
 	final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = explanationCreatorFactory.getRedundantConstraintExplanationCreator();
+	final MultipleAnomaliesExplanationCreator multipleAnomaliesExplanationCreator = explanationCreatorFactory.getMultipleAnomaliesExplanationCreator();
 
 	static class StringToFeature implements Function<String, IFeature> {
 
@@ -404,34 +411,35 @@ public class AnalysesCollection {
 		new ConstraintAnalysisWrapper<>(ContradictionAnalysis.class, new FeatureTreeCNFCreator());
 	final CauseAnalysisWrapper constraintAnomaliesAnalysis = new CauseAnalysisWrapper(CauseAnalysis.class, coreDeadAnalysis, foAnalysis);
 
-	private final List<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> list =
+	private final List<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> analysesList =
 		Arrays.asList(validAnalysis, atomicSetAnalysis, coreDeadAnalysis, foAnalysis, determinedAnalysis, constraintContradictionAnalysis,
 				constraintVoidAnalysis, constraintTautologyAnalysis, constraintRedundancyAnalysis, constraintAnomaliesAnalysis);
 
 	<D extends IFeatureModelElement> Explanation<?> createExplanation(ExplanationCreator<D, ?> creator, D element, FeatureModelFormula formula) {
-		creator.setSubject(element);
-		return creator.getExplanation();
+		return creator.getExplanationFor(element);
 	}
 
 	void reset(FeatureModelFormula formula) {
 		this.formula = formula;
-		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
+		final IFeatureModel featureModel = formula.getFeatureModel();
+		for (final AnalysisWrapper<?, ?> analysisWrapper : analysesList) {
 			analysisWrapper.reset();
 			analysisWrapper.setFormula(formula);
 		}
 		deadFeatureExplanations.clear();
 		falseOptionalFeatureExplanations.clear();
 		redundantConstraintExplanations.clear();
+		multipleAnomaliesExplanation = null;
 
 		featurePropertiesMap.clear();
 		constraintPropertiesMap.clear();
 
-		for (final IFeature feature : formula.getFeatureModel().getFeatures()) {
+		for (final IFeature feature : featureModel.getFeatures()) {
 			final FeatureProperties featureProperties = new FeatureProperties(feature);
 			featurePropertiesMap.put(feature, featureProperties);
 			elementPropertiesMap.put(feature, featureProperties);
 		}
-		for (final IConstraint constraint : formula.getFeatureModel().getConstraints()) {
+		for (final IConstraint constraint : featureModel.getConstraints()) {
 			final ConstraintProperties constraintProperties = new ConstraintProperties(constraint);
 			constraintPropertiesMap.put(constraint, constraintProperties);
 			elementPropertiesMap.put(constraint, constraintProperties);
@@ -442,25 +450,26 @@ public class AnalysesCollection {
 
 	void init(FeatureModelFormula formula) {
 		this.formula = formula;
-		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
+		for (final AnalysisWrapper<?, ?> analysisWrapper : analysesList) {
 			analysisWrapper.setFormula(formula);
 		}
 
 		deadFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		falseOptionalFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		redundantConstraintExplanationCreator.setFeatureModel(formula.getFeatureModel());
+		multipleAnomaliesExplanationCreator.setFeatureModel(formula.getFeatureModel());
 	}
 
 	public void inheritSettings(AnalysesCollection otherCollection) {
-		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> thisAnalysesIterator = list.iterator();
-		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> otherAnalysesIterator = otherCollection.list.iterator();
+		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> thisAnalysesIterator = analysesList.iterator();
+		final Iterator<AnalysisWrapper<?, ? extends AbstractAnalysis<? extends Object>>> otherAnalysesIterator = otherCollection.analysesList.iterator();
 		while (thisAnalysesIterator.hasNext()) {
 			thisAnalysesIterator.next().setEnabled(otherAnalysesIterator.next().isEnabled());
 		}
 	}
 
 	/**
-	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints a also NOT analyzed.
+	 * Defines whether features should be included into calculations. To analyze constraints, features also need to be analyzed,
 	 */
 	public boolean isCalculateFeatures() {
 		return FeatureModelProperty.isCalculateFeatures(formula.getFeatureModel());
@@ -534,6 +543,14 @@ public class AnalysesCollection {
 	public ConstraintProperties getConstraintProperty(IConstraint constraint) {
 		final ConstraintProperties constraintProperties = constraintPropertiesMap.get(constraint);
 		return constraintProperties != null ? constraintProperties : new ConstraintProperties(constraint);
+	}
+
+	MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
+		return multipleAnomaliesExplanation;
+	}
+
+	void setMultipleAnomaliesExplanation(MultipleAnomaliesExplanation multipleAnomaliesExplanation) {
+		this.multipleAnomaliesExplanation = multipleAnomaliesExplanation;
 	}
 
 }

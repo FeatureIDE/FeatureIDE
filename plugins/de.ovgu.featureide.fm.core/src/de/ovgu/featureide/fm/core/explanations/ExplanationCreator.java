@@ -51,4 +51,15 @@ public interface ExplanationCreator<S, E extends Explanation<S>> {
 	 */
 	public E getExplanation() throws IllegalStateException;
 
+	/**
+	 * Returns an explanation for the given subject, and sets the new subject.
+	 *
+	 * @param subject - S <br> The subject with an explanation to give for.
+	 * @return E - an explanation; null if none could be generated.
+	 * @throws IllegalStateExpection - if the context of subject is not set.
+	 */
+	default E getExplanationFor(S subject) {
+		setSubject(subject);
+		return getExplanation();
+	}
 }

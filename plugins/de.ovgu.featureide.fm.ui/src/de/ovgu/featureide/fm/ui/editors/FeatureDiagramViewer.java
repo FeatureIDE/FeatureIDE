@@ -278,8 +278,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void reload() {// TODO do not layout twice
 		// internRefresh(true);
-		final Map<?, ?> editPartRegistry = getEditPartRegistry();
-		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) editPartRegistry.get(graphicalFeatureModel);
+		final AbstractGraphicalEditPart abstractGraphicalEditPart = (AbstractGraphicalEditPart) getEditPartRegistry().get(graphicalFeatureModel);
 		abstractGraphicalEditPart.refresh();
 		internRefresh(true);
 	}
@@ -336,15 +335,24 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		connections.forEach(connection -> registry.remove(connection));
 	}
 
+	/**
+	 * Removes the {@link FeatureEditPart} associated with <code>feature</code>.
+	 *
+	 * @param feature - {@link IGraphicalFeature}
+	 */
 	public void deregisterEditParts(IGraphicalFeature feature) {
 		final Map<?, ?> registry = getEditPartRegistry();
 		registry.remove(feature);
 		registry.remove(feature.getSourceConnection());
 	}
 
+	/**
+	 * Removes the {@link ConstraintEditPart} associated with <code>constraint</code>.
+	 *
+	 * @param constraint - {@link IGraphicalConstraint}
+	 */
 	public void deregisterEditParts(IGraphicalConstraint constraint) {
-		final Map<?, ?> registry = getEditPartRegistry();
-		registry.remove(constraint);
+		getEditPartRegistry().remove(constraint);
 	}
 
 	/**

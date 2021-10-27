@@ -24,7 +24,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatureModelExplanationCreatorFactory;
 
 /**
- * Provides instances of {@link FeatureModelExplanationCreator}.
+ * Provides instances of {@link FeatureModelExplanationCreator}s.
  *
  * @author Timo G&uuml;nther
  */
@@ -60,4 +60,10 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	 */
 	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator();
 
+	/**
+	 * Returns a new instance of a {@link MultipleAnomaliesExplanationCreator}.
+	 *
+	 * @return new {@link MultipleAnomaliesExplanationCreator}
+	 */
+	public abstract MultipleAnomaliesExplanationCreator getMultipleAnomaliesExplanationCreator();
 }

@@ -190,7 +190,7 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 	 * Defines whether features should be included into calculations. If features are not analyzed, then constraints are also NOT analyzed.
 	 *
 	 * @param fm The relative feature model.
-	 * @return true, when feature should be considered when anayses are performed, false otherwise.
+	 * @return true, when feature should be considered when analyses are performed, false otherwise.
 	 */
 	public static boolean isCalculateFeatures(IFeatureModel fm) {
 		Boolean isCalculatingFeatures = FeatureModelProperty.getBooleanProperty(fm.getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,
@@ -206,7 +206,7 @@ public class FeatureModelProperty extends MapPropertyContainer implements IFeatu
 	 * Defines whether constraints should be included into calculations.
 	 *
 	 * @param fm The relative feature model.
-	 * @return true, when constraints should be considered when anayses are performed, false otherwise.
+	 * @return true, when constraints should be considered when analyses are performed, false otherwise.
 	 */
 	public static boolean isCalculateConstraints(IFeatureModel fm) {
 		Boolean isCalculatingConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), FeatureModelProperty.TYPE_CALCULATIONS,

@@ -42,12 +42,10 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
@@ -167,14 +165,14 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		final Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
-		ResetTooltip();
+		resetTooltip();
 
 	}
 
 	/**
 	 * Resets the current tooltip. Should be called when the properties of a feature are changed and the old generated tooltip is obsolete.
 	 */
-	public void ResetTooltip() {
+	public void resetTooltip() {
 		toolTipFigure = null;
 	}
 
@@ -190,13 +188,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 			final StringBuilder toolTip = new StringBuilder();
 
-			// Check if automatic calculations are nessecary
-			AnalysesCollection properties = null;
-			if (FeatureModelProperty.isRunCalculationAutomatically(feature.getFeatureModel())
-				&& FeatureModelProperty.isCalculateFeatures(feature.getFeatureModel())) {
-				final FeatureModelFormula variableFormula = this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula();
-				properties = variableFormula.getAnalyzer().getAnalysesCollection();
-			}
+			// Check if automatic calculations are necessary
+			final AnalysesCollection properties =
+				this.feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection();
 
 			if (properties == null) {
 				toolTip.append(createTooltip());
@@ -276,22 +270,16 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	}
 
 	private void setLabelIcon() {
-		// Check if automatic calculations are wanted (properties are only set when analyses are activated)
-		if (!FeatureModelProperty.isRunCalculationAutomatically(feature.getGraphicalModel().getFeatureModelManager().getVarObject())
-			|| !FeatureModelProperty.isCalculateFeatures(feature.getGraphicalModel().getFeatureModelManager().getVarObject())) {
-			label.setIcon(null);
+		final FeatureProperties featureProperties = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
+				.getAnalysesCollection().getFeatureProperty(feature.getObject());
+		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+			label.setIcon(FM_ERROR);
+		} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+			label.setIcon(FM_WARNING);
+		} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+			label.setIcon(WARNING_IMAGE);
 		} else {
-			final FeatureProperties featureProperties = feature.getGraphicalModel().getFeatureModelManager().getVariableFormula().getAnalyzer()
-					.getAnalysesCollection().getFeatureProperty(feature.getObject());
-			if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
-				label.setIcon(FM_ERROR);
-			} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
-				label.setIcon(FM_WARNING);
-			} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
-				label.setIcon(WARNING_IMAGE);
-			} else {
-				label.setIcon(null);
-			}
+			label.setIcon(null);
 		}
 		setName(label.getText());
 	}

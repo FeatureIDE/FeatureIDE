@@ -47,7 +47,7 @@ public abstract class FeatureModelExplanation<S> extends Explanation<S> {
 	}
 
 	/**
-	 * Returns all feature model elements affected by this explanation. An element is considered affected if it is the defect element, the source element of any
+	 * Returns all feature model elements affected by this explanation. An element is considered affected if it is a defect element, the source element of any
 	 * reason or part of any such constraint.
 	 *
 	 * @return all feature model elements affected by this explanation
@@ -60,9 +60,7 @@ public abstract class FeatureModelExplanation<S> extends Explanation<S> {
 			}
 			affectedElements.addAll(((FeatureModelReason) reason).getSubject().getElements());
 		}
-		if (getSubject() instanceof IFeatureModelElement) {
-			affectedElements.add((IFeatureModelElement) getSubject());
-		}
+		addSubjects(affectedElements);
 		final Set<IFeatureModelElement> constraintElements = new LinkedHashSet<>();
 		for (final IFeatureModelElement affectedElement : affectedElements) {
 			if (!(affectedElement instanceof IConstraint)) {
@@ -73,6 +71,18 @@ public abstract class FeatureModelExplanation<S> extends Explanation<S> {
 		}
 		affectedElements.addAll(constraintElements);
 		return affectedElements;
+	}
+
+	/**
+	 * Adds the subject(s) of this explanation to <code>affectedElements</code>.
+	 *
+	 * @param affectedElements - {@link Set}
+	 * @see getAffectedElements
+	 */
+	protected void addSubjects(final Set<IFeatureModelElement> affectedElements) {
+		if (getSubject() instanceof IFeatureModelElement) {
+			affectedElements.add((IFeatureModelElement) getSubject());
+		}
 	}
 
 	/**

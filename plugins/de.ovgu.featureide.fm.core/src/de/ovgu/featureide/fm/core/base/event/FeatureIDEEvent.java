@@ -112,9 +112,13 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_COLLAPSED_CHANGED,
 		/**
-		 * A collapsed feature was changed.
+		 * All collapsed features were changed.
 		 */
 		FEATURE_COLLAPSED_ALL_CHANGED,
+		/**
+		 * Some or all possible feature model anomalies were calculated.
+		 */
+		MANUAL_CALCULATION_EXECUTED,
 		/**
 		 * The location of an object was changed, for example because the feature order was reversed.
 		 */
@@ -154,7 +158,7 @@ public class FeatureIDEEvent {
 		 */
 		MODEL_DATA_CHANGED,
 		/**
-		 * The model data was saved to file.
+		 * The model data was saved to a file.
 		 */
 		MODEL_DATA_SAVED,
 		/**
@@ -190,7 +194,7 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_ATTRIBUTE_CHANGED,
 		/**
-		 * Value of configurable attribute was overwritten for a configuration
+		 * Value of configurable attribute was overwritten for a configuration.
 		 */
 		CONFIGURABLE_ATTRIBUTE_CHANGED,
 		/**

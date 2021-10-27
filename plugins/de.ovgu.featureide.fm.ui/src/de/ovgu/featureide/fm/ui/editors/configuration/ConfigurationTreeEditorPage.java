@@ -1123,17 +1123,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final FeatureProperties featureProperties = fm.getAnalyzer().getFeatureProperties(automaticSelection.getFeature());
 		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 			deadFeatureExplanationCreator.setFeatureModel(fm.getFeatureModel());
-			deadFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
-			return deadFeatureExplanationCreator.getExplanation();
+			return deadFeatureExplanationCreator.getExplanationFor(automaticSelection.getFeature());
 		}
 		if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 			falseOptionalFeatureExplanationCreator.setFeatureModel(fm.getFeatureModel());
-			falseOptionalFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
-			return falseOptionalFeatureExplanationCreator.getExplanation();
+			return falseOptionalFeatureExplanationCreator.getExplanationFor(automaticSelection.getFeature());
 		}
 		automaticSelectionExplanationCreator.setConfiguration(configManager.getSnapshot());
-		automaticSelectionExplanationCreator.setSubject(automaticSelection);
-		return automaticSelectionExplanationCreator.getExplanation();
+		return automaticSelectionExplanationCreator.getExplanationFor(automaticSelection);
 	}
 
 	protected void computeTree(UpdateStrategy updateStrategy) {
