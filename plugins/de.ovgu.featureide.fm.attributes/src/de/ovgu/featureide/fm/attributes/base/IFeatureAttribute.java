@@ -110,9 +110,15 @@ public interface IFeatureAttribute {
 	 */
 	public void setConfigurable(boolean configurable);
 
-	public void recurseAttribute(IFeature feature);
+	/**
+	 * Adds copies of this attribute recursively to all descendants of its associated feature.
+	 */
+	public void addRecursiveAttributes();
 
-	public void deleteRecursiveAttributes(IFeature feature);
+	/**
+	 * Removes copies of this attribute recursively from all descendants of its associated feature. This attribute itself is not removed.
+	 */
+	public void deleteRecursiveAttributes();
 
 	/**
 	 * Sets the feature of the feature attribute.
