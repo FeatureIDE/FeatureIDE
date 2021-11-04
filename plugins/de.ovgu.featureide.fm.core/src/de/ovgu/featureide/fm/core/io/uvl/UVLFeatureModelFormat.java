@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.core.resources.IProject;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -55,6 +57,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IMultiFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -63,6 +66,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
@@ -82,6 +86,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
+	private static final String MULTI_ROOT_PREFIX = "Abstract_";
 
 	private UVLModel rootModel;
 	protected ProblemList pl;
@@ -141,8 +146,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			final Feature f = rootModel.getRootFeatures()[0];
 			root = parseFeature(fm, null, f, rootModel);
 		} else {
-			root = factory.createFeature(fm, "Root");
-			Arrays.stream(rootModel.getRootFeatures()).forEach(f -> parseFeature(fm, root, f, rootModel));
+			String rootName = MULTI_ROOT_PREFIX + 0;
+			for (int i = 1; rootModel.getAllFeatures().keySet().contains(rootName); i++) {
+				rootName = MULTI_ROOT_PREFIX + i;
+			}
+			root = factory.createFeature(fm, rootName);
+			root.getStructure().setAbstract(true);
+			root.getProperty().setImplicit(true);
+			fm.addFeature(root);
+			Arrays.stream(rootModel.getRootFeatures()).forEachOrdered(f -> parseFeature(fm, root, f, rootModel));
+			root.getStructure().getChildren().forEach(fs -> fs.setMandatory(true));
 		}
 		fm.getStructure().setRoot(root.getStructure());
 		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
@@ -153,6 +166,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f, UVLModel submodel) {
 		final Feature resolved = UVLParser.resolve(f, rootModel);
+
+		boolean duplicateFeature = false;
+		// Add error in case of a duplicate feature name
+		if (fm.getFeatures().stream().anyMatch(feature -> feature.getName().equals(resolved.getName()))) {
+			pl.add(new Problem("Duplicate feature name " + resolved.getName(), 0, Severity.ERROR));
+			duplicateFeature = true;
+		}
 
 		// Validate imported feature
 		if ((root == null ? -1 : root.getName().lastIndexOf('.')) < resolved.getName().lastIndexOf('.')) {
@@ -182,7 +202,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final MultiFeature feature = factory.createFeature(fm, resolved.getName());
 
 		if (resolved.getName().contains(".")) {
-			feature.setType(MultiFeature.TYPE_INTERFACE);
+			feature.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 		}
 		fm.addFeature(feature);
 		if (root != null) {
@@ -190,7 +210,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 		feature.getStructure().setAbstract(isAbstract(resolved));
 
-		Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		if (!duplicateFeature) { // Don't process groups for duplicate feature names, as this can cause infinite recursion
+			Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		}
 		parseAttributes(fm, feature, resolved);
 
 		return feature;
@@ -271,7 +293,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				if (own) {
 					fm.addOwnConstraint(newConstraint);
 				} else {
-					newConstraint.setType(MultiFeature.TYPE_INTERFACE);
+					newConstraint.setType(IMultiFeatureModelElement.TYPE_INTERFACE);
 					fm.addConstraint(newConstraint);
 				}
 			}
@@ -300,14 +322,24 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void checkReferenceValid(String name) {
-		if (fm.getFeature(name) == null) {
+		final IFeature f = fm.getFeature(name);
+		if ((f == null) || f.getProperty().isImplicit()) {
 			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0, Severity.ERROR));
 			throw new RuntimeException("Invalid reference");
 		}
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		fm.addInstance(i.getNamespace(), i.getAlias());
+		final IProject project = EclipseFileSystem.getResource(fm.getSourceFile()).getProject();
+		// Local path of imported model (as given in importing model)
+		final String modelPath = i.getNamespace().replace(".", "/") + "." + FILE_EXTENSION;
+		// Resolved path (import relative to project root)
+		Path path = project.getFile(modelPath).getLocation().toFile().toPath();
+		if (!Files.exists(path)) {
+			// Import relative to importing model
+			path = fm.getSourceFile().resolveSibling(modelPath);
+		}
+		fm.addInstance(i.getNamespace(), i.getAlias(), path);
 	}
 
 	/**
@@ -320,13 +352,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel fm) {
-		return deconstructFeatureModel(fm).toString();
+		// UVL stores MultiFeatureModels, so this cast is acceptable
+		return deconstructFeatureModel((MultiFeatureModel) fm).toString();
 	}
 
-	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
+	/**
+	 * Deconstructs the given {@link MultiFeatureModel} into an {@link UVLModel} to output.
+	 *
+	 * @param fm - {@link MultiFeatureModel}
+	 * @return new {@link UVLModel}
+	 */
+	private UVLModel deconstructFeatureModel(MultiFeatureModel fm) {
 		final UVLModel model = new UVLModel();
 		String namespace = fm.getStructure().getRoot().getFeature().getName();
-		List<IConstraint> constraints = fm.getConstraints();
+		List<IConstraint> constraints = fm.getOwnConstraints();
 		if (fm instanceof MultiFeatureModel) {
 			final MultiFeatureModel mfm = (MultiFeatureModel) fm;
 			final FeatureAttribute<String> nsAttribute = mfm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
@@ -341,7 +380,15 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			model.setImports(new Import[0]);
 		}
 		model.setNamespace(namespace);
-		model.setRootFeatures(new Feature[] { printFeature(fm.getStructure().getRoot().getFeature()) });
+		final IFeatureStructure root = fm.getStructure().getRoot();
+		if (root.getFeature().getProperty().isImplicit() && root.isAnd() && root.hasChildren()
+			&& root.getChildren().stream().allMatch(IFeatureStructure::isMandatory) && root.getRelevantConstraints().isEmpty()) {
+			// Remove implicit root feature, use children as root features
+			model.setRootFeatures(root.getChildren().stream().map(child -> printFeature(child.getFeature())).toArray(Feature[]::new));
+		} else {
+			// Use single root feature
+			model.setRootFeatures(new Feature[] { printFeature(root.getFeature()) });
+		}
 		model.setConstraints(constraints.stream().map(this::printConstraint).toArray());
 		return model;
 	}

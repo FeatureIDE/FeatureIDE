@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator;
 
 /**
- * Abstract implementation of {@link FeatureModelExplanationCreator}.
+ * Abstract implementation of a {@link FeatureModelExplanationCreator}.
  *
  * @param <S> subject
  * @param <E> explanation

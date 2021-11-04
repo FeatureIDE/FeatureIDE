@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,7 +48,7 @@ public class CollapseAllOperation extends AbstractGraphicalFeatureModelOperation
 	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<>();
 
 	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
-		super(graphicalFeatureModel, COLLAPSE_ALL);
+		super(graphicalFeatureModel, collapse ? COLLAPSE_ALL : EXPAND_ALL);
 		this.collapse = collapse;
 	}
 

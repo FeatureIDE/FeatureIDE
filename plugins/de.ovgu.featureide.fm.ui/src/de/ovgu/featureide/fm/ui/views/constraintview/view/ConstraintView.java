@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
-import de.ovgu.featureide.fm.core.localization.StringTable;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -42,6 +41,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewConst
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewDescriptionColumnLabelProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewFilter;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewTagsColumnLabelProvider;
 
 /**
  * This class represents the view (MVC) of the constraint view.
@@ -61,31 +61,30 @@ public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
-    // Style parameters for the view
-    private final String CONSTRAINT_HEADER = "Constraint";
-    private final String DESCRIPTION_HEADER = "Description";
+	// Style parameters for the view
+	private final String CONSTRAINT_HEADER = "Constraint";
+	private final String DESCRIPTION_HEADER = "Description";
+	private final String TAG_HEADER = "Tags";
 
-    // offset to account for the margin of the tree and the scrollbar
-    // this value is larger than needed to ensure correctness on all versions and operating systems
-    private static final int TREE_WIDTH_OFFSET = 50;
-    private static final int INITIAL_COLUMN_WIDTH = 500;
-    private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
-    private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
+	// offset to account for the margin of the tree and the scrollbar
+	// this value is larger than needed to ensure correctness on all versions and operating systems
+	private static final int TREE_WIDTH_OFFSET = 50;
+	private static final int INITIAL_COLUMN_WIDTH = 500;
+	private static final float COLUMN_WIDTH_RATIO = 0.33f;
 
-    // UI elements
-    private TreeViewer treeViewer;
-    private Text searchBox;
+	// UI elements
+	private TreeViewer treeViewer;
+	private Text searchBox;
 
-    public ConstraintViewFilter filter;
-    private ConstraintViewComparator comparator;
+	public ConstraintViewFilter filter;
+	private ConstraintViewComparator comparator;
 
+	private final ConstraintViewController controller;
 
-    private final ConstraintViewController controller;
-
-    public ConstraintView(Composite parent, ConstraintViewController controller) {
-        this.controller = controller;
-        init(parent);
-    }
+	public ConstraintView(Composite parent, ConstraintViewController controller) {
+		this.controller = controller;
+		init(parent);
+	}
 
 	/**
 	 * Initializes the view by adding the search box, the TreeViewer and the content classes such as the ConstraintViewFilter, ConstraintViewComparator and
@@ -93,7 +92,7 @@ public class ConstraintView implements GUIDefaults {
 	 */
 	private void init(Composite parent) {
 
-        parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new GridLayout(1, false));
 
 		// create the search box
 		final GridData searchBoxData = new GridData();
@@ -108,20 +107,20 @@ public class ConstraintView implements GUIDefaults {
 		treeViewer.getTree().setHeaderVisible(true);
 		treeViewer.getTree().setLinesVisible(true);
 
-        treeViewer.setContentProvider(new ConstraintViewContentProvider());
-        filter = new ConstraintViewFilter();
-        treeViewer.addFilter(filter);
+		treeViewer.setContentProvider(new ConstraintViewContentProvider());
+		filter = new ConstraintViewFilter();
+		treeViewer.addFilter(filter);
 
-        comparator = new ConstraintViewComparator();
-        treeViewer.setComparator(comparator);
-        resetSort();
+		comparator = new ConstraintViewComparator();
+		treeViewer.setComparator(comparator);
+		resetSort();
 
-        final GridData treeData = new GridData();
-        treeData.grabExcessHorizontalSpace = true;
-        treeData.horizontalAlignment = SWT.FILL;
-        treeData.grabExcessVerticalSpace = true;
-        treeData.verticalAlignment = SWT.FILL;
-        treeViewer.getControl().setLayoutData(treeData);
+		final GridData treeData = new GridData();
+		treeData.grabExcessHorizontalSpace = true;
+		treeData.horizontalAlignment = SWT.FILL;
+		treeData.grabExcessVerticalSpace = true;
+		treeData.verticalAlignment = SWT.FILL;
+		treeViewer.getControl().setLayoutData(treeData);
 
 		// XXX Not available for Eclipse Neon or below
 //		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
@@ -153,67 +152,88 @@ public class ConstraintView implements GUIDefaults {
 		});
 
 		final TreeViewerColumn descriptionColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
-        descriptionColumn.getColumn().setText(DESCRIPTION_HEADER);
-        descriptionColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
-        descriptionColumn.getColumn().setResizable(true);
-        descriptionColumn.getColumn().setMoveable(true);
-        descriptionColumn.setLabelProvider(new ConstraintViewDescriptionColumnLabelProvider());
+		descriptionColumn.getColumn().setText(DESCRIPTION_HEADER);
+		descriptionColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+		descriptionColumn.getColumn().setResizable(true);
+		descriptionColumn.getColumn().setMoveable(true);
+		descriptionColumn.setLabelProvider(new ConstraintViewDescriptionColumnLabelProvider());
 
 		// sort when clicking on the header of the column
 		descriptionColumn.getColumn().addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                comparator.setColumn(ConstraintViewComparator.DESCRIPTION_COLUMN);
-                treeViewer.getTree().setSortDirection(comparator.getDirection());
-                treeViewer.getTree().setSortColumn(descriptionColumn.getColumn());
-                refresh();
-            }
-        });
 
-        // resize columns on view size change
-        treeViewer.getTree().getParent().addControlListener(new ControlListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(ConstraintViewComparator.DESCRIPTION_COLUMN);
+				treeViewer.getTree().setSortDirection(comparator.getDirection());
+				treeViewer.getTree().setSortColumn(descriptionColumn.getColumn());
+				refresh();
+			}
+		});
 
-            @Override
-            public void controlMoved(ControlEvent e) {
-                // not needed for column resizing
-            }
+		final TreeViewerColumn tagColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+		tagColumn.getColumn().setText(TAG_HEADER);
+		tagColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+		tagColumn.getColumn().setResizable(true);
+		tagColumn.getColumn().setMoveable(true);
+		tagColumn.setLabelProvider(new ConstraintViewTagsColumnLabelProvider());
 
-            @Override
-            public void controlResized(ControlEvent e) {
-                // need to get the size of the tree's parent because the tree's correct size is
-                // not set yet
-                // need to subtract some offset to account for the margin of the tree and the
-                // scrollbar
-                final int treeWidth =
-                        treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
-                constraintColumn.getColumn().setWidth((int) (treeWidth * NAME_COLUMN_WIDTH_RATIO));
-                descriptionColumn.getColumn().setWidth((int) (treeWidth * DESCRIPTION_COLUMN_WIDTH_RATIO));
-            }
-        });
-    }
+		// sort when clicking on the header of the column
+		tagColumn.getColumn().addSelectionListener(new SelectionAdapter() {
 
-    /**
-     * Resets the sorting of the ConstraintView to the constraint column in ascending order.
-     */
-    public void resetSort() {
-        comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
-        comparator.setDirection(ConstraintViewComparator.ASCENDING);
-        treeViewer.getTree().setSortDirection(comparator.getDirection());
-        treeViewer.getTree().setSortColumn(treeViewer.getTree().getColumn(0));
-    }
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(ConstraintViewComparator.TAG_COLUMN);
+				treeViewer.getTree().setSortDirection(comparator.getDirection());
+				treeViewer.getTree().setSortColumn(tagColumn.getColumn());
+				refresh();
+			}
+		});
 
-    public TreeViewer getViewer() {
-     return treeViewer;
+		// resize columns on view size change
+		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
+
+			@Override
+			public void controlMoved(ControlEvent e) {
+				// not needed for column resizing
+			}
+
+			@Override
+			public void controlResized(ControlEvent e) {
+				// need to get the size of the tree's parent because the tree's correct size is
+				// not set yet
+				// need to subtract some offset to account for the margin of the tree and the
+				// scrollbar
+				final int treeWidth = treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
+				constraintColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+				descriptionColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+				tagColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+			}
+		});
 	}
 
-    public Text getSearchBox() {
-        return searchBox;}
+	/**
+	 * Resets the sorting of the ConstraintView to the constraint column in ascending order.
+	 */
+	public void resetSort() {
+		comparator.setColumn(ConstraintViewComparator.CONSTRAINT_COLUMN);
+		comparator.setDirection(ConstraintViewComparator.ASCENDING);
+		treeViewer.getTree().setSortDirection(comparator.getDirection());
+		treeViewer.getTree().setSortColumn(treeViewer.getTree().getColumn(0));
+	}
 
-    public void dispose() {
+	public TreeViewer getViewer() {
+		return treeViewer;
+	}
+
+	public Text getSearchBox() {
+		return searchBox;
+	}
+
+	public void dispose() {
 		treeViewer.getTree().dispose();
 	}
 
-    public void refresh() {
-        treeViewer.refresh();
-    }
+	public void refresh() {
+		treeViewer.refresh();
+	}
 }

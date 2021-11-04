@@ -35,6 +35,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
@@ -112,10 +113,11 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 	}
 
 	protected void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
-		if (feature instanceof ExtendedFeature) {
-			if ((((ExtendedFeature) feature).getAttributes() != null) && !((ExtendedFeature) feature).getAttributes().isEmpty()) {
+		if (feature instanceof IExtendedFeature) {
+			List<IFeatureAttribute> attributesList = ((IExtendedFeature) feature).getAttributes();
+			if ((attributesList != null) && !attributesList.isEmpty()) {
 				// Write FeatureAttributes into the XML
-				for (final IFeatureAttribute featureAttribute : ((ExtendedFeature) feature).getAttributes()) {
+				for (final IFeatureAttribute featureAttribute : attributesList) {
 					final Element attributeNode;
 					if (featureAttribute.isRecursive() && !featureAttribute.isHeadOfRecursiveAttribute()) {
 						createRecursedAttribute(doc, fnode, featureAttribute);

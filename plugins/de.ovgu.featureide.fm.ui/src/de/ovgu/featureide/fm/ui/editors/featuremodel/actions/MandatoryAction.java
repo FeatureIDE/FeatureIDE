@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
@@ -39,7 +40,7 @@ public class MandatoryAction extends MultipleSelectionAction {
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
 	public MandatoryAction(Object viewer, IFeatureModelManager featureModelManager) {
-		super("Mandatory", viewer, ID, featureModelManager);
+		super(StringTable.MANDATORY_UPPERCASE, viewer, ID, featureModelManager);
 	}
 
 	@Override

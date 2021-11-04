@@ -30,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOOLTIP_IMPLICIT;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
@@ -141,6 +142,10 @@ public class Feature extends AFeature {
 		}
 
 		toolTip.append(structure.isRoot() ? ROOT : TOOLTIP_FEATURE);
+
+		if (getProperty().isImplicit()) {
+			toolTip.append(TOOLTIP_IMPLICIT);
+		}
 
 		// Handle analysis results if available
 		if ((objects.length > 0) && (objects[0] instanceof AnalysesCollection)) {

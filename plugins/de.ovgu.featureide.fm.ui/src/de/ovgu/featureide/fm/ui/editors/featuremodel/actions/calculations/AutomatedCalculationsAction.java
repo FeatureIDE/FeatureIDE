@@ -48,7 +48,7 @@ public class AutomatedCalculationsAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-
+		// Check for activated automated analyses.
 		Boolean isAutomaticCalculation = FeatureModelProperty.getBooleanProperty(featureModelManager.getSnapshot().getProperty(),
 				FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
 		// No property value available => take default value
@@ -62,7 +62,7 @@ public class AutomatedCalculationsAction extends AFeatureModelAction {
 			}
 		}
 
-		// Clear old results from the analyses collection
+		// Clear old results from the analyses collection.
 		final FeatureModelFormula variableFormula = featureModelManager.getVariableFormula();
 		final FeatureModelAnalyzer analyzer = variableFormula.getAnalyzer();
 		final IFeatureModel featureModel = variableFormula.getFeatureModel();

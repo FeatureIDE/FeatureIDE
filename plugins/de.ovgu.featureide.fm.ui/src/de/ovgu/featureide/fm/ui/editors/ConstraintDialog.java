@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_NEW_CON
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_PROPOSITIONAL_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_PROPOSITIONAL_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_YOUR_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPERATORS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_INSERT_A_CONSTRAINT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE;
@@ -36,17 +37,26 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -58,6 +68,9 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -84,6 +97,9 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
@@ -113,8 +129,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Marlen Bernier
  * @author Dawid Szczepanski
  * @author Sebastian Krieter
+ * @author Benedikt Jutz
+ * @author Rahel Arens
  */
 public class ConstraintDialog implements GUIDefaults {
+
+	/**
+	 *
+	 */
+	private static final String ENTER_A_NEW_OR_EXISTING_TAG_NAME = "enter a new or existing tag name";
 
 	/**
 	 * Data class
@@ -181,7 +204,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-		ERROR, WARNING, INFO, NONE
+			ERROR, WARNING, INFO, NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -418,6 +441,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private String initialConstraint;
 	private Group featureGroup;
 	private Group descriptionGroup;
+
 	private StyledText searchFeatureText;
 	private final SashForm sashForm;
 	private Text constraintDescriptionText;
@@ -435,10 +459,16 @@ public class ConstraintDialog implements GUIDefaults {
 
 	private Button cancelButton;
 
+	private ToolTip tooltip;
+
 	/**
-	 * Content proposal pop up.
+	 * Content proposal pop up for the formula of the constraint.
 	 */
-	private ContentProposalAdapter adapter;
+	private ContentProposalAdapter constraintFormulaProposalAdapter;
+	/**
+	 * Content proposal pop up for existing constraint tags of a feature model.
+	 */
+	private ContentProposalAdapter existingTagsAdapter;
 
 	private final Consumer<ValidationMessage> onUpdate = new Consumer<ValidationMessage>() {
 
@@ -474,20 +504,42 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 	};
 
+	/**
+	 * <code>tagGroup</code> holds the elements for the constraint tags section.
+	 */
+	private Group tagGroup;
+	/**
+	 * <code>tagEntryText</code> contains a text field to enter new tag names.
+	 */
+	private StyledText tagEntryText;
+
+	private IObservableSet<String> observableTags;
+
+	/**
+	 * Create a new {@link ConstraintDialog} for the feature model managed by <code>featureModelManager</code>. <br> <br> <code>constraint</code> may either be
+	 * null, in which case this dialog creates a new constraint, or be an existing constraint the user wants to edit.
+	 *
+	 * @param featureModelManager - {@link IFeatureModelManager}
+	 * @param constraint - {@link IConstraint}
+	 */
 	public ConstraintDialog(final IFeatureModelManager featureModelManager, final IConstraint constraint) {
 		this.featureModelManager = featureModelManager;
 		featureNamesList = FeatureUtils.getFeatureNamesList(featureModelManager.getSnapshot());
 		this.constraint = constraint;
 
 		final String constraintDescriptionText;
+		final Set<String> constraintTags;
+
 		if (constraint == null) {
 			constraintDescriptionText = "";
+			constraintTags = new HashSet<>();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
 			initialConstraint = "";
 			mode = Mode.CREATE;
 		} else {
 			constraintDescriptionText = constraint.getDescription();
+			constraintTags = constraint.getTags();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
@@ -507,6 +559,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		initFeatureGroup();
 		initConstraintDescriptionText(constraintDescriptionText);
+		initTagGroup(constraintTags);
 		initButtonGroup();
 		initConstraintText();
 		initBottom();
@@ -516,7 +569,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.open();
 
 		update(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE, DialogState.SAVE_CHANGES_DISABLED);
-		// Only create validator when autmated analyses are enabled
+		// Only use validator when automated constraint analyses are enabled.
 		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())
 			&& FeatureModelProperty.isCalculateConstraints(featureModelManager.getVarObject())) {
@@ -547,10 +600,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * closes the shell and adds new constraint to the feature model if possible
-	 *
-	 * @param featureModelManager
-	 * @param constraint
+	 * Closes the shell and adds new constraint to the feature model respectively updates the existing constraint, if possible.
 	 */
 	private void closeShell() {
 		final String input = constraintText.getText().trim();
@@ -558,14 +608,54 @@ public class ConstraintDialog implements GUIDefaults {
 		nodeReader.setFeatureNames(featureNamesList);
 		final Node propNode = nodeReader.stringToNode(input);
 		final String constraintDescription = constraintDescriptionText.getText().trim();
+		final Set<String> constraintTags = new HashSet<>(observableTags);
 
 		final AbstractFeatureModelOperation op =
-			(constraint != null) ? new EditConstraintOperation(featureModelManager, constraint, propNode, constraintDescription)
+			(constraint != null) ? new EditConstraintOperation(featureModelManager, constraint, propNode, constraintDescription, constraintTags)
 				: new CreateConstraintOperation(propNode, featureModelManager, constraintDescription);
 
 		FeatureModelOperationWrapper.run(op);
 
 		shell.dispose();
+	}
+
+	/**
+	 * Creates a {@link StyledText} field that displays <code>defaultText</code> when unselected for the given <code>parent</code> composite.
+	 *
+	 * @param defaultText - {@link String}
+	 * @param parent - {@link Composite}
+	 * @return new {@link StyledText}
+	 */
+	private StyledText createTextField(String defaultText, Composite parent) {
+		final StyledText text = new StyledText(parent, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+		text.setText(defaultText);
+		text.setMargins(3, 5, 3, 5);
+		text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		text.addListener(SWT.FocusOut, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (text.getText().isEmpty()) {
+					text.setText(defaultText);
+					text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+
+				}
+
+			}
+		});
+		text.addListener(SWT.FocusIn, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (defaultText.equals(text.getText())) {
+					text.setText("");
+				}
+				text.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+			}
+
+		});
+		return text;
 	}
 
 	/**
@@ -677,7 +767,8 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintTextComposite.setLayout(constraintTextLayout);
 		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER, Operator.NAMES);
 
-		setupContentProposal();
+		setupContentProposal(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(featureNamesList),
+				new ConstraintProposalLabelProvider());
 
 		final FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
@@ -733,7 +824,9 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * Initializes the text containing the descriptions.
+	 * Initializes the text field containing the description.
+	 *
+	 * @param description - {@link String}
 	 */
 	private void initConstraintDescriptionText(String description) {
 
@@ -753,6 +846,153 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
+	 * Initializes the group containing the tags.
+	 *
+	 * @param tags - {@link Set}
+	 */
+	private void initTagGroup(Set<String> tags) {
+		// Create the tag group, and configure its layout.
+		tagGroup = new Group(sashForm, SWT.NONE);
+		tagGroup.setText("Tags");
+		final GridData tagGroupLayoutData = new GridData(GridData.FILL);
+		tagGroupLayoutData.grabExcessHorizontalSpace = true;
+		tagGroupLayoutData.grabExcessVerticalSpace = true;
+		tagGroup.setLayoutData(tagGroupLayoutData);
+		final GridLayout tagGroupLayout = new GridLayout(1, true);
+		tagGroup.setLayout(tagGroupLayout);
+
+		// Set up a row that contains tagEntryText, and addTagButton.
+		final Composite tagInputRow = new Composite(tagGroup, SWT.NONE);
+		tagInputRow.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		tagInputRow.setLayout(new GridLayout(3, false));
+
+		// Configure tagEntryText.
+		tagEntryText = createTextField(ENTER_A_NEW_OR_EXISTING_TAG_NAME, tagInputRow);
+		tagEntryText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				// manage tooltip for commas in tagEntryText
+				final String tagText = tagEntryText.getText();
+				closeTooltip();
+				if (tagText.contains(",")) {
+					createTooltip(tagInputRow);
+				}
+			}
+
+		});
+
+		// get all tags that exist for all constraints
+		final Set<String> allTags = new HashSet<>();
+		for (final IConstraint constraint : featureModelManager.getVarObject().getConstraints()) {
+			allTags.addAll(constraint.getTags());
+		}
+		allTags.removeAll(tags);
+
+		setupContentProposal(tagEntryText, new ConstraintTagContentAdapter(), new ConstraintTagContentProposalProvider(allTags), new LabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				if (element instanceof ContentProposal) {
+					return ((ContentProposal) element).getContent();
+				}
+				return element.toString();
+			}
+		});
+
+		// Give an overview of the constraint's current tags in <code>tags</code>.
+		final Composite tableComposite = new Composite(tagGroup, SWT.NONE);
+		tableComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		// Configure the column layout.
+		final TableViewer tagTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TableColumnLayout tagTableLayout = new TableColumnLayout();
+		tableComposite.setLayout(tagTableLayout);
+		final TableViewerColumn viewerNameColumn = new TableViewerColumn(tagTableViewer, SWT.NONE);
+		tagTableLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, true));
+
+		// Configure the label and content provider. Set the contents of observableTags as input.
+		final ArrayContentProvider provider = new ArrayContentProvider();
+		tagTableViewer.setContentProvider(provider);
+		tagTableViewer.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(ViewerCell cell) {
+				cell.setText(cell.getElement().toString());
+			}
+		});
+
+		observableTags = new WritableSet<>(tags, String.class);
+		tagTableViewer.setInput(observableTags);
+
+		// Add an button that allows the addition of existing tags.
+		final Button addTagButton = new Button(tagInputRow, SWT.NONE);
+		addTagButton.setText("Add Tag");
+
+		// When pressing addTagButton, add the new tag to tags (only if there is an entered text that does not containt a comma). Update the table viewer and
+		// content provider to show the new tag, and reset the entry text.
+		addTagButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				final String newTagText = tagEntryText.getText();
+				if (!newTagText.isEmpty() && !newTagText.equals(ENTER_A_NEW_OR_EXISTING_TAG_NAME) && !newTagText.contains(",")) {
+					final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
+					newTagSet.add(newTagText);
+					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
+					observableTags.add(newTagText);
+					tagTableViewer.refresh();
+					tagEntryText.setText("");
+					tagEntryText.notifyListeners(SWT.FocusOut, new Event());
+				}
+			}
+		});
+
+		// When pressing deleteTagButton, delete the selected tag (if there is a selection)
+		final Button deleteTagButton = new Button(tagInputRow, SWT.NONE);
+		deleteTagButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
+		deleteTagButton.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final IStructuredSelection tagSelection = (IStructuredSelection) tagTableViewer.getSelection();
+				if (tagSelection != null) {
+					final IObservableSet<String> newTagSet = new WritableSet<>(observableTags, String.class);
+					newTagSet.remove(tagSelection.getFirstElement().toString());
+					provider.inputChanged(tagTableViewer, observableTags, newTagSet);
+					observableTags.remove(tagSelection.getFirstElement().toString());
+					tagTableViewer.refresh();
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+
+	}
+
+	/**
+	 * Creates the tooltip to tell the user, that a comma is not allowed , when he types a comma in the tag
+	 */
+	private void createTooltip(Composite tagInputRow) {
+		tooltip = new ToolTip(tagInputRow.getShell(), SWT.ICON_ERROR);
+		tooltip.setAutoHide(false);
+		tooltip.setLocation(tagInputRow.toDisplay(tagInputRow.getSize().x / 2, tagInputRow.getSize().y + 5));
+		tooltip.setText(INVALID_NAME);
+		tooltip.setMessage("The character , is not allowed in a Constraint Tag");
+		tooltip.setVisible(true);
+	}
+
+	/**
+	 * Lets the tooltip for the forbidden use of a comma disappear
+	 */
+	private void closeTooltip() {
+		if (tooltip != null) {
+			tooltip.setVisible(false);
+			tooltip = null;
+		}
+	}
+
+	/**
 	 * Initializes the group containing the searchText and featureTable.
 	 */
 	private void initFeatureGroup() {
@@ -768,12 +1008,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		featureGroup.setLayout(featureGroupLayout);
 
-		searchFeatureText = new StyledText(featureGroup, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
-		searchFeatureText.setText(FILTERTEXT);
-		searchFeatureText.setMargins(3, 5, 3, 5);
-		searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		searchFeatureText.setLayoutData(gridData);
+		searchFeatureText = createTextField(FILTERTEXT, featureGroup);
 
 		final Composite tableComposite = new Composite(featureGroup, SWT.NONE);
 		gridData = new GridData(SWT.FILL, 200, true, true);
@@ -826,36 +1061,11 @@ public class ConstraintDialog implements GUIDefaults {
 
 		});
 
-		searchFeatureText.addListener(SWT.FocusOut, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (searchFeatureText.getText().isEmpty()) {
-					searchFeatureText.setText(FILTERTEXT);
-					searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-
-				}
-
-			}
-		});
-		searchFeatureText.addListener(SWT.FocusIn, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (FILTERTEXT.equals(searchFeatureText.getText())) {
-					searchFeatureText.setText("");
-				}
-				searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-			}
-
-		});
-
 		featureTableViewer.setInput(featureNamesList);
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessVerticalSpace = true;
 		featureTable.setLayoutData(gridData);
-
 		featureTable.addListener(SWT.MouseDoubleClick, new Listener() {
 
 			@Override
@@ -895,7 +1105,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.SHEET);
 		shell.setText(DEFAULT_DIALOG_TITLE);
 		shell.setImage(FEATURE_SYMBOL);
-		shell.setSize(500, 585);
+		shell.setSize(650, 585);
 		shell.setMinimumSize(280, 575);
 
 		final GridLayout shellLayout = new GridLayout();
@@ -914,7 +1124,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			@Override
 			public void handleEvent(Event event) {
-				if ((event.detail == SWT.TRAVERSE_ESCAPE) && !adapter.isProposalPopupOpen()) {
+				if ((event.detail == SWT.TRAVERSE_ESCAPE) && !constraintFormulaProposalAdapter.isProposalPopupOpen()) {
 
 					cancelButtonPressEvent();
 
@@ -943,7 +1153,8 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setSelection(constrainText.length());
 	}
 
-	private void setupContentProposal() {
+	private void setupContentProposal(Control control, IControlContentAdapter contentAdapter, IContentProposalProvider proposalProvider,
+			ILabelProvider labelProvider) {
 		try {
 			final KeyStroke keyStroke = KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
 
@@ -952,13 +1163,10 @@ public class ConstraintDialog implements GUIDefaults {
 				autoActivationCharacters[c] = c;
 			}
 
-			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(),
-					new ConstraintContentProposalProvider(featureNamesList), keyStroke, autoActivationCharacters);
-
-			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
-			adapter.setPopupSize(new Point(250, 85));
-
-			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
+			constraintFormulaProposalAdapter = new ContentProposalAdapter(control, contentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
+			constraintFormulaProposalAdapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
+			constraintFormulaProposalAdapter.setPopupSize(new Point(250, 85));
+			constraintFormulaProposalAdapter.setLabelProvider(labelProvider);
 
 		} catch (final ParseException e) {
 			FMUIPlugin.getDefault().logError(e);

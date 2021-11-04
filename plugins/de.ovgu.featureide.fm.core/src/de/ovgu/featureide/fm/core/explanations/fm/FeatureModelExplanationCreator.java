@@ -29,9 +29,11 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
  * @param <S> subject
  * @param <E> explanation
  * @author Timo G&uuml;nther
+ * @author Benedikt Jutz
  * @see DeadFeatureExplanationCreator
  * @see FalseOptionalFeatureExplanationCreator
  * @see RedundantConstraintExplanationCreator
+ * @see MultipleAnomaliesExplanationWriter
  */
 public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
 

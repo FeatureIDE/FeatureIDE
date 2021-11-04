@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +36,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -50,8 +52,10 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -98,10 +102,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private ModelMarkerHandler<IFile> markerHandler;
 
+	/**
+	 * File manager for the given configuration.
+	 */
 	private ConfigurationManager configurationManager;
+	/**
+	 * Manager for the feature model that is configured by the configuration in <code>configurationManager</code>.
+	 */
 	private FeatureModelManager featureModelManager;
 
-	private ExpandAlgorithm currentExpandAlgorithm = ExpandAlgorithm.ALL_SELECTED;
+	/**
+	 * The expansion mode when selecting features in a configuration.
+	 */
+	private ExpandAlgorithm currentExpandAlgorithm;
 
 	private int currentPageIndex = -1;
 
@@ -134,8 +147,34 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
+	public ExpandAlgorithm readExpansionAlgorithm() {
+		final IProject project = EclipseFileSystem.getResource(featureModelManager.getObject().getSourceFile()).getProject();
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
+		final int index = store.getInt(EXPAND_PREFERENCE);
+		try {
+			return ExpandAlgorithm.values()[index];
+		} catch (final Exception e) {
+			Logger.logWarning("Failed to read the configuration expansion algorithm for project " + project.getName() + ", falling back to default.");
+			return ExpandAlgorithm.NONE;
+		}
+	}
+
+	@Override
 	public void setExpandAlgorithm(ExpandAlgorithm expandAlgorithm) {
 		currentExpandAlgorithm = expandAlgorithm;
+	}
+
+	@Override
+	public void saveExpansionAlgorithm() {
+		final int index = currentExpandAlgorithm.ordinal();
+		final IProject project = EclipseFileSystem.getResource(featureModelManager.getObject().getSourceFile()).getProject();
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
+		store.setValue(EXPAND_PREFERENCE, index);
+		try {
+			store.save();
+		} catch (final IOException e1) {
+			Logger.logWarning("Failed to save the configuration expansion algorithm for project " + project.getName());
+		}
 	}
 
 	@Override
@@ -159,6 +198,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				if (invalidFeatureModel) {
 					return;
 				}
+				currentExpandAlgorithm = readExpansionAlgorithm();
 			} else {
 				setReadFeatureModelError(true);
 			}

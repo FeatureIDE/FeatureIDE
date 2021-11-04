@@ -41,12 +41,10 @@ import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelSt
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
-import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -195,8 +193,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void refreshProperties(IFeatureModelManager featureModelManager) {
-		// TODO get variable analyzer
-
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 
 		// Retrieve visible features
@@ -223,53 +219,36 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 
-		// skip when automated analyses are deactivated
-		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
-			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())) {
-			final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
-			final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
-			final List<IFeature> deadFeatures = analyzer.getDeadFeatures(null);
-			final List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
-			final List<IFeature> indetHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
-			final List<IConstraint> tautologyConstraints = analyzer.getTautologyConstraints(new NullMonitor<>());
-			final List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
+		final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
+		final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
 
-			if (analysisResults.isCalculateDeadConstraints()) {
-				dead = containsAny(visibleFeatures, deadFeatures);
-			}
-			if (analysisResults.isCalculateFOConstraints()) {
-				falseoptional = containsAny(visibleFeatures, falseOptionalFeatures);
-			}
-			indetHidden = containsAny(visibleFeatures, indetHiddenFeatures);
+		final List<IFeature> indetHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
 
-			void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
-			if (void_model) {
-				dead = false;
-			}
-
-			tautologyConst = analysisResults.isCalculateTautologyConstraints() && containsAny(visibleConstraints, tautologyConstraints);
-			redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints);
-
-			explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
-		} else {
-			dead = false;
-			falseoptional = false;
-			indetHidden = false;
-			void_model = false;
-			tautologyConst = false;
-			redundantConst = false;
-			explanations = false;
+		if (analysisResults.isCalculateDeadConstraints()) {
+			dead = analyzer.hasDeadFeatures(visibleFeatures);
 		}
+		if (analysisResults.isCalculateFOConstraints()) {
+			falseoptional = analyzer.hasFalseOptionalFeatures(visibleFeatures);
+		}
+		indetHidden = containsAny(visibleFeatures, indetHiddenFeatures);
+
+		void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
+		if (void_model) {
+			dead = false;
+		}
+
+		tautologyConst = analysisResults.isCalculateTautologyConstraints() && analyzer.hasTautologyConstraints(visibleConstraints);
+		redundantConst = analysisResults.isCalculateRedundantConstraints() && analyzer.hasRedundantConstraints(visibleConstraints);
+
+		explanations = (graphicalFeatureModel.getActiveExplanation() != null);
 
 		implicitConst = isImplicit(graphicalFeatureModel);
 
 		if (featureModel instanceof MultiFeatureModel) {
-			final MultiFeatureModel extendedFeatureModel = (MultiFeatureModel) featureModel;
 			interfaced = Functional.toList(Functional.filter(graphicalVisibleFeatures, new InterfaceFeatureFilter())).size() > 0;
 			// interfaces hide other features
 			imported = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new ImportedFeatureFilter())).size() > 0);
 			inherited = !interfaced && (Functional.toList(Functional.filter(graphicalVisibleFeatures, new InheritedFeatureFilter())).size() > 0);
-
 		}
 
 		language = FMPropertyManager.getLanguage();
@@ -282,15 +261,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 * @return True iff the first list contains an element that is also present in the second list.
 	 */
 	private <T> boolean containsAny(List<T> visible, List<T> all) {
-		if (all.isEmpty()) {
-			return false;
-		}
-		for (final T t : visible) {
-			if (all.contains(t)) {
-				return true;
-			}
-		}
-		return false;
+		return visible.stream().anyMatch(elem -> all.contains(elem));
 	}
 
 	private void setLegendSize() {
@@ -474,7 +445,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowRedundantConst(int row) {
-		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
+		createSymbol(row, REDUNDANT, false, REDUNDANT_TOOLTIP);
 		final Label labelIndetHidden = createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}

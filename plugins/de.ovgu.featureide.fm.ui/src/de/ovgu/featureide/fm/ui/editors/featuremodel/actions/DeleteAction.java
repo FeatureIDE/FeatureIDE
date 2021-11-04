@@ -38,6 +38,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
@@ -68,7 +69,7 @@ public class DeleteAction extends AFeatureModelAction {
 	};
 
 	public DeleteAction(Object viewer, IFeatureModelManager featureModelManager) {
-		super("Delete (Del)", ID, featureModelManager);
+		super(StringTable.DELETE_SHORTCUT, ID, featureModelManager);
 		this.viewer = viewer;
 		setImageDescriptor(deleteImage);
 		setEnabled(false);
@@ -119,7 +120,7 @@ public class DeleteAction extends AFeatureModelAction {
 			return false;
 		}
 
-		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeatureModelElement(selection)) {
 			return true;
 		}
 

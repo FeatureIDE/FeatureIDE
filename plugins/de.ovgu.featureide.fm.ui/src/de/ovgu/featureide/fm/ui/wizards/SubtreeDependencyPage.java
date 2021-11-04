@@ -128,7 +128,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().addControlListener(viewer.createControlListener());
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
-		// Reset is nessecary to removed wrong cached values
+		// Reset is necessary to removed wrong cached values
 		subTreeAnalyzer.reset();
 		subTreeAnalyzer.getAnalysesCollection().inheritSettings(FeatureModelManager.getAnalyzer(completeFm).getAnalysesCollection());
 		subTreeAnalyzer.analyzeFeatureModel(null);

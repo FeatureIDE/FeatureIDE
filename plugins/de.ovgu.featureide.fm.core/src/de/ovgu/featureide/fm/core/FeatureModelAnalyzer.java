@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
@@ -55,6 +56,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
@@ -65,7 +68,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
- * A collection of methods for working with {@link IFeatureModel} will replace the corresponding methods in {@link IFeatureModel}
+ * A collection of methods for working with {@link IFeatureModel}s.
  *
  * @author Soenke Holthusen
  * @author Florian Proksch
@@ -98,9 +101,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 		analysesCollection.reset(formula);
 	}
 
+	/**
+	 * Tests if <code>featureModel</code> is valid.
+	 *
+	 * @param monitor - {@link IMonitor}
+	 * @return {@link Boolean}
+	 */
 	public boolean isValid(IMonitor<Boolean> monitor) {
 		final Boolean result = analysesCollection.validAnalysis.getResult(monitor);
-		return result == null ? false : result;
+		if (result == null) {
+			return false;
+		}
+		if (!result) {
+			getFeatureModelProperties().setStatus(FeatureModelStatus.VOID);
+		}
+		return result;
 	}
 
 	public List<IFeature> getCoreFeatures(IMonitor<LiteralSet> monitor) {
@@ -285,6 +300,32 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return analysesCollection.featurePropertiesMap.get(feature);
 	}
 
+	public boolean hasDeadFeatures(Collection<IFeature> features) {
+		return hasFeatureWithStatus(FeatureStatus.DEAD, features);
+	}
+
+	public boolean hasFalseOptionalFeatures(Collection<IFeature> features) {
+		return hasFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL, features);
+	}
+
+	private boolean hasFeatureWithStatus(FeatureStatus status, Collection<IFeature> features) {
+		return analysesCollection.featurePropertiesMap.entrySet().stream()
+				.filter(entry -> features.contains(entry.getKey()) && entry.getValue().hasStatus(status)).count() > 0;
+	}
+
+	public boolean hasRedundantConstraints(Collection<IConstraint> constraints) {
+		return hasConstraintsWithStatus(ConstraintStatus.REDUNDANT, constraints);
+	}
+
+	public boolean hasTautologyConstraints(Collection<IConstraint> constraints) {
+		return hasConstraintsWithStatus(ConstraintStatus.TAUTOLOGY, constraints);
+	}
+
+	private boolean hasConstraintsWithStatus(ConstraintStatus status, Collection<IConstraint> constraints) {
+		return analysesCollection.constraintPropertiesMap.entrySet().stream()
+				.filter(entry -> constraints.contains(entry.getKey()) && entry.getValue().hasStatus(status)).count() > 0;
+	}
+
 	public ConstraintProperties getConstraintProperties(IConstraint constraint) {
 		return analysesCollection.constraintPropertiesMap.get(constraint);
 	}
@@ -368,16 +409,9 @@ public class FeatureModelAnalyzer implements IEventListener {
 				monitor.worked(15);
 			} else {
 				// get constraint anomalies
-				final List<IConstraint> redundantConstraints = getRedundantConstraints(monitor.subTask(2));
-				for (final IConstraint constraint : redundantConstraints) {
-					getConstraintProperties(constraint).setStatus(ConstraintStatus.REDUNDANT);
-				}
+				final Collection<IConstraint> redundantConstraints = annotateConstraints(ConstraintStatus.REDUNDANT, monitor);
 				monitor.checkCancel();
-				final List<IConstraint> tautologyConstraints = getTautologyConstraints(monitor.subTask(2));
-				for (final IConstraint constraint : tautologyConstraints) {
-					getConstraintProperties(constraint).setStatus(ConstraintStatus.TAUTOLOGY);
-				}
-
+				final Collection<IConstraint> tautologyConstraints = annotateConstraints(ConstraintStatus.TAUTOLOGY, monitor);
 				if (!redundantConstraints.isEmpty() || !tautologyConstraints.isEmpty()) {
 					properties.setStatus(FeatureModelStatus.ANOMALIES);
 				}
@@ -386,6 +420,36 @@ public class FeatureModelAnalyzer implements IEventListener {
 				getAnomalyConstraints(monitor.subTask(10));
 			}
 		}
+	}
+
+	/**
+	 * Annotates the constraints in <code>constraints</code> with <code>status</code>, which might either {@link ConstraintStatus#REDUNDANT} or
+	 * {@link ConstraintStatus#TAUTOLOGY} (as redundant constraints or tautologies). This triggers a constraint analysis using the given <code>monitor</code>.
+	 * For any other status, this method returns an empty list.
+	 *
+	 * @param status - {@link ConstraintStatus}
+	 * @param monitor - {@link IMonitor} <code>monitor</code> may also be null, in which case a {@link NullMonitor} is used.
+	 * @return new {@link Collection}
+	 */
+	public Collection<IConstraint> annotateConstraints(ConstraintStatus status, IMonitor<Boolean> monitor) {
+		if (monitor == null) {
+			monitor = new NullMonitor<>();
+		}
+		final List<IConstraint> annotatedConstraints;
+
+		switch (status) {
+		case REDUNDANT:
+			annotatedConstraints = getRedundantConstraints(monitor.subTask(2));
+			break;
+		case TAUTOLOGY:
+			annotatedConstraints = getTautologyConstraints(monitor.subTask(2));
+			break;
+		default:
+			annotatedConstraints = Collections.emptyList();
+			break;
+		}
+		annotatedConstraints.forEach(constraint -> getConstraintProperties(constraint).setStatus(status));
+		return annotatedConstraints;
 	}
 
 	public void updateFeatures() {
@@ -414,31 +478,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 			monitor.checkCancel();
 			// set default values for feature properties
-			for (final IFeature feature : featureModel.getFeatures()) {
-				final FeatureProperties featureProperties = getFeatureProperties(feature);
-				featureProperties.resetStatus();
-				featureProperties.setStatus(FeatureStatus.COMMON);
+			featureModel.getFeatures().forEach(feature -> getFeatureProperties(feature).resetStatus());
 
-				final IFeatureStructure structure = feature.getStructure();
-				final IFeatureStructure parent = structure.getParent();
-				if (parent == null) {
-					featureProperties.setStatus(FeatureStatus.MANDATORY);
-				} else {
-					if (parent.isAnd()) {
-						if (structure.isMandatorySet()) {
-							featureProperties.setStatus(FeatureStatus.MANDATORY);
-						} else {
-							featureProperties.setStatus(FeatureStatus.OPTIONAL);
-						}
-					} else {
-						featureProperties.setStatus(FeatureStatus.GROUP);
-					}
-				}
-			}
+			annotateFeatures(FeatureStatus.COMMON, monitor);
+			annotateFeatures(FeatureStatus.MANDATORY, monitor);
+			annotateFeatures(FeatureStatus.OPTIONAL, monitor);
+			annotateFeatures(FeatureStatus.GROUP, monitor);
+
 			monitor.worked();
-
 			monitor.checkCancel();
 			final FeatureModelProperties properties = getFeatureModelProperties();
+
 			if (properties.hasStatus(FeatureModelStatus.VOID)) {
 				for (final IFeature feature : featureModel.getFeatures()) {
 					final FeatureProperties featureProperties = getFeatureProperties(feature);
@@ -446,21 +496,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 				}
 				monitor.worked(3);
 			} else {
-				// get feature anomalies
-				final List<IFeature> deadFeatures = getDeadFeatures(monitor.subTask(1));
-				for (final IFeature feature : deadFeatures) {
-					getFeatureProperties(feature).setStatus(FeatureStatus.DEAD);
-				}
+				final Collection<IFeature> deadFeatures = annotateFeatures(FeatureStatus.DEAD, monitor);
 				monitor.checkCancel();
-				final List<IFeature> falseOptionalFeatures = getFalseOptionalFeatures(monitor.subTask(1));
-				for (final IFeature feature : falseOptionalFeatures) {
-					getFeatureProperties(feature).setStatus(FeatureStatus.FALSE_OPTIONAL);
-				}
+				final Collection<IFeature> falseOptionalFeatures = annotateFeatures(FeatureStatus.FALSE_OPTIONAL, monitor);
 				monitor.checkCancel();
-				final List<IFeature> indeterminedHiddenFeatures = getIndeterminedHiddenFeatures(monitor.subTask(1));
-				for (final IFeature feature : indeterminedHiddenFeatures) {
-					getFeatureProperties(feature).setStatus(FeatureStatus.INDETERMINATE_HIDDEN);
-				}
+				final Collection<IFeature> indeterminedHiddenFeatures = annotateFeatures(FeatureStatus.INDETERMINATE_HIDDEN, monitor);
 				if (!deadFeatures.isEmpty() || !falseOptionalFeatures.isEmpty() || !indeterminedHiddenFeatures.isEmpty()) {
 					properties.setStatus(FeatureModelStatus.ANOMALIES);
 				}
@@ -468,38 +508,78 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 	}
 
+	/**
+	 * Annotates the features of <code>featureModelFormula</code> with the given status, i.e. checks if they are common, mandatory, optional features, belong to
+	 * a group, or are dead, false optional or indeterminate. The latter three analyzes require the <code>monitor</code> object, though a monitor is not
+	 * necessary. Afterwards returns the annotated features.
+	 *
+	 * @param status - {@link FeatureStatus}
+	 * @param monitor - {@link IMonitor}
+	 * @return new {@link Collection}
+	 */
+	public Collection<IFeature> annotateFeatures(FeatureStatus status, IMonitor<Boolean> monitor) {
+		if (monitor == null) {
+			monitor = new NullMonitor<>();
+		}
+		final Collection<IFeature> annotatedFeatures;
+
+		switch (status) {
+		case COMMON:
+			annotatedFeatures = featureModel.getFeatures();
+			break;
+		case MANDATORY:
+			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
+					.filter(structure -> structure.isRoot() || (structure.isMandatorySet() && structure.getParent().isAnd())).map(s -> s.getFeature())
+					.collect(Collectors.toList());
+			break;
+		case OPTIONAL:
+			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
+					.filter(structure -> !structure.isRoot() && !structure.isMandatorySet() && structure.getParent().isAnd())
+					.map(structure -> structure.getFeature()).collect(Collectors.toList());
+			break;
+		case GROUP:
+			annotatedFeatures = featureModel.getFeatures().stream().map(feature -> feature.getStructure())
+					.filter(structure -> !structure.isRoot() && !structure.isAnd()).map(structure -> structure.getFeature()).collect(Collectors.toList());
+			break;
+		case DEAD:
+			if (getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
+				annotatedFeatures = featureModel.getFeatures();
+			} else {
+				annotatedFeatures = getDeadFeatures(monitor.subTask(1));
+			}
+			break;
+		case FALSE_OPTIONAL:
+			annotatedFeatures = getFalseOptionalFeatures(monitor.subTask(1));
+			break;
+		case INDETERMINATE_HIDDEN:
+			annotatedFeatures = getIndeterminedHiddenFeatures(monitor.subTask(1));
+			break;
+		default:
+			annotatedFeatures = Collections.emptyList();
+			break;
+		}
+
+		annotatedFeatures.forEach(feature -> getFeatureProperties(feature).setStatus(status));
+		return new ArrayList<>(annotatedFeatures);
+	}
+
 	// TODO implement as analysis
 	public int countConcreteFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			if (feature.getStructure().isConcrete()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> structure.isConcrete());
 	}
 
 	// TODO implement as analysis
 	public int countHiddenFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			final IFeatureStructure structure = feature.getStructure();
-			if (structure.isHidden() || structure.hasHiddenParent()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> structure.isHidden() || structure.hasHiddenParent());
 	}
 
 	// TODO implement as analysis
 	public int countTerminalFeatures() {
-		int number = 0;
-		for (final IFeature feature : featureModel.getFeatures()) {
-			if (!feature.getStructure().hasChildren()) {
-				number++;
-			}
-		}
-		return number;
+		return countFeaturesWhere(structure -> !structure.hasChildren());
+	}
+
+	private int countFeaturesWhere(Predicate<IFeatureStructure> predicate) {
+		return featureModel.getFeatures().stream().filter(feature -> predicate.test(feature.getStructure())).collect(Collectors.toList()).size();
 	}
 
 	/**
@@ -565,6 +645,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 			Explanation<?> explanation = null;
 			final FeatureProperties featureProperties = getFeatureProperties(feature);
 			if (featureProperties != null) {
+				// Test if feature is the root feature; in that case return the MultipleAnomaliesException.
+				if (FeatureUtils.isRoot(feature) && (getMultipleAnomaliesExplanation() != null)) {
+					explanation = getMultipleAnomaliesExplanation();
+				}
 				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 					explanation = featureProperties.getDeadExplanation();
 					if (explanation == null) {
@@ -702,8 +786,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			creator = analysesCollection.explanationCreatorFactory.getDeadFeatureExplanationCreator();
 			creator.setFeatureModel(fm);
 		}
-		creator.setSubject(feature);
-		analysesCollection.deadFeatureExplanations.put(feature, creator.getExplanation());
+		analysesCollection.deadFeatureExplanations.put(feature, creator.getExplanationFor(feature));
 	}
 
 	/**
@@ -744,8 +827,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			creator = analysesCollection.explanationCreatorFactory.getFalseOptionalFeatureExplanationCreator();
 			creator.setFeatureModel(fm);
 		}
-		creator.setSubject(feature);
-		analysesCollection.falseOptionalFeatureExplanations.put(feature, creator.getExplanation());
+		analysesCollection.falseOptionalFeatureExplanations.put(feature, creator.getExplanationFor(feature));
 	}
 
 	/**
@@ -790,6 +872,35 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 		creator.setSubject(constraint);
 		analysesCollection.redundantConstraintExplanations.put(constraint, creator.getExplanation());
+	}
+
+	public void setMultipleAnomalyExplanationTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses) {
+		analysesCollection.setMultipleAnomaliesExplanation(null);
+		analysesCollection.multipleAnomaliesExplanationCreator.setAnomalyTypes(featureStatuses, constraintStatuses);
+	}
+
+	/**
+	 * Returns an combined explanation for all feature model anomalies.
+	 *
+	 * @return a {@link MultipleAnomaliesExplanation} for <code>featureModel</code>, or null if none can be found.
+	 */
+	public MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
+		return addMultipleAnomaliesExplanation();
+	}
+
+	/**
+	 * Creates the {@link MultipleAnomaliesExplanation} for <code>featureModel</code> at the user's request.
+	 *
+	 * @return new {@link MultipleAnomaliesExplanation}
+	 */
+	public MultipleAnomaliesExplanation addMultipleAnomaliesExplanation() {
+		MultipleAnomaliesExplanation explanation = analysesCollection.getMultipleAnomaliesExplanation();
+		if (explanation == null) {
+			final MultipleAnomaliesExplanationCreator creator = analysesCollection.multipleAnomaliesExplanationCreator;
+			explanation = creator.getExplanation();
+			analysesCollection.setMultipleAnomaliesExplanation(explanation);
+		}
+		return explanation;
 	}
 
 	public AnalysesCollection getAnalysesCollection() {

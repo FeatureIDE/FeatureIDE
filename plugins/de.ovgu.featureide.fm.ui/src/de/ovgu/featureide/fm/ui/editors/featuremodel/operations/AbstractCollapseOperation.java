@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -56,17 +55,13 @@ public abstract class AbstractCollapseOperation extends AbstractGraphicalFeature
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		for (final Entry<IGraphicalFeature, Boolean> target : createTargets().entrySet()) {
-			target.getKey().setCollapsed(target.getValue());
-		}
+		createTargets().entrySet().forEach(entry -> entry.getKey().setCollapsed(entry.getValue()));
 		return null;
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		for (final Entry<IGraphicalFeature, Boolean> target : createTargets().entrySet()) {
-			target.getKey().setCollapsed(!target.getValue());
-		}
+		createTargets().entrySet().forEach(entry -> entry.getKey().setCollapsed(!entry.getValue()));
 		return null;
 	}
 }

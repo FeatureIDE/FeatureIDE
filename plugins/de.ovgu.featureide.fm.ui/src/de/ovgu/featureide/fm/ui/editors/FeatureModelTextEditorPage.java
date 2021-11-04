@@ -208,10 +208,14 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
+			// TODO deregister old feature model listeners
+			featureModelEditor.deregisterImporters();
 			// TODO _interfaces replace text with DocumentEvent (delta)
 			if (FeatureModelOperationWrapper.run(new SourceChangedOperation(featureModelEditor.fmManager, newText, oldText))) {
 				oldText = newText;
+				featureModelEditor.registerImporters();
 			}
+			// TODO register new feature model listeners
 		}
 	}
 

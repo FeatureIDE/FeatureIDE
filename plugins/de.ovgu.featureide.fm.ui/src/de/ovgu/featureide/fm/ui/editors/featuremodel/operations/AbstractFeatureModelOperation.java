@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import java.util.Optional;
+
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -63,12 +65,34 @@ public abstract class AbstractFeatureModelOperation {
 		fireEvent(event);
 	}
 
+	/**
+	 * Tests if this operation can be redone in the current feature model states without causing problems. This method must to be called before running
+	 * {@link AbstractFeatureModelOperation#redo}. <br> If the redo operation would succeed, this method returns {@link Optional#empty()}. In case of failure
+	 * instead, the return value wraps an error string to show to the user.
+	 *
+	 * @return new {@link Optional} - By default, this method returns {@link Optional#empty()} as we assume no problems would occur.
+	 */
+	protected Optional<String> approveRedo() {
+		return Optional.empty();
+	}
+
 	public final void redo() {
 		final FeatureIDEEvent event = featureModelManager.processObject(this::operation, getChangeIndicator());
 		if (event instanceof FeatureModelOperationEvent) {
 			((FeatureModelOperationEvent) event).setExecutionType(ExecutionType.REDO);
 		}
 		fireEvent(event);
+	}
+
+	/**
+	 * Tests if this operation can be undone in the current feature model states without causing problems. This method must to be called before running
+	 * {@link AbstractFeatureModelOperation#undo}. <br> If the undo operation would succeed, this method returns {@link Optional#empty()}. In case of failure
+	 * instead, the return value wraps an error string to show to the user.
+	 *
+	 * @return new {@link Optional} - By default, this method returns {@link Optional#empty()} as we assume no problems would occur.
+	 */
+	protected Optional<String> approveUndo() {
+		return Optional.empty();
 	}
 
 	public final void undo() {
