@@ -7,6 +7,18 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.9.0 (November 2021)
+* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
+* UVL models now support spaces (#1143)
+* Composed UVL model now live updates after changes to submodels (#1134)
+* GUI support for handling imported submodels with UVL (#1250)
+* Many other enhancements and fixes for UVL (#1159, #1210, #1175, #1196, #1194, #1174, #1180)
+* Many minor fixes related to redo/undo (#1235, #1207, #1197)
+* Many minor fixes related to editing feature models (#1214, #1151, #1255, #1005, #1241, #1225, #1200, #1153, #1181, #1195)
+* Expansion mode is now correctly saved in the configuration editor (#1012)
+* Several improvements for the constraint view (#1277,#1256)
+* More intuitive messages in the configuration map (#1178)
+
 Release 3.8.0 (August 2021)
 * Many enhancements for UVL
    * New constraints are now handled correctly (#1164)
