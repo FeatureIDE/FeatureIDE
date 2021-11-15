@@ -316,4 +316,8 @@ public class TFeatureModelAnalyzer {
 	public void TDeadFeatures_FM10() {
 		assertTrue(!FM10_DATA.getFeatureModelProperties().hasDeadFeatures());
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/heads/develop
 }

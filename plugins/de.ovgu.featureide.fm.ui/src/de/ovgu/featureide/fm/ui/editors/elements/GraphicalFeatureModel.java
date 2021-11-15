@@ -398,7 +398,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		final Boolean collapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
 		getLayout().showCollapsedConstraints(collapsedConstraints != null ? collapsedConstraints : true);
 
-    // Configure whether auto layout constraints is activated
+		// Configure whether auto layout constraints is activated
 		final Boolean autoLayoutConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, AUTO_LAYOUT_CONSTRAINTS);
 		getLayout().setAutoLayoutConstraints((autoLayoutConstraints != null ? autoLayoutConstraints : false));
 

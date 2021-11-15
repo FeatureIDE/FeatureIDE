@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewConst
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewDescriptionColumnLabelProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewFilter;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewTagsColumnLabelProvider;
 
 /**
  * This class represents the view (MVC) of the constraint view.
@@ -65,12 +66,15 @@ public class ConstraintView implements GUIDefaults {
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 
+	private final String TAG_HEADER = "Tags";
+
 	// offset to account for the margin of the tree and the scrollbar
 	// this value is larger than needed to ensure correctness on all versions and operating systems
 	private static final int TREE_WIDTH_OFFSET = 50;
 	private static final int INITIAL_COLUMN_WIDTH = 500;
 	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
 	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
+	private static final float COLUMN_WIDTH_RATIO = 0.33f;
 
 	// UI elements
 	private TreeViewer treeViewer;
@@ -171,6 +175,25 @@ public class ConstraintView implements GUIDefaults {
 			}
 		});
 
+		final TreeViewerColumn tagColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+		tagColumn.getColumn().setText(TAG_HEADER);
+		tagColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+		tagColumn.getColumn().setResizable(true);
+		tagColumn.getColumn().setMoveable(true);
+		tagColumn.setLabelProvider(new ConstraintViewTagsColumnLabelProvider());
+
+		// sort when clicking on the header of the column
+		tagColumn.getColumn().addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(ConstraintViewComparator.TAG_COLUMN);
+				treeViewer.getTree().setSortDirection(comparator.getDirection());
+				treeViewer.getTree().setSortColumn(tagColumn.getColumn());
+				refresh();
+			}
+		});
+
 		// resize columns on view size change
 		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
 
@@ -186,8 +209,9 @@ public class ConstraintView implements GUIDefaults {
 				// need to subtract some offset to account for the margin of the tree and the
 				// scrollbar
 				final int treeWidth = treeViewer.getTree().getParent().getClientArea().width - TREE_WIDTH_OFFSET;
-				constraintColumn.getColumn().setWidth((int) (treeWidth * NAME_COLUMN_WIDTH_RATIO));
-				descriptionColumn.getColumn().setWidth((int) (treeWidth * DESCRIPTION_COLUMN_WIDTH_RATIO));
+				constraintColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+				descriptionColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+				tagColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
 			}
 		});
 	}
