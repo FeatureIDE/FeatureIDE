@@ -738,7 +738,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 				openRenameEditor(newCompound);
 			}
-
 			if (refresh) {
 				viewer.internRefresh(true);
 				setDirty();
@@ -760,7 +759,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				final IFeature siblingFeature = (IFeature) event.getNewValue();
 				openRenameEditor(siblingFeature);
 			}
-
 			if (refresh) {
 				viewer.internRefresh(true);
 				setDirty();
@@ -839,7 +837,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) source, graphicalFeatureModel)) {
 				f.update(event);
 			}
-
 			if (refresh) {
 				setDirty();
 				analyzeFeatureModel();

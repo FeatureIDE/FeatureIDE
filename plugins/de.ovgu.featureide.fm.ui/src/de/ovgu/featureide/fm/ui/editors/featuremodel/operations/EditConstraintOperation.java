@@ -59,6 +59,14 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 			this.description = description;
 			this.tags = tags;
 		}
+
+		public Node getNode() {
+			return node;
+		}
+
+		public String getDescription() {
+			return description;
+		}
 	}
 
 	/**
