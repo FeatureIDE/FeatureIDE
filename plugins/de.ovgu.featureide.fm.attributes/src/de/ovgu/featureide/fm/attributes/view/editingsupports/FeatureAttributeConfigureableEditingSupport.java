@@ -27,14 +27,16 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeConfigurableOperation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the configurable column of the {@link FeatureAttributeView}. The boolean value of the column is shown as checkbox.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeConfigureableEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -69,11 +71,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setConfigurable((Boolean) value);
-		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-		if (((IFeatureAttribute) element).isRecursive()) {
-			getViewer().refresh();
-		}
-		getViewer().update(element, null);
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		FeatureModelOperationWrapper.run(new ChangeAttributeConfigurableOperation((IFeatureModelManager) view.getManager(), attribute, (Boolean) value));
 	}
 }

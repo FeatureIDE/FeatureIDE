@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -380,7 +381,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 			break;
 		case CONFIGURABLE_ATTRIBUTE_CHANGED:
-			if (!evt.getNewValue().equals(evt.getOldValue())) {
+			if (!Objects.equals(evt.getOldValue(), evt.getNewValue())) {
 				final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
 				if (currentPage != null) {
 					currentPage.propertyChange(evt);

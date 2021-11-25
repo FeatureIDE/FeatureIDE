@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.view.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME;
 
 import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -32,13 +32,11 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 
 /**
- * Operation to change the value of a feature attribute. Enables undo/redo functionality.
+ * Operation to change whether a feature attribute is configurable. Enables undo/redo functionality.
  * 
- * @author Joshua Sprey
- * @author Chico Sundermann
  * @author Johannes Herschel
  */
-public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperation {
+public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOperation {
 
 	/**
 	 * The name of the feature containing the attribute to be modified.
@@ -49,28 +47,29 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	 */
 	private final String attributeName;
 	/**
-	 * The new value of the attribute after the operation. May be null to indicate no value.
+	 * Whether the attribute is configurable after the operation.
 	 */
-	private final D newValue;
+	private final boolean newConfigurable;
 
 	/**
-	 * The old value of the attribute before the operation.
+	 * Whether the attribute is configurable before the operation.
 	 */
-	private Object oldValue;
+	private final boolean oldConfigurable;
 
-	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute att, D newValue) {
-		super(fmManager, CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME);
-		featureName = att.getFeature().getName();
-		attributeName = att.getName();
-		this.newValue = newValue;
+	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newConfigurable) {
+		super(featureModelManager, CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME);
+		featureName = attribute.getFeature().getName();
+		attributeName = attribute.getName();
+		this.newConfigurable = newConfigurable;
+
+		oldConfigurable = attribute.isConfigurable();
 	}
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
-			oldValue = attribute.getValue();
-			attribute.setValue(newValue);
+			attribute.setConfigurable(newConfigurable);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
@@ -80,7 +79,7 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
-			attribute.setValue(oldValue);
+			attribute.setConfigurable(oldConfigurable);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
 		}
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -64,12 +65,15 @@ public class ConstraintView implements GUIDefaults {
 	// Style parameters for the view
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
+
 	private final String TAG_HEADER = "Tags";
 
 	// offset to account for the margin of the tree and the scrollbar
 	// this value is larger than needed to ensure correctness on all versions and operating systems
 	private static final int TREE_WIDTH_OFFSET = 50;
 	private static final int INITIAL_COLUMN_WIDTH = 500;
+	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
+	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
 	private static final float COLUMN_WIDTH_RATIO = 0.33f;
 
 	// UI elements
@@ -131,6 +135,7 @@ public class ConstraintView implements GUIDefaults {
 	 * Creates the columns for the TreeViewer
 	 */
 	private void createColumns() {
+		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
 		final TreeViewerColumn constraintColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
 		constraintColumn.getColumn().setText(CONSTRAINT_HEADER);

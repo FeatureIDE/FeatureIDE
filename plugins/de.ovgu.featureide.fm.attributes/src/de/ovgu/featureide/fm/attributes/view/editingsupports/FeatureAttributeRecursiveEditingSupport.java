@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -29,16 +32,18 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeRecursiveOperation;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the recursive column of the {@link FeatureAttributeView}. The boolean value of the column is shown as checkbox.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -73,26 +78,23 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		IFeatureAttribute attribute = (IFeatureAttribute) element;
-		Boolean newRecursive = (Boolean) value;
-		attribute.setRecursive(newRecursive);
-		IFeature feat = attribute.getFeature();
-		if (newRecursive) {
-			if (!isNameUnique(attribute, feat)) {
-				MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
-				attribute.setRecursive(false);
-				return;
-			}
-			attribute.recurseAttribute(feat);
-		} else {
-			attribute.deleteRecursiveAttributes(feat);
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeature feature = attribute.getFeature();
+		final Boolean newRecursive = (Boolean) value;
+
+		// Check for name conflicts
+		if (newRecursive && !isNameUnique(attribute, feature)) {
+			MessageDialog.openError(null, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE);
+			return;
 		}
-		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
+
+		// Apply operation
+		FeatureModelOperationWrapper.run(new ChangeAttributeRecursiveOperation((IFeatureModelManager) view.getManager(), attribute, newRecursive));
 	}
 
 	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
-			IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
+			final IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
 			if (feat.isContainingAttribute(attribute)) {
 				return false;
 			}
