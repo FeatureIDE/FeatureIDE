@@ -190,7 +190,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			toolTipContent.add(new Label("No Description"));
 		}
 
-		if (constraint instanceof MultiConstraint) {
+		if (!graphicalConstraint.isFeatureSelected() && (constraint instanceof MultiConstraint)) {
 			final MultiConstraint multiConst = (MultiConstraint) constraint;
 
 			if (multiConst.getType() == MultiFeature.TYPE_INTERFACE) {
