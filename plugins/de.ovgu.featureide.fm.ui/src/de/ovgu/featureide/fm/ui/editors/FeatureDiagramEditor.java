@@ -1371,7 +1371,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
-			menuManager.add(new Separator());
 			if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
 				menuManager.add(longNamesAction);
 				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
