@@ -1,7 +1,7 @@
 .classpath
-.project
-configs/default.xml
-features/Base/Clock.asm
 features/Seconds/Clock.asm
-model.xml
+features/Base/Clock.asm
 StandardLibrary.asm
+configs/default.xml
+model.xml
+.project

@@ -1,9 +1,9 @@
 .classpath
-.project
-.settings/de.ovgu.featureide.core.prefs
-configs/hash.xml
-configs/tree.xml
 features/HashSet/IntegerSet.java
 features/IntegerSet/IntegerSet.java
 features/Tree/IntegerSet.java
+configs/tree.xml
+configs/hash.xml
 model.xml
+.settings/de.ovgu.featureide.core.prefs
+.project
