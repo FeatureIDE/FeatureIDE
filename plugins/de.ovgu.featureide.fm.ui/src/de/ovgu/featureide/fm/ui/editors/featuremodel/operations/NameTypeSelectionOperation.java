@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_QUALIFIED_NAMES;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation that chooses the type of name labels (short or long ones) for MultiFeatureModels.
@@ -41,7 +42,7 @@ public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOpe
 	private final boolean useShortLabels;
 
 	public NameTypeSelectionOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean useShortLabels) {
-		super(graphicalFeatureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(useShortLabels));
+		super(graphicalFeatureModel, SHOW_QUALIFIED_NAMES);
 		this.useShortLabels = useShortLabels;
 	}
 
