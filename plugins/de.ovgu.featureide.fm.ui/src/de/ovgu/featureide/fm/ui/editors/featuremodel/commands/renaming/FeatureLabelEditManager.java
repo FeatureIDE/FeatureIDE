@@ -40,6 +40,9 @@ import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -97,9 +100,19 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 						final IProject project =
 							ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(featureModel.getSourceFile().toString())).getProject();
 						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(project);
-						if ((!fmComposerExtension.isValidFeatureName(value))) {
+
+						if (!fmComposerExtension.isValidFeatureName(value)) {
 							createTooltip(fmComposerExtension.getErrorMessage(), SWT.ICON_ERROR);
 						} else {
+							if (featureModelManager instanceof IFileManager) {
+								final IPersistentFormat<?> format = ((IFileManager<?>) featureModelManager).getFormat();
+								if (format instanceof IFeatureModelFormat) {
+									if (!((IFeatureModelFormat) format).isValidFeatureName(value)) {
+										createTooltip(((IFeatureModelFormat) format).getErrorMessage(), SWT.ICON_ERROR);
+										return;
+									}
+								}
+							}
 							final Iterable<String> extractFeatureNames;
 							extractFeatureNames = FeatureUtils.extractFeatureNames(featureModel.getFeatures());
 							if (Functional.toList(extractFeatureNames).contains(value)) {
