@@ -73,10 +73,6 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.views.outline.standard,
  de.ovgu.featureide.fm.ui.wizards,
  org.abego.treelayout,
- org.abego.treelayout.internal.util,
- org.abego.treelayout.internal.util.java.lang,
- org.abego.treelayout.internal.util.java.lang.string,
- org.abego.treelayout.internal.util.java.util,
  org.abego.treelayout.util
 Bundle-ClassPath: .,
  lib/org.abego.treelayout.core-1.0.3.jar
