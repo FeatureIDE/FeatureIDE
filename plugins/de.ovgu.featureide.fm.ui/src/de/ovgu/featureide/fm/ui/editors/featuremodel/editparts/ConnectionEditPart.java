@@ -152,9 +152,12 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 						final Point requestLocation = ((SelectionRequest) request).getLocation();
 						((CircleDecoration) child).translateToRelative(requestLocation);
 						if (decoratorBounds.contains(requestLocation)) {
-							if (FeatureModelOperationWrapper
-									.run(new MandatoryFeatureOperation(feature.getName(), FeatureModelManager.getInstance(feature.getFeatureModel())))) {
-								return true;
+							if (!(feature instanceof MultiFeature) || !(((MultiFeature) feature.getStructure().getParent().getFeature()).isFromExtern())) {
+								if (FeatureModelOperationWrapper
+										.run(new MandatoryFeatureOperation(feature.getName(), FeatureModelManager.getInstance(feature.getFeatureModel())))) {
+									return true;
+								}
+
 							}
 						}
 					}

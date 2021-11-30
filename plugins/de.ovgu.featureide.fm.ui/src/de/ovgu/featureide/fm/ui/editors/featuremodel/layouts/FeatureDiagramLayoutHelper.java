@@ -20,9 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.LONG_NAMES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -80,18 +78,6 @@ public class FeatureDiagramLayoutHelper {
 			return "Root Bottom (abego TreeLayout)";
 		default:
 			return "Top-Down (ordered)";
-		}
-	}
-
-	/**
-	 * @param useShortLabels - boolean
-	 * @return SHORT_NAMES for useShortLabels = true, LONG_NAMES, otherwise.
-	 */
-	public static String getNameTypeLabel(boolean useShortLabels) {
-		if (useShortLabels) {
-			return SHORT_NAMES;
-		} else {
-			return LONG_NAMES;
 		}
 	}
 

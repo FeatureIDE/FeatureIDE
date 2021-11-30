@@ -354,8 +354,7 @@ public class StringTable {
 	public static final String CONSTRAINTS = "Constraints";
 	public static final String AUTO = "Auto";
 	public static final String NOT = "not";
-	public static final String SHORT_NAMES = "Short Names";
-	public static final String LONG_NAMES = "Long Names";
+	public static final String SHOW_QUALIFIED_NAMES = "Show Qualified Names";
 	public static final String IS_NOT_SUPPORTING_THIS_METHOD = " is not supporting this method";
 	public static final String IFF = "iff";
 	public static final String NO_SYMBOLS_FOUND_ = "No symbols found.";

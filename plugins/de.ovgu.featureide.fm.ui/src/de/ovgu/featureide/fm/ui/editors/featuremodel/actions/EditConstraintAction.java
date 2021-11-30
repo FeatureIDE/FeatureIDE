@@ -67,11 +67,11 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 			final Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
 				constraint = ((ConstraintEditPart) editPart).getModel().getObject();
-				return true;
+				return !isMultiConstraintFromExtern(constraint);
 			}
 			if (editPart instanceof IConstraint) {
 				constraint = (IConstraint) editPart;
-				return true;
+				return !isMultiConstraintFromExtern(constraint);
 			}
 		}
 		return false;
