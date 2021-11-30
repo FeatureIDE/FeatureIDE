@@ -9,7 +9,8 @@ Here, is a list of high-level enhancements.
 
 Release 3.7.3 (November 2021)
 * Hotfix containing only bugfixes over v3.7.2
-* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
+* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263).
+  * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, or v3.7.2.
 
 Release 3.7.2 (July 2021)
 * Hotfix containing only bugfixes and code quality improvements over v3.7.1
