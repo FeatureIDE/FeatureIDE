@@ -1,8 +1,8 @@
 .classpath
-.project
 .settings/org.eclipse.jdt.core.prefs
-lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.8.0.jar
-lib/miglayout15-swing.jar
-lib/org.sat4j.core.jar
 src/de/ovgu/featureide/examples/graphicalconfigurator/GraphicalConfigurator.java
+.project
+lib/miglayout15-swing.jar
+lib/antlr-3.4.jar
+lib/de.ovgu.featureide.lib.fm-v3.8.1.jar
+lib/org.sat4j.core.jar

@@ -7,8 +7,10 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
-Release 3.9.0 (November 2021)
+Release 3.8.1 (November 2021)
+* Hotfix containing only bugfixes over v3.8.0
 * Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
+  * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, v3.7.2, or v3.8.0
 * UVL models now support spaces (#1143)
 * Composed UVL model now live updates after changes to submodels (#1134)
 * GUI support for handling imported submodels with UVL (#1250)
@@ -38,6 +40,11 @@ Release 3.8.0 (August 2021)
 * Fixed a breaking bug in runtime variability feature models (#1094)
 * Removed outdated support for Fuji and corresponding functionality (#936, #1106)
 * Small fixes and enhancements (#844, #934, #981, #1105, #1108, #1110, #1116, #1130)
+
+Release 3.7.3 (November 2021)
+* Hotfix containing only bugfixes over v3.7.2
+* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263).
+  * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, or v3.7.2.
 
 Release 3.7.2 (July 2021)
 * Hotfix containing only bugfixes and code quality improvements over v3.7.1

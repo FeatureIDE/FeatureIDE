@@ -1,7 +1,7 @@
 .classpath
-.project
-configs/Default.xml
-configs/UnderflowPrevention.xml
-features/Base/util/Stack.java
 features/Underflow/util/Stack.java
+features/Base/util/Stack.java
+configs/UnderflowPrevention.xml
+configs/Default.xml
 model.xml
+.project
