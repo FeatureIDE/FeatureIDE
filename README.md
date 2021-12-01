@@ -68,6 +68,6 @@ Development branch:
 |--------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [de.ovgu.featureide.examples](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.examples) | Provides example projects showcasing different functionalities of FeatureIDE. These functionalities include each of the composers, different supported programming paradigms (AOP, FOP, etc.), and feature modeling concepts (extended Feature Models, Feature Model formats, etc.). |
 
-## Licence
+## License
 
 FeatureIDE is released under L-GPL license v3.
