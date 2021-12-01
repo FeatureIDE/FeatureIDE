@@ -438,6 +438,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
+						if (!gfm.hasInitialLayout()) {
+							diagramEditor.adjustModelToEditorSize();
+						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();
@@ -561,6 +564,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 		setTitleToolTip(input.getToolTipText());
 
+		notifyFMEditorOpened();
+
 		// TODO _Interfaces Removed Code
 		// FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
 		// FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
@@ -582,6 +587,23 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			}
 			if (!fmManager.getVariableFormula().getAnalyzer().isValid(null)) {
 				markerHandler.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
+			}
+		}
+	}
+
+	/**
+	 * Notify FeatureModelEditorListeners about the newly opened FeatureModelEditor.
+	 */
+	private void notifyFMEditorOpened() {
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FMEditorListener");
+		for (final IConfigurationElement c : config) {
+			try {
+				final Object o = c.createExecutableExtension("class");
+				if (o instanceof IFeatureModelEditorListener) {
+					((IFeatureModelEditorListener) o).editorOpened(this);
+				}
+			} catch (final Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

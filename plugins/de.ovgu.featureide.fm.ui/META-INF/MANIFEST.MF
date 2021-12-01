@@ -2,11 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
-Bundle-Version: 3.7.2.qualifier
+Bundle-Version: 3.8.1.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
 Require-Bundle: 
  org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.jface.databinding,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
@@ -73,10 +75,6 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.views.outline.standard,
  de.ovgu.featureide.fm.ui.wizards,
  org.abego.treelayout,
- org.abego.treelayout.internal.util,
- org.abego.treelayout.internal.util.java.lang,
- org.abego.treelayout.internal.util.java.lang.string,
- org.abego.treelayout.internal.util.java.util,
  org.abego.treelayout.util
 Bundle-ClassPath: .,
  lib/org.abego.treelayout.core-1.0.3.jar

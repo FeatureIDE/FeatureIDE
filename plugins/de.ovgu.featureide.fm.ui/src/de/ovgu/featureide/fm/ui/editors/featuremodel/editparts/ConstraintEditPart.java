@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
+ * @author Benedikt Jutz
  */
 public class ConstraintEditPart extends ModelElementEditPart {
 
@@ -108,6 +109,10 @@ public class ConstraintEditPart extends ModelElementEditPart {
 		super.deactivate();
 	}
 
+	/**
+	 * Handle movement of the given constraint by updating this edit part's position, constraint changes by updating the given properties + size, and
+	 * explanation changes by setting the active reason accordingly.
+	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
@@ -119,6 +124,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			break;
 		case CONSTRAINT_MODIFY:
 		case ATTRIBUTE_CHANGED:
+		case FEATURE_NAME_CHANGED:
 			getFigure().updateProperties();
 			getModel().setSize(getFigure().getSize());
 			break;

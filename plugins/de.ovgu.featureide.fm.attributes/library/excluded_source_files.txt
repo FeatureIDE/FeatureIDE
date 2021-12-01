@@ -18,6 +18,7 @@ de/ovgu/featureide/fm/attributes/statistics/ExtendedFMOutlineProvider.java
 de/ovgu/featureide/fm/attributes/statistics/ExtendedFMTreeContentProvider.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeContentProvider.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeView.java
+de/ovgu/featureide/fm/attributes/view/FeatureAttributeViewAdder.java
 de/ovgu/featureide/fm/attributes/view/FeatureAttributeViewSelectionFilter.java
 de/ovgu/featureide/fm/attributes/view/actions/AddFeatureAttributeAction.java
 de/ovgu/featureide/fm/attributes/view/actions/CollapseAllButFirstLevel.java
@@ -38,5 +39,11 @@ de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeTypeColumnLa
 de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeUnitColumnLabelProvider.java
 de/ovgu/featureide/fm/attributes/view/labelprovider/FeatureAttributeValueColumnLabelProvider.java
 de/ovgu/featureide/fm/attributes/view/listener/FeatureAttributeSelectionListener.java
+de/ovgu/featureide/fm/attributes/view/operations/AddFeatureAttributeOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeConfigurableOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeNameOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeRecursiveOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeUnitOperation.java
 de/ovgu/featureide/fm/attributes/view/operations/ChangeAttributeValueOperation.java
 de/ovgu/featureide/fm/attributes/view/operations/ChangeConfigurableAttributeValueOperation.java
+de/ovgu/featureide/fm/attributes/view/operations/RemoveFeatureAttributeOperation.java

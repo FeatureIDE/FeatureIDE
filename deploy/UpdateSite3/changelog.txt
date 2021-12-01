@@ -7,6 +7,45 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.8.1 (November 2021)
+* Hotfix containing only bugfixes over v3.8.0
+* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
+  * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, v3.7.2, or v3.8.0
+* UVL models now support spaces (#1143)
+* Composed UVL model now live updates after changes to submodels (#1134)
+* GUI support for handling imported submodels with UVL (#1250)
+* Many other enhancements and fixes for UVL (#1159, #1210, #1175, #1196, #1194, #1174, #1180)
+* Many minor fixes related to redo/undo (#1235, #1207, #1197)
+* Many minor fixes related to editing feature models (#1214, #1151, #1255, #1005, #1241, #1225, #1200, #1153, #1181, #1195)
+* Expansion mode is now correctly saved in the configuration editor (#1012)
+* Several improvements for the constraint view (#1277,#1256)
+* More intuitive messages in the configuration map (#1178)
+
+Release 3.8.0 (August 2021)
+* Many enhancements for UVL
+   * New constraints are now handled correctly (#1164)
+   * Feature Attribute Support (#1133)
+   * Live updates when editing submodels (#1134)
+   * Vastly improved validation of UVL format (#1076, #1156)
+   * Several small improvements (#1141, #1158)
+   * FeautureIDE outline now works with UVL (#1157)
+* Several improvements for the feature attributes view (#713)
+* Searching features now properly works in configuration editor (#1126)
+* Several improvements regarding the feature-model legend (#784, #1114, #1127)
+* Autocompletion of constraint dialog is improved (#781)
+* Several improvements regarding zoom and layouting of feature models (#795, #809, #969, #1142)
+* Feature attributes can now be obfuscated (#772)
+* Undo and Redo now working as expected (#1026)
+* Improvements to the configuration editor under Linux (#1055)
+* Fixed a breaking bug in runtime variability feature models (#1094)
+* Removed outdated support for Fuji and corresponding functionality (#936, #1106)
+* Small fixes and enhancements (#844, #934, #981, #1105, #1108, #1110, #1116, #1130)
+
+Release 3.7.3 (November 2021)
+* Hotfix containing only bugfixes over v3.7.2
+* Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263).
+  * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, or v3.7.2.
+
 Release 3.7.2 (July 2021)
 * Hotfix containing only bugfixes and code quality improvements over v3.7.1
 * Cleaned up outdated libraries in fm.core plug-in (#1144)
@@ -22,8 +61,8 @@ Release 3.7.1 (June 2021)
 * Hotfix containing only stability improvements over v3.7.0
 * Significant speed-ups when opening and working with large feature models (#1093)
 * Minor fixes to the FeatureIDE library (#1111, #1100, thanks for the reports by Paul Maximilian Bittner and Kevin Feichtinger)
-* Fixed problem when opening the Java editor for AHEAD projects (#1048, #1085, thanks for the reports by MrKSP and Sebastian Böhm)
-* Contributions by Tobias Heß and Sebastian Krieter 
+* Fixed problem when opening the Java editor for AHEAD projects (#1048, #1085, thanks for the reports by MrKSP and Sebastian BÃ¶hm)
+* Contributions by Tobias HeÃŸ and Sebastian Krieter 
 
 Release 3.7.0 (October 2020)
 * Universal Variability Language (UVL) integrated into FeatureIDE (#1050)
@@ -33,7 +72,7 @@ Release 3.7.0 (October 2020)
 * Removal of features that occur in cross-tree constraints by means of slicing (#200, #984)
 * Subtrees of feature models can be collapsed to a specified level (#851, thanks for the report by cpwnd)
 * Stability of feature-model editor (#992, #1028, #1083) and sampling with YASA (#967) improved
-* API improved (#917, thanks for the report by Robert Müller)
+* API improved (#917, thanks for the report by Robert MÃ¼ller)
 
 Release 3.6.4 (September 2020)
 * Hotfix containing only stability improvements over v3.6.3

@@ -132,8 +132,21 @@ public abstract class SingleSelectionAction extends AFeatureModelAction implemen
 		}
 	}
 
+	/**
+	 * @param selection
+	 *
+	 * @return true, if the selection is valid and editable
+	 */
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		return isOneFeatureSelected(selection);
+		if (isOneFeatureSelected(selection)) {
+			if (this instanceof ActionAllowedInExternalSubmodel) {
+				return true;
+			}
+			if (!isExternalFeature(getSelectedFeature())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean isConnectionSelected() {

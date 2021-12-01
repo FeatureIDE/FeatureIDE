@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -111,34 +112,35 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {
 
+		// Determine features and constraints to be deleted
 		final Object[] elements = getSelection().toArray();
-
 		final List<IFeature> featuresToDelete = new ArrayList<>();
 		final List<IConstraint> constraintsToDelete = new ArrayList<>();
-		boolean featureInConstraint = false;
-		boolean featureHasGroupDifference = false;
-		boolean featureIsRoot = false;
-
 		for (final Object element : elements) {
 			final IFeature feature = getFeatureFromObject(element);
 			if (feature != null) {
 				featuresToDelete.add(feature);
-
-				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
-					featureInConstraint = true;
-				}
-				if (hasGroupDifference(feature)) {
-					featureHasGroupDifference = true;
-				}
-				// only root with multiple children needs to be considered
-				if (FeatureUtils.isRoot(feature) && (FeatureUtils.getChildrenCount(feature) > 1)) {
-					featureIsRoot = true;
-				}
 			} else {
 				final IConstraint constraint = getConstraintFromObject(element);
 				if (constraint != null) {
 					constraintsToDelete.add(constraint);
 				}
+			}
+		}
+
+		// Check conditions for slicing
+		boolean featureInConstraint = false;
+		boolean featureHasGroupDifference = false;
+		boolean featureIsRoot = false;
+		for (final IFeature feature : featuresToDelete) {
+			if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
+				featureInConstraint = true;
+			}
+			if (hasGroupDifference(feature)) {
+				featureHasGroupDifference = true;
+			}
+			if (isRootRequiringSlicing(feature, featuresToDelete)) {
+				featureIsRoot = true;
 			}
 		}
 
@@ -172,6 +174,27 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
+	 * Checks whether the given feature is the root feature, and deleting it requires slicing because there is no unambiguous new root.
+	 *
+	 * @param feature The feature to check
+	 * @param featuresToDelete The list of features to be deleted
+	 * @return <code>true</code> iff the given feature is the root, and deleting it requires slicing.
+	 */
+	private boolean isRootRequiringSlicing(IFeature feature, List<IFeature> featuresToDelete) {
+		if (!FeatureUtils.isRoot(feature)) {
+			return false;
+		}
+		IFeatureStructure fs = feature.getStructure();
+		while (fs.getChildrenCount() == 1) {
+			fs = fs.getFirstChild();
+			if (!featuresToDelete.contains(fs.getFeature())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Handles the return of the DeleteDialog by performing the correct delete operations.
 	 *
 	 * @param dialogReturnLabel The label of the button that was pressed in the DeleteDialog
@@ -196,7 +219,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param dialogButtonLabels A String array with labels for the buttons of the DeleteDialog
 	 * @return A String containing the label of the button that was pressed in the DeleteDialog or <code>null</code> if the dialog was closed differently
 	 */
-	private String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
+	protected String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
 		final MessageDialog dialog = new DeleteDialog(null, multiple, dialogReasons, dialogButtonLabels, dialogButtonLabels.length - 1);
 		dialog.open();
 		final int dialogReturn = dialog.getReturnCode();
@@ -241,13 +264,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
 		final List<String> dialogReasons = new ArrayList<>();
 		if (featureInConstraint) {
-			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_CONSTRAINTS);
 		}
 		if (featureHasGroupDifference) {
-			dialogReasons.add(StringTable.AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_GROUP_DIFFERENCE);
 		}
 		if (featureIsRoot) {
-			dialogReasons.add(StringTable.A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN);
+			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_ROOT);
 		}
 		return dialogReasons;
 	}
@@ -257,7 +280,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 *
 	 * @param featuresToDelete A List of all the features that need to be deleted
 	 */
-	private void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
+	protected void addDeleteFeatureOperations(List<IFeature> featuresToDelete) {
 		for (final IFeature feature : featuresToDelete) {
 			operations.add(new DeleteFeatureOperation(featureModelManager, feature.getName()));
 		}
@@ -296,7 +319,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param element Object that needs to be casted to a feature
 	 * @return Feature of the object or <code>null</code> if it can't be casted
 	 */
-	private IFeature getFeatureFromObject(Object element) {
+	public IFeature getFeatureFromObject(Object element) {
 		IFeature feature = null;
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
@@ -311,7 +334,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 *
 	 * @return The current selection of the viewer
 	 */
-	private IStructuredSelection getSelection() {
+	protected IStructuredSelection getSelection() {
 		if (viewer instanceof GraphicalViewerImpl) {
 			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 		} else {

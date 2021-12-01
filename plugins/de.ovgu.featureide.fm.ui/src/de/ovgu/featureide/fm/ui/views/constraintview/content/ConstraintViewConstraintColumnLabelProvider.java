@@ -5,13 +5,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -107,16 +107,12 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 				return getColoredCircleImage(color);
 			}
 
-			final Boolean isAutomaticCalculation = FeatureModelProperty.getBooleanProperty(controller.getFeatureModelManager().getSnapshot().getProperty(),
-					FeatureModelProperty.TYPE_CALCULATIONS, FeatureModelProperty.PROPERTY_CALCULATIONS_RUN_AUTOMATICALLY);
+			final ConstraintStatus constraintStatus = getConstraintStatus(constraint);
 
-			final FeatureModelAnalyzer analyzer = controller.getAnalyzer();
-			if (analyzer != null) {
-
-				final ConstraintProperties constraintProperties = analyzer.getAnalysesCollection().getConstraintProperty(constraint);
-				if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.REDUNDANT)) {
-					return GUIDefaults.FM_INFO;
-				}
+			if (constraintStatus == ConstraintProperties.ConstraintStatus.REDUNDANT) {
+				return GUIDefaults.FM_INFO;
+			} else if (constraintStatus == ConstraintProperties.ConstraintStatus.TAUTOLOGY) {
+				return GUIDefaults.FM_WARNING;
 			}
 			return null;
 		}
@@ -148,5 +144,52 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		string = string.replace("&", "\u2227");
 		string = string.replace("-", "\u00AC");
 		return string;
+	}
+
+	@Override
+	public String getToolTipText(Object element) {
+		if (element instanceof IConstraint) {
+			final IConstraint constraint = (IConstraint) element;
+			final ConstraintStatus constraintStatus = getConstraintStatus(constraint);
+
+			if (constraintStatus == ConstraintProperties.ConstraintStatus.TAUTOLOGY) {
+				return "Constraint is a Tautology";
+			} else if (constraintStatus == ConstraintProperties.ConstraintStatus.REDUNDANT) {
+				return "Redundant Constraint";
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Point getToolTipShift(Object object) {
+		return new Point(5, 5);
+	}
+
+	@Override
+	public int getToolTipDisplayDelayTime(Object object) {
+		return 500;
+	}
+
+	@Override
+	public int getToolTipTimeDisplayed(Object object) {
+		return 20000;
+	}
+
+	private ConstraintStatus getConstraintStatus(IConstraint constraint) {
+		if (controller.getFeatureModelManager().getVariableFormula().getAnalyzer() != null) {
+
+			final ConstraintProperties constraintProperties =
+				controller.getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection().getConstraintProperty(constraint);
+
+			if (constraintProperties != null) {
+				if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.TAUTOLOGY)) {
+					return ConstraintProperties.ConstraintStatus.TAUTOLOGY;
+				} else if (constraintProperties.hasStatus(ConstraintProperties.ConstraintStatus.REDUNDANT)) {
+					return ConstraintProperties.ConstraintStatus.REDUNDANT;
+				}
+			}
+		}
+		return null;
 	}
 }

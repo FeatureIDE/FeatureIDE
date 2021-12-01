@@ -25,22 +25,18 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.attributes.view.operations.RemoveFeatureAttributeOperation;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Action for the {@link FeatureAttributeView}. Is used to to remove the currently selected feature attribute.
  * 
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class RemoveFeatureAttributeAction extends Action {
 
@@ -55,38 +51,11 @@ public class RemoveFeatureAttributeAction extends Action {
 
 	@Override
 	public void run() {
-		fmManager.editObject(this::removeAttributes, FeatureModelManager.CHANGE_ATTRIBUTES);
-	}
-
-	private void removeAttributes(IFeatureModel featureModel) {
-		for (final IFeatureAttribute attribute : attributes) {
-			// delete all of these recursive elements
-			if (attribute.isRecursive()) {
-				if (attribute.isHeadOfRecursiveAttribute()) {
-					for (final IFeature feature : featureModel.getFeatures()) {
-						ExtendedFeature extendedFeature = (ExtendedFeature) feature;
-						for (IFeatureAttribute localAttribute : extendedFeature.getAttributes()) {
-							if (attribute.getName().equals(localAttribute.getName())) {
-								extendedFeature.removeAttribute(localAttribute);
-							}
-						}
-					}
-				}
-			} else {
-				for (final IFeature feature : featureModel.getFeatures()) {
-					ExtendedFeature extendedFeature = (ExtendedFeature) feature;
-					if (extendedFeature.getAttributes().contains(attribute)) {
-						extendedFeature.removeAttribute(attribute);
-					}
-				}
-			}
-		}
-		featureModel.fireEvent(new FeatureIDEEvent(null, EventType.FEATURE_ATTRIBUTE_CHANGED, true, FeatureUtils.getRoot(featureModel)));
+		FeatureModelOperationWrapper.run(new RemoveFeatureAttributeOperation(fmManager, attributes));
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return attributes.size() > 0;
+		return attributes.stream().anyMatch(a -> !a.isRecursive() || a.isHeadOfRecursiveAttribute());
 	}
-
 }

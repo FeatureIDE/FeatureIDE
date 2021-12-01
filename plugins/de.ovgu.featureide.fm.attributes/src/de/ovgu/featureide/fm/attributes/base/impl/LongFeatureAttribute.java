@@ -50,6 +50,17 @@ public class LongFeatureAttribute extends FeatureAttribute {
 		attributeType = FeatureAttribute.LONG;
 	}
 
+	/**
+	 * Copy constructor. Constructs a new {@link LongFeatureAttribute} from an existing instance and a corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The containing feature of the new instance
+	 */
+	public LongFeatureAttribute(LongFeatureAttribute oldAttribute, IFeature feature) {
+		super(oldAttribute, feature);
+		value = oldAttribute.value;
+	}
+
 	@Override
 	public Long getValue() {
 		return value;
@@ -75,7 +86,7 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 */
 	@Override
 	public IFeatureAttribute cloneAtt(IFeature feature) {
-		return new LongFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+		return new LongFeatureAttribute(this, feature);
 	}
 
 	/**

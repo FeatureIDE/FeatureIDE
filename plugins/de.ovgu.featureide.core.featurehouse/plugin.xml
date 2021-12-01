@@ -57,26 +57,6 @@
 					</visibleWhen>
 				</command>
 				<command
-						commandId="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
-						id="de.ovgu.featureide.core.featurehouse.ui.actions.fuji"
-						label="Enable Fuji Type Check"
-						style="toggle">
-					<visibleWhen
-							checkEnabled="false">
-						<with
-								variable="activeMenuSelection">
-							<and>
-								<count
-										value="1">
-								</count>
-								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
-								</reference>
-							</and>
-						</with>
-					</visibleWhen>
-				</command>
-				<command
 						commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key"
 						id="de.ovgu.featureide.core.featurehouse.ui.actions.key"
 						label="Perform Feature-Based Verification with KeY"
@@ -111,14 +91,6 @@
 			</state>
 		</command>
 		<command
-				id="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
-				name="Enable Fuji Type Check">
-			<state
-					class="org.eclipse.jface.commands.ToggleState"
-					id="org.eclipse.ui.commands.toggleState">
-			</state>
-		</command>
-		<command
 				id="de.ovgu.featureide.core.featurehouse.ui.commands.key"
 				name="Perform Feature-Based Verification with KeY">
 		</command>
@@ -128,10 +100,6 @@
 		<handler
 				class="de.ovgu.featureide.featurehouse.ui.handlers.BuildMetaProductHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.EnableFujiHandler"
-				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.fuji">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateFeatureStubsHandler"
@@ -151,13 +119,6 @@
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.propertyTesters">
-		<propertyTester
-				class="de.ovgu.featureide.featurehouse.ui.handlers.toggle.FujiTester"
-				id="de.ovgu.featureide.core.featurehouse.toggleTester.fuji"
-				namespace="de.ovgu.featureide.core.featurehouse.properties.toggle"
-				properties="fuji"
-				type="org.eclipse.jface.viewers.IStructuredSelection">
-		</propertyTester>
 		<propertyTester
 				class="de.ovgu.featureide.featurehouse.ui.handlers.toggle.MetaProductTester"
 				id="de.ovgu.featureide.core.featurehouse.toggleTester.metaproduct"

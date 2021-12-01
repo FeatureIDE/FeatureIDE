@@ -24,10 +24,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Abstract action for modifying a feature model.
@@ -60,8 +66,50 @@ public abstract class AFeatureModelAction extends Action {
 		return Collections.emptyList();
 	}
 
-	private boolean isExternalFeature(IFeature feature) {
+	protected boolean isExternalFeature(IFeature feature) {
 		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
+	}
+
+	/**
+	 * method to check if the selection in the editor includes a feature from an external submodel
+	 *
+	 * @param selection the selection from the editor
+	 *
+	 * @return true if there is a feature from an external submodel, false otherwise
+	 */
+	protected boolean hasExternalFeature(IStructuredSelection selection) {
+		for (final Object selectedElement : selection.toArray()) {
+			if (selectedElement instanceof FeatureEditPart) {
+				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
+					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
+					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * method to check if the selection in the editor includes a constraint from an external submodel
+	 *
+	 * @param selection the selection from the editor
+	 *
+	 * @return true if there is a constraint from an external submodel, false otherwise
+	 */
+	protected boolean hasExternalConstraint(IStructuredSelection selection) {
+		for (final Object selectedElement : selection.toArray()) {
+			if (selectedElement instanceof ConstraintEditPart) {
+				if (((ConstraintEditPart) selectedElement).getModel().getObject() instanceof IConstraint) {
+					final IConstraint constraint = (IConstraint) ((ConstraintEditPart) selectedElement).getModel().getObject();
+					if ((constraint instanceof MultiConstraint) && ((MultiConstraint) constraint).isFromExtern()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }

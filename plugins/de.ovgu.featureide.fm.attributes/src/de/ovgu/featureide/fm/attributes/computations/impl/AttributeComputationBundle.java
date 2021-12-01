@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.outlineentry.AttributeEntry;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -61,14 +61,14 @@ public class AttributeComputationBundle implements IOutlineEntry {
 
 	@Override
 	public boolean supportsType(Object element) {
-		return config.getFeatureModel() instanceof ExtendedFeatureModel;
+		return config.getFeatureModel() instanceof IExtendedFeatureModel;
 	}
 
 	private List<IFeatureAttribute> getUniqueAttributes() {
 		List<IFeatureAttribute> attributeList = new ArrayList<IFeatureAttribute>();
 		for (IFeature feat : config.getFeatureModel().getFeatures()) {
-			if (feat instanceof ExtendedFeature) {
-				for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
+			if (feat instanceof IExtendedFeature) {
+				for (IFeatureAttribute att : ((IExtendedFeature) feat).getAttributes()) {
 					if (!containsAttribute(attributeList, att.getName())) {
 						attributeList.add(att);
 					}

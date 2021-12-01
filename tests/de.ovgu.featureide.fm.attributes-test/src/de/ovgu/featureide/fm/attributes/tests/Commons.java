@@ -50,8 +50,7 @@ public class Commons {
 		return folder;
 	}
 
-	private static final String TEST_FEATURE_MODEL_PATH = "extendedTestFeatureModels/";
-
+	public static final String TEST_FEATURE_MODEL_PATH = "extendedTestFeatureModels/";
 
 	public final static IFeatureModel loadTestExtendedFeatureModelFromFile(final String filename) {
 		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(TEST_FEATURE_MODEL_PATH));
@@ -147,28 +146,29 @@ public class Commons {
 			return pathname.getName().endsWith("." + fileExtension);
 		}
 	};
-	
+
 	public static ExtendedFeatureModel getBaseModel() {
 		IFeatureModel model = Commons.loadTestExtendedFeatureModelFromFile("BaseExtendedFeatureModel.xml");
 		assertTrue(model instanceof ExtendedFeatureModel);
 		return (ExtendedFeatureModel) model;
 	}
+
 	public static ExtendedFeatureModel getSandwitchModel() {
 		IFeatureModel model = Commons.loadTestExtendedFeatureModelFromFile("SandwichModel.xml");
 		assertTrue(model instanceof ExtendedFeatureModel);
 		return (ExtendedFeatureModel) model;
 	}
-	
+
 	public static ExtendedFeatureModel getNewFormatBikeModel() {
 		IFeatureModel model = Commons.loadTestExtendedFeatureModelFromFile("newFormatBike.xml");
 		assertTrue(model instanceof ExtendedFeatureModel);
 		return (ExtendedFeatureModel) model;
 	}
-	
+
 	public static boolean compareByAttributeValues(ExtendedFeatureModel model1, ExtendedFeatureModel model2) {
 		return compareModelToValueMap(model2, extractValueMap(model1));
 	}
-	
+
 	public static Map<String, Map<String, Object>> extractValueMap(ExtendedFeatureModel model) {
 		Map<String, Map<String, Object>> valueMap = new HashMap<>();
 		for (IFeature feat : model.getFeatures()) {
@@ -178,12 +178,12 @@ public class Commons {
 				featValueMap.put(att.getName(), att.getValue());
 			}
 			valueMap.put(ext.getName(), featValueMap);
-			
+
 		}
-		
+
 		return valueMap;
 	}
-	
+
 	public static boolean compareModelToValueMap(ExtendedFeatureModel model, Map<String, Map<String, Object>> valueMap) {
 		for (IFeature feat : model.getFeatures()) {
 			ExtendedFeature ext = (ExtendedFeature) feat;
@@ -209,11 +209,8 @@ public class Commons {
 				}
 			}
 
-			
 		}
 		return true;
 	}
-	
 
 }
-

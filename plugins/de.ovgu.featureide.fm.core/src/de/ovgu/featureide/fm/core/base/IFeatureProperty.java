@@ -45,4 +45,13 @@ public interface IFeatureProperty {
 
 	boolean selectConstraint(boolean state);
 
+	/**
+	 * Implicit features can be used to represent features that exist only for technical reasons, such as the implicit root feature of UVL models with multiple
+	 * actual root features.
+	 *
+	 * @return Whether the corresponding feature is implicit.
+	 */
+	boolean isImplicit();
+
+	void setImplicit(boolean implicit);
 }

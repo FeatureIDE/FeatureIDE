@@ -55,13 +55,8 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.MethodFilter;
-import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.IRunner;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Generates Feature Stubs
@@ -89,16 +84,7 @@ public class FeatureStubsGenerator {
 
 		// ProjectManager.getAnalyzer(featureProject.getFeatureModel()).setDependencies();
 
-		final IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
-		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
-
-			@Override
-			public void jobFinished(IJob<ProjectSignatures> finishedJob) {
-				getFeatures(featureProject.getFSTModel().getProjectSignatures());
-			}
-
-		});
-		efsj.schedule();
+		getFeatures(featureProject.getFSTModel().getProjectSignatures());
 
 		return true;
 	}

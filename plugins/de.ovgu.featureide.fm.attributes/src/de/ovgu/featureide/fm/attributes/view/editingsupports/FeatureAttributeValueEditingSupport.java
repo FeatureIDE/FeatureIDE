@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import java.util.Objects;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -41,12 +43,14 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the value column of the {@link FeatureAttributeView}.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -99,81 +103,91 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	@Override
 	protected void setValue(Object element, Object value) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
-		if (value == null || value.toString().equals("")) {
-			((IFeatureAttribute) element).setValue(null);
-			getViewer().update(element, null);
-			return;
-		}
-		String type = attribute.getType();
+		final String valueString = value == null || value.toString().equals("") ? null : value.toString();
 		if (view.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
-			setValueInConfig(attribute, type, value);
+			setValueInConfig(attribute, valueString);
+			getViewer().update(element, null);
+			view.repackAllColumns();
 		} else if (view.getMode() == FeatureAttributeOperationMode.FEATURE_DIAGRAM) {
-			setValueInFeatureDiagram(attribute, type, value);
-		}
-		getViewer().update(element, null);
-		view.repackAllColumns();
-	}
-
-	private void setValueInConfig(IFeatureAttribute attribute, String type, Object value) {
-		ConfigurationManager manager = (ConfigurationManager) view.getManager();
-
-		switch (type) {
-		case FeatureAttribute.BOOLEAN:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeConfigurableAttributeValueOperation<Boolean> op =
-					new ChangeConfigurableAttributeValueOperation<Boolean>(manager, attribute, value.toString().toLowerCase().equals(TRUE_STRING));
-				op.execute();
-			}
-			break;
-		case FeatureAttribute.DOUBLE:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeConfigurableAttributeValueOperation<Double> op =
-					new ChangeConfigurableAttributeValueOperation<Double>(manager, attribute, Double.parseDouble(value.toString()));
-				op.execute();
-			}
-			break;
-		case FeatureAttribute.LONG:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeConfigurableAttributeValueOperation<Long> op =
-					new ChangeConfigurableAttributeValueOperation<Long>(manager, attribute, Long.parseLong(value.toString()));
-				op.execute();
-			}
-			break;
-		case FeatureAttribute.STRING:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeConfigurableAttributeValueOperation<String> op =
-					new ChangeConfigurableAttributeValueOperation<String>(manager, attribute, value.toString());
-				op.execute();
-			}
+			setValueInFeatureDiagram(attribute, valueString);
+			// Visual update handled by attribute view event handler in this case
 		}
 	}
 
-	private void setValueInFeatureDiagram(IFeatureAttribute attribute, String type, Object value) {
-		IFeatureModelManager manager = (IFeatureModelManager) view.getManager();
-		switch (type) {
-		case FeatureAttribute.BOOLEAN:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeAttributeValueOperation<Boolean> op =
-					new ChangeAttributeValueOperation<Boolean>(manager, attribute, value.toString().toLowerCase().equals(TRUE_STRING));
+	/**
+	 * Sets the configured value of the given attribute using an operation.
+	 * 
+	 * @param attribute The configurable attribute
+	 * @param value The new configured attribute value
+	 */
+	private void setValueInConfig(IFeatureAttribute attribute, String value) {
+		if (value == null || attribute.isValidValue(value)) {
+			final ConfigurationManager manager = (ConfigurationManager) view.getManager();
+			switch (attribute.getType()) {
+			case FeatureAttribute.BOOLEAN: {
+				final Boolean v = value == null ? null : value.toLowerCase().equals(TRUE_STRING);
+				final ChangeConfigurableAttributeValueOperation<Boolean> op = new ChangeConfigurableAttributeValueOperation<Boolean>(manager, attribute, v);
 				op.execute();
+				break;
 			}
-			break;
-		case FeatureAttribute.DOUBLE:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeAttributeValueOperation<Double> op = new ChangeAttributeValueOperation<Double>(manager, attribute, Double.parseDouble(value.toString()));
+			case FeatureAttribute.DOUBLE: {
+				final Double v = value == null ? null : Double.parseDouble(value);
+				final ChangeConfigurableAttributeValueOperation<Double> op = new ChangeConfigurableAttributeValueOperation<Double>(manager, attribute, v);
 				op.execute();
+				break;
 			}
-			break;
-		case FeatureAttribute.LONG:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeAttributeValueOperation<Long> op = new ChangeAttributeValueOperation<Long>(manager, attribute, Long.parseLong(value.toString()));
+			case FeatureAttribute.LONG: {
+				final Long v = value == null ? null : Long.parseLong(value);
+				final ChangeConfigurableAttributeValueOperation<Long> op = new ChangeConfigurableAttributeValueOperation<Long>(manager, attribute, v);
 				op.execute();
+				break;
 			}
-			break;
-		case FeatureAttribute.STRING:
-			if (attribute.isValidValue(value.toString())) {
-				ChangeAttributeValueOperation<String> op = new ChangeAttributeValueOperation<String>(manager, attribute, value.toString());
+			case FeatureAttribute.STRING: {
+				final ChangeConfigurableAttributeValueOperation<String> op = new ChangeConfigurableAttributeValueOperation<String>(manager, attribute, value);
 				op.execute();
+				break;
+			}
+			}
+		}
+	}
+
+	/**
+	 * Sets the value of the given attribute using an operation.
+	 * 
+	 * @param attribute The attribute to be edited
+	 * @param value The new attribute value
+	 */
+	private void setValueInFeatureDiagram(IFeatureAttribute attribute, String value) {
+		if (value == null || attribute.isValidValue(value)) {
+			final IFeatureModelManager manager = (IFeatureModelManager) view.getManager();
+			switch (attribute.getType()) {
+			case FeatureAttribute.BOOLEAN: {
+				final Boolean v = value == null ? null : value.toLowerCase().equals(TRUE_STRING);
+				if (!Objects.equals(attribute.getValue(), v)) {
+					FeatureModelOperationWrapper.run(new ChangeAttributeValueOperation<Boolean>(manager, attribute, v));
+				}
+				break;
+			}
+			case FeatureAttribute.DOUBLE: {
+				final Double v = value == null ? null : Double.parseDouble(value);
+				if (!Objects.equals(attribute.getValue(), v)) {
+					FeatureModelOperationWrapper.run(new ChangeAttributeValueOperation<Double>(manager, attribute, v));
+				}
+				break;
+			}
+			case FeatureAttribute.LONG: {
+				final Long v = value == null ? null : Long.parseLong(value);
+				if (!Objects.equals(attribute.getValue(), v)) {
+					FeatureModelOperationWrapper.run(new ChangeAttributeValueOperation<Long>(manager, attribute, v));
+				}
+				break;
+			}
+			case FeatureAttribute.STRING: {
+				if (!Objects.equals(attribute.getValue(), value)) {
+					FeatureModelOperationWrapper.run(new ChangeAttributeValueOperation<String>(manager, attribute, value));
+				}
+				break;
+			}
 			}
 		}
 	}
@@ -182,5 +196,4 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	protected boolean canEdit(Object element) {
 		return enabled && (element instanceof IFeatureAttribute);
 	}
-
 }

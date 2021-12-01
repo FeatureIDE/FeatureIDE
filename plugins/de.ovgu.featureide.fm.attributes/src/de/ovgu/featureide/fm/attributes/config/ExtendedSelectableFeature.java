@@ -23,8 +23,8 @@ package de.ovgu.featureide.fm.attributes.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
@@ -72,7 +72,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 	}
 
 	public Object getAttributeDefaultValue(String attName) {
-		ExtendedFeature feat = ((ExtendedFeature) getFeature());
+		IExtendedFeature feat = ((IExtendedFeature) getFeature());
 		for (IFeatureAttribute att : feat.getAttributes()) {
 			if (att.getName().equals(attName)) {
 				return att.getValue();

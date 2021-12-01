@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for Multi Product Lines
 Bundle-SymbolicName: de.ovgu.featureide.core.mpl;singleton:=true
-Bundle-Version: 3.7.2.qualifier
+Bundle-Version: 3.8.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
@@ -22,6 +22,5 @@ Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.signature.filter,
  de.ovgu.featureide.core.mpl.util
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/fuji.jar,
- .
+Bundle-ClassPath: .
 Automatic-Module-Name: de.ovgu.featureide.core.mpl

@@ -43,6 +43,11 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	IFeatureModelManager getFeatureModelManager();
 
+	/**
+	 * @return True iff the initial feature model, e.g. when opening a file, contains layout information.
+	 */
+	boolean hasInitialLayout();
+
 	FeatureModelLayout getLayout();
 
 	boolean isLegendHidden();

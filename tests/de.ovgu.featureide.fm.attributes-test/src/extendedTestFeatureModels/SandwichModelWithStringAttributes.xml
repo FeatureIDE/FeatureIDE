@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+	<properties>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and mandatory="true" name="Sandwich">
+			<graphics key="collapsed" value="false"/>
+			<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+			<attribute name="Price" type="double" unit="" value="0.0"/>
+			<attribute configurable="true" name="Organic Food" type="boolean" unit="" value="false"/>
+			<attribute name="Advert Text" recursive="true" type="string" unit="" value="Yummy!"/>
+			<alt mandatory="true" name="Bread">
+				<feature name="Full Grain ">
+					<attribute name="Calories" value="203"/>
+				</feature>
+				<feature name="Flatbread">
+					<attribute name="Calories" value="50"/>
+				</feature>
+				<feature name="Toast">
+					<attribute name="Calories" value="313"/>
+				</feature>
+			</alt>
+			<and name="Cheese">
+				<attribute name="Advert Text" value="Cheesy!"/>
+				<alt name="Gouda">
+					<feature name="Sprinkled">
+						<attribute name="Calories" value="72"/>
+					</feature>
+					<feature name="Slice">
+						<attribute name="Calories" value="70"/>
+					</feature>
+				</alt>
+				<feature name="Cheddar">
+					<attribute name="Calories" value="81"/>
+				</feature>
+				<feature name="Cream Cheese ">
+					<attribute name="Calories" value="52"/>
+				</feature>
+			</and>
+			<or name="Meat">
+				<feature name="Salami ">
+					<attribute name="Calories" value="116"/>
+				</feature>
+				<feature name="Ham">
+					<attribute name="Calories" value="92"/>
+				</feature>
+				<feature name="Chicken Breast">
+					<attribute name="Calories" value="56"/>
+				</feature>
+			</or>
+			<and name="Vegetables">
+				<feature name="Cucumber ">
+					<attribute name="Calories" value="2"/>
+				</feature>
+				<feature name="Tomatoes">
+					<attribute name="Calories" value="3"/>
+				</feature>
+				<feature name="Lettuce">
+					<attribute name="Calories" value="2"/>
+				</feature>
+			</and>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>Chicken Breast</var>
+				<var>Lettuce</var>
+			</imp>
+		</rule>
+		<rule>
+			<eq>
+				<var>Salami </var>
+				<not>
+					<var>Toast</var>
+				</not>
+			</eq>
+		</rule>
+	</constraints>
+</extendedFeatureModel>

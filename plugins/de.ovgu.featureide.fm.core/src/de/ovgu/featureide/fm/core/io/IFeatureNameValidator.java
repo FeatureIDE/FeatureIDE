@@ -35,4 +35,8 @@ public interface IFeatureNameValidator {
 	 */
 	boolean isValidFeatureName(String featureName);
 
+	default String getErrorMessage() {
+		return "";
+	}
+
 }

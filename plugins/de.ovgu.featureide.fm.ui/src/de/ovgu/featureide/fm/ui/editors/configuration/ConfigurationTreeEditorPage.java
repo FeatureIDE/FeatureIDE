@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +86,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.prop4j.NodeWriter;
@@ -156,15 +156,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final String NO_AUTOMATIC_EXPAND_TOOL_TIP = "Does Not Expand Automatically";
 	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
 
-	private static final String EXPAND_PREFERENCE = "configurationexpandpreference";
-
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
 	protected static final Color blue = new Color(null, 0, 0, 200);
 	protected static final Color red = new Color(null, 240, 0, 0);
 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
-	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	protected static final Font treeItemBoldFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	protected static final Font treeItemItalicFont = new Font(null, ARIAL, 8, SWT.ITALIC);
+	protected static final Font treeItemBoldItalicFont = new Font(null, ARIAL, 8, SWT.BOLD | SWT.ITALIC);
 
 	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
@@ -173,6 +173,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 	private static final Image IMAGE_RESOLVE = FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif").createImage();
 	protected static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
+	private static final Image IMAGE_RESET_SELECTION = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
 
 	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
 
@@ -396,6 +397,22 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
+		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(IMAGE_RESET_SELECTION);
+		item.setToolTipText("Reset Manual Selection");
+		item.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				resetManualSelection();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
 		resolveButton = new ToolItem(toolbar, SWT.PUSH);
 		resolveButton.setImage(IMAGE_RESOLVE);
 		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
@@ -415,7 +432,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
-		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(IMAGE_COLLAPSE);
 		item.setToolTipText("Collapse All Features");
 		item.addSelectionListener(new SelectionListener() {
@@ -473,7 +490,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final IProject project = EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
 
-		final int index = store.getInt(EXPAND_PREFERENCE);
+		final int index = store.getInt(IConfigurationEditor.EXPAND_PREFERENCE);
 
 		final MenuItem defaultItem = menu.getItem(index);
 
@@ -621,14 +638,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (configurationEditor.getExpandAlgorithm() != algorithm) {
 					configurationEditor.setExpandAlgorithm(algorithm);
-					final int index = menu.indexOf(menuItem);
-					final IProject project =
-						EclipseFileSystem.getResource(configurationEditor.getFeatureModelManager().getObject().getSourceFile()).getProject();
-					final ScopedPreferenceStore store = new ScopedPreferenceStore(new ProjectScope(project), FMUIPlugin.getDefault().getID());
-					store.setValue(EXPAND_PREFERENCE, index);
-					try {
-						store.save();
-					} catch (final IOException e1) {}
+					configurationEditor.saveExpansionAlgorithm();
 					if (useGroups) {
 						curGroup = 0;
 					}
@@ -798,6 +808,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
+	/**
+	 * Resets all manual selections.
+	 */
+	private void resetManualSelection() {
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if (configurationManager != null) {
+			configurationManager.editObject(configuration -> {
+				for (final SelectableFeature feature : configuration.getFeatures()) {
+					if (feature.getManual() != Selection.UNDEFINED) {
+						feature.setManual(Selection.UNDEFINED);
+					}
+				}
+			}, ConfigurationManager.CHANGE_ALL);
+			computeTree(UpdateStrategy.UPDATE);
+			setDirty();
+		}
+	}
+
 	private Void expandAll(Display display) {
 		display.syncExec(() -> expandItems(itemMap.values(), true));
 		return null;
@@ -817,14 +845,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * Manually expands the tree to show the next open clause.
 	 */
 	private void expandToOpenClause() {
-		switch (configurationEditor.getExpandAlgorithm()) {
-		case ALL_SELECTED_OPEN_CLAUSE:
+		if (configurationEditor.getExpandAlgorithm() == ExpandAlgorithm.ALL_SELECTED_OPEN_CLAUSE) {
 			levelExpand();
 			groupExpand(false);
-			break;
-		default:
+		} else {
 			groupExpand(true);
-			break;
 		}
 	}
 
@@ -962,6 +987,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						checked = false;
 						grayed = true;
 						fgColor = gray;
+						// On most operating systems, we use gray text color to show that a feature cannot be selected.
+						// On Ubuntu, this does not work and instead, we use an italic font (see issue #1055).
+						font = treeItemItalicFont;
 						break;
 					case UNDEFINED:
 						checked = feature.getManual() == Selection.SELECTED;
@@ -972,11 +1000,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					if (automatic == Selection.UNDEFINED) {
 						switch (recommended) {
 						case SELECTED:
-							font = treeItemSpecialFont;
+							// again, this is a workaround for Ubuntu, which does not show the gray font color correctly
+							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
 							fgColor = green;
 							break;
 						case UNSELECTED:
-							font = treeItemSpecialFont;
+							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
 							fgColor = blue;
 							break;
 						case UNDEFINED:

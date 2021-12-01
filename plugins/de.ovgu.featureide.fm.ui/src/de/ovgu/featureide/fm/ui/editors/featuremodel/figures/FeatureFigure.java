@@ -97,7 +97,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		label.setFont(DEFAULT_FONT);
 
-		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
+		label.setLocation(new Point(0, 0));
 
 		String displayName = feature.getObject().getName();
 		if (featureModel.getLayout().showShortNames()) {
@@ -110,7 +110,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 		feature.setSize(getSize());
 
-		add(label, label.getBounds());
+		add(label);
 		setOpaque(true);
 
 		if (feature.getLocation() != null) {
@@ -299,20 +299,13 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	public void setName(String newName) {
 		label.setText(newName);
 
-		final Dimension labelSize = label.getPreferredSize();
+		final Dimension labelSize = new Dimension(label.getPreferredSize());
+		labelSize.expand(FEATURE_INSETS.getWidth(), FEATURE_INSETS.getHeight());
 		minSize = labelSize;
 
 		if (!labelSize.equals(label.getSize())) {
 			label.setSize(labelSize);
-
-			final Rectangle bounds = getBounds();
-			bounds.setSize(labelSize.expand(FEATURE_INSETS.getWidth(), FEATURE_INSETS.getHeight()));
-
-			final Dimension oldSize = getSize();
-			if (!oldSize.equals(0, 0)) {
-				bounds.x += (oldSize.width - bounds.width) >> 1;
-			}
-			setBounds(bounds);
+			setSize(labelSize);
 		}
 	}
 

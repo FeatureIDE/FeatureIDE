@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
-Bundle-Version: 3.7.2.qualifier
+Bundle-Version: 3.8.1.qualifier
 Bundle-Activator: de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -15,7 +15,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: lib/FeatureHouse.jar,
- lib/fuji.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
@@ -27,8 +26,6 @@ Export-Package: cide.features,
  de.ovgu.featureide.featurehouse.meta.featuremodel,
  de.ovgu.featureide.featurehouse.model,
  de.ovgu.featureide.featurehouse.signature.documentation,
- de.ovgu.featureide.featurehouse.signature.fuji,
  de.ovgu.featureide.featurehouse.ui.handlers,
- de.ovgu.featureide.featurehouse.ui.handlers.toggle,
- fuji
+ de.ovgu.featureide.featurehouse.ui.handlers.toggle
 Automatic-Module-Name: de.ovgu.featureide.core.featurehouse

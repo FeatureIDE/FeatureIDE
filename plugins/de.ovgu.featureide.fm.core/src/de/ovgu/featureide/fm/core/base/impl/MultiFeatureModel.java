@@ -159,6 +159,26 @@ public class MultiFeatureModel extends FeatureModel {
 		attributeConstraints.add(constraint);
 	}
 
+	@Override
+	public void addConstraint(IConstraint constraint) {
+		if ((constraint instanceof MultiConstraint) && !(((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERFACE)) {
+			addOwnConstraint(constraint);
+		} else {
+			constraints.add(constraint);
+		}
+		elements.put(constraint.getInternalId(), constraint);
+	}
+
+	@Override
+	public void addConstraint(IConstraint constraint, int index) {
+		if ((constraint instanceof MultiConstraint) && !(((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERFACE)) {
+			addOwnConstraint(constraint);
+		} else {
+			constraints.add(constraint);
+		}
+		elements.put(constraint.getInternalId(), constraint);
+	}
+
 	public void addOwnConstraint(final IConstraint constraint) {
 		ownConstraints.add(constraint);
 		constraints.add(constraint);

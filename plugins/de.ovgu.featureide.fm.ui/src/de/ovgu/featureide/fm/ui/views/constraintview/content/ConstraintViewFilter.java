@@ -2,6 +2,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview.content;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.jface.viewers.Viewer;
@@ -110,12 +111,29 @@ public class ConstraintViewFilter extends ViewerFilter {
 
 		// filter by search text
 		if ((searchText != null) && !searchText.isEmpty()) {
-			if (!constraintInSearch(constraint)) {
+			if (!constraintInSearch(constraint) && !constraintTagInSearch(constraint)) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 *
+	 * @param constraint which is checked for the containment of a tag that equals/contains the searchText
+	 * @return true if the constraint contains such a tag. False otherwise.
+	 */
+	private boolean constraintTagInSearch(IConstraint constraint) {
+		if (searchText.startsWith("#")) {
+			final Set<String> constraintTags = constraint.getTags();
+			for (final String tag : constraintTags) {
+				if (tag.contains(searchText.substring(1))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean constraintInExplanation(IConstraint constraint) {

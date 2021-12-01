@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class ExtendedFeature extends Feature {
+public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 	protected List<IFeatureAttribute> attributes;
 
@@ -58,14 +59,17 @@ public class ExtendedFeature extends Feature {
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 	}
 
+	@Override
 	public List<IFeatureAttribute> getAttributes() {
 		return attributes;
 	}
 
+	@Override
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
 	}
 
+	@Override
 	public void removeAttribute(IFeatureAttribute attribute) {
 		attributes.remove(attribute);
 	}
@@ -75,6 +79,7 @@ public class ExtendedFeature extends Feature {
 		return new ExtendedFeature(this, newFeatureModel, newStructure);
 	}
 
+	@Override
 	public boolean isContainingAttribute(IFeatureAttribute attribute) {
 		for (IFeatureAttribute att : attributes) {
 			if (attribute.getName().equals(att.getName())) {
@@ -87,6 +92,10 @@ public class ExtendedFeature extends Feature {
 	@Override
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
+		return createExtendedTooltip(attributes, tooltip);
+	}
+
+	public static String createExtendedTooltip(List<IFeatureAttribute> attributes, StringBuilder tooltip) {
 		tooltip.append("\n\n");
 
 		StringBuilder attributesString = new StringBuilder();
@@ -162,6 +171,5 @@ public class ExtendedFeature extends Feature {
 			}
 		}
 		return tooltip.toString();
-
 	}
 }
