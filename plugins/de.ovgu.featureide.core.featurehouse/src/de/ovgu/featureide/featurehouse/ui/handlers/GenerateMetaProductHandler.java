@@ -37,13 +37,13 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class BuildMetaProductHandler extends AFeatureProjectHandler {
+public class GenerateMetaProductHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void singleAction(final IFeatureProject featureProject) {
 		if (FeatureHouseComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
 			final FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) featureProject.getComposer();
-			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.buildMetaProduct());
+			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.generateMetaProduct());
 
 			final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
@@ -57,7 +57,7 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 					return true;
 				}
 			};
-			LongRunningWrapper.getRunner(job, "Build meta product for project \"" + featureProject.getProjectName() + "\".").schedule();
+			LongRunningWrapper.getRunner(job, "Generate meta product for project \"" + featureProject.getProjectName() + "\".").schedule();
 		}
 	}
 
