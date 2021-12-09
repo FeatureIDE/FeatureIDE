@@ -662,12 +662,16 @@ public class StringTable {
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_TEXT = "Please enter the relative path to the model file, and an optional alias.";
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_PATH = "Path";
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_ALIAS = "Alias";
+	public static final String IMPORT_FEATURE_MODEL_DIALOG_NAME = "Name";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NONEXISTENT_PATH = "The import path does not exist.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NOT_A_FEATURE_MODEL = "The import path does not represent a valid feature model.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_IMPORT_CYCLE = "The import path is invalid since it causes a cyclic import.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS = "An imported model with the given name or alias already exists.";
 	public static final String REMOVE_IMPORTED_FEATURE_MODEL = "Remove Imported Feature Model";
 	public static final String REMOVE_IMPORTED_FEATURE_MODELS = "Remove Imported Feature Models";
+	public static final String EDIT_IMPORT_ALIAS_ACTION_NAME = "Edit Alias";
+	public static final String EDIT_IMPORT_ALIAS = "Edit Import Alias";
+	public static final String EDIT_IMPORT_ALIAS_DIALOG_TEXT = "Please enter a new alias for the selected model, or leave it empty to set no alias.";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";
 	public static final String CHOOSE_FEATURE = "Choose Feature";

@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.core.io.manager.IManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.EditImportAliasAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.ImportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.RemoveImportedFeatureModelsAction;
 
@@ -78,6 +79,7 @@ public class FmOutlinePageContextMenu {
 
 	private SetFeatureColorAction setFeatureColorAction;
 	private ImportFeatureModelAction importFeatureModelAction;
+	private EditImportAliasAction editImportAliasAction;
 	private RemoveImportedFeatureModelsAction removeImportedFeatureModelsAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
@@ -154,6 +156,7 @@ public class FmOutlinePageContextMenu {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 
 		importFeatureModelAction = new ImportFeatureModelAction(fInput);
+		editImportAliasAction = new EditImportAliasAction(viewer, fInput);
 		removeImportedFeatureModelsAction = new RemoveImportedFeatureModelsAction(viewer, fInput);
 
 		collapseAllAction = new Action() {
@@ -238,6 +241,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(importFeatureModelAction);
 		}
 		if (isValidSelection(selection, element -> element instanceof MultiFeatureModel.UsedModel)) {
+			manager.add(editImportAliasAction);
 			manager.add(removeImportedFeatureModelsAction);
 		}
 	}

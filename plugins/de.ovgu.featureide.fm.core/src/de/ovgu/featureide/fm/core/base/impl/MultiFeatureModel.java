@@ -44,7 +44,7 @@ public class MultiFeatureModel extends FeatureModel {
 	public static class UsedModel {
 
 		private final String modelName;
-		private final String varName;
+		private String varName;
 		/**
 		 * The absolute path of the used model.
 		 */
@@ -73,6 +73,15 @@ public class MultiFeatureModel extends FeatureModel {
 
 		public String getVarName() {
 			return varName;
+		}
+
+		/**
+		 * Private setter for varName. Use {@link MultiFeatureModel#renameExternalModel(String, String)} to rename external models.
+		 *
+		 * @param varName The new varName
+		 */
+		private void setVarName(String varName) {
+			this.varName = varName;
 		}
 
 		/**
@@ -243,6 +252,22 @@ public class MultiFeatureModel extends FeatureModel {
 	 */
 	public UsedModel getExternalModel(String varName) {
 		return usedModels.get(varName);
+	}
+
+	/**
+	 * Renames an external model.
+	 *
+	 * @param oldVarName The old name of the model to rename
+	 * @param newVarName The new name of the model to rename
+	 */
+	public void renameExternalModel(String oldVarName, String newVarName) {
+		if (!usedModels.containsKey(oldVarName) || usedModels.containsKey(newVarName)) {
+			return;
+		}
+
+		final UsedModel usedModel = usedModels.remove(oldVarName);
+		usedModel.setVarName(newVarName);
+		usedModels.put(newVarName, usedModel);
 	}
 
 	public List<Equation> getAttributConstraints() {
