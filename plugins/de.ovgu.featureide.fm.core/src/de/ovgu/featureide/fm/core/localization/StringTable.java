@@ -657,6 +657,9 @@ public class StringTable {
 	public static final String FOCUS_ON_EXPLANATION = "Focus on Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
 	public static final String ADD_IMPORTED_FEATURES = "Add Imported Features";
+	public static final String ADD_IMPORTED_FEATURES_DIALOG_TEXT = "Please select the features to be added.";
+	public static final String ADD_IMPORTED_FEATURES_DIALOG_TEXT_EMPTY =
+		"There are no imported feature models. Please import a feature model using the outline view before adding imported features.";
 	public static final String ADD_IMPORTED_FEATURES_ALREADY_IMPORTED_WARNING = "At least one of the selected features is already imported.";
 	public static final String IMPORT_FEATURE_MODEL = "Import Feature Model";
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_TEXT = "Please enter the relative path to the model file, and an optional alias.";

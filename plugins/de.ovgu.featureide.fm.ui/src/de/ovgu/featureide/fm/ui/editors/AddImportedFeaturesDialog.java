@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_IMPORTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_IMPORTED_FEATURES_ALREADY_IMPORTED_WARNING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_IMPORTED_FEATURES_DIALOG_TEXT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_IMPORTED_FEATURES_DIALOG_TEXT_EMPTY;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,10 +39,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -201,9 +201,14 @@ public class AddImportedFeaturesDialog extends Dialog {
 	 */
 	private final Map<MultiFeatureModel.UsedModel, Set<RootFeatureSet>> rootSets;
 
+	/**
+	 * Tree viewer to select features to be added. null if there are no imported models.
+	 */
 	private TreeViewer treeViewer;
+	/**
+	 * Composite for warning icon and text. null if there are no imported models.
+	 */
 	private Composite warningLabel;
-	private Label warningText;
 
 	/**
 	 * Currently selected features, used to calculate selection changes
@@ -251,23 +256,21 @@ public class AddImportedFeaturesDialog extends Dialog {
 		final Composite composite = (Composite) super.createDialogArea(parent);
 
 		// Create widgets
-		final Label label = new Label(composite, SWT.NONE);
-		label.setText("Please select the feature to be added.");
+		if (!importedFeatures.isEmpty()) {
+			final Label label = new Label(composite, SWT.NONE);
+			label.setText(ADD_IMPORTED_FEATURES_DIALOG_TEXT);
 
-		treeViewer = new TreeViewer(composite, SWT.MULTI);
-		treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
-		final GridData treeLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		treeViewer.getControl().setLayoutData(treeLayoutData);
-		treeViewer.setContentProvider(new ImportedFeatureContentProvider());
-		treeViewer.setLabelProvider(new ImportedFeatureLabelProvider());
+			treeViewer = new TreeViewer(composite, SWT.MULTI);
+			treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
+			final GridData treeLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+			treeViewer.getControl().setLayoutData(treeLayoutData);
+			treeViewer.setContentProvider(new ImportedFeatureContentProvider());
+			treeViewer.setLabelProvider(new ImportedFeatureLabelProvider());
 
-		createWarningLabel(composite);
+			createWarningLabel(composite);
 
-		// Listener to automatically select and deselect root features based on constraint dependencies
-		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
+			// Listener to automatically select and deselect root features based on constraint dependencies
+			treeViewer.addSelectionChangedListener(event -> {
 				// Compute selected features from selection
 				final Set<ImportedFeature> selectedFeatures = ((List<?>) event.getStructuredSelection().toList()).stream()
 						.filter(e -> e instanceof ImportedFeature).map(e -> (ImportedFeature) e).collect(Collectors.toSet());
@@ -327,18 +330,22 @@ public class AddImportedFeaturesDialog extends Dialog {
 					// Show warning if at least one selected feature is already imported
 					warningLabel.setVisible(featuresAlreadyImported);
 				}
-			}
-		});
+			});
 
-		// Set input of tree viewer. Input is not needed, but must be non-null to update the viewer.
-		treeViewer.setInput(new Object());
+			// Set input of tree viewer. Input is not needed, but must be non-null to update the viewer.
+			treeViewer.setInput(new Object());
 
-		// Mark already imported features with gray text and warning icon
-		Arrays.stream(treeViewer.getTree().getItems()).flatMap(model -> Arrays.stream(model.getItems()))
-				.filter(feature -> ((ImportedFeature) feature.getData()).alreadyImported).forEachOrdered(feature -> {
-					feature.setForeground(ColorConstants.gray);
-					feature.setImage(GUIDefaults.FM_WARNING);
-				});
+			// Mark already imported features with gray text and warning icon
+			Arrays.stream(treeViewer.getTree().getItems()).flatMap(model -> Arrays.stream(model.getItems()))
+					.filter(feature -> ((ImportedFeature) feature.getData()).alreadyImported).forEachOrdered(feature -> {
+						feature.setForeground(ColorConstants.gray);
+						feature.setImage(GUIDefaults.FM_WARNING);
+					});
+		} else {
+			final Label label = new Label(composite, SWT.WRAP);
+			label.setText(ADD_IMPORTED_FEATURES_DIALOG_TEXT_EMPTY);
+			label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		}
 
 		applyDialogFont(composite);
 		return composite;
@@ -372,7 +379,7 @@ public class AddImportedFeaturesDialog extends Dialog {
 		final Label icon = new Label(warningLabel, SWT.NONE);
 		icon.setImage(GUIDefaults.FM_WARNING);
 
-		warningText = new Label(warningLabel, SWT.NONE);
+		final Label warningText = new Label(warningLabel, SWT.NONE);
 		warningText.setText(ADD_IMPORTED_FEATURES_ALREADY_IMPORTED_WARNING);
 	}
 
