@@ -69,7 +69,7 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		return oldFeature.getStructure().clone(featureModel).getFeature();
 	}
 
 	@Override
