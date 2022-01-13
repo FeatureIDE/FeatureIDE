@@ -22,7 +22,9 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.prop4j.Node;
 
@@ -51,22 +53,41 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	boolean featureSelected;
 	boolean isImplicit;
 	protected String description;
+	/**
+	 * Stores the tags of the constraint this group belongs to.
+	 */
+	protected final Set<String> tags;
 
+	/**
+	 * Creates a copy of <code>oldConstraint</code> that belongs to <code>featureModel</code>.
+	 *
+	 * @param oldConstraint - {@link AConstraint}
+	 * @param featureModel - {@link IFeatureModel}
+	 * @param copyId - If <code>true</code> the id of the old constraint is kept. Otherwise a new id is assigned to the new constraint.
+	 */
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
 		super(oldConstraint, featureModel, copyId);
 		setNode(oldConstraint.propNode.clone());
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
 		description = oldConstraint.description;
+		tags = new HashSet<>(oldConstraint.tags);
 		propertyContainer = new MapPropertyContainer(oldConstraint.propertyContainer);
 	}
 
+	/**
+	 * Creates a new {@link AConstraint} for <code>featureModel</code> that has <code>propNode</code> as formula.
+	 *
+	 * @param featureModel - {@link IFeatureModel}
+	 * @param propNode - {@link Node}
+	 */
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		setNode(propNode);
 		featureSelected = false;
 		isImplicit = false;
 		description = "";
+		tags = new HashSet<>();
 		propertyContainer = new MapPropertyContainer();
 	}
 
@@ -134,4 +155,18 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		return description;
 	}
 
+	@Override
+	public Set<String> getTags() {
+		synchronized (tags) {
+			return new HashSet<>(tags);
+		}
+	}
+
+	@Override
+	public void setTags(Set<String> tags) {
+		synchronized (this.tags) {
+			this.tags.clear();
+			this.tags.addAll(tags);
+		}
+	}
 }

@@ -518,6 +518,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	@Override
+	public boolean isValidFeatureName(String featureName) {
+		return featureName.matches("[^\\\"\\.\\n\\r]*");
+	}
+
+	@Override
+	public String getErrorMessage() {
+		return "The characters  \" and . are not allowed and the feature name has to be non-empty.";
+	}
+
+	@Override
 	public boolean initExtension() {
 		FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(getId(), MultiFeatureModelFactory.ID);
 		return super.initExtension();

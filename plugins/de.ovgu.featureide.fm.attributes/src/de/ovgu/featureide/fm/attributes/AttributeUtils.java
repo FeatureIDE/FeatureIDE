@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 public class AttributeUtils {
 
@@ -127,4 +128,42 @@ public class AttributeUtils {
 		return value ? trueDouble : falseDouble;
 	}
 
+	/**
+	 * Returns the attribute with the given attribute name of the feature with the given feature name.
+	 * 
+	 * @param featureModel The model in which to look up the feature and attribute
+	 * @param featureName The name of the containing feature
+	 * @param attributeName The name of the attribute
+	 * @return The attribute, or null if the feature or attribute cannot be found
+	 */
+	public static IFeatureAttribute getAttribute(IFeatureModel featureModel, String featureName, String attributeName) {
+		final IFeature feature = featureModel.getFeature(featureName);
+		if (feature instanceof IExtendedFeature) { // Also checks that feature != null
+			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
+			return extendedFeature.getAttribute(attributeName);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns an attribute of the given feature or one of its children with the given name.
+	 * 
+	 * @param feature
+	 * @param attributeName
+	 * @return The found attribute, or null if no attribute is found
+	 */
+	public static IFeatureAttribute getChildAttribute(IExtendedFeature feature, String attributeName) {
+		IFeatureAttribute att = feature.getAttribute(attributeName);
+		if (att != null) {
+			return att;
+		}
+		for (IFeatureStructure child : feature.getStructure().getChildren()) {
+			IFeatureAttribute childAtt = getChildAttribute((IExtendedFeature) child.getFeature(), attributeName);
+			if (childAtt != null) {
+				return childAtt;
+			}
+		}
+		return null;
+	}
 }

@@ -41,6 +41,19 @@ public interface IExtendedFeature extends IFeature {
 	public List<IFeatureAttribute> getAttributes();
 
 	/**
+	 * @param name The name of an attribute
+	 * @return The attribute with the given name, or null if no such attribute exists
+	 */
+	public default IFeatureAttribute getAttribute(String name) {
+		for (IFeatureAttribute attribute : getAttributes()) {
+			if (attribute.getName().equals(name)) {
+				return attribute;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @param attribute the attribute that is added to this feature.
 	 */
 	public void addAttribute(IFeatureAttribute attribute);

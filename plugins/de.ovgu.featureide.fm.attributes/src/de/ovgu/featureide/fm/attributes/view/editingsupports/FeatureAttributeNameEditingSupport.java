@@ -20,24 +20,31 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_ATTRIBUTE_NAME_ERROR_TITLE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
+import de.ovgu.featureide.fm.attributes.AttributeUtils;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeNameOperation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the name column of the {@link FeatureAttributeView}.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -58,29 +65,28 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		IExtendedFeature feat = (IExtendedFeature) ((IFeatureAttribute) element).getFeature();
-		for (IFeature f : feat.getFeatureModel().getFeatures()) {
-			IExtendedFeature ext = (IExtendedFeature) f;
-			for (IFeatureAttribute att : ext.getAttributes()) {
-				if (att.getName().equals(value.toString()) && !((IFeatureAttribute) element).getType().equals(att.getType())) {
-					MessageDialog.openError(null, "Invalid input", "The inserted attribute name is used on a different attribute type");
-					return;
-				}
-			}
+		IFeatureAttribute attribute = (IFeatureAttribute) element;
+		IExtendedFeature feature = (IExtendedFeature) attribute.getFeature();
+		String newName = value.toString();
+
+		// No further checks and no operation if no change occurred
+		if (attribute.getName().equals(newName)) {
+			return;
 		}
-		for (IFeatureAttribute att : feat.getAttributes()) {
-			if (att.getName().equals(value.toString()) && att != (IFeatureAttribute) element) {
-				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");
+
+		// Check for name conflicts
+		if (feature.getAttribute(newName) != null) {
+			MessageDialog.openError(null, INVALID_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE);
+			return;
+		}
+		if (attribute.isRecursive()) {
+			if (AttributeUtils.getChildAttribute(feature, newName) != null) {
+				MessageDialog.openError(null, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE, INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE);
 				return;
 			}
 		}
-		((IFeatureAttribute) element).setName(value.toString());
-		if (((IFeatureAttribute) element).isRecursive()) {
-			view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, true, ((IFeatureAttribute) element).getFeature()));
-		} else {
-			view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-		}
-		getViewer().update(element, null);
-		view.repackAllColumns();
+
+		// Apply operation
+		FeatureModelOperationWrapper.run(new ChangeAttributeNameOperation((IFeatureModelManager) view.getManager(), attribute, newName));
 	}
 }

@@ -354,8 +354,7 @@ public class StringTable {
 	public static final String CONSTRAINTS = "Constraints";
 	public static final String AUTO = "Auto";
 	public static final String NOT = "not";
-	public static final String SHORT_NAMES = "Short Names";
-	public static final String LONG_NAMES = "Long Names";
+	public static final String SHOW_QUALIFIED_NAMES = "Show Qualified Names";
 	public static final String IS_NOT_SUPPORTING_THIS_METHOD = " is not supporting this method";
 	public static final String IFF = "iff";
 	public static final String NO_SYMBOLS_FOUND_ = "No symbols found.";
@@ -1137,6 +1136,17 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String REMOVE_ATTRIBUTE_OPERATION_NAME = "Remove Attribute";
+	public static final String CHANGE_ATTRIBUTE_NAME_OPERATION_NAME = "Rename Attribute";
+	public static final String CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME = "Set Attribute Recursive";
+	public static final String CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME = "Set Attribute Configurable";
+	public static final String CHANGE_ATTRIBUTE_UNIT_OPERATION_NAME = "Change Attribute Unit";
+	public static final String CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME = "Change Attribute Value";
+	public static final String CHANGE_CONFIGURABLE_ATTRIBUTE_VALUE_OPERATION_NAME = "Change Configurable Attribute Value";
+	public static final String INVALID_ATTRIBUTE_NAME_ERROR_TITLE = "Invalid attribute name";
+	public static final String INVALID_ATTRIBUTE_NAME_ERROR_MESSAGE = "Please insert a unique attribute name.";
+	public static final String INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE = "Invalid recursive attribute name";
+	public static final String INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_MESSAGE = "Please ensure the name is not used by an attribute of a child feature.";
 	public static final String CONSTRAINT_VIEW_REMEMBER_DECISION = "Remember my decision.";
 	public static final String CONSTRAINT_VIEW_NEVER_ASK = "Never ask again.";
 	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Open the Constraint View?";
@@ -1154,10 +1164,9 @@ public class StringTable {
 	public static final String DELETE_WITH_SLICING = "Delete With Slicing";
 	public static final String DELETE_WITHOUT_SLICING = "Delete Without Slicing";
 	public static final String WIKI_DELETING_URL = "https://github.com/FeatureIDE/FeatureIDE/wiki/Feature-Model-Edit-Operations#deleting";
-	public static final String AT_LEAST_ONE_FEATURE_IS_CONTAINED_IN_CONSTRAINTS = "at least one feature is contained in constraints";
-	public static final String AT_LEAST_ONE_FEATURE_HAS_A_DIFFERENT_GROUP_THAN_ITS_PARENT = "at least one feature has a different group than its parent";
-	public static final String A_FEATURE_IS_THE_ROOT_OF_THE_FEATURE_DIAGRAM_AND_HAS_MULTIPLE_CHILDREN =
-		"a feature is the root of the feature diagram and has multiple children";
+	public static final String DELETE_FEATURE_REASON_CONSTRAINTS = "at least one feature is contained in constraints";
+	public static final String DELETE_FEATURE_REASON_GROUP_DIFFERENCE = "at least one feature has a different group than its parent";
+	public static final String DELETE_FEATURE_REASON_ROOT = "a feature is the root of the feature diagram and there is no unambiguous remaining root";
 	public static final String LIST_BULLET_DASH = "  - ";
 	public static final String DELETING_THIS_FEATURE_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting this feature may result in unwanted changes as";
 	public static final String DELETING_THESE_FEATURES_MAY_RESULT_IN_UNWANTED_CHANGES_AS = "Deleting these features may result in unwanted changes as";

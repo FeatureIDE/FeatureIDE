@@ -29,7 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRA
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_ALL_LEVELS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_SUBTREE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
@@ -243,7 +242,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/**
 	 * Actions to toggle between short and long names.
 	 */
-	private NameTypeSelectionAction shortNamesAction;
 	private NameTypeSelectionAction longNamesAction;
 	private final List<Action> actions = new ArrayList<>();
 
@@ -322,8 +320,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		legendLayoutAction = addAction(new LegendLayoutAction(viewer, graphicalFeatureModel));
 		legendAction = addAction(new LegendAction(viewer, graphicalFeatureModel));
 		// Name view actions
-		shortNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, true));
-		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, false));
+		longNamesAction = addAction(new NameTypeSelectionAction(graphicalFeatureModel, !graphicalFeatureModel.getLayout().showShortNames()));
 
 		// Calculation actions
 		calculateDependencyAction = addAction(new CalculateDependencyAction(viewer, featureModelManager));
@@ -594,6 +591,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 							graphicalFeatureModel.getGraphicalFeature((IFeature) element).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 						} else if (element instanceof IConstraint) {
 							((IConstraint) element).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
+							fmManager.getVarObject().getConstraints().get(fmManager.getVarObject().getConstraintIndex((IConstraint) element))
+									.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 							graphicalFeatureModel.getGraphicalConstraint((IConstraint) element).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 						}
 					}
@@ -1278,32 +1277,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
-	/**
-	 * Creates a MenuManager with the short/long name labels.
-	 *
-	 * @return new {@link MenuManager}
-	 */
-	private MenuManager createNameTypeMenuManager() {
-		final MenuManager menuManager = new MenuManager(SET_NAME_TYPE);
-		menuManager.setRemoveAllWhenShown(true);
-		menuManager.addMenuListener(new IMenuListener() {
-
-			@Override
-			public void menuAboutToShow(IMenuManager manager) {
-				// Add actions
-				menuManager.add(longNamesAction);
-				menuManager.add(shortNamesAction);
-
-				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
-				shortNamesAction.setEnabled(!useShortNames);
-				shortNamesAction.setChecked(useShortNames);
-				longNamesAction.setEnabled(useShortNames);
-				longNamesAction.setChecked(!useShortNames);
-			}
-		});
-		return menuManager;
-	}
-
 	private boolean isFeatureMenu(IStructuredSelection selection) {
 		boolean featureMenu = !selection.toList().isEmpty();
 		for (final Object obj : selection.toList()) {
@@ -1349,9 +1322,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		final boolean isMultiFeatureModel = fmManager.getVarObject() instanceof MultiFeatureModel;
 
-		if (isMultiFeatureModel) {
-			menuManager.add(createNameTypeMenuManager());
-		}
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
 			menuManager.add(createFeatureBelowAction);
@@ -1413,6 +1383,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
+			if (isMultiFeatureModel) {
+				menuManager.add(longNamesAction);
+				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
+				longNamesAction.setUseShortType(!useShortNames);
+				longNamesAction.setChecked(!useShortNames);
+			}
 			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menuManager.add(exportFeatureModelAction);
 			menuManager.add(convertGraphicalFileAction);

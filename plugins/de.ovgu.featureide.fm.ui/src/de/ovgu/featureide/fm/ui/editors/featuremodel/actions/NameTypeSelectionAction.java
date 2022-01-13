@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_QUALIFIED_NAMES;
+
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectionOperation;
 
@@ -37,11 +38,11 @@ public class NameTypeSelectionAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.nametypeselection";
 
-	private final boolean useShortType;
+	private boolean useShortType;
 	private final IGraphicalFeatureModel featureModel;
 
 	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, boolean useShortType) {
-		super(FeatureDiagramLayoutHelper.getNameTypeLabel(useShortType));
+		super(SHOW_QUALIFIED_NAMES);
 		this.useShortType = useShortType;
 		this.featureModel = featureModel;
 		setId(ID);
@@ -50,6 +51,10 @@ public class NameTypeSelectionAction extends Action {
 	@Override
 	public void run() {
 		FeatureModelOperationWrapper.run(new NameTypeSelectionOperation(featureModel, useShortType));
+	}
+
+	public void setUseShortType(boolean useShortType) {
+		this.useShortType = useShortType;
 	}
 
 }

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-
 /**
  * Contains all information needed to execute commands that move features
  *
@@ -30,60 +28,60 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  */
 public class FeatureOperationData {
 
-	private IGraphicalFeature oldParent;
-	private IGraphicalFeature feature;
-	private IGraphicalFeature newParent;
+	private String oldParentName;
+	private String featureName;
+	private String newParentName;
 	private int newIndex;
 	private int oldIndex;
 
-	public FeatureOperationData(IGraphicalFeature feature, IGraphicalFeature oldParent, IGraphicalFeature newParent, int newIndex, int oldIndex) {
-		this.feature = feature;
+	public FeatureOperationData(String featureName, String oldParentName, String newParentName, int newIndex, int oldIndex) {
+		this.featureName = featureName;
 		this.newIndex = newIndex;
-		this.newParent = newParent;
+		this.newParentName = newParentName;
 		this.oldIndex = oldIndex;
-		this.oldParent = oldParent;
+		this.oldParentName = oldParentName;
 	}
 
 	/**
-	 * @return the oldParent
+	 * @return the oldParentName
 	 */
-	public IGraphicalFeature getOldParent() {
-		return oldParent;
+	public String getOldParentName() {
+		return oldParentName;
 	}
 
 	/**
-	 * @param oldParent the oldParent to set
+	 * @param oldParentName the oldParentName to set
 	 */
-	public void setOldParent(IGraphicalFeature oldParent) {
-		this.oldParent = oldParent;
+	public void setOldParentName(String oldParentName) {
+		this.oldParentName = oldParentName;
 	}
 
 	/**
-	 * @return the feature
+	 * @return the featureName
 	 */
-	public IGraphicalFeature getFeature() {
-		return feature;
+	public String getFeatureName() {
+		return featureName;
 	}
 
 	/**
-	 * @param feature the feature to set
+	 * @param featureName the featureName to set
 	 */
-	public void setFeature(IGraphicalFeature feature) {
-		this.feature = feature;
+	public void setFeatureName(String featureName) {
+		this.featureName = featureName;
 	}
 
 	/**
-	 * @return the newParent
+	 * @return the newParentName
 	 */
-	public IGraphicalFeature getNewParent() {
-		return newParent;
+	public String getNewParentName() {
+		return newParentName;
 	}
 
 	/**
-	 * @param newParent the newParent to set
+	 * @param newParentName the newParentName to set
 	 */
-	public void setNewParent(IGraphicalFeature newParent) {
-		this.newParent = newParent;
+	public void setNewParentName(String newParentName) {
+		this.newParentName = newParentName;
 	}
 
 	/**
