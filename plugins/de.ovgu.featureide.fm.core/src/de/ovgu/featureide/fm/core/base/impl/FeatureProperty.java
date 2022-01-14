@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -36,15 +34,18 @@ public class FeatureProperty implements IFeatureProperty {
 	protected final IFeature correspondingFeature;
 
 	protected String description;
+	protected boolean implicit;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 		description = oldProperty.description.toString();
+		implicit = oldProperty.implicit;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 		description = "";
+		implicit = false;
 	}
 
 	@Override
@@ -57,7 +58,6 @@ public class FeatureProperty implements IFeatureProperty {
 	 * @return The description of the Feature.
 	 */
 	@Override
-	@Nonnull
 	public String getDescription() {
 		return description;
 	}
@@ -73,7 +73,7 @@ public class FeatureProperty implements IFeatureProperty {
 	}
 
 	@Override
-	public void setDescription(@Nonnull final CharSequence description) {
+	public void setDescription(final CharSequence description) {
 		this.description = description.toString();
 	}
 
@@ -90,4 +90,13 @@ public class FeatureProperty implements IFeatureProperty {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
+	@Override
+	public boolean isImplicit() {
+		return implicit;
+	}
+
+	@Override
+	public void setImplicit(boolean implicit) {
+		this.implicit = implicit;
+	}
 }

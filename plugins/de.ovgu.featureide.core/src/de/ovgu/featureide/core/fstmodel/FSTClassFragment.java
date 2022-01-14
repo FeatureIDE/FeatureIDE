@@ -23,8 +23,6 @@ package de.ovgu.featureide.core.fstmodel;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
-
 /**
  * Collection of the members and characteristics of a class representing by one {@link FSTRole}
  *
@@ -59,37 +57,30 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 		return pckg;
 	}
 
-	@Nonnull
 	public HashSet<String> getImports() {
 		return importList;
 	}
 
-	@Nonnull
 	public HashSet<String> getExtends() {
 		return extendList;
 	}
 
-	@Nonnull
 	public HashSet<String> getImplements() {
 		return implementList;
 	}
 
-	@Nonnull
 	public TreeSet<FSTField> getFields() {
 		return fields;
 	}
 
-	@Nonnull
 	public TreeSet<FSTInvariant> getInvariants() {
 		return invariants;
 	}
 
-	@Nonnull
 	public TreeSet<FSTMethod> getMethods() {
 		return methods;
 	}
 
-	@Nonnull
 	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return innerClasses;
 	}

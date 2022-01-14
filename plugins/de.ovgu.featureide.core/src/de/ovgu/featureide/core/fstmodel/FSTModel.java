@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 
@@ -61,7 +59,6 @@ public class FSTModel {
 		features.clear();
 	}
 
-	@Nonnull
 	public Collection<FSTFeature> getFeatures() {
 		return features.values();
 	}

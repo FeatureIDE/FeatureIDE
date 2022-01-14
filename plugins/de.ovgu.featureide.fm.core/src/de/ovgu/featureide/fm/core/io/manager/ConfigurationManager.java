@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.ConfigurationFactoryManager;
@@ -32,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * Responsible to load and save all information for a feature model instance.
+ * Responsible to load and save all information for a feature model configuration instance.
  *
  * @author Sebastian Krieter
  */
@@ -45,7 +43,6 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	public static final int CHANGE_CONFIGURABLE_ATTRIBUTE = 4;
 	public static final int CHANGE_NOTHING = Integer.MAX_VALUE;
 
-	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
 		return getOrCreateInstance(path, ConfigurationManager.class, null);
 	}

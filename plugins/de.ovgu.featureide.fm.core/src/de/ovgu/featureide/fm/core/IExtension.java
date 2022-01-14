@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import javax.annotation.Nonnull;
-
 /**
  * A FeatureIDE extension with its ID.<br> <b>NOTE:</b> All extensions should provide a default/nullary constructor.
  *
@@ -33,7 +31,6 @@ public interface IExtension {
 	/**
 	 * @return the unique ID of this extension.
 	 */
-	@Nonnull
 	String getId();
 
 	/**

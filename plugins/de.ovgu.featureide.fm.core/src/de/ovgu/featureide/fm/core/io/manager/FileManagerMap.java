@@ -24,8 +24,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
@@ -47,7 +45,6 @@ public abstract class FileManagerMap<T> implements IFileManager<T>, IEventManage
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@SuppressWarnings("unchecked")
-	@CheckForNull
 	public static <R extends IFileManager<?>> R getInstance(Path path) throws ClassCastException {
 		final String absolutePath = constructAbsolutePath(path);
 		synchronized (map) {
@@ -78,7 +75,6 @@ public abstract class FileManagerMap<T> implements IFileManager<T>, IEventManage
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@SuppressWarnings("unchecked")
-	@CheckForNull
 	public static final <R extends IFileManager<?>> R removeInstance(Path path) {
 		final String absolutePath = constructAbsolutePath(path);
 		synchronized (map) {

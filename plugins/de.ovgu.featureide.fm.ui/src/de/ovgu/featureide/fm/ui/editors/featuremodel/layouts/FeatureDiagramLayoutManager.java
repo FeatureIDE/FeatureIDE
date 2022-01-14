@@ -93,6 +93,7 @@ abstract public class FeatureDiagramLayoutManager {
 				layoutLegend(featureModel);
 			}
 		}
+
 		newLocations.clear();
 	}
 

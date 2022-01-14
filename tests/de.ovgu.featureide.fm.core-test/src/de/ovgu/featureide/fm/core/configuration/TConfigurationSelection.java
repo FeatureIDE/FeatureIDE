@@ -38,7 +38,11 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Override
 	IFeatureModel loadModel() {
-		return loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
+		return loadXML("<and mandatory=\"true\" name=\"S\">" + //
+			"<feature name=\"A\"/>" + //
+			"<feature name=\"B\"/>" + //
+			"<feature mandatory=\"true\" name=\"C\"/>" + //
+			"</and>", "<rule><not><var>B</var></not></rule>");
 	}
 
 	private void testConfigurationValid(Configuration c, final long expectedValue) {

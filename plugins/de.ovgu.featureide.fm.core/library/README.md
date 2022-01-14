@@ -12,7 +12,9 @@
 
 ### Build
 - Go to the folder `library` of the fm.core plug-in  
-`cd plugins/de.ovgu.featureide.fm.core/library`
+`cd plugins/de.ovgu.featureide.fm.core/library`  
+- If you want to use a custom JDK create a file named `build_jar.properties` with the following content:  
+`bin.javac.path=<path-to-your-javac>`  
 - Compile the source
   - **Using the command line:**
     - Run *ant* with the target *build* (or *clean_build*)  

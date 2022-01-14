@@ -168,10 +168,10 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	protected abstract void updateProperties();
 
 	/**
-	 * Checks whether selection only contains features
+	 * Checks whether selection only contains features and that those features are editable (not external features)
 	 *
 	 * @param selection
-	 * @return boolean indicating whether there are only features selected
+	 * @return boolean indicating whether there are only editable features selected
 	 */
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		for (final Object obj : selection.toArray()) {
@@ -179,15 +179,22 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 				return false;
 			}
 		}
-		return true;
+
+		// check whether the selection includes no feature from an external submodel
+		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+			return true;
+		}
+
+		return false;
+
 	}
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop)
-			|| EventType.FEATURE_HIDDEN_CHANGED.equals(prop) || EventType.FEATURE_COLOR_CHANGED.equals(prop)
-			|| EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)) {
+			|| EventType.FEATURE_HIDDEN_CHANGED.equals(prop) || EventType.FEATURE_COLOR_CHANGED.equals(prop) || EventType.FEATURE_COLLAPSED_CHANGED.equals(prop)
+			|| EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

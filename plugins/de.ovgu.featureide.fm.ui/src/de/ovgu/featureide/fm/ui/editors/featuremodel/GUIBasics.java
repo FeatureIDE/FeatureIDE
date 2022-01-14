@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
-import javax.annotation.CheckReturnValue;
-
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -32,7 +30,6 @@ import org.eclipse.swt.graphics.FontData;
  *
  * @author Thomas Thuem
  */
-@CheckReturnValue
 public class GUIBasics {
 
 	public static Color createColor(int r, int g, int b) {

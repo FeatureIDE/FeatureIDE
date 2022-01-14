@@ -41,8 +41,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.annotation.CheckForNull;
-
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -269,7 +267,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
-	@CheckForNull
 	public String getComposerID(IProjectDescription description) {
 		for (final ICommand command : description.getBuildSpec()) {
 			// TODO Make Extension Point for additional Builders
@@ -611,7 +608,6 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param res given resource
 	 * @return <code>null</code> if there is no associated project, no active instance of this plug-in or resource is the workspace root
 	 */
-	@CheckForNull
 	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
 			getDefault().logWarning(NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA);

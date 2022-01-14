@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -138,7 +136,6 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 		this.recommendationValue = recommendationValue;
 	}
 
-	@Nonnull
 	public Collection<LiteralSet> getOpenClauses() {
 		if (openClauses == null) {
 			return Collections.emptyList();
@@ -157,7 +154,6 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 		openClauses = null;
 	}
 
-	@Nonnull
 	public Set<Integer> getOpenClauseIndexes() {
 		if (openClauses == null) {
 			return Collections.emptySet();

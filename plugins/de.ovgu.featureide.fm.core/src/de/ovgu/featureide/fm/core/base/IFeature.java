@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import javax.annotation.Nonnull;
-
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
@@ -106,7 +104,6 @@ public interface IFeature extends IFeatureModelElement {
 	 *
 	 * @return The features structure properties.
 	 */
-	@Nonnull
 	IFeatureStructure getStructure();
 
 	/**

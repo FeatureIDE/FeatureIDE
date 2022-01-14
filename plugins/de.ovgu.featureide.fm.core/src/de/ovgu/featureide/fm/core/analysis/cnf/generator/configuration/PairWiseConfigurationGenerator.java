@@ -602,6 +602,7 @@ public class PairWiseConfigurationGenerator extends AConfigurationGenerator impl
 
 		config.time = System.nanoTime() - time;
 		addResult(solution);
+		count++;
 		time = System.nanoTime();
 
 		try {

@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
-	private ExtendedFeatureModel featureModel;
+	private IExtendedFeatureModel featureModel;
 	private Configuration config;
 	private FeatureAttributeView view;
 
@@ -57,9 +57,9 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	public Object[] getElements(Object inputElement) {
 		switch (view.getMode()) {
 		case FEATURE_DIAGRAM:
-			if (inputElement instanceof ExtendedFeatureModel) {
+			if (inputElement instanceof IExtendedFeatureModel) {
 				config = null;
-				featureModel = (ExtendedFeatureModel) inputElement;
+				featureModel = (IExtendedFeatureModel) inputElement;
 				List<Object> elements = new ArrayList<Object>();
 				elements.add(view.getMode().getMessage());
 				elements.add(featureModel.getStructure().getRoot().getFeature());
@@ -69,7 +69,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		case CONFIGURATION_EDITOR:
 			if (inputElement instanceof Configuration) {
 				config = (Configuration) inputElement;
-				featureModel = (ExtendedFeatureModel) config.getFeatureModel();
+				featureModel = (IExtendedFeatureModel) config.getFeatureModel();
 				List<Object> elements = new ArrayList<Object>();
 				elements.add(view.getMode().getMessage());
 				elements.add(featureModel.getStructure().getRoot().getFeature());
@@ -91,8 +91,8 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (featureModel == null) {
 			return null;
 		}
-		if (parentElement instanceof ExtendedFeature) {
-			final ExtendedFeature feature = (ExtendedFeature) parentElement;
+		if (parentElement instanceof IExtendedFeature) {
+			final IExtendedFeature feature = (IExtendedFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
 			// Add all attributes
 			featureList.addAll(feature.getAttributes());
@@ -113,8 +113,8 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (featureModel == null) {
 			return null;
 		}
-		if (element instanceof ExtendedFeature) {
-			final ExtendedFeature feature = (ExtendedFeature) element;
+		if (element instanceof IExtendedFeature) {
+			final IExtendedFeature feature = (IExtendedFeature) element;
 			return feature.getStructure().getParent() != null ? feature.getStructure().getParent().getFeature() : null;
 		} else if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getFeature();
@@ -128,8 +128,8 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof ExtendedFeature) {
-			final ExtendedFeature feature = (ExtendedFeature) element;
+		if (element instanceof IExtendedFeature) {
+			final IExtendedFeature feature = (IExtendedFeature) element;
 			return feature.getStructure().hasChildren() || (!feature.getAttributes().isEmpty());
 		}
 		return false;

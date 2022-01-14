@@ -54,7 +54,6 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IManager;
@@ -76,10 +75,10 @@ public class GraphicsExporter {
 
 	public static boolean exportAs(IManager<IFeatureModel> featureModelManager, ScrollingGraphicalViewer diagramEditor) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg", "*.tex" };
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.xml", ".velvet", "*.svg", "*.tex" };
 		fileDialog.setFilterExtensions(extensions);
-		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
-			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg", "LaTeX-Document with TikZ *.tex" };
+		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "XML Export *.xml", "Velvet Export *.velvet",
+			"Scalable Vector Graphics *.svg", "LaTeX-Document with TikZ *.tex" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		final String filePath = fileDialog.open();
@@ -90,8 +89,6 @@ public class GraphicsExporter {
 		final String fileExtension = SimpleFileHandler.getFileExtension(Paths.get(filePath));
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		switch (fileExtension) {
-		case GuidslFormat.FILE_EXTENSION:
-			return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
 		case XmlFeatureModelFormat.FILE_EXTENSION:
 			return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
 		case VelvetFeatureModelFormat.FILE_EXTENSION:

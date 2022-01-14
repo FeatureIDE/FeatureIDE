@@ -7,9 +7,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.Viewer;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.computations.IAttributeComputation;
 import de.ovgu.featureide.fm.attributes.computations.impl.AttributeComputationBundle;
 import de.ovgu.featureide.fm.attributes.computations.impl.ComputationHeader;
@@ -44,11 +44,11 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (fModel instanceof ExtendedFeatureModel) {
+		if (fModel instanceof IExtendedFeatureModel) {
 			List<IFeatureAttribute> attributeList = new ArrayList<>();
 			for (IFeature feat : fModel.getFeatures()) {
-				if (feat instanceof ExtendedFeature) {
-					for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
+				if (feat instanceof IExtendedFeature) {
+					for (IFeatureAttribute att : ((IExtendedFeature) feat).getAttributes()) {
 						if (!containsAttribute(attributeList, att.getName())) {
 							attributeList.add(att);
 						}

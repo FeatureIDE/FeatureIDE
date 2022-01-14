@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * 
@@ -76,7 +77,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		return (ExtendedFeature) oldFeature.getStructure().clone(featureModel).getFeature();
 	}
 
 	@Override
@@ -86,6 +87,11 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
 	public SelectableFeature createSelectableFeature(IFeature feature) {
 		return new ExtendedSelectableFeature(feature);
+	}
+
+	@Override
+	public IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt) {
+		return LongRunningWrapper.runMethod(new ExtendedFeatureModelObfuscator(featureModel, salt));
 	}
 
 }

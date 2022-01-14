@@ -77,13 +77,13 @@ public abstract class AbstractConstraintEditorAction extends AFeatureModelAction
 
 	protected abstract boolean isValidSelection(IStructuredSelection selection);
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isEnabled() {
-		if (selection.toList().stream().filter(o -> o instanceof MultiConstraint).anyMatch(c -> ((MultiConstraint) c).isFromExtern())) {
-			return false;
-		}
 		return super.isEnabled();
+	}
+
+	protected boolean isMultiConstraintFromExtern(IConstraint constraint) {
+		return (constraint != null) && (constraint instanceof MultiConstraint) && ((MultiConstraint) constraint).isFromExtern();
 	}
 
 }

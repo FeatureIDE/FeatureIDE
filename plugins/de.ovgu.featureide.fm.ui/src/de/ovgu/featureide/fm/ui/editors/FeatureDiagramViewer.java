@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
@@ -40,12 +42,14 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.CellEditorActionHandler;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
@@ -126,6 +130,8 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	private FeatureDiagramLayoutManager layoutManager;
 
 	private boolean openConstraintViewDecisionDialogAlreadySpawned = false;
+
+	private CellEditorActionHandler cellEditorActionHandler;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -288,7 +294,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 		layoutManager.layout(graphicalFeatureModel, this);
 
-		if (!graphicalFeatureModel.isLegendHidden() && graphicalFeatureModel.getLayout().hasLegendAutoLayout()) {
+		if (!graphicalFeatureModel.isLegendHidden()) {
 			for (final Object obj : getEditPartRegistry().values()) {
 				if (obj instanceof LegendEditPart) {
 					final LegendFigure fig = ((LegendEditPart) obj).getFigure();
@@ -296,6 +302,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 				}
 			}
 		}
+
 	}
 
 	public void layoutLegendOnIntersect() {
@@ -311,15 +318,22 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	/**
+	 * Deregisters the {@link FeatureEditPart}s with their {@link ConnectionEditPart}s and the {@link ConstraintEditPart}s that belong to the features and
+	 * constraints in <code>graphicalFeatureModel</code>.
+	 */
 	public void deregisterEditParts() {
 		final Map<?, ?> registry = getEditPartRegistry();
 		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
 			registry.remove(f);
-			registry.remove(f.getSourceConnection());
 		}
 		for (final IGraphicalConstraint f : graphicalFeatureModel.getConstraints()) {
 			registry.remove(f);
 		}
+
+		final Set<FeatureConnection> connections = new HashSet<>(registry.size());
+		registry.keySet().stream().filter(object -> object instanceof FeatureConnection).forEach(fc -> connections.add((FeatureConnection) fc));
+		connections.forEach(connection -> registry.remove(connection));
 	}
 
 	public void deregisterEditParts(IGraphicalFeature feature) {
@@ -425,6 +439,14 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public void setZoomManager(ZoomManager zoomManager) {
 		this.zoomManager = zoomManager;
+	}
+
+	public CellEditorActionHandler getCellEditorActionHandler() {
+		return cellEditorActionHandler;
+	}
+
+	public void setCellEditorActionHandler(CellEditorActionHandler cellEditorActionHandler) {
+		this.cellEditorActionHandler = cellEditorActionHandler;
 	}
 
 	public void createMouseHandlers() {

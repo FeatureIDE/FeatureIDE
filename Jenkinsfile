@@ -53,15 +53,6 @@ pipeline {
         	}
         }
 
-        stage ('Verify') {
-        	steps {
-                //starts Xvfb plugin
-                wrap([$class: 'Xvfb', additionalOptions: '', assignedLabels: '', autoDisplayName: true, debug: true, displayNameOffset: 0, installationName: 'default', parallelBuild: true, screen: '']) {
-                    sh 'mvn clean verify'
-                }
-                jacoco exclusionPattern: '**/*Test*.class **/T*.class **/*Test.class **/*Tests.class', sourcePattern: '**/src/de/ovgu'
-        	}
-        }
     }
     post {
         success{
@@ -80,7 +71,7 @@ pipeline {
                     author = author.substring(1, author.length()-1)
                 }
                 def gitBranch = currentBuild.displayName.substring(currentBuild.displayName.indexOf('/')+1, currentBuild.displayName.indexOf('['))
-                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  'thomas.thuem@uni-ulm.de, Sebastian.Krieter@ovgu.de, chico.sundermann@uni-ulm.de, paul.westphal@tu-braunschweig.de, tobias.hess@uni-ulm.de'
+                emailext body: "Result can be found at:'${currentBuild.absoluteUrl}' \n \n${author} \n \nGitbranch: ${gitBranch} ", subject: "Failed Branch: ${gitBranch}", to:  'featureide@uni-ulm.de'
             }
         }
     }    

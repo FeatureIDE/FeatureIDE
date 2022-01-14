@@ -21,7 +21,6 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -52,11 +51,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.prop4j.NodeWriter;
 
-import AST.Problem;
-import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
 import composer.CmdLineInterpreter;
@@ -98,20 +94,9 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import fuji.CompilerWarningException;
-import fuji.CompositionErrorException;
-import fuji.FeatureDirNotFoundException;
-import fuji.Main;
-import fuji.SemanticErrorException;
-import fuji.SyntacticErrorException;
 
 /**
  * Composes files using FeatureHouse.
@@ -125,8 +110,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private static final QualifiedName BUILD_META_PRODUCT =
 		new QualifiedName(FeatureHouseComposer.class.getName() + "#BuildMetaProduct", FeatureHouseComposer.class.getName() + "#BuildMetaProduct");
-	private static final QualifiedName USE_FUJI =
-		new QualifiedName(FeatureHouseComposer.class.getName() + "#Fuji", FeatureHouseComposer.class.getName() + "#Fuji");
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 
@@ -174,7 +157,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	private final ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
-	private IJob<?> fuji;
 
 	private ICompositionErrorListener createCompositionErrorListener() {
 		return new ICompositionErrorListener() {
@@ -394,13 +376,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return;
 		}
 
-		final SignatureSetter signatureSetter = new SignatureSetter();
-
-		/*
-		 * Run fuji parallel to the build process.
-		 */
-		fuji(signatureSetter);
-
 		if (buildMetaProduct()) {
 			if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())) {
 				buildDefaultMetaProduct(configPath, basePath, outputPath);
@@ -423,7 +398,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		}
 		buildFSTModel(configPath, basePath, outputPath);
-		signatureSetter.setFstModel(featureProject.getFSTModel());
 
 		checkContractComposition();
 	}
@@ -710,92 +684,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 	}
 
-	/**
-	 * Starts type checking with fuji in a background job.
-	 */
-	private void fuji(final SignatureSetter signatureSetter) {
-		if (!usesFuji()) {
-			return;
-		}
-		if (fuji != null) {
-			fuji.cancel();
-			try {
-				fuji.join();
-			} catch (final InterruptedException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
-		final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
-
-			@Override
-			public Boolean execute(IMonitor<Boolean> workMonitor) throws Exception {
-				try {
-					final Program ast = runFuji(featureProject);
-					signatureSetter.setFujiParameters(featureProject, ast);
-					return true;
-				} catch (final CompositionException e) {
-					FMCorePlugin.getDefault().logError(e);
-					return false;
-				}
-			}
-		};
-		fuji = LongRunningWrapper.getRunner(job, "Type checking " + featureProject.getProjectName() + " with fuji");
-		fuji.schedule();
-	}
-
-	/**
-	 * Runs the type checker fuji. synchronized because fuji use static fields, and a parallel execution is not possible.
-	 *
-	 * @param featureProject The feature project of the caller.
-	 */
-	private synchronized static Program runFuji(IFeatureProject featureProject) throws CompositionException {
-		final String sourcePath = featureProject.getSourcePath();
-		final String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE,
-			"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", sourcePath };
-		Program ast = null;
-		try {
-			final IFeatureModel fm = featureProject.getFeatureModel();
-			// fm.getAnalyser().setDependencies();
-
-			final Main fuji = new Main(fujiOptions, fm, null);
-
-			ast = fuji.getComposition(fuji).composeAST();
-			ast.setCmd(fuji.getCmd());
-
-			// run type check
-			fuji.typecheckAST(ast);
-
-			// parsing warnings
-			for (final Problem warn : fuji.getWarnings()) {
-				createFujiMarker(warn.line(), warn.message(), warn.fileName(), IMarker.SEVERITY_WARNING, featureProject);
-			}
-
-			// parsing errors
-			for (final Problem err : fuji.getErrors()) {
-				final String message = err.message();
-				if (err.line() == -1) {
-					for (final String fileName : err.fileName().split("[\n]")) {
-						// currently bad workaround @ fuji, but seems to work
-						final String file = fileName.substring(0, fileName.lastIndexOf(":"));
-						final int line = Integer.parseInt(fileName.substring(fileName.lastIndexOf(":") + 1));
-						createFujiMarker(line, message, file, IMarker.SEVERITY_ERROR, featureProject);
-					}
-				} else {
-					createFujiMarker(err.line(), message, err.fileName(), IMarker.SEVERITY_ERROR, featureProject);
-				}
-
-			}
-		} catch (final CompositionErrorException e) {
-			createFujiMarker(-1, e.getMessage(), featureProject.getSourceFolder(), IMarker.SEVERITY_ERROR, featureProject);
-		} catch (
-				IllegalArgumentException | org.apache.commons.cli.ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
-				| SemanticErrorException | CompilerWarningException | UnsupportedModelException e) {
-			LOGGER.logError(e);
-		}
-
-		return ast;
-	}
-
 	public static String getClassPaths(IFeatureProject featureProject) {
 		final StringBuilder classpath = new StringBuilder();
 		final String sep = System.getProperty("path.separator");
@@ -819,41 +707,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		}
 		return classpath.length() > 0 ? classpath.substring(1) : classpath.toString();
-	}
-
-	/**
-	 * Creates an marker for fuji type checks.
-	 *
-	 * @param line The line number
-	 * @param message The message to display
-	 * @param file The file path
-	 * @param severity The severity of the marker (IMarker.SEVERITY_*)
-	 */
-	protected static void createFujiMarker(int line, String message, String file, int severity, IFeatureProject featureProject) {
-		final IFile iFile = featureProject.getProject().getWorkspace().getRoot().findFilesForLocationURI(new File(file).toURI())[0];
-		createFujiMarker(line, message, iFile, severity, featureProject);
-	}
-
-	/**
-	 * Creates an marker for fuji type checks.
-	 *
-	 * @param line The line number
-	 * @param message The message to display
-	 * @param file The file
-	 * @param severity The severity of the marker (IMarker.SEVERITY_*)
-	 */
-	private static void createFujiMarker(int line, String message, IResource file, int severity, IFeatureProject featureProject) {
-		// TODO NEWLine does not work
-		message = message.replace("\n", NEWLINE);
-		try {
-			final IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-			marker.setAttribute(IMarker.LINE_NUMBER, line);
-			marker.setAttribute(IMarker.MESSAGE, "fuji: " + message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
-		}
-
 	}
 
 	/**
@@ -1157,32 +1010,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return false;
-	}
-
-	public void setUseFuji(boolean useFuji) {
-		// This is actually a quick fix until Fuji works on JRE8
-		// Begin of Quick Fix
-		final boolean jre8 = System.getProperty("java.runtime.version").substring(0, 3).equals("1.8");
-
-		if (jre8) {
-			MessageDialog.openInformation(null, "Information", "Fuji Typechecker is currently not supported for Java 1.8 runtime.");
-			setProperty(USE_FUJI, false);
-			return;
-		}
-		// End of Quick Fix
-
-		setProperty(USE_FUJI, useFuji);
-
-		if (useFuji) {
-			final Path currentConfiguration = featureProject.getCurrentConfiguration();
-			if (currentConfiguration != null) {
-				performFullBuild(currentConfiguration);
-			}
-		}
-	}
-
-	public boolean usesFuji() {
-		return getPropertyBoolean(USE_FUJI);
 	}
 
 	public void setBuildMetaProduct(boolean value) {

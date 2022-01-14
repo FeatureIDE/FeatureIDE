@@ -27,14 +27,16 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.attributes.view.operations.ChangeAttributeUnitOperation;
+import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Editing support for the unit column of the {@link FeatureAttributeView}.
  *
  * @author Joshua Sprey
  * @author Chico Sundermann
+ * @author Johannes Herschel
  */
 public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -67,10 +69,10 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setUnit(value.toString());
-		view.getManager().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED, false, ((IFeatureAttribute) element).getFeature()));
-		getViewer().update(element, null);
-		view.repackAllColumns();
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final String newUnit = value.toString();
+		if (!attribute.getUnit().equals(newUnit)) {
+			FeatureModelOperationWrapper.run(new ChangeAttributeUnitOperation((IFeatureModelManager) view.getManager(), attribute, newUnit));
+		}
 	}
-
 }

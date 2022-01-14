@@ -68,11 +68,11 @@ public class DeleteConstraintInViewAction extends AbstractConstraintEditorAction
 	public boolean isValidSelection(IStructuredSelection selection) {
 		if (selection != null) {
 			if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
-				return true;
+				return !isMultiConstraintFromExtern((IConstraint) selection.getFirstElement());
 			} else if ((selection.size() > 1)) {
 				// checking that every selected item is a constraint
 				for (final Object sel : selection.toList()) {
-					if (!(sel instanceof IConstraint)) {
+					if (!(sel instanceof IConstraint) || isMultiConstraintFromExtern((IConstraint) sel)) {
 						return false;
 					}
 				}

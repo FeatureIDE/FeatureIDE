@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -62,7 +63,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	protected String attributeType;
 
-	private Map<ExtendedFeature, Object> savedRecursiveValues = new HashMap<>();
+	private Map<IExtendedFeature, Object> savedRecursiveValues = new HashMap<>();
 
 	/**
 	 * Creates a new feature attribute with the given values.
@@ -81,6 +82,26 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configureable = configureable;
+	}
+
+	/**
+	 * Copy constructor. Constructs a new <code>FeatureAttribute</code> instance from the given attribute and the new corresponding feature.
+	 * 
+	 * @param oldAttribute The attribute to be copied
+	 * @param feature The feature to contain this attribute
+	 */
+	protected FeatureAttribute(FeatureAttribute oldAttribute, IFeature feature) {
+		this.feature = feature;
+		name = oldAttribute.name;
+		unit = oldAttribute.unit;
+		recursive = oldAttribute.recursive;
+		configureable = oldAttribute.configureable;
+		attributeType = oldAttribute.attributeType;
+
+		savedRecursiveValues = new HashMap<>(oldAttribute.savedRecursiveValues.size());
+		for (Map.Entry<IExtendedFeature, Object> e : oldAttribute.savedRecursiveValues.entrySet()) {
+			savedRecursiveValues.put(e.getKey(), e.getValue());
+		}
 	}
 
 	/*
@@ -167,7 +188,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	public void setName(String name) {
 		if (recursive) {
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setName(name);
 					}
@@ -186,7 +207,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		// recursive boolean is enough because otherwise it would not be clickable check this again later
 		if (recursive) {
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setUnit(unit);
 					}
@@ -223,7 +244,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		if (recursive) {
 			Iterable<IFeature> test = getFeature().getFeatureModel().getFeatures();
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setConfigurable(configurable);
 					}
@@ -233,42 +254,49 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.configureable = configurable;
 	}
 
-	/**
-	 * Recursive Method to recursive attributes to all descendants.
-	 */
-	public void recurseAttribute(IFeature feature) {
-		IFeatureAttribute attribute = this;
-		IFeatureAttribute newAttribute = null;
-		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
-			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
-			recurseAttribute(feat);
-			newAttribute = attribute.cloneRecursive(feat);
-			if (savedRecursiveValues.containsKey(feat)) {
-				newAttribute.setValue(savedRecursiveValues.get(feat));
-			}
-			if (!feat.isContainingAttribute(newAttribute)) {
-				feat.addAttribute(newAttribute);
-			}
-		}
+	@Override
+	public void addRecursiveAttributes() {
+		addRecursiveAttributes((IExtendedFeature) getFeature());
 	}
 
 	/**
-	 * Removes the recursive attribute of the descendants
+	 * Recursive helper method to add this attribute recursively to all descendants.
 	 * 
-	 * @param feature Holding feature
+	 * @param feature The currently traversed feature
 	 */
-	public void deleteRecursiveAttributes(IFeature feature) {
-		IFeatureAttribute attribute = this;
-		for (IFeature feat : feature.getFeatureModel().getFeatures()) {
-			if (!feat.equals(feature)) {
-				for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
-					if (att.getName().equals(attribute.getName())) {
-						saveRecursiveValue((ExtendedFeature) feat, att.getValue());
-						((ExtendedFeature) feat).removeAttribute(att);
-						break;
-					}
-				}
+	private void addRecursiveAttributes(IExtendedFeature feature) {
+		for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
+			IExtendedFeature child = (IExtendedFeature) childStructure.getFeature();
+			IFeatureAttribute newAttribute = this.cloneRecursive(child);
+			if (savedRecursiveValues.containsKey(child)) {
+				newAttribute.setValue(savedRecursiveValues.get(child));
 			}
+			if (!child.isContainingAttribute(newAttribute)) {
+				child.addAttribute(newAttribute);
+			}
+			addRecursiveAttributes(child);
+		}
+	}
+
+	@Override
+	public void deleteRecursiveAttributes() {
+		deleteRecursiveAttributes((IExtendedFeature) getFeature());
+	}
+
+	/**
+	 * Recursive helper method to remove this recursive attribute from the descendants.
+	 * 
+	 * @param feature The currently traversed feature
+	 */
+	private void deleteRecursiveAttributes(IExtendedFeature feature) {
+		for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
+			IExtendedFeature child = (IExtendedFeature) childStructure.getFeature();
+			IFeatureAttribute att = child.getAttribute(getName());
+			if (att != null) {
+				saveRecursiveValue(child, att.getValue());
+				child.removeAttribute(att);
+			}
+			deleteRecursiveAttributes(child);
 		}
 	}
 
@@ -276,7 +304,13 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @return true, if attribute is head of recursive attributes.
 	 */
 	public boolean isHeadOfRecursiveAttribute() {
-		return getFeature().getStructure().isRoot() || (!((ExtendedFeature) getFeature().getStructure().getParent().getFeature()).isContainingAttribute(this));
+		if (getFeature().getStructure().isRoot()) {
+			return true;
+		} else {
+			// Check parent feature/attribute if not root
+			IFeatureAttribute parentAttribute = ((IExtendedFeature) getFeature().getStructure().getParent().getFeature()).getAttribute(getName());
+			return parentAttribute == null || !parentAttribute.isRecursive();
+		}
 	}
 
 	/*
@@ -306,11 +340,11 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		return builder.toString();
 	}
 
-	public void saveRecursiveValue(ExtendedFeature feature, Object value) {
+	public void saveRecursiveValue(IExtendedFeature feature, Object value) {
 		savedRecursiveValues.put(feature, value);
 	}
 
-	public Map<ExtendedFeature, Object> getSavedRecursiveValues() {
+	public Map<IExtendedFeature, Object> getSavedRecursiveValues() {
 		return savedRecursiveValues;
 	}
 

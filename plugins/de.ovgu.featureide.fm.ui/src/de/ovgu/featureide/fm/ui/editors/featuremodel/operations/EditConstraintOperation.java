@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
 
+import java.util.Set;
+
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -44,17 +46,19 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private final int constraintIndex;
 
 	/**
-	 * This wrapper is used to wrap both fields (node and description) of a constraint It is needed because the FeatureIDEEvent constructor expects only one set
-	 * of objects (oldState and newState) This way it is possible to cache the state of two different fields.
+	 * This wrapper is used to wrap both fields (node and description) of a constraint. It is needed because the FeatureIDEEvent constructor expects only one
+	 * set of objects (oldState and newState). This way it is possible to cache the state of two different fields.
 	 */
 	public static class ConstraintDescription {
 
 		private final Node node;
 		private final String description;
+		public final Set<String> tags;
 
-		public ConstraintDescription(Node node, String description) {
+		public ConstraintDescription(Node node, String description, Set<String> tags) {
 			this.node = node;
 			this.description = description;
+			this.tags = tags;
 		}
 
 		public Node getNode() {
@@ -69,10 +73,10 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private final ConstraintDescription newWrapper;
 	private final ConstraintDescription oldWrapper;
 
-	public EditConstraintOperation(IFeatureModelManager featureModelManager, IConstraint constraint, Node propNode, String description) {
+	public EditConstraintOperation(IFeatureModelManager featureModelManager, IConstraint constraint, Node propNode, String description, Set<String> tags) {
 		super(featureModelManager, EDIT_CONSTRAINT);
-		oldWrapper = new ConstraintDescription(constraint.getNode(), constraint.getDescription());
-		newWrapper = new ConstraintDescription(propNode, description);
+		oldWrapper = new ConstraintDescription(constraint.getNode(), constraint.getDescription(), constraint.getTags());
+		newWrapper = new ConstraintDescription(propNode, description, tags);
 		constraintIndex = featureModelManager.getSnapshot().getConstraintIndex(constraint);
 	}
 
@@ -81,14 +85,16 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
 		constraint.setNode(newWrapper.getNode());
 		constraint.setDescription(newWrapper.getDescription());
+		constraint.setTags(newWrapper.tags);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldWrapper, newWrapper);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
 		final IConstraint constraint = featureModel.getConstraints().get(constraintIndex);
-		constraint.setNode(newWrapper.getNode());
-		constraint.setDescription(newWrapper.getDescription());
+		constraint.setNode(oldWrapper.getNode());
+		constraint.setDescription(oldWrapper.getDescription());
+		constraint.setTags(oldWrapper.tags);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);
 	}
 

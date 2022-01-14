@@ -38,6 +38,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.ide.IDEActionFactory;
+import org.eclipse.ui.part.CellEditorActionHandler;
 import org.eclipse.ui.part.EditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -58,9 +59,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateFeatureBelowAction.ID, CreateFeatureAboveAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
-		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-		ActionFactory.SELECT_ALL.getId(), ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT, };
+	private static final String[] DIAGRAM_ACTION_IDS =
+		{ CreateFeatureBelowAction.ID, CreateFeatureAboveAction.ID, CalculateDependencyAction.ID, MandatoryAction.ID, AndAction.ID, OrAction.ID,
+			AlternativeAction.ID, ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT, };
 
 	private static final String[] TEXTEDITOR_ACTION_IDS =
 		{ ActionFactory.DELETE.getId(), ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(),
@@ -77,6 +78,14 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 		for (int i = 0; i < DIAGRAM_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(DIAGRAM_ACTION_IDS[i], editor.getDiagramAction(DIAGRAM_ACTION_IDS[i]));
 		}
+
+		// Register actions that need to be redirected if a cell editor (used for renaming a feature) is active
+		final CellEditorActionHandler ceah = new CellEditorActionHandler(actionBars);
+		ceah.setUndoAction(editor.getDiagramAction(ActionFactory.UNDO.getId()));
+		ceah.setRedoAction(editor.getDiagramAction(ActionFactory.REDO.getId()));
+		ceah.setDeleteAction(editor.getDiagramAction(DeleteAction.ID));
+		ceah.setSelectAllAction(editor.getDiagramAction(ActionFactory.SELECT_ALL.getId()));
+		editor.diagramEditor.getViewer().setCellEditorActionHandler(ceah);
 	}
 
 	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {

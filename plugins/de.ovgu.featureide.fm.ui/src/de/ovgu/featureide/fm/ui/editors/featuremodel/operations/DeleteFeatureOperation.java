@@ -144,13 +144,18 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 
-			// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
-			if ((oldParent != null) && or) {
-				oldParent.getStructure().changeToOr();
-			} else if ((oldParent != null) && alternative) {
-				oldParent.getStructure().changeToAlternative();
+			// When deleting a child the parent's group type may be changed (to and when leaving one sibling behind, to the child's group type when leaving no
+			// siblings behind). Reverse to old group type.
+			if (oldParent != null) {
+				if (or) {
+					oldParent.getStructure().changeToOr();
+				} else if (alternative) {
+					oldParent.getStructure().changeToAlternative();
+				} else {
+					oldParent.getStructure().changeToAnd();
+				}
 			}
-			
+
 			return new FeatureModelOperationEvent(ID, EventType.FEATURE_ADD, featureModel, oldParent, feature);
 		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);

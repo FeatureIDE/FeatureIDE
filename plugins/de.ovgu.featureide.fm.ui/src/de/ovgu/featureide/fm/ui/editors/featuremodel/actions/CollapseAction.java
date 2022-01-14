@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
  * @author Chico Sundermann
  * @author Paul Westphal
  */
-public class CollapseAction extends MultipleSelectionAction {
+public class CollapseAction extends MultipleSelectionAction implements ActionAllowedInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.collapse";
 	private final IGraphicalFeatureModel graphicalFeatureModel;

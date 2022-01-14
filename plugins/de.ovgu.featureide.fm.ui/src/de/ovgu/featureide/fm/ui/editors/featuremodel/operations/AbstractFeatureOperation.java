@@ -42,6 +42,11 @@ public class AbstractFeatureOperation extends AbstractFeatureModelOperation {
 
 	private final String featureName;
 
+	/**
+	 * Whether the feature was implicit before the operation.
+	 */
+	private boolean implicitFeature = false;
+
 	public AbstractFeatureOperation(String featureName, IFeatureModelManager featureModelManager) {
 		super(featureModelManager, ABSTRACT_OPERATION);
 		this.featureName = featureName;
@@ -50,15 +55,23 @@ public class AbstractFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		final IFeature feature = featureModel.getFeature(featureName);
-		final boolean oldValue = feature.getStructure().isAbstract();
-		final boolean newValue = !oldValue;
-		feature.getStructure().setAbstract(newValue);
-		return new FeatureModelOperationEvent(ID, EventType.ATTRIBUTE_CHANGED, feature, oldValue, newValue);
+		implicitFeature = feature.getProperty().isImplicit();
+		feature.getProperty().setImplicit(false);
+		return changeAbstract(feature);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		return operation(featureModel);
+		final IFeature feature = featureModel.getFeature(featureName);
+		feature.getProperty().setImplicit(implicitFeature);
+		return changeAbstract(feature);
+	}
+
+	private FeatureIDEEvent changeAbstract(IFeature feature) {
+		final boolean oldValue = feature.getStructure().isAbstract();
+		final boolean newValue = !oldValue;
+		feature.getStructure().setAbstract(newValue);
+		return new FeatureModelOperationEvent(ID, EventType.ATTRIBUTE_CHANGED, feature, oldValue, newValue);
 	}
 
 	@Override

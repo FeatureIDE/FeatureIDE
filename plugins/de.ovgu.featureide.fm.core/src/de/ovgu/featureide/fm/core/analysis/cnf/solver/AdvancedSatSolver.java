@@ -28,7 +28,6 @@ import org.sat4j.core.VecInt;
 import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.RSATPhaseSelectionStrategy;
-import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
@@ -269,7 +268,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 				solver.setOrder(new VarOrderHeap2(new PositiveLiteralSelectionStrategy(), order));
 				break;
 			case RANDOM:
-				solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
+				solver.setOrder(new VarOrderHeap2(new RandomSelectionStrategy(), order));
 				break;
 			case FIXED:
 			case UNIFORM_RANDOM:

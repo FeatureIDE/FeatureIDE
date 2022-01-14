@@ -24,11 +24,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_DESCRIP
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureDescriptionOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
 /**
  * Opens dialog to change the description of a feature
@@ -54,12 +54,10 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 		final ChangeFeatureDescriptionDialog dialog =
 			new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_ + feature.getName() + "'", description);
 		dialog.open();
-		final String descriptemp = dialog.getValue();
+		final String descriptemp = dialog.getValue().trim();
 
-		// TODO implement as operation
-		if (!description.equals(descriptemp.trim())) {
-			feature.getProperty().setDescription(descriptemp);
-			feature.getFeatureModel().fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
+		if (!description.equals(descriptemp)) {
+			FeatureModelOperationWrapper.run(new ChangeFeatureDescriptionOperation(featureModelManager, feature.getName(), description, descriptemp));
 		}
 	}
 

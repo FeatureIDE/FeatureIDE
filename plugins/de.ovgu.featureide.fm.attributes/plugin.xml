@@ -18,6 +18,11 @@
             id="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
             name="XmlExtendedFeatureModelFormat">
       </fmFormat>
+      <fmFormat
+            class="de.ovgu.featureide.fm.attributes.format.UVLExtendedFeatureModelFormat"
+            id="de.ovgu.featureide.fm.attributes.format.UVLExtendedFeatureModelFormat"
+            name="UVLExtendedFeatureModelFormat">
+      </fmFormat>
    </extension>
    <extension
          point="de.ovgu.featureide.fm.core.FMFactory">
@@ -25,6 +30,11 @@
             class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
             id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
             name="ExtendedFeatureModelFactory">
+      </fmFactory>
+      <fmFactory
+            class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory"
+            id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedMultiFeatureModelFactory"
+            name="ExtendedMultiFeatureModelFactory">
       </fmFactory>
    </extension>
    <extension
@@ -121,5 +131,17 @@
             name="Extended Feature Modeling"
             nature="FeatureIDE_Core.FeatureModelingNature">
       </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.ui.views">
+      <viewid
+            id="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView">
+      </viewid>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.FMEditorListener">
+      <listener
+            class="de.ovgu.featureide.fm.attributes.view.FeatureAttributeViewAdder">
+      </listener>
    </extension>
 </plugin>

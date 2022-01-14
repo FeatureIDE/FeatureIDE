@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="de.ovgu.featureide.ui.views" name="Views" schema="schema/de.ovgu.featureide.ui.views.exsd"/>
 	<extension
 			point="org.eclipse.ui.newWizards">
 		<wizard
@@ -121,7 +122,7 @@
 	</extension>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
-		<content-type base-type="org.eclipse.core.runtime.xml"
+		<content-type base-type="org.eclipse.jdt.core.javaSource"
 				file-extensions="jak"
 				id="de.ovgu.featureide.contenttype.jak"
 				name="Jak (for FeatureIDE projects)"
@@ -149,20 +150,6 @@
 		</content-type>
 	</extension>
 
-	<extension
-			point="org.eclipse.ui.editors">
-		<editor
-				class="de.ovgu.featureide.ui.editors.JavaEditor"
-				contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-				default="true"
-				icon="icons/JakFileIcon.png"
-				id="de.ovgu.featureide.ui.editors.JakEditor"
-				name="Jak Editor">
-			<contentTypeBinding
-					contentTypeId="de.ovgu.featureide.contenttype.jak">
-			</contentTypeBinding>
-		</editor>
-	</extension>
 	<extension
 			point="org.eclipse.help.contexts">
 		<contexts
@@ -1208,6 +1195,19 @@
          </with>
       </visibleWhen>
    </command>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.exportAs"
+         icon="icons/export_icon.gif"
+         id="de.ovgu.featureide.fm.ui.actions.exportAs"
+         label="Export As"
+         style="push">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
+         </reference>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 
 		<menuContribution
@@ -1328,6 +1328,10 @@
         id="de.ovgu.featureide.ui.commands.buildPartialProject"
         name="Build Partial Project">
   </command>
+  <command
+        id="de.ovgu.featureide.ui.commands.exportAs"
+        name="Export As">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1366,6 +1370,10 @@
   <handler
         class="de.ovgu.featureide.ui.handlers.BuildPartialProjectHandler"
         commandId="de.ovgu.featureide.ui.commands.buildPartialProject">
+  </handler>
+  <handler
+        class="de.ovgu.featureide.ui.handlers.ExportAsHandler"
+        commandId="de.ovgu.featureide.ui.commands.exportAs">
   </handler>
 	</extension>
 	<extension

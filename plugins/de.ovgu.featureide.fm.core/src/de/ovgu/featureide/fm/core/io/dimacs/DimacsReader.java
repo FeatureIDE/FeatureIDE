@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
-
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -98,7 +96,6 @@ public class DimacsReader {
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
-	@Nonnull
 	public Node read(Reader in) throws ParseException, IOException {
 		indexVariables.clear();
 		variableCount = -1;
@@ -145,7 +142,6 @@ public class DimacsReader {
 	 * @throws IOException if the reader encounters a problem.
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 */
-	@Nonnull
 	public Node read(String in) throws ParseException, IOException {
 		return read(new StringReader(in));
 	}

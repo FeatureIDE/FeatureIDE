@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.CheckForNull;
-
 import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
 import de.ovgu.featureide.fm.core.AnalysesCollection.StringToFeature;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
@@ -521,7 +519,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param context another feature model that is used as reference for the explanations
 	 * @return an explanation why the given feature model element is defect or null if it cannot be explained
 	 */
-	@CheckForNull
 	public Explanation<?> getExplanation(IFeatureModelElement modelElement, FeatureModelFormula context) {
 		if (modelElement instanceof IFeature) {
 			return getFeatureExplanation((IFeature) modelElement, context);
