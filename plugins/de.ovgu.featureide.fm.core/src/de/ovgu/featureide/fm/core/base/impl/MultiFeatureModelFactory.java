@@ -72,7 +72,7 @@ public class MultiFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public MultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (MultiFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		return (MultiFeature) oldFeature.getStructure().clone(featureModel).getFeature();
 	}
 
 	@Override

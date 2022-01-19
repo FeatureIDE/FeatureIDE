@@ -77,7 +77,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		return (ExtendedFeature) oldFeature.getStructure().clone(featureModel).getFeature();
 	}
 
 	@Override
