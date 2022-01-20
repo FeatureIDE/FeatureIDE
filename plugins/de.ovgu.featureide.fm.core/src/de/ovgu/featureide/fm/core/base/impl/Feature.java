@@ -95,8 +95,23 @@ public class Feature extends AFeature {
 	 *
 	 * @since 3.0
 	 */
-	protected Feature(Feature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatrureStructure) {
+	public Feature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel, copyId, newFeatrureStructure);
+	}
+
+	/**
+	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, and a feature model
+	 * <code>featureModel</code>.
+	 *
+	 * The feature properties and feature structure are copied.
+	 *
+	 * @param oldFeature The feature to be copied. Has to be non-null.
+	 * @param featureModel The feature model of the new feature. Has to be non-null if <code>copyId</code> is <code>false</code> to provide the id of the new
+	 *        feature.
+	 * @param copyId If <code>true</code> the id of the old feature is kept. Otherwise a new id is assigned to the new feature.
+	 */
+	public Feature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
 	}
 
 	/**

@@ -83,16 +83,35 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	 * @param featureModel is used to set the new feature's feature model if <code>featureModel</code> is non-null. If <code>featureModel</code> is <b>null</b>,
 	 *        a reference to the feature model of <code>oldFeature</code> will be used.
 	 * @param copyId If <code>true</code> the id of the old feature is kept. Otherwise a new id is assigned to the new feature.
-	 * @param newFeatrureStructure is used to set the new feature's feature structure if <code>newFeatrureStructure</code> is non-null. If
+	 * @param newFeatureStructure is used to set the new feature's feature structure if <code>newFeatrureStructure</code> is non-null. If
 	 *        <code>newFeatrureStructure</code> is <b>null</b>, a reference to the feature structure <code>oldFeature</code> will be used.
 	 *
 	 * @since 3.0
 	 */
-	protected AFeature(AFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatrureStructure) {
+	public AFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatureStructure) {
 		super(oldFeature, featureModel, copyId);
 
-		property = oldFeature.property.clone(this);
-		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
+		property = oldFeature.getProperty().clone(this);
+		structure = newFeatureStructure != null ? newFeatureStructure : oldFeature.getStructure();
+		propertyContainer = clonePropertyContainer(oldFeature);
+	}
+
+	/**
+	 * <b>Copy constructor</b>. Constructs a new instance of <code>AFeature</code> given another feature <code>oldFeature</code>, and a feature model
+	 * <code>featureModel</code>.
+	 *
+	 * The feature properties and feature structure are copied.
+	 *
+	 * @param oldFeature The feature to be copied. Has to be non-null.
+	 * @param featureModel The feature model of the new feature. Has to be non-null if <code>copyId</code> is <code>false</code> to provide the id of the new
+	 *        feature.
+	 * @param copyId If <code>true</code> the id of the old feature is kept. Otherwise a new id is assigned to the new feature.
+	 */
+	public AFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
+
+		property = oldFeature.getProperty().clone(this);
+		structure = oldFeature.getStructure().clone(this);
 		propertyContainer = clonePropertyContainer(oldFeature);
 	}
 
@@ -119,8 +138,8 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		return new MapPropertyContainer();
 	}
 
-	protected IPropertyContainer clonePropertyContainer(AFeature other) {
-		return new MapPropertyContainer(other.propertyContainer);
+	protected IPropertyContainer clonePropertyContainer(IFeature other) {
+		return new MapPropertyContainer(other.getCustomProperties());
 	}
 
 	protected IFeatureProperty createProperty() {

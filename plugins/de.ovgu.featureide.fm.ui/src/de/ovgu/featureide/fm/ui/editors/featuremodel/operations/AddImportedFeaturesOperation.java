@@ -30,9 +30,11 @@ import java.util.Set;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.RootFeatureSet;
@@ -83,11 +85,13 @@ public class AddImportedFeaturesOperation extends AbstractFeatureModelOperation 
 
 		final IFeature parentFeature = featureModel.getFeature(parentFeatureName);
 		if (parentFeature != null) {
+			final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 			for (final Map.Entry<MultiFeatureModel.UsedModel, Set<RootFeatureSet>> entry : importedFeatures.entrySet()) {
+				final String featurePrefix = entry.getKey().getVarName() + ".";
 				for (final RootFeatureSet rs : entry.getValue()) {
 					// Add features
 					for (final IFeature feature : rs.getRootFeatures()) {
-						final IFeatureStructure clonedFeature = cloneFeature(feature.getStructure(), entry.getKey(), featureModel);
+						final IFeatureStructure clonedFeature = cloneFeature(feature.getStructure(), featurePrefix, featureModel, factory);
 						clonedFeature.setMandatory(false); // Necessary for models with multiple root features
 						clonedImportedFeatureIds.add(clonedFeature.getFeature().getInternalId());
 						parentFeature.getStructure().addChild(clonedFeature);
@@ -95,7 +99,7 @@ public class AddImportedFeaturesOperation extends AbstractFeatureModelOperation 
 
 					// Add constraints
 					for (final IConstraint constraint : rs.getConstraints()) {
-						final IConstraint clonedConstraint = cloneConstraint(constraint, entry.getKey(), featureModel);
+						final IConstraint clonedConstraint = cloneConstraint(constraint, featurePrefix, featureModel, factory);
 						clonedImportedConstraintIds.add(clonedConstraint.getInternalId());
 						featureModel.addConstraint(clonedConstraint);
 					}
@@ -133,36 +137,38 @@ public class AddImportedFeaturesOperation extends AbstractFeatureModelOperation 
 	 * Clones the feature tree given by <code>featureStructure</code> to be used in the given feature model.
 	 *
 	 * @param featureStructure Root of the subtree to be cloned
-	 * @param importedModel The imported model
+	 * @param featurePrefix The prefix for the imported features
 	 * @param featureModel The feature model to contain the cloned subtree
+	 * @param factory The feature model factory of <code>featureModel</code>
 	 * @return The cloned subtree
 	 */
-	private IFeatureStructure cloneFeature(IFeatureStructure featureStructure, MultiFeatureModel.UsedModel importedModel, IFeatureModel featureModel) {
-		final IFeatureStructure clonedStructure = featureStructure.clone(featureModel, false);
-		clonedStructure.getFeature().setName(importedModel.getVarName() + "." + clonedStructure.getFeature().getName());
-		((MultiFeature) clonedStructure.getFeature()).setType(MultiFeature.TYPE_INTERFACE);
+	private IFeatureStructure cloneFeature(IFeatureStructure featureStructure, String featurePrefix, IFeatureModel featureModel, IFeatureModelFactory factory) {
+		final IFeature clonedFeature = factory.copyFeature(featureModel, featureStructure.getFeature(), false);
+		clonedFeature.setName(featurePrefix + clonedFeature.getName());
+		((MultiFeature) clonedFeature).setType(MultiFeature.TYPE_INTERFACE);
 
-		featureModel.addFeature(clonedStructure.getFeature());
+		featureModel.addFeature(clonedFeature);
 
 		for (final IFeatureStructure child : featureStructure.getChildren()) {
-			clonedStructure.addChild(cloneFeature(child, importedModel, featureModel));
+			clonedFeature.getStructure().addChild(cloneFeature(child, featurePrefix, featureModel, factory));
 		}
 
-		return clonedStructure;
+		return clonedFeature.getStructure();
 	}
 
 	/**
 	 * Clones the given constraint to be used in the given feature model.
 	 *
 	 * @param constraint The constraint to be cloned
-	 * @param importedModel The imported model
+	 * @param featurePrefix The prefix for the features of the imported constraint
 	 * @param featureModel The feature model to contain the cloned constraint
+	 * @param factory The feature model factory of <code>featureModel</code>
 	 * @return The cloned constraint
 	 */
-	private IConstraint cloneConstraint(IConstraint constraint, MultiFeatureModel.UsedModel importedModel, IFeatureModel featureModel) {
+	private IConstraint cloneConstraint(IConstraint constraint, String featurePrefix, IFeatureModel featureModel, IFeatureModelFactory factory) {
 		// Clone first time so feature name changes are not applied to original constraint
-		final IConstraint clonedConstraint = constraint.clone(featureModel, false);
-		clonedConstraint.getNode().modifyFeatureNames(featureName -> importedModel.getVarName() + "." + featureName);
+		final IConstraint clonedConstraint = factory.copyConstraint(featureModel, constraint, false);
+		clonedConstraint.getNode().modifyFeatureNames(featureName -> featurePrefix + featureName);
 		// Clone second time to update feature references of the constraint
 		return clonedConstraint.clone(featureModel);
 	}

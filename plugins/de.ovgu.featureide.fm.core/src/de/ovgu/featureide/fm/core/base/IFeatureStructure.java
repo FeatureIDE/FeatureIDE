@@ -150,4 +150,6 @@ public interface IFeatureStructure {
 	default IFeatureStructure clone(IFeatureModel newFeatureModel) {
 		return clone(newFeatureModel, true);
 	}
+
+	IFeatureStructure clone(IFeature correspondingFeature);
 }

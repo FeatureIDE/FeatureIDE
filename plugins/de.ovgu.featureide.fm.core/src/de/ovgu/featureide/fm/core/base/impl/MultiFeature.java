@@ -42,11 +42,28 @@ public class MultiFeature extends Feature {
 		super(featureModel, name);
 	}
 
-	public MultiFeature(MultiFeature extendedFeature, IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
-		super(extendedFeature, newFeatureModel, copyId, newStructure);
-		type = extendedFeature.type;
-		externalModelName = extendedFeature.externalModelName;
-		newDefined = extendedFeature.newDefined;
+	public MultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newStructure) {
+		super(oldFeature, featureModel, copyId, newStructure);
+
+		if (oldFeature instanceof MultiFeature) {
+			// Copy properties of MultiFeature if available
+			final MultiFeature feature = (MultiFeature) oldFeature;
+			type = feature.type;
+			externalModelName = feature.externalModelName;
+			newDefined = feature.newDefined;
+		}
+	}
+
+	public MultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
+
+		if (oldFeature instanceof MultiFeature) {
+			// Copy properties of MultiFeature if available
+			final MultiFeature feature = (MultiFeature) oldFeature;
+			type = feature.type;
+			externalModelName = feature.externalModelName;
+			newDefined = feature.newDefined;
+		}
 	}
 
 	@Override

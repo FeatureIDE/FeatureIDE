@@ -44,10 +44,10 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	protected final IFeatureModel featureModel;
 	protected final IEventManager eventManager = new DefaultEventManager();
 
-	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel, boolean copyId) {
-		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
-		id = copyId ? oldElement.id : featureModel.getNextElementId();
-		name = (oldElement.name == null) ? null : new String(oldElement.name);
+	public AFeatureModelElement(IFeatureModelElement oldElement, IFeatureModel featureModel, boolean copyId) {
+		this.featureModel = featureModel != null ? featureModel : oldElement.getFeatureModel();
+		id = copyId ? oldElement.getInternalId() : featureModel.getNextElementId();
+		name = (oldElement.getName() == null) ? null : new String(oldElement.getName());
 	}
 
 	public AFeatureModelElement(IFeatureModel featureModel) {

@@ -68,13 +68,13 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+	public Feature copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId) {
+		return new Feature(oldFeature, featureModel, copyId);
 	}
 
 	@Override
-	public IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-		return oldConstraint.clone(featureModel);
+	public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId) {
+		return new Constraint(oldConstraint, featureModel, copyId);
 	}
 
 	@Override

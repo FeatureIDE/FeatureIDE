@@ -42,13 +42,29 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 	protected List<IFeatureAttribute> attributes;
 
-	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatrureStructure) {
-		super(copyFeature, featureModel, copyId, newFeatrureStructure);
+	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatureStructure) {
+		super(oldFeature, featureModel, copyId, newFeatureStructure);
 
-		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
-		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
-			attributes.add(attribute.cloneAtt(this));
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
+		}
+	}
+
+	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
+
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
 		}
 	}
 

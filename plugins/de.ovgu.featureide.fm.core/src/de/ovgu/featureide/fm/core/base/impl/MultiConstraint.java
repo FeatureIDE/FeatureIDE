@@ -37,9 +37,12 @@ public class MultiConstraint extends Constraint {
 		super(featureModel, propNode);
 	}
 
-	public MultiConstraint(MultiConstraint extendedConstraint, IFeatureModel newFeatureModel, boolean copyId) {
-		super(extendedConstraint, newFeatureModel, copyId);
-		type = extendedConstraint.type;
+	public MultiConstraint(IConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
+		super(oldConstraint, featureModel, copyId);
+		if (oldConstraint instanceof MultiConstraint) {
+			final MultiConstraint constraint = (MultiConstraint) oldConstraint;
+			type = constraint.type;
+		}
 	}
 
 	public int getType() {

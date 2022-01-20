@@ -71,13 +71,13 @@ public class MultiFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public MultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (MultiFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+	public MultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId) {
+		return new MultiFeature(oldFeature, featureModel, copyId);
 	}
 
 	@Override
-	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-		return (MultiConstraint) oldConstraint.clone(featureModel);
+	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId) {
+		return new MultiConstraint(oldConstraint, featureModel, copyId);
 	}
 
 	@Override

@@ -41,8 +41,46 @@ public interface IFeatureModelFactory extends IFactory<IFeatureModel> {
 
 	IFeatureModel createObfuscatedFeatureModel(IFeatureModel featureModel, String salt);
 
-	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature);
+	/**
+	 * Creates a copy of a feature with the feature type of the factory.
+	 *
+	 * @param featureModel The feature model of the new feature
+	 * @param oldFeature The feature to be copied
+	 * @param copyId If <code>true</code> the id of the old feature is kept. Otherwise a new id is assigned to the new feature.
+	 * @return A copy of the feature <code>oldFeature</code>, with the feature type of the factory.
+	 */
+	IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId);
 
-	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint);
+	/**
+	 * Default implementation of {@link IFeatureModelFactory#copyFeature(IFeatureModel, IFeature, boolean)} where <code>copyId</code> is <code>true</code>.
+	 *
+	 * @param featureModel The feature model of the new feature
+	 * @param oldFeature The feature to be copied
+	 * @return A copy of the feature <code>oldFeature</code>, with the feature type of the factory.
+	 */
+	default IFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
+		return copyFeature(featureModel, oldFeature, true);
+	}
 
+	/**
+	 * Creates a copy of a constraint with the constraint type of the factory.
+	 *
+	 * @param featureModel The feature model of the new constraint
+	 * @param oldConstraint The constraint to be copied
+	 * @param copyId If <code>true</code> the id of the old constraint is kept. Otherwise a new id is assigned to the new constraint.
+	 * @return A copy of the constraint <code>oldConstraint</code>, with the constraint type of the factory.
+	 */
+	IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId);
+
+	/**
+	 * Default implementation of {@link IFeatureModelFactory#copyConstraint(IFeatureModel, IConstraint, boolean)} where <code>copyId</code> is
+	 * <code>true</code>.
+	 *
+	 * @param featureModel The feature model of the new constraint
+	 * @param oldConstraint The constraint to be copied
+	 * @return A copy of the constraint <code>oldConstraint</code>, with the constraint type of the factory.
+	 */
+	default IConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
+		return copyConstraint(featureModel, oldConstraint, true);
+	}
 }

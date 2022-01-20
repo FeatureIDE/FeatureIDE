@@ -82,6 +82,16 @@ public class FeatureStructure implements IFeatureStructure {
 		}
 	}
 
+	public FeatureStructure(FeatureStructure oldStructure, IFeature correspondingFeature) {
+		this.correspondingFeature = correspondingFeature;
+
+		mandatory = oldStructure.mandatory;
+		concrete = oldStructure.concrete;
+		and = oldStructure.and;
+		multiple = oldStructure.multiple;
+		hidden = oldStructure.hidden;
+	}
+
 	public FeatureStructure(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 
@@ -148,6 +158,11 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public IFeatureStructure clone(IFeatureModel newFeatureModel, boolean copyId) {
 		return new FeatureStructure(this, newFeatureModel, copyId, false);
+	}
+
+	@Override
+	public IFeatureStructure clone(IFeature correspondingFeature) {
+		return new FeatureStructure(this, correspondingFeature);
 	}
 
 	protected void fireAttributeChanged() {

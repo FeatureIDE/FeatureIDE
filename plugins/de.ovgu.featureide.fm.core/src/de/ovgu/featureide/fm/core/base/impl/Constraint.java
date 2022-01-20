@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class Constraint extends AConstraint {
 
-	protected Constraint(Constraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
+	public Constraint(IConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
 		super(oldConstraint, featureModel, copyId);
 	}
 
