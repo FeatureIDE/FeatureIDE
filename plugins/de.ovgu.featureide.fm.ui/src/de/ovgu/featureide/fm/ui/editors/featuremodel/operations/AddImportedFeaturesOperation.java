@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.RootFeatureSet;
@@ -169,6 +170,7 @@ public class AddImportedFeaturesOperation extends AbstractFeatureModelOperation 
 		// Clone first time so feature name changes are not applied to original constraint
 		final IConstraint clonedConstraint = factory.copyConstraint(featureModel, constraint, false);
 		clonedConstraint.getNode().modifyFeatureNames(featureName -> featurePrefix + featureName);
+		((MultiConstraint) clonedConstraint).setType(MultiFeature.TYPE_INTERFACE);
 		// Clone second time to update feature references of the constraint
 		return clonedConstraint.clone(featureModel);
 	}
