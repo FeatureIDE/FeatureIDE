@@ -20,10 +20,13 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_FORMAT_NAME;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_IMPORT_CYCLE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_NONEXISTENT_PATH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_NOT_A_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_UNKNOWN_IMPORTING_MODEL_FILE;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
@@ -68,9 +72,11 @@ public final class ExternalModelUtil {
 	 * Resolves and validates the import path <code>importedPath</code> for an external feature model of the feature model <code>importingModel</code>. The
 	 * import path must be either relative to the importing model or to its project.
 	 *
-	 * The import is valid if <ul><li>the import path exists,</li> <li>it represents a feature model file,</li> <li>the feature model represented by the import
-	 * path does not import the importing model, so importing it will not create a cyclic import, and</li> <li>the importing model does not already have an
-	 * import with the same alias, or model name if the alias is empty.</li></ul>
+	 * The import is valid if all of the following is true: <ul><li>the importing model has an associated feature model source file (to resolve the import
+	 * path)</li> <li>the import path exists</li> <li>it represents a feature model file</li> <li>the feature model represented by the import path does not
+	 * import the importing model, so importing it will not create a cyclic import</li> <li>the import name (computed from the import path) and alias are valid
+	 * in the format of the importing model (see {@link IFeatureModelFormat})</li> <li>the importing model does not already have an import with the same alias,
+	 * or model name if the alias is empty</li></ul>
 	 *
 	 * @param importingModel The importing feature model.
 	 * @param importedPath The path of the model to be imported.
@@ -79,7 +85,15 @@ public final class ExternalModelUtil {
 	 * @throws InvalidImportException If the import is invalid. Contains a message describing the reason why the import is invalid.
 	 */
 	public static MultiFeatureModel.UsedModel resolveImport(IFeatureModel importingModel, String importedPath, String alias) throws InvalidImportException {
+		// Check importing model file
 		final Path importingPath = importingModel.getSourceFile();
+		if (importingPath == null) {
+			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_UNKNOWN_IMPORTING_MODEL_FILE);
+		}
+		final FeatureModelManager importingFeatureModelManager = FeatureModelManager.getInstance(importingPath);
+		if (importingFeatureModelManager == null) {
+			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_UNKNOWN_IMPORTING_MODEL_FILE);
+		}
 
 		// Check that import path exists
 		final Path path = resolveImportPath(importingPath, importedPath);
@@ -98,15 +112,18 @@ public final class ExternalModelUtil {
 			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_IMPORT_CYCLE);
 		}
 
-		// Check that import path can be converted to model name
-		final int fileExtensionIndex = importedPath.lastIndexOf(".");
-		if (fileExtensionIndex == -1) {
-			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_NOT_A_FEATURE_MODEL);
+		// Determine model name
+		final IFeatureModelFormat format = importingFeatureModelManager.getFormat();
+		final String modelName = format.getImportNameFromPath(importedPath);
+
+		// Validate import name and alias
+		if (!format.isValidImportName(modelName)) {
+			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_FORMAT_NAME);
+		}
+		if (!format.isValidImportAlias(alias)) {
+			throw new InvalidImportException(IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS);
 		}
 
-		// Determine name and alias
-		// Remove file extension and replace / and \ by .
-		final String modelName = importedPath.substring(0, fileExtensionIndex).replaceAll("[/\\\\]", ".");
 		// Use model name as alias if alias is empty
 		final String modelAlias = alias.isEmpty() ? modelName : alias;
 

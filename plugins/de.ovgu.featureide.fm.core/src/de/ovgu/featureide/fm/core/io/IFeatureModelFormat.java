@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Format for {@link IFeatureModel feature models}.
  *
  * @author Sebastian Krieter
+ * @author Johannes Herschel
  */
 public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel>, IFeatureNameValidator {
 
@@ -39,10 +40,44 @@ public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel>, I
 	void setFeatureNameValidator(IFeatureNameValidator validator);
 
 	IFeatureNameValidator getFeatureNameValidator();
-	
+
 	@Override
 	default boolean isValidFeatureName(String featureName) {
 		return true;
 	}
 
+	/**
+	 * Computes the name of an imported model from its file path. The default implementation removes the file extension (if present) and replaces directory
+	 * separators with dots.
+	 *
+	 * @param path The file path of the imported model
+	 * @return The name of the import
+	 */
+	default String getImportNameFromPath(String path) {
+		// Remove file extension
+		final int fileExtensionIndex = path.lastIndexOf(".");
+		final String removedExtension = fileExtensionIndex != -1 ? path.substring(0, fileExtensionIndex) : path;
+		// Replace / and \ by .
+		return removedExtension.replaceAll("[/\\\\]", ".");
+	}
+
+	/**
+	 * Checks whether the given name is valid for an imported model in this format. The default implementation returns <code>true</code> for any name.
+	 *
+	 * @param name The import name to check
+	 * @return <code>true</code> iff the given name is valid in this format
+	 */
+	default boolean isValidImportName(String name) {
+		return true;
+	}
+
+	/**
+	 * Checks whether the given alias is valid for an imported model in this format. The default implementation returns <code>true</code> for any alias.
+	 *
+	 * @param alias The import alias to check
+	 * @return <code>true</code> iff the given alias is valid in this format
+	 */
+	default boolean isValidImportAlias(String alias) {
+		return true;
+	}
 }

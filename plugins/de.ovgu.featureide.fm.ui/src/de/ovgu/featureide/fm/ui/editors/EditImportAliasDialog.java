@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_IMPORT_AL
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_IMPORT_ALIAS_DIALOG_TEXT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_DIALOG_ALIAS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_DIALOG_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -41,7 +42,10 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -73,6 +77,10 @@ public class EditImportAliasDialog extends Dialog {
 	 * Composite for warning icon and text.
 	 */
 	private Composite warningLabel;
+	/**
+	 * Text label of the warning.
+	 */
+	private Label warningText;
 
 	/**
 	 * The currently entered alias, or null if the alias is invalid. May be an empty string to indicate no alias.
@@ -162,8 +170,8 @@ public class EditImportAliasDialog extends Dialog {
 		icon.setImage(GUIDefaults.FM_WARNING);
 		icon.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
 
-		final Label warningText = new Label(warningLabel, SWT.WRAP);
-		warningText.setText(IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS);
+		warningText = new Label(warningLabel, SWT.WRAP);
+		warningText.setText("");
 		warningText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 	}
 
@@ -194,7 +202,7 @@ public class EditImportAliasDialog extends Dialog {
 	private void update() {
 		final String alias = aliasText != null ? aliasText.getText() : null;
 
-		final boolean valid = isValidAlias(alias);
+		final boolean valid = validateAlias(alias);
 
 		if (warningLabel != null) {
 			warningLabel.setVisible(!valid);
@@ -208,21 +216,48 @@ public class EditImportAliasDialog extends Dialog {
 	}
 
 	/**
+	 * Checks whether the given alias is valid, and updates the warning text if the alias is invalid. The alias is valid if it does not conflict with the name
+	 * or alias of a different import and is valid according to the {@link IFeatureModelFormat} of the importing model (see
+	 * {@link IFeatureModelFormat#isValidImportAlias(String)}).
+	 *
 	 * @param alias The alias to validate
-	 * @return True iff the alias is valid, i.e. it does not conflict with the name or alias of a different import.
+	 * @return True iff the alias is valid
 	 */
-	private boolean isValidAlias(String alias) {
+	private boolean validateAlias(String alias) {
 		if (alias == null) {
+			warningText.setText("");
+			warningText.requestLayout();
 			return false;
 		}
+
 		final String name = alias.isEmpty() ? importedModel.getModelName() : alias;
 		if (importedModel.getVarName().equals(name)) {
 			// The alias has not changed, so it is valid
 			return true;
 		}
+
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
-		// The alias is valid if there is no imported model with the same alias, or name in case of no alias
-		return !(featureModel instanceof MultiFeatureModel) || (((MultiFeatureModel) featureModel).getExternalModel(name) == null);
+		// The alias is invalid if there already is an imported model with the same alias, or name in case of no alias
+		if ((featureModel instanceof MultiFeatureModel) && (((MultiFeatureModel) featureModel).getExternalModel(name) != null)) {
+			warningText.setText(IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS);
+			warningText.requestLayout();
+			return false;
+		}
+
+		// Check if alias is valid according to feature model format
+		if (featureModelManager instanceof IFileManager<?>) {
+			final IPersistentFormat<?> format = ((IFileManager<?>) featureModelManager).getFormat();
+			if (format instanceof IFeatureModelFormat) {
+				final IFeatureModelFormat fmFormat = (IFeatureModelFormat) format;
+				if (!fmFormat.isValidImportAlias(alias)) {
+					warningText.setText(IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS);
+					warningText.requestLayout();
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**

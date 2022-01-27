@@ -665,10 +665,13 @@ public class StringTable {
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_PATH = "Path";
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_ALIAS = "Alias";
 	public static final String IMPORT_FEATURE_MODEL_DIALOG_NAME = "Name";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_UNKNOWN_IMPORTING_MODEL_FILE = "The source file of the importing feature model is unknown.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NONEXISTENT_PATH = "The import path does not exist.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NOT_A_FEATURE_MODEL = "The import path does not represent a valid feature model.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_IMPORT_CYCLE = "The import path is invalid since it causes a cyclic import.";
 	public static final String IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS = "An imported model with the given name or alias already exists.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_FORMAT_NAME = "The model name is invalid in this feature model format.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS = "The alias is invalid in this feature model format.";
 	public static final String REMOVE_IMPORTED_FEATURE_MODEL = "Remove Imported Feature Model";
 	public static final String REMOVE_IMPORTED_FEATURE_MODELS = "Remove Imported Feature Models";
 	public static final String EDIT_IMPORT_ALIAS_ACTION_NAME = "Edit Alias";
