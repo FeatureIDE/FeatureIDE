@@ -1095,6 +1095,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		final Configuration configuration = fileHandler.getObject();
 
+		// link the configuration to the feature model formula, so that the feature order is respected
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+		configuration.updateFeatures(formula);
+
 		try {
 			// Feature house composer requires a file with each selected feature in one line. Thus, the default format is used here.
 			final IConfigurationFormat outputFormat = new DefaultFormat();
