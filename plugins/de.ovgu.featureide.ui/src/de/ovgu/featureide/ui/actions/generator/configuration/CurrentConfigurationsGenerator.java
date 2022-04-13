@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.actions.generator.configuration;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -58,24 +59,23 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	}
 
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor<?> monitor) {
-		try {
-			for (final IResource configuration : featureProject.getConfigFolder().members()) {
-				if (confs >= builder.configurationNumber) {
-					break;
-				}
-				try {
+		final IFolder configFolder = featureProject.getConfigFolder();
+		if (configFolder != null) {
+			try {
+				for (final IResource configuration : configFolder.members()) {
 					monitor.checkCancel();
-				} catch (final MethodCancelException e) {
-					builder.finish();
-					return;
+					if (isConfiguration(configuration)) {
+						build(configuration, monitor);
+						if (++confs >= builder.configurationNumber) {
+							break;
+						}
+					}
 				}
-				if (isConfiguration(configuration)) {
-					build(configuration, monitor);
-					confs++;
-				}
+			} catch (final MethodCancelException e) {
+				builder.finish();
+			} catch (final CoreException e) {
+				UIPlugin.getDefault().logError(e);
 			}
-		} catch (final CoreException e) {
-			UIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -106,17 +106,14 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	 * @return Number of configuration files
 	 */
 	private int countConfigurations(IFolder configFolder) {
-		int i = 0;
-		try {
-			for (final IResource res : configFolder.members()) {
-				if (isConfiguration(res)) {
-					i++;
-				}
+		if (configFolder != null) {
+			try {
+				return (int) Arrays.stream(configFolder.members()).filter(this::isConfiguration).count();
+			} catch (final CoreException e) {
+				UIPlugin.getDefault().logError(e);
 			}
-		} catch (final CoreException e) {
-			UIPlugin.getDefault().logError(e);
 		}
-		return i;
+		return 0;
 	}
 
 }

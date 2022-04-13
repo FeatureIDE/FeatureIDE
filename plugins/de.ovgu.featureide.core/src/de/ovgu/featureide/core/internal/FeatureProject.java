@@ -824,7 +824,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	@Override
 	public String getConfigPath() {
-		return configFolder.toAbsolutePath().normalize().toString();
+		return configFolder == null ? null : configFolder.toAbsolutePath().normalize().toString();
 	}
 
 	@Override
@@ -1362,7 +1362,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_CONFIGS_PATH;
+		return "";
 	}
 
 	@Override
@@ -1380,7 +1380,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_BUILD_PATH;
+		return "";
 	}
 
 	@Override
@@ -1398,7 +1398,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_SOURCE_PATH;
+		return "";
 	}
 
 	@Override

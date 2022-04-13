@@ -27,12 +27,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_F
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -134,8 +133,8 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
-		final Path configPath = Paths.get(featureProject.getConfigPath());
-		final IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(EclipseFileSystem.getIPath(configPath));
+		final IFolder configFolder = featureProject.getConfigFolder();
+		final IContainer container = configFolder == null ? featureProject.getProject() : configFolder;
 		if (!container.exists()) {
 			if (featureProject.getProject().isAccessible()) {
 				FMCorePlugin.createFolder(featureProject.getProject(), container.getProjectRelativePath().toString());
@@ -144,6 +143,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			}
 		}
 
+		final Path configPath = EclipseFileSystem.getPath(container);
 		final Path file = configPath.resolve(fileName);
 		SimpleFileHandler.save(configPath.resolve(fileName), new Configuration(featureModel), format);
 

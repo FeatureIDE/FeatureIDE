@@ -324,45 +324,48 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	@Override
 	public boolean initialize(final IFeatureProject project) {
 		if (super.initialize(project)) {
-			if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
-				final IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
+			final IFolder buildFolder = featureProject.getBuildFolder();
+			if (buildFolder != null) {
+				if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
+					final IFolder propFolder = buildFolder.getFolder(PROPERTY_MANAGER_PACKAGE);
 
-				try {
-					if (!propFolder.exists()) {
-						propFolder.create(true, true, new NullProgressMonitor());
-					}
-				} catch (final CoreException e) {
-					RuntimeCorePlugin.getDefault().logError(e);
-				}
-				final IFile propFile = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
-				if (!propFile.exists()) {
-					InputStream inputStream = null;
 					try {
-						inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
-								new org.eclipse.core.runtime.Path("Resources" + FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"),
-								false);
-					} catch (final IOException e) {
+						if (!propFolder.exists()) {
+							propFolder.create(true, true, new NullProgressMonitor());
+						}
+					} catch (final CoreException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
-					createFile(propFile, inputStream);
+					final IFile propFile = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
+					if (!propFile.exists()) {
+						InputStream inputStream = null;
+						try {
+							inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
+									new org.eclipse.core.runtime.Path("Resources" + FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"),
+									false);
+						} catch (final IOException e) {
+							RuntimeCorePlugin.getDefault().logError(e);
+						}
+						createFile(propFile, inputStream);
+						try {
+							propFile.setDerived(true, null);
+						} catch (final CoreException e) {
+							RuntimeCorePlugin.getDefault().logError(e);
+						}
+					}
+				} else {
+					final IFolder propFolder = buildFolder.getFolder(PROPERTY_MANAGER_PACKAGE);
+					final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
+					deleteFile(filePropMan);
 					try {
-						propFile.setDerived(true, null);
+						propFolder.delete(true, null);
 					} catch (final CoreException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
 				}
-			} else {
-				final IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
-				final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
-				deleteFile(filePropMan);
-				try {
-					propFolder.delete(true, null);
-				} catch (final CoreException e) {
-					RuntimeCorePlugin.getDefault().logError(e);
-				}
 			}
 		}
-		return super.initialize(project);
+		return isInitialized();
 	}
 
 	@Override
@@ -378,8 +381,12 @@ public class RuntimeParameters extends ComposerExtensionClass {
 		if (featureProject == null) {
 			return;
 		}
+		final IFolder buildFolder = featureProject.getBuildFolder();
+		if (buildFolder == null) {
+			return;
+		}
 
-		final IFile filePropInBuild = featureProject.getBuildFolder().getFile("runtime.properties");
+		final IFile filePropInBuild = buildFolder.getFile("runtime.properties");
 		final IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 			buildFSTModel();
@@ -484,14 +491,14 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			for (final CallLocation[] callLoc : callLocs) {
 				for (final CallLocation element : callLoc) {
 					// feature name = attribute of getProperty-call
-					
-					String[] callTextElements = element.getCallText().split("\"");
-					
-					if(callTextElements.length < 2) {
+
+					final String[] callTextElements = element.getCallText().split("\"");
+
+					if (callTextElements.length < 2) {
 						continue;
 					}
 					featureName = callTextElements[1];
-					
+
 					className = element.getMember().getParent().getElementName();
 					classFile = (IFile) element.getMember().getCompilationUnit().getCorrespondingResource();
 					compilationUnit = element.getMember().getCompilationUnit();

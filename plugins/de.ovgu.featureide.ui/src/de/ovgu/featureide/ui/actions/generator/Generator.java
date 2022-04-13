@@ -221,34 +221,36 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 		}
 
 		final IComposerExtensionClass composer = builder.featureProject.getComposer();
-		for (final String src : srcPaths) {
-			final IFolder buildFolder = builder.featureProject.getBuildFolder();
-			final IPath buildFolderPath = buildFolder.getFullPath().makeRelativeTo(builder.featureProject.getProject().getFullPath());
-			if (src.equals(buildFolderPath.toString())) {
-				// build files
-				final IFolder sourceFolder = project.getFolder(src);
-				composer.buildConfiguration(sourceFolder, configuration, name);
-				if (composer instanceof PPComposerExtensionClass) {
-					((PPComposerExtensionClass) composer).postProcess(sourceFolder);
-				}
-			} else {
-				// copy files of further source folder
-				final IFolder srcFolder = builder.featureProject.getProject().getFolder(src);
-				final IFolder dstFolder = project.getFolder(src);
-				try {
-					srcFolder.copy(dstFolder.getFullPath(), true, null);
-				} catch (final CoreException e) {
-					UIPlugin.getDefault().logError(e);
-				}
+		final IFolder buildFolder = builder.featureProject.getBuildFolder();
+		if (buildFolder != null) {
+			for (final String src : srcPaths) {
+				final IPath buildFolderPath = buildFolder.getFullPath().makeRelativeTo(builder.featureProject.getProject().getFullPath());
+				if (src.equals(buildFolderPath.toString())) {
+					// build files
+					final IFolder sourceFolder = project.getFolder(src);
+					composer.buildConfiguration(sourceFolder, configuration, name);
+					if (composer instanceof PPComposerExtensionClass) {
+						((PPComposerExtensionClass) composer).postProcess(sourceFolder);
+					}
+				} else {
+					// copy files of further source folder
+					final IFolder srcFolder = builder.featureProject.getProject().getFolder(src);
+					final IFolder dstFolder = project.getFolder(src);
+					try {
+						srcFolder.copy(dstFolder.getFullPath(), true, null);
+					} catch (final CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
 
+				}
 			}
-		}
-		try {
-			final IFile modelFile = builder.featureProject.getModelFile();
-			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);
-			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (final CoreException e) {
-			UIPlugin.getDefault().logError(e);
+			try {
+				final IFile modelFile = builder.featureProject.getModelFile();
+				modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);
+				project.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (final CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 	}
 
