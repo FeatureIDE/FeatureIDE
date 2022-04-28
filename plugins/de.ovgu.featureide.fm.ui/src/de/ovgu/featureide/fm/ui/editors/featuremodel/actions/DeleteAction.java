@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -60,7 +61,7 @@ public class DeleteAction extends AFeatureModelAction {
 
 	private final Object viewer;
 
-	List<IFeature> featuresToDelete = new ArrayList<>();
+	private final List<IFeature> featuresToDelete = new ArrayList<>();
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
@@ -85,14 +86,11 @@ public class DeleteAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		final DeleteDialogVerifier deleteDialogVerifier = new DeleteDialogVerifier(featuresToDelete);
+		final Optional<String> dialogReturnLabel = DeleteDialogVerifier.checkForDialog(featuresToDelete);
 
-		final String dialogReturnLabel = deleteDialogVerifier.checkForDialog();
-
-		if ((dialogReturnLabel != null) && dialogReturnLabel.equals("Cancel")) {
-			return;
+		if (dialogReturnLabel.filter("Cancel"::equals).isPresent()) {
+			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, dialogReturnLabel.get()));
 		}
-		FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, dialogReturnLabel));
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -100,7 +98,7 @@ public class DeleteAction extends AFeatureModelAction {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
-		featuresToDelete = new ArrayList<>();
+		featuresToDelete.clear();
 
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		// check that a possibly new root can be determined unique

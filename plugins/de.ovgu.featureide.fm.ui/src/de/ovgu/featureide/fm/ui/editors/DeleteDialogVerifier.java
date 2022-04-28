@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
@@ -38,18 +39,16 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class DeleteDialogVerifier {
 
-	List<IFeature> featuresToDelete = new ArrayList<>();
+	private final static List<IFeature> featuresToDelete = new ArrayList<>();
 
-	public DeleteDialogVerifier(List<IFeature> featuresToDelete) {
-		this.featuresToDelete = featuresToDelete;
-	}
+	private DeleteDialogVerifier() {}
 
 	/**
 	 * checks, whether a dialog is needed.
 	 *
 	 * @return Returns null if there is no dialog needed at all, otherwise it returns the button that was pressed in the dialog
 	 */
-	public String checkForDialog() {
+	public static Optional<String> checkForDialog(List<IFeature> featuresToDelete) {
 		boolean featureInConstraint = false;
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
@@ -65,7 +64,7 @@ public class DeleteDialogVerifier {
 			}
 		}
 
-		String dialogReturnLabel = null;
+		Optional<String> dialogReturnLabel = null;
 
 		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
 			// the delete dialog needs to be shown
@@ -83,7 +82,7 @@ public class DeleteDialogVerifier {
 	 * @return <code>true</code> if the group of the feature is different from the group of the parent. <code>false</code> if the group is the same or the
 	 *         feature has no parent or no children.
 	 */
-	private boolean hasGroupDifference(IFeature feature) {
+	private static boolean hasGroupDifference(IFeature feature) {
 		final IFeature parent = FeatureUtils.getParent(feature);
 		if ((parent == null) || !FeatureUtils.hasChildren(feature)) {
 			return false;
@@ -99,7 +98,7 @@ public class DeleteDialogVerifier {
 	 * @param featuresToDelete The list of features to be deleted
 	 * @return <code>true</code> iff the given feature is the root, and deleting it requires slicing.
 	 */
-	private boolean isRootRequiringSlicing(IFeature feature, List<IFeature> featuresToDelete) {
+	private static boolean isRootRequiringSlicing(IFeature feature, List<IFeature> featuresToDelete) {
 		if (!FeatureUtils.isRoot(feature)) {
 			return false;
 		}
@@ -121,7 +120,7 @@ public class DeleteDialogVerifier {
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A List of Strings with reasons for the dialog. These are being displayed in the DeleteDialog
 	 */
-	private List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private static List<String> getDialogReasons(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
 		final List<String> dialogReasons = new ArrayList<>();
 		if (featureInConstraint) {
 			dialogReasons.add(StringTable.DELETE_FEATURE_REASON_CONSTRAINTS);
@@ -143,7 +142,7 @@ public class DeleteDialogVerifier {
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A String array with labels for the buttons of the DeleteDialog
 	 */
-	private String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private static String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
 		final List<String> buttonLabels = new ArrayList<>();
 		final boolean isMultiFeature = isAnyFeatureMultiFeature();
 		if ((featureInConstraint || featureHasGroupDifference || featureIsRoot) && !isMultiFeature) {
@@ -158,10 +157,7 @@ public class DeleteDialogVerifier {
 		return buttonLabels.toArray(new String[0]);
 	}
 
-	/**
-	 * @return
-	 */
-	private boolean isAnyFeatureMultiFeature() {
+	private static boolean isAnyFeatureMultiFeature() {
 		for (final IFeature feat : featuresToDelete) {
 			if (feat instanceof MultiFeature) {
 				return true;
@@ -178,15 +174,15 @@ public class DeleteDialogVerifier {
 	 * @param dialogButtonLabels A String array with labels for the buttons of the DeleteDialog
 	 * @return A String containing the label of the button that was pressed in the DeleteDialog or <code>null</code> if the dialog was closed differently
 	 */
-	protected String openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
+	protected static Optional<String> openDeleteDialog(boolean multiple, List<String> dialogReasons, String[] dialogButtonLabels) {
 		final MessageDialog dialog = new DeleteDialog(null, multiple, dialogReasons, dialogButtonLabels, dialogButtonLabels.length - 1);
 		dialog.open();
 		final int dialogReturn = dialog.getReturnCode();
 
 		if ((dialogReturn >= 0) && (dialogReturn < dialogButtonLabels.length)) {
-			return dialogButtonLabels[dialogReturn];
+			return Optional.of(dialogButtonLabels[dialogReturn]);
 		} else {
-			return null;
+			return Optional.empty();
 		}
 	}
 

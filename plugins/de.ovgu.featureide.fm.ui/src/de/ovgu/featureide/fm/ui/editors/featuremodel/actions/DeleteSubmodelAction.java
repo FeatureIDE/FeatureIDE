@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_SUBMODE
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -88,15 +89,12 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 			featuresToDelete.add(selectedFeature);
 		}
 
-		final DeleteDialogVerifier deleteDialogVerifier = new DeleteDialogVerifier(featuresToDelete);
+		final Optional<String> dialogReturnLabel = DeleteDialogVerifier.checkForDialog(featuresToDelete);
 
-		final String dialogReturnLabel = deleteDialogVerifier.checkForDialog();
-
-		if ((dialogReturnLabel == null) || dialogReturnLabel.equals("Cancel")) {
-			return;
+		if (dialogReturnLabel.filter("Cancel"::equals).isPresent()) {
+			FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
 		}
 
-		FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
 	}
 
 	public IFeature getFeatureFromObject(Object element) {
