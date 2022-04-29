@@ -22,6 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_SUBMODEL;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
@@ -32,7 +36,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.DeleteDialogVerifier;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteSubmodelOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
@@ -45,6 +51,7 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 
 	public static final String ID = "de.ovgu.featureide.deletesubmodel";
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+	IStructuredSelection selection;
 
 	public DeleteSubmodelAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(DELETE_SUBMODEL, viewer, ID, graphicalFeatureModel.getFeatureModelManager());
@@ -72,11 +79,47 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
+		final List<IFeature> featuresToDelete = new ArrayList<>();
+
+		final List<Object> selectedObjects = selection.toList();
+
+		for (final Object selectedObject : selectedObjects) {
+			final IFeature selectedFeature = getFeatureFromObject(selectedObject);
+			featuresToDelete.addAll(getAllChildren(selectedFeature));
+			featuresToDelete.add(selectedFeature);
+		}
+
+		final Optional<String> dialogReturnLabel = DeleteDialogVerifier.checkForDialog(featuresToDelete);
+
+		if (dialogReturnLabel.filter("Cancel"::equals).isPresent()) {
+			FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
+		}
+
+	}
+
+	public IFeature getFeatureFromObject(Object element) {
+		IFeature feature = null;
+		if (element instanceof IFeature) {
+			feature = ((IFeature) element);
+		} else if (element instanceof FeatureEditPart) {
+			feature = ((FeatureEditPart) element).getModel().getObject();
+		}
+		return feature;
+	}
+
+	private List<IFeature> getAllChildren(IFeature selectedFeature) {
+		final List<IFeature> childFeatures = new ArrayList<>();
+
+		for (final IFeatureStructure childStructure : selectedFeature.getStructure().getChildren()) {
+			childFeatures.add(childStructure.getFeature());
+			childFeatures.addAll(getAllChildren(childStructure.getFeature()));
+		}
+		return childFeatures;
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
+		this.selection = selection;
 		if (super.isValidSelection(selection)) {
 			if (getInvolvedFeatures().stream().allMatch(f -> isSubmodelRootFeature((IFeature) f))) {
 				return true;
