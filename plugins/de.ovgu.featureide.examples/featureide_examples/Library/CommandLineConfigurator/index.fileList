@@ -1,9 +1,9 @@
+.project
+model.png
+lib/de.ovgu.featureide.lib.fm-v3.8.2.jar
+lib/antlr-3.4.jar
+lib/org.sat4j.core.jar
+src/de/ovgu/featureide/examples/commandlineconfigurator/CommandLineConfigurator.java
+.settings/org.eclipse.jdt.core.prefs
 .classpath
 model.xml
-.settings/org.eclipse.jdt.core.prefs
-src/de/ovgu/featureide/examples/commandlineconfigurator/CommandLineConfigurator.java
-model.png
-.project
-lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.8.1.jar
-lib/org.sat4j.core.jar

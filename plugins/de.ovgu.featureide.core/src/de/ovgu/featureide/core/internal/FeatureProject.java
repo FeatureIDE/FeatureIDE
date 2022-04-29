@@ -339,6 +339,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		if (project.getFile("mpl.velvet").exists()) {
 			modelFile = new ModelMarkerHandler<>(project.getFile("mpl.velvet"));
+		} else if (project.getFile("model.uvl").exists()) {
+			modelFile = new ModelMarkerHandler<>(project.getFile("model.uvl"));
 		} else {
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
 		}
@@ -824,7 +826,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	@Override
 	public String getConfigPath() {
-		return configFolder.toAbsolutePath().normalize().toString();
+		return configFolder == null ? null : configFolder.toAbsolutePath().normalize().toString();
 	}
 
 	@Override
@@ -1362,7 +1364,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_CONFIGS_PATH;
+		return "";
 	}
 
 	@Override
@@ -1380,7 +1382,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_BUILD_PATH;
+		return "";
 	}
 
 	@Override
@@ -1398,7 +1400,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (final Exception e) {
 			LOGGER.logError(e);
 		}
-		return DEFAULT_SOURCE_PATH;
+		return "";
 	}
 
 	@Override

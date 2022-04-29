@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+<properties/>
+<struct>
+<and mandatory="true" name="Sandwich">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.0"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="false"/>
+<alt mandatory="true" name="Bread">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit=""/>
+<feature name="Full Grain ">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="203"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="1.99"/>
+</feature>
+<feature name="Flatbread">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="50"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="1.79"/>
+</feature>
+<feature name="Toast">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="313"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="false"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="1.79"/>
+</feature>
+</alt>
+<and name="Cheese">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit=""/>
+<alt name="Gouda">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit=""/>
+<feature name="Sprinkled">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="72"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.49"/>
+</feature>
+<feature name="Slice">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="70"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.69"/>
+</feature>
+</alt>
+<feature name="Cheddar">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="81"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="false"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.69"/>
+</feature>
+<feature name="Cream Cheese ">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="52"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="false"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.59"/>
+</feature>
+</and>
+<or name="Meat">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit=""/>
+<feature name="Salami ">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="116"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="1.29"/>
+</feature>
+<feature name="Ham">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="92"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="false"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.99"/>
+</feature>
+<feature name="Chicken Breast">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="56"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="1.39"/>
+</feature>
+</or>
+<and name="Vegetables">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit=""/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit=""/>
+<attribute name="Price" recursive="true" type="double" unit=""/>
+<feature name="Cucumber ">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="2"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.29"/>
+</feature>
+<feature name="Tomatoes">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="3"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.39"/>
+</feature>
+<feature name="Lettuce">
+<attribute configurable="true" name="Calories" recursive="true" type="long" unit="" value="2"/>
+<attribute name="Organic Food" recursive="true" type="boolean" unit="" value="true"/>
+<attribute name="Price" recursive="true" type="double" unit="" value="0.39"/>
+</feature>
+</and>
+</and>
+</struct>
+<constraints/>
+<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+<comments/>
+<featureOrder userDefined="false"/>
+</extendedFeatureModel>

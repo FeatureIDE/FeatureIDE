@@ -591,13 +591,16 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * Removes the base markers from every file in the source folder
 	 */
 	public void RemoveBaseMarkerFromSourceFolderFiles() {
-		try {
-			final IMarker[] baseMarker = featureProject.getSourceFolder().findMarkers(IMarker.MARKER, true, IResource.DEPTH_INFINITE);
-			for (final IMarker iMarker : baseMarker) {
-				iMarker.delete();
+		final IFolder source = featureProject.getSourceFolder();
+		if (source != null) {
+			try {
+				final IMarker[] baseMarker = source.findMarkers(IMarker.MARKER, true, IResource.DEPTH_INFINITE);
+				for (final IMarker marker : baseMarker) {
+					marker.delete();
+				}
+			} catch (final CoreException e) {
+				UIPlugin.getDefault().logError(e);
 			}
-		} catch (final CoreException e) {
-			UIPlugin.getDefault().logError(e);
 		}
 	}
 

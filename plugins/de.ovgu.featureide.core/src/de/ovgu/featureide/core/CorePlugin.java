@@ -554,10 +554,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	private static FeatureModelManager createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
-		final Path modelPath = EclipseFileSystem.getPath(project.getFile("model.xml"));
+		final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
+		final Path modelPath = EclipseFileSystem.getPath(project.getFile("model." + format.getSuffix()));
 
 		if (!Files.exists(modelPath)) {
-			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
 				factory = FMFactoryManager.getInstance().getFactory(modelPath, format);

@@ -2,7 +2,7 @@
 <project name="JAR Build Script" default="build" basedir=".">
 	
 	<!-- Set JAR name -->
-	<property name="build.jar.version" value="3.8.1" />
+	<property name="build.jar.version" value="3.8.2" />
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes-v${build.jar.version}" />
 
 	<!-- Constants -->

@@ -71,7 +71,7 @@ public class ExtendedMultiFeatureModelFactory extends MultiFeatureModelFactory {
 
 	@Override
 	public ExtendedMultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedMultiFeature) oldFeature.clone(featureModel, oldFeature.getStructure().clone(featureModel));
+		return (ExtendedMultiFeature) oldFeature.getStructure().clone(featureModel).getFeature();
 	}
 
 	@Override

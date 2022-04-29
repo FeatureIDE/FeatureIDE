@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -197,9 +198,14 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 	}
 
 	private void manageConfigurations() {
-		final ArrayList<IResource> configurations = new ArrayList<IResource>();
+		final IFolder configFolder = project.getConfigFolder();
+		if (configFolder == null) {
+			return;
+		}
+
+		final ArrayList<IResource> configurations = new ArrayList<>();
 		try {
-			Collections.addAll(configurations, project.getConfigFolder().members());
+			Collections.addAll(configurations, configFolder.members());
 		} catch (final CoreException e) {
 			e.printStackTrace();
 		}

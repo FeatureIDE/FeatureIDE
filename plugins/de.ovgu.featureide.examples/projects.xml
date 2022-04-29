@@ -5,9 +5,9 @@
 	<project name="Arith-FH-Haskell" path="featureide_examples/Arith-FH-Haskell/.project"/>
 	<project name="BankAccount-FH-JML" path="featureide_examples/BankAccount-FH-JML/.project"/>
 	<project name="BerkeleyDB-FH-Java" path="featureide_examples/BerkeleyDB-FH-Java/.project"/>
-	<project name="Elevator-FeatureModeling-Colored" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Colored/.project"/>
-	<project name="Elevator-FeatureModeling" path="featureide_examples/Book/FM/Elevator-FeatureModeling/.project">
 	<project name="Elevator-FeatureModeling-Configuration" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Configuration/.project"/>
+	<project name="Elevator-FeatureModeling" path="featureide_examples/Book/FM/Elevator-FeatureModeling/.project">
+	<project name="Elevator-FeatureModeling-Colored" path="featureide_examples/Book/FM/Elevator-FeatureModeling-Colored/.project"/>
 </project>
 <project name="Elevator-FeatureHouse-v0.0" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.0/.project"/>
 <project name="Elevator-FeatureHouse-v0.1" path="featureide_examples/Book/FOP/Elevator-FeatureHouse-v0.1/.project"/>
@@ -207,8 +207,8 @@
 <project name="HelloWorld-FH-Java" path="featureide_examples/HelloWorld-FH-Java/.project"/>
 <project name="HelloWorld-Framework" path="featureide_examples/HelloWorld-Framework/.project">
 <project name="World" path="featureide_examples/HelloWorld-Framework/features/World/.project"/>
-<project name="Hello" path="featureide_examples/HelloWorld-Framework/features/Hello/.project"/>
 <project name="Beautiful" path="featureide_examples/HelloWorld-Framework/features/Beautiful/.project"/>
+<project name="Hello" path="featureide_examples/HelloWorld-Framework/features/Hello/.project"/>
 <project name="Wonderful" path="featureide_examples/HelloWorld-Framework/features/Wonderful/.project"/>
 </project>
 <project name="HelloWorld-Munge" path="featureide_examples/HelloWorld-Munge/.project"/>
@@ -222,7 +222,9 @@
 <project name="LandingGear-FH-AsmetaL" path="featureide_examples/LandingGear-FH-AsmetaL/.project"/>
 <project name="LibSSH-Colligens" path="featureide_examples/LibSSH-Colligens/.project"/>
 <project name="CommandLineConfigurator" path="featureide_examples/Library/CommandLineConfigurator/.project"/>
+<project name="FeatureAttributes" path="featureide_examples/Library/FeatureAttributes/.project"/>
 <project name="FeatureModelAnalysis" path="featureide_examples/Library/FeatureModelAnalysis/.project"/>
+<project name="FeatureModelTransformation" path="featureide_examples/Library/FeatureModelTransformation/.project"/>
 <project name="GraphicalConfigurator" path="featureide_examples/Library/GraphicalConfigurator/.project"/>
 <project name="Notepad-FH-Java-2" path="featureide_examples/Notepad-FH-Java-2/.project"/>
 <project name="Notepad-FH-Java" path="featureide_examples/Notepad-FH-Java/.project"/>
@@ -243,7 +245,8 @@
 <project name="Telecom Example-AspectJ" path="featureide_examples/Telecom Example-AspectJ/.project"/>
 <project name="Tracing Example-AspectJ" path="featureide_examples/Tracing Example-AspectJ/.project"/>
 <project name="UnionFind-FH-JML" path="featureide_examples/UnionFind-FH-JML/.project"/>
+<project name="Universal-Variability-Language" path="featureide_examples/UniversalVariabilityLanguage/Universal-Variability-Language/.project">
 <project name="Universal-Variability-Language-Multi" path="featureide_examples/UniversalVariabilityLanguage/Universal-Variability-Language-Multi/.project"/>
-<project name="Universal-Variability-Language" path="featureide_examples/UniversalVariabilityLanguage/Universal-Variability-Language/.project"/>
+</project>
 <project name="VariableCharacters-ImageComposer" path="featureide_examples/VariableCharacters-ImageComposer/.project"/>
 </projectRecords>
