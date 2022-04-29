@@ -1,8 +1,8 @@
-.classpath
+.project
 features/Real/Complex.java
 features/Complex/Complex.java
-configs/Real.xml
 configs/Complex.xml
-model.xml
+configs/Real.xml
 .settings/de.ovgu.featureide.core.prefs
-.project
+.classpath
+model.xml

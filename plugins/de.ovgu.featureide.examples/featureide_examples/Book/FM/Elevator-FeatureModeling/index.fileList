@@ -1,7 +1,7 @@
+.project
+.featureide/model.xml/model.xml.xml
+configs/HomeBasic.xml
+configs/Ultimate.xml
 configs/HomePremium.xml
 configs/Enterprise.xml
-configs/Ultimate.xml
-configs/HomeBasic.xml
 model.xml
-.featureide/model.xml/model.xml.xml
-.project

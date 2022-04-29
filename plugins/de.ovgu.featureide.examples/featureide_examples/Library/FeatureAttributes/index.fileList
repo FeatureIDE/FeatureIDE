@@ -1,8 +1,8 @@
-.classpath
 .project
-src/de/ovgu/featureide/examples/featureattributes/FeatureAttributes.java
-lib/de.ovgu.featureide.lib.fm-v3.7.0.jar
-lib/de.ovgu.featureide.lib.fm.attributes-v3.7.0.jar
-lib/org.sat4j.core.jar
+lib/de.ovgu.featureide.lib.fm-v3.8.2.jar
 lib/antlr-3.4.jar
+lib/org.sat4j.core.jar
+lib/de.ovgu.featureide.lib.fm.attributes-v3.8.2.jar
 sandwich.xml
+src/de/ovgu/featureide/examples/featureattributes/FeatureAttributes.java
+.classpath

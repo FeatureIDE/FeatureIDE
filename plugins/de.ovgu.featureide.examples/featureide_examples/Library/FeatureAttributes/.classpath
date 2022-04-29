@@ -6,8 +6,8 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm.attributes-v3.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm-v3.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm.attributes-v3.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm-v3.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry kind="lib" path="lib/org.sat4j.core.jar"/>
 	<classpathentry kind="output" path="bin"/>

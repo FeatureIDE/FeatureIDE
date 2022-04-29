@@ -1,5 +1,5 @@
-configs/default.xml
-Server.uvl
-submodels/FileSystem.uvl
-OperatingSystem.uvl
 .project
+OperatingSystem.uvl
+submodels/FileSystem.uvl
+Server.uvl
+configs/default.xml

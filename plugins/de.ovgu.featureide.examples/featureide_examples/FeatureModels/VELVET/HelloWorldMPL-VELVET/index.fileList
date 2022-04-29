@@ -1,5 +1,5 @@
-mpl.velvet
-model.xml
-MPL/HelloWorldInstance2.velvet
-MPL/HelloWorldInstance.xml
 .project
+mpl.velvet
+MPL/HelloWorldInstance.xml
+MPL/HelloWorldInstance2.velvet
+model.xml

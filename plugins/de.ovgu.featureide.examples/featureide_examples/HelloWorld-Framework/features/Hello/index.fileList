@@ -1,4 +1,4 @@
-.classpath
-src/Hello.java
 .project
 info.xml
+src/Hello.java
+.classpath
