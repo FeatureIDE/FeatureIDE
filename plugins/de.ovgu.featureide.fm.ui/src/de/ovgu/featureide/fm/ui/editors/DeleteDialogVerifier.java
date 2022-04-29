@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  *
  * @author Rahel Arens
  */
-public class DeleteDialogVerifier {
+public final class DeleteDialogVerifier {
 
-	private final static List<IFeature> featuresToDelete = new ArrayList<>();
+//	private final static List<IFeature> featuresToDelete = new ArrayList<>();
 
 	private DeleteDialogVerifier() {}
 
@@ -68,8 +68,9 @@ public class DeleteDialogVerifier {
 
 		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
 			// the delete dialog needs to be shown
+			final boolean isMultiFeature = isAnyFeatureMultiFeature(featuresToDelete);
 			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featureHasGroupDifference, featureIsRoot);
-			final String[] dialogButtonLabels = getDialogButtonLabels(featureInConstraint, featureHasGroupDifference, featureIsRoot);
+			final String[] dialogButtonLabels = getDialogButtonLabels(featureInConstraint, featureHasGroupDifference, featureIsRoot, isMultiFeature);
 			dialogReturnLabel = openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, dialogButtonLabels);
 		}
 		return dialogReturnLabel;
@@ -142,9 +143,9 @@ public class DeleteDialogVerifier {
 	 * @param featureIsRoot <code>true</code> if any of the selected features is the root and has multiple children, <code>false</code> if not
 	 * @return A String array with labels for the buttons of the DeleteDialog
 	 */
-	private static String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot) {
+	private static String[] getDialogButtonLabels(boolean featureInConstraint, boolean featureHasGroupDifference, boolean featureIsRoot,
+			boolean isMultiFeature) {
 		final List<String> buttonLabels = new ArrayList<>();
-		final boolean isMultiFeature = isAnyFeatureMultiFeature();
 		if ((featureInConstraint || featureHasGroupDifference || featureIsRoot) && !isMultiFeature) {
 			buttonLabels.add(StringTable.DELETE_WITH_SLICING);
 		}
@@ -157,7 +158,7 @@ public class DeleteDialogVerifier {
 		return buttonLabels.toArray(new String[0]);
 	}
 
-	private static boolean isAnyFeatureMultiFeature() {
+	private static boolean isAnyFeatureMultiFeature(List<IFeature> featuresToDelete) {
 		for (final IFeature feat : featuresToDelete) {
 			if (feat instanceof MultiFeature) {
 				return true;
