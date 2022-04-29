@@ -241,7 +241,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			// final IContainer parentFolder = file.getParent();
 			// mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
 		} else {
-			res = project.findMember("model.xml");
+			// try to find UVL model first before resort to XML
+			final String filename = project.getFile("model.uvl").exists() ? "model.uvl" : "model.xml";
+			res = project.findMember(filename);
 		}
 
 		File modelFile = null;
