@@ -7,6 +7,16 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.8.2 (April 2022)
+* Hotfix containing mostly bugfixes over v3.8.1
+* Added example projects for using attributes and formats with the FeatureIDE Library (#1098)
+* Added support for using UVL files as default feature model (#1338)
+* Bugfixes:
+  * User-defined Feature Order has no effect when using FeatureHouse (#1140)
+  * Fixed problems with Undo/Redo for deleting and renaming elements (#1206, #1233)
+  * Fixed problem with changing default directories of a feature project (#1296)
+  * Improved behavior of framework plug-in when plug-ins are faulty (#1109)
+
 Release 3.8.1 (November 2021)
 * Hotfix containing only bugfixes over v3.8.0
 * Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
