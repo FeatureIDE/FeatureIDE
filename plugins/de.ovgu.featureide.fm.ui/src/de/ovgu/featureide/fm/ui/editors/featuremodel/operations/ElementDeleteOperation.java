@@ -36,7 +36,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
@@ -57,12 +56,12 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 	private final Object viewer;
 
-	private final String dialogReturnLabel;
+	private final boolean slicing;
 
-	public ElementDeleteOperation(Object viewer, IFeatureModelManager featureModelManager, String dialogReturnLabel) {
+	public ElementDeleteOperation(Object viewer, IFeatureModelManager featureModelManager, boolean slicing) {
 		super(featureModelManager, DELETE, getFeatureNames(viewer));
 		this.viewer = viewer;
-		this.dialogReturnLabel = dialogReturnLabel;
+		this.slicing = slicing;
 	}
 
 	@Override
@@ -127,27 +126,10 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		if (dialogReturnLabel != null) {
-			handleDialogReturn(dialogReturnLabel, featuresToDelete, constraintsToDelete);
-		} else {
-			// regular delete
-			addDeleteConstraintOperations(constraintsToDelete);
-			addDeleteFeatureOperations(featuresToDelete);
-		}
-	}
-
-	/**
-	 * Handles the return of the DeleteDialog by performing the correct delete operations.
-	 *
-	 * @param dialogReturnLabel The label of the button that was pressed in the DeleteDialog
-	 * @param featuresToDelete The features which are selected to be deleted
-	 * @param constraintsToDelete The constraints which are selected to be deleted
-	 */
-	private void handleDialogReturn(String dialogReturnLabel, List<IFeature> featuresToDelete, List<IConstraint> constraintsToDelete) {
-		if (StringTable.DELETE_WITH_SLICING.equals(dialogReturnLabel)) {
+		if (slicing) {
 			operations.add(new DeleteSlicingOperation(viewer, featureModelManager, getNotSelectedFeatureNames()));
 			addDeleteConstraintOperations(constraintsToDelete);
-		} else if (StringTable.DELETE_WITHOUT_SLICING.equals(dialogReturnLabel)) {
+		} else {
 			addDeleteConstraintOperations(constraintsToDelete);
 			addDeleteFeatureOperations(featuresToDelete);
 		}

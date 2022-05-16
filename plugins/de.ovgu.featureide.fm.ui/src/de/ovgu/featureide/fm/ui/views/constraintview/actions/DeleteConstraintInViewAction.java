@@ -55,7 +55,7 @@ public class DeleteConstraintInViewAction extends AbstractConstraintEditorAction
 		if (selection.toList().size() == 1) {
 			FeatureModelOperationWrapper.run(new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModelManager));
 		} else if (selection.toList().size() > 1) {
-			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, null));
+			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, false));
 		}
 	}
 

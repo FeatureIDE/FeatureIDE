@@ -39,7 +39,9 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public final class DeleteDialogVerifier {
 
-//	private final static List<IFeature> featuresToDelete = new ArrayList<>();
+	public static final String DELETE_WITH_SLICING = StringTable.DELETE_WITH_SLICING;
+	public static final String DELETE_WITHOUT_SLICING = StringTable.DELETE_WITHOUT_SLICING;
+	public static final String CANCEL = StringTable.CANCEL;
 
 	private DeleteDialogVerifier() {}
 
@@ -64,16 +66,15 @@ public final class DeleteDialogVerifier {
 			}
 		}
 
-		Optional<String> dialogReturnLabel = null;
-
 		if (featureInConstraint || featureHasGroupDifference || featureIsRoot) {
 			// the delete dialog needs to be shown
 			final boolean isMultiFeature = isAnyFeatureMultiFeature(featuresToDelete);
 			final List<String> dialogReasons = getDialogReasons(featureInConstraint, featureHasGroupDifference, featureIsRoot);
 			final String[] dialogButtonLabels = getDialogButtonLabels(featureInConstraint, featureHasGroupDifference, featureIsRoot, isMultiFeature);
-			dialogReturnLabel = openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, dialogButtonLabels);
+			return openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, dialogButtonLabels);
+		} else {
+			return Optional.of(DeleteDialogVerifier.DELETE_WITHOUT_SLICING);
 		}
-		return dialogReturnLabel;
 	}
 
 	/**
@@ -147,14 +148,14 @@ public final class DeleteDialogVerifier {
 			boolean isMultiFeature) {
 		final List<String> buttonLabels = new ArrayList<>();
 		if ((featureInConstraint || featureHasGroupDifference || featureIsRoot) && !isMultiFeature) {
-			buttonLabels.add(StringTable.DELETE_WITH_SLICING);
+			buttonLabels.add(DELETE_WITH_SLICING);
 		}
 
 		if (!featureInConstraint && !featureIsRoot) {
-			buttonLabels.add(StringTable.DELETE_WITHOUT_SLICING);
+			buttonLabels.add(DELETE_WITHOUT_SLICING);
 		}
 
-		buttonLabels.add(StringTable.CANCEL);
+		buttonLabels.add(CANCEL);
 		return buttonLabels.toArray(new String[0]);
 	}
 
