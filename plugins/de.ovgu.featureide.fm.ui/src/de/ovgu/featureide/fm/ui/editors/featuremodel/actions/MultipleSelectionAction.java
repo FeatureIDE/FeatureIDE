@@ -186,7 +186,6 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 		}
 
 		return false;
-
 	}
 
 	@Override

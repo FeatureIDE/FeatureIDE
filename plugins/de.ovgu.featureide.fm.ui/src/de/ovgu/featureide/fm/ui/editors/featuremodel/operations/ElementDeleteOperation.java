@@ -109,7 +109,6 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 */
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {
-
 		// Determine features and constraints to be deleted
 		final Object[] elements = getSelection().toArray();
 		final List<IFeature> featuresToDelete = new ArrayList<>();
