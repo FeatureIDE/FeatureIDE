@@ -40,7 +40,7 @@ public class ConstraintCNFCreator extends ACreator<CNF> {
 		nodeCreator.setModelType(ModelType.OnlyConstraints);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
-		final CNF cnf = new FeatureModelCNF(formula.getFeatureModel(), false);
+		final CNF cnf = FeatureModelCNF.empty(formula.getFeatureModel(), false);
 		cnf.addClauses(Nodes.convert(cnf.getVariables(), nodeCreator.createNodes()));
 		return cnf;
 	}

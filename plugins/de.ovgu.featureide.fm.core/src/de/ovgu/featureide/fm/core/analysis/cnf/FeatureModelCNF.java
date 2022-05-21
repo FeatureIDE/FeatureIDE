@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
@@ -41,11 +42,15 @@ public class FeatureModelCNF extends CNF {
 
 	protected final boolean useOldNames;
 
-	public FeatureModelCNF(IFeatureModel featureModel) {
-		this(featureModel, false);
+	public static FeatureModelCNF fromFeatureModel(IFeatureModel featureModel) {
+		return (FeatureModelCNF) new FeatureModelFormula(featureModel).getCNF();
 	}
 
-	public FeatureModelCNF(IFeatureModel featureModel, boolean useOldNames) {
+	public static FeatureModelCNF empty(IFeatureModel featureModel, boolean useOldNames) {
+		return new FeatureModelCNF(featureModel, useOldNames);
+	}
+
+	private FeatureModelCNF(IFeatureModel featureModel, boolean useOldNames) {
 		super(new Variables(useOldNames ? FeatureUtils.getOldFeatureNamesList(featureModel) : FeatureUtils.getFeatureNamesList(featureModel)));
 		this.featureModel = featureModel;
 		this.useOldNames = useOldNames;

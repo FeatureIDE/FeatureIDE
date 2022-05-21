@@ -72,7 +72,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 			return new CNF(new Variables(Collections.<String> emptyList()));
 		}
 
-		final CNF cnf = new FeatureModelCNF(featureModel, useOldNames);
+		final CNF cnf = FeatureModelCNF.empty(featureModel, useOldNames);
 		final IVariables vars = cnf.getVariables();
 
 		monitor.setTaskName("Creating Formula");

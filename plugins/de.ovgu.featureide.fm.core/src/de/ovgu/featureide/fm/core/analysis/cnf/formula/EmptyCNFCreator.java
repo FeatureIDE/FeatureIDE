@@ -32,7 +32,7 @@ public class EmptyCNFCreator extends ACreator<CNF> {
 
 	@Override
 	protected CNF create() {
-		return new FeatureModelCNF(formula.getFeatureModel(), false);
+		return FeatureModelCNF.empty(formula.getFeatureModel(), false);
 	}
 
 }
