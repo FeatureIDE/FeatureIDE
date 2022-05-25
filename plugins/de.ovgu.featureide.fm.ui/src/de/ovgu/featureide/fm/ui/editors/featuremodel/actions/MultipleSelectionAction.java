@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -202,6 +203,24 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	@Override
 	protected List<IFeature> getInvolvedFeatures() {
 		return getSelectedFeatures().stream().map(f -> featureModelManager.getObject().getFeature(f)).collect(Collectors.toList());
+	}
+
+	/**
+	 * @return true, if every selected feature from extern is a root feature, false otherwise
+	 */
+	protected boolean isExternalRootFeature(IStructuredSelection selection) {
+		for (final Object selectedElement : selection.toArray()) {
+			if (selectedElement instanceof FeatureEditPart) {
+				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {
+					final Feature feature = (Feature) ((FeatureEditPart) selectedElement).getModel().getObject();
+					if ((feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern()
+						&& ((MultiFeature) feature.getStructure().getParent().getFeature()).isFromExtern()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 }

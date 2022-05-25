@@ -20,9 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
@@ -34,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMand
  * @author Chico Sundermann
  * @author Paul Westphal
  */
-public class MandatoryAction extends MultipleSelectionAction {
+public class MandatoryAction extends MultipleSelectionAction implements ActionAllowedForRootFeaturesInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
@@ -67,6 +72,22 @@ public class MandatoryAction extends MultipleSelectionAction {
 	protected void updateProperties() {
 		setEnabled(selectionContainsOptionalFeature());
 		setChecked(isEveryFeatureMandatory());
+	}
+
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		for (final Object obj : selection.toArray()) {
+			if (!((obj instanceof FeatureEditPart) || (obj instanceof IFeature) || (obj instanceof Feature))) {
+				return false;
+			}
+		}
+
+		// check whether the selection includes no feature from an external submodel
+		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootFeature(selection)) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

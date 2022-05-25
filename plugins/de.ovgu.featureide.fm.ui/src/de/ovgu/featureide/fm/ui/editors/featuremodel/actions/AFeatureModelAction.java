@@ -57,7 +57,10 @@ public abstract class AFeatureModelAction extends Action {
 	public boolean isEnabled() {
 		// determine if the action has to be disabled to prevent editing imported features in other files
 		if (!(this instanceof ActionAllowedInExternalSubmodel) && getInvolvedFeatures().stream().anyMatch(f -> isExternalFeature((IFeature) f))) {
-			return false;
+			if (!((this instanceof ActionAllowedForRootFeaturesInExternalSubmodel)
+				&& getInvolvedFeatures().stream().allMatch(f -> isExternalRootFeature((IFeature) f)))) {
+				return false;
+			}
 		}
 		return super.isEnabled();
 	}
@@ -68,6 +71,11 @@ public abstract class AFeatureModelAction extends Action {
 
 	protected boolean isExternalFeature(IFeature feature) {
 		return (feature != null) && (feature instanceof MultiFeature) && ((MultiFeature) feature).isFromExtern();
+	}
+
+	protected boolean isExternalRootFeature(IFeature feature) {
+		return (feature != null) && (feature instanceof MultiFeature)
+			&& (!((MultiFeature) feature).isFromExtern() || !((MultiFeature) feature.getStructure().getParent().getFeature()).isFromExtern());
 	}
 
 	/**

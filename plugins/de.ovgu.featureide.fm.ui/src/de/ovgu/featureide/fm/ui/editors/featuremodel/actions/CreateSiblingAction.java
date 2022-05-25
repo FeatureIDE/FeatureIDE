@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Sabrina Hugo
  * @author Christian Orsinger
  */
-public class CreateSiblingAction extends SingleSelectionAction {
+public class CreateSiblingAction extends SingleSelectionAction implements ActionAllowedForRootFeaturesInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.createsibling";
 
