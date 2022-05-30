@@ -63,7 +63,6 @@ public class StringTable {
 	public static final String FATAL_ERROR = "fatal error";
 	public static final String PARSER_ERROR = "parser error ";
 	public static final String TYPE_ERROR = "Type error ";
-	public static final String GENERATING_STUBS = "Generating stubs";
 	public static final String WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS = "Was not possible to generate the stubs";
 	public static final String ANALYZING_SELECTED_FILES = "Analyzing selected files";
 	public static final String TYPECHEF_DID_NOT_RUN_CORRECTLY_ = "TypeChef did not run correctly.";
@@ -191,17 +190,10 @@ public class StringTable {
 	public static final String CALL_COMPILER = "Call compiler";
 	public static final String INFORMATION = "Information";
 	public static final String CLASS = "Class ";
-	public static final String PLEASE_INSTALL_KEY_FOR_AN_AUTO_START_OF_THE_THEOREM_PROVER_ = "Please install KeY for an auto-start of the theorem prover.";
-	public static final String FEATURE_STUBS_GENERATED_AND_PROVEN_ = "Feature stubs generated and proven.";
-	public static final String ENSURES = "ensures";
 	public static final String REQUIRES = "requires";
-	public static final String ASSIGNABLE = "assignable";
-	public static final String FEATURE_STUB_GENERATOR_FOR = "Feature Stub Generator for ";
-	public static final String KEY_COULD_NOT_BE_STARTED_ = "KeY could not be started.";
 	public static final String INVARIANT = "Invariant";
 	public static final String EXTENDS = " extends ";
 	public static final String IMPLEMENTS = " implements ";
-	public static final String FEATURE_STUBS_GENERATION_STARTED_ = "Feature stub generation started.";
 	public static final String NO_PROJECT_GOT = "no project got";
 	public static final String CREATED_JAVA_PROJECT = "Created Java Project";
 	public static final String CREATE_INTERFACE = "Create Interface";
