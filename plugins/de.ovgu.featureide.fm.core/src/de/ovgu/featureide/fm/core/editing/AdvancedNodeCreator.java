@@ -57,6 +57,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		All, OnlyConstraints, OnlyStructure
 	}
 
+	private boolean omitRoot = false;
+
 	public static Node createCNF(IFeatureModel featureModel) {
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
@@ -276,7 +278,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
 			Node clause;
 
-			if (!optionalRoot) {
+			if (!optionalRoot && !(omitRoot && ((modelType != ModelType.All) || !rootInConstraints(root)))) {
 				clause = getLiteral(root, true);
 				switch (cnfType) {
 				case Regular:
@@ -295,68 +297,125 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 			final Iterable<IFeature> features = featureModel.getFeatures();
 			for (final IFeature feature : features) {
-				for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-					final IFeature childFeature = child.getFeature();
-					clause = new Or(getLiteral(feature, true), getLiteral(childFeature, false));
-					clauses.add(clause);
-					if (isRecordingTraceModel()) {
-						traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
-					}
-				}
+				final IFeatureStructure structure = feature.getStructure();
 
-				if (feature.getStructure().hasChildren()) {
-					if (feature.getStructure().isAnd()) {
-						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-							if (child.isMandatory()) {
+				if (structure.hasChildren()) {
+					if (!omitRoot || !structure.isRoot()) {
+						for (final IFeatureStructure child : structure.getChildren()) {
+							final IFeature childFeature = child.getFeature();
+							clause = new Or(getLiteral(feature, true), getLiteral(childFeature, false));
+							clauses.add(clause);
+							if (isRecordingTraceModel()) {
+								traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
+							}
+						}
+
+						if (structure.isAnd()) {
+							for (final IFeatureStructure child : structure.getChildren()) {
+								if (child.isMandatory()) {
+									final IFeature childFeature = child.getFeature();
+									clause = new Or(getLiteral(childFeature, true), getLiteral(feature, false));
+									clauses.add(clause);
+									if (isRecordingTraceModel()) {
+										traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
+									}
+								}
+							}
+						} else if (structure.isOr()) {
+							final List<IFeature> children = new LinkedList<>();
+							final Literal[] orLiterals = new Literal[structure.getChildren().size() + 1];
+							int i = 0;
+							for (final IFeatureStructure child : structure.getChildren()) {
 								final IFeature childFeature = child.getFeature();
-								clause = new Or(getLiteral(childFeature, true), getLiteral(feature, false));
-								clauses.add(clause);
-								if (isRecordingTraceModel()) {
-									traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
+								orLiterals[i++] = getLiteral(childFeature, true);
+								children.add(childFeature);
+							}
+							orLiterals[i] = getLiteral(feature, false);
+							clause = new Or(orLiterals);
+							clauses.add(clause);
+							if (isRecordingTraceModel()) {
+								traceModel.addTraceChildDown(feature, children);
+							}
+						} else if (structure.isAlternative()) {
+							final List<IFeature> children = new LinkedList<>();
+							final Literal[] alternativeLiterals = new Literal[structure.getChildrenCount() + 1];
+							int i = 0;
+							for (final IFeatureStructure child : structure.getChildren()) {
+								final IFeature childFeature = child.getFeature();
+								alternativeLiterals[i++] = getLiteral(childFeature, true);
+								children.add(childFeature);
+							}
+							alternativeLiterals[i] = getLiteral(feature, false);
+							clause = new Or(alternativeLiterals);
+							clauses.add(clause);
+							if (isRecordingTraceModel()) {
+								traceModel.addTraceChildDown(feature, children);
+							}
+
+							for (final ListIterator<IFeatureStructure> it1 = structure.getChildren().listIterator(); it1.hasNext();) {
+								final IFeatureStructure fs = it1.next();
+								final IFeature sibling1 = fs.getFeature();
+								for (final ListIterator<IFeatureStructure> it2 = structure.getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
+									final IFeature sibling2 = it2.next().getFeature();
+									clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
+									clauses.add(clause);
+									if (isRecordingTraceModel()) {
+										traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
+									}
 								}
 							}
 						}
-					} else if (feature.getStructure().isOr()) {
-						final List<IFeature> children = new LinkedList<>();
-						final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
-						int i = 0;
-						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-							final IFeature childFeature = child.getFeature();
-							orLiterals[i++] = getLiteral(childFeature, true);
-							children.add(childFeature);
-						}
-						orLiterals[i] = getLiteral(feature, false);
-						clause = new Or(orLiterals);
-						clauses.add(clause);
-						if (isRecordingTraceModel()) {
-							traceModel.addTraceChildDown(feature, children);
-						}
-					} else if (feature.getStructure().isAlternative()) {
-						final List<IFeature> children = new LinkedList<>();
-						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
-						int i = 0;
-						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-							final IFeature childFeature = child.getFeature();
-							alternativeLiterals[i++] = getLiteral(childFeature, true);
-							children.add(childFeature);
-						}
-						alternativeLiterals[i] = getLiteral(feature, false);
-						clause = new Or(alternativeLiterals);
-						clauses.add(clause);
-						if (isRecordingTraceModel()) {
-							traceModel.addTraceChildDown(feature, children);
-						}
+					} else {
+						if (structure.isAnd()) {
+							for (final IFeatureStructure child : structure.getChildren()) {
+								if (child.isMandatory()) {
+									final IFeature childFeature = child.getFeature();
+									clause = new Or(getLiteral(childFeature, true));
+									clauses.add(clause);
+									if (isRecordingTraceModel()) {
+										traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
+									}
+								}
+							}
+						} else if (structure.isOr()) {
+							final List<IFeature> children = new LinkedList<>();
+							final Literal[] orLiterals = new Literal[structure.getChildren().size()];
+							int i = 0;
+							for (final IFeatureStructure child : structure.getChildren()) {
+								final IFeature childFeature = child.getFeature();
+								orLiterals[i++] = getLiteral(childFeature, true);
+								children.add(childFeature);
+							}
+							clause = new Or(orLiterals);
+							clauses.add(clause);
+							if (isRecordingTraceModel()) {
+								traceModel.addTraceChildDown(feature, children);
+							}
+						} else if (structure.isAlternative()) {
+							final List<IFeature> children = new LinkedList<>();
+							final Literal[] alternativeLiterals = new Literal[structure.getChildrenCount()];
+							int i = 0;
+							for (final IFeatureStructure child : structure.getChildren()) {
+								final IFeature childFeature = child.getFeature();
+								alternativeLiterals[i++] = getLiteral(childFeature, true);
+								children.add(childFeature);
+							}
+							clause = new Or(alternativeLiterals);
+							clauses.add(clause);
+							if (isRecordingTraceModel()) {
+								traceModel.addTraceChildDown(feature, children);
+							}
 
-						for (final ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
-							final IFeatureStructure fs = it1.next();
-							final IFeature sibling1 = fs.getFeature();
-							for (final ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2
-									.hasNext();) {
-								final IFeature sibling2 = it2.next().getFeature();
-								clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
-								clauses.add(clause);
-								if (isRecordingTraceModel()) {
-									traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
+							for (final ListIterator<IFeatureStructure> it1 = structure.getChildren().listIterator(); it1.hasNext();) {
+								final IFeatureStructure fs = it1.next();
+								final IFeature sibling1 = fs.getFeature();
+								for (final ListIterator<IFeatureStructure> it2 = structure.getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
+									final IFeature sibling2 = it2.next().getFeature();
+									clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
+									clauses.add(clause);
+									if (isRecordingTraceModel()) {
+										traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
+									}
 								}
 							}
 						}
@@ -367,6 +426,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			return new And(clauses.toArray(new Node[0]));
 		}
 		return new And(new Node[0]);
+	}
+
+	private boolean rootInConstraints(final IFeature root) {
+		return featureModel.getConstraints().stream().anyMatch(c -> c.getContainedFeatures().contains(root));
 	}
 
 	private Literal getLiteral(IFeature feature, boolean positive) {
@@ -433,6 +496,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		this.optionalRoot = optionalRoot;
 	}
 
+	public boolean isOmitRoot() {
+		return omitRoot;
+	}
+
+	public void setOmitRoot(boolean omitRoot) {
+		this.omitRoot = omitRoot;
+	}
+
 	/**
 	 * <p> Returns the trace model. The trace model keeps track of the origin of transformed elements. </p>
 	 *
@@ -466,4 +537,5 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; // Reset the trace model.
 		}
 	}
+
 }

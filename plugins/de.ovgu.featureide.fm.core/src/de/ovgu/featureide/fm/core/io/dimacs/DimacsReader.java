@@ -25,12 +25,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +49,7 @@ public class DimacsReader {
 	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSConstants.PROBLEM + "\\s+" + DIMACSConstants.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
-	private final Map<Integer, String> indexVariables = new LinkedHashMap<>();
+	private final List<String> indexVariables = new ArrayList<>();
 	/**
 	 * The amount of variables as declared in the problem definition. May differ from the actual amount of variables found.
 	 */
@@ -98,6 +96,7 @@ public class DimacsReader {
 	 */
 	public Node read(Reader in) throws ParseException, IOException {
 		indexVariables.clear();
+		indexVariables.add(null);
 		variableCount = -1;
 		clauseCount = -1;
 		readingVariables = readVariableDirectory;
@@ -111,7 +110,7 @@ public class DimacsReader {
 			readingVariables = false;
 
 			final Node[] clauses = readClauses(lineIterator);
-			final int actualVariableCount = indexVariables.size();
+			final int actualVariableCount = indexVariables.size() - 1;
 			if (variableCount != actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
 			}
@@ -174,6 +173,9 @@ public class DimacsReader {
 		}
 		if (variableCount < 0) {
 			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
+		}
+		while (indexVariables.size() <= variableCount) {
+			indexVariables.add(Integer.toString(indexVariables.size()));
 		}
 
 		try {
@@ -250,12 +252,10 @@ public class DimacsReader {
 				throw new ParseException("Illegal literal", lineIterator.getLineCount());
 			}
 			final Integer key = Math.abs(index);
-			String variable = indexVariables.get(key);
-			if (variable == null) {
-				variable = String.valueOf(key);
-				indexVariables.put(key, variable);
+			if (indexVariables.size() <= key) {
+				throw new ParseException("Variable count is smaller than given literal", lineIterator.getLineCount());
 			}
-			literals[j] = new Literal(variable, index > 0);
+			literals[j] = new Literal(indexVariables.get(key), index > 0);
 		}
 		return new Or(literals);
 	}
@@ -291,14 +291,15 @@ public class DimacsReader {
 			return false;
 		}
 		final String variable = comment.substring(firstSeparator + 1);
-		if (!indexVariables.containsKey(index)) {
-			indexVariables.put(index, variable);
+		while (indexVariables.size() <= index) {
+			indexVariables.add(Integer.toString(indexVariables.size()));
 		}
+		indexVariables.set(index, variable);
 		return true;
 	}
 
-	public Collection<String> getVariables() {
-		return indexVariables.values();
+	public List<String> getVariables() {
+		return indexVariables.subList(1, indexVariables.size());
 	}
 
 }

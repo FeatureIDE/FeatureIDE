@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.handlers;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.SWT;
@@ -60,20 +59,14 @@ public abstract class AExportHandler<T> extends AFileHandler {
 				fileDialog.setFilterIndex(getDefaultFormat(formatExtensions));
 			}
 
-			final BooleanSupplier bs = new BooleanSupplier() {
+			final Runnable bs = new Runnable() {
 
 				@Override
-				public boolean getAsBoolean() {
+				public void run() {
 					final String filepath = fileDialog.getSelectedFile();
-
-					if (filepath == null) {
-						return false;
+					if (filepath != null) {
+						finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
 					}
-
-					final FileHandler<T> fileHandler = read(modelFilePath);
-					save(formatExtensions.get(fileDialog.getFilterIndex()), fileHandler, Paths.get(filepath));
-
-					return false;
 				}
 			};
 
@@ -95,13 +88,14 @@ public abstract class AExportHandler<T> extends AFileHandler {
 
 			// Ask for file name
 			final String filepath = fileDialog.open();
-			if (filepath == null) {
-				return;
+			if (filepath != null) {
+				finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
 			}
-
-			final FileHandler<T> fileHandler = read(modelFilePath);
-			save(formatExtensions.get(fileDialog.getFilterIndex()), fileHandler, Paths.get(filepath));
 		}
+	}
+
+	private void finish(Path modelFilePath, final String filepath, IPersistentFormat<T> format) {
+		save(format, read(modelFilePath), Paths.get(filepath));
 	}
 
 	protected abstract List<? extends IPersistentFormat<T>> getFormats();

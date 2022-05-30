@@ -562,8 +562,9 @@ public class StringTable {
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
-	public static final String CONFIGURATION_DIALOGS_REMEMBER_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
-	public static final String CONFIGURATION_DIALOGS_DECISION_CONSTRAINT_TEXT = "Open Constraint View when starting FeatureIDE.";
+	public static final String CONSTRAINT_VIEW_ON_TEXT = "Show constraint view dialog";
+	public static final String CONSTRAINT_VIEW_OFF_TEXT = "Hide constraint view dialog";
+	public static final String CONSTRAINT_VIEW_ASK_TEXT = "Open Constraint View when starting FeatureIDE";
 	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP =
 		"Don't show tooltip asking if you want to open the constraint view when starting FeatureIDE.";
 	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP = "Open Constraint View when starting FeatureIDE.";
