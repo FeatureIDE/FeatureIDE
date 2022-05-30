@@ -166,8 +166,8 @@ public class StringTable {
 	public static final String FROM_FEATUREHOUSE_TO_AHEAD_ = " from FeatureHouse to AHEAD.";
 	public static final String REPLACE_KEYWORDS_ = "Replace keywords.";
 	public static final String COMPOSER_CONVERSION = "Composer Conversion";
-	public static final String SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_ =
-		"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.";
+	public static final String FEATUREHOUSE_SUPPORTS_JAVA_5_AND_AHEAD_JAVA_4 =
+		"If you continue, your source files will be changed automatically. Note that FeatureHouse supports Java 5, while AHEAD supports Java 4. This may cause problems during the conversion.";
 	public static final String LINUX = "Linux";
 	public static final String IS_NOT_AN_ABSOLUTE_PATH_ = " is not an absolute path. ";
 	public static final String IS_NO_VALID_PATH_ = " is no valid path. ";
