@@ -98,7 +98,7 @@ public class CreateFeatureAboveAction extends MultipleSelectionAction implements
 			}
 		}
 
-		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootOrInternalFeature(selection)) {
 			return true;
 		}
 

@@ -208,7 +208,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	/**
 	 * @return true, if every selected feature from extern is a root feature, false otherwise
 	 */
-	protected boolean isExternalRootFeature(IStructuredSelection selection) {
+	protected boolean isExternalRootOrInternalFeature(IStructuredSelection selection) {
 		for (final Object selectedElement : selection.toArray()) {
 			if (selectedElement instanceof FeatureEditPart) {
 				if (((FeatureEditPart) selectedElement).getModel().getObject() instanceof Feature) {

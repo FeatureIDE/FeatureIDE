@@ -83,7 +83,7 @@ public class MandatoryAction extends MultipleSelectionAction implements ActionAl
 		}
 
 		// check whether the selection includes no feature from an external submodel
-		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootOrInternalFeature(selection)) {
 			return true;
 		}
 
