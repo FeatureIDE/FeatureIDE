@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateFeatureAboveAction extends MultipleSelectionAction {
+public class CreateFeatureAboveAction extends MultipleSelectionAction implements ActionAllowedForRootFeaturesInExternalSubmodel {
 
 	public static final String ID = "de.ovgu.featureide.createfeatureabove";
 
@@ -98,12 +98,12 @@ public class CreateFeatureAboveAction extends MultipleSelectionAction {
 			}
 		}
 
-		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
+		if ((this instanceof ActionAllowedInExternalSubmodel) || isExternalRootOrInternalFeature(selection)) {
 			return true;
 		}
 
 		return false;
-
+		
 	}
 
 	@Override
