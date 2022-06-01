@@ -296,7 +296,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private int getGroup(IFeatureStructure f) {
 		if (f == null) {
 			return GROUP_NO;
-		} else if (f.isAnd()) {
+		} else if (f.isAndInternal()) {
 			return GROUP_AND;
 		} else if (f.isOr()) {
 			return GROUP_OR;

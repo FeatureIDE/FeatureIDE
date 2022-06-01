@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,11 +31,14 @@ import org.prop4j.And;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -50,8 +52,10 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 public class DIMACSFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
+	public static final String DUMMY_ROOT_NAME = "__Root__";
 
 	private boolean flattenCNF = false;
+	private boolean omitDummyRoot = true;
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -64,7 +68,7 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		r.setFlattenCNF(flattenCNF);
 		try (StringReader reader = new StringReader(source.toString())) {
 			final Node node = r.read(reader);
-			final Collection<String> variables = r.getVariables();
+			final List<String> variables = r.getVariables();
 
 			// Add the propositional node to the feature model.
 			featureModel.reset();
@@ -86,18 +90,20 @@ public class DIMACSFormat extends AFeatureModelFormat {
 	 * @param node propositional node to add
 	 * @param variables the variables of the propositional node
 	 */
-	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, Collection<String> variables) {
+	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node, List<String> variables) {
 		// Add a dummy feature as root.
-		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
-		rootFeature.getStructure().setAbstract(true);
+		final IFeature rootFeature = factory.createFeature(featureModel, DUMMY_ROOT_NAME);
 		featureModel.addFeature(rootFeature);
+		rootFeature.getStructure().setAbstract(true);
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		// Add a feature for each variable.
 		for (final String variable : variables) {
-			final IFeature feature = factory.createFeature(featureModel, variable.toString());
-			FeatureUtils.addFeature(featureModel, feature);
-			FeatureUtils.addChild(rootFeature, feature);
+			if (!DUMMY_ROOT_NAME.equals(variable)) {
+				final IFeature feature = factory.createFeature(featureModel, variable.toString());
+				FeatureUtils.addFeature(featureModel, feature);
+				FeatureUtils.addChild(rootFeature, feature);
+			}
 		}
 
 		// Add a constraint for each conjunctive clause.
@@ -111,9 +117,27 @@ public class DIMACSFormat extends AFeatureModelFormat {
 		this.flattenCNF = flattenCNF;
 	}
 
+	public boolean isOmitDummyRoot() {
+		return omitDummyRoot;
+	}
+
+	public void setOmitDummyRoot(boolean omitRoot) {
+		this.omitDummyRoot = omitRoot;
+	}
+
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final DimacsWriter w = new DimacsWriter(new FeatureModelFormula(featureModel).getCNF());
+		final Variables variables = new Variables(FeatureUtils.getFeatureNamesList(featureModel));
+		final CNF cnf = new CNF(variables);
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		if (omitDummyRoot) {
+			final IFeatureStructure root = featureModel.getStructure().getRoot();
+			if ((root != null) && DUMMY_ROOT_NAME.equals(root.getFeature().getName())) {
+				nodeCreator.setOmitRoot(omitDummyRoot);
+			}
+		}
+		cnf.addClauses(Nodes.convert(variables, nodeCreator.createNodes()));
+		final DimacsWriter w = new DimacsWriter(cnf);
 		w.setWritingVariableDirectory(true);
 		return w.write();
 	}

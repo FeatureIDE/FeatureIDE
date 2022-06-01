@@ -1,11 +1,23 @@
-Change log for FeatureIDE
+# Changelog for FeatureIDE
 
 Each release contains smaller changes, bug fixes, and performance improvements,
-which can be found here:
+which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
+This log contains an overview of enhancements and bug fixes for each release:
 
-https://github.com/FeatureIDE/FeatureIDE/milestones
-
-Here, is a list of high-level enhancements.
+Release 3.8.3 (May 2022)
+* Hotfix containing mostly bugfixes over v3.8.2
+* Fixed bug that prevented features from being deleted in feature model editor (#1350)
+* Fixed bug that prevented deletion of multiple constraints (#1342)
+* Fixed bug that changed feature order in DIMACS files (#1340)
+* Fixed problem when slicing alternative groups (#1348)
+* Fixed typos in some dialogs for FeatureHouse (#1106)
+* Improvements for FeatureIDE preference page
+  * Fixed behavior when reseting options to default values
+  * Fixed behavior when leaving the page without applying changes
+  * Added option to omit artificial root, when saving a feature model as DIMACS file (#1340)
+* Added missing actions for root feature of submodels in feature model editor (#1314)
+* Added license file and corresponding information to repository root (#1290)
+* Minor API improvements (#1351)
 
 Release 3.8.2 (April 2022)
 * Hotfix containing mostly bugfixes over v3.8.1
@@ -140,7 +152,7 @@ Release 3.6.1 (October 2019)
 * Critical and major bugs _introduced_ with this version
   * T-wise configuration generation with ICPL and Chvatal does not work anymore (#983)
 
-## Release 3.6.0 (August 2019) 
+Release 3.6.0 (August 2019) 
 * Increased required Java version to 1.8
 * New constraint view added listing cross-tree constraints
   * Filter of constraints based on selection in feature diagram

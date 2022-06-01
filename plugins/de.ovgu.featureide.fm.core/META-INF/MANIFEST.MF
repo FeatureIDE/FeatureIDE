@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 3.8.2.qualifier
+Bundle-Version: 3.8.3.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.swt
@@ -88,6 +88,7 @@ Export-Package: clojure.lang,
  de.ovgu.featureide.fm.core.job.monitor,
  de.ovgu.featureide.fm.core.job.util,
  de.ovgu.featureide.fm.core.localization,
+ de.ovgu.featureide.fm.core.preferences,
  no.sintef.ict.splcatool,
  org.antlr,
  org.antlr.analysis,

@@ -39,7 +39,7 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 	public static final String ID = ID_PREFIX + "DeleteSubmodelOperation";
 
 	public DeleteSubmodelOperation(Object viewer, IFeatureModelManager featureModelManager) {
-		super(viewer, featureModelManager, null);
+		super(viewer, featureModelManager, false);
 	}
 
 	@Override

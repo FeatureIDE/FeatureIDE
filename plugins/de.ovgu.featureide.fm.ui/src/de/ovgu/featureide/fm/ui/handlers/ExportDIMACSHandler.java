@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
+import de.ovgu.featureide.fm.core.preferences.DIMACSOmitRootPreference;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractFMExportHandler;
 
 /**
@@ -35,7 +36,9 @@ public class ExportDIMACSHandler extends AbstractFMExportHandler {
 
 	@Override
 	protected IFeatureModelFormat getOutputFormat() {
-		return new DIMACSFormat();
+		final DIMACSFormat format = new DIMACSFormat();
+		format.setOmitDummyRoot(DIMACSOmitRootPreference.getInstance().get());
+		return format;
 	}
 
 	@Override

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -86,11 +85,15 @@ public class DeleteAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		final Optional<String> dialogReturnLabel = DeleteDialogVerifier.checkForDialog(featuresToDelete);
-
-		if (dialogReturnLabel.filter("Cancel"::equals).isPresent()) {
-			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, dialogReturnLabel.get()));
-		}
+		DeleteDialogVerifier.checkForDialog(featuresToDelete).map(label -> {
+			switch (label) {
+			case DeleteDialogVerifier.DELETE_WITH_SLICING:
+				return new ElementDeleteOperation(viewer, featureModelManager, true);
+			case DeleteDialogVerifier.DELETE_WITHOUT_SLICING:
+				return new ElementDeleteOperation(viewer, featureModelManager, false);
+			}
+			return null;
+		}).ifPresent(FeatureModelOperationWrapper::run);
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {

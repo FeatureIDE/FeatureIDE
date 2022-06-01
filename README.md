@@ -1,14 +1,16 @@
 # FeatureIDE
 
-An extensible framework for feature-oriented software development
+**An extensible framework for feature-oriented software development**
 
-latest release:
+**[Visit our website](https://featureide.github.io)** for more information about features, news, and downloads.
+
+Latest release:
 [![Build Status](https://travis-ci.org/FeatureIDE/FeatureIDE.svg?branch=master)](https://travis-ci.org/FeatureIDE/FeatureIDE)
 
-release candidate:
+Release candidate:
 [![Build Status](https://travis-ci.org/FeatureIDE/FeatureIDE.svg?branch=release3.6)](https://travis-ci.org/FeatureIDE/FeatureIDE)
 
-development branch:
+Development branch:
 [![Build Status](https://travis-ci.org/FeatureIDE/FeatureIDE.svg?branch=develop)](https://travis-ci.org/FeatureIDE/FeatureIDE)
 
 ## Plugins Overview
@@ -65,3 +67,7 @@ development branch:
 | Plugin                                                                                                                   | Description                                                                                                                                                                                                                                                                          |
 |--------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [de.ovgu.featureide.examples](https://github.com/FeatureIDE/FeatureIDE/tree/develop/plugins/de.ovgu.featureide.examples) | Provides example projects showcasing different functionalities of FeatureIDE. These functionalities include each of the composers, different supported programming paradigms (AOP, FOP, etc.), and feature modeling concepts (extended Feature Models, Feature Model formats, etc.). |
+
+## License
+
+FeatureIDE is released under L-GPL license v3.
