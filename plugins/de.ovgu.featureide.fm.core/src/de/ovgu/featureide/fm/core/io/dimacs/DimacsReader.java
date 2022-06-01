@@ -109,10 +109,23 @@ public class DimacsReader {
 			readComments(lineIterator);
 			readingVariables = false;
 
-			final Node[] clauses = readClauses(lineIterator);
+			for (int i = 1; i < indexVariables.size(); i++) {
+				if (indexVariables.get(i) == null) {
+					indexVariables.set(i, Integer.toString(i));
+				}
+			}
+			while (indexVariables.size() <= variableCount) {
+				indexVariables.add(Integer.toString(indexVariables.size()));
+			}
+
+			final ArrayList<Node> clauses = readClauses(lineIterator);
 			final int actualVariableCount = indexVariables.size() - 1;
 			if (variableCount != actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
+			}
+			final int actualClausesCount = clauses.size();
+			if (clauseCount != actualClausesCount) {
+				throw new ParseException(String.format("Found %d instead of %d clauses", actualClausesCount, clauseCount), 1);
 			}
 			Node node = new And(clauses);
 			if (flattenCNF) {
@@ -174,9 +187,6 @@ public class DimacsReader {
 		if (variableCount < 0) {
 			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
-		while (indexVariables.size() <= variableCount) {
-			indexVariables.add(Integer.toString(indexVariables.size()));
-		}
 
 		try {
 			clauseCount = Integer.parseInt(matcher.group(2));
@@ -195,10 +205,9 @@ public class DimacsReader {
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 * @throws IOException
 	 */
-	private Node[] readClauses(LineIterator lineIterator) throws ParseException, IOException {
+	private ArrayList<Node> readClauses(LineIterator lineIterator) throws ParseException, IOException {
 		final LinkedList<String> literalQueue = new LinkedList<>();
-		final Node[] clauses = new Node[clauseCount];
-		int readClausesCount = 0;
+		final ArrayList<Node> clauses = new ArrayList<>(clauseCount);
 		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.get()) {
 			if (commentPattern.matcher(line).matches()) {
 				continue;
@@ -216,8 +225,7 @@ public class DimacsReader {
 					throw new ParseException("Empty clause", lineIterator.getLineCount());
 				}
 
-				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
-				readClausesCount++;
+				clauses.add(parseClause(clauseSize, literalQueue, lineIterator));
 
 				if (!DIMACSConstants.CLAUSE_END.equals(literalQueue.removeFirst())) {
 					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
@@ -226,19 +234,12 @@ public class DimacsReader {
 			} while (!literalQueue.isEmpty());
 		}
 		if (!literalQueue.isEmpty()) {
-			clauses[readClausesCount] = parseClause(readClausesCount, literalQueue.size(), literalQueue, lineIterator);
-			readClausesCount++;
-		}
-		if (readClausesCount < clauseCount) {
-			throw new ParseException(String.format("Found %d instead of %d clauses", readClausesCount, clauseCount), 1);
+			clauses.add(parseClause(literalQueue.size(), literalQueue, lineIterator));
 		}
 		return clauses;
 	}
 
-	private Or parseClause(int readClausesCount, int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
-		if (readClausesCount == clauseCount) {
-			throw new ParseException(String.format("Found more than %d clauses", clauseCount), 1);
-		}
+	private Or parseClause(int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
 		final Node[] literals = new Node[clauseSize];
 		for (int j = 0; j < literals.length; j++) {
 			final String token = literalQueue.removeFirst();
@@ -292,9 +293,11 @@ public class DimacsReader {
 		}
 		final String variable = comment.substring(firstSeparator + 1);
 		while (indexVariables.size() <= index) {
-			indexVariables.add(Integer.toString(indexVariables.size()));
+			indexVariables.add(null);
 		}
-		indexVariables.set(index, variable);
+		if (indexVariables.get(index) == null) {
+			indexVariables.set(index, variable);
+		}
 		return true;
 	}
 
