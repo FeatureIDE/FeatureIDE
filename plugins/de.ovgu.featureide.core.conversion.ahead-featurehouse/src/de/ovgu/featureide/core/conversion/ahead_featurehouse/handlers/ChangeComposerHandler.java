@@ -21,7 +21,7 @@
 package de.ovgu.featureide.core.conversion.ahead_featurehouse.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSER_CONVERSION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATUREHOUSE_SUPPORTS_JAVA_5_AND_AHEAD_JAVA_4;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -46,9 +46,8 @@ public class ChangeComposerHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
-		return MessageDialog.open(MessageDialog.WARNING, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), COMPOSER_CONVERSION,
-				SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_,
-				SWT.NONE);
+		return MessageDialog.open(MessageDialog.CONFIRM, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), COMPOSER_CONVERSION,
+				FEATUREHOUSE_SUPPORTS_JAVA_5_AND_AHEAD_JAVA_4, SWT.NONE);
 	}
 
 	@Override

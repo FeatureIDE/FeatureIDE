@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOperationWrapper;
 
@@ -51,11 +50,8 @@ public class DeleteConstraintInViewAction extends AbstractConstraintEditorAction
 
 	@Override
 	public void run() {
-		// Decision single or multiply selection of constraints
-		if (selection.toList().size() == 1) {
-			FeatureModelOperationWrapper.run(new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModelManager));
-		} else if (selection.toList().size() > 1) {
-			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, null));
+		if (selection.size() >= 1) {
+			FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager, false));
 		}
 	}
 

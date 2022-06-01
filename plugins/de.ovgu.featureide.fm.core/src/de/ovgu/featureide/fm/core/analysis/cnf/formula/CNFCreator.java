@@ -33,7 +33,7 @@ public class CNFCreator extends ACreator<CNF> {
 
 	@Override
 	protected CNF create() {
-		final CNF cnf = new FeatureModelCNF(formula.getFeatureModel(), false);
+		final CNF cnf = FeatureModelCNF.empty(formula.getFeatureModel(), false);
 		cnf.addClauses(Nodes.convert(cnf.getVariables(), formula.getElement(new CNFNodeCreator())));
 		return cnf;
 	}

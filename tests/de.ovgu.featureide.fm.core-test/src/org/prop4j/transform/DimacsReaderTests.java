@@ -220,7 +220,7 @@ public class DimacsReaderTests {
 
 	@Test
 	public void testProblemVariableCountTooHigh() throws ParseException, IOException {
-		testException("" + "p cnf 4 2\n" + "1 -3 0\n" + "2 3 -1 0");
+		testEquals("" + "p cnf 4 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
@@ -270,13 +270,12 @@ public class DimacsReaderTests {
 
 	@Test
 	public void testIndexStart() throws ParseException, IOException {
-		testEquals("" + "p cnf 3 2\n" + "11 -13 0\n" + "12 13 -11 0",
-				new And(new Or("11", new Literal("13", false)), new Or("12", "13", new Literal("11", false))));
+		testException("" + "p cnf 3 2\n" + "11 -13 0\n" + "12 13 -11 0");
 	}
 
 	@Test
 	public void testIndexGap() throws ParseException, IOException {
-		testEquals("" + "p cnf 3 2\n" + "1 -4 0\n" + "2 4 -1 0", new And(new Or("1", new Literal("4", false)), new Or("2", "4", new Literal("1", false))));
+		testException("" + "p cnf 3 2\n" + "1 -4 0\n" + "2 4 -1 0");
 	}
 
 	@Test
