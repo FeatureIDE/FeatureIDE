@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -136,6 +137,15 @@ public class ConfigurationGeneratorTest {
 	}
 
 	@Test
+	public void YASAInitialSample() {
+		testInitialTWise("gpl_medium_model", 1, 5);
+		testInitialTWise("gpl_medium_model", 2, 5);
+		testInitialTWise("gpl_medium_model", 3, 5);
+		testInitialTWise("gpl_medium_model", 2, 0);
+		testInitialTWise("gpl_medium_model", 2, 30);
+	}
+
+	@Test
 	public void YASAOneWiseCoverage() {
 		testCoverageAndDeterminism("yasa", 1, modelNames);
 	}
@@ -188,7 +198,7 @@ public class ConfigurationGeneratorTest {
 	private void testCoverage(final String algorithmName, final int t, final List<String> modelNameList) {
 		for (final String modelName : modelNameList) {
 			final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-			final SampleTester tester = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 			assertEquals("Wrong coverage for " + modelName, 1.0, tester.getCoverage(new TWiseCoverageCriterion(tester.getCnf(), t)), 0.0);
 		}
@@ -197,59 +207,53 @@ public class ConfigurationGeneratorTest {
 	private void testCoverageAndDeterminism(final String algorithmName, final int t, final List<String> modelNameList) {
 		for (final String modelName : modelNameList) {
 			final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-			final SampleTester tester = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 			assertEquals("Wrong coverage for " + modelName, 1.0, tester.getCoverage(new TWiseCoverageCriterion(tester.getCnf(), t)), 0.0);
-			final SampleTester tester2 = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester2 = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertEquals("Wrong size for " + modelName, tester.getSize(), tester2.getSize());
 		}
 	}
 
 	private static void testSize(String modelName, String algorithm, int numberOfConfigurations) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, null);
+		final SampleTester tester = sample(modelFile, algorithm, Collections.emptyList());
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 		assertEquals("Wrong number of configurations for " + modelName, numberOfConfigurations, tester.getSize());
 	}
 
 	private static void testLimitedSize(String modelName, String algorithm, int numberOfConfigurations, int limit) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, limit);
+		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-l", Integer.toString(limit)));
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 		assertTrue("Number of configurations larger than limit for " + modelName, limit >= tester.getSize());
 	}
 
 	private static void testTWiseLimitedSize(String modelName, String algorithm, int t, int limit) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, limit);
+		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-l", Integer.toString(limit)));
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 		assertTrue("Number of configurations larger than limit for " + modelName, limit >= tester.getSize());
 	}
 
-	private static SampleTester sample(final Path modelFile, String algorithm, Integer t, Integer limit) {
+	private static void testInitialTWise(String modelName, int t, int initialSize) {
+		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
 		try {
-			final Path inFile = Files.createTempFile("input", ".xml");
-			Files.write(inFile, Files.readAllBytes(modelFile));
+			final Path sampleFile = runSampleAlgorithm(modelFile, "random", Arrays.asList("-l", Integer.toString(initialSize)));
+			final SolutionList sample = new SolutionList();
+			FileHandler.load(sampleFile, sample, new ConfigurationListFormat());
+			final SampleTester tester = sample(modelFile, "yasa", Arrays.asList("-t", Integer.toString(t), "-m", "5", "-i", sampleFile.toString()));
+			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
+			assertEquals("Initial sample is changed for " + sample.getSolutions(), sample.getSolutions(), tester.getSample().subList(0, initialSize));
+		} catch (final IOException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
 
-			final Path outFile = Files.createTempFile("output", "");
-
-			final ArrayList<String> args = new ArrayList<>();
-			args.add("-a");
-			args.add(algorithm);
-			args.add("-o");
-			args.add(outFile.toString());
-			args.add("-fm");
-			args.add(inFile.toString());
-
-			if (t != null) {
-				args.add("-t");
-				args.add(Integer.toString(t));
-			}
-			if (limit != null) {
-				args.add("-l");
-				args.add(Integer.toString(limit));
-			}
-			new ConfigurationGenerator().run(args);
+	private static SampleTester sample(final Path modelFile, String algorithm, List<String> additionalArgs) {
+		try {
+			final Path outFile = runSampleAlgorithm(modelFile, algorithm, additionalArgs);
 
 			final SolutionList sample = new SolutionList();
 			FileHandler.load(outFile, sample, new ConfigurationListFormat());
@@ -268,5 +272,23 @@ public class ConfigurationGeneratorTest {
 			fail(e.getMessage());
 			return null;
 		}
+	}
+
+	private static Path runSampleAlgorithm(final Path modelFile, String algorithm, List<String> additionalArgs) throws IOException {
+		final Path inFile = Files.createTempFile("input", ".xml");
+		Files.write(inFile, Files.readAllBytes(modelFile));
+
+		final Path outFile = Files.createTempFile("output", "");
+
+		final ArrayList<String> args = new ArrayList<>();
+		args.add("-a");
+		args.add(algorithm);
+		args.add("-o");
+		args.add(outFile.toString());
+		args.add("-fm");
+		args.add(inFile.toString());
+		args.addAll(additionalArgs);
+		new ConfigurationGenerator().run(args);
+		return outFile;
 	}
 }

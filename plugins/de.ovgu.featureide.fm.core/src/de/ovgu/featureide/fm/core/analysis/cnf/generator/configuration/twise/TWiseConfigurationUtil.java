@@ -374,19 +374,30 @@ public class TWiseConfigurationUtil {
 		return false;
 	}
 
-	public void newConfiguration(final LiteralSet literals) {
-		if ((completeSolutionList.size() + incompleteSolutionList.size()) < maxSampleSize) {
+	public void newConfiguration(final LiteralSet literals, boolean unchanged) {
+		if (unchanged) {
 			final TWiseConfiguration configuration = new TWiseConfiguration(this);
-			selectLiterals(configuration, Deduce.DP, literals);
-			configuration.updateSolverSolutions();
-			if (configuration.isComplete()) {
-				configuration.clear();
-				completeSolutionList.add(configuration);
-			} else {
-				incompleteSolutionList.add(configuration);
-				Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
+			selectLiterals(configuration, Deduce.NONE, literals);
+			configuration.clear();
+			completeSolutionList.add(configuration);
+		} else {
+			if ((completeSolutionList.size() + incompleteSolutionList.size()) < maxSampleSize) {
+				final TWiseConfiguration configuration = new TWiseConfiguration(this);
+				selectLiterals(configuration, Deduce.DP, literals);
+				configuration.updateSolverSolutions();
+				if (configuration.isComplete()) {
+					configuration.clear();
+					completeSolutionList.add(configuration);
+				} else {
+					incompleteSolutionList.add(configuration);
+					Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
+				}
 			}
 		}
+	}
+
+	public void newConfiguration(final LiteralSet literals) {
+		newConfiguration(literals, false);
 	}
 
 	public List<TWiseConfiguration> getIncompleteSolutionList() {
@@ -399,8 +410,8 @@ public class TWiseConfigurationUtil {
 
 	public List<TWiseConfiguration> getResultList() {
 		final ArrayList<TWiseConfiguration> resultList = new ArrayList<>(completeSolutionList.size() + incompleteSolutionList.size());
-		resultList.addAll(incompleteSolutionList);
 		resultList.addAll(completeSolutionList);
+		resultList.addAll(incompleteSolutionList);
 		return resultList;
 	}
 

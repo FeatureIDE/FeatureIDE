@@ -294,7 +294,7 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public LiteralSet getCompleteSolution() {
-		if (isComplete()) {
+		if (isComplete() || (solverSolutionIndex == null)) {
 			return new LiteralSet(this);
 		} else {
 			final int[] s;

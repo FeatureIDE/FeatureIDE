@@ -138,6 +138,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private List<TWiseConfiguration> curResult = null;
 	private ArrayList<TWiseConfiguration> bestResult = null;
+	private List<LiteralSet> initialSample = null;
+	private boolean keepInitialSample = true;
 
 	protected MonitorThread samplingMonitor;
 
@@ -157,6 +159,22 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		super(cnf, maxSampleSize);
 		this.t = t;
 		this.nodes = nodes;
+	}
+
+	public List<LiteralSet> getInitialSample() {
+		return Collections.unmodifiableList(initialSample);
+	}
+
+	public void setInitialSample(List<LiteralSet> initialSample) {
+		this.initialSample = new ArrayList<>(initialSample);
+	}
+
+	public boolean isKeepInitialSample() {
+		return keepInitialSample;
+	}
+
+	public void setKeepInitialSample(boolean keepInitialSample) {
+		this.keepInitialSample = keepInitialSample;
 	}
 
 	private void init() {
@@ -181,6 +199,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		solver.useSolutionList(0);
 		solver.setSelectionStrategy(SelectionStrategy.ORG);
+
+		if (initialSample != null) {
+			initialSample.forEach(c -> util.newConfiguration(c, keepInitialSample));
+		}
 	}
 
 	@Override
@@ -199,10 +221,12 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private void trimConfigurations() {
 		if (curResult != null) {
+			final int firstGenerated = ((initialSample != null) && keepInitialSample) ? initialSample.size() : 0;
+
 			final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
 			statistic.setT(t);
 			statistic.setFastCalc(true);
-			statistic.calculate(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
+			statistic.calculate(util, curResult.subList(firstGenerated, curResult.size()), presenceConditionManager.getGroupedPresenceConditions());
 
 			final double[] normConfigValues = statistic.getConfigValues2();
 			double mean = 0;
@@ -210,20 +234,20 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				mean += d;
 			}
 			mean /= normConfigValues.length;
-
-			final double reference = mean;
+			final double threshold = mean;
 
 			int index = 0;
-			index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
-			index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
+			final List<TWiseConfiguration> completeSolutions = util.getCompleteSolutionList();
+			index = removeSolutions(normConfigValues, threshold, index, completeSolutions.subList(firstGenerated, completeSolutions.size()));
+			index = removeSolutions(normConfigValues, threshold, index, util.getIncompleteSolutionList());
 		}
 	}
 
 	private int removeSolutions(double[] values, final double reference, int index, List<TWiseConfiguration> solutionList) {
-		for (final Iterator<TWiseConfiguration> iterator = solutionList.iterator(); iterator.hasNext();) {
-			iterator.next();
+		for (final Iterator<TWiseConfiguration> it = solutionList.iterator(); it.hasNext();) {
+			it.next();
 			if (values[index++] < reference) {
-				iterator.remove();
+				it.remove();
 			}
 		}
 		return index;
