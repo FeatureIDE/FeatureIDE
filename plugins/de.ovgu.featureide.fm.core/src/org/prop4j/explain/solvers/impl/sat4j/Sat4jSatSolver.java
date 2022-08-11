@@ -71,18 +71,21 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 
 	@Override
 	protected int addClause(Node clause) {
-		final int clauseIndex = super.addClause(clause);
-		addVariables(clause.getUniqueVariables());
-		IConstr constraint = null;
-		try {
-			constraint = getOracle().addClause(getVectorFromClause(clause));
-		} catch (final ContradictionException e) {
-			setContradiction(true);
+		final int index = super.addClause(clause);
+		if (index >= 0) {
+			clause = clauses.get(index);
+			addVariables(clause.getUniqueVariables());
+			IConstr constraint = null;
+			try {
+				constraint = getOracle().addClause(getVectorFromClause(clause));
+			} catch (final ContradictionException e) {
+				setContradiction(true);
+			}
+			if (constraint != null) {
+				onClauseConstraintAdded(index, constraint);
+			}
 		}
-		if (constraint != null) {
-			onClauseConstraintAdded(clauseIndex, constraint);
-		}
-		return clauseIndex;
+		return index;
 	}
 
 	/**
@@ -190,12 +193,16 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
 	public IVecInt getVectorFromClause(Node clause) {
-		final Node[] children = clause.getChildren();
-		final int[] indexes = new int[children.length];
-		for (int i = 0; i < children.length; i++) {
-			indexes[i] = getIndexFromLiteral((Literal) children[i]);
+		if (clause instanceof Literal) {
+			return new VecInt(new int[] { getIndexFromLiteral((Literal) clause) });
+		} else {
+			final Node[] children = clause.getChildren();
+			final int[] indexes = new int[children.length];
+			for (int i = 0; i < children.length; i++) {
+				indexes[i] = getIndexFromLiteral((Literal) children[i]);
+			}
+			return new VecInt(indexes);
 		}
-		return new VecInt(indexes);
 	}
 
 	/**
@@ -216,11 +223,8 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
 	public int getIndexFromLiteral(Object variable, boolean positive) {
-		int index = getIndexFromVariable(variable);
-		if (!positive) {
-			index = -index;
-		}
-		return index;
+		final int index = getIndexFromVariable(variable);
+		return positive ? index : -index;
 	}
 
 	/**
@@ -242,10 +246,7 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	 */
 	public Literal getLiteralFromIndex(int index) {
 		final Object variable = getVariableFromIndex(index);
-		if (variable == null) {
-			return null;
-		}
-		return new Literal(variable, index > 0);
+		return variable == null ? null : new Literal(variable, index > 0);
 	}
 
 	/**

@@ -23,6 +23,7 @@ package org.prop4j;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -88,11 +89,6 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausifyCNF(boolean simplify) {
-		return this;
-	}
-
-	@Override
 	protected Node clausifyDNF(boolean simplify) {
 		return this;
 	}
@@ -128,7 +124,7 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		return var.hashCode() * (positive ? 31 : 37);
+		return Objects.hashCode(var) * (positive ? 31 : 37);
 	}
 
 	@Override
@@ -140,7 +136,7 @@ public class Literal extends Node implements Cloneable {
 			return false;
 		}
 		final Literal other = (Literal) node;
-		return (positive == other.positive) && (var.equals(other.var));
+		return (positive == other.positive) && Objects.equals(var, other.var);
 	}
 
 	@Override
