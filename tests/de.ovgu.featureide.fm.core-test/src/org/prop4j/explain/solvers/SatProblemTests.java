@@ -54,6 +54,10 @@ import org.prop4j.Or;
  */
 public abstract class SatProblemTests {
 
+	private static void compareSets(final List<Node> expected, final List<Node> actual) {
+		assertEquals(expected, actual);
+	}
+
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 
@@ -65,7 +69,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(new Literal("A", false)));
 		expected.add(new Or("A", "B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -74,7 +78,7 @@ public abstract class SatProblemTests {
 		instance.addFormulas();
 		final List<Node> expected = Collections.emptyList();
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -102,7 +106,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(new Literal("A", false)));
 		expected.add(new Or("A", "B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -112,7 +116,7 @@ public abstract class SatProblemTests {
 		instance.addFormulas(in);
 		final List<Node> expected = Collections.emptyList();
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -139,7 +143,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(new Literal("A", false)));
 		expected.add(new Or("A", "B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -148,7 +152,7 @@ public abstract class SatProblemTests {
 		instance.addFormula(new And());
 		final List<Node> expected = Collections.emptyList();
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -175,7 +179,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("B", "C"));
 		expected.add(new Or(new Literal("C", false)));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -185,20 +189,20 @@ public abstract class SatProblemTests {
 		instance.addFormula(new And("A", "B"));
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
-		assertEquals(expected, instance.getClauses());
+		compareSets(expected, instance.getClauses());
 		instance.addFormula(new Or("A", "B"));
 		expected.add(new Or("A", "B"));
-		assertEquals(expected, instance.getClauses());
+		compareSets(expected, instance.getClauses());
 		instance.addFormula(new And(new Or("B", "A"), new Or("A", "B")));
 		expected.add(new Or("B", "A"));
 		expected.add(new Or("A", "B"));
-		assertEquals(expected, instance.getClauses());
+		compareSets(expected, instance.getClauses());
 		instance.addFormula(new Or("B", "C"));
 		expected.add(new Or("B", "C"));
-		assertEquals(expected, instance.getClauses());
+		compareSets(expected, instance.getClauses());
 		instance.addFormula(new Literal("C", false));
 		expected.add(new Or(new Literal("C", false)));
-		assertEquals(expected, instance.getClauses());
+		compareSets(expected, instance.getClauses());
 	}
 
 	@Test
@@ -209,7 +213,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -219,7 +223,7 @@ public abstract class SatProblemTests {
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or("A", "B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -229,7 +233,7 @@ public abstract class SatProblemTests {
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false)));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -239,7 +243,7 @@ public abstract class SatProblemTests {
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false)));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -249,7 +253,7 @@ public abstract class SatProblemTests {
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false), "B"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -260,7 +264,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(new Literal("A", false), "B"));
 		expected.add(new Or(new Literal("B", false), "A"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -272,7 +276,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A", "C"));
 		expected.add(new Or("B", "C"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -282,7 +286,7 @@ public abstract class SatProblemTests {
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false), new Literal("B", false), new Literal("C", false)));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -295,7 +299,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A", "C"));
 		expected.add(new Or("B", "C"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -307,7 +311,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("B"));
 		expected.add(new Or("C"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -319,7 +323,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("2"));
 		expected.add(new Or("-3"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -331,7 +335,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(2));
 		expected.add(new Or(-3));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -343,7 +347,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or("Bar"));
 		expected.add(new Or("Baz"));
 		final List<Node> actual = instance.getClauses();
-		assertEquals(expected, actual);
+		compareSets(expected, actual);
 	}
 
 	@Test
@@ -353,7 +357,7 @@ public abstract class SatProblemTests {
 		Node expected = new Or(new Literal("A"));
 		Node actual = instance.getClause(0);
 		assertEquals(expected, actual);
-		expected = new Or(new Literal("A", false), "B");
+		expected = new Or(new Literal("A", false), new Literal("B"));
 		actual = instance.getClause(1);
 		assertEquals(expected, actual);
 		expected = new Or(new Literal("C"));

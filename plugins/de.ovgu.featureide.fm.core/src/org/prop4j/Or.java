@@ -73,14 +73,6 @@ public class Or extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Node clausifyCNF(boolean simplify) {
-		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausifyCNF(simplify);
-		}
-		return simplifyNode();
-	}
-
-	@Override
 	protected Node clausifyDNF(boolean simplify) {
 		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausifyDNF(simplify);

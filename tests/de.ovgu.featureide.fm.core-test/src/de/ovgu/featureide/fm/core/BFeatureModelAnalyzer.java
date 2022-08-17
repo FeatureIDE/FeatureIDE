@@ -63,6 +63,11 @@ public class BFeatureModelAnalyzer {
 		analyze(2);
 	}
 
+	@Test(timeout = 2000)
+	public final void BAnalyzeFeatureModel3() {
+		analyze(3);
+	}
+
 	@Test(timeout = 1000) // 0.007 @ i5(3,3GHz)
 	public final void BAnalyzeFeatureModel10() {
 		analyze(10);
@@ -237,6 +242,8 @@ public class BFeatureModelAnalyzer {
 		case 1:
 			return Commons.loadBenchmarkFeatureModelFromFile("berkeley_db_model.xml");
 		case 2:
+			return Commons.loadBenchmarkFeatureModelFromFile("berkeley_db_model2.xml");
+		case 3:
 			return Commons.loadBenchmarkFeatureModelFromFile("berkeley_db_model2.xml");
 		case 1000:
 			return Commons.loadBenchmarkFeatureModelFromFile("1000-100.xml");

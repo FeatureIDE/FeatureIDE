@@ -20,12 +20,7 @@
  */
 package org.prop4j;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
-
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * A constraint that is true iff all child nodes are true.
@@ -78,33 +73,6 @@ public class And extends Node {
 			children[i] = children[i].clausifyDNF(simplify);
 		}
 		return simplifyNode();
-	}
-
-	@Override
-	protected Node clausifyCNF(boolean simplify) {
-		for (int i = 0; i < children.length; i++) {
-			children[i] = children[i].clausifyCNF(simplify);
-		}
-		final LinkedList<LinkedHashSet<Literal>> newClauseList = new LinkedList<>();
-		for (int i = 0; i < children.length; i++) {
-			createNF(children[i], newClauseList, simplify);
-			if (simplify) {
-				if (newClauseList.isEmpty()) {
-					return new Literal(NodeCreator.varTrue);
-				} else {
-					if (unitPropagation(newClauseList)) {
-						return new Literal(NodeCreator.varFalse);
-					}
-				}
-			}
-		}
-		final Node[] newChildren = new Node[newClauseList.size()];
-		int index = 0;
-		for (final HashSet<Literal> clause : newClauseList) {
-			newChildren[index++] = new Or(clause);
-		}
-		setChildren(newChildren);
-		return simplifyTree();
 	}
 
 	@Override
