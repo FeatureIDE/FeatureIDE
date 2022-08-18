@@ -73,15 +73,16 @@ public interface IConstraint extends IFeatureModelElement {
 	 * <code>c</code> such that at least <ul> <li><code>c</code> underlying {@link org.prop4j.Node node} <code>n</code> containing the propositional formula is
 	 * accessible by <code>c'</code>. A deep copy of <code>n</code> is not required.</li> <li>the flag indicating a selection of this constraint in the UI
 	 * (e.g., FeatureDiagramEditor) is equal for <code>c</code> and <code>c'</code></li> <li>if <code>c</code> inherits {@link IFeatureModelElement},
-	 * <code>c'</code> must deep copy the required members of this implementation</li> </ul> It holds <code>c' != c</code> and <code>c.equals(c')</code>. <br>
-	 * <br> <b>Note:</b> the parameter <b>newFeatureModel</b> is intended to change the feature model context of the newly created, and affects members if this
-	 * constraint implements {@link IFeatureModelElement}. <br><br> <b>Notes on side effects and <code>null</code> references</b><br> Calling this method: <ul>
-	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>does <b>not</b> affect the <b>parameter</b> <code>newFeatureModel</code>.</li>
-	 * <li>the parameter <code>newFeature</code> is expected to be <b>non-null</b></li> <li>the returned <b>result</b> is guaranteed <b>non-null</b> and
-	 * <b>modifiable</b></li> </ul>
+	 * <code>c'</code> must deep copy the required members of this implementation</li> </ul> It holds <code>c' != c</code> and <code>copyId <=>
+	 * c.equals(c')</code>. <br> <br> <b>Note:</b> the parameter <b>newFeatureModel</b> is intended to change the feature model context of the newly created,
+	 * and affects members if this constraint implements {@link IFeatureModelElement}. <br><br> <b>Notes on side effects and <code>null</code>
+	 * references</b><br> Calling this method: <ul> <li>does <b>not</b> affect the <b>members</b> in this object.</li> <li>does <b>not</b> affect the
+	 * <b>parameter</b> <code>newFeatureModel</code>.</li> <li>the parameter <code>newFeature</code> is expected to be <b>non-null</b></li> <li>the returned
+	 * <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li> </ul>
 	 *
 	 *
 	 * @param newFeatureModel a possible new context for this constraint
+	 * @param copyId If <code>true</code> the id of the old constraint is kept. Otherwise a new id is assigned to the new constraint.
 	 *
 	 * @see AConstraint Default implementation for constraints (extending implementation for <code>IFeatureModelElement</code>
 	 * @see IFeatureModelElement Feature model element interface
@@ -90,7 +91,17 @@ public interface IConstraint extends IFeatureModelElement {
 	 *
 	 * @return a new instance of this constraint which has a new reference
 	 */
-	IConstraint clone(IFeatureModel newFeatureModel);
+	IConstraint clone(IFeatureModel newFeatureModel, boolean copyId);
+
+	/**
+	 * Default implementation of {@link IConstraint#clone(IFeatureModel, boolean)} where <code>copyId</code> is <code>true</code>.
+	 *
+	 * @param newFeatureModel a possible new context for this constraint
+	 * @return a new instance of this constraint which has a new reference
+	 */
+	default IConstraint clone(IFeatureModel newFeatureModel) {
+		return clone(newFeatureModel, true);
+	}
 
 	/**
 	 * Returns analysis results for this constraint, i.e., how this constraint affects the feature model. <br> <br> A constraint can affect a set of features

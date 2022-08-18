@@ -648,6 +648,28 @@ public class StringTable {
 	public static final String EXPAND_ALL = "Expand All";
 	public static final String FOCUS_ON_EXPLANATION = "Focus on Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
+	public static final String ADD_IMPORTED_FEATURES = "Add Imported Features";
+	public static final String ADD_IMPORTED_FEATURES_DIALOG_TEXT = "Please select the features to be added.";
+	public static final String ADD_IMPORTED_FEATURES_DIALOG_TEXT_EMPTY =
+		"There are no imported feature models. Please import a feature model using the outline view before adding imported features.";
+	public static final String ADD_IMPORTED_FEATURES_ALREADY_IMPORTED_WARNING = "At least one of the selected features is already imported.";
+	public static final String IMPORT_FEATURE_MODEL = "Import Feature Model";
+	public static final String IMPORT_FEATURE_MODEL_DIALOG_TEXT = "Please enter the relative path to the model file, and an optional alias.";
+	public static final String IMPORT_FEATURE_MODEL_DIALOG_PATH = "Path";
+	public static final String IMPORT_FEATURE_MODEL_DIALOG_ALIAS = "Alias";
+	public static final String IMPORT_FEATURE_MODEL_DIALOG_NAME = "Name";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_UNKNOWN_IMPORTING_MODEL_FILE = "The source file of the importing feature model is unknown.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_NONEXISTENT_PATH = "The import path does not exist.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_NOT_A_FEATURE_MODEL = "The import path does not represent a valid feature model.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_IMPORT_CYCLE = "The import path is invalid since it causes a cyclic import.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_NAME_ALREADY_EXISTS = "An imported model with the given name or alias already exists.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_FORMAT_NAME = "The model name is invalid in this feature model format.";
+	public static final String IMPORT_FEATURE_MODEL_ERROR_FORMAT_ALIAS = "The alias is invalid in this feature model format.";
+	public static final String REMOVE_IMPORTED_FEATURE_MODEL = "Remove Imported Feature Model";
+	public static final String REMOVE_IMPORTED_FEATURE_MODELS = "Remove Imported Feature Models";
+	public static final String EDIT_IMPORT_ALIAS_ACTION_NAME = "Edit Alias";
+	public static final String EDIT_IMPORT_ALIAS = "Edit Import Alias";
+	public static final String EDIT_IMPORT_ALIAS_DIALOG_TEXT = "Please enter a new alias for the selected model, or leave it empty to set no alias.";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";
 	public static final String CHOOSE_FEATURE = "Choose Feature";
@@ -903,6 +925,7 @@ public class StringTable {
 	public static final String NO_FILE_FOUND = "no file found";
 	public static final String COLLABORATION_MODEL_NOT_FOUND = "Collaboration model not found";
 	public static final String FEATURE_MODEL_OUTLINE = "Feature-Model Outline";
+	public static final String OUTLINE_IMPORTS = "Imports";
 	public static final String OUTLINE_SELECTION = "Outline Selection";
 	public static final String UPDATE_OUTLINE_VIEW = "Update Outline View";
 	public static final String HIDE_FIELDS = "Hide Fields";

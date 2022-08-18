@@ -169,6 +169,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 		case CONSTRAINT_ADD:
 		case FEATURE_COLLAPSED_CHANGED:
 		case FEATURE_COLLAPSED_ALL_CHANGED:
+		case IMPORTS_CHANGED:
 			update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 			break;
 		default:

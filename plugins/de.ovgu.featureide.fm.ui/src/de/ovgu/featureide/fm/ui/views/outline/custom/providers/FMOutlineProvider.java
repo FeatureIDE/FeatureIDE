@@ -24,7 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CO
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
@@ -58,6 +60,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
+import de.ovgu.featureide.fm.ui.views.outline.custom.action.ImportFeatureModelAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.action.SyncCollapsedStateAction;
 import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
@@ -146,6 +149,9 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
+		final ImportFeatureModelAction importFeatureModelAction = new ImportFeatureModelAction(featureModelManager);
+		manager.add(importFeatureModelAction);
+
 		syncCollapsedStateAction = new SyncCollapsedStateAction();
 		syncCollapsedStateAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
@@ -174,13 +180,15 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	private void setExpandedElements() {
 		if (syncCollapsedStateAction.isChecked()) {
-			final ArrayList<Object> expandedElements = new ArrayList<>();
+			// Expand all elements which are already expanded and which are not features
+			final ArrayList<Object> expandedElements =
+				Arrays.stream(viewer.getExpandedElements()).filter(element -> !(element instanceof IFeature)).collect(Collectors.toCollection(ArrayList::new));
+			// Expand all features which are expanded in the diagram
 			for (final IGraphicalFeature f : graphicalFeatureModel.getAllFeatures()) {
 				if (!f.isCollapsed()) {
 					expandedElements.add(f.getObject());
 				}
 			}
-			expandedElements.add("Constraints");
 			viewer.setExpandedElements(expandedElements.toArray());
 		}
 	}
@@ -228,6 +236,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 			case CONSTRAINT_ADD:
 			case FEATURE_COLLAPSED_CHANGED:
 			case FEATURE_COLLAPSED_ALL_CHANGED:
+			case IMPORTS_CHANGED:
 				contentProvider.inputChanged(viewer, null, file);
 				break;
 			default:

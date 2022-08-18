@@ -61,17 +61,21 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	/**
 	 * Creates a copy of <code>oldConstraint</code> that belongs to <code>featureModel</code>.
 	 *
-	 * @param oldConstraint - {@link AConstraint}
+	 * @param oldConstraint - {@link IConstraint}
 	 * @param featureModel - {@link IFeatureModel}
+	 * @param copyId - If <code>true</code> the id of the old constraint is kept. Otherwise a new id is assigned to the new constraint.
 	 */
-	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
-		super(oldConstraint, featureModel);
-		setNode(oldConstraint.propNode.clone());
-		featureSelected = oldConstraint.featureSelected;
-		isImplicit = oldConstraint.isImplicit;
-		description = oldConstraint.description;
-		tags = new HashSet<>(oldConstraint.tags);
-		propertyContainer = new MapPropertyContainer(oldConstraint.propertyContainer);
+	public AConstraint(IConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
+		super(oldConstraint, featureModel, copyId);
+		setNode(oldConstraint.getNode().clone());
+		description = oldConstraint.getDescription();
+		tags = new HashSet<>(oldConstraint.getTags());
+		propertyContainer = new MapPropertyContainer(oldConstraint.getCustomProperties());
+		if (oldConstraint instanceof AConstraint) {
+			final AConstraint constraint = (AConstraint) oldConstraint;
+			featureSelected = constraint.featureSelected;
+			isImplicit = constraint.isImplicit;
+		}
 	}
 
 	/**

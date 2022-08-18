@@ -76,13 +76,13 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedFeature) oldFeature.getStructure().clone(featureModel).getFeature();
+	public ExtendedFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId) {
+		return new ExtendedFeature(oldFeature, featureModel, copyId);
 	}
 
 	@Override
-	public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-		return (Constraint) oldConstraint.clone(featureModel);
+	public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId) {
+		return new Constraint(oldConstraint, featureModel, copyId);
 	}
 
 	public SelectableFeature createSelectableFeature(IFeature feature) {

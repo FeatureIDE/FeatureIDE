@@ -26,6 +26,7 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -48,13 +49,29 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
 	}
 
-	protected ExtendedMultiFeature(ExtendedMultiFeature copyFeature, IFeatureModel featureModel, IFeatureStructure featureStructure) {
-		super(copyFeature, featureModel, featureStructure);
+	public ExtendedMultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure featureStructure) {
+		super(oldFeature, featureModel, copyId, featureStructure);
 
-		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
-		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
-			attributes.add(attribute.cloneAtt(this));
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
+		}
+	}
+
+	public ExtendedMultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
+
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
 		}
 	}
 
@@ -79,8 +96,8 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 	}
 
 	@Override
-	public ExtendedMultiFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new ExtendedMultiFeature(this, newFeatureModel, newStructure);
+	public ExtendedMultiFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		return new ExtendedMultiFeature(this, newFeatureModel, copyId, newStructure);
 	}
 
 	@Override

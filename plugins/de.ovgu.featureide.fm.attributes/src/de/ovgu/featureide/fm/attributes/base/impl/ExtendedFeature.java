@@ -42,13 +42,29 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 	protected List<IFeatureAttribute> attributes;
 
-	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
-		super(copyFeature, featureModel, newFeatrureStructure);
+	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatureStructure) {
+		super(oldFeature, featureModel, copyId, newFeatureStructure);
 
-		// Copy all attributes from the copy feature
 		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
-		for (IFeatureAttribute attribute : copyFeature.getAttributes()) {
-			attributes.add(attribute.cloneAtt(this));
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
+		}
+	}
+
+	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+		super(oldFeature, featureModel, copyId);
+
+		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		if (oldFeature instanceof IExtendedFeature) {
+			// Copy attributes from the old feature if available
+			IExtendedFeature feature = (IExtendedFeature) oldFeature;
+			for (IFeatureAttribute attribute : feature.getAttributes()) {
+				attributes.add(attribute.cloneAtt(this));
+			}
 		}
 	}
 
@@ -75,8 +91,8 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 	}
 
 	@Override
-	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
-		return new ExtendedFeature(this, newFeatureModel, newStructure);
+	public IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
+		return new ExtendedFeature(this, newFeatureModel, copyId, newStructure);
 	}
 
 	@Override

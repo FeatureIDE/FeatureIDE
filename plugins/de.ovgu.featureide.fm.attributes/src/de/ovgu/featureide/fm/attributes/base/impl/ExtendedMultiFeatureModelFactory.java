@@ -70,12 +70,12 @@ public class ExtendedMultiFeatureModelFactory extends MultiFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedMultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-		return (ExtendedMultiFeature) oldFeature.getStructure().clone(featureModel).getFeature();
+	public ExtendedMultiFeature copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId) {
+		return new ExtendedMultiFeature(oldFeature, featureModel, copyId);
 	}
 
 	@Override
-	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-		return (MultiConstraint) oldConstraint.clone(featureModel);
+	public MultiConstraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId) {
+		return new MultiConstraint(oldConstraint, featureModel, copyId);
 	}
 }

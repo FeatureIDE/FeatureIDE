@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base.event;
 
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
  * Event triggered by changes to a feature model or its elements. <br> <br> Each event contains the following information: <ul> <li>an event type which
@@ -125,6 +126,10 @@ public class FeatureIDEEvent {
 		 * The feature structure changed.
 		 */
 		STRUCTURE_CHANGED,
+		/**
+		 * The list of imported models of a {@link MultiFeatureModel} changed.
+		 */
+		IMPORTS_CHANGED,
 		/**
 		 * The legend layout was changed.
 		 */

@@ -49,8 +49,12 @@ public class CustomFeaturesCustomPropertiesTest {
 			super(featureModel, name);
 		}
 
+		public MyFeatureImplementation(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
+			super(oldFeature, featureModel, copyId);
+		}
+
 		@Override
-		public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		public IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure) {
 			throw new RuntimeException();
 		}
 	}
@@ -85,13 +89,13 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
-		public MyFeatureImplementation copyFeature(IFeatureModel featureModel, IFeature oldFeature) {
-			return (MyFeatureImplementation) oldFeature.getStructure().clone(featureModel).getFeature();
+		public MyFeatureImplementation copyFeature(IFeatureModel featureModel, IFeature oldFeature, boolean copyId) {
+			return new MyFeatureImplementation(oldFeature, featureModel, copyId);
 		}
 
 		@Override
-		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint) {
-			return (Constraint) oldConstraint.clone(featureModel);
+		public Constraint copyConstraint(IFeatureModel featureModel, IConstraint oldConstraint, boolean copyId) {
+			return new Constraint(oldConstraint, featureModel, copyId);
 		}
 
 		@Override

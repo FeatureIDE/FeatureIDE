@@ -67,21 +67,32 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 public interface IFeature extends IFeatureModelElement {
 
 	/**
-	 * Creates a new instance (new reference) of this feature with the same feature name and internal id, optionally change the features feature model and/or
-	 * structure.
-	 *
-	 * @since 3.0
+	 * Creates a new instance (new reference) of this feature with the same feature name, optionally change the features feature model and/or structure.
 	 *
 	 * @param newFeatureModel A new feature model in which the feature should be part of. If this parameter is <code>null</code>, the cloned feature's new
 	 *        feature model have to be the originals feature's feature model.
+	 * @param copyId If <code>true</code> the id of the old feature is kept. Otherwise a new id is assigned to the new feature.
 	 * @param newStructure A new structure in which the feature should life. If this parameter is <code>null</code>, the cloned feature's new structure have to
 	 *        be the originals feature's structure.
 	 *
 	 * @since 3.0
 	 *
+	 * @return New instance <code>f'</code> of this feature <code>f</code> such that <code>f != f'</code> but <code>copyId <=> f.equals(f')</code> holds.
+	 */
+	IFeature clone(IFeatureModel newFeatureModel, boolean copyId, IFeatureStructure newStructure);
+
+	/**
+	 * Default implementation of {@link IFeature#clone(IFeatureModel, boolean, IFeatureStructure)} where <code>copyId</code> is <code>true</code>.
+	 *
+	 * @param newFeatureModel A new feature model in which the feature should be part of. If this parameter is <code>null</code>, the cloned feature's new
+	 *        feature model have to be the originals feature's feature model.
+	 * @param newStructure A new structure in which the feature should life. If this parameter is <code>null</code>, the cloned feature's new structure have to
+	 *        be the originals feature's structure.
 	 * @return New instance <code>f'</code> of this feature <code>f</code> such that <code>f != f'</code> but <code>f.equals(f')</code> holds.
 	 */
-	IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure);
+	default IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return clone(newFeatureModel, true, newStructure);
+	}
 
 	/**
 	 * Returns the feature's properties. These properties depend on the {@link IFeatureProperty} implementation, but contain at least getters and setters for

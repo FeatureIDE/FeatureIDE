@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,9 +32,11 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.core.resources.IProject;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -63,6 +66,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
@@ -72,6 +76,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * Reads / writes feature models in the UVL format.
  *
  * @author Dominik Engelhardt
+ * @author Johannes Herschel
  */
 public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
@@ -83,6 +88,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
 	private static final String MULTI_ROOT_PREFIX = "Abstract_";
+
+	// Patterns for import validation. The same as in the BNF of the UVL parser.
+	private static final Pattern ID_PATTERN = Pattern.compile("(?!true|false)[a-zA-Z][a-zA-Z_0-9]*");
+	private static final Pattern STRICT_ID_RESTRICTIVE_PATTERN =
+		Pattern.compile("(?!alternative|or|features|constraints|true|false|as|refer)[a-zA-Z][a-zA-Z_0-9]*");
 
 	private UVLModel rootModel;
 	protected ProblemList pl;
@@ -326,7 +336,16 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		fm.addInstance(i.getNamespace(), i.getAlias());
+		final IProject project = EclipseFileSystem.getResource(fm.getSourceFile()).getProject();
+		// Local path of imported model (as given in importing model)
+		final String modelPath = i.getNamespace().replace(".", "/") + "." + FILE_EXTENSION;
+		// Resolved path (import relative to project root)
+		Path path = project.getFile(modelPath).getLocation().toFile().toPath();
+		if (!Files.exists(path)) {
+			// Import relative to importing model
+			path = fm.getSourceFile().resolveSibling(modelPath);
+		}
+		fm.addInstance(i.getNamespace(), i.getAlias(), path);
 	}
 
 	/**
@@ -508,6 +527,22 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public boolean isValidFeatureName(String featureName) {
 		return featureName.matches("[^\\\"\\.\\n\\r]*");
+	}
+
+	@Override
+	public boolean isValidImportName(String name) {
+		final String[] splitName = name.split("\\.", -1);
+		for (int i = 0; i < (splitName.length - 1); i++) {
+			if (!ID_PATTERN.matcher(splitName[i]).matches()) {
+				return false;
+			}
+		}
+		return STRICT_ID_RESTRICTIVE_PATTERN.matcher(splitName[splitName.length - 1]).matches();
+	}
+
+	@Override
+	public boolean isValidImportAlias(String alias) {
+		return alias.isEmpty() || ID_PATTERN.matcher(alias).matches();
 	}
 
 	@Override

@@ -115,6 +115,7 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AFeatureModelAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AddImportedFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
@@ -190,6 +191,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private CreateFeatureBelowAction createFeatureBelowAction;
 	private CreateFeatureAboveAction createFeatureAboveAction;
 	private CreateSiblingAction createSiblingAction;
+	private AddImportedFeaturesAction addImportedFeaturesAction;
 	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
 	private MandatoryAction mandatoryAction;
@@ -277,6 +279,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		createFeatureBelowAction = addAction(new CreateFeatureBelowAction(viewer, graphicalFeatureModel));
 		createFeatureAboveAction = addAction(new CreateFeatureAboveAction(viewer, graphicalFeatureModel));
 		createSiblingAction = addAction(new CreateSiblingAction(viewer, graphicalFeatureModel));
+		addImportedFeaturesAction = addAction(new AddImportedFeaturesAction(viewer, featureModelManager));
 		// FM structure modify actions
 		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer, featureModelManager));
 		deleteAction = addAction(new DeleteAction(viewer, featureModelManager));
@@ -832,6 +835,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				analyzeFeatureModel();
 			}
 			break;
+		case IMPORTS_CHANGED:
+			if (refresh) {
+				setDirty();
+			}
+			break;
 		case MODEL_DATA_OVERWRITTEN:
 			Display.getDefault().syncExec(new Runnable() {
 
@@ -1312,17 +1320,21 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private void fillContextMenu(IMenuManager menuManager) {
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		final boolean isMultiFeatureModel = fmManager.getVarObject() instanceof MultiFeatureModel;
 
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createFeatureAboveAction);
 			menuManager.add(createFeatureBelowAction);
 			menuManager.add(createSiblingAction);
+			if (isMultiFeatureModel) {
+				menuManager.add(addImportedFeaturesAction);
+			}
 			menuManager.add(createConstraintWithAction);
 			menuManager.add(selectSubtreeAction);
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
-			if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
+			if (isMultiFeatureModel) {
 				menuManager.add(deleteSubmodelAction);
 			}
 			menuManager.add(new Separator());
@@ -1371,7 +1383,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
-			if (getFeatureModel().getObject() instanceof MultiFeatureModel) {
+			if (isMultiFeatureModel) {
 				menuManager.add(longNamesAction);
 				final boolean useShortNames = graphicalFeatureModel.getLayout().showShortNames();
 				longNamesAction.setUseShortType(!useShortNames);

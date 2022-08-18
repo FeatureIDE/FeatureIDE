@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
@@ -387,6 +388,17 @@ public abstract class Node {
 			child.replaceFeature(feature, replaceWithFeature, list);
 		}
 		return list;
+	}
+
+	/**
+	 * Applies the given function to the name of each contained feature.
+	 *
+	 * @param f The function to apply to each feature name
+	 */
+	public void modifyFeatureNames(UnaryOperator<String> f) {
+		for (final Node child : children) {
+			child.modifyFeatureNames(f);
+		}
 	}
 
 	protected static Node getNode(Object object) {

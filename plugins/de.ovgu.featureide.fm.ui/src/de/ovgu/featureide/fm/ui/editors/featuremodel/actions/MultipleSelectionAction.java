@@ -201,7 +201,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 
 	@Override
 	protected List<IFeature> getInvolvedFeatures() {
-		return getSelectedFeatures().stream().map(f -> featureModelManager.getObject().getFeature(f)).collect(Collectors.toList());
+		return getSelectedFeatures().stream().map(f -> featureModelManager.getSnapshot().getFeature(f)).collect(Collectors.toList());
 	}
 
 	/**

@@ -41,7 +41,11 @@ public interface IFeatureStructure {
 
 	void changeToOr();
 
-	IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel);
+	IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel, boolean copyId);
+
+	default IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel) {
+		return cloneSubtree(newFeatureModel, true);
+	}
 
 	int getChildIndex(IFeatureStructure feature);
 
@@ -141,5 +145,11 @@ public interface IFeatureStructure {
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
 
-	IFeatureStructure clone(IFeatureModel newFeatureModel);
+	IFeatureStructure clone(IFeatureModel newFeatureModel, boolean copyId);
+
+	default IFeatureStructure clone(IFeatureModel newFeatureModel) {
+		return clone(newFeatureModel, true);
+	}
+
+	IFeatureStructure clone(IFeature correspondingFeature);
 }
