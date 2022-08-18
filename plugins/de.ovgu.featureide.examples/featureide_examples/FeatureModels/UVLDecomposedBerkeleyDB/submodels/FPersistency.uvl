@@ -1,0 +1,41 @@
+namespace submodels.FPersistency
+
+features
+	FPersistency {abstract}	
+							optional
+								Persistency {abstract}	
+									mandatory
+										FIOFeature {abstract}	
+											alternative
+												NIO {abstract}	
+													mandatory
+														FNIOType {abstract}	
+															alternative
+																featureNIO
+																featureChunkedNIO
+	
+													optional
+														featureDirectNIO
+												IO {abstract}	
+													mandatory
+														featureIO
+	
+													optional
+														featureSynchronizedIO
+	
+									optional
+										FPersistencyFeatures {abstract}	
+											or
+												featureChecksum
+												featureFileHandleCache
+												featureHandleFullDiscError
+												featureEnvironmentLock
+												Checkpointer {abstract}	
+													optional
+														featureCustomizableCheckpointerTime
+														featureCustomizableCheckpointerBytes
+														featureCheckpointerDaemon
+												Cleaner {abstract}	
+													optional
+														featureLookAheadCache
+														featureCleanerDaemon

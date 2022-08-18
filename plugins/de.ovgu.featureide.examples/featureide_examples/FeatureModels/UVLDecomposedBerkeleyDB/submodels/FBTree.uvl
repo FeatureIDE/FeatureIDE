@@ -1,0 +1,19 @@
+namespace submodels.FBTree
+
+features
+	FBtree {abstract}	
+					optional
+						BTree {abstract}	
+							optional
+								featureVerifier
+								featureTreeVisitor
+								featureINCompressor
+								FEvictor {abstract}	
+									optional
+										Evictor {abstract}	
+											mandatory
+												featureEvictor
+
+											optional
+												featureCriticalEviction
+												featureEvictorDaemon

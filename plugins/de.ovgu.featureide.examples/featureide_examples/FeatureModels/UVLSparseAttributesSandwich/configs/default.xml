@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="Server"/>
+	<feature automatic="selected" name="FileSystem"/>
+	<feature name="NTFS"/>
+	<feature manual="selected" name="APFS"/>
+	<feature name="EXT4"/>
+	<feature automatic="selected" name="OperatingSystem"/>
+	<feature name="Windows"/>
+	<feature name="macOS"/>
+	<feature name="Debian"/>
+	<feature name="Logging"/>
+</configuration>

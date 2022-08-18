@@ -1,0 +1,46 @@
+namespace BerkeleyDb
+
+imports
+	submodels.FLogging as fl
+	submodels.FBTree as fbt
+	submodels.FPersistency as fp
+	submodels.FConcurrency as fc
+	submodels.FStatistics as fs
+
+features
+	BerkeleyDb {abstract}	
+		optional
+			BerkeleyDB {abstract}	
+				mandatory
+					BASE
+					fp.FPersistency
+					fbt.FBtree
+
+				optional
+					fl.FLogging
+					fs.FStatistics
+					fc.FConcurrency
+					featureMemoryBudget
+					FDbOperation {abstract}	
+						or
+							featureDeleteDb
+							featureTruncateDb
+
+constraints
+	fbt.featureEvictor | fbt.featureEvictorDaemon | fp.featureLookAheadCache | fs.featureStatisticsEnvCaching => featureMemoryBudget
+	fc.featureCheckLeaks => fs.featureStatisticsLock
+	fbt.featureCriticalEviction => fbt.featureINCompressor
+	fp.featureCustomizableCheckpointerBytes => fp.featureCustomizableCheckpointerTime
+	featureDeleteDb => fc.dummyFeatureLocking & fbt.featureEvictor & fbt.featureINCompressor & featureMemoryBudget
+	fc.featureLatch => fc.dummyFeatureLocking & fc.featureCheckLeaks & featureDeleteDb & fbt.featureEvictor & fp.featureFileHandleCache & fc.featureFSync & fbt.featureINCompressor & featureMemoryBudget & fs.featureStatisticsLock & fbt.featureTreeVisitor & featureTruncateDb & fbt.featureVerifier
+	fl.featureLoggingFine => fc.dummyFeatureLocking & fbt.featureEvictor & fbt.featureINCompressor
+	fl.featureLoggingBase | fl.featureLoggingFinest => fc.featureTransaction
+	featureMemoryBudget => fbt.featureEvictor & fc.featureLatch
+	fs.featureStatisticsLock | fs.featureStatisticsTransaction => fc.dummyFeatureLocking
+	fs.featureStatisticsEnvEvictor => fbt.featureEvictor
+	fs.featureStatisticsEnvFSync => fc.featureFSync
+	fs.featureStatisticsTransaction => fc.featureTransaction
+	fs.featureStatisticsDatabase => fbt.featureTreeVisitor
+	fc.featureTransaction => fc.dummyFeatureLocking & featureDeleteDb & featureTruncateDb
+	featureTruncateDb => featureDeleteDb
+	fbt.featureVerifier => fbt.featureINCompressor & fbt.featureTreeVisitor
