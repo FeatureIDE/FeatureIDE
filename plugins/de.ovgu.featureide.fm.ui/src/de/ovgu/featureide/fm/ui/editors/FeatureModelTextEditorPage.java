@@ -124,13 +124,12 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
 		if (problems.containsError()) {
 			createMarkers(problems);
-			throw new RuntimeException();
 		} else {
 			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
-			super.doSave(progressMonitor);
-			executeSaveOperation();
-			featureModelEditor.setPageModified(false);
 		}
+		super.doSave(progressMonitor);
+		executeSaveOperation();
+		featureModelEditor.setPageModified(false);
 	}
 
 	@Override
