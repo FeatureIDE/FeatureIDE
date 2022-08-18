@@ -20,9 +20,6 @@
  */
 package org.prop4j;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-
-import java.util.function.UnaryOperator;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORTING_THIS_METHOD;
 
 import java.util.ArrayList;
@@ -37,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
