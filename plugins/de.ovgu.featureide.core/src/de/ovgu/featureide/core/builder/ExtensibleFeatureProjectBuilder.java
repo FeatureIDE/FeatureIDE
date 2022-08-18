@@ -91,8 +91,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded()) {
 			return;
 		}
-
-		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(), IResource.DEPTH_INFINITE);
+		final IFolder sourceFolder = featureProject.getSourceFolder();
+		if (sourceFolder != null) {
+			featureProject.deleteBuilderMarkers(sourceFolder, IResource.DEPTH_INFINITE);
+		}
 		final IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;
@@ -163,8 +165,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
-			if (featureProject.getConfigFolder().isAccessible()) {
-				featureProject.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
+			final IFolder configFolder = featureProject.getConfigFolder();
+			if ((configFolder != null) && configFolder.isAccessible()) {
+				configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 			}
 			cleanBuild = true;
 			clean(monitor);

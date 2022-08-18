@@ -1,0 +1,7 @@
+.project
+lib/uvl-parser-0.1.0.jar
+lib/antlr-3.4.jar
+lib/de.ovgu.featureide.lib.fm-v3.8.3.jar
+src/de/ovgu/featureide/examples/transformation/FeatureModelTransformation.java
+.classpath
+model.xml

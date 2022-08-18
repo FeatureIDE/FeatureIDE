@@ -23,13 +23,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Operation with functionality to delete a submodel from a {@link MultiFeatureModel}
@@ -41,7 +39,7 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 	public static final String ID = ID_PREFIX + "DeleteSubmodelOperation";
 
 	public DeleteSubmodelOperation(Object viewer, IFeatureModelManager featureModelManager) {
-		super(viewer, featureModelManager);
+		super(viewer, featureModelManager, false);
 	}
 
 	@Override
@@ -60,20 +58,6 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 			final IFeature selectedFeature = getFeatureFromObject(selectedObject);
 			featuresToDelete.addAll(getAllChildren(selectedFeature));
 			featuresToDelete.add(selectedFeature);
-		}
-
-		// Not allowed to delete submodels that have features contained in a constraint
-		for (final IFeature feature : featuresToDelete) {
-			if (feature != null) {
-				if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
-					final List<String> dialogReasons = new ArrayList<>();
-					dialogReasons.add(StringTable.DELETE_FEATURE_REASON_CONSTRAINTS);
-					final List<String> buttonLabels = new ArrayList<>();
-					buttonLabels.add(StringTable.CANCEL);
-					openDeleteDialog(featuresToDelete.size() > 1, dialogReasons, buttonLabels.toArray(new String[0]));
-					return;
-				}
-			}
 		}
 
 		addDeleteFeatureOperations(featuresToDelete);

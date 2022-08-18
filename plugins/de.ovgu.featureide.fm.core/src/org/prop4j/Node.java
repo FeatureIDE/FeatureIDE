@@ -22,8 +22,21 @@ package org.prop4j;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 
-import java.util.*;
 import java.util.function.UnaryOperator;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORTING_THIS_METHOD;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
@@ -101,19 +114,22 @@ public abstract class Node {
 	}
 
 	public Node toCNF() {
-		return toCNF(false);
+		return toCNF(false, false);
 	}
 
 	public Node toDNF() {
 		return toDNF(false);
 	}
 
-	public Node toCNF(boolean simplify) {
+	public Node toCNF(boolean propagateUnitClauses, boolean removeSubsumed) {
 		if (isConjunctiveNormalForm()) {
 			return clone();
 		} else {
 			final Node prepareNF = prepareNF();
-			return (prepareNF instanceof And) ? prepareNF.clausifyCNF(simplify) : new And(prepareNF).clausifyCNF(simplify);
+			final CNFDistributiveLawTransformer transformer = new CNFDistributiveLawTransformer();
+			transformer.setPropagateUnitClauses(propagateUnitClauses);
+			transformer.setRemoveSubsumed(removeSubsumed);
+			return transformer.transform(prepareNF);
 		}
 	}
 
@@ -136,11 +152,11 @@ public abstract class Node {
 	}
 
 	public Node toRegularCNF() {
-		return toRegularCNF(false);
+		return toRegularCNF(false, false);
 	}
 
-	public Node toRegularCNF(boolean simplify) {
-		Node regularCNFNode = toCNF(simplify);
+	public Node toRegularCNF(boolean propagateUnitClauses, boolean removeSubsumed) {
+		Node regularCNFNode = toCNF(propagateUnitClauses, removeSubsumed);
 		if (regularCNFNode instanceof And) {
 			final Node[] children = regularCNFNode.getChildren();
 			for (int i = 0; i < children.length; i++) {
@@ -359,10 +375,6 @@ public abstract class Node {
 			children[i] = children[i].eliminate(list);
 		}
 		return this;
-	}
-
-	protected Node clausifyCNF(boolean simplify) {
-		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	protected Node clausifyDNF(boolean simplify) {

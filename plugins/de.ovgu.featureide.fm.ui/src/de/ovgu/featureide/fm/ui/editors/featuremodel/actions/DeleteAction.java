@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.ui.editors.DeleteDialogVerifier;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
@@ -57,6 +59,8 @@ public class DeleteAction extends AFeatureModelAction {
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	private final Object viewer;
+
+	private final List<IFeature> featuresToDelete = new ArrayList<>();
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
@@ -81,7 +85,15 @@ public class DeleteAction extends AFeatureModelAction {
 
 	@Override
 	public void run() {
-		FeatureModelOperationWrapper.run(new ElementDeleteOperation(viewer, featureModelManager));
+		DeleteDialogVerifier.checkForDialog(featuresToDelete).map(label -> {
+			switch (label) {
+			case DeleteDialogVerifier.DELETE_WITH_SLICING:
+				return new ElementDeleteOperation(viewer, featureModelManager, true);
+			case DeleteDialogVerifier.DELETE_WITHOUT_SLICING:
+				return new ElementDeleteOperation(viewer, featureModelManager, false);
+			}
+			return null;
+		}).ifPresent(FeatureModelOperationWrapper::run);
 	}
 
 	private boolean isValidSelection(IStructuredSelection selection) {
@@ -89,6 +101,7 @@ public class DeleteAction extends AFeatureModelAction {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
+		featuresToDelete.clear();
 
 		final IFeatureModel featureModel = featureModelManager.getSnapshot();
 		// check that a possibly new root can be determined unique
@@ -112,6 +125,7 @@ public class DeleteAction extends AFeatureModelAction {
 				}
 			}
 			features.remove(feature);
+			featuresToDelete.add(feature);
 		}
 
 		// check that the only child of a deleted root is not deleted too

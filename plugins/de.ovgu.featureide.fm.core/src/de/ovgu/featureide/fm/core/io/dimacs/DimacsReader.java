@@ -25,12 +25,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +49,7 @@ public class DimacsReader {
 	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSConstants.PROBLEM + "\\s+" + DIMACSConstants.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
-	private final Map<Integer, String> indexVariables = new LinkedHashMap<>();
+	private final List<String> indexVariables = new ArrayList<>();
 	/**
 	 * The amount of variables as declared in the problem definition. May differ from the actual amount of variables found.
 	 */
@@ -98,6 +96,7 @@ public class DimacsReader {
 	 */
 	public Node read(Reader in) throws ParseException, IOException {
 		indexVariables.clear();
+		indexVariables.add(null);
 		variableCount = -1;
 		clauseCount = -1;
 		readingVariables = readVariableDirectory;
@@ -110,10 +109,23 @@ public class DimacsReader {
 			readComments(lineIterator);
 			readingVariables = false;
 
-			final Node[] clauses = readClauses(lineIterator);
-			final int actualVariableCount = indexVariables.size();
+			for (int i = 1; i < indexVariables.size(); i++) {
+				if (indexVariables.get(i) == null) {
+					indexVariables.set(i, Integer.toString(i));
+				}
+			}
+			while (indexVariables.size() <= variableCount) {
+				indexVariables.add(Integer.toString(indexVariables.size()));
+			}
+
+			final ArrayList<Node> clauses = readClauses(lineIterator);
+			final int actualVariableCount = indexVariables.size() - 1;
 			if (variableCount != actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
+			}
+			final int actualClausesCount = clauses.size();
+			if (clauseCount != actualClausesCount) {
+				throw new ParseException(String.format("Found %d instead of %d clauses", actualClausesCount, clauseCount), 1);
 			}
 			Node node = new And(clauses);
 			if (flattenCNF) {
@@ -193,10 +205,9 @@ public class DimacsReader {
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 * @throws IOException
 	 */
-	private Node[] readClauses(LineIterator lineIterator) throws ParseException, IOException {
+	private ArrayList<Node> readClauses(LineIterator lineIterator) throws ParseException, IOException {
 		final LinkedList<String> literalQueue = new LinkedList<>();
-		final Node[] clauses = new Node[clauseCount];
-		int readClausesCount = 0;
+		final ArrayList<Node> clauses = new ArrayList<>(clauseCount);
 		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.get()) {
 			if (commentPattern.matcher(line).matches()) {
 				continue;
@@ -214,8 +225,7 @@ public class DimacsReader {
 					throw new ParseException("Empty clause", lineIterator.getLineCount());
 				}
 
-				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
-				readClausesCount++;
+				clauses.add(parseClause(clauseSize, literalQueue, lineIterator));
 
 				if (!DIMACSConstants.CLAUSE_END.equals(literalQueue.removeFirst())) {
 					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
@@ -224,19 +234,12 @@ public class DimacsReader {
 			} while (!literalQueue.isEmpty());
 		}
 		if (!literalQueue.isEmpty()) {
-			clauses[readClausesCount] = parseClause(readClausesCount, literalQueue.size(), literalQueue, lineIterator);
-			readClausesCount++;
-		}
-		if (readClausesCount < clauseCount) {
-			throw new ParseException(String.format("Found %d instead of %d clauses", readClausesCount, clauseCount), 1);
+			clauses.add(parseClause(literalQueue.size(), literalQueue, lineIterator));
 		}
 		return clauses;
 	}
 
-	private Or parseClause(int readClausesCount, int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
-		if (readClausesCount == clauseCount) {
-			throw new ParseException(String.format("Found more than %d clauses", clauseCount), 1);
-		}
+	private Or parseClause(int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
 		final Node[] literals = new Node[clauseSize];
 		for (int j = 0; j < literals.length; j++) {
 			final String token = literalQueue.removeFirst();
@@ -250,12 +253,10 @@ public class DimacsReader {
 				throw new ParseException("Illegal literal", lineIterator.getLineCount());
 			}
 			final Integer key = Math.abs(index);
-			String variable = indexVariables.get(key);
-			if (variable == null) {
-				variable = String.valueOf(key);
-				indexVariables.put(key, variable);
+			if (indexVariables.size() <= key) {
+				throw new ParseException("Variable count is smaller than given literal", lineIterator.getLineCount());
 			}
-			literals[j] = new Literal(variable, index > 0);
+			literals[j] = new Literal(indexVariables.get(key), index > 0);
 		}
 		return new Or(literals);
 	}
@@ -291,14 +292,17 @@ public class DimacsReader {
 			return false;
 		}
 		final String variable = comment.substring(firstSeparator + 1);
-		if (!indexVariables.containsKey(index)) {
-			indexVariables.put(index, variable);
+		while (indexVariables.size() <= index) {
+			indexVariables.add(null);
+		}
+		if (indexVariables.get(index) == null) {
+			indexVariables.set(index, variable);
 		}
 		return true;
 	}
 
-	public Collection<String> getVariables() {
-		return indexVariables.values();
+	public List<String> getVariables() {
+		return indexVariables.subList(1, indexVariables.size());
 	}
 
 }

@@ -42,6 +42,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -367,10 +368,15 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	}
 
 	private void setCompositionMechanism() {
-		final String item = mechanismCombo.getItem(mechanismCombo.getSelectionIndex());
-		if (!featureProject.getCompositionMechanism().equals(item)) {
-			featureProject.setCompositionMechanism(item);
-			updated = true;
+		if (mechanismCombo.getEnabled()) {
+			final int selectionIndex = mechanismCombo.getSelectionIndex();
+			if (selectionIndex >= 0) {
+				final String item = mechanismCombo.getItem(selectionIndex);
+				if (!featureProject.getCompositionMechanism().equals(item)) {
+					featureProject.setCompositionMechanism(item);
+					updated = true;
+				}
+			}
 		}
 	}
 
@@ -394,44 +400,52 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 */
 	private void setPaths() {
 		boolean pathsUpdates = false;
-		final IProject iProject = featureProject.getProject();
-		if (featurePath.getText().equals(featureProject.getSourceFolder().getProjectRelativePath().toOSString())) {
-			FMCorePlugin.createFolder(iProject, featurePath.getText());
-			pathsUpdates = true;
-		}
-		if (sourcePath.getText().equals(featureProject.getBuildFolder().getProjectRelativePath().toOSString())) {
-			FMCorePlugin.createFolder(iProject, sourcePath.getText());
-			pathsUpdates = true;
-		}
-		if (configPath.getText().equals(featureProject.getConfigFolder().getProjectRelativePath().toOSString())) {
-			FMCorePlugin.createFolder(iProject, configPath.getText());
-			pathsUpdates = true;
-		}
+		final IProject project = featureProject.getProject();
+
+		final String sourcePathText = featurePath.getText();
+		FMCorePlugin.createFolder(project, sourcePathText);
+		pathsUpdates |= hasChanged(featureProject.getSourceFolder(), sourcePathText);
+
+		final String buildPathText = sourcePath.getText();
+		FMCorePlugin.createFolder(project, buildPathText);
+		pathsUpdates |= hasChanged(featureProject.getBuildFolder(), buildPathText);
+
+		final String configPathText = configPath.getText();
+		FMCorePlugin.createFolder(project, configPathText);
+		pathsUpdates |= hasChanged(featureProject.getConfigFolder(), configPathText);
 
 		if (pathsUpdates) {
 			try {
-				iProject.refreshLocal(IResource.DEPTH_INFINITE, null);
+				project.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (final CoreException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 
-			featureProject.setPaths(featurePath.getText(), sourcePath.getText(), configPath.getText());
+			featureProject.setPaths(sourcePathText, buildPathText, configPathText);
 			updated = true;
 		}
+	}
+
+	private boolean hasChanged(IFolder folder, String newFolderName) {
+		return (folder == null) || Objects.equals(newFolderName, folder.getProjectRelativePath().toOSString());
 	}
 
 	@Override
 	protected void performDefaults() {
 		featurePath.setEnabled(composer.hasFeatureFolder());
-		featurePath.setText(featureProject.getSourceFolder().getProjectRelativePath().toOSString());
+		featurePath.setText(getFolderText(featureProject.getSourceFolder()));
 		sourcePath.setEnabled(composer.hasSourceFolder());
-		sourcePath.setText(featureProject.getBuildFolder().getProjectRelativePath().toOSString());
-		configPath.setText(featureProject.getConfigFolder().getProjectRelativePath().toOSString());
+		sourcePath.setText(getFolderText(featureProject.getBuildFolder()));
+		configPath.setText(getFolderText(featureProject.getConfigFolder()));
 
 		refreshCombo(composerCombo, true, featureProject.getComposer().getName());
 		refreshCombo(contractCombo, composer.hasContractComposition(), featureProject.getContractComposition());
 		refreshCombo(metaCombo, composer.hasMetaProductGeneration(), featureProject.getMetaProductGeneration());
 		refreshCombo(mechanismCombo, composer.getCompositionMechanisms().length > 0, featureProject.getCompositionMechanism());
+	}
+
+	private String getFolderText(IFolder folder) {
+		return folder == null ? "" : folder.getProjectRelativePath().toOSString();
 	}
 
 	/**

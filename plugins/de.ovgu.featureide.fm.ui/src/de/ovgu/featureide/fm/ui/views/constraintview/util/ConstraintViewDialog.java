@@ -26,8 +26,8 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.core.preferences.ConstraintViewPreference;
 
 /**
  * A dialog that asks a user to open the constraint view. Its saves the decision in the workspace wide preferences.
@@ -36,13 +36,10 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ConstraintViewDialog {
 
-	public static final String CONSTRAINT_VIEW_REMEMBER = "de.ovgu.featureide.fm.ui.views.constraintview_remember";
-	public static final String CONSTRAINT_VIEW_DECISION = "de.ovgu.featureide.fm.ui.views.constraintview_decision";
-
 	public static boolean spawn() {
-
-		if (Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "false"))) {
-			return Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "false"));
+		final ConstraintViewPreference preference = ConstraintViewPreference.getInstance();
+		if (preference.get() != ConstraintViewPreference.ASK) {
+			return preference.get() == ConstraintViewPreference.SHOW;
 		}
 
 		final MessageDialogWithToggle dialog =
@@ -52,10 +49,11 @@ public class ConstraintViewDialog {
 		final boolean toggleState = dialog.getToggleState();
 		final boolean pressedOK = dialog.getReturnCode() == IDialogConstants.YES_ID;
 
-		final String rememberString = Boolean.toString(toggleState);
-		final String decisionString = Boolean.toString(pressedOK);
-		Preferences.store(CONSTRAINT_VIEW_REMEMBER, rememberString);
-		Preferences.store(CONSTRAINT_VIEW_DECISION, decisionString);
+		if (toggleState) {
+			preference.set(pressedOK ? ConstraintViewPreference.SHOW : ConstraintViewPreference.HIDE);
+		} else {
+			preference.set(ConstraintViewPreference.ASK);
+		}
 
 		return pressedOK;
 	}

@@ -35,7 +35,7 @@
 				<command
 						commandId="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct"
 						id="de.ovgu.featureide.core.featurehouse.ui.actions.meatproduct"
-						label="Build Metaproduct"
+						label="Generate Metaproduct"
 						style="toggle">
 					<visibleWhen
 							checkEnabled="false">
@@ -56,27 +56,6 @@
 						</with>
 					</visibleWhen>
 				</command>
-				<command
-						commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key"
-						id="de.ovgu.featureide.core.featurehouse.ui.actions.key"
-						label="Perform Feature-Based Verification with KeY"
-						tooltip="Generates Feature Stubs and Starts KeY for each Feature Stub&apos;s Verification"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<with
-								variable="activeMenuSelection">
-							<and>
-								<count
-										value="1">
-								</count>
-								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
-								</reference>
-							</and>
-						</with>
-					</visibleWhen>
-				</command>
 			</menu>
 		</menuContribution>
 	</extension>
@@ -84,26 +63,18 @@
 			point="org.eclipse.ui.commands">
 		<command
 				id="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct"
-				name="Build Metaproduct">
+				name="Generate Metaproduct">
 			<state
 					class="org.eclipse.jface.commands.ToggleState"
 					id="org.eclipse.ui.commands.toggleState">
 			</state>
 		</command>
-		<command
-				id="de.ovgu.featureide.core.featurehouse.ui.commands.key"
-				name="Perform Feature-Based Verification with KeY">
-		</command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
 		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.BuildMetaProductHandler"
+				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateMetaProductHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateFeatureStubsHandler"
-				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key">
 		</handler>
 	</extension>
 	<extension

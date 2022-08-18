@@ -63,7 +63,6 @@ public class StringTable {
 	public static final String FATAL_ERROR = "fatal error";
 	public static final String PARSER_ERROR = "parser error ";
 	public static final String TYPE_ERROR = "Type error ";
-	public static final String GENERATING_STUBS = "Generating stubs";
 	public static final String WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS = "Was not possible to generate the stubs";
 	public static final String ANALYZING_SELECTED_FILES = "Analyzing selected files";
 	public static final String TYPECHEF_DID_NOT_RUN_CORRECTLY_ = "TypeChef did not run correctly.";
@@ -166,8 +165,8 @@ public class StringTable {
 	public static final String FROM_FEATUREHOUSE_TO_AHEAD_ = " from FeatureHouse to AHEAD.";
 	public static final String REPLACE_KEYWORDS_ = "Replace keywords.";
 	public static final String COMPOSER_CONVERSION = "Composer Conversion";
-	public static final String SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_ =
-		"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.";
+	public static final String FEATUREHOUSE_SUPPORTS_JAVA_5_AND_AHEAD_JAVA_4 =
+		"If you continue, your source files will be changed automatically. Note that FeatureHouse supports Java 5, while AHEAD supports Java 4. This may cause problems during the conversion.";
 	public static final String LINUX = "Linux";
 	public static final String IS_NOT_AN_ABSOLUTE_PATH_ = " is not an absolute path. ";
 	public static final String IS_NO_VALID_PATH_ = " is no valid path. ";
@@ -191,17 +190,10 @@ public class StringTable {
 	public static final String CALL_COMPILER = "Call compiler";
 	public static final String INFORMATION = "Information";
 	public static final String CLASS = "Class ";
-	public static final String PLEASE_INSTALL_KEY_FOR_AN_AUTO_START_OF_THE_THEOREM_PROVER_ = "Please install KeY for an auto-start of the theorem prover.";
-	public static final String FEATURE_STUBS_GENERATED_AND_PROVEN_ = "Feature stubs generated and proven.";
-	public static final String ENSURES = "ensures";
 	public static final String REQUIRES = "requires";
-	public static final String ASSIGNABLE = "assignable";
-	public static final String FEATURE_STUB_GENERATOR_FOR = "Feature Stub Generator for ";
-	public static final String KEY_COULD_NOT_BE_STARTED_ = "KeY could not be started.";
 	public static final String INVARIANT = "Invariant";
 	public static final String EXTENDS = " extends ";
 	public static final String IMPLEMENTS = " implements ";
-	public static final String FEATURE_STUBS_GENERATION_STARTED_ = "Feature stub generation started.";
 	public static final String NO_PROJECT_GOT = "no project got";
 	public static final String CREATED_JAVA_PROJECT = "Created Java Project";
 	public static final String CREATE_INTERFACE = "Create Interface";
@@ -562,8 +554,9 @@ public class StringTable {
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String CONFIGURATION_DIALOGS = "Configuration Dialogs";
-	public static final String CONFIGURATION_DIALOGS_REMEMBER_CONSTRAINT_TEXT = "Turn off the ConstraintView Dialog.";
-	public static final String CONFIGURATION_DIALOGS_DECISION_CONSTRAINT_TEXT = "Open Constraint View when starting FeatureIDE.";
+	public static final String CONSTRAINT_VIEW_ON_TEXT = "Show constraint view dialog";
+	public static final String CONSTRAINT_VIEW_OFF_TEXT = "Hide constraint view dialog";
+	public static final String CONSTRAINT_VIEW_ASK_TEXT = "Open Constraint View when starting FeatureIDE";
 	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_REMEMBER_TOOLTIP =
 		"Don't show tooltip asking if you want to open the constraint view when starting FeatureIDE.";
 	public static final String CONFIGURATION_DIALOGS_CONSTRAINT_DECISION_TOOLTIP = "Open Constraint View when starting FeatureIDE.";

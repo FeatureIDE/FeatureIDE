@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
 
@@ -86,8 +86,8 @@ public class FeatureModel implements IFeatureModel {
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
-	protected final Map<Long, IFeatureModelElement> elements = new ConcurrentHashMap<>();
+	protected final Map<String, IFeature> featureTable = Collections.synchronizedMap(new LinkedHashMap<>());
+	protected final Map<Long, IFeatureModelElement> elements = Collections.synchronizedMap(new LinkedHashMap<>());
 
 	protected IEventManager eventManager = new DefaultEventManager();
 

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.init;
 
 import de.ovgu.featureide.fm.core.EclipseExtensionLoader;
 import de.ovgu.featureide.fm.core.EclipseLogger;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFactory;
@@ -39,8 +40,10 @@ import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningEclipse;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.preferences.DIMACSOmitRootPreference;
 
 /**
  * The library object for the fm.core plug-in when using the Eclipse platform.
@@ -78,6 +81,12 @@ public class FMCoreEclipseLibrary implements ILibrary {
 
 		ConfigFormatManager.getInstance().addExtensions(new EclipseExtensionLoader<IPersistentFormat<Configuration>>(PluginID.PLUGIN_ID,
 				IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
+
+		try {
+			((DIMACSFormat) FMFormatManager.getInstance().getExtension(DIMACSFormat.ID)).setOmitDummyRoot(DIMACSOmitRootPreference.getInstance().get());
+		} catch (final NoSuchExtensionException e) {
+			Logger.logError(e);
+		}
 	}
 
 	@Override

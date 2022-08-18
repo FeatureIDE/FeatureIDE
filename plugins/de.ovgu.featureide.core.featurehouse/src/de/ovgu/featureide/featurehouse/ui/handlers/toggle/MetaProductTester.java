@@ -51,7 +51,7 @@ public class MetaProductTester extends PropertyTester {
 			if (featureProject != null) {
 				final IComposerExtensionClass composer = featureProject.getComposer();
 				if (FeatureHouseComposer.COMPOSER_ID.equals(composer.getId())) {
-					state.setValue(((FeatureHouseComposer) composer).buildMetaProduct());
+					state.setValue(((FeatureHouseComposer) composer).generateMetaProduct());
 					return true;
 				}
 			}

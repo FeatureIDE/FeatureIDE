@@ -1,7 +1,7 @@
+.project
+readme.txt
 configs/LibSSH.xml
+src/dh.c
+src/main.c
 .cproject
 model.xml
-readme.txt
-src/main.c
-src/dh.c
-.project

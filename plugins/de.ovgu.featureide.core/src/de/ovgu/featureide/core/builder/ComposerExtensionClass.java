@@ -143,13 +143,20 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				destination = featureProject.getBuildFolder();
 			}
 
-			for (final IFeature feature : selectedFeatures) {
-				final IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
+			final IFolder source = featureProject.getSourceFolder();
+
+			if ((source != null) && (destination != null)) {
 				try {
 					if (!destination.exists()) {
 						destination.create(false, true, null);
 					}
-					copy(folder, destination);
+					for (final IFeature feature : selectedFeatures) {
+						try {
+							copy(source.getFolder(feature.getName()), destination);
+						} catch (final CoreException e) {
+							CorePlugin.getDefault().logError(e);
+						}
+					}
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}

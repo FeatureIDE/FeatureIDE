@@ -168,8 +168,9 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 					final IProject newProject = getNewProject();
 					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
 							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled());
-					// open editor
-					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile("model.xml"));
+					// open editor. try to search uvl format first before xml.
+					final String modelFile = newProject.getFile("model.uvl").exists() ? "model.uvl" : "model.xml";
+					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile(modelFile));
 				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}

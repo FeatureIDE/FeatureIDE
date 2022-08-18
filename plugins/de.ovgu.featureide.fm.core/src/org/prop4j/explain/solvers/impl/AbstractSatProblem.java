@@ -29,8 +29,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 import org.prop4j.explain.solvers.SatProblem;
+
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Abstract implementation of {@link SatProblem}.
@@ -40,7 +44,7 @@ import org.prop4j.explain.solvers.SatProblem;
 public abstract class AbstractSatProblem implements SatProblem {
 
 	/** The clauses added to this problem. */
-	private final List<Node> clauses = new ArrayList<>();
+	protected final List<Node> clauses = new ArrayList<>();
 	/** The assumptions added to this problem. */
 	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
 
@@ -56,9 +60,7 @@ public abstract class AbstractSatProblem implements SatProblem {
 
 	@Override
 	public int addFormula(Node formula) {
-		formula = formula.toRegularCNF();
-		final List<Node> clauses = Arrays.asList(formula.getChildren());
-		return addClauses(clauses);
+		return addClauses(formula.toRegularCNF(false, true).getChildren());
 	}
 
 	/**
@@ -67,11 +69,11 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 * @param clauses clauses to add; not null
 	 * @return the amount of clauses added
 	 */
-	protected int addClauses(Collection<? extends Node> clauses) {
+	protected int addClauses(Node[] clauses) {
 		for (final Node clause : clauses) {
 			addClause(clause);
 		}
-		return clauses.size();
+		return clauses.length;
 	}
 
 	/**
@@ -83,10 +85,42 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 */
 	protected int addClause(Node clause) throws IllegalArgumentException {
 		if (clause.getChildren().length == 0) {
-			throw new IllegalArgumentException("Empty clause");
+			clauses.add(clause);
+		}
+
+		final Literal[] children = (clause instanceof Literal) ? new Literal[] { (Literal) clause }
+			: Arrays.copyOf(clause.getChildren(), clause.getChildren().length, Literal[].class);
+
+		int absoluteValueCount = 0;
+		for (int j = 0; j < children.length; j++) {
+			final Literal literal = children[j];
+			if (literal.var.equals(NodeCreator.varTrue)) {
+				if (literal.positive) {
+					return -1;
+				} else {
+					absoluteValueCount++;
+					children[j] = null;
+				}
+			} else if (literal.var.equals(NodeCreator.varFalse)) {
+				if (literal.positive) {
+					absoluteValueCount++;
+					children[j] = null;
+				} else {
+					return -1;
+				}
+			}
+		}
+
+		final Literal[] newChildren = new Literal[children.length - absoluteValueCount];
+		int k = 0;
+		for (int j = 0; j < children.length; j++) {
+			final Literal literal = children[j];
+			if (literal != null) {
+				newChildren[k++] = literal;
+			}
 		}
 		final int clauseIndex = getClauseCount();
-		clauses.add(clause);
+		clauses.add(new Or(newChildren));
 		return clauseIndex;
 	}
 

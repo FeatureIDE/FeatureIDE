@@ -108,7 +108,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
-	private static final QualifiedName BUILD_META_PRODUCT =
+	private static final QualifiedName GENERATE_META_PRODUCT =
 		new QualifiedName(FeatureHouseComposer.class.getName() + "#BuildMetaProduct", FeatureHouseComposer.class.getName() + "#BuildMetaProduct");
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
@@ -376,17 +376,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			return;
 		}
 
-		if (buildMetaProduct()) {
+		if (generateMetaProduct()) {
 			if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())) {
-				buildDefaultMetaProduct(configPath, basePath, outputPath);
+				generateDefaultMetaProduct(configPath, basePath, outputPath);
 			} else if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA.equals(featureProject.getMetaProductGeneration())) {
 				buildBDDMetaProduct(configPath, basePath, outputPath, "java");
 			} else if (IFeatureProject.META_VAREXJ.equals(featureProject.getMetaProductGeneration())) {
-				buildDefaultMetaProduct(configPath, basePath, outputPath);
+				generateDefaultMetaProduct(configPath, basePath, outputPath);
 			} else if (IFeatureProject.META_MODEL_CHECKING_BDD_C.equals(featureProject.getMetaProductGeneration())) {
 				buildBDDMetaProduct(configPath, basePath, outputPath, "c");
 			} else {
-				buildDefaultMetaProduct(configPath, basePath, outputPath);
+				generateDefaultMetaProduct(configPath, basePath, outputPath);
 			}
 		} else {
 			composer = new FSTGenComposer(false);
@@ -580,7 +580,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param basePath
 	 * @param outputPath
 	 */
-	private void buildDefaultMetaProduct(final String configPath, final String basePath, final String outputPath) {
+	private void generateDefaultMetaProduct(final String configPath, final String basePath, final String outputPath) {
 		new FeatureModelClassGenerator(featureProject);
 		FSTGenComposerExtension.key = IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration())
 			|| IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())
@@ -948,6 +948,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		final Configuration configuration = fileHandler.getObject();
 
+		// link the configuration to the feature model formula, so that the feature order is respected
+		final FeatureModelFormula formula = featureProject.getFeatureModelManager().getPersistentFormula();
+		configuration.updateFeatures(formula);
+
 		try {
 			// Feature house composer requires a file with each selected feature in one line. Thus, the default format is used here.
 			final IConfigurationFormat outputFormat = new DefaultFormat();
@@ -1013,11 +1017,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public void setBuildMetaProduct(boolean value) {
-		setProperty(BUILD_META_PRODUCT, value);
+		setProperty(GENERATE_META_PRODUCT, value);
 	}
 
-	public final boolean buildMetaProduct() {
-		return getPropertyBoolean(BUILD_META_PRODUCT);
+	public final boolean generateMetaProduct() {
+		return getPropertyBoolean(GENERATE_META_PRODUCT);
 	}
 
 	@Override

@@ -108,16 +108,29 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	@Override
 	public int addClause(Node clause) {
 		final int index = super.addClause(clause);
-		for (final Node child : clause.getChildren()) {
-			final Literal literal = (Literal) child;
-			Set<Integer> clauseSet = variableClauses.get(literal.var);
-			if (clauseSet == null) {
-				clauseSet = new HashSet<>();
-				variableClauses.put(literal.var, clauseSet);
+		if (index >= 0) {
+			clause = clauses.get(index);
+			if (clause instanceof Literal) {
+				final Literal literal = (Literal) clause;
+				Set<Integer> clauseSet = variableClauses.get(literal.var);
+				if (clauseSet == null) {
+					clauseSet = new HashSet<>();
+					variableClauses.put(literal.var, clauseSet);
+				}
+				clauseSet.add(index);
+			} else {
+				for (final Node child : clause.getChildren()) {
+					final Literal literal = (Literal) child;
+					Set<Integer> clauseSet = variableClauses.get(literal.var);
+					if (clauseSet == null) {
+						clauseSet = new HashSet<>();
+						variableClauses.put(literal.var, clauseSet);
+					}
+					clauseSet.add(index);
+				}
 			}
-			clauseSet.add(index);
+			scopeClauseCount++;
 		}
-		scopeClauseCount++;
 		return index;
 	}
 

@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.wizards;
 
 import java.nio.file.Paths;
-import java.util.function.BooleanSupplier;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
@@ -33,8 +32,8 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.core.preferences.NonGTKFileDialogPreference;
 
 /**
  * Workaround for #1003
@@ -76,7 +75,7 @@ public class NonGTKFileDialog {
 		chooser.setFileFilter(chooser.getChoosableFileFilters()[defaultFormat]);
 	}
 
-	public void open(BooleanSupplier bs) {
+	public void open(Runnable runner) {
 
 		final NonGTKFileDialog dialog = this;
 
@@ -91,7 +90,7 @@ public class NonGTKFileDialog {
 					dialog.selectedFile = chooser.getSelectedFile().getAbsolutePath();
 					dialog.selectedFile += dialog.selectedFile.endsWith(extension) ? "" : extension;
 				}
-				bs.getAsBoolean();
+				runner.run();
 			}
 		});
 	}
@@ -110,15 +109,13 @@ public class NonGTKFileDialog {
 	}
 
 	public static void spawnInfo() {
-
-		if (Boolean.parseBoolean(Preferences.getPref(WORKAROUND_INFO_REMEMBER, "false"))) {
+		final NonGTKFileDialogPreference preference = NonGTKFileDialogPreference.getInstance();
+		if (preference.get()) {
 			return;
 		}
-
 		final MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.INFORMATION, Display.getCurrent().getActiveShell(),
 				StringTable.GTK_WORKAROUND_INFO_TITLE, StringTable.GTK_WORKAROUND_INFO_MSG, StringTable.GTK_WORKAROUND_INFO_TOGGLE, true, null, null, SWT.NONE);
-
-		Preferences.store(WORKAROUND_INFO_REMEMBER, String.valueOf(dialog.getToggleState()));
+		preference.set(dialog.getToggleState());
 	}
 
 	public String getSelectedFile() {

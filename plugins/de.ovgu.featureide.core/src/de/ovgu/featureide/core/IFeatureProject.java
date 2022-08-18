@@ -44,17 +44,20 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 
-	QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
-	QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
-	QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
-	QualifiedName compositionMechanismConfigID = new QualifiedName("featureproject.configs", "compositionmechanism");
-
 	String SOURCE_ARGUMENT = "source";
 	String CONFIGS_ARGUMENT = "equations";
 	String BUILD_ARGUMENT = "build";
 
+	QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", BUILD_ARGUMENT);
+	QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", CONFIGS_ARGUMENT);
+	QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", SOURCE_ARGUMENT);
+	QualifiedName compositionMechanismConfigID = new QualifiedName("featureproject.configs", "compositionmechanism");
+
+	@Deprecated
 	String DEFAULT_SOURCE_PATH = "src";
+	@Deprecated
 	String DEFAULT_CONFIGS_PATH = "equations";
+	@Deprecated
 	String DEFAULT_BUILD_PATH = "build";
 	String DEFAULT_CONTRACT_COMPOSITION = "None";
 
