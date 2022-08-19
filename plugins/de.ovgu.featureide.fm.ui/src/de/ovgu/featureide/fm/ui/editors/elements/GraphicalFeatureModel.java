@@ -352,6 +352,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	}
 
 	private static final String LAYOUT_ALGORITHM = "layoutalgorithm";
+	private static final String SHOW_CONSTRAINTS = "showconstraints";
 	private static final String SHOW_COLLAPSED_CONSTRAINTS = "showcollapsedconstraints";
 	private static final String SHOW_SHORT_NAMES = "showshortnames";
 	private static final String LEGEND_AUTO_LAYOUT = "legendautolayout";
@@ -397,6 +398,10 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		// Configure collapsing of constraints
 		final Boolean collapsedConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_COLLAPSED_CONSTRAINTS);
 		getLayout().showCollapsedConstraints(collapsedConstraints != null ? collapsedConstraints : true);
+
+		// Configure whether the constraints should be shown beneath the feature model
+		final Boolean showConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, SHOW_CONSTRAINTS);
+		setConstraintsHidden(showConstraints != null ? !showConstraints : false);
 
 		// Configure whether auto layout constraints is activated
 		final Boolean autoLayoutConstraints = FeatureModelProperty.getBooleanProperty(fm.getProperty(), TYPE_GRAPHICS, AUTO_LAYOUT_CONSTRAINTS);
@@ -538,6 +543,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
 		} else {
 			fm.getProperty().set(SHOW_SHORT_NAMES, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
+		}
+		if (getLayout().showConstraints()) {
+			fm.getProperty().set(SHOW_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);
+		} else {
+			fm.getProperty().set(SHOW_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_FALSE);
 		}
 		if (getLayout().showCollapsedConstraints()) {
 			fm.getProperty().set(SHOW_COLLAPSED_CONSTRAINTS, TYPE_GRAPHICS, FeatureModelProperty.VALUE_BOOLEAN_TRUE);

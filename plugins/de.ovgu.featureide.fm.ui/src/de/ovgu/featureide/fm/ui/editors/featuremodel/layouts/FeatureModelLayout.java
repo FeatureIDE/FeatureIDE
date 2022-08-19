@@ -34,6 +34,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private Configuration.Location abegoRootposition;
 
 	private boolean autoLayoutLegend;
+	private boolean showConstraints;
 	private boolean showCollapsedConstraints;
 	private boolean hasVerticalLayout;
 	private final Point legendPos;
@@ -52,6 +53,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		selectedLayoutAlgorithm = 4;
 		usesAbegoTreeLayout = false;
 		autoLayoutConstraints = false;
+		showConstraints = true;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
@@ -62,6 +64,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
 		usesAbegoTreeLayout = featureModelLayout.usesAbegoTreeLayout;
 		autoLayoutConstraints = featureModelLayout.autoLayoutConstraints;
+		showConstraints = true;
 	}
 
 	public boolean isAutoLayoutConstraints() {
@@ -90,6 +93,16 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	@Override
 	public void setShowShortNames(boolean b) {
 		showShortNames = b;
+	}
+
+	@Override
+	public boolean showConstraints() {
+		return showConstraints;
+	}
+
+	@Override
+	public void showConstraints(boolean b) {
+		showConstraints = b;
 	}
 
 	@Override
