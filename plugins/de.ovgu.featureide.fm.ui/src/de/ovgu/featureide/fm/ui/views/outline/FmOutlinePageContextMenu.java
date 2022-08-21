@@ -253,7 +253,7 @@ public class FmOutlinePageContextMenu {
 	 */
 	private boolean isValidSelection(ITreeSelection selection, Predicate<Object> p) {
 		final List<Object> selectedElements = new ArrayList<Object>();
-		for (final Object selectedElement : selection) {
+		for (final Object selectedElement : selection.toArray()) {
 			selectedElements.add(selectedElement);
 		}
 		return !selection.isEmpty() && selectedElements.stream().allMatch(p);

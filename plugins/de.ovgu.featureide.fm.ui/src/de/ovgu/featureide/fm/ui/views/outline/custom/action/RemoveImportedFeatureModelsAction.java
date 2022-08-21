@@ -131,7 +131,7 @@ public class RemoveImportedFeatureModelsAction extends Action {
 	private void updateSelection(IStructuredSelection selection) {
 		// Update data
 		final List<Object> selectedElements = new ArrayList<Object>();
-		for (final Object selectedElement : selection) {
+		for (final Object selectedElement : selection.toArray()) {
 			selectedElements.add(selectedElement);
 		}
 		selectedModels = selectedElements.stream().filter(element -> element instanceof MultiFeatureModel.UsedModel)
