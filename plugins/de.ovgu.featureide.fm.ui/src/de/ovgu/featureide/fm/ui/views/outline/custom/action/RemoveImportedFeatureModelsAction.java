@@ -23,10 +23,9 @@ package de.ovgu.featureide.fm.ui.views.outline.custom.action;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_IMPORTED_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_IMPORTED_FEATURE_MODELS;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -131,7 +130,10 @@ public class RemoveImportedFeatureModelsAction extends Action {
 	 */
 	private void updateSelection(IStructuredSelection selection) {
 		// Update data
-		final List<Object> selectedElements = StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).collect(Collectors.toList());
+		final List<Object> selectedElements = new ArrayList<Object>();
+		for (final Object selectedElement : selection) {
+			selectedElements.add(selectedElement);
+		}
 		selectedModels = selectedElements.stream().filter(element -> element instanceof MultiFeatureModel.UsedModel)
 				.map(element -> (MultiFeatureModel.UsedModel) element).filter(usedModel -> !hasImportedFeatures(usedModel)).collect(Collectors.toList());
 		valid = (selectedModels.size() == selectedElements.size()) && (selectedModels.size() > 0);

@@ -24,9 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_IMPORTS;
 
-import java.util.Spliterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.StreamSupport;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
@@ -252,7 +252,11 @@ public class FmOutlinePageContextMenu {
 	 * @return True iff the selection is not empty and all selected elements satisfy the given predicate
 	 */
 	private boolean isValidSelection(ITreeSelection selection, Predicate<Object> p) {
-		return !selection.isEmpty() && StreamSupport.stream((Spliterator<?>) selection.spliterator(), false).allMatch(p);
+		final List<Object> selectedElements = new ArrayList<Object>();
+		for (final Object selectedElement : selection) {
+			selectedElements.add(selectedElement);
+		}
+		return !selection.isEmpty() && selectedElements.stream().allMatch(p);
 	}
 
 	public void addToolbar(IToolBarManager iToolBarManager) {
