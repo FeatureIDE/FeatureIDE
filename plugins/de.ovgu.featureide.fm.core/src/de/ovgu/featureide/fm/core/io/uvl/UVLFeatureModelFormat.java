@@ -28,31 +28,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
+import org.prop4j.And;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
+import org.prop4j.Or;
 
-import de.neominik.uvl.UVLParser;
-import de.neominik.uvl.ast.And;
-import de.neominik.uvl.ast.Equiv;
-import de.neominik.uvl.ast.Feature;
-import de.neominik.uvl.ast.Group;
-import de.neominik.uvl.ast.Impl;
-import de.neominik.uvl.ast.Import;
-import de.neominik.uvl.ast.Not;
-import de.neominik.uvl.ast.Or;
-import de.neominik.uvl.ast.ParseError;
-import de.neominik.uvl.ast.UVLModel;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -71,6 +60,22 @@ import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.vill.exception.ParseError;
+import de.vill.main.UVLModelFactory;
+import de.vill.model.Attribute;
+import de.vill.model.Feature;
+import de.vill.model.FeatureModel;
+import de.vill.model.Group;
+import de.vill.model.Group.GroupType;
+import de.vill.model.Import;
+import de.vill.model.constraint.AndConstraint;
+import de.vill.model.constraint.Constraint;
+import de.vill.model.constraint.EquivalenceConstraint;
+import de.vill.model.constraint.ImplicationConstraint;
+import de.vill.model.constraint.LiteralConstraint;
+import de.vill.model.constraint.NotConstraint;
+import de.vill.model.constraint.OrConstraint;
+import de.vill.model.constraint.ParenthesisConstraint;
 
 /**
  * Reads / writes feature models in the UVL format.
@@ -94,7 +99,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final Pattern STRICT_ID_RESTRICTIVE_PATTERN =
 		Pattern.compile("(?!alternative|or|features|constraints|true|false|as|refer)[a-zA-Z][a-zA-Z_0-9]*");
 
-	private UVLModel rootModel;
+	private FeatureModel rootModel;
 	protected ProblemList pl;
 	private IFeatureModel fm;
 	protected MultiFeatureModelFactory factory;
@@ -133,12 +138,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		fm.setSourceFile(path);
 		this.fm = fm;
 		pl = new ProblemList();
-		final Object result = UVLParser.parse(source.toString(), path.getParent().toString());
-		if (result instanceof UVLModel) {
-			rootModel = (UVLModel) result;
+		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
+		try {
+			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
 			constructFeatureModel((MultiFeatureModel) fm);
-		} else if (result instanceof ParseError) {
-			pl.add(toProblem((ParseError) result));
+		} catch (final ParseError e) {
+			pl.add(toProblem(e));
 		}
 		return pl;
 	}
@@ -146,112 +151,61 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private void constructFeatureModel(MultiFeatureModel fm) {
 		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
-		Arrays.stream(rootModel.getImports()).forEach(i -> parseImport(fm, i));
-		IFeature root;
-		if (rootModel.getRootFeatures().length == 1) {
-			final Feature f = rootModel.getRootFeatures()[0];
-			root = parseFeature(fm, null, f, rootModel);
-		} else {
-			String rootName = MULTI_ROOT_PREFIX + 0;
-			for (int i = 1; rootModel.getAllFeatures().keySet().contains(rootName); i++) {
-				rootName = MULTI_ROOT_PREFIX + i;
-			}
-			root = factory.createFeature(fm, rootName);
-			root.getStructure().setAbstract(true);
-			root.getProperty().setImplicit(true);
-			fm.addFeature(root);
-			Arrays.stream(rootModel.getRootFeatures()).forEachOrdered(f -> parseFeature(fm, root, f, rootModel));
-			root.getStructure().getChildren().forEach(fs -> fs.setMandatory(true));
-		}
-		fm.getStructure().setRoot(root.getStructure());
-		final List<Object> ownConstraints = Arrays.asList(rootModel.getOwnConstraints());
-		Arrays.stream(rootModel.getConstraints()).filter(c -> !ownConstraints.contains(c)).forEach(c -> parseConstraint(fm, c));
-		ownConstraints.forEach(c -> parseOwnConstraint(fm, c));
-		fm.addAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME, rootModel.getNamespace());
+		final IFeature rootFeature;
+		final Feature uvlRootFeature = rootModel.getRootFeature();
+		rootFeature = parseFeature(fm, uvlRootFeature, null);
+		fm.getStructure().setRoot(rootFeature.getStructure());
+		// TODO Constraints
+		// TODO Attributes
 	}
 
-	private IFeature parseFeature(MultiFeatureModel fm, IFeature root, Feature f, UVLModel submodel) {
-		final Feature resolved = UVLParser.resolve(f, rootModel);
-
-		boolean duplicateFeature = false;
-		// Add error in case of a duplicate feature name
-		if (fm.getFeatures().stream().anyMatch(feature -> feature.getName().equals(resolved.getName()))) {
-			pl.add(new Problem("Duplicate feature name " + resolved.getName(), 0, Severity.ERROR));
-			duplicateFeature = true;
-		}
-
-		// Validate imported feature
-		if ((root == null ? -1 : root.getName().lastIndexOf('.')) < resolved.getName().lastIndexOf('.')) {
-			// Update current submodel or add an error if the feature does not exist
-			boolean invalid = true;
-			Optional<UVLModel> sub;
-			// Find submodel declaring the current feature, iterate in case a submodel has an imported root feature
-			while ((sub = Arrays.stream(submodel.getSubmodels())
-					.filter(m -> Arrays.stream(m.getRootFeatures()).map(Feature::getName).anyMatch(resolved.getName()::equals)).findFirst()).isPresent()) {
-				submodel = sub.get();
-				invalid = false;
-			}
-			if (invalid) {
-				pl.add(new Problem("Feature " + resolved.getName() + " does not exist", 0, Severity.ERROR));
-			}
-
-			// Check for invalid attributes and child groups
-			if (!f.getAttributes().isEmpty()) {
-				pl.add(new Problem("Invalid attribute of imported feature " + f.getName(), 0, Severity.ERROR));
-			}
-			if (f.getGroups().length != 0) {
-				pl.add(new Problem("Invalid group of imported feature " + f.getName(), 0, Severity.ERROR));
-			}
-		}
-		final UVLModel finalSubmodel = submodel;
-
-		final MultiFeature feature = factory.createFeature(fm, resolved.getName());
-
-		if (resolved.getName().contains(".")) {
-			feature.setType(MultiFeature.TYPE_INTERFACE);
-		}
+	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
+		final MultiFeature feature = factory.createFeature(fm, uvlFeature.getFeatureName());
 		fm.addFeature(feature);
-		if (root != null) {
-			root.getStructure().addChild(feature.getStructure());
-		}
-		feature.getStructure().setAbstract(isAbstract(resolved));
 
-		if (!duplicateFeature) { // Don't process groups for duplicate feature names, as this can cause infinite recursion
-			Arrays.stream(resolved.getGroups()).forEach(g -> parseGroup(fm, feature, g, finalSubmodel));
+		if (parentFeature != null) {
+			parentFeature.getStructure().addChild(feature.getStructure());
 		}
-		parseAttributes(fm, feature, resolved);
+		// TODO set feature abstract if attribute is present (or do it when parsing attributes)
 
+		for (final Group group : uvlFeature.getChildren()) {
+			parseGroup(fm, group, feature);
+		}
+		// todo parse attributes
 		return feature;
 	}
 
-	private void parseGroup(MultiFeatureModel fm, IFeature root, Group g, UVLModel submodel) {
-		if ("cardinality".equals(g.getType())) {
-			if ((g.getLower() == 1) && (g.getUpper() == -1)) {
-				g.setType("or");
-			} else if ((g.getLower() == 1) && (g.getUpper() == 1)) {
-				g.setType("alternative");
-			} else if ((g.getLower() == 0) && (g.getUpper() == -1)) {
-				g.setType("optional");
-			} else if ((g.getLower() == g.getUpper()) && (g.getUpper() == g.getChildren().length)) {
-				g.setType("mandatory");
+	private void parseGroup(MultiFeatureModel fm, Group uvlGroup, IFeature parentFeature) {
+		final List<IFeature> children = new LinkedList();
+		for (final Feature feature : uvlGroup.getFeatures()) {
+			children.add(parseFeature(fm, feature, parentFeature));
+		}
+
+		if (uvlGroup.GROUPTYPE.equals(GroupType.GROUP_CARDINALITY)) {
+			if ((uvlGroup.getLowerBound().equals("1")) && (uvlGroup.getUpperBound().equals("*"))) {
+				parentFeature.getStructure().setOr();
+			} else if ((uvlGroup.getLowerBound().equals("1")) && (uvlGroup.getUpperBound().equals("1"))) {
+				parentFeature.getStructure().setAlternative();
+			} else if ((uvlGroup.getLowerBound().equals("0")) && (uvlGroup.getUpperBound().equals("*"))) {
+				// optional is true if nothing else is set
+			} else if ((uvlGroup.getLowerBound().equals(uvlGroup.getUpperBound())) && (uvlGroup.getUpperBound().equals(uvlGroup.getFeatures().size()))) {
+				children.forEach(f -> f.getStructure().setMandatory(true));
 			} else {
-				g.setType("optional");
-				pl.add(new Problem(
-						String.format("Failed to convert cardinality [%d..%d] to known group type at feature %s.", g.getLower(), g.getUpper(), root.getName()),
-						0, Severity.WARNING));
+				pl.add(new Problem(String.format("Failed to convert cardinality [%d..%d] to known group type at feature %s.", uvlGroup.getLowerBound(),
+						uvlGroup.getUpperBound(), parentFeature.getName()), 0, Severity.WARNING));
 			}
 		}
-		final List<IFeature> children = Stream.of(g.getChildren()).map(f -> parseFeature(fm, root, (Feature) f, submodel)).collect(Collectors.toList());
-		switch (g.getType()) {
-		case "or":
-			root.getStructure().setOr();
+
+		switch (uvlGroup.GROUPTYPE) {
+		case OR:
+			parentFeature.getStructure().setOr();
 			break;
-		case "alternative":
-			root.getStructure().setAlternative();
+		case ALTERNATIVE:
+			parentFeature.getStructure().setAlternative();
 			break;
-		case "optional":
+		case OPTIONAL:
 			break;
-		case "mandatory":
+		case MANDATORY:
 			children.forEach(f -> f.getStructure().setMandatory(true));
 			break;
 		}
@@ -261,8 +215,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
-	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature f) {
-		UVLParser.getAttributes(f).entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
+	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature uvlFeature) {
+		uvlFeature.getAttributes().entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
 	}
 
 	/**
@@ -273,25 +227,22 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	 * @param attributeKey the name of the attribute that is parsed
 	 * @param attributeValue the value of the attribute that is parsed
 	 */
-	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
-		if (attributeKey.equals("constraint") || attributeKey.equals("constraints")) {
-			if (attributeValue instanceof List<?>) {
-				((List<?>) attributeValue).forEach(v -> parseConstraint(fm, v));
-			} else {
-				parseConstraint(fm, attributeValue);
-			}
+	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Attribute attributeValue) {
+		if (attributeValue.getValue() instanceof Constraint) {
+			parseConstraint(fm, (Constraint) attributeValue.getValue());
 		}
+		// TODO list with constraints?
 	}
 
-	private void parseConstraint(MultiFeatureModel fm, Object c) {
+	private void parseConstraint(MultiFeatureModel fm, Constraint c) {
 		parseConstraint(fm, c, false);
 	}
 
-	private void parseOwnConstraint(MultiFeatureModel fm, Object c) {
+	private void parseOwnConstraint(MultiFeatureModel fm, Constraint c) {
 		parseConstraint(fm, c, true);
 	}
 
-	private void parseConstraint(MultiFeatureModel fm, Object c, boolean own) {
+	private void parseConstraint(MultiFeatureModel fm, Constraint c, boolean own) {
 		try {
 			final Node constraint = parseConstraint(c);
 			if (constraint != null) {
@@ -308,23 +259,26 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
-	private Node parseConstraint(Object c) {
-		if (c instanceof String) {
-			final String name = (String) c;
-			checkReferenceValid(name);
-			return new Literal((String) c);
-		} else if (c instanceof Not) {
-			return new org.prop4j.Not(parseConstraint(((Not) c).getChild()));
-		} else if (c instanceof And) {
-			return new org.prop4j.And(parseConstraint(((And) c).getLeft()), parseConstraint(((And) c).getRight()));
-		} else if (c instanceof Or) {
-			return new org.prop4j.Or(parseConstraint(((Or) c).getLeft()), parseConstraint(((Or) c).getRight()));
-		} else if (c instanceof Impl) {
-			return new Implies(parseConstraint(((Impl) c).getLeft()), parseConstraint(((Impl) c).getRight()));
-		} else if (c instanceof Equiv) {
-			return new Equals(parseConstraint(((Equiv) c).getLeft()), parseConstraint(((Equiv) c).getRight()));
+	private Node parseConstraint(Constraint constraint) {
+		if (constraint instanceof AndConstraint) {
+			return new org.prop4j.And(parseConstraint(((AndConstraint) constraint).getLeft()), parseConstraint(((AndConstraint) constraint).getRight()));
+		} else if (constraint instanceof EquivalenceConstraint) {
+			return new Equals(parseConstraint(((EquivalenceConstraint) constraint).getLeft()),
+					parseConstraint(((EquivalenceConstraint) constraint).getRight()));
+		} else if (constraint instanceof ImplicationConstraint) {
+			return new org.prop4j.Implies(parseConstraint(((ImplicationConstraint) constraint).getLeft()),
+					parseConstraint(((ImplicationConstraint) constraint).getRight()));
+		} else if (constraint instanceof NotConstraint) {
+			return new org.prop4j.Not(parseConstraint(((NotConstraint) constraint).getContent()));
+		} else if (constraint instanceof OrConstraint) {
+			return new org.prop4j.Or(parseConstraint(((OrConstraint) constraint).getLeft()), parseConstraint(((OrConstraint) constraint).getRight()));
+		} else if (constraint instanceof ParenthesisConstraint) {
+			return parseConstraint(((ParenthesisConstraint) constraint).getContent());
+		} else if (constraint instanceof LiteralConstraint) {
+			return new Literal(((LiteralConstraint) constraint).getLiteral());
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	private void checkReferenceValid(String name) {
@@ -353,7 +307,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	 * @return a {@link Problem}
 	 */
 	private Problem toProblem(ParseError error) {
-		return new Problem(error.toString(), error.getLine(), Severity.ERROR);
+		return new Problem(error);
 	}
 
 	@Override
