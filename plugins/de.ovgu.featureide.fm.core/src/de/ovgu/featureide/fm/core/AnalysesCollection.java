@@ -66,6 +66,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanation;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
@@ -114,6 +116,10 @@ public class AnalysesCollection {
 	 * Remembers explanations for redundant constraints.
 	 */
 	final Map<IConstraint, RedundantConstraintExplanation> redundantConstraintExplanations = new HashMap<>();
+	/**
+	 * Remembers the collected explanation for all anomalies.
+	 */
+	private MultipleAnomaliesExplanation multipleAnomaliesExplanation;
 
 	/**
 	 * Used for creating explanation creators.
@@ -131,6 +137,7 @@ public class AnalysesCollection {
 	 * Creates explanations for redundant constraints. Stored for performance so the underlying CNF is not recreated for every explanation.
 	 */
 	final RedundantConstraintExplanationCreator redundantConstraintExplanationCreator = explanationCreatorFactory.getRedundantConstraintExplanationCreator();
+	final MultipleAnomaliesExplanationCreator multipleAnomaliesExplanationCreator = explanationCreatorFactory.getMultipleAnomaliesExplanationCreator();
 
 	static class StringToFeature implements Function<String, IFeature> {
 
@@ -422,6 +429,7 @@ public class AnalysesCollection {
 		deadFeatureExplanations.clear();
 		falseOptionalFeatureExplanations.clear();
 		redundantConstraintExplanations.clear();
+		multipleAnomaliesExplanation = null;
 
 		featurePropertiesMap.clear();
 		constraintPropertiesMap.clear();
@@ -449,6 +457,7 @@ public class AnalysesCollection {
 		deadFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		falseOptionalFeatureExplanationCreator.setFeatureModel(formula.getFeatureModel());
 		redundantConstraintExplanationCreator.setFeatureModel(formula.getFeatureModel());
+		multipleAnomaliesExplanationCreator.setFeatureModel(formula.getFeatureModel());
 	}
 
 	public void inheritSettings(AnalysesCollection otherCollection) {
@@ -536,4 +545,11 @@ public class AnalysesCollection {
 		return constraintProperties != null ? constraintProperties : new ConstraintProperties(constraint);
 	}
 
+	MultipleAnomaliesExplanation getMultipleAnomaliesExplanation() {
+		return multipleAnomaliesExplanation;
+	}
+
+	void setMultipleAnomaliesExplanation(MultipleAnomaliesExplanation multipleAnomaliesExplanation) {
+		this.multipleAnomaliesExplanation = multipleAnomaliesExplanation;
+	}
 }

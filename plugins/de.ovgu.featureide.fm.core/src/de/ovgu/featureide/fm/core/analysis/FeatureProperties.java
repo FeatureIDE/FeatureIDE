@@ -111,4 +111,9 @@ public class FeatureProperties {
 		this.deadExplanation = deadExplanation;
 	}
 
+	@Override
+	public String toString() {
+		return "FeatureProperties for " + feature.getName() + " " + featureStatus.toString();
+	}
+
 }

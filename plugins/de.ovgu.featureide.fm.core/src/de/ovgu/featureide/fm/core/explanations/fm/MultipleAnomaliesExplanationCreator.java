@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2020  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,33 +20,22 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 
 /**
- * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
+ * {@link MultipleAnomaliesExplanationCreator} provides an interface for creators of {@link MultipleAnomaliesExplanation}s.
  *
- * @param <S> subject
- * @param <E> explanation
- * @author Timo G&uuml;nther
- * @see DeadFeatureExplanationCreator
- * @see FalseOptionalFeatureExplanationCreator
- * @see RedundantConstraintExplanationCreator
- * @see MultipleAnomaliesExplanationWriter
+ * @author Benedikt Jutz
  */
-public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
+public interface MultipleAnomaliesExplanationCreator extends FeatureModelExplanationCreator<IFeatureModel, MultipleAnomaliesExplanation> {
 
 	/**
-	 * Returns the feature model context.
+	 * Configures the anomaly types to find explanations for.
 	 *
-	 * @return the feature model context
+	 * @param featureStatuses - {@link FeatureStatus}[]
+	 * @param constraintStatuses - {@link ConstraintStatus}[]
 	 */
-	public IFeatureModel getFeatureModel();
-
-	/**
-	 * Sets the feature model context.
-	 *
-	 * @param fm the feature model context
-	 */
-	public void setFeatureModel(IFeatureModel fm);
+	void setAnomalyTypes(FeatureStatus[] featureStatuses, ConstraintStatus[] constraintStatuses);
 }
