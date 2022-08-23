@@ -24,35 +24,30 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.function.BiFunction;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
-import org.prop4j.And;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
-import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
-import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
@@ -263,7 +258,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (constraint instanceof AndConstraint) {
 			return new org.prop4j.And(parseConstraint(((AndConstraint) constraint).getLeft()), parseConstraint(((AndConstraint) constraint).getRight()));
 		} else if (constraint instanceof EquivalenceConstraint) {
-			return new Equals(parseConstraint(((EquivalenceConstraint) constraint).getLeft()),
+			return new org.prop4j.Equals(parseConstraint(((EquivalenceConstraint) constraint).getLeft()),
 					parseConstraint(((EquivalenceConstraint) constraint).getRight()));
 		} else if (constraint instanceof ImplicationConstraint) {
 			return new org.prop4j.Implies(parseConstraint(((ImplicationConstraint) constraint).getLeft()),
@@ -275,7 +270,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} else if (constraint instanceof ParenthesisConstraint) {
 			return parseConstraint(((ParenthesisConstraint) constraint).getContent());
 		} else if (constraint instanceof LiteralConstraint) {
-			return new Literal(((LiteralConstraint) constraint).getLiteral());
+			return new org.prop4j.Literal(((LiteralConstraint) constraint).getLiteral());
 		} else {
 			return null;
 		}
@@ -312,149 +307,105 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel fm) {
-		return deconstructFeatureModel(fm).toString();
+		return featureIDEModelToUVLFeatureModel(fm).toString();
 	}
 
-	private UVLModel deconstructFeatureModel(IFeatureModel fm) {
-		final UVLModel model = new UVLModel();
-		String namespace = fm.getStructure().getRoot().getFeature().getName();
-		List<IConstraint> constraints = fm.getConstraints();
-		if (fm instanceof MultiFeatureModel) {
-			final MultiFeatureModel mfm = (MultiFeatureModel) fm;
-			final FeatureAttribute<String> nsAttribute = mfm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
-			if (nsAttribute != null) {
-				namespace = nsAttribute.getValue();
+	private FeatureModel featureIDEModelToUVLFeatureModel(IFeatureModel fm) {
+		final FeatureModel uvlModel = new FeatureModel();
+		uvlModel.setNamespace(fm.getStructure().getRoot().getFeature().getName());
+		final Feature rootFeature = featureIDEFeatureToUVLFeature(fm.getStructure().getRoot().getFeature());
+		uvlModel.setRootFeature(rootFeature);
+		uvlModel.getOwnConstraints().addAll(featureIDEConstraintsToUVLConstraints(fm));
+		return uvlModel;
+	}
+
+	private Feature featureIDEFeatureToUVLFeature(IFeature feature) {
+		final Feature uvlFeature = new Feature(feature.getName());
+		uvlFeature.getAttributes().putAll(featureIDEAttributesToUVLAttributes(feature));
+
+		if (feature.getStructure().isAlternative()) {
+			final List<IFeature> alternativeChildren = feature.getStructure().getChildren().stream().map(x -> x.getFeature()).collect(Collectors.toList());
+			final Group group = new Group(GroupType.ALTERNATIVE);
+			for (final IFeature childFeature : alternativeChildren) {
+				group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
 			}
-			model.setImports(mfm.getExternalModels().values().stream().map(um -> new Import(um.getModelName(), um.getVarName())).toArray(Import[]::new));
-			if (mfm.isMultiProductLineModel()) {
-				constraints = mfm.getOwnConstraints();
+			uvlFeature.getChildren().add(group);
+		} else if (feature.getStructure().isOr()) {
+			final List<IFeature> orChildren = feature.getStructure().getChildren().stream().map(x -> x.getFeature()).collect(Collectors.toList());
+			final Group group = new Group(GroupType.OR);
+			for (final IFeature childFeature : orChildren) {
+				group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
 			}
+			uvlFeature.getChildren().add(group);
 		} else {
-			model.setImports(new Import[0]);
+			final List<IFeature> mandatoryChildren =
+				feature.getStructure().getChildren().stream().filter(x -> x.isMandatory()).map(x -> x.getFeature()).collect(Collectors.toList());
+			if (mandatoryChildren.size() > 0) {
+				final Group group = new Group(GroupType.MANDATORY);
+				for (final IFeature childFeature : mandatoryChildren) {
+					group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
+				}
+				uvlFeature.getChildren().add(group);
+			}
+
+			final List<IFeature> optionalChildren =
+				feature.getStructure().getChildren().stream().filter(x -> !x.isMandatory()).map(x -> x.getFeature()).collect(Collectors.toList());
+			if (optionalChildren.size() > 0) {
+				final Group group = new Group(GroupType.OPTIONAL);
+				for (final IFeature childFeature : optionalChildren) {
+					group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
+				}
+				uvlFeature.getChildren().add(group);
+			}
 		}
-		model.setNamespace(namespace);
-		final IFeatureStructure root = fm.getStructure().getRoot();
-		if (root.getFeature().getProperty().isImplicit() && root.isAnd() && root.hasChildren()
-			&& root.getChildren().stream().allMatch(IFeatureStructure::isMandatory) && root.getRelevantConstraints().isEmpty()) {
-			// Remove implicit root feature, use children as root features
-			model.setRootFeatures(root.getChildren().stream().map(child -> printFeature(child.getFeature())).toArray(Feature[]::new));
-		} else {
-			// Use single root feature
-			model.setRootFeatures(new Feature[] { printFeature(root.getFeature()) });
-		}
-		model.setConstraints(constraints.stream().map(this::printConstraint).toArray());
-		return model;
+		return uvlFeature;
+
 	}
 
-	private Feature printFeature(IFeature feature) {
-		final Feature f = new Feature();
-		f.setName(feature.getName());
-		if (!f.getName().contains(".")) { // exclude references
-			f.setAttributes(printAttributes(feature));
-			f.setGroups(printGroups(feature));
-		}
-		return f;
-	}
-
-	/**
-	 * This method writes all attributes of the specified feature to a map that can be converted to UVL.
-	 *
-	 * @param feature the feature whose attributes are written
-	 * @return a map containing the attributes
-	 */
-	protected Map<String, Object> printAttributes(IFeature feature) {
-		final Map<String, Object> attributes = new TreeMap<>();
+	private Map<String, Attribute> featureIDEAttributesToUVLAttributes(IFeature feature) {
+		final Map<String, Attribute> attribtues = new HashMap<>();
 		if (feature.getStructure().isAbstract()) {
-			attributes.put("abstract", true);
+			attribtues.put("abstract", new Attribute("abstract", true));
 		}
-		return attributes;
+		return attribtues;
 	}
 
-	private Group constructGroup(IFeatureStructure fs, String type, Predicate<IFeatureStructure> pred) {
-		return new Group(type, 0, 0, fs.getChildren().stream().filter(pred).map(f -> printFeature(f.getFeature())).toArray(Feature[]::new));
+	private List<Constraint> featureIDEConstraintsToUVLConstraints(IFeatureModel fm) {
+		final List<Constraint> result = new LinkedList<>();
+		for (final IConstraint constraint : fm.getConstraints()) {
+			result.add(featureIDEConstraintToUVLConstraint(constraint.getNode()));
+		}
+		return result;
 	}
 
-	private Group[] printGroups(IFeature feature) {
-		final IFeatureStructure fs = feature.getStructure();
-		if (!fs.hasChildren()) {
-			return new Group[] {};
-		}
-		if (fs.isAnd()) {
-			final List<Group> groups = new LinkedList<Group>();
-			for (int i = 0; i < fs.getChildrenCount(); i++) {
-				final Group group = getGroup(fs.getChildren().get(i), i);
-				groups.add(group);
-				i = (i + group.getChildren().length) - 1;
-			}
-			final Group[] groupArray = new Group[groups.size()];
-			for (int i = 0; i < groups.size(); i++) {
-				groupArray[i] = groups.get(i);
-			}
-			return groupArray;
-		} else if (fs.isOr()) {
-			return new Group[] { constructGroup(fs, "or", x -> true) };
-		} else if (fs.isAlternative()) {
-			return new Group[] { constructGroup(fs, "alternative", x -> true) };
-		}
-		return new Group[] {};
-	}
-
-	/**
-	 * a method to create a group for uvl starting with a feature that is either mandatory or optional and adding all features with the same property until a
-	 * feature with a different property comes in order
-	 *
-	 * @param feat the first feature of a new group
-	 * @param pos the position of the feature in the list of children of the parent feature
-	 * @return the new group with the given feature as start feature
-	 */
-	private Group getGroup(IFeatureStructure feat, int pos) {
-		final List<IFeatureStructure> featuresInGroup = new LinkedList<IFeatureStructure>();
-		featuresInGroup.add(feat);
-		for (int i = pos + 1; i < feat.getParent().getChildrenCount(); i++) {
-			if (feat.getParent().getChildren().get(i).isMandatory() == feat.isMandatory()) {
-				featuresInGroup.add(feat.getParent().getChildren().get(i));
-			} else {
-				break;
-			}
-		}
-		if (feat.isMandatory()) {
-			return constructGroup(feat.getParent(), "mandatory", c -> featuresInGroup.contains(c));
-		} else {
-			return constructGroup(feat.getParent(), "optional", c -> featuresInGroup.contains(c));
-		}
-	}
-
-	private Object printConstraint(IConstraint constraint) {
-		return printConstraint(constraint.getNode());
-	}
-
-	private Object printConstraint(Node n) {
+	private Constraint featureIDEConstraintToUVLConstraint(Node n) {
+		final Constraint uvlConstraint;
 		if (n instanceof Literal) {
-			return ((Literal) n).var;
+			return new LiteralConstraint(((Literal) n).var.toString());
 		} else if (n instanceof org.prop4j.Not) {
-			return new Not(printConstraint(n.getChildren()[0]));
+			return new NotConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]));
 		} else if (n instanceof org.prop4j.And) {
-			return printMultiArity(And::new, n.getChildren());
+			return printMultiArity(AndConstraint::new, n.getChildren());
 		} else if (n instanceof org.prop4j.Or) {
-			return printMultiArity(Or::new, n.getChildren());
+			return printMultiArity(OrConstraint::new, n.getChildren());
 		} else if (n instanceof Implies) {
-			return new Impl(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return new ImplicationConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]), featureIDEConstraintToUVLConstraint(n.getChildren()[1]));
 		} else if (n instanceof Equals) {
-			return new Equiv(printConstraint(n.getChildren()[0]), printConstraint(n.getChildren()[1]));
+			return new EquivalenceConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]), featureIDEConstraintToUVLConstraint(n.getChildren()[1]));
 		}
 		return null;
 	}
 
-	private Object printMultiArity(BiFunction<Object, Object, Object> constructor, Node[] args) {
+	private Constraint printMultiArity(BiFunction<Constraint, Constraint, Constraint> constructor, Node[] args) {
 		switch (args.length) {
 		case 0:
 			return null;
 		case 1:
-			return printConstraint(args[0]);
+			return featureIDEConstraintToUVLConstraint(args[0]);
 		case 2:
-			return constructor.apply(printConstraint(args[0]), printConstraint(args[1]));
+			return constructor.apply(featureIDEConstraintToUVLConstraint(args[0]), featureIDEConstraintToUVLConstraint(args[1]));
 		default:
-			return constructor.apply(printConstraint(args[0]), printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length)));
+			return constructor.apply(featureIDEConstraintToUVLConstraint(args[0]), printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length)));
 		}
 	}
 
