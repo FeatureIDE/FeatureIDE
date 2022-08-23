@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -138,8 +139,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	private List<TWiseConfiguration> curResult = null;
 	private ArrayList<TWiseConfiguration> bestResult = null;
+
 	private List<LiteralSet> initialSample = null;
-	private boolean keepInitialSample = true;
+	private boolean allowInitialSolutionModify = false;
+	private boolean allowInitialSolutionRemove = false;
+	private boolean countInitialSolutionForLimit = false;
 
 	protected MonitorThread samplingMonitor;
 
@@ -169,14 +173,6 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		this.initialSample = new ArrayList<>(initialSample);
 	}
 
-	public boolean isKeepInitialSample() {
-		return keepInitialSample;
-	}
-
-	public void setKeepInitialSample(boolean keepInitialSample) {
-		this.keepInitialSample = keepInitialSample;
-	}
-
 	private void init() {
 		final CNF cnf = solver.getSatInstance();
 		if (cnf.getClauses().isEmpty()) {
@@ -185,8 +181,10 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			util = new TWiseConfigurationUtil(cnf, solver);
 		}
 		util.setMaxSampleSize(maxSampleSize);
-		util.setRandom(getRandom());
+		util.setAllowInitialSolutionModify(allowInitialSolutionModify);
+		util.setCountInitialSolutionForLimit(countInitialSolutionForLimit);
 
+		util.setRandom(getRandom());
 		util.computeRandomSample();
 		if (!util.getCnf().getClauses().isEmpty()) {
 			util.computeMIG();
@@ -201,7 +199,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		solver.setSelectionStrategy(SelectionStrategy.ORG);
 
 		if (initialSample != null) {
-			initialSample.forEach(c -> util.newConfiguration(c, keepInitialSample));
+			initialSample.forEach(c -> util.newConfiguration(c, true));
 		}
 	}
 
@@ -216,17 +214,28 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			buildCombinations();
 		}
 
-		bestResult.forEach(configuration -> addResult(configuration.getCompleteSolution()));
+		if (allowInitialSolutionModify) {
+			bestResult.stream() //
+					.filter(c -> c.isInitial()) //
+					.sorted(Comparator.comparing(TWiseConfiguration::getInitialIndex)) //
+					.forEach(c -> addResult(c.getCompleteSolution()));
+		} else {
+			bestResult.stream() //
+					.filter(c -> c.isInitial()) //
+					.sorted(Comparator.comparing(TWiseConfiguration::getInitialIndex)) //
+					.forEach(c -> addResult(c));
+		}
+		bestResult.stream() //
+				.filter(c -> !c.isInitial()) //
+				.forEach(c -> addResult(c.getCompleteSolution()));
 	}
 
 	private void trimConfigurations() {
 		if (curResult != null) {
-			final int firstGenerated = ((initialSample != null) && keepInitialSample) ? initialSample.size() : 0;
-
 			final TWiseConfigurationStatistic statistic = new TWiseConfigurationStatistic();
 			statistic.setT(t);
 			statistic.setFastCalc(true);
-			statistic.calculate(util, curResult.subList(firstGenerated, curResult.size()), presenceConditionManager.getGroupedPresenceConditions());
+			statistic.calculate(util, curResult, presenceConditionManager.getGroupedPresenceConditions());
 
 			final double[] normConfigValues = statistic.getConfigValues2();
 			double mean = 0;
@@ -234,20 +243,22 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				mean += d;
 			}
 			mean /= normConfigValues.length;
-			final double threshold = mean;
+
+			final double reference = mean;
 
 			int index = 0;
-			final List<TWiseConfiguration> completeSolutions = util.getCompleteSolutionList();
-			index = removeSolutions(normConfigValues, threshold, index, completeSolutions.subList(firstGenerated, completeSolutions.size()));
-			index = removeSolutions(normConfigValues, threshold, index, util.getIncompleteSolutionList());
+			index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
+			index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
 		}
 	}
 
 	private int removeSolutions(double[] values, final double reference, int index, List<TWiseConfiguration> solutionList) {
 		for (final Iterator<TWiseConfiguration> it = solutionList.iterator(); it.hasNext();) {
-			it.next();
+			final TWiseConfiguration solution = it.next();
 			if (values[index++] < reference) {
-				it.remove();
+				if (allowInitialSolutionRemove || !solution.isInitial()) {
+					it.remove();
+				}
 			}
 		}
 		return index;
@@ -361,6 +372,30 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	public void setIterations(int iterations) {
 		this.iterations = iterations;
+	}
+
+	public boolean isAllowInitialSolutionModify() {
+		return allowInitialSolutionModify;
+	}
+
+	public void setAllowInitialSolutionModify(boolean allowInitialSolutionModify) {
+		this.allowInitialSolutionModify = allowInitialSolutionModify;
+	}
+
+	public boolean isAllowInitialSolutionRemove() {
+		return allowInitialSolutionRemove;
+	}
+
+	public void setAllowInitialSolutionRemove(boolean allowInitialSolutionRemove) {
+		this.allowInitialSolutionRemove = allowInitialSolutionRemove;
+	}
+
+	public boolean isCountInitialSolutionForLimit() {
+		return countInitialSolutionForLimit;
+	}
+
+	public void setCountInitialSolutionForLimit(boolean countInitialSolutionForLimit) {
+		this.countInitialSolutionForLimit = countInitialSolutionForLimit;
 	}
 
 }

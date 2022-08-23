@@ -186,7 +186,8 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	public int indexOfVariable(int variable) {
 		switch (order) {
 		case INDEX:
-			return (variable > 0) && (variable < size()) ? (variable - 1) : -1;
+			final int variableIndex = variable - 1;
+			return ((variableIndex >= 0) && (variableIndex < size()) && (Math.abs(literals[variableIndex]) == variable)) ? variableIndex : -1;
 		case UNORDERED:
 		case NATURAL:
 			for (int i = 0; i < literals.length; i++) {
@@ -270,8 +271,12 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	}
 
 	public LiteralSet removeAll(LiteralSet variables) {
+		return removeAll(variables.literals);
+	}
+
+	public LiteralSet removeAll(int... variables) {
 		final boolean[] removeMarker = new boolean[literals.length];
-		final int count = getDuplicates(variables, removeMarker);
+		final int count = getDuplicateVariables(variables, removeMarker);
 
 		final int[] newLiterals = new int[literals.length - count];
 		int j = 0;
@@ -280,12 +285,18 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 				newLiterals[j++] = literals[i];
 			}
 		}
-		return new LiteralSet(newLiterals, order, false);
+		return ((order == Order.NATURAL) || (newLiterals.length == literals.length)) //
+			? new LiteralSet(newLiterals, order, false) //
+			: new LiteralSet(newLiterals, Order.UNORDERED, false);
 	}
 
 	public LiteralSet retainAll(LiteralSet variables) {
+		return retainAll(variables.literals);
+	}
+
+	public LiteralSet retainAll(int... variables) {
 		final boolean[] removeMarker = new boolean[literals.length];
-		final int count = getDuplicates(variables, removeMarker);
+		final int count = getDuplicateVariables(variables, removeMarker);
 
 		final int[] newLiterals = new int[count];
 		int j = 0;
@@ -294,26 +305,41 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 				newLiterals[j++] = literals[i];
 			}
 		}
-		return new LiteralSet(newLiterals, order, false);
+		return ((order == Order.NATURAL) || (newLiterals.length == literals.length)) //
+			? new LiteralSet(newLiterals, order, false) //
+			: new LiteralSet(newLiterals, Order.UNORDERED, false);
 	}
 
-	protected int getDuplicates(LiteralSet variables, final boolean[] removeMarker) {
-		final int[] otherLiterals = variables.getLiterals();
+	protected int getDuplicates(int[] literals, final boolean[] marker) {
 		int count = 0;
-		for (int i = 0; i < otherLiterals.length; i++) {
-			final int index = indexOfLiteral(otherLiterals[i]);
+		for (int i = 0; i < literals.length; i++) {
+			final int index = indexOfLiteral(literals[i]);
 			if (index >= 0) {
 				count++;
-				if (removeMarker != null) {
-					removeMarker[index] = true;
+				if (marker != null) {
+					marker[index] = true;
 				}
 			}
 		}
 		return count;
 	}
 
-	public boolean hasDuplicates(LiteralSet variables) {
-		final int[] otherLiterals = variables.getLiterals();
+	protected int getDuplicateVariables(int[] variables, final boolean[] marker) {
+		int count = 0;
+		for (int i = 0; i < variables.length; i++) {
+			final int index = indexOfVariable(variables[i]);
+			if (index >= 0) {
+				count++;
+				if (marker != null) {
+					marker[index] = true;
+				}
+			}
+		}
+		return count;
+	}
+
+	public boolean hasDuplicates(LiteralSet literals) {
+		final int[] otherLiterals = literals.getLiterals();
 		for (int i = 0; i < otherLiterals.length; i++) {
 			if (indexOfLiteral(otherLiterals[i]) >= 0) {
 				return true;
@@ -322,15 +348,27 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return false;
 	}
 
-	public int countDuplicates(LiteralSet variables) {
+	public int countDuplicateVariables(int... variables) {
+		return getDuplicateVariables(variables, null);
+	}
+
+	public int countDuplicateVariables(LiteralSet variables) {
+		return countDuplicateVariables(variables.literals);
+	}
+
+	public int countDuplicates(int... variables) {
 		return getDuplicates(variables, null);
 	}
 
-	public boolean hasConflicts(LiteralSet variables) {
-		return hasConflicts(variables.getLiterals());
+	public int countDuplicates(LiteralSet variables) {
+		return countDuplicates(variables.literals);
 	}
 
-	public boolean hasConflicts(final int[] otherLiterals) {
+	public boolean hasConflicts(LiteralSet literals) {
+		return hasConflicts(literals.getLiterals());
+	}
+
+	public boolean hasConflicts(int... otherLiterals) {
 		for (int i = 0; i < otherLiterals.length; i++) {
 			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
 				return true;
@@ -339,8 +377,8 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return false;
 	}
 
-	public int countConflicts(LiteralSet variables) {
-		final int[] otherLiterals = variables.getLiterals();
+	public int countConflicts(LiteralSet literals) {
+		final int[] otherLiterals = literals.getLiterals();
 		int count = 0;
 		for (int i = 0; i < otherLiterals.length; i++) {
 			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
@@ -387,14 +425,13 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 					positiveLiterals[i++] = literal;
 				}
 			}
-			break;
+			return new LiteralSet(positiveLiterals, Order.UNORDERED, false);
 		case NATURAL:
 			positiveLiterals = Arrays.copyOfRange(literals, literals.length - countPositive, literals.length);
-			break;
+			return new LiteralSet(positiveLiterals, Order.NATURAL, false);
 		default:
 			throw new AssertionError(order);
 		}
-		return new LiteralSet(positiveLiterals, order, false);
 	}
 
 	public LiteralSet getNegative() {
@@ -410,14 +447,13 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 					negativeLiterals[i++] = literal;
 				}
 			}
-			break;
+			return new LiteralSet(negativeLiterals, Order.UNORDERED, false);
 		case NATURAL:
 			negativeLiterals = Arrays.copyOfRange(literals, 0, countNegative);
-			break;
+			return new LiteralSet(negativeLiterals, Order.NATURAL, false);
 		default:
 			throw new AssertionError(order);
 		}
-		return new LiteralSet(negativeLiterals, order, false);
 	}
 
 	/**
@@ -448,7 +484,9 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		for (final int lit : newLiteralSet) {
 			uniqueVarArray[i++] = lit;
 		}
-		return new LiteralSet(uniqueVarArray, order, false);
+		return ((order == Order.NATURAL) || (uniqueVarArray.length == literals.length)) //
+			? new LiteralSet(uniqueVarArray, order, false) //
+			: new LiteralSet(uniqueVarArray, Order.UNORDERED, false);
 	}
 
 	@Override
@@ -494,7 +532,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 		return lengthDiff;
 	}
 
-	public LiteralSet adapt(IVariables oldVariables, IVariables newVariables) {
+	public LiteralSet adapt(Variables oldVariables, Variables newVariables) {
 		final int[] oldLiterals = literals;
 		final int[] newLiterals = new int[oldLiterals.length];
 		for (int i = 0; i < oldLiterals.length; i++) {

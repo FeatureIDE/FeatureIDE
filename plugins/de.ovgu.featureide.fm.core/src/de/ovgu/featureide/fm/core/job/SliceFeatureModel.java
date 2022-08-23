@@ -29,9 +29,9 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
@@ -309,7 +309,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		monitor.setTaskName("Adding Constraints");
 
 		final CNF featureTreeCNF = CNFCreator.createNodes(featureTree);
-		final IVariables variables = featureTreeCNF.getVariables();
+		final Variables variables = featureTreeCNF.getVariables();
 		final List<LiteralSet> children = slicedFeatureModelCNF.adaptClauseList(variables);
 		monitor.setRemainingWork(children.size() + 1);
 

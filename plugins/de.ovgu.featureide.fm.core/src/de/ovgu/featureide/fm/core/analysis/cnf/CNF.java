@@ -86,7 +86,7 @@ public class CNF implements Serializable {
 		this.variables = variables;
 	}
 
-	public IVariables getVariables() {
+	public Variables getVariables() {
 		return variables;
 	}
 
@@ -203,7 +203,7 @@ public class CNF implements Serializable {
 	 * @param newVariables the new variables
 	 * @return an adapted clause list, {@code null} if there are old variables names the are not contained in the new variables.
 	 */
-	public ClauseList adaptClauseList(IVariables newVariables) {
+	public ClauseList adaptClauseList(Variables newVariables) {
 		final boolean validFeatureSet = Arrays.asList(newVariables.getNames()).containsAll(Arrays.asList(variables.getNames()));
 		return validFeatureSet ? createAdaptedClauseList(newVariables) : null;
 	}
@@ -224,7 +224,7 @@ public class CNF implements Serializable {
 		return new CNF(newVariables, adaptedClauseList);
 	}
 
-	private ClauseList createAdaptedClauseList(IVariables newVariables) {
+	private ClauseList createAdaptedClauseList(Variables newVariables) {
 		final ClauseList newClauses = new ClauseList(clauses.size());
 		for (final LiteralSet oldClause : clauses) {
 			newClauses.add(oldClause.adapt(variables, newVariables));

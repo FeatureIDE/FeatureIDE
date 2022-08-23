@@ -33,9 +33,9 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AClauseAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AbstractAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.AnalysisResult;
@@ -350,7 +350,7 @@ public class AnalysesCollection {
 		protected final void setClauseGroups(List<IConstraint> constraints) {
 			constraintClauses = new ArrayList<>();
 			clauseGroupSize = new int[constraints.size()];
-			final IVariables variables = formula.getElement(new EmptyCNFCreator()).getVariables();
+			final Variables variables = formula.getElement(new EmptyCNFCreator()).getVariables();
 			int i = 0;
 			for (final IConstraint constraint : constraints) {
 				final List<LiteralSet> clauses = Nodes.convert(variables, constraint.getNode());
@@ -372,7 +372,7 @@ public class AnalysesCollection {
 		@Override
 		protected void configureAnalysis(CNF cnf, IndependentRedundancyAnalysis analysis) {
 			final List<LiteralSet> literalSetList = new ArrayList<>();
-			final IVariables variables = cnf.getVariables();
+			final Variables variables = cnf.getVariables();
 			for (final IFeature iFeature : optionalFeatures) {
 				literalSetList.add(new LiteralSet(variables.getVariable(FeatureUtils.getParent(iFeature).getName(), false),
 						variables.getVariable(iFeature.getName(), true)));

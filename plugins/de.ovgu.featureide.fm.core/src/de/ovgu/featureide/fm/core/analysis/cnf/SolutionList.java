@@ -35,13 +35,13 @@ public class SolutionList implements Serializable {
 	private static final long serialVersionUID = 3882530497452645334L;
 
 	protected final List<LiteralSet> solutions;
-	protected IVariables variables;
+	protected Variables variables;
 
 	public SolutionList() {
 		solutions = new ArrayList<>();
 	}
 
-	public SolutionList(IVariables mapping, List<LiteralSet> solutions) {
+	public SolutionList(Variables mapping, List<LiteralSet> solutions) {
 		variables = mapping;
 		this.solutions = solutions;
 	}
@@ -58,7 +58,7 @@ public class SolutionList implements Serializable {
 		this.variables = variables;
 	}
 
-	public IVariables getVariables() {
+	public Variables getVariables() {
 		return variables;
 	}
 

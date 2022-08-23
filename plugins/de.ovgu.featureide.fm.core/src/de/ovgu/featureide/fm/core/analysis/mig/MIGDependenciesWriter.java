@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.core.analysis.mig;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 
 /**
  * Computes a textual representation of the feature relationships in a modal implication graph.
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
  */
 public class MIGDependenciesWriter {
 
-	public String write(final ModalImplicationGraph mig, final IVariables variables) {
+	public String write(final ModalImplicationGraph mig, final Variables variables) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("X ALWAYS Y := If X is selected then Y is selected in every valid configuration.\n");
 		sb.append("X MAYBE  Y := If X is selected then Y is selected in at least one but not all valid configurations. \n");

@@ -26,7 +26,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -71,7 +71,7 @@ public class FeatureModelFormula {
 		return featureModel;
 	}
 
-	public IVariables getVariables() {
+	public Variables getVariables() {
 		return getElement(new EmptyCNFCreator()).getVariables();
 	}
 

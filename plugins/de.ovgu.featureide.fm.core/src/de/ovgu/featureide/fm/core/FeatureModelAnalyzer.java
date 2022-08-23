@@ -36,8 +36,8 @@ import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelSt
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis.Anomalies;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
@@ -252,7 +252,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			return Collections.emptyList();
 		}
 
-		final IVariables variables = formula.getCNF().getVariables();
+		final Variables variables = formula.getCNF().getVariables();
 
 		final List<IConstraint> resultList = new ArrayList<>();
 		for (int i = 0; i < analysesCollection.constraintAnomaliesAnalysis.getClauseGroupSize().length; i++) {
@@ -604,7 +604,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 
 		final CNF cnf = formula.getCNF();
-		final IVariables variables = cnf.getVariables();
+		final Variables variables = cnf.getVariables();
 
 		// (A1 and ... or An) => (B1 or ... or Bm)
 		// |= -A1 or ... or -An or B1 or ... or Bm
@@ -634,7 +634,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 
 		final CNF cnf = formula.getCNF();
-		final IVariables variables = cnf.getVariables();
+		final Variables variables = cnf.getVariables();
 
 		final CoreDeadAnalysis analysis = new CoreDeadAnalysis(cnf);
 		analysis.setAssumptions(new LiteralSet(variables.getVariable(feature1.getName())));

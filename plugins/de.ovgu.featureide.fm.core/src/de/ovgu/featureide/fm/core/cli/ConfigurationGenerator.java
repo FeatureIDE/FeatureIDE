@@ -58,7 +58,9 @@ public class ConfigurationGenerator extends ACLIFunction {
 	private Path fmFile;
 	private Path expressionFile;
 	private Path initialSampleFile;
-	private boolean keepInitialSample;
+	private boolean allowInitialSolutionModify = false;
+	private boolean allowInitialSolutionRemove = false;
+	private boolean countInitialSolutionForLimit = false;
 	private int t;
 	private int m;
 	private int limit;
@@ -134,7 +136,9 @@ public class ConfigurationGenerator extends ACLIFunction {
 			yasa.setIterations(m);
 			if (initialSampleFile != null) {
 				yasa.setInitialSample(initialSample.getSolutions());
-				yasa.setKeepInitialSample(keepInitialSample);
+				yasa.setAllowInitialSolutionModify(allowInitialSolutionModify);
+				yasa.setAllowInitialSolutionRemove(allowInitialSolutionRemove);
+				yasa.setCountInitialSolutionForLimit(countInitialSolutionForLimit);
 			}
 			break;
 		}
@@ -159,7 +163,9 @@ public class ConfigurationGenerator extends ACLIFunction {
 		fmFile = null;
 		expressionFile = null;
 		initialSampleFile = null;
-		keepInitialSample = true;
+		allowInitialSolutionModify = false;
+		allowInitialSolutionRemove = false;
+		countInitialSolutionForLimit = false;
 		t = 0;
 		m = 1;
 		limit = Integer.MAX_VALUE;
@@ -188,7 +194,15 @@ public class ConfigurationGenerator extends ACLIFunction {
 					break;
 				}
 				case "im": {
-					keepInitialSample = false;
+					allowInitialSolutionModify = true;
+					break;
+				}
+				case "ir": {
+					allowInitialSolutionRemove = true;
+					break;
+				}
+				case "il": {
+					countInitialSolutionForLimit = true;
 					break;
 				}
 				case "l": {

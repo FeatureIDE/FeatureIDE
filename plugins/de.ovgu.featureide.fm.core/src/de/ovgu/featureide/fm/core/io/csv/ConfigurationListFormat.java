@@ -57,9 +57,10 @@ public class ConfigurationListFormat extends APersistentFormat<SolutionList> {
 		for (final LiteralSet configuration : configurationList.getSolutions()) {
 			csv.append(configurationIndex++);
 			final int[] literals = configuration.getLiterals();
-			for (int i = 0; i < literals.length; i++) {
+			for (int i = 1; i < names.length; i++) {
 				csv.append(';');
-				csv.append(literals[i] < 0 ? 0 : 1);
+				final int indexOfVariable = configuration.indexOfVariable(i);
+				csv.append(indexOfVariable < 0 ? '0' : literals[indexOfVariable] > 0 ? '+' : '-');
 			}
 			csv.append('\n');
 		}
@@ -73,9 +74,13 @@ public class ConfigurationListFormat extends APersistentFormat<SolutionList> {
 		try (final Scanner scanner = new Scanner(source.toString())) {
 			scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
 			{
+				if (!scanner.hasNext()) {
+					problems.add(new Problem(new UnsupportedModelException("Empty file!", lineNumber)));
+					return problems;
+				}
 				final String line = scanner.next();
 				if (line.trim().isEmpty()) {
-					problems.add(new Problem(new UnsupportedModelException("Empty file!", lineNumber)));
+					problems.add(new Problem(new UnsupportedModelException("Empty first line!", lineNumber)));
 					return problems;
 				}
 				final String[] names = line.split(";");
@@ -91,10 +96,27 @@ public class ConfigurationListFormat extends APersistentFormat<SolutionList> {
 					return problems;
 				}
 				final int[] literals = new int[configurationList.getVariables().size()];
+				int index = 0;
 				for (int i = 1; i < split.length; i++) {
-					literals[i - 1] = split[i].equals("0") ? -i : i;
+					switch (split[i]) {
+					case "0":
+						break;
+					case "+":
+						literals[index++] = i;
+						break;
+					case "-":
+						literals[index++] = -i;
+						break;
+					default:
+						problems.add(new Problem(new UnsupportedModelException("Invalid symbol \"" + split[i] + "\"!", lineNumber)));
+						return problems;
+					}
 				}
-				configurationList.addSolution(new LiteralSet(literals, Order.INDEX, false));
+				if (index == configurationList.getVariables().size()) {
+					configurationList.addSolution(new LiteralSet(literals, Order.INDEX, false));
+				} else {
+					configurationList.addSolution(new LiteralSet(Arrays.copyOfRange(literals, 0, index), Order.UNORDERED, false));
+				}
 			}
 		} catch (final Exception e) {
 			problems.add(new Problem(new UnsupportedModelException(e.getMessage(), lineNumber)));
