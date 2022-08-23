@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.vill.config.Configuration;
 import de.vill.exception.ParseError;
 import de.vill.main.UVLModelFactory;
 import de.vill.model.Attribute;
@@ -150,8 +151,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final Feature uvlRootFeature = rootModel.getRootFeature();
 		rootFeature = parseFeature(fm, uvlRootFeature, null);
 		fm.getStructure().setRoot(rootFeature.getStructure());
-		// TODO Constraints
-		// TODO Attributes
+		parseConstraints(fm, rootModel.getOwnConstraints());
 	}
 
 	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
@@ -161,11 +161,15 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (parentFeature != null) {
 			parentFeature.getStructure().addChild(feature.getStructure());
 		}
-		// TODO set feature abstract if attribute is present (or do it when parsing attributes)
+		if (uvlFeature.getAttributes().containsKey("abstract")) {
+			feature.getStructure().setAbstract(true);
+		}
 
 		for (final Group group : uvlFeature.getChildren()) {
 			parseGroup(fm, group, feature);
 		}
+
+		parseAttributes(fm, feature, uvlFeature);
 		// todo parse attributes
 		return feature;
 	}
@@ -214,19 +218,17 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		uvlFeature.getAttributes().entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
 	}
 
-	/**
-	 * This method parses an attribute that is contained in UVL under a feature to an attribute/constraint in the feature model.
-	 *
-	 * @param fm the featuremodel that is parsed from UVL
-	 * @param feature the feature that contains the attribute that is parsed
-	 * @param attributeKey the name of the attribute that is parsed
-	 * @param attributeValue the value of the attribute that is parsed
-	 */
 	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Attribute attributeValue) {
 		if (attributeValue.getValue() instanceof Constraint) {
 			parseConstraint(fm, (Constraint) attributeValue.getValue());
 		}
 		// TODO list with constraints?
+	}
+
+	private void parseConstraints(MultiFeatureModel fm, List<Constraint> constraints) {
+		for (final Constraint constraint : constraints) {
+			parseConstraint(fm, constraint);
+		}
 	}
 
 	private void parseConstraint(MultiFeatureModel fm, Constraint c) {
@@ -307,6 +309,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel fm) {
+		Configuration.setTabulatorSymbol("\t");
 		return featureIDEModelToUVLFeatureModel(fm).toString();
 	}
 
@@ -379,7 +382,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private Constraint featureIDEConstraintToUVLConstraint(Node n) {
-		final Constraint uvlConstraint;
+		System.out.println(n.toString());
 		if (n instanceof Literal) {
 			return new LiteralConstraint(((Literal) n).var.toString());
 		} else if (n instanceof org.prop4j.Not) {
