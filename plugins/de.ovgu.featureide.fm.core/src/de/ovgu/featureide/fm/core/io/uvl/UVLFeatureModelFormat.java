@@ -145,17 +145,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
+		rootModel.getImports().stream().forEach(i -> parseImport(fm, i));
+
 		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
 		final IFeature rootFeature;
 		final Feature uvlRootFeature = rootModel.getRootFeature();
 		rootFeature = parseFeature(fm, uvlRootFeature, null);
 		fm.getStructure().setRoot(rootFeature.getStructure());
+		fm.addAttribute(rootFeature.getName(), NS_ATTRIBUTE_FEATURE, rootModel.getNamespace());
 		parseConstraints(fm, rootModel.getOwnConstraints());
 	}
 
 	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
-		final MultiFeature feature = factory.createFeature(fm, uvlFeature.getFeatureName());
+		final MultiFeature feature = factory.createFeature(fm, uvlFeature.getReferenceFromSpecificSubmodel(""));
 		fm.addFeature(feature);
 
 		if (parentFeature != null) {
@@ -164,13 +167,18 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (uvlFeature.getAttributes().containsKey("abstract")) {
 			feature.getStructure().setAbstract(true);
 		}
+		parseAttributes(fm, feature, uvlFeature);
+		if (uvlFeature.getReferenceFromSpecificSubmodel("").contains(".")) {
+			feature.setType(MultiFeature.TYPE_INTERFACE);
+		}
+		if (uvlFeature.isSubmodelRoot()) {
+			fm.addAttribute(uvlFeature.getReferenceFromSpecificSubmodel(""), NS_ATTRIBUTE_FEATURE, uvlFeature.getRelatedImport().getNamespace());
+		}
 
 		for (final Group group : uvlFeature.getChildren()) {
 			parseGroup(fm, group, feature);
 		}
 
-		parseAttributes(fm, feature, uvlFeature);
-		// todo parse attributes
 		return feature;
 	}
 
@@ -324,6 +332,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private Feature featureIDEFeatureToUVLFeature(IFeature feature) {
 		final Feature uvlFeature = new Feature(feature.getName());
+
+		/*
+		 * if(feature. { feature.setType(MultiFeature.TYPE_INTERFACE); }
+		 */
+
 		uvlFeature.getAttributes().putAll(featureIDEAttributesToUVLAttributes(feature));
 
 		if (feature.getStructure().isAlternative()) {
