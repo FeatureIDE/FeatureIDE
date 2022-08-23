@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
@@ -334,6 +335,18 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private FeatureModel featureIDEModelToUVLFeatureModel(IFeatureModel fm) {
 		final FeatureModel uvlModel = new FeatureModel();
 		uvlModel.setNamespace(fm.getStructure().getRoot().getFeature().getName());
+
+		if (fm instanceof MultiFeatureModel) {
+			final MultiFeatureModel mfm = (MultiFeatureModel) fm;
+			final FeatureAttribute<String> nsAttribute = mfm.getStringAttributes().getAttribute(NS_ATTRIBUTE_FEATURE, NS_ATTRIBUTE_NAME);
+			if (nsAttribute != null) {
+				uvlModel.setNamespace(nsAttribute.getValue());
+			}
+
+			uvlModel.getImports()
+					.addAll(mfm.getExternalModels().values().stream().map(um -> new Import(um.getModelName(), um.getVarName())).collect(Collectors.toList()));
+		}
+
 		final Feature rootFeature = featureIDEFeatureToUVLFeature(fm.getStructure().getRoot().getFeature());
 		uvlModel.setRootFeature(rootFeature);
 		uvlModel.getOwnConstraints().addAll(featureIDEConstraintsToUVLConstraints(fm));
@@ -341,11 +354,24 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private Feature featureIDEFeatureToUVLFeature(IFeature feature) {
-		final Feature uvlFeature = new Feature(feature.getName());
+		final String featureReference = feature.getName();
+		final String[] featureReferenceParts = featureReference.split("\\.");
+		String featureName;
+		String featureNamespace;
+		if (featureReferenceParts.length > 1) {
+			featureName = featureReferenceParts[featureReferenceParts.length - 1];
+			featureNamespace = featureReference.substring(0, featureReference.length() - featureName.length() - 1);
+		} else {
+			featureName = featureReferenceParts[0];
+			featureNamespace = null;
+		}
 
-		/*
-		 * if(feature. { feature.setType(MultiFeature.TYPE_INTERFACE); }
-		 */
+		final Feature uvlFeature = new Feature(featureName);
+		if (featureNamespace != null) {
+			uvlFeature.setNameSpace(featureNamespace);
+			uvlFeature.setSubmodelRoot(true);
+			return uvlFeature;
+		}
 
 		uvlFeature.getAttributes().putAll(featureIDEAttributesToUVLAttributes(feature));
 
