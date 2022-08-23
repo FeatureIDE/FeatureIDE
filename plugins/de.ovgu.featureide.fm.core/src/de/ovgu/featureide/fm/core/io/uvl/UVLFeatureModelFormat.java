@@ -146,10 +146,9 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
-		rootModel.getImports().stream().forEach(i -> parseImport(fm, i));
-
 		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
+		rootModel.getImports().stream().forEach(i -> parseImport(fm, i));
 		final IFeature rootFeature;
 		final Feature uvlRootFeature = rootModel.getRootFeature();
 		rootFeature = parseFeature(fm, uvlRootFeature, null);
