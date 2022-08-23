@@ -154,7 +154,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		rootFeature = parseFeature(fm, uvlRootFeature, null);
 		fm.getStructure().setRoot(rootFeature.getStructure());
 		fm.addAttribute(rootFeature.getName(), NS_ATTRIBUTE_FEATURE, rootModel.getNamespace());
-		parseConstraints(fm, rootModel.getOwnConstraints());
+		parseConstraints(fm);
 	}
 
 	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
@@ -233,10 +233,20 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		// TODO list with constraints?
 	}
 
-	private void parseConstraints(MultiFeatureModel fm, List<Constraint> constraints) {
-		for (final Constraint constraint : constraints) {
-			parseConstraint(fm, constraint);
+	private void parseConstraints(MultiFeatureModel fm) {
+		final List<Constraint> allConstraints = rootModel.getConstraints();
+		final List<Constraint> ownConstraints = rootModel.getOwnConstraints();
+
+		for (final Constraint constraint : ownConstraints) {
+			parseOwnConstraint(fm, constraint);
 		}
+
+		for (final Constraint constraint : allConstraints) {
+			if (!ownConstraints.contains(constraint)) {
+				parseConstraint(fm, constraint);
+			}
+		}
+
 	}
 
 	private void parseConstraint(MultiFeatureModel fm, Constraint c) {
