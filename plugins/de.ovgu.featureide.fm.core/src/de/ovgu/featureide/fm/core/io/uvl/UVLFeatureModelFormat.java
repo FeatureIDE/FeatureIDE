@@ -24,6 +24,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,6 +96,18 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final Pattern ID_PATTERN = Pattern.compile("(?!true|false)[a-zA-Z][a-zA-Z_0-9]*");
 	private static final Pattern STRICT_ID_RESTRICTIVE_PATTERN =
 		Pattern.compile("(?!alternative|or|features|constraints|true|false|as|refer)[a-zA-Z][a-zA-Z_0-9]*");
+
+	private static Map<Class<? extends Constraint>, Integer> prioritiy = new HashMap<>();
+	static {
+		final Map<Class<? extends Constraint>, Integer> tempMap = new HashMap<>();
+		tempMap.put(LiteralConstraint.class, 0);
+		tempMap.put(NotConstraint.class, 1);
+		tempMap.put(AndConstraint.class, 2);
+		tempMap.put(OrConstraint.class, 3);
+		tempMap.put(ImplicationConstraint.class, 4);
+		tempMap.put(EquivalenceConstraint.class, 5);
+		prioritiy = Collections.unmodifiableMap(tempMap);
+	}
 
 	private FeatureModel rootModel;
 	protected ProblemList pl;
@@ -430,33 +443,72 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private Constraint featureIDEConstraintToUVLConstraint(Node n) {
-		System.out.println(n.toString());
 		if (n instanceof Literal) {
 			return new LiteralConstraint(((Literal) n).var.toString());
 		} else if (n instanceof org.prop4j.Not) {
-			return new NotConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]));
+			Constraint child = featureIDEConstraintToUVLConstraint(n.getChildren()[0]);
+			if (prioritiy.get(child.getClass()) > prioritiy.get(NotConstraint.class)) {
+				child = new ParenthesisConstraint(child);
+			}
+			return new NotConstraint(child);
 		} else if (n instanceof org.prop4j.And) {
-			return printMultiArity(AndConstraint::new, n.getChildren());
+			return printMultiArity(AndConstraint::new, n.getChildren(), AndConstraint.class);
 		} else if (n instanceof org.prop4j.Or) {
-			return printMultiArity(OrConstraint::new, n.getChildren());
+			return printMultiArity(OrConstraint::new, n.getChildren(), OrConstraint.class);
 		} else if (n instanceof Implies) {
-			return new ImplicationConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]), featureIDEConstraintToUVLConstraint(n.getChildren()[1]));
+			Constraint child1 = featureIDEConstraintToUVLConstraint(n.getChildren()[0]);
+			Constraint child2 = featureIDEConstraintToUVLConstraint(n.getChildren()[1]);
+			if (prioritiy.get(child1.getClass()) > prioritiy.get(ImplicationConstraint.class)) {
+				child1 = new ParenthesisConstraint(child1);
+			}
+			if (prioritiy.get(child2.getClass()) > prioritiy.get(ImplicationConstraint.class)) {
+				child2 = new ParenthesisConstraint(child2);
+			}
+			return new ImplicationConstraint(child1, child2);
 		} else if (n instanceof Equals) {
-			return new EquivalenceConstraint(featureIDEConstraintToUVLConstraint(n.getChildren()[0]), featureIDEConstraintToUVLConstraint(n.getChildren()[1]));
+			Constraint child1 = featureIDEConstraintToUVLConstraint(n.getChildren()[0]);
+			Constraint child2 = featureIDEConstraintToUVLConstraint(n.getChildren()[1]);
+			if (prioritiy.get(child1.getClass()) > prioritiy.get(EquivalenceConstraint.class)) {
+				child1 = new ParenthesisConstraint(child1);
+			}
+			if (prioritiy.get(child2.getClass()) > prioritiy.get(EquivalenceConstraint.class)) {
+				child2 = new ParenthesisConstraint(child2);
+			}
+			return new EquivalenceConstraint(child1, child2);
 		}
 		return null;
 	}
 
-	private Constraint printMultiArity(BiFunction<Constraint, Constraint, Constraint> constructor, Node[] args) {
+	private Constraint printMultiArity(BiFunction<Constraint, Constraint, Constraint> constructor, Node[] args, Class<? extends Constraint> constraintType) {
 		switch (args.length) {
 		case 0:
 			return null;
 		case 1:
-			return featureIDEConstraintToUVLConstraint(args[0]);
+			Constraint child = featureIDEConstraintToUVLConstraint(args[0]);
+			if (prioritiy.get(child.getClass()) > prioritiy.get(constraintType)) {
+				child = new ParenthesisConstraint(child);
+			}
+			return child;
 		case 2:
-			return constructor.apply(featureIDEConstraintToUVLConstraint(args[0]), featureIDEConstraintToUVLConstraint(args[1]));
+			Constraint child1 = featureIDEConstraintToUVLConstraint(args[0]);
+			Constraint child2 = featureIDEConstraintToUVLConstraint(args[1]);
+			if (prioritiy.get(child1.getClass()) > prioritiy.get(constraintType)) {
+				child1 = new ParenthesisConstraint(child1);
+			}
+			if (prioritiy.get(child2.getClass()) > prioritiy.get(constraintType)) {
+				child2 = new ParenthesisConstraint(child2);
+			}
+			return constructor.apply(child1, child2);
 		default:
-			return constructor.apply(featureIDEConstraintToUVLConstraint(args[0]), printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length)));
+			Constraint childLeft = featureIDEConstraintToUVLConstraint(args[0]);
+			Constraint childRight = printMultiArity(constructor, Arrays.copyOfRange(args, 1, args.length), constraintType);
+			if (prioritiy.get(childLeft.getClass()) > prioritiy.get(constraintType)) {
+				childLeft = new ParenthesisConstraint(childLeft);
+			}
+			if (prioritiy.get(childRight.getClass()) > prioritiy.get(constraintType)) {
+				childRight = new ParenthesisConstraint(childRight);
+			}
+			return constructor.apply(childLeft, childRight);
 		}
 	}
 
