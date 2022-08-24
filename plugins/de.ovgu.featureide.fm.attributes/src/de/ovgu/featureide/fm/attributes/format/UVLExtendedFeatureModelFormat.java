@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import clojure.lang.Symbol;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
@@ -44,6 +43,7 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
+import de.vill.model.Attribute;
 
 /**
  * This class extends {@link UVLFeatureModelFormat} to support usage of attributes in UVL. Reads / writes {@link ExtendedMultiFeatureModel}s in UVL format.
@@ -161,14 +161,14 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	}
 
 	@Override
-	protected Map<String, Object> printAttributes(IFeature feature) {
-		Map<String, Object> attributes = super.printAttributes(feature);
+	protected Map<String, Attribute> printAttributes(IFeature feature) {
+		Map<String, Attribute> attributes = super.printAttributes(feature);
 		if (feature.getStructure().isRoot()) {
-			attributes.put(EXTENDED_ATTRIBUTE_NAME, true);
+			attributes.put(EXTENDED_ATTRIBUTE_NAME, new Attribute<Boolean>(EXTENDED_ATTRIBUTE_NAME, true));
 		}
 		if (feature instanceof IExtendedFeature) {
 			for (IFeatureAttribute attr : ((IExtendedFeature) feature).getAttributes()) {
-				attributes.put(attr.getName(), printAttribute(attr));
+				attributes.put(attr.getName(), new Attribute<>(attr.getName(), printAttribute(attr)));
 			}
 
 		}
@@ -188,18 +188,18 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		} else {
 			Map<Object, Object> attributeMap = new HashMap<>();
 			if (attr.isConfigurable()) {
-				attributeMap.put(Symbol.create("configurable"), true);
+				attributeMap.put("configurable", true);
 			}
 			if (attr.isRecursive()) {
-				attributeMap.put(Symbol.create("recursive"), true);
+				attributeMap.put("recursive", true);
 			}
 			if (attr.getUnit() != null && !attr.getUnit().equals("")) {
-				attributeMap.put(Symbol.create("unit"), attr.getUnit());
+				attributeMap.put("unit", attr.getUnit());
 			}
 			if (attr.getValue() == null) {
-				attributeMap.put(Symbol.create("type"), attr.getType());
+				attributeMap.put("type", attr.getType());
 			} else {
-				attributeMap.put(Symbol.create("value"), attr.getValue());
+				attributeMap.put("value", attr.getValue());
 			}
 			return attributeMap;
 		}

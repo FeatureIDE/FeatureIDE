@@ -236,12 +236,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature uvlFeature) {
-		uvlFeature.getAttributes().entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue()));
+		uvlFeature.getAttributes().entrySet().stream().forEachOrdered(e -> parseAttribute(fm, feature, e.getKey(), e.getValue().getValue()));
 	}
 
-	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Attribute attributeValue) {
-		if (attributeValue.getValue() instanceof Constraint) {
-			parseConstraint(fm, (Constraint) attributeValue.getValue());
+	protected void parseAttribute(MultiFeatureModel fm, MultiFeature feature, String attributeKey, Object attributeValue) {
+		if (attributeValue instanceof Constraint) {
+			parseConstraint(fm, (Constraint) attributeValue);
 		}
 		// TODO list with constraints?
 	}
@@ -385,7 +385,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			return uvlFeature;
 		}
 
-		uvlFeature.getAttributes().putAll(featureIDEAttributesToUVLAttributes(feature));
+		uvlFeature.getAttributes().putAll(printAttributes(feature));
 
 		if (feature.getStructure().isAlternative()) {
 			final List<IFeature> alternativeChildren = feature.getStructure().getChildren().stream().map(x -> x.getFeature()).collect(Collectors.toList());
@@ -426,7 +426,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	}
 
-	private Map<String, Attribute> featureIDEAttributesToUVLAttributes(IFeature feature) {
+	protected Map<String, Attribute> printAttributes(IFeature feature) {
 		final Map<String, Attribute> attribtues = new HashMap<>();
 		if (feature.getStructure().isAbstract()) {
 			attribtues.put("abstract", new Attribute("abstract", true));
