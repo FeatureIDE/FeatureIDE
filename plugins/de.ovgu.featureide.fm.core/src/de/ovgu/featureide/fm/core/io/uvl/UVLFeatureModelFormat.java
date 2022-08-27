@@ -87,10 +87,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	public static final String FILE_EXTENSION = "uvl";
 
 	private static final String NS_ATTRIBUTE_NAME = "namespace";
-	private static final String NS_ATTRIBUTE_FEATURE = "_synthetic_ns_feature";
+	private static final String NS_ATTRIBUTE_FEATURE = "synthetic_ns_feature";
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
 	private static final String MULTI_ROOT_PREFIX = "Abstract_";
+
+	private static final String FEATURE_DESCRIPTION_ATTRIBUTE_NAME = "featureDescription__";
 
 	// Patterns for import validation. The same as in the BNF of the UVL parser.
 	private static final Pattern ID_PATTERN = Pattern.compile("(?!true|false)[a-zA-Z][a-zA-Z_0-9]*");
@@ -173,6 +175,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
 		final MultiFeature feature = factory.createFeature(fm, uvlFeature.getReferenceFromSpecificSubmodel(""));
 		fm.addFeature(feature);
+
+		final Attribute<String> featureDescription = uvlFeature.getAttributes().get(FEATURE_DESCRIPTION_ATTRIBUTE_NAME);
+		if ((featureDescription != null) && (featureDescription.getValue() instanceof String)) {
+			feature.getProperty().setDescription((String) featureDescription.getValue());
+		}
 
 		if (parentFeature != null) {
 			parentFeature.getStructure().addChild(feature.getStructure());
@@ -386,6 +393,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 
 		uvlFeature.getAttributes().putAll(printAttributes(feature));
+
+		final String featureDescription = feature.getProperty().getDescription();
+		if ((featureDescription != null) && !featureDescription.equals("")) {
+			final Attribute<String> featureDescriptionAttribute = new Attribute<String>(FEATURE_DESCRIPTION_ATTRIBUTE_NAME, featureDescription);
+			uvlFeature.getAttributes().put(FEATURE_DESCRIPTION_ATTRIBUTE_NAME, featureDescriptionAttribute);
+		}
 
 		if (feature.getStructure().isAlternative()) {
 			final List<IFeature> alternativeChildren = feature.getStructure().getChildren().stream().map(x -> x.getFeature()).collect(Collectors.toList());
