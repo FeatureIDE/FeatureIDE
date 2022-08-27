@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.attributes.format;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
@@ -80,26 +79,40 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			ExtendedMultiFeature extendedFeature = (ExtendedMultiFeature) feature;
 			// check whether the attribute has only a simple value or a list as value. When having a list it means that the attribute has more information saved
 			// than just its own value.
-			if (attributeValue instanceof List<?>) {
-				List<?> attributeList = (List<?>) attributeValue;
-				if (attributeList.size() == 2 && attributeList.get(1) instanceof Map<?, ?>) {
-					// check if the attributes list contains informations of the attribute in FeatureIDE, which are value, unit, recrusive, and/or configurable
-					Map<?, ?> attributeMap = (Map<?, ?>) attributeList.get(1);
-					Object value = attributeMap.get("value");
-					Object unitObj = attributeMap.get("unit");
-					String unit = unitObj instanceof String ? (String) unitObj : "";
-					Object recursiveObj = attributeMap.get("recursive");
-					boolean recursive = recursiveObj instanceof Boolean ? (Boolean) recursiveObj : false;
-					Object configurableObj = attributeMap.get("configurable");
-					boolean configurable = configurableObj instanceof Boolean ? (Boolean) configurableObj : false;
-					if (value == null) {
-						// if the attribute has no value from which we can automatically read the type, the type needs to be found
-						Object type = attributeMap.get("type");
-						createAttribute(extendedFeature, type instanceof String ? (String) type : null, attributeKey, value, unit, recursive, configurable);
-					} else {
-						createAttribute(extendedFeature, attributeKey, value, unit, recursive, configurable);
-					}
+			if (attributeValue instanceof Map<?, ?>) {
+				// check if the attributes list contains informations of the attribute in FeatureIDE, which are value, unit, recrusive, and/or configurable
+				Map<String, Attribute> attributeMap = (Map<String, Attribute>) attributeValue;
+				String unit = "";
+				Object value = null;
+				boolean recursive = false;
+				boolean configurable = false;
+				String type = "";
+				Attribute valueObj = attributeMap.get("value");
+				if (valueObj != null) {
+					value = valueObj.getValue();
 				}
+				Attribute unitObj = attributeMap.get("unit");
+				if (unitObj != null && unitObj.getValue() instanceof String) {
+					unit = (String) unitObj.getValue();
+				}
+				Attribute recursiveObj = attributeMap.get("recursive");
+				if (recursiveObj != null && recursiveObj.getValue() instanceof Boolean) {
+					recursive = (boolean) recursiveObj.getValue();
+				}
+				Attribute configurableObj = attributeMap.get("configurable");
+				if (configurableObj != null && configurableObj.getValue() instanceof Boolean) {
+					configurable = (boolean) configurableObj.getValue();
+				}
+				Attribute typeObj = attributeMap.get("type");
+				if (typeObj != null && typeObj.getValue() instanceof Boolean) {
+					type = (String) typeObj.getValue();
+				}
+				if (type == "") {
+					createAttribute(extendedFeature, attributeKey, value, unit, recursive, configurable);
+				} else {
+					createAttribute(extendedFeature, type, attributeKey, value, unit, recursive, configurable);
+				}
+
 			} else {
 				createAttribute(extendedFeature, attributeKey, attributeValue, "", false, false);
 			}
@@ -122,7 +135,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			type = "string";
 		} else if (value instanceof Double) {
 			type = "double";
-		} else if (value instanceof Long) {
+		} else if (value instanceof Long || value instanceof Integer) {
 			type = "long";
 		} else if (value instanceof Boolean) {
 			type = "boolean";
@@ -186,20 +199,20 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
 			return attr.getValue();
 		} else {
-			Map<Object, Object> attributeMap = new HashMap<>();
+			Map<String, Attribute> attributeMap = new HashMap<>();
 			if (attr.isConfigurable()) {
-				attributeMap.put("configurable", true);
+				attributeMap.put("configurable", new Attribute<Boolean>("configurable", true));
 			}
 			if (attr.isRecursive()) {
-				attributeMap.put("recursive", true);
+				attributeMap.put("recursive", new Attribute<Boolean>("recursive", true));
 			}
 			if (attr.getUnit() != null && !attr.getUnit().equals("")) {
-				attributeMap.put("unit", attr.getUnit());
+				attributeMap.put("unit", new Attribute<String>("unit", attr.getUnit()));
 			}
 			if (attr.getValue() == null) {
-				attributeMap.put("type", attr.getType());
+				attributeMap.put("type", new Attribute<String>("type", attr.getType()));
 			} else {
-				attributeMap.put("value", attr.getValue());
+				attributeMap.put("value", new Attribute<Object>("value", attr.getValue()));
 			}
 			return attributeMap;
 		}
