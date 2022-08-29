@@ -163,13 +163,15 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private void constructFeatureModel(MultiFeatureModel fm) {
 		factory = (MultiFeatureModelFactory) FMFactoryManager.getInstance().getFactory(fm);
 		fm.reset();
-		rootModel.getImports().stream().forEach(i -> parseImport(fm, i));
+		parseImports(rootModel, fm);
 		final IFeature rootFeature;
 		final Feature uvlRootFeature = rootModel.getRootFeature();
 		rootFeature = parseFeature(fm, uvlRootFeature, null);
 		fm.getStructure().setRoot(rootFeature.getStructure());
 		fm.addAttribute(rootFeature.getName(), NS_ATTRIBUTE_FEATURE, rootModel.getNamespace());
 		parseConstraints(fm);
+
+		// final Map<String, UsedModel> externalModels = fm.getExternalModels();
 	}
 
 	private IFeature parseFeature(MultiFeatureModel fm, Feature uvlFeature, IFeature parentFeature) {
@@ -324,6 +326,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
+	private void parseImports(FeatureModel uvlModel, MultiFeatureModel fm) {
+		final List<Import> imports = uvlModel.getImports();
+		for (final Import importLine : imports) {
+			parseImports(importLine.getFeatureModel(), fm);
+			parseImport(fm, importLine);
+		}
+	}
+
 	private void parseImport(MultiFeatureModel fm, Import i) {
 		final IProject project = EclipseFileSystem.getResource(fm.getSourceFile()).getProject();
 		// Local path of imported model (as given in importing model)
@@ -348,7 +358,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public String write(IFeatureModel fm) {
 		Configuration.setTabulatorSymbol("\t");
-		return featureIDEModelToUVLFeatureModel(fm).toString();
+		final String uvlModel = featureIDEModelToUVLFeatureModel(fm).toString();
+		return uvlModel;
 	}
 
 	private FeatureModel featureIDEModelToUVLFeatureModel(IFeatureModel fm) {
