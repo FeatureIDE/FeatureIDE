@@ -220,7 +220,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			} else if ((uvlGroup.getLowerBound().equals(uvlGroup.getUpperBound())) && (uvlGroup.getUpperBound().equals(uvlGroup.getFeatures().size()))) {
 				children.forEach(f -> f.getStructure().setMandatory(true));
 			} else {
-				pl.add(new Problem(String.format("Failed to convert cardinality [%d..%d] to known group type at feature %s.", uvlGroup.getLowerBound(),
+				pl.add(new Problem(String.format("Failed to convert cardinality [%s..%s] to known group type at feature %s.", uvlGroup.getLowerBound(),
 						uvlGroup.getUpperBound(), parentFeature.getName()), 0, Severity.WARNING));
 			}
 		}
