@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.vill.config.Configuration;
 import de.vill.exception.ParseError;
+import de.vill.exception.ParseErrorList;
 import de.vill.main.UVLModelFactory;
 import de.vill.model.Attribute;
 import de.vill.model.Feature;
@@ -155,7 +156,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
-			pl.add(toProblem(e));
+			if (e instanceof ParseErrorList) {
+				final List<ParseError> errorList = ((ParseErrorList) e).getErrorList();
+				for (final ParseError error : errorList) {
+					pl.add(toProblem(error));
+				}
+			} else {
+				pl.add(toProblem(e));
+			}
 		}
 		return pl;
 	}
@@ -352,7 +360,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	 * @return a {@link Problem}
 	 */
 	private Problem toProblem(ParseError error) {
-		return new Problem(error);
+		return new Problem(error, error.getLine());
 	}
 
 	@Override
