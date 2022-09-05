@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
@@ -134,7 +134,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		final List<String> formalizedRequires = new ArrayList<>();
 		final List<String> formalizedExcludes = new ArrayList<>();
 
-		final IVariables variables = formula.getVariables();
+		final Variables variables = formula.getVariables();
 		final int variable = variables.getVariable(fc.getName());
 
 		final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
