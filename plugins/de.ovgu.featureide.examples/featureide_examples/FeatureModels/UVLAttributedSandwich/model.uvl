@@ -1,0 +1,107 @@
+namespace Sandwich
+
+features
+	Sandwich {
+		Calories {type "long", recursive true, configurable true},
+		OrganicFood {recursive true, value false},
+		Price {recursive true, value 0.0},
+		extended__
+	}	
+		mandatory
+			Bread {
+				Calories {type "long", recursive true, configurable true},
+				OrganicFood {type "boolean", recursive true},
+				Price {type "double", recursive true}
+			}	
+				alternative
+					"Full Grain " {
+						Calories {recursive true, configurable true, value 203},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 1.99}
+					}
+					Flatbread {
+						Calories {recursive true, configurable true, value 50},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 1.79}
+					}
+					Toast {
+						Calories {recursive true, configurable true, value 313},
+						OrganicFood {recursive true, value false},
+						Price {recursive true, value 1.79}
+					}
+
+		optional
+			Cheese {
+				Calories {type "long", recursive true, configurable true},
+				OrganicFood {type "boolean", recursive true},
+				Price {type "double", recursive true}
+			}	
+				optional
+					Gouda {
+						Calories {type "long", recursive true, configurable true},
+						OrganicFood {type "boolean", recursive true},
+						Price {type "double", recursive true}
+					}	
+						alternative
+							Sprinkled {
+								Calories {recursive true, configurable true, value 72},
+								OrganicFood {recursive true, value true},
+								Price {recursive true, value 0.49}
+							}
+							Slice {
+								Calories {recursive true, configurable true, value 70},
+								OrganicFood {recursive true, value true},
+								Price {recursive true, value 0.69}
+							}
+					Cheddar {
+						Calories {recursive true, configurable true, value 81},
+						OrganicFood {recursive true, value false},
+						Price {recursive true, value 0.69}
+					}
+					"Cream Cheese " {
+						Calories {recursive true, configurable true, value 52},
+						OrganicFood {recursive true, value false},
+						Price {recursive true, value 0.59}
+					}
+			Meat {
+				Calories {type "long", recursive true, configurable true},
+				OrganicFood {type "boolean", recursive true},
+				Price {type "double", recursive true}
+			}	
+				or
+					"Salami " {
+						Calories {recursive true, configurable true, value 116},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 1.29}
+					}
+					Ham {
+						Calories {recursive true, configurable true, value 92},
+						OrganicFood {recursive true, value false},
+						Price {recursive true, value 0.99}
+					}
+					"Chicken Breast" {
+						Calories {recursive true, configurable true, value 56},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 1.39}
+					}
+			Vegetables {
+				Calories {type "long", recursive true, configurable true},
+				OrganicFood {type "boolean", recursive true},
+				Price {type "double", recursive true}
+			}	
+				optional
+					"Cucumber " {
+						Calories {recursive true, configurable true, value 2},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 0.29}
+					}
+					Tomatoes {
+						Calories {recursive true, configurable true, value 3},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 0.39}
+					}
+					Lettuce {
+						Calories {recursive true, configurable true, value 2},
+						OrganicFood {recursive true, value true},
+						Price {recursive true, value 0.39}
+					}
