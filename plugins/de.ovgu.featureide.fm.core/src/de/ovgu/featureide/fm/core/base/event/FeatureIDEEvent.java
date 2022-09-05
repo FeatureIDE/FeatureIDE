@@ -103,6 +103,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_COLLAPSED_ALL_CHANGED,
 		/**
+		 * Some or all possible feature model anomalies were calculated.
+		 */
+		MANUAL_CALCULATION_EXECUTED,
+		/**
 		 * The location of an object was changed.
 		 */
 		LOCATION_CHANGED,

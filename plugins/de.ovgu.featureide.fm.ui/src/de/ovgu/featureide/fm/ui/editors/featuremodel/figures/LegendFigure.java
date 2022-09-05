@@ -41,7 +41,6 @@ import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelSt
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -224,43 +223,32 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
 
 		// skip when automated analyses are deactivated
-		if (FeatureModelProperty.isRunCalculationAutomatically(featureModelManager.getVarObject())
-			&& FeatureModelProperty.isCalculateFeatures(featureModelManager.getVarObject())) {
-			final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
-			final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
-			final List<IFeature> deadFeatures = analyzer.getDeadFeatures(null);
-			final List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
-			final List<IFeature> indetHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
-			final List<IConstraint> tautologyConstraints = analyzer.getTautologyConstraints(new NullMonitor<>());
-			final List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
+		final FeatureModelAnalyzer analyzer = featureModelManager.getVariableFormula().getAnalyzer();
+		final AnalysesCollection analysisResults = analyzer.getAnalysesCollection();
+		final List<IFeature> deadFeatures = analyzer.getDeadFeatures(null);
+		final List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
+		final List<IFeature> indetHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
+		final List<IConstraint> tautologyConstraints = analyzer.getTautologyConstraints(new NullMonitor<>());
+		final List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
 
-			if (analysisResults.isCalculateDeadConstraints()) {
-				dead = containsAny(visibleFeatures, deadFeatures);
-			}
-			if (analysisResults.isCalculateFOConstraints()) {
-				falseoptional = containsAny(visibleFeatures, falseOptionalFeatures);
-			}
-			indetHidden = containsAny(visibleFeatures, indetHiddenFeatures);
-
-			void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
-			if (void_model) {
-				dead = false;
-			}
-
-			tautologyConst = analysisResults.isCalculateTautologyConstraints() && containsAny(visibleConstraints, tautologyConstraints);
-			redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints)
-				&& !tautologyConstraints.containsAll(redundantConstraints);
-
-			explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
-		} else {
-			dead = false;
-			falseoptional = false;
-			indetHidden = false;
-			void_model = false;
-			tautologyConst = false;
-			redundantConst = false;
-			explanations = false;
+		if (analysisResults.isCalculateDeadConstraints()) {
+			dead = containsAny(visibleFeatures, deadFeatures);
 		}
+		if (analysisResults.isCalculateFOConstraints()) {
+			falseoptional = containsAny(visibleFeatures, falseOptionalFeatures);
+		}
+		indetHidden = containsAny(visibleFeatures, indetHiddenFeatures);
+
+		void_model = analysisResults.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID);
+		if (void_model) {
+			dead = false;
+		}
+
+		tautologyConst = analysisResults.isCalculateTautologyConstraints() && containsAny(visibleConstraints, tautologyConstraints);
+		redundantConst = analysisResults.isCalculateRedundantConstraints() && containsAny(visibleConstraints, redundantConstraints)
+			&& !tautologyConstraints.containsAll(redundantConstraints);
+
+		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;
 
 		implicitConst = isImplicit(graphicalFeatureModel);
 

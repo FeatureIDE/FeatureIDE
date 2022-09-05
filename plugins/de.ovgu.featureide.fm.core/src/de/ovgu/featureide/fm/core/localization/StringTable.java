@@ -647,6 +647,11 @@ public class StringTable {
 	public static final String COLLAPSE_ALL = "Collapse All";
 	public static final String EXPAND_ALL = "Expand All";
 	public static final String FOCUS_ON_EXPLANATION = "Focus on Explanation";
+	public static final String FOCUS_ON_ALL_ANOMALIES = "Focus on All Anomalies";
+	public static final String FOCUS_ON_FALSE_OPTIONAL_FEATURES = "Focus on False-Optional Features";
+	public static final String FOCUS_ON_DEAD_FEATURES = "Focus on Dead Features";
+	public static final String FOCUS_ON_REDUNDANT_CONSTRAINTS = "Focus on Redundant Constraints";
+	public static final String FOCUS_ON_ALL_EXPLANATIONS = "Focus on All Explanations";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
 	public static final String ADD_IMPORTED_FEATURES = "Add Imported Features";
 	public static final String ADD_IMPORTED_FEATURES_DIALOG_TEXT = "Please select the features to be added.";
