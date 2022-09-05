@@ -24,6 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +34,10 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -412,23 +414,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @return lines of the given file
 	 */
 	public static Vector<String> loadStringsFromFile(IFile res) {
-		final Vector<String> lines = new Vector<String>();
-
-		Scanner scanner = null;
-		try {
-			scanner = new Scanner(res.getContents(), "UTF-8");
-
-			while (scanner.hasNext()) {
-				lines.add(scanner.nextLine());
-			}
-		} catch (final CoreException e) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(res.getContents(), "UTF-8"))) {
+			return reader.lines().collect(Collectors.toCollection(Vector::new));
+		} catch (final Exception e) {
 			CorePlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
+			return new Vector<>();
 		}
-		return lines;
 	}
 
 	public void deleteAllPreprocessorAnotationMarkers() {

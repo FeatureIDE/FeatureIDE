@@ -34,7 +34,7 @@ public class CodeBlock {
 	private final int startLine;
 	private int endLine;
 	private Node node;
-	private final ArrayList<CodeBlock> children = new ArrayList<CodeBlock>();
+	private final ArrayList<CodeBlock> children = new ArrayList<>();
 
 	public CodeBlock() {
 		startLine = 0;

@@ -30,7 +30,9 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.PartialFeatureProjectBuilder;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -49,24 +51,15 @@ public class PartialFeatureProjectJob implements LongRunningMethod<Boolean> {
 		this.file = file;
 	}
 
-	private String getConfigName(IFile file) {
-		String configName = file.getName();
-		final int pos = configName.lastIndexOf(".");
-		if (pos > 0) {
-			configName = configName.substring(0, pos);
-		}
-		return configName;
-	}
-
 	@Override
 	public Boolean execute(IMonitor<Boolean> monitor) throws Exception {
 		final IFeatureProject baseProject = CorePlugin.getFeatureProject(file);
-		final String newProjectName = baseProject.getProjectName() + "_" + getConfigName(file) + "_" + System.currentTimeMillis();
+		final String newProjectName = baseProject.getProjectName() + "_" + FileHandler.getFileName(file.getName()) + "_" + System.currentTimeMillis();
 
 		try {
 			baseProject.getProject().copy(baseProject.getProject().getFullPath().removeLastSegments(1).append(newProjectName), true, null);
 		} catch (final CoreException e) {
-			e.printStackTrace();
+			Logger.logError(e);
 		}
 
 		final IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
@@ -77,7 +70,6 @@ public class PartialFeatureProjectJob implements LongRunningMethod<Boolean> {
 		final Configuration config =
 			baseProject.loadConfiguration(Paths.get(ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + file.getFullPath()));
 
-		System.out.println("check");
 		LongRunningWrapper.runMethod(new PartialFeatureProjectBuilder(newFeatureProject, config));
 		return null;
 	}

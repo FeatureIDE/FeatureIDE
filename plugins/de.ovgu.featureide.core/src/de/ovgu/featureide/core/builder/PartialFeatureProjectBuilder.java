@@ -42,6 +42,7 @@ import org.prop4j.True;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -77,9 +78,8 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 	@Override
 	public IFeatureProject execute(IMonitor<IFeatureProject> monitor) throws Exception {
 		manageConfigurations();
-		final ArrayList<String> removedFeatureNameList = new ArrayList<String>(config.getUnselectedFeatureNames());
-		final ArrayList<String> selectedFeatureNameList = new ArrayList<String>();
-		selectedFeatureNameList.addAll(config.getSelectedFeatureNames());
+		final ArrayList<String> removedFeatureNameList = new ArrayList<>(config.getUnselectedFeatureNames());
+		final ArrayList<String> selectedFeatureNameList = new ArrayList<>(config.getSelectedFeatureNames());
 
 		modifiedModel = modifyFeatureModel(project.getFeatureModel(), removedFeatureNameList, selectedFeatureNameList);
 
@@ -90,29 +90,28 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 			try {
 				project.getComposer().buildPartialFeatureProjectAssets(project.getSourceFolder(), removedFeatureNameList, selectedFeatureNameList);
 			} catch (IOException | CoreException e) {
-				e.printStackTrace();
+				Logger.logError(e);
 			}
 		}
 
 		return project;
 	}
 
-	private IFeatureModel modifyFeatureModel(IFeatureModel model, ArrayList<String> removedFeatures, ArrayList<String> selectedFeatures) {
+	private IFeatureModel modifyFeatureModel(IFeatureModel model, List<String> removedFeatures, List<String> selectedFeatures) {
 		final List<IConstraint> modelconstraints = model.getConstraints();
-		final ArrayList<IConstraint> constraints = new ArrayList<IConstraint>();
+		final List<IConstraint> constraints = new ArrayList<>();
 		constraints.addAll(modelconstraints);
 		modifyConstraints(constraints, removedFeatures, selectedFeatures, model);
 		deleteFeatures(removedFeatures, model);
 		return model;
 	}
 
-	private void modifyConstraints(ArrayList<IConstraint> constraints, ArrayList<String> removedFeatures, ArrayList<String> selectedFeatures,
-			IFeatureModel model) {
-		final ArrayList<IConstraint> constraintsToDelete = new ArrayList<IConstraint>();
-		final ArrayList<IConstraint> constraintsToAdd = new ArrayList<IConstraint>();
+	private void modifyConstraints(List<IConstraint> constraints, List<String> removedFeatures, List<String> selectedFeatures, IFeatureModel model) {
+		final List<IConstraint> constraintsToDelete = new ArrayList<>();
+		final List<IConstraint> constraintsToAdd = new ArrayList<>();
 
 		// Features that are now dead because their parents get removed
-		final ArrayList<String> deadFeatures = new ArrayList<String>();
+		final ArrayList<String> deadFeatures = new ArrayList<>();
 		for (final String feature : removedFeatures) {
 			deadFeatures.addAll(getAllChildren(model.getFeature(feature).getStructure()));
 		}
@@ -127,7 +126,7 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 		}
 
 		// Features that are now core features because they were selected in the configuration
-		final ArrayList<String> coreFeatures = new ArrayList<String>(selectedFeatures);
+		final ArrayList<String> coreFeatures = new ArrayList<>(selectedFeatures);
 
 		final FeatureModelAnalyzer fma = new FeatureModelAnalyzer(model);
 		final List<IFeature> currentCoreFeatures = fma.getCoreFeatures(null);
@@ -169,7 +168,7 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 		model.setConstraints(constraints);
 	}
 
-	private void deleteFeatures(ArrayList<String> removedFeatures, IFeatureModel model) {
+	private void deleteFeatures(List<String> removedFeatures, IFeatureModel model) {
 		for (final String feature : removedFeatures) {
 			if ((model.getFeature(feature).getStructure().getParent().getChildrenCount() == 2)
 				&& (model.getFeature(feature).getStructure().getParent().isAlternative() || model.getFeature(feature).getStructure().getParent().isOr())) {
@@ -189,7 +188,7 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 	}
 
 	private ArrayList<String> getAllChildren(IFeatureStructure feature) {
-		final ArrayList<String> features = new ArrayList<String>();
+		final ArrayList<String> features = new ArrayList<>();
 		features.add(feature.getFeature().getName());
 		for (final IFeatureStructure child : feature.getChildren()) {
 			features.addAll(getAllChildren(child));
@@ -207,7 +206,7 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 		try {
 			Collections.addAll(configurations, configFolder.members());
 		} catch (final CoreException e) {
-			e.printStackTrace();
+			Logger.logError(e);
 		}
 
 		// delete all configs
@@ -215,7 +214,7 @@ public class PartialFeatureProjectBuilder implements LongRunningMethod<IFeatureP
 			try {
 				resource.delete(true, null);
 			} catch (final CoreException e) {
-				e.printStackTrace();
+				Logger.logError(e);
 			}
 		}
 
