@@ -260,23 +260,14 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (attributeValue instanceof Constraint) {
 			parseConstraint(fm, (Constraint) attributeValue);
 		}
-		// TODO list with constraints?
 	}
 
 	private void parseConstraints(MultiFeatureModel fm) {
-		final List<Constraint> allConstraints = rootModel.getConstraints();
-		final List<Constraint> ownConstraints = rootModel.getOwnConstraints();
+		final List<Constraint> constraints = rootModel.getOwnConstraints();
 
-		for (final Constraint constraint : ownConstraints) {
+		for (final Constraint constraint : constraints) {
 			parseOwnConstraint(fm, constraint);
 		}
-
-		for (final Constraint constraint : allConstraints) {
-			if (!ownConstraints.contains(constraint)) {
-				parseConstraint(fm, constraint);
-			}
-		}
-
 	}
 
 	private void parseConstraint(MultiFeatureModel fm, Constraint c) {
