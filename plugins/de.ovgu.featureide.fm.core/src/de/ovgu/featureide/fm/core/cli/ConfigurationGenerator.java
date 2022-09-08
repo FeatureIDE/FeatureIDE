@@ -57,6 +57,10 @@ public class ConfigurationGenerator extends ACLIFunction {
 	private Path outputFile;
 	private Path fmFile;
 	private Path expressionFile;
+	private Path initialSampleFile;
+	private boolean allowInitialSolutionModify = false;
+	private boolean allowInitialSolutionRemove = false;
+	private boolean countInitialSolutionForLimit = false;
 	private int t;
 	private int m;
 	private int limit;
@@ -97,6 +101,17 @@ public class ConfigurationGenerator extends ACLIFunction {
 			expressionGroups = null;
 		}
 
+		final SolutionList initialSample;
+		if (initialSampleFile != null) {
+			initialSample = new SolutionList();
+			final ProblemList lastProblems = FileHandler.load(initialSampleFile, initialSample, new ConfigurationListFormat());
+			if (lastProblems.containsError()) {
+				throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
+			}
+		} else {
+			initialSample = null;
+		}
+
 		IConfigurationGenerator generator = null;
 		switch (algorithm.toLowerCase()) {
 		case "icpl": {
@@ -117,7 +132,14 @@ public class ConfigurationGenerator extends ACLIFunction {
 			} else {
 				generator = new TWiseConfigurationGenerator(cnf, expressionGroups, t, limit);
 			}
-			((TWiseConfigurationGenerator) generator).setIterations(m);
+			final TWiseConfigurationGenerator yasa = (TWiseConfigurationGenerator) generator;
+			yasa.setIterations(m);
+			if (initialSampleFile != null) {
+				yasa.setInitialSample(initialSample.getSolutions());
+				yasa.setAllowInitialSolutionModify(allowInitialSolutionModify);
+				yasa.setAllowInitialSolutionRemove(allowInitialSolutionRemove);
+				yasa.setCountInitialSolutionForLimit(countInitialSolutionForLimit);
+			}
 			break;
 		}
 		case "random": {
@@ -140,6 +162,10 @@ public class ConfigurationGenerator extends ACLIFunction {
 		outputFile = null;
 		fmFile = null;
 		expressionFile = null;
+		initialSampleFile = null;
+		allowInitialSolutionModify = false;
+		allowInitialSolutionRemove = false;
+		countInitialSolutionForLimit = false;
 		t = 0;
 		m = 1;
 		limit = Integer.MAX_VALUE;
@@ -155,28 +181,44 @@ public class ConfigurationGenerator extends ACLIFunction {
 					algorithm = getArgValue(iterator, arg);
 					break;
 				}
-				case "o": {
-					outputFile = Paths.get(getArgValue(iterator, arg));
+				case "e": {
+					expressionFile = Paths.get(getArgValue(iterator, arg));
 					break;
 				}
 				case "fm": {
 					fmFile = Paths.get(getArgValue(iterator, arg));
 					break;
 				}
-				case "t": {
-					t = Integer.parseInt(getArgValue(iterator, arg));
+				case "i": {
+					initialSampleFile = Paths.get(getArgValue(iterator, arg));
 					break;
 				}
-				case "m": {
-					m = Integer.parseInt(getArgValue(iterator, arg));
+				case "im": {
+					allowInitialSolutionModify = true;
+					break;
+				}
+				case "ir": {
+					allowInitialSolutionRemove = true;
+					break;
+				}
+				case "il": {
+					countInitialSolutionForLimit = true;
 					break;
 				}
 				case "l": {
 					limit = Integer.parseInt(getArgValue(iterator, arg));
 					break;
 				}
-				case "e": {
-					expressionFile = Paths.get(getArgValue(iterator, arg));
+				case "m": {
+					m = Integer.parseInt(getArgValue(iterator, arg));
+					break;
+				}
+				case "o": {
+					outputFile = Paths.get(getArgValue(iterator, arg));
+					break;
+				}
+				case "t": {
+					t = Integer.parseInt(getArgValue(iterator, arg));
 					break;
 				}
 				default: {

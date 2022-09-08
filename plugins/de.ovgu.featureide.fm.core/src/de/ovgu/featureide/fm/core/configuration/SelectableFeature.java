@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -48,7 +48,7 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 
 	private int recommendationValue = -1;
 	private Map<Integer, LiteralSet> openClauses = null;
-	private IVariables variables = null;
+	private Variables variables = null;
 
 	private String name;
 
@@ -161,11 +161,11 @@ public class SelectableFeature extends TreeElement implements Cloneable {
 		return openClauses.keySet();
 	}
 
-	public IVariables getVariables() {
+	public Variables getVariables() {
 		return variables;
 	}
 
-	public void setVariables(IVariables variables) {
+	public void setVariables(Variables variables) {
 		this.variables = variables;
 	}
 

@@ -55,11 +55,11 @@ public final class Nodes {
 		return convertNF(node.toRegularCNF(), true, true);
 	}
 
-	public static ClauseList convert(IVariables satInstance, Node node) {
+	public static ClauseList convert(Variables satInstance, Node node) {
 		return convert(satInstance, node, true);
 	}
 
-	public static ClauseList convert(IVariables satInstance, Node node, boolean keepLiteralOrder) {
+	public static ClauseList convert(Variables satInstance, Node node, boolean keepLiteralOrder) {
 		if (node == null) {
 			return null;
 		}
@@ -90,7 +90,7 @@ public final class Nodes {
 		return new CNF(mapping, clauses);
 	}
 
-	public static ClauseList convertNF(IVariables satInstance, Node node, boolean keepLiteralOrder, boolean cnf) {
+	public static ClauseList convertNF(Variables satInstance, Node node, boolean keepLiteralOrder, boolean cnf) {
 		final ClauseList clauses = new ClauseList();
 		getClauseFromNode(satInstance, clauses, node, keepLiteralOrder, cnf);
 		return clauses;
@@ -104,7 +104,7 @@ public final class Nodes {
 		}
 	}
 
-	public static CNF convertSlicingErrorLiterals(IVariables satInstance, Node cnfNode, boolean keepLiteralOrder) {
+	public static CNF convertSlicingErrorLiterals(Variables satInstance, Node cnfNode, boolean keepLiteralOrder) {
 		final HashSet<String> varNames = new HashSet<>();
 		final HashSet<String> errorNames = new HashSet<>();
 		collectVariables(satInstance, cnfNode, varNames, errorNames);
@@ -128,7 +128,7 @@ public final class Nodes {
 		}
 	}
 
-	public static void collectVariables(IVariables variables, Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
+	public static void collectVariables(Variables variables, Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
 		for (final Node clause : cnfNode.getChildren()) {
 			final Node[] literals = clause.getChildren();
 			for (int i = 0; i < literals.length; i++) {
@@ -196,7 +196,7 @@ public final class Nodes {
 		return new And(nodeClauses);
 	}
 
-	public static Or convert(IVariables variables, LiteralSet clause) {
+	public static Or convert(Variables variables, LiteralSet clause) {
 		final int[] literals = clause.getLiterals();
 		final Literal[] nodeLiterals = new Literal[literals.length];
 		for (int i = 0; i < literals.length; i++) {
@@ -222,7 +222,7 @@ public final class Nodes {
 		}
 	}
 
-	static void getClauseFromNode(IVariables s, final Collection<LiteralSet> clauses, final Node node, boolean keepLiteralOrder, boolean cnf) {
+	static void getClauseFromNode(Variables s, final Collection<LiteralSet> clauses, final Node node, boolean keepLiteralOrder, boolean cnf) {
 		for (final Node children : node.getChildren()) {
 			final LiteralSet clause = getClause(s, children, keepLiteralOrder, cnf);
 			if (clause != null) {
@@ -237,7 +237,7 @@ public final class Nodes {
 		}
 	}
 
-	private static LiteralSet getClause(IVariables s, Node clauseNode, boolean keepLiteralOrder, boolean cnf) {
+	private static LiteralSet getClause(Variables s, Node clauseNode, boolean keepLiteralOrder, boolean cnf) {
 		int absoluteValueCount = 0;
 		boolean irrelevant = false;
 

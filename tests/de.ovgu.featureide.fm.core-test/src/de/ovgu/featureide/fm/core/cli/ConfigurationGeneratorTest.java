@@ -30,20 +30,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SolutionList;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.RandomConfigurationGenerator;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.SampleTester;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.TWiseCoverageCriterion;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.csv.ConfigurationListFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
 
 /**
  * Tests sampling algorithms.
@@ -136,6 +143,36 @@ public class ConfigurationGeneratorTest {
 	}
 
 	@Test
+	public void YASAInitialSample() {
+		testInitialTWise("apl_model", 1, 5);
+		testInitialTWise("apl_model", 2, 5);
+		testInitialTWise("apl_model", 3, 5);
+		testInitialTWise("apl_model", 2, 0);
+		testInitialTWise("apl_model", 2, 30);
+		testInitialTWise("gpl_medium_model", 1, 5);
+		testInitialTWise("gpl_medium_model", 2, 5);
+		testInitialTWise("gpl_medium_model", 3, 5);
+		testInitialTWise("gpl_medium_model", 2, 0);
+		testInitialTWise("gpl_medium_model", 2, 30);
+		testInitialTWise("berkeley_db_model", 2, 10);
+	}
+
+	@Test
+	public void YASAInitialPartialSample() {
+		testPartialInitialTWise("apl_model", 1, 5);
+		testPartialInitialTWise("apl_model", 2, 0);
+		testPartialInitialTWise("apl_model", 2, 5);
+		testPartialInitialTWise("apl_model", 3, 5);
+		testPartialInitialTWise("apl_model", 2, 30);
+		testPartialInitialTWise("gpl_medium_model", 1, 5);
+		testPartialInitialTWise("gpl_medium_model", 2, 5);
+		testPartialInitialTWise("gpl_medium_model", 3, 5);
+		testPartialInitialTWise("gpl_medium_model", 2, 0);
+		testPartialInitialTWise("gpl_medium_model", 2, 30);
+		testPartialInitialTWise("berkeley_db_model", 2, 10);
+	}
+
+	@Test
 	public void YASAOneWiseCoverage() {
 		testCoverageAndDeterminism("yasa", 1, modelNames);
 	}
@@ -188,7 +225,7 @@ public class ConfigurationGeneratorTest {
 	private void testCoverage(final String algorithmName, final int t, final List<String> modelNameList) {
 		for (final String modelName : modelNameList) {
 			final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-			final SampleTester tester = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 			assertEquals("Wrong coverage for " + modelName, 1.0, tester.getCoverage(new TWiseCoverageCriterion(tester.getCnf(), t)), 0.0);
 		}
@@ -197,59 +234,108 @@ public class ConfigurationGeneratorTest {
 	private void testCoverageAndDeterminism(final String algorithmName, final int t, final List<String> modelNameList) {
 		for (final String modelName : modelNameList) {
 			final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-			final SampleTester tester = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 			assertEquals("Wrong coverage for " + modelName, 1.0, tester.getCoverage(new TWiseCoverageCriterion(tester.getCnf(), t)), 0.0);
-			final SampleTester tester2 = sample(modelFile, algorithmName, t, null);
+			final SampleTester tester2 = sample(modelFile, algorithmName, Arrays.asList("-t", Integer.toString(t)));
 			assertEquals("Wrong size for " + modelName, tester.getSize(), tester2.getSize());
 		}
 	}
 
 	private static void testSize(String modelName, String algorithm, int numberOfConfigurations) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, null);
+		final SampleTester tester = sample(modelFile, algorithm, Collections.emptyList());
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 		assertEquals("Wrong number of configurations for " + modelName, numberOfConfigurations, tester.getSize());
 	}
 
 	private static void testLimitedSize(String modelName, String algorithm, int numberOfConfigurations, int limit) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, limit);
+		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-l", Integer.toString(limit)));
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
 		assertTrue("Number of configurations larger than limit for " + modelName, limit >= tester.getSize());
 	}
 
 	private static void testTWiseLimitedSize(String modelName, String algorithm, int t, int limit) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, null, limit);
+		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-t", Integer.toString(t), "-l", Integer.toString(limit)));
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
-		assertTrue("Number of configurations larger than limit for " + modelName, limit >= tester.getSize());
+		assertTrue("Number of configurations (" + tester.getSize() + ") larger than limit (" + limit + ") for " + modelName, limit >= tester.getSize());
 	}
 
-	private static SampleTester sample(final Path modelFile, String algorithm, Integer t, Integer limit) {
+	private static void testInitialTWise(String modelName, int t, int initialSize) {
+		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
 		try {
-			final Path inFile = Files.createTempFile("input", ".xml");
-			Files.write(inFile, Files.readAllBytes(modelFile));
-
-			final Path outFile = Files.createTempFile("output", "");
-
-			final ArrayList<String> args = new ArrayList<>();
-			args.add("-a");
-			args.add(algorithm);
-			args.add("-o");
-			args.add(outFile.toString());
-			args.add("-fm");
-			args.add(inFile.toString());
-
-			if (t != null) {
-				args.add("-t");
-				args.add(Integer.toString(t));
+			final Path sampleFile = runSampleAlgorithm(modelFile, "random", Arrays.asList("-l", Integer.toString(initialSize)));
+			final SolutionList sample = new SolutionList();
+			FileHandler.load(sampleFile, sample, new ConfigurationListFormat());
+			final SampleTester tester = sample(modelFile, "yasa", Arrays.asList("-t", Integer.toString(t), "-m", "5", "-i", sampleFile.toString()));
+			assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
+			for (int i = 0; i < initialSize; i++) {
+				final LiteralSet initialConfig = sample.getSolutions().get(i);
+				final LiteralSet newConfig = tester.getSample().get(i);
+				assertEquals("Initial sample is changed for " + initialConfig, initialConfig, newConfig);
 			}
-			if (limit != null) {
-				args.add("-l");
-				args.add(Integer.toString(limit));
+			assertEquals("Initial sample is changed for " + sample.getSolutions(), sample.getSolutions(), tester.getSample().subList(0, initialSize));
+		} catch (final IOException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	private static void testPartialInitialTWise(String modelName, int t, int initialSize) {
+		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
+		try {
+			final CNF cnf = new FeatureModelFormula(FeatureModelManager.load(modelFile)).getCNF();
+
+			final RandomConfigurationGenerator generator = new RandomConfigurationGenerator(cnf, initialSize);
+			generator.setRandom(new Random(123));
+			final List<LiteralSet> sample = LongRunningWrapper.runMethod(generator, new ConsoleMonitor<>());
+
+			for (int repetition = 0; repetition < 5; repetition++) {
+				final SolutionList partialSample = new SolutionList();
+				partialSample.setVariables(cnf.getVariables());
+				final Path partialSampleFile = Files.createTempFile("sample", "");
+				final int[] unwantedVariables;
+				if (sample.size() > 0) {
+					final Random random = new Random(repetition);
+					unwantedVariables = IntStream.range(1, sample.get(0).size()).filter(v -> random.nextBoolean()).toArray();
+				} else {
+					unwantedVariables = new int[0];
+				}
+				for (final LiteralSet config : sample) {
+					partialSample.addSolution(config.removeAll(unwantedVariables));
+				}
+				FileHandler.save(partialSampleFile, partialSample, new ConfigurationListFormat());
+
+				final SampleTester testerModified =
+					sample(modelFile, "yasa", Arrays.asList("-t", Integer.toString(t), "-m", "5", "-im", "-il", "-i", partialSampleFile.toString()));
+
+				assertFalse("Invalid solutions for " + modelName, testerModified.hasInvalidSolutions());
+				for (int i = 0; i < initialSize; i++) {
+					final LiteralSet initialConfig = partialSample.getSolutions().get(i);
+					final LiteralSet newConfig = testerModified.getSample().get(i).removeAll(unwantedVariables);
+					assertEquals("Initial sample is changed for " + modelName, initialConfig, newConfig);
+				}
+
+				final SampleTester testerUnmodified =
+					sample(modelFile, "yasa", Arrays.asList("-t", Integer.toString(t), "-m", "5", "-il", "-i", partialSampleFile.toString()));
+
+				for (int i = 0; i < initialSize; i++) {
+					final LiteralSet initialConfig = partialSample.getSolutions().get(i);
+					final LiteralSet newConfig = testerUnmodified.getSample().get(i);
+					assertEquals("Initial sample is changed for " + modelName, initialConfig, newConfig);
+				}
 			}
-			new ConfigurationGenerator().run(args);
+		} catch (final IOException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	private static SampleTester sample(final Path modelFile, String algorithm, List<String> additionalArgs) {
+		try {
+			final Path outFile = runSampleAlgorithm(modelFile, algorithm, additionalArgs);
 
 			final SolutionList sample = new SolutionList();
 			FileHandler.load(outFile, sample, new ConfigurationListFormat());
@@ -268,5 +354,23 @@ public class ConfigurationGeneratorTest {
 			fail(e.getMessage());
 			return null;
 		}
+	}
+
+	private static Path runSampleAlgorithm(final Path modelFile, String algorithm, List<String> additionalArgs) throws IOException {
+		final Path inFile = Files.createTempFile("input", ".xml");
+		Files.write(inFile, Files.readAllBytes(modelFile));
+
+		final Path outFile = Files.createTempFile("output", "");
+
+		final ArrayList<String> args = new ArrayList<>();
+		args.add("-a");
+		args.add(algorithm);
+		args.add("-o");
+		args.add(outFile.toString());
+		args.add("-fm");
+		args.add(inFile.toString());
+		args.addAll(additionalArgs);
+		new ConfigurationGenerator().run(args);
+		return outFile;
 	}
 }

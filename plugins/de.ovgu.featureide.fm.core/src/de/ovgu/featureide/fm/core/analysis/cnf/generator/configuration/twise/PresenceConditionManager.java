@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 
 /**
  * Manages and manipulates a list of {@link PresenceCondition presence conditions}.
@@ -44,7 +45,7 @@ class PresenceConditionManager {
 	private final List<List<PresenceCondition>> groupedPresenceConditions = new ArrayList<>();
 
 	public PresenceConditionManager(TWiseConfigurationUtil util, List<List<ClauseList>> expressions) {
-		final LiteralSet coreDeadFeature = util.getDeadCoreFeatures();
+		final LiteralSet coreDeadFeature = new LiteralSet(util.getDeadCoreFeatures(), Order.NATURAL);
 		final int numberOfVariables = util.getCnf().getVariables().size();
 
 		final HashMap<PresenceCondition, PresenceCondition> presenceConditionSet = new HashMap<>();

@@ -31,8 +31,8 @@ import java.util.stream.IntStream;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.Renaming;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -93,7 +93,7 @@ public class Configuration implements Cloneable {
 
 	public static Configuration fromLiteralSet(final FeatureModelFormula formula, final LiteralSet literalSet) {
 		final Configuration configuration = new Configuration(formula);
-		final IVariables variables = formula.getVariables();
+		final Variables variables = formula.getVariables();
 
 		IntStream.of(literalSet.getLiterals()) //
 				.filter(l -> l != 0) //

@@ -31,7 +31,6 @@ import java.util.concurrent.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
-import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -105,7 +104,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 		} catch (final Exception e) {
 			Logger.logWarning("Problems occurred during the execution of " + algorithm);
 		}
-		final IVariables variables = solver.getSatInstance().getVariables();
+		final Variables variables = solver.getSatInstance().getVariables();
 		solutions.stream().limit(maxSampleSize).forEach(solution -> {
 			final int[] literals = new int[variables.size()];
 			for (int i = 0; i < literals.length; i++) {

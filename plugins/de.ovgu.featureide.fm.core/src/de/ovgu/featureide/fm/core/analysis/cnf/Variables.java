@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  *
  * @author Sebastian Krieter
  */
-public class Variables implements Serializable, IVariables, IInternalVariables {
+public class Variables implements Serializable, IInternalVariables {
 
 	private static final long serialVersionUID = -1767212780361483105L;
 
@@ -69,32 +69,26 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		varToInt = new LinkedHashMap<>(oldSatMapping.varToInt);
 	}
 
-	@Override
 	public List<String> convertToString(int[] literals) {
 		return convertToString(literals, true, false);
 	}
 
-	@Override
 	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative) {
 		return convertToString(literals, includePositive, includeNegative, true);
 	}
 
-	@Override
 	public List<String> convertToString(LiteralSet model) {
 		return convertToString(model, true, false);
 	}
 
-	@Override
 	public List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative) {
 		return convertToString(literals, includePositive, includeNegative, true);
 	}
 
-	@Override
 	public List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
 		return convertToString(literals.getLiterals(), includePositive, includeNegative, markNegative);
 	}
 
-	@Override
 	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
 		final List<String> resultList = new ArrayList<>();
 		for (final int var : literals) {
@@ -115,7 +109,6 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return resultList;
 	}
 
-	@Override
 	public LiteralSet convertToVariables(Iterable<String> variableNames) {
 		final Collection<String> variableNameCollection = Functional.toCollection(variableNames);
 		final int[] literals = new int[variableNameCollection.size()];
@@ -126,7 +119,6 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return new LiteralSet(literals);
 	}
 
-	@Override
 	public LiteralSet convertToVariables(Iterable<String> variableNames, boolean sign) {
 		final Collection<String> variableNameCollection = Functional.toCollection(variableNames);
 		final int[] literals = new int[variableNameCollection.size()];
@@ -137,7 +129,6 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return new LiteralSet(literals);
 	}
 
-	@Override
 	public LiteralSet convertToLiterals(Iterable<String> variableNames, boolean includePositive, boolean includeNegative) {
 		if (!includeNegative && !includePositive) {
 			return new LiteralSet();
@@ -162,28 +153,23 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return intToVar.length - 1;
 	}
 
-	@Override
 	public int maxVariableID() {
 		return intToVar.length - 1;
 	}
 
-	@Override
 	public int getVariable(String varName) {
 		final Integer var = varToInt.get(varName);
 		return var == null ? 0 : var;
 	}
 
-	@Override
 	public int getVariable(String varName, boolean sign) {
 		return sign ? getVariable(varName) : -getVariable(varName);
 	}
 
-	@Override
 	public String getName(final int x) {
 		return intToVar[Math.abs(x)];
 	}
 
-	@Override
 	public String[] getNames() {
 		return intToVar;
 	}
@@ -252,7 +238,6 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return "Variables [" + Arrays.toString(intToVar) + "]";
 	}
 
-	@Override
 	public LiteralSet getLiterals() {
 		final int length = intToVar.length - 1;
 		final int[] literals = new int[length << 1];
@@ -265,7 +250,6 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 		return new LiteralSet(literals, Order.NATURAL, false);
 	}
 
-	@Override
 	public void renameVariable(String oldName, String newName) {
 		final Integer index = varToInt.remove(oldName);
 		if (index != null) {

@@ -25,12 +25,11 @@ import java.util.Arrays;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.mig.DefaultVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
-import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
 import de.ovgu.featureide.fm.core.analysis.mig.Visitor;
 
 /**
@@ -47,14 +46,17 @@ public class TWiseConfiguration extends LiteralSet {
 
 	public static int SOLUTION_COUNT_THRESHOLD = 10;
 
-	protected VecInt solutionLiterals;
+	private final TWiseConfigurationUtil util;
+	private final int initialIndex;
 
-	protected int countLiterals, rank = 0;
+	private boolean modifiable = true;
 
-	protected final int numberOfVariableLiterals;
-	protected final TWiseConfigurationUtil util;
-	protected Traverser traverser;
-	protected Visitor<?> visitor;
+	int countLiterals = 0;
+	int rank = 0;
+
+	private VecInt solutionLiterals;
+	private Traverser traverser;
+	private Visitor<?> visitor;
 
 	protected VecInt solverSolutionIndex = new VecInt();
 
@@ -116,25 +118,12 @@ public class TWiseConfiguration extends LiteralSet {
 		private final boolean sat(final int[] unkownValues, final int curLiteral) {
 			final int i = Math.abs(curLiteral) - 1;
 			if (unkownValues[i] == curLiteral) {
-				final ISatSolver solver = util.getSolver();
-				solver.assignmentPush(-curLiteral);
-				switch (solver.hasSolution()) {
-				case FALSE:
-					solver.assignmentReplaceLast(curLiteral);
+				final int[] solution = util.sat(-curLiteral);
+				if (solution == null) {
 					unkownValues[i] = 0;
-					unkownValues[Math.abs(curLiteral) - 1] = 0;
 					return true;
-				case TIMEOUT:
-					solver.assignmentPop();
-					unkownValues[Math.abs(curLiteral) - 1] = 0;
-					break;
-				case TRUE:
-					solver.assignmentPop();
-					final int[] solution2 = solver.getSolution();
-					util.addSolverSolution(solution2);
-					LiteralSet.resetConflicts(unkownValues, solution2);
-					solver.shuffleOrder(util.getRandom());
-					break;
+				} else {
+					LiteralSet.resetConflicts(unkownValues, solution);
 				}
 			}
 			return false;
@@ -143,20 +132,18 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public TWiseConfiguration(TWiseConfigurationUtil util) {
+		this(util, -1);
+	}
+
+	public TWiseConfiguration(TWiseConfigurationUtil util, int initialIndex) {
 		super(new int[util.getCnf().getVariables().size()], Order.INDEX, false);
-		countLiterals = 0;
 		this.util = util;
-		if (util.hasSolver()) {
-			for (final Vertex vertex : util.getMig().getAdjList()) {
-				if (vertex.isCore()) {
-					final int var = vertex.getVar();
-					literals[Math.abs(var) - 1] = var;
-					countLiterals++;
-				}
-			}
-			numberOfVariableLiterals = literals.length - countLiterals;
-			solutionLiterals = new VecInt(numberOfVariableLiterals);
-			countLiterals = 0;
+		this.initialIndex = initialIndex;
+		if (util.hasNoConstraints()) {
+			traverser = null;
+			visitor = null;
+		} else {
+			solutionLiterals = new VecInt(literals.length);
 			traverser = new Traverser(util.getMig());
 			traverser.setModel(literals);
 			visitor = new DefaultVisitor() {
@@ -167,25 +154,29 @@ public class TWiseConfiguration extends LiteralSet {
 					return super.visitStrong(curLiteral);
 				}
 			};
-		} else {
-			traverser = null;
-			visitor = null;
-			numberOfVariableLiterals = 0;
 		}
+	}
+
+	public void setCoreLiterals() {
+		setLiterals(util.getDeadCoreFeatures());
 	}
 
 	public TWiseConfiguration(TWiseConfiguration other) {
 		super(other);
 		util = other.util;
+		initialIndex = other.initialIndex;
 
-		numberOfVariableLiterals = other.numberOfVariableLiterals;
+		modifiable = other.modifiable;
 		solverSolutionIndex = other.solverSolutionIndex;
 		countLiterals = other.countLiterals;
 		rank = other.rank;
 
-		if (util.hasSolver()) {
+		if (util.hasNoConstraints()) {
+			traverser = null;
+			visitor = null;
+		} else {
 			if (other.solutionLiterals != null) {
-				solutionLiterals = new VecInt(numberOfVariableLiterals);
+				solutionLiterals = new VecInt(other.solutionLiterals.size());
 				other.solutionLiterals.copyTo(solutionLiterals);
 			}
 			traverser = new Traverser(util.getMig());
@@ -198,9 +189,6 @@ public class TWiseConfiguration extends LiteralSet {
 					return super.visitStrong(curLiteral);
 				}
 			};
-		} else {
-			traverser = null;
-			visitor = null;
 		}
 	}
 
@@ -216,36 +204,66 @@ public class TWiseConfiguration extends LiteralSet {
 		}
 	}
 
-	public void setLiteral(int... literals) {
-		if (traverser != null) {
-			traverser.setVisitor(visitor);
-			traverser.traverseStrong(literals);
-		} else {
-			for (final int literal : literals) {
-				final int i = Math.abs(literal) - 1;
-				if (this.literals[i] == 0) {
-					this.literals[i] = literal;
-					countLiterals++;
-				}
+	public void selectLiterals(Deduce deduce, int... literals) {
+		if (modifiable) {
+			switch (deduce) {
+			case AutoCompletion:
+				setLiteralsWithStrong(literals);
+				autoComplete();
+				break;
+			case DecisionPropagation:
+				setLiteralsWithStrong(literals);
+				propagate();
+				break;
+			case TraverseStrong:
+				setLiteralsWithStrong(literals);
+				break;
+			case None:
+				setLiterals(literals);
+				break;
 			}
 		}
 	}
 
-	public void propagation() {
+	private void setLiteralsWithStrong(int... literals) {
 		if (traverser != null) {
-			final DPVisitor visitor = new DPVisitor();
-
-			final int[] literals = Arrays.copyOf(solutionLiterals.toArray(), solutionLiterals.size());
-			for (int i = 0, length = literals.length; i < length; i++) {
-				this.literals[Math.abs(literals[i]) - 1] = 0;
-			}
-			solutionLiterals.clear();
-			countLiterals = 0;
-
-			final int orgAssignmentSize = util.getSolver().getAssignmentSize();
 			traverser.setVisitor(visitor);
-			traverser.traverse(literals);
-			util.getSolver().assignmentClear(orgAssignmentSize);
+			traverser.traverseStrong(literals);
+		} else {
+			setLiterals(literals);
+		}
+	}
+
+	private void setLiterals(int... literals) {
+		for (final int literal : literals) {
+			final int i = Math.abs(literal) - 1;
+			if (this.literals[i] == 0) {
+				this.literals[i] = literal;
+				countLiterals++;
+			}
+		}
+	}
+
+	public void propagate() {
+		if (modifiable) {
+			if (traverser != null) {
+				final DPVisitor visitor = new DPVisitor();
+
+				final int[] literals = Arrays.copyOf(solutionLiterals.toArray(), solutionLiterals.size());
+				for (int i = 0, length = literals.length; i < length; i++) {
+					final int j = Math.abs(literals[i]) - 1;
+					if (this.literals[j] != 0) {
+						this.literals[j] = 0;
+						countLiterals--;
+					}
+				}
+				solutionLiterals.clear();
+
+				final int orgAssignmentSize = util.getSolver().getAssignmentSize();
+				traverser.setVisitor(visitor);
+				traverser.traverse(literals);
+				util.getSolver().assignmentClear(orgAssignmentSize);
+			}
 		}
 	}
 
@@ -257,7 +275,7 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public boolean isComplete() {
-		return countLiterals == numberOfVariableLiterals;
+		return countLiterals == literals.length;
 	}
 
 	public int countLiterals() {
@@ -265,40 +283,50 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public void autoComplete() {
-		if (!isComplete()) {
-			if (util.hasSolver()) {
-				if (solverSolutionIndex.isEmpty()) {
-					final ISatSolver solver = util.getSolver();
-					final int orgAssignmentSize = setUpSolver(solver);
-					try {
-						final int[] s = solver.findSolution();
-						if (s != null) {
-							System.arraycopy(s, 0, literals, 0, literals.length);
+		if (modifiable) {
+			if (!isComplete()) {
+				if (util.hasNoConstraints()) {
+					for (int i = 0; i < literals.length; i++) {
+						if (literals[i] == 0) {
+							literals[i] = -(i + 1);
+							countLiterals++;
 						}
-					} finally {
-						solver.assignmentClear(orgAssignmentSize);
 					}
 				} else {
-					System.arraycopy(util.getSolverSolution(solverSolutionIndex.last()).getLiterals(), 0, literals, 0, literals.length);
-					solverSolutionIndex.clear();
-				}
-			} else {
-				for (int i = 0; i < literals.length; i++) {
-					if (literals[i] == 0) {
-						literals[i] = -(i + 1);
+					if (solverSolutionIndex.isEmpty()) {
+						final ISatSolver solver = util.getSolver();
+						final int orgAssignmentSize = setUpSolver(solver);
+						try {
+							final int[] s = solver.findSolution();
+							if (s != null) {
+								System.arraycopy(s, 0, literals, 0, literals.length);
+							}
+						} finally {
+							solver.assignmentClear(orgAssignmentSize);
+						}
+					} else {
+						System.arraycopy(util.getSolverSolution(solverSolutionIndex.last()).getLiterals(), 0, literals, 0, literals.length);
+						solverSolutionIndex.clear();
 					}
+					countLiterals = util.getCnf().getVariables().size();
 				}
 			}
-			countLiterals = numberOfVariableLiterals;
 		}
 	}
 
 	public LiteralSet getCompleteSolution() {
-		if (isComplete()) {
+		if (isComplete() || (solverSolutionIndex == null)) {
 			return new LiteralSet(this);
 		} else {
 			final int[] s;
-			if (util.hasSolver()) {
+			if (util.hasNoConstraints()) {
+				s = Arrays.copyOf(literals, literals.length);
+				for (int i = 0; i < s.length; i++) {
+					if (s[i] == 0) {
+						s[i] = -(i + 1);
+					}
+				}
+			} else {
 				if (solverSolutionIndex.isEmpty()) {
 					final ISatSolver solver = util.getSolver();
 					final int orgAssignmentSize = setUpSolver(solver);
@@ -310,45 +338,8 @@ public class TWiseConfiguration extends LiteralSet {
 				} else {
 					s = util.getSolverSolution(solverSolutionIndex.last()).getLiterals();
 				}
-			} else {
-				s = Arrays.copyOf(literals, literals.length);
-				for (int i = 0; i < s.length; i++) {
-					if (s[i] == 0) {
-						s[i] = -(i + 1);
-					}
-				}
 			}
 			return (s == null) ? null : new LiteralSet(Arrays.copyOf(s, s.length), Order.INDEX, false);
-		}
-	}
-
-	public void generateRandomSolutions(int count) {
-		final ISatSolver solver = util.getSolver();
-		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
-		final int orgAssignmentSize = setUpSolver(solver);
-		try {
-			for (int i = 0; i < count; i++) {
-				util.addSolverSolution(solver.findSolution());
-				solver.shuffleOrder(util.getRandom());
-			}
-		} finally {
-			solver.assignmentClear(orgAssignmentSize);
-		}
-	}
-
-	public boolean isValid() {
-		final ISatSolver solver = util.getSolver();
-		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
-		final int orgAssignmentSize = setUpSolver(solver);
-		try {
-			final SatResult satResult = solver.hasSolution();
-			if (satResult == SatResult.TRUE) {
-				util.addSolverSolution(solver.getSolution());
-				solver.shuffleOrder(util.getRandom());
-			}
-			return satResult == SatResult.TRUE;
-		} finally {
-			solver.assignmentClear(orgAssignmentSize);
 		}
 	}
 
@@ -366,7 +357,7 @@ public class TWiseConfiguration extends LiteralSet {
 	}
 
 	public void updateSolverSolutions() {
-		if (util.hasSolver()) {
+		if (!util.hasNoConstraints()) {
 			solverSolutionIndex.clear();
 			final int[] array = solutionLiterals.toArray();
 			final LiteralSet[] solverSolutions = util.getSolverSolutions();
@@ -416,6 +407,22 @@ public class TWiseConfiguration extends LiteralSet {
 	@Override
 	public TWiseConfiguration clone() {
 		return new TWiseConfiguration(this);
+	}
+
+	public boolean isModifiable() {
+		return modifiable;
+	}
+
+	public void setModifiable(boolean modifiable) {
+		this.modifiable = modifiable;
+	}
+
+	public boolean isInitial() {
+		return initialIndex >= 0;
+	}
+
+	public int getInitialIndex() {
+		return initialIndex;
 	}
 
 }

@@ -33,9 +33,9 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair
  */
 class CoverAll implements ICoverStrategy {
 
-	private final TWiseConfigurationUtil util;
+	private final TWiseConfigurationGenerator util;
 
-	public CoverAll(TWiseConfigurationUtil util) {
+	public CoverAll(TWiseConfigurationGenerator util) {
 		this.util = util;
 	}
 
