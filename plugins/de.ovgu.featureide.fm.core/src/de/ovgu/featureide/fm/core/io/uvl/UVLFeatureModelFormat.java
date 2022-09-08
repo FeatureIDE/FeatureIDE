@@ -260,21 +260,22 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (attributeValue instanceof Constraint) {
 			parseConstraint(fm, (Constraint) attributeValue);
 		}
-		// TODO list with constraints?
+
 	}
 
 	private void parseConstraints(MultiFeatureModel fm) {
-		final List<Constraint> allConstraints = rootModel.getConstraints();
 		final List<Constraint> ownConstraints = rootModel.getOwnConstraints();
+		final List<Constraint> allConstraints = new LinkedList<>();
+		for (final Import importLine : rootModel.getImports()) {
+			allConstraints.addAll(importLine.getFeatureModel().getConstraints());
+		}
 
 		for (final Constraint constraint : ownConstraints) {
 			parseOwnConstraint(fm, constraint);
 		}
 
 		for (final Constraint constraint : allConstraints) {
-			if (!ownConstraints.contains(constraint)) {
-				parseConstraint(fm, constraint);
-			}
+			parseConstraint(fm, constraint);
 		}
 
 	}
@@ -320,7 +321,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} else if (constraint instanceof ParenthesisConstraint) {
 			return parseConstraint(((ParenthesisConstraint) constraint).getContent());
 		} else if (constraint instanceof LiteralConstraint) {
-			return new org.prop4j.Literal(((LiteralConstraint) constraint).getLiteral());
+			return new org.prop4j.Literal(((LiteralConstraint) constraint).toString(false, "").replace("\"", ""));
 		} else {
 			return null;
 		}
@@ -469,6 +470,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private List<Constraint> featureIDEConstraintsToUVLConstraints(IFeatureModel fm) {
 		final List<Constraint> result = new LinkedList<>();
 		for (final IConstraint constraint : fm.getConstraints()) {
+			if ((constraint instanceof MultiConstraint) && (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERFACE)) {
+				continue;
+			}
+
 			result.add(featureIDEConstraintToUVLConstraint(constraint.getNode()));
 		}
 		return result;
