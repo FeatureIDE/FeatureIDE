@@ -258,9 +258,9 @@ public class ConfigurationGeneratorTest {
 
 	private static void testTWiseLimitedSize(String modelName, String algorithm, int t, int limit) {
 		final Path modelFile = modelDirectory.resolve(modelName + ".xml");
-		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-l", Integer.toString(limit)));
+		final SampleTester tester = sample(modelFile, algorithm, Arrays.asList("-t", Integer.toString(t), "-l", Integer.toString(limit)));
 		assertFalse("Invalid solutions for " + modelName, tester.hasInvalidSolutions());
-		assertTrue("Number of configurations larger than limit for " + modelName, limit >= tester.getSize());
+		assertTrue("Number of configurations (" + tester.getSize() + ") larger than limit (" + limit + ") for " + modelName, limit >= tester.getSize());
 	}
 
 	private static void testInitialTWise(String modelName, int t, int initialSize) {

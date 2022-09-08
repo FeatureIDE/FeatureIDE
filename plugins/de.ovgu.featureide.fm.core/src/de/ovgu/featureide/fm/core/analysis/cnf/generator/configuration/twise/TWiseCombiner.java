@@ -104,7 +104,7 @@ public class TWiseCombiner {
 							final int undoLiteral = literals[i];
 							final int var2 = Math.abs(undoLiteral);
 							final int y = features[var2];
-							final int y2 = y - ((undoLiteral >>> 31) == 0 ? 1 : -1);
+							final int y2 = y - (undoLiteral >= 0 ? 1 : -1);
 							features[var2] = y2;
 							if (y2 == 0) {
 								lits.pop();
@@ -112,7 +112,7 @@ public class TWiseCombiner {
 						}
 						continue clauseLoop;
 					} else {
-						features[var] = x + ((literal >>> 31) == 0 ? 1 : -1);
+						features[var] = x + (literal >= 0 ? 1 : -1);
 						if (x == 0) {
 							lits.push(literal);
 						}
@@ -125,7 +125,7 @@ public class TWiseCombiner {
 					final int literal = literals[i];
 					final int var = Math.abs(literal);
 					final int y = features[var];
-					final int y2 = y - ((literal >>> 31) == 0 ? 1 : -1);
+					final int y2 = y - (literal >= 0 ? 1 : -1);
 					features[var] = y2;
 					if (y2 == 0) {
 						lits.pop();
@@ -197,7 +197,7 @@ public class TWiseCombiner {
 							final int undoLiteral = literals[i];
 							final int var2 = Math.abs(undoLiteral);
 							final int y = features[var2];
-							final int y2 = y - ((undoLiteral >>> 31) == 0 ? 1 : -1);
+							final int y2 = y - (undoLiteral >= 0 ? 1 : -1);
 							features[var2] = y2;
 							if (y2 == 0) {
 								lits.pop();
@@ -205,7 +205,7 @@ public class TWiseCombiner {
 						}
 						continue clauseLoop;
 					} else {
-						features[var] = x + ((literal >>> 31) == 0 ? 1 : -1);
+						features[var] = x + (literal >= 0 ? 1 : -1);
 						if (x == 0) {
 							lits.push(literal);
 						}
@@ -217,7 +217,7 @@ public class TWiseCombiner {
 				for (int i = 0; i < literals.length; i++) {
 					final int literal = literals[i];
 					final int var = Math.abs(literal);
-					final int y2 = features[var] - ((literal >>> 31) == 0 ? 1 : -1);
+					final int y2 = features[var] - (literal >= 0 ? 1 : -1);
 					features[var] = y2;
 					if (y2 == 0) {
 						lits.pop();
@@ -247,7 +247,7 @@ public class TWiseCombiner {
 							final int undoLiteral = literals[i];
 							final int var2 = Math.abs(undoLiteral);
 							final int y = features[var2];
-							final int y2 = y - ((undoLiteral >>> 31) == 0 ? 1 : -1);
+							final int y2 = y - (undoLiteral >= 0 ? 1 : -1);
 							features[var2] = y2;
 							if (y2 == 0) {
 								lits.pop();
@@ -255,7 +255,7 @@ public class TWiseCombiner {
 						}
 						continue clauseLoop;
 					} else {
-						features[var] = x + ((literal >>> 31) == 0 ? 1 : -1);
+						features[var] = x + (literal >= 0 ? 1 : -1);
 						if (x == 0) {
 							lits.push(literal);
 						}
@@ -267,7 +267,7 @@ public class TWiseCombiner {
 				for (int i = 0; i < literals.length; i++) {
 					final int literal = literals[i];
 					final int var = Math.abs(literal);
-					final int y2 = features[var] - ((literal >>> 31) == 0 ? 1 : -1);
+					final int y2 = features[var] - (literal >= 0 ? 1 : -1);
 					features[var] = y2;
 					if (y2 == 0) {
 						lits.pop();

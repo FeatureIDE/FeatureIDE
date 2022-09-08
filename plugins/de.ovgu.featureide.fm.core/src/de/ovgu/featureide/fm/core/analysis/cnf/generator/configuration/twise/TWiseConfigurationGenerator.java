@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
@@ -36,6 +37,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.ICo
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.ICombinationSupplier;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.MergeIterator3;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise.iterator.SingleIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
@@ -66,11 +68,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				sb.append(count);
 
 				sb.append(") -- Configurations: ");
-				sb.append(util.getIncompleteSolutionList().size() + util.getCompleteSolutionList().size());
+				sb.append(getIncompleteSolutionList().size() + getCompleteSolutionList().size());
 				sb.append(" (");
-				sb.append(util.getIncompleteSolutionList().size());
+				sb.append(getIncompleteSolutionList().size());
 				sb.append(" | ");
-				sb.append(util.getCompleteSolutionList().size());
+				sb.append(getCompleteSolutionList().size());
 
 				sb.append(") -- Covered: ");
 				sb.append(coverProgress);
@@ -131,7 +133,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	protected TWiseCombiner combiner;
 
 	protected final int t;
-	protected final List<List<ClauseList>> nodes;
+	protected List<List<ClauseList>> nodes;
 	protected PresenceConditionManager presenceConditionManager;
 
 	protected long numberOfCombinations, count, coveredCount, invalidCount;
@@ -140,12 +142,17 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	private List<TWiseConfiguration> curResult = null;
 	private ArrayList<TWiseConfiguration> bestResult = null;
 
-	private List<LiteralSet> initialSample = null;
+	private List<LiteralSet> initialSample = Collections.emptyList();
 	private boolean allowInitialSolutionModify = false;
 	private boolean allowInitialSolutionRemove = false;
 	private boolean countInitialSolutionForLimit = false;
 
 	protected MonitorThread samplingMonitor;
+
+	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
+
+	private final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
+	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
 
 	public TWiseConfigurationGenerator(CNF cnf, int t) {
 		this(cnf, convertLiterals(cnf.getVariables().getLiterals()), t, Integer.MAX_VALUE);
@@ -174,33 +181,29 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	}
 
 	private void init() {
-		final CNF cnf = solver.getSatInstance();
-		if (cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, null);
-		} else {
-			util = new TWiseConfigurationUtil(cnf, solver);
+		if (util == null) {
+			util = new TWiseConfigurationUtil(solver);
+			util.setSolutionList(incompleteSolutionList);
+			util.setRandom(getRandom());
+			util.computeRandomSample();
+			// TODO Variation Point: Building Combinations
+			combiner = new TWiseCombiner(util.getCnf().getVariables().size());
 		}
-		util.setMaxSampleSize(maxSampleSize);
-		util.setAllowInitialSolutionModify(allowInitialSolutionModify);
-		util.setCountInitialSolutionForLimit(countInitialSolutionForLimit);
-
-		util.setRandom(getRandom());
-		util.computeRandomSample();
-		if (!util.getCnf().getClauses().isEmpty()) {
-			util.computeMIG();
+		if (presenceConditionManager == null) {
+			// TODO Variation Point: Sorting Nodes
+			presenceConditionManager = new PresenceConditionManager(util, nodes);
 		}
-
-		// TODO Variation Point: Sorting Nodes
-		presenceConditionManager = new PresenceConditionManager(util, nodes);
-		// TODO Variation Point: Building Combinations
-		combiner = new TWiseCombiner(cnf.getVariables().size());
 
 		solver.useSolutionList(0);
 		solver.setSelectionStrategy(SelectionStrategy.ORG);
 
-		if (initialSample != null) {
-			initialSample.forEach(c -> util.newConfiguration(c, true));
-		}
+		curResult = null;
+		bestResult = null;
+
+		incompleteSolutionList.clear();
+		completeSolutionList.clear();
+
+		initialSample.forEach(c -> newInitialConfiguration(c));
 	}
 
 	@Override
@@ -247,8 +250,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			final double reference = mean;
 
 			int index = 0;
-			index = removeSolutions(normConfigValues, reference, index, util.getIncompleteSolutionList());
-			index = removeSolutions(normConfigValues, reference, index, util.getCompleteSolutionList());
+			index = removeSolutions(normConfigValues, reference, index, getIncompleteSolutionList());
+			index = removeSolutions(normConfigValues, reference, index, getCompleteSolutionList());
 		}
 	}
 
@@ -267,7 +270,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 	private void buildCombinations() {
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
-				new CoverAll(util) //
+				new CoverAll(this) //
 		);
 
 		// TODO Variation Point: Combination order
@@ -283,7 +286,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		if (numberOfCombinations == 0) {
 			final LiteralSet[] solverSolutions = util.getSolverSolutions();
 			if ((solverSolutions.length > 0) && (solverSolutions[0] != null)) {
-				util.newConfiguration(solverSolutions[0]);
+				newConfiguration(solverSolutions[0]);
 			}
 		} else {
 			coveredCount = 0;
@@ -355,15 +358,11 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 			}
 		}
 
-		curResult = util.getResultList();
+		curResult = getResultList();
 		if ((bestResult == null) || (bestResult.size() > curResult.size())) {
 			bestResult = new ArrayList<>(curResult.size());
 			curResult.stream().map(TWiseConfiguration::clone).forEach(bestResult::add);
 		}
-	}
-
-	public TWiseConfigurationUtil getUtil() {
-		return util;
 	}
 
 	public int getIterations() {
@@ -396,6 +395,157 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 	public void setCountInitialSolutionForLimit(boolean countInitialSolutionForLimit) {
 		this.countInitialSolutionForLimit = countInitialSolutionForLimit;
+	}
+
+	public boolean isCombinationValid(LiteralSet literals) {
+		return util.isCombinationValid(literals);
+	}
+
+	public List<List<ClauseList>> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(List<List<ClauseList>> nodes) {
+		this.nodes = nodes;
+		presenceConditionManager = null;
+	}
+	public boolean removeInvalidClauses(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		int validCount = nextCondition.size();
+		for (final LiteralSet literals : nextCondition) {
+			if (!util.isCombinationValid(literals)) {
+				validCount--;
+				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
+					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
+					if (pair.getKey().equals(literals)) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+		return validCount == 0;
+	}
+
+	public static boolean isCovered(ClauseList condition, Iterable<? extends LiteralSet> solutionList) {
+		for (final LiteralSet configuration : solutionList) {
+			for (final LiteralSet literals : condition) {
+				if (configuration.containsAll(literals)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean isCovered(ClauseList condition) {
+		return isCovered(condition, completeSolutionList) || isCovered(condition, incompleteSolutionList);
+	}
+
+	public boolean select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
+		solution.selectLiterals(deduce, literals.getLiterals());
+
+		if (solution.isComplete()) {
+			solution.clear();
+			for (final Iterator<TWiseConfiguration> it = incompleteSolutionList.iterator(); it.hasNext();) {
+				if (it.next() == solution) {
+					it.remove();
+					completeSolutionList.add(solution);
+					break;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isCandidate(final LiteralSet literals, TWiseConfiguration solution) {
+		return !solution.hasConflicts(literals);
+	}
+
+	public void addCandidates(final LiteralSet literals, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		for (final TWiseConfiguration configuration : incompleteSolutionList) {
+			if ((allowInitialSolutionModify || !configuration.isInitial()) && isCandidate(literals, configuration)) {
+				candidatesList.add(new Pair<>(literals, configuration));
+			}
+		}
+	}
+
+	public void initCandidatesList(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		candidatesList.clear();
+		for (final LiteralSet literals : nextCondition) {
+			addCandidates(literals, candidatesList);
+		}
+		Collections.sort(candidatesList, candidateLengthComparator);
+	}
+
+	protected boolean cover(boolean useSolver, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
+		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
+			if (useSolver) {
+				if (util.isSelectionPossibleSAT(pair.getKey(), pair.getValue())) {
+					select(pair.getValue(), Deduce.TraverseStrong, pair.getKey());
+					return true;
+				}
+			} else {
+				if (util.isSelectionPossibleHistory(pair.getKey(), pair.getValue())) {
+					select(pair.getValue(), Deduce.TraverseStrong, pair.getKey());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void newInitialConfiguration(final LiteralSet literals) {
+		final int initialIndex = completeSolutionList.size() + incompleteSolutionList.size();
+		TWiseConfiguration configuration = null;
+		if (allowInitialSolutionModify) {
+			configuration = new TWiseConfiguration(util, initialIndex);
+			configuration.setCoreLiterals();
+			configuration.selectLiterals(Deduce.DecisionPropagation, literals.getLiterals());
+			configuration.updateSolverSolutions();
+		} else {
+			configuration = new TWiseConfiguration(util, initialIndex);
+			configuration.selectLiterals(Deduce.None, literals.getLiterals());
+			configuration.setModifiable(false);
+		}
+		addToConfigurationToList(configuration);
+	}
+
+	public void newConfiguration(final LiteralSet literals) {
+		TWiseConfiguration configuration = null;
+		final int size = (completeSolutionList.size() + incompleteSolutionList.size()) - (countInitialSolutionForLimit ? 0 : initialSample.size());
+		if (size < maxSampleSize) {
+			configuration = new TWiseConfiguration(util);
+			configuration.setCoreLiterals();
+			configuration.selectLiterals(Deduce.DecisionPropagation, literals.getLiterals());
+			configuration.updateSolverSolutions();
+			addToConfigurationToList(configuration);
+		}
+	}
+
+	private void addToConfigurationToList(TWiseConfiguration configuration) {
+		if (configuration.isComplete()) {
+			configuration.clear();
+			completeSolutionList.add(configuration);
+		} else {
+			incompleteSolutionList.add(configuration);
+			Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
+		}
+	}
+
+	public List<TWiseConfiguration> getIncompleteSolutionList() {
+		return incompleteSolutionList;
+	}
+
+	public List<TWiseConfiguration> getCompleteSolutionList() {
+		return completeSolutionList;
+	}
+
+	public List<TWiseConfiguration> getResultList() {
+		final ArrayList<TWiseConfiguration> resultList = new ArrayList<>(completeSolutionList.size() + incompleteSolutionList.size());
+		resultList.addAll(incompleteSolutionList);
+		resultList.addAll(completeSolutionList);
+		return resultList;
 	}
 
 }

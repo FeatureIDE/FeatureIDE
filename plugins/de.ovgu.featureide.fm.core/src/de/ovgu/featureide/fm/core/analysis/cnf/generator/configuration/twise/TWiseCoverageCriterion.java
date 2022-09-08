@@ -42,16 +42,9 @@ public class TWiseCoverageCriterion implements CoverageCriterion {
 	private int t;
 
 	public TWiseCoverageCriterion(CNF cnf, int t) {
-		if (!cnf.getClauses().isEmpty()) {
-			util = new TWiseConfigurationUtil(cnf, new AdvancedSatSolver(cnf));
-		} else {
-			util = new TWiseConfigurationUtil(cnf, null);
-		}
-
+		util = new TWiseConfigurationUtil(new AdvancedSatSolver(cnf));
 		util.computeRandomSample();
-		if (!cnf.getClauses().isEmpty()) {
-			util.computeMIG();
-		}
+
 		presenceConditionManager = new PresenceConditionManager(util, TWiseConfigurationGenerator.convertLiterals(cnf.getVariables().getLiterals()));
 		this.t = t;
 	}
@@ -122,7 +115,7 @@ public class TWiseCoverageCriterion implements CoverageCriterion {
 
 				combinedCondition.clear();
 				combiner.combineConditions(clauseListArray, combinedCondition);
-				if (!TWiseConfigurationUtil.isCovered(combinedCondition, sample) && util.isCombinationValid(combinedCondition)) {
+				if (!TWiseConfigurationGenerator.isCovered(combinedCondition, sample) && util.isCombinationValid(combinedCondition)) {
 					uncoveredConditions.add(combinedCondition);
 					combinedCondition = new ClauseList();
 					if (cancelAfterFirst) {

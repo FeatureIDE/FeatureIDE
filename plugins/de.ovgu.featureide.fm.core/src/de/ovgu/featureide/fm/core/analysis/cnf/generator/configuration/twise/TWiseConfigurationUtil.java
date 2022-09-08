@@ -20,13 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.twise;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,11 +33,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet.Order;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.ITWiseConfigurationGenerator.Deduce;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.UniformRandomConfigurationGenerator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.util.Pair;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.analysis.mig.CollectingStrongVisitor;
 import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
@@ -59,34 +54,51 @@ public class TWiseConfigurationUtil {
 
 	public static final int GLOBAL_SOLUTION_LIMIT = 100_000;
 
-	final static Comparator<Pair<LiteralSet, TWiseConfiguration>> candidateLengthComparator = new CandidateLengthComparator();
+	private final CNF cnf;
+	private final ISatSolver solver;
+	private ModalImplicationGraph mig;
+	private int[] core;
+	private LiteralSet[] strongHull;
 
-	protected final LiteralSet[] solverSolutions = new LiteralSet[GLOBAL_SOLUTION_LIMIT];
-	protected final HashSet<LiteralSet> solutionSet = new HashSet<>();
-	protected Random random = new Random(42);
+	private Random random = new Random(42);
 
-	protected List<LiteralSet> randomSample;
+	private final LiteralSet[] solverSolutions = new LiteralSet[GLOBAL_SOLUTION_LIMIT];
+	private final HashSet<LiteralSet> solutionSet = new HashSet<>();
 
-	private final List<TWiseConfiguration> incompleteSolutionList = new LinkedList<>();
-	private final List<TWiseConfiguration> completeSolutionList = new ArrayList<>();
+	private int solverSolutionEndIndex = -1;
 
-	private boolean allowInitialSolutionModify = false;
-	private boolean countInitialSolutionForLimit = false;
-	private int initialSolutionCount = 0;
+	private List<TWiseConfiguration> solutionList = Collections.emptyList();
 
-	protected final CNF cnf;
-	protected final ISatSolver localSolver;
+	public TWiseConfigurationUtil(ISatSolver solver) {
+		this.solver = solver;
+		cnf = solver.getSatInstance();
+		if (!cnf.getClauses().isEmpty()) {
+			computeMIG();
+		}
+	}
 
-	protected ModalImplicationGraph mig;
-	protected LiteralSet[] strongHull;
+	public void addSolverSolution(int[] literals) {
+		final LiteralSet solution = new LiteralSet(literals, Order.INDEX, false);
+		if (solutionSet.add(solution)) {
+			solverSolutionEndIndex = (solverSolutionEndIndex + 1) % GLOBAL_SOLUTION_LIMIT;
+			final LiteralSet oldSolution = solverSolutions[solverSolutionEndIndex];
+			if (oldSolution != null) {
+				solutionSet.remove(oldSolution);
+			}
+			solverSolutions[solverSolutionEndIndex] = solution;
 
-	protected int maxSampleSize = Integer.MAX_VALUE;
+			for (final TWiseConfiguration configuration : solutionList) {
+				configuration.updateSolverSolutions(literals, solverSolutionEndIndex);
+			}
+		}
+	}
 
-	public TWiseConfigurationUtil(CNF cnf, ISatSolver localSolver) {
-		this.cnf = cnf;
-		this.localSolver = localSolver;
+	public LiteralSet getSolverSolution(int index) {
+		return solverSolutions[index];
+	}
 
-		randomSample = Collections.emptyList();
+	public LiteralSet[] getSolverSolutions() {
+		return solverSolutions;
 	}
 
 	public void computeRandomSample() {
@@ -94,20 +106,19 @@ public class TWiseConfigurationUtil {
 		randomGenerator.setAllowDuplicates(false);
 		randomGenerator.setSampleSize(1000);
 		randomGenerator.setRandom(random);
-		randomSample = LongRunningWrapper.runMethod(randomGenerator);
-
-		for (final LiteralSet solution : randomSample) {
-			addSolverSolution(solution.getLiterals());
-		}
+		LongRunningWrapper.runMethod(randomGenerator).forEach(s -> addSolverSolution(s.getLiterals()));
 	}
 
 	public void computeMIG() {
 		if (ITWiseConfigurationGenerator.VERBOSE) {
 			System.out.print("Init graph... ");
 		}
-		mig = LongRunningWrapper.runMethod(new MIGBuilder(localSolver.getSatInstance(), false));
-		strongHull = new LiteralSet[mig.getAdjList().size()];
+		mig = LongRunningWrapper.runMethod(new MIGBuilder(solver.getSatInstance(), false));
 
+		core = mig.getAdjList().stream().filter(Vertex::isCore).mapToInt(Vertex::getVar).toArray();
+		solver.assignmentPushAll(core);
+
+		strongHull = new LiteralSet[mig.getAdjList().size()];
 		for (final Vertex vertex : mig.getAdjList()) {
 			final int literalSet = vertex.getVar();
 			final Traverser traverser = new Traverser(mig);
@@ -123,22 +134,12 @@ public class TWiseConfigurationUtil {
 		}
 	}
 
-	public LiteralSet getDeadCoreFeatures() {
-		if (localSolver == null) {
-			return new LiteralSet();
-		}
-		final int[] coreDead = new int[localSolver.getSatInstance().getVariables().size()];
-		int index = 0;
-		for (final Vertex vertex : mig.getAdjList()) {
-			if (vertex.isCore()) {
-				coreDead[index++] = vertex.getVar();
-			}
-		}
-		final LiteralSet coreDeadFeature = new LiteralSet(Arrays.copyOf(coreDead, index));
-		if (!coreDeadFeature.isEmpty()) {
-			localSolver.assignmentPushAll(coreDeadFeature.getLiterals());
-		}
-		return coreDeadFeature;
+	public int[] getDeadCoreFeatures() {
+		return core;
+	}
+
+	public boolean hasNoConstraints() {
+		return cnf.getClauses().isEmpty();
 	}
 
 	public CNF getCnf() {
@@ -146,309 +147,161 @@ public class TWiseConfigurationUtil {
 	}
 
 	public ISatSolver getSolver() {
-		return localSolver;
+		return solver;
+	}
+
+	int[] sat(final int curLiteral) {
+		solver.assignmentPush(curLiteral);
+		final SatResult hasSolution = solver.hasSolution();
+		switch (hasSolution) {
+		case FALSE:
+			solver.assignmentReplaceLast(-curLiteral);
+			return null;
+		case TIMEOUT:
+			solver.assignmentPop();
+			throw new RuntimeTimeoutException();
+		case TRUE:
+			solver.assignmentPop();
+			final int[] solution = solver.getSolution();
+			addSolverSolution(solution);
+			solver.shuffleOrder(random);
+			return solution;
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 	public ModalImplicationGraph getMig() {
 		return mig;
 	}
 
-	public boolean hasSolver() {
-		return localSolver != null;
-	}
-
-	public Random getRandom() {
-		return random;
-	}
-
-	protected int solverSolutionEndIndex = -1;
-
-	public void addSolverSolution(int[] literals) {
-		final LiteralSet solution = new LiteralSet(literals, Order.INDEX, false);
-		if (solutionSet.add(solution)) {
-			solverSolutionEndIndex = (solverSolutionEndIndex + 1) % GLOBAL_SOLUTION_LIMIT;
-			final LiteralSet oldSolution = solverSolutions[solverSolutionEndIndex];
-			if (oldSolution != null) {
-				solutionSet.remove(oldSolution);
-			}
-			solverSolutions[solverSolutionEndIndex] = solution;
-
-			for (final TWiseConfiguration configuration : incompleteSolutionList) {
-				configuration.updateSolverSolutions(literals, solverSolutionEndIndex);
-			}
-		}
-	}
-
-	public LiteralSet getSolverSolution(int index) {
-		return solverSolutions[index];
-	}
-
-	public LiteralSet[] getSolverSolutions() {
-		return solverSolutions;
-	}
-
 	public boolean isCombinationValid(LiteralSet literals) {
-		return !isCombinationInvalidMIG(literals) && isCombinationValidSAT(literals);
+		if (hasNoConstraints()) {
+			return true;
+		}
+		if (isCombinationInvalidMIG(literals)) {
+			return false;
+		} else if (isCombinationValidHistory(literals)) {
+			return true;
+		} else {
+			return isCombinationValidSAT(literals);
+		}
 	}
 
 	public boolean isCombinationValid(ClauseList clauses) {
-		if (hasSolver()) {
-			for (final LiteralSet literalSet : clauses) {
-				if (isCombinationInvalidMIG(literalSet)) {
-					return false;
-				}
-			}
-			for (final LiteralSet literalSet : clauses) {
-				if (isCombinationValidSAT(literalSet)) {
-					return true;
-				}
-			}
-			return false;
+		if (hasNoConstraints()) {
+			return !clauses.isEmpty();
 		}
-		return !clauses.isEmpty();
-	}
-
-	public boolean isCombinationInvalidMIG(LiteralSet literals) {
-		if (hasSolver()) {
-			for (final int literal : literals.getLiterals()) {
-				if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literals)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public boolean isCombinationValidSAT(LiteralSet literals) {
-		if (hasSolver()) {
-			for (final LiteralSet s : randomSample) {
-				if (!s.hasConflicts(literals)) {
-					return true;
-				}
-			}
-
-			final ISatSolver solver = getSolver();
-			final int orgAssingmentLength = solver.getAssignmentSize();
-			solver.assignmentPushAll(literals.getLiterals());
-			try {
-				final SatResult hasSolution = solver.hasSolution();
-				switch (hasSolution) {
-				case TRUE:
-					addSolverSolution(solver.getSolution());
-					break;
-				case FALSE:
-				case TIMEOUT:
-					return false;
-				default:
-					break;
-				}
-			} finally {
-				solver.assignmentClear(orgAssingmentLength);
-			}
-		}
-		return true;
-	}
-
-	public boolean removeInvalidClauses(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		int validCount = nextCondition.size();
-		for (final LiteralSet literals : nextCondition) {
-			if (!isCombinationValid(literals)) {
-				validCount--;
-				for (final Iterator<Pair<LiteralSet, TWiseConfiguration>> iterator = candidatesList.iterator(); iterator.hasNext();) {
-					final Pair<LiteralSet, TWiseConfiguration> pair = iterator.next();
-					if (pair.getKey().equals(literals)) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-		return validCount == 0;
-	}
-
-	public boolean isSelectionPossible(final LiteralSet literals, final TWiseConfiguration configuration, boolean useSolver) {
-		if (hasSolver()) {
-			if (useSolver) {
-				final ISatSolver localSolver = getSolver();
-				final int orgAssignmentSize = configuration.setUpSolver(localSolver);
-				try {
-					final int[] configurationLiterals = configuration.getLiterals();
-					for (final int literal : literals.getLiterals()) {
-						if (configurationLiterals[Math.abs(literal) - 1] == 0) {
-							localSolver.assignmentPush(literal);
-						}
-					}
-					if (orgAssignmentSize < localSolver.getAssignmentSize()) {
-						if (localSolver.hasSolution() != SatResult.TRUE) {
-							return false;
-						}
-					}
-				} finally {
-					localSolver.assignmentClear(orgAssignmentSize);
-				}
-			} else {
-				final VecInt solverSolutionIndex = configuration.getSolverSolutionIndex();
-				for (int i = 0; i < solverSolutionIndex.size(); i++) {
-					if (!getSolverSolution(solverSolutionIndex.get(i)).hasConflicts(literals)) {
-						return true;
-					}
-				}
+		for (final LiteralSet literalSet : clauses) {
+			if (isCombinationInvalidMIG(literalSet)) {
 				return false;
 			}
 		}
-		return true;
-	}
-
-	public static boolean isCovered(ClauseList condition, Iterable<? extends LiteralSet> solutionList) {
-		for (final LiteralSet configuration : solutionList) {
-			for (final LiteralSet literals : condition) {
-				if (configuration.containsAll(literals)) {
-					return true;
-				}
+		for (final LiteralSet literalSet : clauses) {
+			if (isCombinationValidHistory(literalSet)) {
+				return true;
 			}
 		}
-		return false;
-	}
-
-	public boolean isCovered(ClauseList condition) {
-		return isCovered(condition, completeSolutionList) || isCovered(condition, incompleteSolutionList);
-	}
-
-	public boolean select(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
-		selectLiterals(solution, deduce, literals);
-
-		if (solution.isComplete()) {
-			solution.clear();
-			for (final Iterator<TWiseConfiguration> it = incompleteSolutionList.iterator(); it.hasNext();) {
-				if (it.next() == solution) {
-					it.remove();
-					completeSolutionList.add(solution);
-					break;
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private void selectLiterals(TWiseConfiguration solution, Deduce deduce, LiteralSet literals) {
-		solution.setLiteral(literals.getLiterals());
-		if (hasSolver()) {
-			switch (deduce) {
-			case AC:
-				solution.autoComplete();
-				break;
-			case DP:
-				solution.propagate();
-				break;
-			case NONE:
-				break;
-			}
-		}
-	}
-
-	public boolean isCandidate(final LiteralSet literals, TWiseConfiguration solution) {
-		return !solution.hasConflicts(literals);
-	}
-
-	public void addCandidates(final LiteralSet literals, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		for (final TWiseConfiguration configuration : incompleteSolutionList) {
-			if ((allowInitialSolutionModify || !configuration.isInitial()) && isCandidate(literals, configuration)) {
-				candidatesList.add(new Pair<>(literals, configuration));
-			}
-		}
-	}
-
-	public void initCandidatesList(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		candidatesList.clear();
-		for (final LiteralSet literals : nextCondition) {
-			addCandidates(literals, candidatesList);
-		}
-		Collections.sort(candidatesList, candidateLengthComparator);
-	}
-
-	protected boolean cover(boolean useSolver, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
-		for (final Pair<LiteralSet, TWiseConfiguration> pair : candidatesList) {
-			if (isSelectionPossible(pair.getKey(), pair.getValue(), useSolver)) {
-				select(pair.getValue(), Deduce.NONE, pair.getKey());
+		for (final LiteralSet literalSet : clauses) {
+			if (isCombinationValidSAT(literalSet)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public void newConfiguration(final LiteralSet literals, boolean initial) {
-		TWiseConfiguration configuration = null;
-		if (initial) {
-			if (allowInitialSolutionModify) {
-				configuration = new TWiseConfiguration(this, initialSolutionCount++);
-				selectLiterals(configuration, Deduce.DP, literals);
-			} else {
-				configuration = new TWiseConfiguration(this, initialSolutionCount++, literals.getLiterals());
-			}
-		} else {
-			final int size = (completeSolutionList.size() + incompleteSolutionList.size()) - (countInitialSolutionForLimit ? 0 : initialSolutionCount);
-			if (size < maxSampleSize) {
-				configuration = new TWiseConfiguration(this, -1);
-				selectLiterals(configuration, Deduce.DP, literals);
+	public boolean isCombinationInvalidMIG(LiteralSet literals) {
+		if (hasNoConstraints()) {
+			return false;
+		}
+		for (final int literal : literals.getLiterals()) {
+			if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literals)) {
+				return true;
 			}
 		}
-		if (configuration != null) {
-			if (configuration.isComplete()) {
-				configuration.clear();
-				completeSolutionList.add(configuration);
-			} else {
-				incompleteSolutionList.add(configuration);
-				Collections.sort(incompleteSolutionList, (a, b) -> a.countLiterals() - b.countLiterals());
+		return false;
+	}
+
+	public boolean isCombinationValidHistory(LiteralSet literals) {
+		for (final LiteralSet s : solverSolutions) {
+			if (s == null) {
+				break;
 			}
+			if (!s.hasConflicts(literals)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isCombinationValidSAT(LiteralSet literals) {
+		if (hasNoConstraints()) {
+			return true;
+		}
+		final int orgAssingmentLength = solver.getAssignmentSize();
+		solver.assignmentPushAll(literals.getLiterals());
+		try {
+			final SatResult hasSolution = solver.hasSolution();
+			switch (hasSolution) {
+			case TRUE:
+				addSolverSolution(solver.getSolution());
+				return true;
+			case FALSE:
+			case TIMEOUT:
+			default:
+				return false;
+			}
+		} finally {
+			solver.assignmentClear(orgAssingmentLength);
 		}
 	}
 
-	public void newConfiguration(final LiteralSet literals) {
-		newConfiguration(literals, false);
+	public boolean isSelectionPossibleHistory(final LiteralSet literals, final TWiseConfiguration configuration) {
+		if (hasNoConstraints()) {
+			return true;
+		}
+		final VecInt solverSolutionIndex = configuration.getSolverSolutionIndex();
+		for (int i = 0; i < solverSolutionIndex.size(); i++) {
+			if (!getSolverSolution(solverSolutionIndex.get(i)).hasConflicts(literals)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public List<TWiseConfiguration> getIncompleteSolutionList() {
-		return incompleteSolutionList;
+	public boolean isSelectionPossibleSAT(final LiteralSet literals, final TWiseConfiguration configuration) {
+		if (hasNoConstraints()) {
+			return true;
+		}
+		final int orgAssignmentSize = configuration.setUpSolver(solver);
+		try {
+			final int[] configurationLiterals = configuration.getLiterals();
+			for (final int literal : literals.getLiterals()) {
+				if (configurationLiterals[Math.abs(literal) - 1] == 0) {
+					solver.assignmentPush(literal);
+				}
+			}
+			if (orgAssignmentSize < solver.getAssignmentSize()) {
+				if (solver.hasSolution() != SatResult.TRUE) {
+					return false;
+				}
+			}
+		} finally {
+			solver.assignmentClear(orgAssignmentSize);
+		}
+		return true;
 	}
 
-	public List<TWiseConfiguration> getCompleteSolutionList() {
-		return completeSolutionList;
+	public List<TWiseConfiguration> getSolutionList() {
+		return solutionList;
 	}
 
-	public List<TWiseConfiguration> getResultList() {
-		final ArrayList<TWiseConfiguration> resultList = new ArrayList<>(completeSolutionList.size() + incompleteSolutionList.size());
-		resultList.addAll(incompleteSolutionList);
-		resultList.addAll(completeSolutionList);
-		return resultList;
-	}
-
-	public int getMaxSampleSize() {
-		return maxSampleSize;
-	}
-
-	public void setMaxSampleSize(int maxSampleSize) {
-		this.maxSampleSize = maxSampleSize;
+	public void setSolutionList(List<TWiseConfiguration> solutionList) {
+		this.solutionList = solutionList;
 	}
 
 	public void setRandom(Random random) {
 		this.random = random;
-	}
-
-	public boolean isAllowInitialSolutionModify() {
-		return allowInitialSolutionModify;
-	}
-
-	public void setAllowInitialSolutionModify(boolean allowInitialSolutionModify) {
-		this.allowInitialSolutionModify = allowInitialSolutionModify;
-	}
-
-	public boolean isCountInitialSolutionForLimit() {
-		return countInitialSolutionForLimit;
-	}
-
-	public void setCountInitialSolutionForLimit(boolean countInitialSolutionForLimit) {
-		this.countInitialSolutionForLimit = countInitialSolutionForLimit;
 	}
 
 }

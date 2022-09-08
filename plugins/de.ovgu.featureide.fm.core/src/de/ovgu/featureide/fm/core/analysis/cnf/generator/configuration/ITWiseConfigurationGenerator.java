@@ -30,7 +30,7 @@ public interface ITWiseConfigurationGenerator extends IConfigurationGenerator {
 	public static final boolean VERBOSE = false;
 
 	static enum Deduce {
-		DP, AC, NONE
+		TraverseStrong, DecisionPropagation, AutoCompletion, None
 	};
 
 	static enum Order {
