@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
  * @see DeadFeatureExplanationCreator
  * @see FalseOptionalFeatureExplanationCreator
  * @see RedundantConstraintExplanationCreator
+ * @see MultipleAnomaliesExplanationWriter
  */
 public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
 

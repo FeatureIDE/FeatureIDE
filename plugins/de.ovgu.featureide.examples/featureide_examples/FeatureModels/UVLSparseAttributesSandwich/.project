@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>UVLSparseAttributesSandwich</name>
+	<comment>
+	[description]
+	An example showcasing the usage of feature attributes with a more sparse notation in the Universal Variability Language.
+	[/description]
+	</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>build</key>
+					<value>src</value>
+				</dictionary>
+				<dictionary>
+					<key>composer</key>
+					<value>de.ovgu.featureide.core.FeatureModeling</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>configs</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>src</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+	</natures>
+</projectDescription>

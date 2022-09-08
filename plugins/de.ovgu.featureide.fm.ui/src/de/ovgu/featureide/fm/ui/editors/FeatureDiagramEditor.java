@@ -82,6 +82,7 @@ import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties.FeatureModelStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -138,7 +139,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnAllAnomaliesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnDeadFeaturesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnFalseOptionalFeaturesAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnRedundantConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -203,6 +208,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private ExpandAllAction expandAllAction;
 	private FocusOnExplanationAction focusOnExplanationAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
+	private FocusOnDeadFeaturesAction focusOnDeadFeaturesAction;
+	private FocusOnFalseOptionalFeaturesAction focusOnFalseOptionalFeaturesAction;
+	private FocusOnRedundantConstraintsAction focusOnRedundantConstraintAction;
+	private FocusOnAllAnomaliesAction focusOnAllAnomaliesAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
 	private AndAction andAction;
@@ -297,11 +306,17 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
 		collapseFeaturesAction = addAction(new CollapseSiblingsAction(viewer, graphicalFeatureModel));
 		collapseAllAction = addAction(new CollapseAllAction(graphicalFeatureModel));
-		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
 		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
 		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
 		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
 		showCollapsedConstraintsAction = addAction(new ShowCollapsedConstraintsAction(viewer, graphicalFeatureModel));
+
+		// Focus on Anomalies & Explanations actions
+		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
+		focusOnDeadFeaturesAction = addAction(new FocusOnDeadFeaturesAction(viewer));
+		focusOnFalseOptionalFeaturesAction = addAction(new FocusOnFalseOptionalFeaturesAction(viewer));
+		focusOnRedundantConstraintAction = addAction(new FocusOnRedundantConstraintsAction(viewer));
+		focusOnAllAnomaliesAction = addAction(new FocusOnAllAnomaliesAction(viewer));
 
 		// Feature property actions
 		mandatoryAction = addAction(new MandatoryAction(viewer, featureModelManager));
@@ -462,12 +477,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * Sets the active explanation depending on the current selection.
 	 */
 	protected void setActiveExplanation() {
-		// skip when automated analyses are deactivated
-		if (!FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject())
-			|| !FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject())) {
-			return;
-		}
-
 		ModelElementEditPart primary = null;
 		for (final Object selected : viewer.getSelectedEditParts()) {
 			if (!(selected instanceof ModelElementEditPart)) {
@@ -483,8 +492,16 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			setActiveExplanation(null);
 			return;
 		}
-		final FeatureModelAnalyzer analyser = getFeatureModel().getVariableFormula().getAnalyzer();
-		setActiveExplanation(analyser.isValid(null) ? analyser.getExplanation(primary.getModel().getObject()) : analyser.getVoidFeatureModelExplanation());
+		// Retrieve a void feature model explanation, if it exists (either automatic calculations are enabled, or they are disabled, and the result previously
+		// calculated).
+		final boolean autoCalculateFeatures =
+			FeatureModelProperty.isRunCalculationAutomatically(fmManager.getVarObject()) && FeatureModelProperty.isCalculateFeatures(fmManager.getVarObject());
+		final FeatureModelAnalyzer analyzer = getFeatureModel().getVariableFormula().getAnalyzer();
+		if ((autoCalculateFeatures && !analyzer.isValid(null)) || analyzer.getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
+			setActiveExplanation(analyzer.getVoidFeatureModelExplanation());
+		} else {
+			setActiveExplanation(analyzer.getExplanation(primary.getModel().getObject()));
+		}
 	}
 
 	/**
@@ -863,6 +880,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// clear registry
 			viewer.deregisterEditParts();
 			graphicalFeatureModel.init();
+
+			// update labels, colors
+			refreshGraphics(graphicalFeatureModel.getFeatureModelManager().getVariableFormula().getAnalyzer().getAnalysesCollection());
 			viewer.setContents(graphicalFeatureModel);
 			if (refresh) {
 				viewer.internRefresh(true);
@@ -1280,6 +1300,29 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	/**
+	 * Creates a MenuManager with the different anomaly types to focus on.
+	 *
+	 * @return new {@link MenuManager}
+	 */
+	private MenuManager createAnomaliesFocusMenuManager() {
+		final MenuManager manager = new MenuManager("Focus on Anomalies");
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener() {
+
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				// All anomalies at once
+				manager.add(focusOnAllAnomaliesAction);
+				// Single anomaly types
+				manager.add(focusOnDeadFeaturesAction);
+				manager.add(focusOnFalseOptionalFeaturesAction);
+				manager.add(focusOnRedundantConstraintAction);
+			}
+		});
+		return manager;
+	}
+
 	private boolean isFeatureMenu(IStructuredSelection selection) {
 		boolean featureMenu = !selection.toList().isEmpty();
 		for (final Object obj : selection.toList()) {
@@ -1378,6 +1421,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(new Separator());
 			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createCalculationsMenuManager(true));
+			menuManager.add(createAnomaliesFocusMenuManager());
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			menuManager.add(showConstraintsAction);

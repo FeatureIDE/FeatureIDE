@@ -1,0 +1,22 @@
+namespace Server
+
+features
+	Server {abstract, extended__}	
+		mandatory
+			FileSystem	
+				or
+					NTFS
+					APFS
+					EXT4
+			OperatingSystem {abstract}	
+				alternative
+					Windows {Memory 4100}
+					macOS {Memory 2800}
+					Debian {Memory 3500}
+
+		optional
+			Logging
+
+constraints
+	Windows => NTFS
+	macOS => APFS

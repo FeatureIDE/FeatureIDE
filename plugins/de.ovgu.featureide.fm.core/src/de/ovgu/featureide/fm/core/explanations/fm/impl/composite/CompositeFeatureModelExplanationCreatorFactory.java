@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.MultipleAnomaliesExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsFeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
@@ -57,5 +58,11 @@ public class CompositeFeatureModelExplanationCreatorFactory extends FeatureModel
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
 		return new CompositeRedundantConstraintExplanationCreator(
 				Arrays.asList(ltms.getRedundantConstraintExplanationCreator(), mus.getRedundantConstraintExplanationCreator()));
+	}
+
+	@Override
+	public MultipleAnomaliesExplanationCreator getMultipleAnomaliesExplanationCreator() {
+		return new CompositeMultipleAnomaliesExplanationCreator(
+				Arrays.asList(ltms.getMultipleAnomaliesExplanationCreator(), mus.getMultipleAnomaliesExplanationCreator()));
 	}
 }

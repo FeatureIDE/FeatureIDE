@@ -77,6 +77,7 @@ import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -99,6 +100,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/** pattern for replacing preprocessor commands like "//#if" */
 	static final Pattern replaceCommandPattern = Pattern.compile("//\\s*\\#(.+?)\\s");
+	static final Pattern annotationPattern = Pattern.compile(".*//\\s*(\\#|\\@).*");
 
 	public AntennaPreprocessor() {
 		super(ANTENNA);
@@ -686,15 +688,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
-	/**
-	 *
-	 */
-	// TODO use regex
 	private boolean isAnnotation(String line) {
-		if (line.matches(".*//\\s*(\\#|\\@).*")) {
-			return true;
-		}
-		return false;
+		return annotationPattern.matcher(line).matches();
 	}
 
 	@Override
@@ -720,7 +715,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				try {
 					changed = updateAnnotations(codeBlock.getChildren(), lines, removedFeatures);
 				} catch (final TimeoutException e) {
-					e.printStackTrace();
+					Logger.logError(e);
 				}
 
 				// if this process changed file: check if the file should be deleted entirely, save & refresh
@@ -767,7 +762,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		final int ANNOTATION_REMOVED = 1;
 		final int ANNOTATION_AND_BLOCK_REMOVED = 2;
 
-		final ArrayList<Integer> annotationDecision = new ArrayList<Integer>();
+		final ArrayList<Integer> annotationDecision = new ArrayList<>();
 
 		for (int i = 0; i < children.size(); i++) {
 
@@ -853,33 +848,33 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				annotationDecision.add(ANNOTATION_REMOVED);
 			} else if ((!new SatSolver(beforeNode, 1000).hasSolution() && (afterNode instanceof False))
 				|| (!new SatSolver(new Not(beforeNode), 1000).hasSolution() && (afterNode instanceof True))) {
-				// afterNode is a contradiction or a tautology, but not because of the removal of a feature
-				if (block instanceof ElifBlock) {
-					if ((Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof False)
-						|| (Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof True)) {
-						lines.set(block.getStartLine(), "//#else");
-						annotationDecision.add(ANNOTATION_KEPT);
-					} else {
-						if (annotationDecision.get(i - 1) == ANNOTATION_KEPT) {
-							lines.set(block.getStartLine(),
-									translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), true));
+					// afterNode is a contradiction or a tautology, but not because of the removal of a feature
+					if (block instanceof ElifBlock) {
+						if ((Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof False)
+							|| (Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false) instanceof True)) {
+							lines.set(block.getStartLine(), "//#else");
 							annotationDecision.add(ANNOTATION_KEPT);
 						} else {
-							// make an if
-							lines.set(block.getStartLine(),
-									translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), false));
-							annotationDecision.add(ANNOTATION_KEPT);
+							if (annotationDecision.get(i - 1) == ANNOTATION_KEPT) {
+								lines.set(block.getStartLine(),
+										translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), true));
+								annotationDecision.add(ANNOTATION_KEPT);
+							} else {
+								// make an if
+								lines.set(block.getStartLine(),
+										translateNodeToAntennaStatement(Node.replaceLiterals(((ElifBlock) block).getElifNode(), features, false), false));
+								annotationDecision.add(ANNOTATION_KEPT);
+							}
 						}
+					} else if (block instanceof IfBlock) {
+						lines.set(block.getStartLine(), translateNodeToAntennaStatement(Node.replaceLiterals(beforeNode, features, false), false));
+						annotationDecision.add(ANNOTATION_KEPT);
+					} else if (block instanceof ElseBlock) {
+						annotationDecision.add(ANNOTATION_KEPT);
 					}
-				} else if (block instanceof IfBlock) {
-					lines.set(block.getStartLine(), translateNodeToAntennaStatement(Node.replaceLiterals(beforeNode, features, false), false));
-					annotationDecision.add(ANNOTATION_KEPT);
-				} else if (block instanceof ElseBlock) {
-					annotationDecision.add(ANNOTATION_KEPT);
+				} else {
+					// If there are any other cases, add them here.
 				}
-			} else {
-				// If there are any other cases, add them here.
-			}
 
 			// recursively do the same for children if they haven't already been deleted
 			if (annotationDecision.get(i) != ANNOTATION_AND_BLOCK_REMOVED) {
@@ -925,19 +920,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @return antenna statement made of a node
 	 */
 	private String translateNodeToAntennaStatement(Node node, boolean elif) {
-		final String line;
-
-		if (elif) {
-			line = "//#elif ";
-		} else {
-			line = "//#if ";
-		}
-		String statement = node.toString();
-
-		statement = statement.replace("&", " && ");
-		statement = statement.replace("|", " || ");
-		statement = statement.replace("-", "!");
-		return line + statement;
+		final StringBuilder line = new StringBuilder();
+		line.append(elif ? "//#elif " : "//#if ");
+		line.append(node.toString() //
+				.replace("&", " && ") //
+				.replace("|", " || ") //
+				.replace("-", "!"));
+		return line.toString();
 	}
 
 	/**
@@ -1037,22 +1026,15 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	private String convertLineForNodeReader(String line) {
-		String trimmedLine = line;
-
-		// remove "//#if ", "//ifdef", ...
-		trimmedLine = replaceCommandPattern.matcher(trimmedLine).replaceAll("");
-
-		trimmedLine = trimmedLine.trim();
-		trimmedLine = trimmedLine.replace("&&", "&");
-		trimmedLine = trimmedLine.replace("||", "|");
-		trimmedLine = trimmedLine.replace("!", "-");
-		trimmedLine = trimmedLine.replace("==", "=");
-
-		trimmedLine = trimmedLine.replace("&", " and ");
-		trimmedLine = trimmedLine.replace("|", " or ");
-		trimmedLine = trimmedLine.replace("-", " not ");
-
-		trimmedLine = trimmedLine.replace("=", " iff ");
-		return trimmedLine;
+		return replaceCommandPattern.matcher(line).replaceAll("") // remove "//#if ", "//ifdef", ...
+				.trim() //
+				.replace("&&", "&") //
+				.replace("||", "|") //
+				.replace("!", "-") //
+				.replace("==", "=") //
+				.replace("&", " and ") //
+				.replace("|", " or ") //
+				.replace("-", " not ") //
+				.replace("=", " iff ");
 	}
 }

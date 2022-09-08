@@ -1,0 +1,30 @@
+namespace Sandwich
+
+features
+	Sandwich {extended__}	
+		mandatory
+			Bread	
+				alternative
+					"Full Grain" {Calories 203, Price 1.99, Organic true}
+					Flatbread {Calories 90, Price 0.79, Organic true}
+					Toast {Calories 250, Price 0.99, Organic false}
+
+		optional
+			Cheese	
+				optional
+					Gouda	
+						alternative
+							Sprinkled {Fat {value 35, unit "g"}}
+							Slice {Fat {value 35, unit "g"}}
+					Cheddar
+					"Cream Cheese"
+			Meat	
+				or
+					"Salami" {Producer "Farmer Bob"}
+					Ham {Producer "Farmer Sam"}
+					"Chicken Breast" {Producer "Farmer Sam"}
+			Vegetables	
+				optional
+					"Cucumber"
+					Tomatoes
+					Lettuce

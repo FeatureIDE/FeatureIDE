@@ -60,4 +60,11 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	 */
 	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator();
 
+	/**
+	 * Returns a new instance of a {@link MultipleAnomaliesExplanationCreator}.
+	 *
+	 * @return new {@link MultipleAnomaliesExplanationCreator}
+	 */
+	public abstract MultipleAnomaliesExplanationCreator getMultipleAnomaliesExplanationCreator();
+
 }

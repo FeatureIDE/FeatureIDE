@@ -1,0 +1,10 @@
+namespace submodels.FConcurrency
+
+features
+	FConcurrency {abstract}	
+						or
+							featureLatch
+							featureFSync
+							featureTransaction
+							dummyFeatureLocking
+							featureCheckLeaks

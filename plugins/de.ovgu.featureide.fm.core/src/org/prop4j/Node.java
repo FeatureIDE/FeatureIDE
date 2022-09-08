@@ -745,7 +745,7 @@ public abstract class Node {
 	 * @param resolve
 	 * @return
 	 */
-	public static Node replaceLiterals(Node node, ArrayList<String> features, boolean resolve) {
+	public static Node replaceLiterals(Node node, List<String> features, boolean resolve) {
 		if (node instanceof And) {
 			final List<Node> children = new ArrayList<>();
 			for (final Node child : node.getChildren()) {

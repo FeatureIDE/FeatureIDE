@@ -260,6 +260,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		if (attributeValue instanceof Constraint) {
 			parseConstraint(fm, (Constraint) attributeValue);
 		}
+
 	}
 
 	private void parseConstraints(MultiFeatureModel fm) {
@@ -472,6 +473,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			if ((constraint instanceof MultiConstraint) && (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERFACE)) {
 				continue;
 			}
+
 			result.add(featureIDEConstraintToUVLConstraint(constraint.getNode()));
 		}
 		return result;
