@@ -4,6 +4,22 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+Release 3.9.0 (September 2022)
+* Many enhancements and fixes for UVL
+  * Added GUI support for importing sub models (#1250)
+  * Added examples showcasing usage of UVL parser API (#1369)
+  * Fixed various issues (#1239, #1341, #1353, #1363)
+  * Improved UVL examples (#1357, #1361)
+  * Replaced UVL Parser (#1341, #1367)
+* Added button to reset manual selections in the configuration editor (#1237)
+* Added missing license files (#1290)
+* Fixed problems with failed Jenkins (#1366)
+* Improved UI of feature model editor (#834, #849, #1102)
+* Improved support for initial samples in YASA
+* Improved performance of CNF creation
+* Removed no longer supported options for FeatureHouse, including Fuji and Key (#936, #1106, #1169)
+* Removed unused files (#1356)
+
 Release 3.8.3 (May 2022)
 * Hotfix containing mostly bugfixes over v3.8.2
 * Fixed bug that prevented features from being deleted in feature model editor (#1350)
