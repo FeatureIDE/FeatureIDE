@@ -81,29 +81,29 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			// than just its own value.
 			if (attributeValue instanceof Map<?, ?>) {
 				// check if the attributes list contains informations of the attribute in FeatureIDE, which are value, unit, recrusive, and/or configurable
-				Map<String, Attribute> attributeMap = (Map<String, Attribute>) attributeValue;
+				Map<String, Attribute<?>> attributeMap = (Map<String, Attribute<?>>) attributeValue;
 				String unit = "";
 				Object value = null;
 				boolean recursive = false;
 				boolean configurable = false;
 				String type = "";
-				Attribute valueObj = attributeMap.get("value");
+				Attribute<?> valueObj = attributeMap.get("value");
 				if (valueObj != null) {
 					value = valueObj.getValue();
 				}
-				Attribute unitObj = attributeMap.get("unit");
+				Attribute<?> unitObj = attributeMap.get("unit");
 				if (unitObj != null && unitObj.getValue() instanceof String) {
 					unit = (String) unitObj.getValue();
 				}
-				Attribute recursiveObj = attributeMap.get("recursive");
+				Attribute<?> recursiveObj = attributeMap.get("recursive");
 				if (recursiveObj != null && recursiveObj.getValue() instanceof Boolean) {
 					recursive = (boolean) recursiveObj.getValue();
 				}
-				Attribute configurableObj = attributeMap.get("configurable");
+				Attribute<?> configurableObj = attributeMap.get("configurable");
 				if (configurableObj != null && configurableObj.getValue() instanceof Boolean) {
 					configurable = (boolean) configurableObj.getValue();
 				}
-				Attribute typeObj = attributeMap.get("type");
+				Attribute<?> typeObj = attributeMap.get("type");
 				if (typeObj != null && typeObj.getValue() instanceof Boolean) {
 					type = (String) typeObj.getValue();
 				}
@@ -174,10 +174,10 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	}
 
 	@Override
-	protected Map<String, Attribute> printAttributes(IFeature feature) {
-		Map<String, Attribute> attributes = super.printAttributes(feature);
+	protected Map<String, Attribute<?>> printAttributes(IFeature feature) {
+		Map<String, Attribute<?>> attributes = super.printAttributes(feature);
 		if (feature.getStructure().isRoot()) {
-			attributes.put(EXTENDED_ATTRIBUTE_NAME, new Attribute<Boolean>(EXTENDED_ATTRIBUTE_NAME, true));
+			attributes.put(EXTENDED_ATTRIBUTE_NAME, new Attribute<>(EXTENDED_ATTRIBUTE_NAME, true));
 		}
 		if (feature instanceof IExtendedFeature) {
 			for (IFeatureAttribute attr : ((IExtendedFeature) feature).getAttributes()) {
@@ -199,20 +199,20 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
 			return attr.getValue();
 		} else {
-			Map<String, Attribute> attributeMap = new HashMap<>();
+			Map<String, Attribute<?>> attributeMap = new HashMap<>();
 			if (attr.isConfigurable()) {
-				attributeMap.put("configurable", new Attribute<Boolean>("configurable", true));
+				attributeMap.put("configurable", new Attribute<>("configurable", true));
 			}
 			if (attr.isRecursive()) {
-				attributeMap.put("recursive", new Attribute<Boolean>("recursive", true));
+				attributeMap.put("recursive", new Attribute<>("recursive", true));
 			}
 			if (attr.getUnit() != null && !attr.getUnit().equals("")) {
-				attributeMap.put("unit", new Attribute<String>("unit", attr.getUnit()));
+				attributeMap.put("unit", new Attribute<>("unit", attr.getUnit()));
 			}
 			if (attr.getValue() == null) {
-				attributeMap.put("type", new Attribute<String>("type", attr.getType()));
+				attributeMap.put("type", new Attribute<>("type", attr.getType()));
 			} else {
-				attributeMap.put("value", new Attribute<Object>("value", attr.getValue()));
+				attributeMap.put("value", new Attribute<>("value", attr.getValue()));
 			}
 			return attributeMap;
 		}

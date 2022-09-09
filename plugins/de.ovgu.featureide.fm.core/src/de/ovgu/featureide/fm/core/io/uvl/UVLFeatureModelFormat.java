@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,12 +28,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.resources.IProject;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -52,7 +49,6 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.Problem.Severity;
@@ -91,7 +87,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private static final String NS_ATTRIBUTE_FEATURE = "synthetic_ns_feature";
 
 	protected static final String EXTENDED_ATTRIBUTE_NAME = "extended__";
-	private static final String MULTI_ROOT_PREFIX = "Abstract_";
 
 	private static final String FEATURE_DESCRIPTION_ATTRIBUTE_NAME = "featureDescription__";
 
@@ -114,7 +109,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private FeatureModel rootModel;
 	protected ProblemList pl;
-	private IFeatureModel fm;
 	protected MultiFeatureModelFactory factory;
 
 	@Override
@@ -149,7 +143,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel fm, CharSequence source, Path path) {
 		fm.setSourceFile(path);
-		this.fm = fm;
 		pl = new ProblemList();
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
@@ -186,7 +179,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final MultiFeature feature = factory.createFeature(fm, uvlFeature.getReferenceFromSpecificSubmodel(""));
 		fm.addFeature(feature);
 
-		final Attribute<String> featureDescription = uvlFeature.getAttributes().get(FEATURE_DESCRIPTION_ATTRIBUTE_NAME);
+		final Attribute<?> featureDescription = uvlFeature.getAttributes().get(FEATURE_DESCRIPTION_ATTRIBUTE_NAME);
 		if ((featureDescription != null) && (featureDescription.getValue() instanceof String)) {
 			feature.getProperty().setDescription((String) featureDescription.getValue());
 		}
@@ -213,7 +206,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseGroup(MultiFeatureModel fm, Group uvlGroup, IFeature parentFeature) {
-		final List<IFeature> children = new LinkedList();
+		final List<IFeature> children = new LinkedList<>();
 		for (final Feature feature : uvlGroup.getFeatures()) {
 			children.add(parseFeature(fm, feature, parentFeature));
 		}
@@ -225,12 +218,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 				parentFeature.getStructure().setAlternative();
 			} else if ((uvlGroup.getLowerBound().equals("0")) && (uvlGroup.getUpperBound().equals("*"))) {
 				// optional is true if nothing else is set
-			} else if ((uvlGroup.getLowerBound().equals(uvlGroup.getUpperBound())) && (uvlGroup.getUpperBound().equals(uvlGroup.getFeatures().size()))) {
-				children.forEach(f -> f.getStructure().setMandatory(true));
-			} else {
-				pl.add(new Problem(String.format("Failed to convert cardinality [%s..%s] to known group type at feature %s.", uvlGroup.getLowerBound(),
-						uvlGroup.getUpperBound(), parentFeature.getName()), 0, Severity.WARNING));
-			}
+			} else if ((uvlGroup.getLowerBound().equals(uvlGroup.getUpperBound()))
+				&& (uvlGroup.getUpperBound().equals(Integer.toString(uvlGroup.getFeatures().size())))) {
+					children.forEach(f -> f.getStructure().setMandatory(true));
+				} else {
+					pl.add(new Problem(String.format("Failed to convert cardinality [%s..%s] to known group type at feature %s.", uvlGroup.getLowerBound(),
+							uvlGroup.getUpperBound(), parentFeature.getName()), 0, Severity.WARNING));
+				}
 		}
 
 		switch (uvlGroup.GROUPTYPE) {
@@ -245,11 +239,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		case MANDATORY:
 			children.forEach(f -> f.getStructure().setMandatory(true));
 			break;
+		case GROUP_CARDINALITY:
+			break;
+		default:
+			break;
 		}
-	}
-
-	private boolean isAbstract(Feature f) {
-		return Objects.equals(true, f.getAttributes().get("abstract"));
 	}
 
 	private void parseAttributes(MultiFeatureModel fm, MultiFeature feature, Feature uvlFeature) {
@@ -327,14 +321,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		}
 	}
 
-	private void checkReferenceValid(String name) {
-		final IFeature f = fm.getFeature(name);
-		if ((f == null) || f.getProperty().isImplicit()) {
-			pl.add(new Problem("Invalid reference: Feature " + name + " doesn't exist", 0, Severity.ERROR));
-			throw new RuntimeException("Invalid reference");
-		}
-	}
-
 	private void parseImports(FeatureModel uvlModel, MultiFeatureModel fm) {
 		final List<Import> imports = uvlModel.getImports();
 		for (final Import importLine : imports) {
@@ -344,15 +330,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	private void parseImport(MultiFeatureModel fm, Import i) {
-		final IProject project = EclipseFileSystem.getResource(fm.getSourceFile()).getProject();
-		// Local path of imported model (as given in importing model)
-		final String modelPath = i.getNamespace().replace(".", "/") + "." + FILE_EXTENSION;
-		// Resolved path (import relative to project root)
-		Path path = project.getFile(modelPath).getLocation().toFile().toPath();
-		if (!Files.exists(path)) {
-			// Import relative to importing model
-			path = fm.getSourceFile().resolveSibling(modelPath);
-		}
+		final Path path = fm.getSourceFile().resolveSibling(i.getNamespace().replace(".", "/") + "." + FILE_EXTENSION);
 		fm.addInstance(i.getNamespace(), i.getAlias(), path);
 	}
 
@@ -459,10 +437,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	}
 
-	protected Map<String, Attribute> printAttributes(IFeature feature) {
-		final Map<String, Attribute> attribtues = new HashMap<>();
+	protected Map<String, Attribute<?>> printAttributes(IFeature feature) {
+		final Map<String, Attribute<?>> attribtues = new HashMap<>();
 		if (feature.getStructure().isAbstract()) {
-			attribtues.put("abstract", new Attribute("abstract", true));
+			attribtues.put("abstract", new Attribute<>("abstract", Boolean.TRUE));
 		}
 		return attribtues;
 	}

@@ -1,0 +1,53 @@
+Add Example Showcasing Usage of UVL Parser API enhancement UVL
+#1369
+
+Replace UVL Parser enhancement UVL
+#1367
+
+Feature-Attribute Names in UVL Do Not Allow Spaces bug (major) UVL
+#1363
+
+Overhaul UVL Examples enhancement UVL
+#1361
+
+UVL Multi Product Line Example Is Empty bug (minor) UVL
+#1357
+
+Commented out classes: Errors when trying to build own jars
+#1356
+
+UVL Submodels Can Be Deleted Even if Subfeatures Appear in Constraints bug (minor) UVL
+#1353
+
+Non-consistent features naming conventions between UVLParser and FeatureIDE [Linked Issue] UVL
+#1341
+
+LICENSE.txt missing
+#1290
+
+GUI Support for Importing Submodels in UVL enhancement UVL
+#1250
+
+Cannot persist UVL file with incorrect syntax bug (major) UVL
+#1239
+
+Introduce a button for resetting manual selections in the configuration editor Configuration enhancement
+#1237
+
+"Perform Feature-Based Verification with KeY" does not work bug (minor) FeatureHouse
+#1169
+
+FeatureHouse menu throws exceptions bug (minor) FeatureHouse
+#1106
+
+Drawing cross-tree constraints both below the feature model and in the constraint view is counterintuitive Constraints View enhancement Feature Modeling
+#1102
+
+Remove Fuji Support enhancement FeatureHouse
+#936
+
+Group-tag functionality for constraints. enhancement
+#849
+
+Focus on all anomalies in a feature model enhancement Feature Modeling
+#834
