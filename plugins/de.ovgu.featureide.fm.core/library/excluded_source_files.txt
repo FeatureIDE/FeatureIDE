@@ -4,6 +4,7 @@ de/ovgu/featureide/fm/core/Constraint.java
 de/ovgu/featureide/fm/core/DeprecatedFeatureModel.java
 de/ovgu/featureide/fm/core/EclipseExtensionLoader.java
 de/ovgu/featureide/fm/core/EclipseLogger.java
+de/ovgu/featureide/fm/core/ExternalModelUtil.java
 de/ovgu/featureide/fm/core/Feature.java
 de/ovgu/featureide/fm/core/FeatureModel.java
 de/ovgu/featureide/fm/core/FMComposerExtension.java
@@ -37,7 +38,6 @@ de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java
-de/ovgu/featureide/fm/core/io/uvl/UVLFeatureModelFormat.java
 de/ovgu/featureide/fm/core/io/xml/AbstractXMLFeatureModelWriter.java
 de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelReader.java
 de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelWriter.java
