@@ -37,6 +37,7 @@ de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelReader.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelWriter.java
+de/ovgu/featureide/fm/core/io/uvl/UVLFeatureModelFormat.java
 de/ovgu/featureide/fm/core/io/xml/AbstractXMLFeatureModelWriter.java
 de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelReader.java
 de/ovgu/featureide/fm/core/io/xml/XmlFeatureModelWriter.java
