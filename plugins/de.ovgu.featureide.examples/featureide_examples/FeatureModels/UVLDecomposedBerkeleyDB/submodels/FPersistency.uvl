@@ -1,41 +1,39 @@
-namespace submodels.FPersistency
+namespace FPersistency
 
 features
-	FPersistency {abstract}	
-							optional
-								Persistency {abstract}	
-									mandatory
-										FIOFeature {abstract}	
-											alternative
-												NIO {abstract}	
-													mandatory
-														FNIOType {abstract}	
-															alternative
-																featureNIO
-																featureChunkedNIO
-	
-													optional
-														featureDirectNIO
-												IO {abstract}	
-													mandatory
-														featureIO
-	
-													optional
-														featureSynchronizedIO
-	
-									optional
-										FPersistencyFeatures {abstract}	
-											or
-												featureChecksum
-												featureFileHandleCache
-												featureHandleFullDiscError
-												featureEnvironmentLock
-												Checkpointer {abstract}	
-													optional
-														featureCustomizableCheckpointerTime
-														featureCustomizableCheckpointerBytes
-														featureCheckpointerDaemon
-												Cleaner {abstract}	
-													optional
-														featureLookAheadCache
-														featureCleanerDaemon
+	FPersistency {abstract true}
+		optional
+			Persistency {abstract true}
+				mandatory
+					FIOFeature {abstract true}
+						alternative
+							NIO {abstract true}
+								mandatory
+									FNIOType {abstract true}
+										alternative
+											featureNIO
+											featureChunkedNIO
+								optional
+									featureDirectNIO
+							IO {abstract true}
+								mandatory
+									featureIO
+								optional
+									featureSynchronizedIO
+				optional
+					FPersistencyFeatures {abstract true}
+						or
+							featureChecksum
+							featureFileHandleCache
+							featureHandleFullDiscError
+							featureEnvironmentLock
+							Checkpointer {abstract true}
+								optional
+									featureCustomizableCheckpointerTime
+									featureCustomizableCheckpointerBytes
+									featureCheckpointerDaemon
+							Cleaner {abstract true}
+								optional
+									featureLookAheadCache
+									featureCleanerDaemon
+

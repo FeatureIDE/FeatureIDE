@@ -1,8 +1,9 @@
-namespace submodels.FileSystem
+namespace FileSystem
 
 features
-	FileSystem	
+	FileSystem
 		or
 			NTFS
 			APFS
 			EXT4
+

@@ -5,11 +5,10 @@ imports
 	submodels.FileSystem as fs
 
 features
-	Server {abstract}	
+	Server {abstract true}
 		mandatory
 			fs.FileSystem
 			os.OperatingSystem
-
 		optional
 			Logging
 

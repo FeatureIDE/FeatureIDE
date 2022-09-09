@@ -1,27 +1,27 @@
-namespace Root
+namespace FStatistics
 
 features
-	FStatistics {abstract}	
-						optional
-							Statistics {abstract}	
+	FStatistics {abstract true}
+		optional
+			Statistics {abstract true}
+				mandatory
+					FStatisticsFeatures {abstract true}
+						or
+							EnvStats {abstract true}
 								mandatory
-									FStatisticsFeatures {abstract}	
-										or
-											EnvStats {abstract}	
-												mandatory
-													featureStatisticsEnvBase
+									featureStatisticsEnvBase
+								optional
+									featureStatisticsEnvLog
+									featureStatisticsEnvINCompressor
+									featureStatisticsEnvFSync
+									featureStatisticsEnvEvictor
+									featureStatisticsEnvCleaner
+									featureStatisticsEnvCheckpointer
+									featureStatisticsEnvCaching
+							featureStatisticsDatabase
+							featureStatisticsLock
+							featureStatisticsPreload
+							featureStatisticsSequence
+							featureStatisticsTransaction
+					featureStatisticsBase
 
-												optional
-													featureStatisticsEnvLog
-													featureStatisticsEnvINCompressor
-													featureStatisticsEnvFSync
-													featureStatisticsEnvEvictor
-													featureStatisticsEnvCleaner
-													featureStatisticsEnvCheckpointer
-													featureStatisticsEnvCaching
-											featureStatisticsDatabase
-											featureStatisticsLock
-											featureStatisticsPreload
-											featureStatisticsSequence
-											featureStatisticsTransaction
-									featureStatisticsBase

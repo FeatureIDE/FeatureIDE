@@ -8,7 +8,6 @@ features
 					"Full Grain" {Calories 203, Price 1.99, Organic true}
 					Flatbread {Calories 90, Price 0.79, Organic true}
 					Toast {Calories 250, Price 0.99, Organic false}
-
 		optional
 			Cheese	
 				optional

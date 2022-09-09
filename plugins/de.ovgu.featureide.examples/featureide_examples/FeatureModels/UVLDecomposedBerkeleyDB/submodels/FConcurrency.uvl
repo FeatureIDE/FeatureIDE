@@ -1,10 +1,11 @@
-namespace submodels.FConcurrency
+namespace FConcurrency
 
 features
-	FConcurrency {abstract}	
-						or
-							featureLatch
-							featureFSync
-							featureTransaction
-							dummyFeatureLocking
-							featureCheckLeaks
+	FConcurrency {abstract true}
+		or
+			featureLatch
+			featureFSync
+			featureTransaction
+			dummyFeatureLocking
+			featureCheckLeaks
+

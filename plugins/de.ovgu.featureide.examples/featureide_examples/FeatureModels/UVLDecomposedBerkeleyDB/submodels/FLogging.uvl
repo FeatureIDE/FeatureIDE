@@ -1,18 +1,20 @@
-namespace submodels.FLogging
+namespace FLogging
 
 features
-	FLogging {abstract}	
-						optional
-							Logging {abstract}	
-								mandatory
-									featureLoggingBase
-								optional
-									featureLoggingFile
-									featureLoggingConsole
-									featureLoggingDbLog
-									featureLoggingFinest
-									featureLoggingFiner
-									featureLoggingFine
-									featureLoggingInfo
-									featureLoggingConfig
-									featureLoggingSevere
+	FLogging {abstract true}
+		optional
+			Logging {abstract true}
+				mandatory
+					featureLoggingBase
+				optional
+					featureLoggingFile
+					featureLoggingConsole
+					featureLoggingDbLog
+					featureLoggingFinest
+					featureLoggingFiner
+					featureLoggingFine
+					featureLoggingInfo
+					featureLoggingConfig
+					featureLoggingSevere
+
+				

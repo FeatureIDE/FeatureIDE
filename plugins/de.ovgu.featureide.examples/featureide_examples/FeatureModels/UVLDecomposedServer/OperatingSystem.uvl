@@ -1,8 +1,9 @@
 namespace OperatingSystem
 
 features
-	OperatingSystem {abstract}	
+	OperatingSystem {abstract true}
 		alternative
 			Windows
 			macOS
 			Debian
+
