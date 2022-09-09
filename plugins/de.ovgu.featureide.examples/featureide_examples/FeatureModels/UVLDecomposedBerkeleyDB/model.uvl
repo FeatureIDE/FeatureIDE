@@ -8,20 +8,19 @@ imports
 	submodels.FStatistics as fs
 
 features
-	BerkeleyDb {abstract}	
+	BerkeleyDb {abstract true}
 		optional
-			BerkeleyDB {abstract}	
+			BerkeleyDB {abstract true}
 				mandatory
 					BASE
 					fp.FPersistency
 					fbt.FBtree
-
 				optional
 					fl.FLogging
 					fs.FStatistics
 					fc.FConcurrency
 					featureMemoryBudget
-					FDbOperation {abstract}	
+					FDbOperation {abstract true}
 						or
 							featureDeleteDb
 							featureTruncateDb
