@@ -200,6 +200,8 @@ Library.
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="de.ovgu.featureide.fm.ui"/>
       <import plugin="de.ovgu.featureide.core"/>
+      <import plugin="org.eclipse.core.databinding.observable"/>
+      <import plugin="org.eclipse.jface.databinding"/>
    </requires>
 
    <plugin
