@@ -97,11 +97,11 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 				}
 				Attribute<?> recursiveObj = attributeMap.get("recursive");
 				if (recursiveObj != null && recursiveObj.getValue() instanceof Boolean) {
-					recursive = (boolean) recursiveObj.getValue();
+					recursive = (Boolean) recursiveObj.getValue();
 				}
 				Attribute<?> configurableObj = attributeMap.get("configurable");
 				if (configurableObj != null && configurableObj.getValue() instanceof Boolean) {
-					configurable = (boolean) configurableObj.getValue();
+					configurable = (Boolean) configurableObj.getValue();
 				}
 				Attribute<?> typeObj = attributeMap.get("type");
 				if (typeObj != null && typeObj.getValue() instanceof Boolean) {
