@@ -20,15 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_IMAGE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN_IMAGE_FILE_FORMAT;
 
-import java.io.File;
-import java.util.Locale;
+import java.io.IOException;
+import java.nio.file.Path;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.SWTGraphics;
@@ -37,13 +33,13 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
-import org.eclipse.ui.progress.UIJob;
+
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Saves the figures of an GEF editor into a bitmap file.
@@ -52,24 +48,16 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class GEFImageWriter {
 
-	public static void writeToFile(final GraphicalViewerImpl graphicalViewer, final File file) {
-		final UIJob job = new UIJob(SAVE_IMAGE) {
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				saveEditorContentsAsImage(graphicalViewer, file.toString());
-				return Status.OK_STATUS;
-			}
-		};
-		job.schedule();
-	}
-
-	private static void saveEditorContentsAsImage(GraphicalViewer viewer, String saveFilePath) {
-		final Image image = drawFigureOnImage(viewer);
-		final Image croppedImage = cropImage(image);
-		image.dispose();
-		saveImage(croppedImage, saveFilePath);
-		croppedImage.dispose();
+	public static void saveEditorContentsAsImage(Path path, GraphicalViewer viewer) throws IOException {
+		try {
+			final Image image = drawFigureOnImage(viewer);
+			final Image croppedImage = cropImage(image);
+			image.dispose();
+			saveImage(croppedImage, path);
+			croppedImage.dispose();
+		} catch (final Exception e) {
+			throw new IOException(e);
+		}
 	}
 
 	private static Image drawFigureOnImage(GraphicalViewer viewer) {
@@ -100,7 +88,7 @@ public class GEFImageWriter {
 		return img2;
 	}
 
-	private static void saveImage(Image image, String saveFilePath) {
+	private static void saveImage(Image image, Path saveFilePath) {
 		final int format = readFormatFromFileName(saveFilePath);
 
 		final ImageData[] data = new ImageData[1];
@@ -108,7 +96,7 @@ public class GEFImageWriter {
 
 		final ImageLoader loader = new ImageLoader();
 		loader.data = data;
-		loader.save(saveFilePath, format);
+		loader.save(saveFilePath.toString(), format);
 	}
 
 	private static IFigure getRootFigure(GraphicalViewer viewer) {
@@ -159,30 +147,25 @@ public class GEFImageWriter {
 		return r;
 	}
 
-	private static int readFormatFromFileName(String saveFilePath) {
-		final String file = saveFilePath.toLowerCase(Locale.ENGLISH);
-		if (file.endsWith(".bmp")) {
+	private static int readFormatFromFileName(Path saveFilePath) {
+		switch (FileHandler.getFileExtension(saveFilePath).toLowerCase()) {
+		case "bmp":
 			return SWT.IMAGE_BMP;
-		}
-		if (file.endsWith(".gif")) {
+		case "gif":
 			return SWT.IMAGE_GIF;
-		}
-		if (file.endsWith(".ico")) {
+		case "ico":
 			return SWT.IMAGE_ICO;
-		}
-		if (file.endsWith(".jpg")) {
+		case "jpg":
 			return SWT.IMAGE_JPEG;
-		}
-		if (file.endsWith(".jpeg")) {
+		case "jpeg":
 			return SWT.IMAGE_JPEG;
-		}
-		if (file.endsWith(".png")) {
+		case "png":
 			return SWT.IMAGE_PNG;
-		}
-		if (file.endsWith(".tif")) {
+		case "tif":
 			return SWT.IMAGE_TIFF;
+		default:
+			throw new RuntimeException(UNKNOWN_IMAGE_FILE_FORMAT + saveFilePath);
 		}
-		throw new RuntimeException(UNKNOWN_IMAGE_FILE_FORMAT + saveFilePath);
 	}
 
 }

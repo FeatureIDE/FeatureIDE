@@ -51,6 +51,6 @@ public class ExportFeatureModelAction extends Action {
 
 	@Override
 	public void run() {
-		GraphicsExporter.exportAs(featureModelEditor.getFeatureModel(), featureModelEditor.getViewer());
+		GraphicsExporter.exportAs(featureModelEditor.getViewer());
 	}
 }
