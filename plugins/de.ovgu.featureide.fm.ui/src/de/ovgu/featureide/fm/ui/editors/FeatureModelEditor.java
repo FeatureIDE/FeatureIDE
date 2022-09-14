@@ -172,7 +172,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	public void doSaveAs() {
-		GraphicsExporter.exportAs(fmManager, diagramEditor.getViewer());
+		GraphicsExporter.exportAs(diagramEditor.getViewer());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

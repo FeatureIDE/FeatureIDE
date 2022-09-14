@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 
 /**
  * Displays the tree for common configuration selection at the configuration editor
@@ -69,7 +70,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 					@Override
 					public void run() {
-						ConfigurationExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
+						GraphicsExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
 					}
 				});
 			}
