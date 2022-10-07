@@ -21,12 +21,15 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -55,8 +58,15 @@ public final class DeleteDialogVerifier {
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
 		for (final IFeature feature : featuresToDelete) {
-			if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
-				featureInConstraint = true;
+			final Collection<IConstraint> relevantConstraints = FeatureUtils.getRelevantConstraints(feature);
+			final Collection<IFeature> allFeaturesInConstraints = new LinkedList<>();
+			for (final IConstraint constraint : relevantConstraints) {
+				allFeaturesInConstraints.addAll(FeatureUtils.getContainedFeatures(constraint));
+			}
+			if (!relevantConstraints.isEmpty()) {
+				if (!featuresToDelete.containsAll(allFeaturesInConstraints)) {
+					featureInConstraint = true;
+				}
 			}
 			if (hasGroupDifference(feature)) {
 				featureHasGroupDifference = true;
