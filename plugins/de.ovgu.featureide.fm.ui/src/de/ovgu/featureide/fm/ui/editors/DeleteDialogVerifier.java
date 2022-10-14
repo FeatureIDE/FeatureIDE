@@ -64,9 +64,9 @@ public final class DeleteDialogVerifier {
 				allFeaturesInConstraints.addAll(FeatureUtils.getContainedFeatures(constraint));
 			}
 			if (!relevantConstraints.isEmpty()) {
-				if (!featuresToDelete.containsAll(allFeaturesInConstraints)) {
-					featureInConstraint = true;
-				}
+				// if (!featuresToDelete.containsAll(allFeaturesInConstraints)) {
+				featureInConstraint = true;
+				// }
 			}
 			if (hasGroupDifference(feature)) {
 				featureHasGroupDifference = true;
