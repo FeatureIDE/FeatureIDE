@@ -123,6 +123,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		final List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 		extensions = new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
+
 		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
 
 			@Override
@@ -153,7 +154,15 @@ public class NewFeatureProjectPage extends WizardPage {
 				composerExtension = extensions[toolCB.getSelectionIndex()];
 			}
 		});
-		toolCB.select(0);
+		// set Feature Modelling as default composer
+		int featureModellingComposerIndex = 0;
+		for (int i = 0; i < extensions.length; i++) {
+			if (extensions[i].getName().equals("Feature Modeling")) {
+				featureModellingComposerIndex = i;
+				break;
+			}
+		}
+		toolCB.select(featureModellingComposerIndex);
 
 		// Path Group
 		pathGroup = new Group(container, SWT.NONE);
