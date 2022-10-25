@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -58,15 +59,27 @@ public final class DeleteDialogVerifier {
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
 		for (final IFeature feature : featuresToDelete) {
-			final Collection<IConstraint> relevantConstraints = FeatureUtils.getRelevantConstraints(feature);
-			final Collection<IFeature> allFeaturesInConstraints = new LinkedList<>();
-			for (final IConstraint constraint : relevantConstraints) {
-				allFeaturesInConstraints.addAll(FeatureUtils.getContainedFeatures(constraint));
+			final List<IConstraint> constraintsToConsider = new LinkedList<>();
+			if (feature.getFeatureModel() instanceof MultiFeatureModel) {
+				constraintsToConsider.addAll(((MultiFeatureModel) feature.getFeatureModel()).getOwnConstraints());
+			} else {
+				constraintsToConsider.addAll(feature.getFeatureModel().getConstraints());
 			}
+
+			final Collection<IConstraint> relevantConstraints = new LinkedList<>();
+
+			// set relevant constraints
+			for (final IConstraint constraint : constraintsToConsider) {
+				for (final IFeature f : constraint.getContainedFeatures()) {
+					if (f.getName().equals(feature.getName())) {
+						relevantConstraints.add(constraint);
+						break;
+					}
+				}
+			}
+
 			if (!relevantConstraints.isEmpty()) {
-				// if (!featuresToDelete.containsAll(allFeaturesInConstraints)) {
 				featureInConstraint = true;
-				// }
 			}
 			if (hasGroupDifference(feature)) {
 				featureHasGroupDifference = true;
