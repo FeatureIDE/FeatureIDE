@@ -21,8 +21,11 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -51,6 +54,8 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 	@Override
 	public void createSingleOperations(IFeatureModel featureModel) {
 		final List<IFeature> featuresToDelete = new ArrayList<>();
+		final List<IConstraint> constraintsToDelete = new ArrayList<>();
+		final HashSet<MultiFeatureModel.UsedModel> subModelsToDelete = new HashSet<>();
 
 		final List<Object> selectedObjects = getSelection().toList();
 
@@ -58,9 +63,29 @@ public class DeleteSubmodelOperation extends ElementDeleteOperation {
 			final IFeature selectedFeature = getFeatureFromObject(selectedObject);
 			featuresToDelete.addAll(getAllChildren(selectedFeature));
 			featuresToDelete.add(selectedFeature);
-		}
+			// get constraints to delete (this is a little bit hacky, because there is no mapping between a constraint and its corresponding submodel in the
+			// MultiFeatureModel. Therefore we get all constraints that containt the features of the submodel and remove the constraints that are part of the
+			// root feature model.
+			if (featureModel instanceof MultiFeatureModel) {
+				for (final IFeature feature : featuresToDelete) {
+					constraintsToDelete.addAll(FeatureUtils.getRelevantConstraints(feature));
+					if (feature.getName().contains(".")) {
+						// this is a hacky way to detect which submodels we need to remove
+						subModelsToDelete.add(((MultiFeatureModel) featureModel).getExternalModel(feature.getName().split("\\.")[0]));
+					}
+				}
+				constraintsToDelete.removeAll(((MultiFeatureModel) featureModel).getOwnConstraints());
+			}
 
+			// used models to delete
+
+		}
+		addRemoveImportedFeatureModelsOperation(new ArrayList<>(subModelsToDelete));
+		// it is important to remove the constraints before the features, otherwise the undo and redo wont work because the constraint can not reference its
+		// features (because they are not restored yet)
+		addDeleteConstraintOperations(constraintsToDelete);
 		addDeleteFeatureOperations(featuresToDelete);
+
 	}
 
 	private List<IFeature> getAllChildren(IFeature selectedFeature) {
