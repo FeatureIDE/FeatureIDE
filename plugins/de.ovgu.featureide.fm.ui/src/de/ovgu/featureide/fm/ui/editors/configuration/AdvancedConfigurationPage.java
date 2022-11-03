@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -150,7 +151,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 					@Override
 					public void run() {
-						ConfigurationExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
+						GraphicsExporter.exportAs(configurationEditor.getConfigurationManager().getSnapshot());
 					}
 				});
 			}

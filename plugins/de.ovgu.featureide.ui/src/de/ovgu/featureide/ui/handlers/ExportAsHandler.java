@@ -28,7 +28,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationExporter;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
 /**
@@ -45,7 +45,7 @@ public class ExportAsHandler extends AFileHandler {
 		final Configuration selectedConfiguration =
 			project.loadConfiguration(Paths.get(ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + file.getFullPath()));
 
-		ConfigurationExporter.exportAs(selectedConfiguration);
+		GraphicsExporter.exportAs(selectedConfiguration);
 	}
 
 }
