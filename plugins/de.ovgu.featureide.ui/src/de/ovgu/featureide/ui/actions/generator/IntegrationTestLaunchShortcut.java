@@ -30,6 +30,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildOrder;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildType;
+import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.OutputType;
 
 /**
  * Launch shortcut for integration tests<br> See: Run As - Run as JUnit Integration Test.
@@ -43,7 +44,8 @@ public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 		final TreeSelection treeSelection = (TreeSelection) selection;
 		final IFolder selectedFolder = (IFolder) treeSelection.toArray()[0];
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
-		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName(), 2, 1);
+		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, OutputType.CONFIGURATION, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName(), 2,
+				1);
 	}
 
 	@Override

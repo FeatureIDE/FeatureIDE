@@ -535,6 +535,9 @@ public class StringTable {
 	public static final String DOWN = "Down";
 	public static final String DEFAULT = "Default";
 	public static final String USERDEFINED_ORDER = "userdefined-order";
+	public static final String OUTPUT_CONFIGURATIONS = "Configuration files";
+	public static final String OUTPUT_PRODUCTS = "Products";
+	public static final String OUTPUT_PROJECTS = "New projects";
 	public static final String NL_UTWENTE_CE_IMAGEEXPORT = "nl.utwente.ce.imageexport";
 	public static final String NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN = "nl.utwente.ce.imageexport.core.ImageExportPlugin";
 	public static final String PROVIDESETTINGS = "provideSettings";

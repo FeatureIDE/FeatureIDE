@@ -25,6 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_VALI
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_INTEGRATION_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HAS_BEEN_DEPRECATED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTPUT_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTPUT_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTPUT_PROJECTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CAST_TO;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SERIALIZABLE_CLASS;
@@ -45,6 +48,17 @@ import de.ovgu.featureide.core.CorePlugin;
  * @author Jens Meinicke
  */
 public interface IConfigurationBuilderBasics {
+
+	enum OutputType {
+
+		CONFIGURATION(OUTPUT_CONFIGURATIONS), PRODUCT(OUTPUT_PRODUCTS), PROJECT(OUTPUT_PROJECTS);
+
+		public final String displayName;
+
+		private OutputType(String displayName) {
+			this.displayName = displayName;
+		}
+	};
 
 	enum BuildType {
 		ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION, RANDOM
@@ -67,6 +81,8 @@ public interface IConfigurationBuilderBasics {
 	QualifiedName GENERATE =
 		new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Generate", IConfigurationBuilderBasics.class.getName() + "#Generate");
 	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", IConfigurationBuilderBasics.class.getName() + "#Order");
+	QualifiedName OUTPUT_TYPE =
+		new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#OutputType", IConfigurationBuilderBasics.class.getName() + "#OutputType");
 	QualifiedName TEST = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Test", IConfigurationBuilderBasics.class.getName() + "#Test");
 	QualifiedName MAX = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#MaxConf", IConfigurationBuilderBasics.class.getName() + "#MaxConf");
 	String TRUE = "true";
