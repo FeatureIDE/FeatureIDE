@@ -107,7 +107,7 @@ public class GraphicsExporter {
 					return Status.OK_STATUS;
 				} catch (final IOException e) {
 					FMUIPlugin.getDefault().logInfo(NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___);
-					return Status.error(e.getClass().getName(), e);
+					return new Status(Status.ERROR, e.getClass().getName(), e.getMessage());
 				}
 			}
 		};
