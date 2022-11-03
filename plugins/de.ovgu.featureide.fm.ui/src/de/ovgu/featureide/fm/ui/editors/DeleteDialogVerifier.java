@@ -21,15 +21,19 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -55,7 +59,26 @@ public final class DeleteDialogVerifier {
 		boolean featureHasGroupDifference = false;
 		boolean featureIsRoot = false;
 		for (final IFeature feature : featuresToDelete) {
-			if (!FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
+			final List<IConstraint> constraintsToConsider = new LinkedList<>();
+			if (feature.getFeatureModel() instanceof MultiFeatureModel) {
+				constraintsToConsider.addAll(((MultiFeatureModel) feature.getFeatureModel()).getOwnConstraints());
+			} else {
+				constraintsToConsider.addAll(feature.getFeatureModel().getConstraints());
+			}
+
+			final Collection<IConstraint> relevantConstraints = new LinkedList<>();
+
+			// set relevant constraints
+			for (final IConstraint constraint : constraintsToConsider) {
+				for (final IFeature f : constraint.getContainedFeatures()) {
+					if (f.getName().equals(feature.getName())) {
+						relevantConstraints.add(constraint);
+						break;
+					}
+				}
+			}
+
+			if (!relevantConstraints.isEmpty()) {
 				featureInConstraint = true;
 			}
 			if (hasGroupDifference(feature)) {

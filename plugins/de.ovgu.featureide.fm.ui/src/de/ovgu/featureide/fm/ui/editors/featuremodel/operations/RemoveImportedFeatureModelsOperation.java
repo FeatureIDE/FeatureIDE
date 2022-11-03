@@ -28,6 +28,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 
@@ -38,6 +39,8 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
  * @author Johannes Herschel
  */
 public class RemoveImportedFeatureModelsOperation extends AbstractFeatureModelOperation {
+
+	public static final String ID = ID_PREFIX + "RemoveImportedFeatureModelsOperation";
 
 	/**
 	 * The models to be removed.
@@ -57,7 +60,8 @@ public class RemoveImportedFeatureModelsOperation extends AbstractFeatureModelOp
 				multiFeatureModel.removeExternalModel(removedModel.getVarName());
 			}
 		}
-		return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
+		return new FeatureModelOperationEvent(ID, EventType.IMPORTS_CHANGED, featureModel, removedModels, null);
+		// return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
 	}
 
 	@Override
@@ -68,6 +72,7 @@ public class RemoveImportedFeatureModelsOperation extends AbstractFeatureModelOp
 				multiFeatureModel.addExternalModel(removedModel);
 			}
 		}
-		return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
+		return new FeatureModelOperationEvent(ID, EventType.IMPORTS_CHANGED, featureModel, removedModels, null);
+		// return FeatureIDEEvent.getDefault(EventType.IMPORTS_CHANGED);
 	}
 }

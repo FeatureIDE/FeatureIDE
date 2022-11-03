@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -53,6 +54,9 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
 		final IFeatureStructure rootStructure = root.getObject().getStructure();
 		for (final IFeatureStructure feature : Features.getCompoundFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
+			if ((feature.getFeature() instanceof MultiFeature) && ((MultiFeature) feature.getFeature()).isFromExtern()) {
+				continue;
+			}
 			Collections.reverse(feature.getChildren());
 		}
 		return FeatureIDEEvent.getDefault(FeatureIDEEvent.EventType.LOCATION_CHANGED);
