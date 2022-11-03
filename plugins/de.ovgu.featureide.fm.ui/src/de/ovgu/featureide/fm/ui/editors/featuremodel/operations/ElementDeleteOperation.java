@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -150,9 +151,15 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 *
 	 * @param constraintsToDelete A List of all the constraints that need to be deleted
 	 */
-	private void addDeleteConstraintOperations(List<IConstraint> constraintsToDelete) {
+	protected void addDeleteConstraintOperations(List<IConstraint> constraintsToDelete) {
 		for (final IConstraint constraint : constraintsToDelete) {
 			operations.add(new DeleteConstraintOperation(constraint, featureModelManager));
+		}
+	}
+
+	protected void addRemoveImportedFeatureModelsOperation(List<MultiFeatureModel.UsedModel> removedModels) {
+		for (final MultiFeatureModel.UsedModel usedModel : removedModels) {
+			operations.add(new RemoveImportedFeatureModelsOperation(featureModelManager, removedModels));
 		}
 	}
 
