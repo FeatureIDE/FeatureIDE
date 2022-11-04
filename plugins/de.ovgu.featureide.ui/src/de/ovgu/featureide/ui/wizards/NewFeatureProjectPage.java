@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Text;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * A dialog page for creating FeatureIDE projects.
@@ -157,7 +158,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		// set Feature Modelling as default composer
 		int featureModellingComposerIndex = 0;
 		for (int i = 0; i < extensions.length; i++) {
-			if (extensions[i].getName().equals("Feature Modeling")) {
+			if (extensions[i].getName().equals(StringTable.FEATURE_MODELING_COMPOSER_NAME)) {
 				featureModellingComposerIndex = i;
 				break;
 			}
