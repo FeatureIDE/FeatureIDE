@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.ui.handlers;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.actions.generator.BuildProductsWizard;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
@@ -41,35 +38,9 @@ public class BuildProductsHandler extends AFeatureProjectHandler implements ICon
 
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final BuildProductsWizard wizard = new BuildProductsWizard(featureProject, getToggleState());
+		final BuildProductsWizard wizard = new BuildProductsWizard(featureProject);
 		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-
-		setToggleState(wizard.getToggleState());
 	}
-
-	/**
-	 * Gets the toggle state from persistent properties
-	 */
-	protected static boolean getToggleState() {
-		try {
-			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TOGGLE_STATE));
-		} catch (final CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
-	}
-
-	/**
-	 * Saves the toggle state of the dialog at persistent properties
-	 */
-	protected static void setToggleState(boolean value) {
-		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
-		} catch (final CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
 }

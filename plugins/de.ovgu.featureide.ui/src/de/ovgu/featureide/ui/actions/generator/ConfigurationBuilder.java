@@ -111,9 +111,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	IFolder tmp;
 
 	/**
-	 * This flag indicates if a new project should be created for each configuration.
+	 * Indicates if configurations are stored as configuration files, products, or whether new project should be created for each configuration.
 	 */
-	boolean createNewProjects;
+	OutputType outputType;
 
 	/**
 	 * The count of how many configurations where already built
@@ -136,7 +136,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	boolean finish = false;
 
 	/**
-	 * <code>true</code>: all valid configurations should be built.<br> <code>false</code>: all configurations at the configurations folder should be built.
+	 * Which configurations should be built.
 	 */
 	BuildType buildType;
 
@@ -190,27 +190,27 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param featureProject The feature project
 	 * @param buildType <code>true</code> if all possible valid configurations should be build<br> <code>false</code> if all current configurations should be
 	 *        build
-	 * @param createNewProjects <code>true</code> if the configurations should be built into separate projects
-	 * @param algorithm selected algorithmen
+	 * @param outputType if the configurations stored as configuration files, products, or be build into separate projects
+	 * @param algorithm selected algorithm
 	 * @param t t
 	 * @param buildOrder build order
 	 * @param runTests whether the tests should be run after the operation
 	 * @param max Maximal number of configurations to generate.
 	 * @param tOrder tOrder
 	 */
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final OutputType outputType, final String algorithm,
 			final int t, final BuildOrder buildOrder, boolean runTests, int max, int tOrder) {
-		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null, max, tOrder);
+		this(featureProject, buildType, outputType, algorithm, t, buildOrder, runTests, null, max, tOrder);
 	}
 
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
-		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE, 1);
+		this(featureProject, BuildType.INTEGRATION, OutputType.CONFIGURATION, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE, 1);
 	}
 
 	static int id = 0;
 	IProgressMonitor globalMonitor;
 
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm,
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final OutputType outputType, final String algorithm,
 			final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs, int tOrder) {
 		this.runTests = runTests;
 		if (maxConfigs <= 0) {
@@ -226,7 +226,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		this.featureProject = featureProject;
-		this.createNewProjects = createNewProjects;
+		this.outputType = outputType;
 		this.buildType = buildType;
 
 		featureModel = featureProject.getFeatureModelManager().getPersistentFormula();
@@ -317,7 +317,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					configurationBuilderJob = LongRunningWrapper.getRunner(configurationGenerator, "Create Configurations " + id++);
 					configurationBuilderJob.schedule();
 					showStatistics(monitor);
-					if (!createNewProjects) {
+					if (outputType != OutputType.PROJECT) {
 						try {
 							folder.refreshLocal(IResource.DEPTH_INFINITE, null);
 						} catch (final CoreException e) {
@@ -421,8 +421,26 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private boolean init(IProgressMonitor monitor, BuildType buildType) {
 		// method is called to initialize composer extension if not yet
 		// initialized; so only delete if sure
-		featureProject.getComposer();
-		if (!createNewProjects) {
+		switch (outputType) {
+		case CONFIGURATION:
+			folder = featureProject.getProject().getFolder(FOLDER_NAME);
+			if (folder.exists()) {
+				try {
+					folder.delete(true, null);
+				} catch (final CoreException e) {
+					LOGGER.logError(e);
+					return false;
+				}
+			}
+			try {
+				folder.create(true, true, null);
+			} catch (final CoreException e) {
+				LOGGER.logError(e);
+				return false;
+			}
+			break;
+		case PRODUCT:
+			featureProject.getComposer();
 			folder = featureProject.getProject().getFolder(FOLDER_NAME);
 			if (!folder.exists()) {
 				try {
@@ -448,7 +466,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					LOGGER.logError(e);
 				}
 			}
-		} else {
+			break;
+		case PROJECT:
+			featureProject.getComposer();
 			try {
 				String identifier;
 				switch (buildType) {
@@ -483,6 +503,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			} catch (final CoreException e) {
 				LOGGER.logError(e);
 			}
+			break;
+		default:
+			return false;
 		}
 		return true;
 	}

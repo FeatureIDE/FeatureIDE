@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Text;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * A dialog page for creating FeatureIDE projects.
@@ -123,6 +124,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		final List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 		extensions = new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
+
 		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
 
 			@Override
@@ -153,7 +155,15 @@ public class NewFeatureProjectPage extends WizardPage {
 				composerExtension = extensions[toolCB.getSelectionIndex()];
 			}
 		});
-		toolCB.select(0);
+		// set Feature Modelling as default composer
+		int featureModellingComposerIndex = 0;
+		for (int i = 0; i < extensions.length; i++) {
+			if (extensions[i].getName().equals(StringTable.FEATURE_MODELING_COMPOSER_NAME)) {
+				featureModellingComposerIndex = i;
+				break;
+			}
+		}
+		toolCB.select(featureModellingComposerIndex);
 
 		// Path Group
 		pathGroup = new Group(container, SWT.NONE);

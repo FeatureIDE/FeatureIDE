@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Text;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -78,7 +77,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String LABEL_ORDER = "&Order:";
 	private static final String LABEL_TEST = "&Run JUnit tests:";
 	private static final String LABEL_INTERACTIONS = "&Interactions: T=";
-	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
+	private static final String LABEL_CREATE_NEW_PROJECTS = "Output &Type:";
 
 	private static final String TOOL_TIP_GENERATE = DEFINES_THE_PRODUKT_BASED_STRATEGY_;
 	private static final String TOOL_TIP_T_WISE = DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
@@ -90,22 +89,19 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
 
-	private final IFeatureProject project;
-
 	Text fileName;
 
 	private Combo comboAlgorithm;
-	private Button buttonBuildProject;
+	private Combo comboOutputType;
 	private Scale scaleTWise;
 	private Scale scaleInteraction;
 	private Label labelTWise;
 	private Label labelOrderInteraction;
 
-	private final boolean buildProjects;
-
 	private final int t;
 	private final int t_Interaction;
 
+	private final String outputType;
 	private final String algorithm;
 
 	private Combo comboOrder;
@@ -120,11 +116,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Label labelMax;
 	private final String maxConfs;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, int t_Interaction,
-			String order, boolean test, String maxConfs) {
+	public BuildProductsPage(String project, String generate, String outputType, String algorithm, int t, int t_Interaction, String order, boolean test,
+			String maxConfs) {
 		super(project);
-		this.project = featureProject;
-		this.buildProjects = buildProjects;
+		this.outputType = outputType;
 		this.algorithm = algorithm;
 		this.generate = generate;
 		this.t = t;
@@ -135,7 +130,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			maxConfs = "";
 		}
 		this.maxConfs = maxConfs;
-		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
+		setDescription(BUILD_PRODUCTS_FOR_PROJECT + project + ".");
 	}
 
 	@Override
@@ -260,28 +255,34 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scaleInteraction.setSelection(t_Interaction);
 		setScaleInteraction();
 
-		final Composite jUnitContainer = new Composite(container, SWT.NONE);
+		final Group groupOutput = new Group(container, SWT.SHADOW_ETCHED_IN);
+		groupOutput.setText("Output");
 		groupLayout = new GridLayout();
 		groupLayout.numColumns = 2;
 		groupLayout.verticalSpacing = 5;
-		jUnitContainer.setLayout(groupLayout);
+		groupOutput.setLayout(groupLayout);
 		gridDataGroup = new GridData();
 		gridDataGroup.grabExcessHorizontalSpace = true;
 		gridDataGroup.horizontalAlignment = GridData.FILL;
-		jUnitContainer.setLayoutData(gridDataGroup);
+		groupOutput.setLayoutData(gridDataGroup);
 
-		final Label labelProject = new Label(jUnitContainer, SWT.NULL);
+		final Label labelProject = new Label(groupOutput, SWT.NULL);
 		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
 		labelProject.setToolTipText(TOOL_TIP_PROJECT);
+		labelProject.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelProject);
-		buttonBuildProject = new Button(jUnitContainer, SWT.CHECK);
-		buttonBuildProject.setSelection(buildProjects);
+		comboOutputType = new Combo(groupOutput, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		comboOutputType.add(OutputType.CONFIGURATION.displayName);
+		comboOutputType.add(OutputType.PRODUCT.displayName);
+		comboOutputType.add(OutputType.PROJECT.displayName);
+		comboOutputType.setText(outputType);
 
-		final Label labelTest = new Label(jUnitContainer, SWT.NULL);
+		final Label labelTest = new Label(groupOutput, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
 		labelTest.setToolTipText(TOOL_TIP_TEST);
 		labels.add(labelTest);
-		buttonTest = new Button(jUnitContainer, SWT.CHECK);
+		buttonTest = new Button(groupOutput, SWT.CHECK);
+		buttonTest.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		buttonTest.setSelection(test);
 
 		container.setSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -295,15 +296,16 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		gd_LeftColumnInsideGroup.widthHint = widthOfLabel + 5;
 		gd_LeftColumn.widthHint = gd_LeftColumnInsideGroup.widthHint + 10;
 
-		labelProject.setLayoutData(gd_LeftColumn);
-		labelTest.setLayoutData(gd_LeftColumn);
+		for (final Label label : labels) {
+			label.setLayoutData(gd_LeftColumn);
+		}
 
 		comboGenerate.setLayoutData(gd_Fill_H);
 		comboAlgorithm.setLayoutData(gd_Fill_H);
 		scaleTWise.setLayoutData(gd_Fill_H);
 		comboOrder.setLayoutData(gd_Fill_H);
 		scaleInteraction.setLayoutData(gd_Fill_H);
-		buttonBuildProject.setLayoutData(gd_Fill_H);
+		comboOutputType.setLayoutData(gd_Fill_H);
 		buttonTest.setLayoutData(gd_Fill_H);
 
 		container.setSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -313,13 +315,13 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		addListeners();
 		dialogChanged();
 
-		buttonTest.setEnabled(!buttonBuildProject.getSelection());
-
 		if (!JUNIT_INSTALLED) {
 			buttonTest.setSelection(false);
 			buttonTest.setEnabled(false);
 			buttonTest.setToolTipText(JUNIT_PLUGIN_WARNING);
 			labelTest.setToolTipText(JUNIT_PLUGIN_WARNING);
+		} else {
+			buttonTest.setEnabled(comboOutputType.getSelectionIndex() == 2);
 		}
 	}
 
@@ -521,14 +523,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			}
 		});
 
-		buttonBuildProject.addSelectionListener(new SelectionListener() {
+		comboOutputType.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				buttonTest.setEnabled(!buttonBuildProject.getSelection());
-				if (!JUNIT_INSTALLED) {
-					buttonTest.setEnabled(false);
-				}
+				buttonTest.setEnabled(JUNIT_INSTALLED && (comboOutputType.getSelectionIndex() == 2));
 				dialogChanged();
 			}
 
@@ -546,10 +545,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			}
 		});
 
-	}
-
-	boolean getToggleState() {
-		return buttonBuildProject.getSelection();
 	}
 
 	String getAlgorithm() {
@@ -596,6 +591,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	String getSelectedOrder() {
 		return comboOrder.getText();
+	}
+
+	OutputType getOutputType() {
+		for (final OutputType outputType : OutputType.values()) {
+			if (outputType.displayName.equals(comboOutputType.getText())) {
+				return outputType;
+			}
+		}
+		return OutputType.CONFIGURATION;
 	}
 
 	public boolean getTest() {

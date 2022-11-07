@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INCLING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTPUT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YASA;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -48,23 +49,21 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private final IFeatureProject featureProject;
 	private BuildProductsPage page;
-	private boolean toggleState;
 
-	public BuildProductsWizard(IFeatureProject featureProject, boolean toggleState) {
+	public BuildProductsWizard(IFeatureProject featureProject) {
 		this.featureProject = featureProject;
-		this.toggleState = toggleState;
 	}
 
 	@Override
 	public boolean performFinish() {
-		toggleState = page.getToggleState();
 		setTWise(page.getAlgorithm(), page.getT());
 		setTOrder(page.getTInteraction());
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
+		setOutputType(page.getOutputType());
 		setTest(page.getTest());
 		setMax(page.getMax());
-		new ConfigurationBuilder(featureProject, page.getGeneration(), toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(),
+		new ConfigurationBuilder(featureProject, page.getGeneration(), page.getOutputType(), page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(),
 				page.getMax(), page.getTInteraction());
 
 		return true;
@@ -73,17 +72,13 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	@Override
 	public void addPages() {
 		setWindowTitle(BUILD_PRODUCTS);
-		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getT_Interaction(),
-				getOrder(), getTest(), getMax());
+		page = new BuildProductsPage(featureProject.getProjectName(), getGenerate(), getOutputType(), getAlgorithm(), getT(), getT_Interaction(), getOrder(),
+				getTest(), getMax());
 		addPage(page);
 	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {}
-
-	public boolean getToggleState() {
-		return toggleState;
-	}
 
 	private String getAlgorithm() {
 		final String tWise = getTWise();
@@ -182,6 +177,26 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private static void setOrder(String order) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(ORDER, order);
+		} catch (final CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	private static String getOutputType() {
+		try {
+			final String outputType = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(OUTPUT_TYPE);
+			if (outputType != null) {
+				return outputType;
+			}
+		} catch (final CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return OUTPUT_CONFIGURATIONS;
+	}
+
+	private static void setOutputType(OutputType outputType) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(OUTPUT_TYPE, outputType.displayName);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

@@ -261,7 +261,10 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final List<Constraint> ownConstraints = rootModel.getOwnConstraints();
 		final List<Constraint> allConstraints = new LinkedList<>();
 		for (final Import importLine : rootModel.getImports()) {
-			allConstraints.addAll(importLine.getFeatureModel().getConstraints());
+			// only consider submodels from imports that are actually used
+			if (importLine.isReferenced()) {
+				allConstraints.addAll(importLine.getFeatureModel().getConstraints());
+			}
 		}
 
 		for (final Constraint constraint : ownConstraints) {
@@ -324,8 +327,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	private void parseImports(FeatureModel uvlModel, MultiFeatureModel fm) {
 		final List<Import> imports = uvlModel.getImports();
 		for (final Import importLine : imports) {
-			parseImports(importLine.getFeatureModel(), fm);
-			parseImport(fm, importLine);
+			// only consider submodels that are actually referenced somewhere
+			if (importLine.isReferenced()) {
+				parseImports(importLine.getFeatureModel(), fm);
+				parseImport(fm, importLine);
+			}
 		}
 	}
 

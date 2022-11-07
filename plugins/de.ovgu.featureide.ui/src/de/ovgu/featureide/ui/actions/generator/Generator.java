@@ -51,6 +51,9 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -94,7 +97,10 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	public Generator(int nr, ConfigurationBuilder builder) {
 		this.nr = nr;
 		this.builder = builder;
-		if (!builder.createNewProjects) {
+		switch (builder.outputType) {
+		case CONFIGURATION:
+			break;
+		case PRODUCT:
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
 					compiler = new JavaCompiler(nr, this);
@@ -109,6 +115,11 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 			} catch (final Error e3) {
 				System.out.println(e3);
 			}
+			break;
+		case PROJECT:
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -143,7 +154,17 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 					continue;
 				}
 				final String name = configuration.getName();
-				if (builder.createNewProjects) {
+
+				switch (builder.outputType) {
+				case CONFIGURATION:
+					final XMLConfFormat format = new XMLConfFormat();
+					final java.nio.file.Path outputPath = EclipseFileSystem.getPath(builder.folder).resolve(name + "." + format.getSuffix());
+					SimpleFileHandler.save(outputPath, configuration, format);
+					break;
+				case PRODUCT:
+					builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
+					break;
+				case PROJECT:
 					final String separator;
 					switch (builder.buildType) {
 					case ALL_CURRENT:
@@ -165,8 +186,9 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 						throw new RuntimeException(builder.buildType + " not supported");
 					}
 					buildConfiguration(builder.featureProject.getProjectName() + separator + name, configuration);
-				} else {
-					builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
+					break;
+				default:
+					break;
 				}
 
 				if (compiler != null) {
