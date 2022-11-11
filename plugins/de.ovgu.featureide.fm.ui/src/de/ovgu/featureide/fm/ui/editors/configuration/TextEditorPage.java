@@ -118,10 +118,10 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 		if (configurationManager != null) {
 			final ProblemList lastProblems =
 				configurationManager.processObject(config -> updateConfiguration(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
-			if (lastProblems != null) {
+			if (lastProblems.containsError()) {
 				configurationManager.resetSnapshot();
-				return lastProblems;
 			}
+			return lastProblems;
 		}
 		return new ProblemList();
 	}
@@ -133,7 +133,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 		if (!currentConfiguration.equals(text)) {
 			return confFormat.getInstance().read(configuration, text);
 		}
-		return null;
+		return new ProblemList();
 	}
 
 	@Override
@@ -161,7 +161,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 			configurationEditor.setReadConfigurationError(problems.containsError());
 			return problems;
 		}
-		return null;
+		return new ProblemList();
 	}
 
 	private ProblemList parseSource(final Configuration configuration, final IPersistentFormat<Configuration> confFormat) {
