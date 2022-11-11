@@ -472,16 +472,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				if (configurationManager == null) {
 					currentPage.doSave(monitor);
 				} else {
+					// TODO fix for #1082. works but might be possible with less effort
 					final IAnnotationModel model = textEditorPage.getDocumentProvider().getAnnotationModel(textEditorPage.getEditorInput());
 					final Iterator<Annotation> annotationIterator = model.getAnnotationIterator();
 					final List<Annotation> annotationList = new ArrayList<>();
-					// TODO fix for #1082. works but might be possible with less effort
-					while (annotationIterator.hasNext()) {
-						annotationList.add(annotationIterator.next());
-					}
-					for (final Annotation ann : annotationList) {
-						model.removeAnnotation(ann);
-					}
+					annotationIterator.forEachRemaining(annotationList::add);
+					annotationList.forEach(model::removeAnnotation);
+
 					final ProblemList lastProblems = textEditorPage.updateConfiguration();
 					configurationManager.externalSave(() -> notifyPages(monitor, currentPage));
 					createModelFileMarkers(lastProblems);
