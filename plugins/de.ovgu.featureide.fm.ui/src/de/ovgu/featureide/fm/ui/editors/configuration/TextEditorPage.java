@@ -113,26 +113,27 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 		updateConfiguration();
 	}
 
-	public void updateConfiguration() {
+	public ProblemList updateConfiguration() {
 		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			final boolean changed =
+			final ProblemList lastProblems =
 				configurationManager.processObject(config -> updateConfiguration(configurationManager, config), ConfigurationManager.CHANGE_NOTHING);
-			if (changed) {
+			if (lastProblems.containsError()) {
 				configurationManager.resetSnapshot();
 			}
+			return lastProblems;
 		}
+		return new ProblemList();
 	}
 
-	private boolean updateConfiguration(final ConfigurationManager configurationManager, final Configuration configuration) {
+	private ProblemList updateConfiguration(final ConfigurationManager configurationManager, final Configuration configuration) {
 		final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
 		final String currentConfiguration = confFormat.getInstance().write(configuration);
 		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
 		if (!currentConfiguration.equals(text)) {
-			confFormat.getInstance().read(configuration, text);
-			return true;
+			return confFormat.getInstance().read(configuration, text);
 		}
-		return false;
+		return new ProblemList();
 	}
 
 	@Override
@@ -160,7 +161,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 			configurationEditor.setReadConfigurationError(problems.containsError());
 			return problems;
 		}
-		return null;
+		return new ProblemList();
 	}
 
 	private ProblemList parseSource(final Configuration configuration, final IPersistentFormat<Configuration> confFormat) {

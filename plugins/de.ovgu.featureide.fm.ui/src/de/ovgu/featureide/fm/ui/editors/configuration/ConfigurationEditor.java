@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +45,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -509,8 +512,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				if (configurationManager == null) {
 					currentPage.doSave(monitor);
 				} else {
-					textEditorPage.updateConfiguration();
+					// TODO fix for #1082. works but might be possible with less effort
+					final IAnnotationModel model = textEditorPage.getDocumentProvider().getAnnotationModel(textEditorPage.getEditorInput());
+					final Iterator<Annotation> annotationIterator = model.getAnnotationIterator();
+					final List<Annotation> annotationList = new ArrayList<>();
+					annotationIterator.forEachRemaining(annotationList::add);
+					annotationList.forEach(model::removeAnnotation);
+
+					final ProblemList lastProblems = textEditorPage.updateConfiguration();
 					configurationManager.externalSave(() -> notifyPages(monitor, currentPage));
+					createModelFileMarkers(lastProblems);
+					setReadConfigurationError(lastProblems.containsError());
 				}
 			} else {
 				configurationManager.save();
