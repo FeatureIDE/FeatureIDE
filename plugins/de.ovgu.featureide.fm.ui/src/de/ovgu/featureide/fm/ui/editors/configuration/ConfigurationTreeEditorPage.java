@@ -740,7 +740,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		tree.removeAll();
 		final TreeItem item = new TreeItem(tree, 1);
 		item.setText(message);
-		item.setImage(0, FMUIPlugin.getDefault().getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
+		item.setImage(0, PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
 		item.setChecked(true);
 		item.setGrayed(true);
 		dirty = false;
