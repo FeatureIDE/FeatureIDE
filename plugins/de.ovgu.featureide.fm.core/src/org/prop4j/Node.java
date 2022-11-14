@@ -33,8 +33,13 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
+
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form (cnf).
@@ -123,12 +128,33 @@ public abstract class Node {
 		if (isConjunctiveNormalForm()) {
 			return clone();
 		} else {
-			final Node prepareNF = prepareNF();
-			final CNFDistributiveLawTransformer transformer = new CNFDistributiveLawTransformer();
-			transformer.setPropagateUnitClauses(propagateUnitClauses);
-			transformer.setRemoveSubsumed(removeSubsumed);
-			return transformer.transform(prepareNF);
+			return transformToCNF(propagateUnitClauses, removeSubsumed, null);
 		}
+	}
+
+	public Optional<Node> toCNF(boolean propagateUnitClauses, boolean removeSubsumed, long timeout) {
+		if (isConjunctiveNormalForm()) {
+			return Optional.of(clone());
+		} else {
+			final NullMonitor<Object> monitor = new NullMonitor<>();
+			try {
+				return Optional.ofNullable(Executors.newSingleThreadExecutor() //
+						.submit(() -> transformToCNF(propagateUnitClauses, removeSubsumed, monitor)) //
+						.get(timeout, TimeUnit.MILLISECONDS));
+			} catch (final Exception e) {
+				monitor.cancel();
+			}
+		}
+		return Optional.empty();
+	}
+
+	private Node transformToCNF(boolean propagateUnitClauses, boolean removeSubsumed, final NullMonitor<?> monitor) {
+		final Node prepareNF = prepareNF();
+		final CNFDistributiveLawTransformer transformer = new CNFDistributiveLawTransformer();
+		transformer.setPropagateUnitClauses(propagateUnitClauses);
+		transformer.setRemoveSubsumed(removeSubsumed);
+		transformer.setMonitor(monitor);
+		return transformer.transform(prepareNF);
 	}
 
 	public Node toDNF(boolean simplify) {

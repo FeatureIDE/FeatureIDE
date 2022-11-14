@@ -3,8 +3,10 @@ package org.prop4j;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.ListIterator;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -22,22 +24,30 @@ public class CNFDistributiveLawTransformer extends DistributiveLawTransformer {
 
 	@Override
 	public Node transform(Node formula) {
+		monitor.checkCancel();
 		final ArrayList<Node> clauses = new ArrayList<>();
 		if (formula instanceof And) {
-			for (final Node child : formula.getChildren()) {
-				clauses.addAll(Arrays.asList(super.transform(new And(child)).getChildren()));
-			}
+			final List<Node> synchronizedClauseList = Collections.synchronizedList(clauses);
+			Arrays.stream(formula.getChildren()) //
+					.parallel() //
+					.map(this::transformSubnode) //
+					.forEach(synchronizedClauseList::addAll);
 		} else {
-			clauses.addAll(Arrays.asList(super.transform(new And(formula)).getChildren()));
+			clauses.addAll(transformSubnode(formula));
 		}
 
 		return simplify(clauses);
+	}
+
+	private List<Node> transformSubnode(final Node subnode) {
+		return Arrays.asList(super.transform(new And(subnode)).getChildren());
 	}
 
 	private Node simplify(ArrayList<Node> clauses) {
 		if (!propagateUnitClauses && !removeSubsumed) {
 			return new And(clauses);
 		}
+		monitor.checkCancel();
 
 		final ArrayList<LinkedHashSet<Literal>> newClauseList = new ArrayList<>(clauses.size());
 		clauseLoop: for (final Node clause : clauses) {
@@ -75,6 +85,7 @@ public class CNFDistributiveLawTransformer extends DistributiveLawTransformer {
 			}
 
 			while (newUnitClauses) {
+				monitor.checkCancel();
 				newUnitClauses = false;
 				for (final Collection<Literal> clause : newClauseList) {
 					if (clause.size() > 1) {
@@ -94,6 +105,7 @@ public class CNFDistributiveLawTransformer extends DistributiveLawTransformer {
 
 		if (removeSubsumed) {
 			for (int end = newClauseList.size(), i = 0; i < end; i++) {
+				monitor.checkCancel();
 				final LinkedHashSet<Literal> clause = newClauseList.get(i);
 				for (final ListIterator<LinkedHashSet<Literal>> it = newClauseList.listIterator(i + 1); it.hasNext();) {
 					final LinkedHashSet<Literal> clause2 = it.next();

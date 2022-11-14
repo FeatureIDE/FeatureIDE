@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
+
 /**
  * Transforms propositional formulas into (clausal) CNF or DNF.
  *
@@ -35,6 +38,13 @@ public class DistributiveLawTransformer {
 
 	protected boolean removeSubsumed = false;
 	protected boolean propagateUnitClauses = false;
+	protected IMonitor<?> monitor = new NullMonitor<>();
+
+	public void setMonitor(IMonitor<?> monitor) {
+		if (monitor != null) {
+			this.monitor = monitor;
+		}
+	}
 
 	public DistributiveLawTransformer(Class<? extends Node> clauseClass, Function<List<? extends Node>, Node> clauseConstructor) {
 		this.clauseClass = clauseClass;
@@ -62,6 +72,7 @@ public class DistributiveLawTransformer {
 		final ArrayDeque<Node> stack = new ArrayDeque<>();
 		stack.addLast(node);
 		while (!stack.isEmpty()) {
+			monitor.checkCancel();
 			final Node curNode = stack.getLast();
 			final boolean firstEncounter = path.isEmpty() || (curNode != path.get(path.size() - 1).node);
 			if (firstEncounter) {
@@ -107,6 +118,7 @@ public class DistributiveLawTransformer {
 	}
 
 	private List<Node> convert(Node child) {
+		monitor.checkCancel();
 		if (child instanceof Literal) {
 			return null;
 		} else {
@@ -119,6 +131,7 @@ public class DistributiveLawTransformer {
 			newClauseList.sort(Comparator.comparingInt(Set::size));
 			final int lastIndex = newClauseList.size();
 			for (int i = 0; i < lastIndex; i++) {
+				monitor.checkCancel();
 				final Set<Literal> set = newClauseList.get(i);
 				if (set != null) {
 					for (int j = i + 1; j < lastIndex; j++) {
@@ -137,6 +150,7 @@ public class DistributiveLawTransformer {
 	}
 
 	private void convertNF(List<Node> children, List<Set<Literal>> clauses, LinkedHashSet<Literal> literals, int index) {
+		monitor.checkCancel();
 		if (index == children.size()) {
 			final HashSet<Literal> newClause = new HashSet<>(literals);
 			clauses.add(newClause);
