@@ -41,6 +41,8 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.Problem.Severity;
 import de.ovgu.featureide.fm.core.io.uvl.UVLFeatureModelFormat;
 import de.vill.model.Attribute;
 
@@ -86,7 +88,6 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 				Object value = null;
 				boolean recursive = false;
 				boolean configurable = false;
-				String type = "";
 				Attribute<?> valueObj = attributeMap.get("value");
 				if (valueObj != null) {
 					value = valueObj.getValue();
@@ -104,10 +105,8 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 					configurable = (Boolean) configurableObj.getValue();
 				}
 				Attribute<?> typeObj = attributeMap.get("type");
-				if (typeObj != null && typeObj.getValue() instanceof String) {
-					type = (String) typeObj.getValue();
-				}
-				if (type == "") {
+				final String type = (typeObj != null && typeObj.getValue() instanceof String) ? (String) typeObj.getValue() : "";
+				if (type.isEmpty()) {
 					createAttribute(extendedFeature, attributeKey, value, unit, recursive, configurable);
 				} else {
 					createAttribute(extendedFeature, type, attributeKey, value, unit, recursive, configurable);
@@ -130,7 +129,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	 * @param configurable true if the attribute is configurable, false otherwise
 	 */
 	private void createAttribute(ExtendedMultiFeature feature, String key, Object value, String unit, boolean recursive, boolean configurable) {
-		String type = null;
+		final String type;
 		if (value instanceof String) {
 			type = "string";
 		} else if (value instanceof Double) {
@@ -139,6 +138,8 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			type = "long";
 		} else if (value instanceof Boolean) {
 			type = "boolean";
+		} else {
+			type = "";
 		}
 		createAttribute(feature, type, key, value, unit, recursive, configurable);
 	}
@@ -155,21 +156,23 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	 * @param configurable true if the attribute is configurable, false otherwise
 	 */
 	private void createAttribute(ExtendedMultiFeature feature, String type, String key, Object value, String unit, boolean recursive, boolean configurable) {
-		if (type != null) {
-			switch (type) {
-			case "string":
-				feature.addAttribute(new StringFeatureAttribute(feature, key, unit, (String) value, recursive, configurable));
-				break;
-			case "double":
-				feature.addAttribute(new DoubleFeatureAttribute(feature, key, unit, (Double) value, recursive, configurable));
-				break;
-			case "long":
-				feature.addAttribute(new LongFeatureAttribute(feature, key, unit, (Long) value, recursive, configurable));
-				break;
-			case "boolean":
-				feature.addAttribute(new BooleanFeatureAttribute(feature, key, unit, (Boolean) value, recursive, configurable));
-				break;
-			}
+		switch (type) {
+		case "string":
+			feature.addAttribute(new StringFeatureAttribute(feature, key, unit, (String) value, recursive, configurable));
+			break;
+		case "double":
+			feature.addAttribute(new DoubleFeatureAttribute(feature, key, unit, (Double) value, recursive, configurable));
+			break;
+		case "long":
+			feature.addAttribute(new LongFeatureAttribute(feature, key, unit, (Long) value, recursive, configurable));
+			break;
+		case "boolean":
+			feature.addAttribute(new BooleanFeatureAttribute(feature, key, unit, (Boolean) value, recursive, configurable));
+			break;
+		default:
+			// TODO: Add accurate line numbers. Information is not available
+			pl.add(new Problem("Wrong attribute type \"" + type + "\"", 0, Severity.WARNING));
+			break;
 		}
 	}
 
