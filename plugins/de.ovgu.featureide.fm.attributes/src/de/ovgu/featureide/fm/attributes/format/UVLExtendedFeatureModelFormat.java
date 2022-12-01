@@ -104,7 +104,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 					configurable = (Boolean) configurableObj.getValue();
 				}
 				Attribute<?> typeObj = attributeMap.get("type");
-				if (typeObj != null && typeObj.getValue() instanceof Boolean) {
+				if (typeObj != null && typeObj.getValue() instanceof String) {
 					type = (String) typeObj.getValue();
 				}
 				if (type == "") {
