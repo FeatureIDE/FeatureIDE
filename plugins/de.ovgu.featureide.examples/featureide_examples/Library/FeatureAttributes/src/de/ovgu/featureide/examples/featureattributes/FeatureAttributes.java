@@ -110,7 +110,7 @@ public class FeatureAttributes {
 			ExtendedFeature ext = (ExtendedFeature) feat;
 			ext.addAttribute(att);
 			if (att.isRecursive()) {
-				att.recurseAttribute(feat);
+				att.addRecursiveAttributes();
 			}
 		}
 	}

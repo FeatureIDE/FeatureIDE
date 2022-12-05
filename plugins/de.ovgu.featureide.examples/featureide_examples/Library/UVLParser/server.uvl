@@ -1,19 +1,18 @@
 namespace Server
 
 features
-	Server {abstract, extended__}	
+	Server {extended__ true, abstract true}
 		mandatory
-			FileSystem	
+			FileSystem
 				or
 					NTFS
 					APFS
 					EXT4
-			OperatingSystem {abstract}	
+			OperatingSystem {abstract true}
 				alternative
 					Windows {Memory 4100}
 					macOS {Memory 2800}
 					Debian {Memory 3500}
-
 		optional
 			Logging
 

@@ -1,8 +1,9 @@
 .project
+lib/uvl-parser.jar
+lib/de.ovgu.featureide.lib.fm.attributes-v3.9.1.jar
 lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.8.3.jar
 lib/org.sat4j.core.jar
-lib/de.ovgu.featureide.lib.fm.attributes-v3.8.3.jar
+lib/de.ovgu.featureide.lib.fm-v3.9.1.jar
 sandwich.xml
 src/de/ovgu/featureide/examples/featureattributes/FeatureAttributes.java
 .classpath
