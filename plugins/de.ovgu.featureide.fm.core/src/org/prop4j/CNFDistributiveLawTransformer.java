@@ -29,7 +29,6 @@ public class CNFDistributiveLawTransformer extends DistributiveLawTransformer {
 		if (formula instanceof And) {
 			final List<Node> synchronizedClauseList = Collections.synchronizedList(clauses);
 			Arrays.stream(formula.getChildren()) //
-					.parallel() //
 					.map(this::transformSubnode) //
 					.forEach(synchronizedClauseList::addAll);
 		} else {
