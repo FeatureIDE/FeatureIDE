@@ -444,11 +444,11 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 	}
 
 	protected Map<String, Attribute<?>> printAttributes(IFeature feature) {
-		final Map<String, Attribute<?>> attribtues = new HashMap<>();
+		final Map<String, Attribute<?>> properties = new HashMap<>();
 		if (feature.getStructure().isAbstract()) {
-			attribtues.put("abstract", new Attribute<>("abstract", Boolean.TRUE));
+			properties.put("abstract", new Attribute<>("abstract", Boolean.TRUE));
 		}
-		return attribtues;
+		return properties;
 	}
 
 	private List<Constraint> featureIDEConstraintsToUVLConstraints(IFeatureModel fm) {
