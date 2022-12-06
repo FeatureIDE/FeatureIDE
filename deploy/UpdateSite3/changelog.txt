@@ -4,6 +4,17 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+Release 3.9.1 (November 2022)
+* Hotfix containing mostly bugfixes over v3.9.0
+* Fixed example projects and added current library versions (#1375, #1380)
+* Fixed multiple problems with UVL (#1285, #1304, #1378, #1386, #1391)
+* Added some minor enhancements
+  * Enabled product generator to create configurations only (#1325)
+  * Revised feature model export dialog (#1371)
+  * Changed default composer to "Feature Modelling" (#1379)
+  * Added timeout functionality for CNF conversion
+* Fixed other minor bugs (#1082)
+
 Release 3.9.0 (September 2022)
 * Many enhancements and fixes for UVL
   * Added GUI support for importing sub models (#1250)
