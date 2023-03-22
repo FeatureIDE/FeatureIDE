@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
@@ -419,23 +420,31 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			}
 			uvlFeature.getChildren().add(group);
 		} else {
-			final List<IFeature> mandatoryChildren =
-				feature.getStructure().getChildren().stream().filter(x -> x.isMandatory()).map(x -> x.getFeature()).collect(Collectors.toList());
-			if (mandatoryChildren.size() > 0) {
-				final Group group = new Group(GroupType.MANDATORY);
-				for (final IFeature childFeature : mandatoryChildren) {
-					group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
+			Group group = new Group(GroupType.OPTIONAL);
+			for (final IFeatureStructure fs : feature.getStructure().getChildren()) {
+				if (fs.isMandatory()) {
+					if (group.GROUPTYPE == GroupType.MANDATORY) {
+						group.getFeatures().add(featureIDEFeatureToUVLFeature(fs.getFeature()));
+					} else {
+						if (group.getFeatures().size() > 0) {
+							uvlFeature.getChildren().add(group);
+						}
+						group = new Group(GroupType.MANDATORY);
+						group.getFeatures().add(featureIDEFeatureToUVLFeature(fs.getFeature()));
+					}
+				} else {
+					if (group.GROUPTYPE == GroupType.OPTIONAL) {
+						group.getFeatures().add(featureIDEFeatureToUVLFeature(fs.getFeature()));
+					} else {
+						if (group.getFeatures().size() > 0) {
+							uvlFeature.getChildren().add(group);
+						}
+						group = new Group(GroupType.OPTIONAL);
+						group.getFeatures().add(featureIDEFeatureToUVLFeature(fs.getFeature()));
+					}
 				}
-				uvlFeature.getChildren().add(group);
 			}
-
-			final List<IFeature> optionalChildren =
-				feature.getStructure().getChildren().stream().filter(x -> !x.isMandatory()).map(x -> x.getFeature()).collect(Collectors.toList());
-			if (optionalChildren.size() > 0) {
-				final Group group = new Group(GroupType.OPTIONAL);
-				for (final IFeature childFeature : optionalChildren) {
-					group.getFeatures().add(featureIDEFeatureToUVLFeature(childFeature));
-				}
+			if (group.getFeatures().size() > 0) {
 				uvlFeature.getChildren().add(group);
 			}
 		}
