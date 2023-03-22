@@ -182,7 +182,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 		final Attribute<?> featureDescription = uvlFeature.getAttributes().get(FEATURE_DESCRIPTION_ATTRIBUTE_NAME);
 		if ((featureDescription != null) && (featureDescription.getValue() instanceof String)) {
-			feature.getProperty().setDescription((String) featureDescription.getValue());
+			feature.getProperty().setDescription(((String) featureDescription.getValue()).replace("\\n", "\n"));
 		}
 
 		if (parentFeature != null) {
@@ -401,7 +401,8 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 		final String featureDescription = feature.getProperty().getDescription();
 		if ((featureDescription != null) && !featureDescription.equals("")) {
-			final Attribute<String> featureDescriptionAttribute = new Attribute<String>(FEATURE_DESCRIPTION_ATTRIBUTE_NAME, featureDescription);
+			final Attribute<String> featureDescriptionAttribute =
+				new Attribute<String>(FEATURE_DESCRIPTION_ATTRIBUTE_NAME, featureDescription.replace("\n", "\\n"));
 			uvlFeature.getAttributes().put(FEATURE_DESCRIPTION_ATTRIBUTE_NAME, featureDescriptionAttribute);
 		}
 
