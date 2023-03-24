@@ -555,7 +555,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return !content.toString().contains(EXTENDED_ATTRIBUTE_NAME);
+		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
+		final FeatureModel featureModel = uvlModelFactory.parse(content.toString());
+		if ((featureModel != null) && (featureModel.getRootFeature() != null)) {
+			return !content.toString().contains(EXTENDED_ATTRIBUTE_NAME);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
