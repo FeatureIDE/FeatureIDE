@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewConst
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewDescriptionColumnLabelProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewFilter;
+import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewImportedColumnLabelProvider;
 import de.ovgu.featureide.fm.ui.views.constraintview.content.ConstraintViewTagsColumnLabelProvider;
 
 /**
@@ -67,6 +68,7 @@ public class ConstraintView implements GUIDefaults {
 	private final String DESCRIPTION_HEADER = "Description";
 
 	private final String TAG_HEADER = "Tags";
+	private final String IMPORTED_HEADER = "Imported";
 
 	// offset to account for the margin of the tree and the scrollbar
 	// this value is larger than needed to ensure correctness on all versions and operating systems
@@ -74,7 +76,7 @@ public class ConstraintView implements GUIDefaults {
 	private static final int INITIAL_COLUMN_WIDTH = 500;
 	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
 	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
-	private static final float COLUMN_WIDTH_RATIO = 0.33f;
+	private static final float COLUMN_WIDTH_RATIO = 0.3f;
 
 	// UI elements
 	private TreeViewer treeViewer;
@@ -194,6 +196,15 @@ public class ConstraintView implements GUIDefaults {
 			}
 		});
 
+		final TreeViewerColumn importedColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+		importedColumn.getColumn().setText(IMPORTED_HEADER);
+		importedColumn.getColumn().setWidth(INITIAL_COLUMN_WIDTH);
+		importedColumn.getColumn().setResizable(true);
+		importedColumn.getColumn().setMoveable(true);
+		importedColumn.setLabelProvider(new ConstraintViewImportedColumnLabelProvider());
+
+		importedColumn.getColumn().setToolTipText("For models that can contain a submodel");
+
 		// resize columns on view size change
 		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
 
@@ -212,6 +223,7 @@ public class ConstraintView implements GUIDefaults {
 				constraintColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
 				descriptionColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
 				tagColumn.getColumn().setWidth((int) (treeWidth * COLUMN_WIDTH_RATIO));
+				importedColumn.getColumn().setWidth((int) (treeWidth * 0.1f));
 			}
 		});
 	}
