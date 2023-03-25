@@ -23,9 +23,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -46,7 +48,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	private final String childName;
-	private final List<String> selectedFeatureNames;
+	private final HashSet<String> selectedFeatureNames;
 	private final TreeMap<Integer, String> children = new TreeMap<>();
 
 	private String featureName;
@@ -56,7 +58,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatures) {
 		super(featureModelManager, "Add Feature");
-		selectedFeatureNames = selectedFeatures;
+		selectedFeatureNames = new HashSet<>(selectedFeatures);
 		childName = selectedFeatures.get(0);
 	}
 
@@ -73,15 +75,19 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 			newFeature.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
-			for (final String name : selectedFeatureNames) {
-				final IFeature iFeature = featureModel.getFeature(name);
-				children.put(parent.getChildIndex(iFeature.getStructure()), iFeature.getName());
-				parent.removeChild(iFeature.getStructure());
+
+			final List<String> parentChildren = parent.getChildren().stream().map(c -> c.getFeature().getName()).collect(Collectors.toList());
+			int childrenCounter = 0;
+			for (final String newChild : parentChildren) {
+				if (selectedFeatureNames.contains(newChild)) {
+					final IFeature iFeature = featureModel.getFeature(newChild);
+					children.put(childrenCounter, newChild);
+					parent.removeChild(iFeature.getStructure());
+					newFeature.getStructure().addChild(featureModel.getFeature(newChild).getStructure());
+				}
+				childrenCounter++;
 			}
 			parent.addChildAtPosition(index, newFeature.getStructure());
-			for (final String name : selectedFeatureNames) {
-				newFeature.getStructure().addChild(featureModel.getFeature(name).getStructure());
-			}
 
 			if (parentOr) {
 				newFeature.getStructure().changeToOr();
