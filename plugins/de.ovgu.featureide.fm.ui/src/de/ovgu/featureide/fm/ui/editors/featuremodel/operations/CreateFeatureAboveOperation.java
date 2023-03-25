@@ -23,8 +23,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -71,17 +73,24 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			parentOr = parent.isOr();
 			parentAlternative = parent.isAlternative();
 
+			final Set<String> parentChildren = new HashSet<String>();
+			for (int i = 0; i < parent.getChildren().size(); i++) {
+				parentChildren.add(parent.getChildren().get(i).getFeature().getName());
+			}
+
 			newFeature.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
-			for (final String name : selectedFeatureNames) {
-				final IFeature iFeature = featureModel.getFeature(name);
-				children.put(parent.getChildIndex(iFeature.getStructure()), iFeature.getName());
-				parent.removeChild(iFeature.getStructure());
+			int childrenCounter = 0;
+			for (final String newChild : parentChildren) {
+				if (selectedFeatureNames.contains(newChild)) {
+					final IFeature iFeature = featureModel.getFeature(newChild);
+					children.put(childrenCounter, newChild);
+					parent.removeChild(iFeature.getStructure());
+					newFeature.getStructure().addChild(featureModel.getFeature(newChild).getStructure());
+				}
+				childrenCounter++;
 			}
 			parent.addChildAtPosition(index, newFeature.getStructure());
-			for (final String name : selectedFeatureNames) {
-				newFeature.getStructure().addChild(featureModel.getFeature(name).getStructure());
-			}
 
 			if (parentOr) {
 				newFeature.getStructure().changeToOr();
