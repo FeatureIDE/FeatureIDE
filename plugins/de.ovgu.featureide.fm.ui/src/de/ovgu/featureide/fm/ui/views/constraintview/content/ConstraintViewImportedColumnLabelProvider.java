@@ -22,11 +22,10 @@ package de.ovgu.featureide.fm.ui.views.constraintview.content;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
 
 /**
- * This class is the label provider for the Importedcolumn. It displays whether the constraint is imported.
+ * This class is the label provider for the ImportedColumn. It displays whether the constraint is imported.
  *
  * @author Rahel Arens
  */
@@ -35,20 +34,10 @@ public class ConstraintViewImportedColumnLabelProvider extends ColumnLabelProvid
 	@Override
 	public String getText(Object element) {
 		// in the special case that there is no FeatureModel opened, a String will be given. The ImportedColumn should then not show anything.
-		if (element instanceof String) {
-			return "";
-		} else {
-			final IConstraint constraint = (IConstraint) element;
-			if (constraint instanceof MultiConstraint) {
-				final MultiConstraint multiConstraint = (MultiConstraint) constraint;
-				if (multiConstraint.isFromExtern()) {
-					return "yes";
-				} else {
-					return "no";
-				}
-			} else {
-				return "";
-			}
-		}
+		return (element instanceof MultiConstraint) //
+			? (((MultiConstraint) element).isFromExtern()) //
+				? "yes" //
+				: "no" //
+			: "";
 	}
 }

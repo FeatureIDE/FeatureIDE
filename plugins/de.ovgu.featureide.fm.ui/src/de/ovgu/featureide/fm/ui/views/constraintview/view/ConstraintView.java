@@ -203,7 +203,7 @@ public class ConstraintView implements GUIDefaults {
 		importedColumn.getColumn().setMoveable(true);
 		importedColumn.setLabelProvider(new ConstraintViewImportedColumnLabelProvider());
 
-		importedColumn.getColumn().setToolTipText("For models that can contain a submodel");
+		importedColumn.getColumn().setToolTipText("Available only for models that can contain a submodel");
 
 		// resize columns on view size change
 		treeViewer.getTree().getParent().addControlListener(new ControlListener() {
