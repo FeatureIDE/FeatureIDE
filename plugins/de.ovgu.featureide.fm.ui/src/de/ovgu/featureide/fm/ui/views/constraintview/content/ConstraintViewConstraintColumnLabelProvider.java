@@ -75,7 +75,7 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 			return null;
 		}
 
-		for (final Reason reason : controller.getFeatureModelEditor().diagramEditor.getActiveExplanation().getReasons()) {
+		for (final Reason<?> reason : controller.getFeatureModelEditor().diagramEditor.getActiveExplanation().getReasons()) {
 			if (reason.getSubject() instanceof FeatureModelToNodeTraceModel.FeatureModelElementTrace) {
 				final IFeatureModelElement featureModelElement = ((FeatureModelToNodeTraceModel.FeatureModelElementTrace) reason.getSubject()).getElement();
 				if (featureModelElement instanceof IConstraint) {
