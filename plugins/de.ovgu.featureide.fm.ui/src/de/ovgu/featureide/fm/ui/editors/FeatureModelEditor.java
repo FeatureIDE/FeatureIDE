@@ -117,6 +117,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private ModelMarkerHandler<IFile> markerHandler;
 	boolean isPageModified = false;
+	boolean isFirstSourceAccess = true;
 	FeatureModelManager fmManager;
 	IGraphicalFeatureModel gfm;
 

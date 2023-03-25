@@ -122,7 +122,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	public void internalSave(IProgressMonitor progressMonitor) {
 		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
-		if (problems.containsError()) {
+		if (problems.containsWarning()) {
 			createMarkers(problems);
 		} else {
 			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
@@ -151,13 +151,12 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 			return true;
 		}
 		final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
-		final boolean containsError = problems.containsError();
-		if (containsError) {
+		if (problems.containsWarning()) {
 			createMarkers(problems);
 		} else {
 			deleteMarkers(getDocumentProvider().getAnnotationModel(getEditorInput()));
 		}
-		return !containsError;
+		return !problems.containsError();
 	}
 
 	private void createMarkers(ProblemList problems) {
@@ -223,6 +222,13 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 				resetTextEditor();
 			}
 			oldText = getDocumentProvider().getDocument(getEditorInput()).get();
+		}
+		if (featureModelEditor.isFirstSourceAccess) {
+			final ProblemList problems = featureModelEditor.checkModel(getCurrentContent());
+			if (problems.containsWarning()) {
+				createMarkers(problems);
+			}
+			featureModelEditor.isFirstSourceAccess = false;
 		}
 	}
 
