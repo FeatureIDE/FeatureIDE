@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	private final String childName;
-	private final List<String> selectedFeatureNames;
+	private final HashSet<String> selectedFeatureNames;
 	private final TreeMap<Integer, String> children = new TreeMap<>();
 
 	private String featureName;
@@ -58,7 +58,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	public CreateFeatureAboveOperation(IFeatureModelManager featureModelManager, List<String> selectedFeatures) {
 		super(featureModelManager, "Add Feature");
-		selectedFeatureNames = selectedFeatures;
+		selectedFeatureNames = new HashSet<>(selectedFeatures);
 		childName = selectedFeatures.get(0);
 	}
 
@@ -73,13 +73,10 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			parentOr = parent.isOr();
 			parentAlternative = parent.isAlternative();
 
-			final Set<String> parentChildren = new HashSet<String>();
-			for (int i = 0; i < parent.getChildren().size(); i++) {
-				parentChildren.add(parent.getChildren().get(i).getFeature().getName());
-			}
-
 			newFeature.getStructure().setMultiple(parent.isMultiple());
 			final int index = parent.getChildIndex(child.getStructure());
+
+			final List<String> parentChildren = parent.getChildren().stream().map(c -> c.getFeature().getName()).collect(Collectors.toList());
 			int childrenCounter = 0;
 			for (final String newChild : parentChildren) {
 				if (selectedFeatureNames.contains(newChild)) {
