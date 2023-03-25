@@ -61,7 +61,6 @@ public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	@SuppressWarnings("unused")
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
-	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
 
 	// Style parameters for the view
 	private final String CONSTRAINT_HEADER = "Constraint";
@@ -74,8 +73,6 @@ public class ConstraintView implements GUIDefaults {
 	// this value is larger than needed to ensure correctness on all versions and operating systems
 	private static final int TREE_WIDTH_OFFSET = 50;
 	private static final int INITIAL_COLUMN_WIDTH = 500;
-	private static final float NAME_COLUMN_WIDTH_RATIO = 0.33f;
-	private static final float DESCRIPTION_COLUMN_WIDTH_RATIO = 0.67f;
 	private static final float COLUMN_WIDTH_RATIO = 0.3f;
 
 	// UI elements

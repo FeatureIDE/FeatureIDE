@@ -25,7 +25,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.CreateConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshConstraintViewAction;
@@ -40,7 +39,6 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstr
 public class ConstraintViewSettingsMenu {
 
 	private final ConstraintViewController controller;
-	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 
 	private final ShowCollapsedConstraintsInViewAction collapseAction;
 	private final RefreshConstraintViewAction refreshAction;
@@ -58,7 +56,7 @@ public class ConstraintViewSettingsMenu {
 
 	/**
 	 * Sets the image and tooltip for the "Show collapsed constraints" Button.
-	 * 
+	 *
 	 * @param collapse True: Show the "collapse"-image and tooltip. False: Show the "expand"-image and tooltip
 	 */
 	public void setShowCollapsedConstraintsInViewActionImage(boolean collapse) {
