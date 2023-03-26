@@ -4,6 +4,12 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+Release 3.9.2 (March 2023)
+* Hotfix containing mostly bugfixes over v3.9.1
+* Improves UVL support of feature diagram editor and constraint view (#1415, #1410, #1377)
+* Fixes some problem in the feature diagram editor (#1299, #1313, #1402)
+* Fixes incompatibility with latest Eclipse versions (#1403)
+
 Release 3.9.1 (December 2022)
 * Hotfix containing mostly bugfixes over v3.9.0
 * Fixed example projects and added current library versions (#1375, #1380)
