@@ -4,7 +4,7 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
-Release 3.9.1 (November 2022)
+Release 3.9.1 (December 2022)
 * Hotfix containing mostly bugfixes over v3.9.0
 * Fixed example projects and added current library versions (#1375, #1380)
 * Fixed multiple problems with UVL (#1285, #1304, #1378, #1386, #1391)
