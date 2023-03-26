@@ -215,11 +215,11 @@ Library.
       <import plugin="de.ovgu.featureide.fm.ui"/>
       <import plugin="de.ovgu.featureide.core"/>
       <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.jdt.core.manipulation"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.junit"/>
       <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.eclipse.jdt.core.manipulation"/>
    </requires>
 
    <plugin

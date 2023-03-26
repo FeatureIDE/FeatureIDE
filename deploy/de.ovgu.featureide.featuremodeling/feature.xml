@@ -190,6 +190,8 @@ Library.
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.databinding.observable"/>
+      <import plugin="org.eclipse.jface.databinding"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
@@ -200,8 +202,6 @@ Library.
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="de.ovgu.featureide.fm.ui"/>
       <import plugin="de.ovgu.featureide.core"/>
-      <import plugin="org.eclipse.core.databinding.observable"/>
-      <import plugin="org.eclipse.jface.databinding"/>
    </requires>
 
    <plugin
