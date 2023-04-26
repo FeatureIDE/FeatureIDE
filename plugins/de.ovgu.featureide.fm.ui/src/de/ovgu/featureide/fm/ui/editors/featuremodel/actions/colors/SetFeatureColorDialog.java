@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIA
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_ALL_CHILDREN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_AND_ALL_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_DIRECT_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
 
@@ -147,7 +148,8 @@ public class SetFeatureColorDialog extends Dialog {
 		actionLabel.setText(CHOOSE_ACTION);
 
 		final Combo actionDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		final String[] actionDropDownItems = { SELECTED_FEATURE, SELECTED_FEATURE_DIRECT_CHILDREN, SELECTED_FEATURE_ALL_CHILDREN, SELECTED_FEATURE_SIBLINGS };
+		final String[] actionDropDownItems =
+			{ SELECTED_FEATURE, SELECTED_FEATURE_DIRECT_CHILDREN, SELECTED_FEATURE_ALL_CHILDREN, SELECTED_FEATURE_SIBLINGS, SELECTED_FEATURE_AND_ALL_CHILDREN };
 		actionDropDownMenu.setLayoutData(gridData);
 		actionDropDownMenu.setItems(actionDropDownItems);
 
@@ -209,6 +211,9 @@ public class SetFeatureColorDialog extends Dialog {
 					findAllChildren();
 				} else if (selectedAction.equals(SELECTED_FEATURE_SIBLINGS)) {
 					findSiblings();
+				} else if (selectedAction.equals(SELECTED_FEATURE_AND_ALL_CHILDREN)) {
+					findAllChildren();
+					featureListBuffer.addAll(featureList);
 				}
 				featureTable.redraw();
 				featureTable.removeAll();
