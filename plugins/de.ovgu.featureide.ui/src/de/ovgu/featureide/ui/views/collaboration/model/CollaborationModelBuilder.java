@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -278,7 +279,7 @@ public class CollaborationModelBuilder {
 		final FSTConfiguration c;
 		if (config == null) {
 			c = new FSTConfiguration(NO_CONFIGURATION, configuration, false);
-		} else if ((configuration == null) || configuration.equals(config)) {
+		} else if ((configuration == null) || Objects.equals(EclipseFileSystem.getPath(configuration), config)) {
 			c = new FSTConfiguration(FileHandler.getFileName(config) + " ", configuration, true);
 		} else {
 			c = new FSTConfiguration(FileHandler.getFileName(configuration.getName()) + " ", configuration, false);
