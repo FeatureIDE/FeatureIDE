@@ -5,13 +5,18 @@ Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
 Bundle-Version: 3.9.2.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.ui.ide,
- org.eclipse.jdt.ui,
- org.eclipse.gef,
- org.eclipse.core.expressions,
+Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.editors,
+ org.eclipse.gef,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.debug.ui,
+ org.junit,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core
@@ -93,15 +98,4 @@ Export-Package:
    org.eclipse.swt.layout,
    de.ovgu.featureide.core.builder,
    de.ovgu.featureide.fm.core"
-Import-Package: org.eclipse.debug.ui,
- org.eclipse.jdt.core,
- org.eclipse.jdt.core.compiler.batch,
- org.eclipse.jdt.internal.core,
- org.eclipse.jdt.internal.ui.javaeditor,
- org.eclipse.jface.text,
- org.eclipse.jface.text.contentassist,
- org.eclipse.jface.text.source,
- org.eclipse.ui.texteditor,
- org.junit.runner;resolution:=optional,
- org.junit.runner.notification;resolution:=optional
 Automatic-Module-Name: de.ovgu.featureide.ui
