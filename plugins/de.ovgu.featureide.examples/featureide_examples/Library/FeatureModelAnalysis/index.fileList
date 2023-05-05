@@ -1,8 +1,8 @@
 .project
 lib/uvl-parser.jar
 lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.9.2.jar
 lib/org.sat4j.core.jar
+lib/de.ovgu.featureide.lib.fm-v3.9.3.jar
 src/de/ovgu/featureide/examples/featuremodelanalysis/FeatureModelAnalysis.java
 car.xml
 .classpath
