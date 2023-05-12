@@ -1109,7 +1109,6 @@ public class StringTable {
 	public static final String MAGENTA = "magenta";
 	public static final String PURPLE = "purple";
 	public static final String SELECTED_FEATURE = "Current Selection";
-	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Children (first level)";
 	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Children (all)";
 	public static final String SELECTED_FEATURE_SIBLINGS = "Current selection and all siblings";
 	public static final String SELECTED_FEATURE_AND_ALL_CHILDREN = "Current selection and all children";

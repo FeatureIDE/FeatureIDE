@@ -27,7 +27,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_ALL_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_AND_ALL_CHILDREN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_DIRECT_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
 
 import java.util.ArrayList;
@@ -148,8 +147,7 @@ public class SetFeatureColorDialog extends Dialog {
 		actionLabel.setText(CHOOSE_ACTION);
 
 		final Combo actionDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		final String[] actionDropDownItems =
-			{ SELECTED_FEATURE, SELECTED_FEATURE_DIRECT_CHILDREN, SELECTED_FEATURE_ALL_CHILDREN, SELECTED_FEATURE_SIBLINGS, SELECTED_FEATURE_AND_ALL_CHILDREN };
+		final String[] actionDropDownItems = { SELECTED_FEATURE, SELECTED_FEATURE_ALL_CHILDREN, SELECTED_FEATURE_SIBLINGS, SELECTED_FEATURE_AND_ALL_CHILDREN };
 		actionDropDownMenu.setLayoutData(gridData);
 		actionDropDownMenu.setItems(actionDropDownItems);
 
@@ -205,9 +203,7 @@ public class SetFeatureColorDialog extends Dialog {
 			public void widgetSelected(SelectionEvent event) {
 				bufferSelectedFeatures();
 				final String selectedAction = ((Combo) event.widget).getText();
-				if (selectedAction.equals(SELECTED_FEATURE_DIRECT_CHILDREN)) {
-					findDirectChildren();
-				} else if (selectedAction.equals(SELECTED_FEATURE_ALL_CHILDREN)) {
+				if (selectedAction.equals(SELECTED_FEATURE_ALL_CHILDREN)) {
 					findAllChildren();
 				} else if (selectedAction.equals(SELECTED_FEATURE_SIBLINGS)) {
 					findSiblings();
@@ -256,14 +252,6 @@ public class SetFeatureColorDialog extends Dialog {
 					children.add(childStructure.getFeature());
 				}
 				return children;
-			}
-
-			private void findDirectChildren() {
-				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
-				for (int j = 0; j < featureListBuffer.size(); j++) {
-					affectedFeatures.addAll(findChildren(featureListBuffer.get(j)));
-				}
-				featureListBuffer = affectedFeatures;
 			}
 
 			@Override
