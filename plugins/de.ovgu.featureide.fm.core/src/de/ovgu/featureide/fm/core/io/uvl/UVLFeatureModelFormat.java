@@ -25,9 +25,11 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,6 +66,7 @@ import de.vill.model.FeatureModel;
 import de.vill.model.Group;
 import de.vill.model.Group.GroupType;
 import de.vill.model.Import;
+import de.vill.model.LanguageLevel;
 import de.vill.model.constraint.AndConstraint;
 import de.vill.model.constraint.Constraint;
 import de.vill.model.constraint.EquivalenceConstraint;
@@ -148,6 +151,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
 			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
+			uvlModelFactory.convertExceptAcceptedLanguageLevel(rootModel, getSupportedLanguageLevels());
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
 			if (e instanceof ParseErrorList) {
@@ -301,6 +305,12 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} catch (final RuntimeException e) {
 			// Contained invalid reference. Already added to problem list
 		}
+	}
+
+	private Set<LanguageLevel> getSupportedLanguageLevels() {
+		final Set<LanguageLevel> supportedLevels = new LinkedHashSet<>();
+		supportedLevels.add(LanguageLevel.SAT_LEVEL);
+		return supportedLevels;
 	}
 
 	private Node parseConstraint(Constraint constraint) {
