@@ -214,7 +214,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 
 		for (int i = 0; i < iterations; i++) {
 			trimConfigurations();
-			buildCombinations();
+			buildCombinations(monitor);
 		}
 
 		if (allowInitialSolutionModify) {
@@ -267,7 +267,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		return index;
 	}
 
-	private void buildCombinations() {
+	private void buildCombinations(IMonitor<List<LiteralSet>> monitor) {
 		// TODO Variation Point: Cover Strategies
 		final List<? extends ICoverStrategy> phaseList = Arrays.asList(//
 				new CoverAll(this) //
@@ -300,6 +300,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 				phaseCount++;
 				ICoverStrategy phase = phaseList.get(0);
 				while (true) {
+					monitor.checkCancel();
 					final ClauseList combinedCondition = it.get();
 					if (combinedCondition == null) {
 						break;
@@ -409,6 +410,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		this.nodes = nodes;
 		presenceConditionManager = null;
 	}
+
 	public boolean removeInvalidClauses(ClauseList nextCondition, List<Pair<LiteralSet, TWiseConfiguration>> candidatesList) {
 		int validCount = nextCondition.size();
 		for (final LiteralSet literals : nextCondition) {
