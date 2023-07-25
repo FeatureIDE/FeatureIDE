@@ -154,6 +154,8 @@ public interface ISimpleSatSolver extends Cloneable {
 	 */
 	int[] getSolution();
 
+	int[] getPrimeImplicant();
+
 	int[] getInternalSolution();
 
 	/**

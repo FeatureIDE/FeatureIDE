@@ -256,4 +256,9 @@ public class EmptySatSolver implements ISatSolver {
 		return null;
 	}
 
+	@Override
+	public int[] getPrimeImplicant() {
+		return null;
+	}
+
 }

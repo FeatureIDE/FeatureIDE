@@ -96,14 +96,6 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		}
 	}
 
-	// protected IConstr addClauseInternal(Solver<?> solver, VecInt vec) throws RuntimeContradictionException {
-	// try {
-	// return solver.addClause(vec);
-	// } catch (ContradictionException e) {
-	// throw new RuntimeContradictionException(e);
-	// }
-	// }
-
 	@Override
 	public List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
 		return addClauses(solver, clauses, false);
@@ -186,6 +178,23 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	@Override
 	public SatResult hasSolution(LiteralSet assignment) {
 		return hasSolution(assignment.getLiterals());
+	}
+
+	@Override
+	public int[] getPrimeImplicant() {
+		if (contradiction) {
+			return null;
+		}
+		try {
+			if (solver.isSatisfiable()) {
+				final int[] internalPrimeImplicant = solver.primeImplicant();
+				return internalPrimeImplicant == null ? null : internalMapping.convertToOriginal(internalPrimeImplicant);
+			} else {
+				return null;
+			}
+		} catch (final Exception e) {
+			return null;
+		}
 	}
 
 	@Override
