@@ -525,7 +525,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 			editor.removeEventListener(this);
 			editor.removePageChangedListener(pageListener);
-			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			if (editor.diagramEditor != null) {
+				editor.diagramEditor.removeSelectionChangedListener(selectionListener);
+			}
 		} else if (currentEditor instanceof ConfigurationEditor) {
 			final ConfigurationEditor editor = (ConfigurationEditor) currentEditor;
 			editor.removePageChangedListener(pageListener);
