@@ -1289,12 +1289,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				addElement(sb, null, explanation.getWriter().getString());
 			}
 
-			if (sb.length() > 0) {
-				tipItem = item;
-				final Rectangle bounds = item.getBounds();
-				final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12, bounds.y));
-				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
+			tipItem = item;
+			final Rectangle bounds = item.getBounds();
+			final Point displayPoint = tree.toDisplay(new Point(bounds.x + bounds.width + 12, bounds.y));
+
+			if (sb.length() == 0) {
+				sb.append("No information available.");
 			}
+			newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 		}
 	}
 
