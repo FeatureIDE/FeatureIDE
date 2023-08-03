@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
@@ -47,10 +48,9 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		if (element instanceof String) {
 			return (String) element;
 		} else {
-			final IConstraint constraint = (IConstraint) element;
-			String constraintText = constraint.getDisplayName();
-			constraintText = replaceSpecialChars(constraintText);
-			return constraintText;
+			final NodeWriter nodeWriter = new NodeWriter(((IConstraint) element).getNode());
+			nodeWriter.setSymbols(NodeWriter.logicalSymbols);
+			return nodeWriter.nodeToString();
 		}
 	}
 
@@ -132,18 +132,6 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 		gc.fillOval(0, 0, CIRCLE_DECORATION_SIZE, CIRCLE_DECORATION_SIZE);
 		gc.dispose();
 		return image;
-	}
-
-	/**
-	 * replaces logical connectives with unicode signs
-	 */
-	private String replaceSpecialChars(String string) {
-		string = string.replace("|", "\u2228");
-		string = string.replace("<=>", "\u21D4");
-		string = string.replace("=>", "\u21D2");
-		string = string.replace("&", "\u2227");
-		string = string.replace("-", "\u00AC");
-		return string;
 	}
 
 	@Override
