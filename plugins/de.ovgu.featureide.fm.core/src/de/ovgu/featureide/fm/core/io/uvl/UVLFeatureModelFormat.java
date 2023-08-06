@@ -309,7 +309,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 
 	private Set<LanguageLevel> getSupportedLanguageLevels() {
 		final Set<LanguageLevel> supportedLevels = new LinkedHashSet<>();
-		supportedLevels.add(LanguageLevel.SAT_LEVEL);
+		supportedLevels.add(LanguageLevel.BOOLEAN_LEVEL);
 		return supportedLevels;
 	}
 
