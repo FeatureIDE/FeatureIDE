@@ -25,11 +25,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -151,7 +149,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
 			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
-			uvlModelFactory.convertExceptAcceptedLanguageLevel(rootModel, getSupportedLanguageLevels());
+			uvlModelFactory.convertAllMoreComplexLanguageLevels(rootModel, LanguageLevel.BOOLEAN_LEVEL);
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
 			if (e instanceof ParseErrorList) {
@@ -305,12 +303,6 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		} catch (final RuntimeException e) {
 			// Contained invalid reference. Already added to problem list
 		}
-	}
-
-	private Set<LanguageLevel> getSupportedLanguageLevels() {
-		final Set<LanguageLevel> supportedLevels = new LinkedHashSet<>();
-		supportedLevels.add(LanguageLevel.BOOLEAN_LEVEL);
-		return supportedLevels;
 	}
 
 	private Node parseConstraint(Constraint constraint) {
