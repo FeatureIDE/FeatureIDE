@@ -24,9 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURS
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_RECURSIVE_ATTRIBUTE_NAME_ERROR_TITLE;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
@@ -59,7 +62,12 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new CheckboxCellEditor((Composite) getViewer().getControl());
+		Boolean[] items = { false, true };
+		ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor((Composite) getViewer().getControl(), SWT.READ_ONLY);
+		cellEditor.setLabelProvider(new LabelProvider());
+		cellEditor.setContentProvider(ArrayContentProvider.getInstance());
+		cellEditor.setInput(items);
+		return cellEditor;
 	}
 
 	/*

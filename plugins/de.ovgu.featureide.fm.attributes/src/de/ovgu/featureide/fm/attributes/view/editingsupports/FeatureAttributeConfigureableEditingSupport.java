@@ -20,9 +20,12 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -52,7 +55,12 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new CheckboxCellEditor((Composite) getViewer().getControl());
+		Boolean[] items = { false, true };
+		ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor((Composite) getViewer().getControl(), SWT.READ_ONLY);
+		cellEditor.setLabelProvider(new LabelProvider());
+		cellEditor.setContentProvider(ArrayContentProvider.getInstance());
+		cellEditor.setInput(items);
+		return cellEditor;
 	}
 
 	/*
