@@ -64,6 +64,7 @@ import de.vill.model.FeatureModel;
 import de.vill.model.Group;
 import de.vill.model.Group.GroupType;
 import de.vill.model.Import;
+import de.vill.model.LanguageLevel;
 import de.vill.model.constraint.AndConstraint;
 import de.vill.model.constraint.Constraint;
 import de.vill.model.constraint.EquivalenceConstraint;
@@ -148,6 +149,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
 			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
+			uvlModelFactory.convertAllMoreComplexLanguageLevels(rootModel, LanguageLevel.BOOLEAN_LEVEL);
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
 			if (e instanceof ParseErrorList) {
