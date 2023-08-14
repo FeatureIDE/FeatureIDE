@@ -104,6 +104,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationExportHandler;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTreeEditorPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
 import de.ovgu.featureide.fm.ui.handlers.FMExportHandler;
@@ -283,7 +284,11 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new FMExportHandler().singleAction(manager.getPath());
+				if (currentEditor instanceof FeatureModelEditor) {
+					new FMExportHandler().singleAction(manager.getPath());
+				} else if (currentEditor instanceof ConfigurationEditor) {
+					new ConfigurationExportHandler().singleAction(manager.getPath());
+				}
 			}
 		});
 		conversionButton.setText("Convert...");
