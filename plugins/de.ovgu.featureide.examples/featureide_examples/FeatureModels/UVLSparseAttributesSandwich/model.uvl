@@ -13,15 +13,15 @@ features
 				optional
 					Gouda	
 						alternative
-							Sprinkled {Fat {value 35, unit "g"}}
-							Slice {Fat {value 35, unit "g"}}
+							Sprinkled {Fat {value 35, unit 'g'}}
+							Slice {Fat {value 35, unit 'g'}}
 					Cheddar
 					"Cream Cheese"
 			Meat	
 				or
-					"Salami" {Producer "Farmer Bob"}
-					Ham {Producer "Farmer Sam"}
-					"Chicken Breast" {Producer "Farmer Sam"}
+					"Salami" {Producer 'Farmer Bob'}
+					Ham {Producer 'Farmer Sam'}
+					"Chicken Breast" {Producer 'Farmer Sam'}
 			Vegetables	
 				optional
 					"Cucumber"
