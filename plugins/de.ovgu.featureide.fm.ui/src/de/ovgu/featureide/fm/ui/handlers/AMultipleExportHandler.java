@@ -40,13 +40,15 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.handlers.base.AContainerHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.fm.ui.wizards.FormatConversionWizard;
 
-public abstract class AMultipleExportHandler<T> extends AContainerHandler {
+public abstract class AMultipleExportHandler<T> extends ASelectionHandler {
 
 	private Path outputPath;
 	private IPersistentFormat<T> outputFormat;
+	private final List<IFile> files = new ArrayList<>();
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
@@ -66,33 +68,47 @@ public abstract class AMultipleExportHandler<T> extends AContainerHandler {
 	}
 
 	@Override
-	protected void singleAction(IContainer modelFolder) {
-		final List<IFile> files = new ArrayList<>();
-		try {
-			modelFolder.accept(new IResourceVisitor() {
+	protected void singleAction(Object element) {
+		final IContainer modelFolder = SelectionWrapper.checkClass(element, IContainer.class);
+		if (modelFolder != null) {
+			try {
+				modelFolder.accept(new IResourceVisitor() {
 
-				@Override
-				public boolean visit(IResource child) throws CoreException {
-					if (child instanceof IFile) {
-						files.add((IFile) child);
+					@Override
+					public boolean visit(IResource child) throws CoreException {
+						if (child instanceof IFile) {
+							files.add((IFile) child);
+						}
+						return true;
 					}
-					return true;
-				}
-			}, IResource.DEPTH_ONE, IResource.NONE);
-			if (!files.isEmpty()) {
-				for (final IFile file : files) {
-					final Path modelFilePath = EclipseFileSystem.getPath(file);
-					String fileName = modelFilePath.getFileName().toString();
-					final int extIndex = fileName.lastIndexOf('.');
-					if (extIndex > 0) {
-						fileName = fileName.substring(0, extIndex + 1) + outputFormat.getSuffix();
-					}
+				}, IResource.DEPTH_ONE, IResource.NONE);
 
-					save(outputFormat, read(modelFilePath), outputPath.resolve(fileName));
-				}
+			} catch (final CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
 			}
-		} catch (final CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
+		} else {
+			final IFile modelFile = SelectionWrapper.checkClass(element, IFile.class);
+			if (modelFile != null) {
+				files.add(modelFile);
+			}
+		}
+	}
+
+	@Override
+	protected void endAction() {
+		super.endAction();
+		if (!files.isEmpty()) {
+			for (final IFile file : files) {
+				final Path modelFilePath = EclipseFileSystem.getPath(file);
+				String fileName = modelFilePath.getFileName().toString();
+				final int extIndex = fileName.lastIndexOf('.');
+				if (extIndex > 0) {
+					fileName = fileName.substring(0, extIndex + 1) + outputFormat.getSuffix();
+				}
+
+				save(outputFormat, read(modelFilePath), outputPath.resolve(fileName));
+			}
+			files.clear();
 		}
 	}
 

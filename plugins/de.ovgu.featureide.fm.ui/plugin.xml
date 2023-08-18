@@ -369,9 +369,13 @@
          style="push">
 				<visibleWhen
 						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModelFolder">
-					</reference>
+			         <or>
+			            <reference
+			                  definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+			            </reference>
+			            <reference
+			                  definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModelFolder">
+			            </reference></or>						
 				</visibleWhen>
 			</command>
 		</menuContribution>
