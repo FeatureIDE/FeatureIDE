@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -34,7 +33,7 @@ public abstract class ACreator<T> {
 
 	protected FeatureModelFormula formula;
 
-	private Lock lock;
+	private ReentrantLock lock;
 	private T formulaElement;
 
 	T get() {
@@ -51,7 +50,7 @@ public abstract class ACreator<T> {
 
 	void init(FeatureModelFormula formula) {
 		this.formula = formula;
-		this.lock = new ReentrantLock();
+		lock = new ReentrantLock();
 	}
 
 	protected abstract T create();

@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -162,7 +161,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	private final IEventManager eventManager = new DefaultEventManager();
 	private final ProblemList lastProblems = new ProblemList();
 
-	protected final Lock fileOperationLock = new ReentrantLock();
+	protected final ReentrantLock fileOperationLock = new ReentrantLock();
 
 	private final Path path;
 	private final List<? extends IPersistentFormat<T>> formats;
@@ -199,7 +198,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 					lastProblems.addAll(problems);
 				}
 				persistentObjectSource = content;
-				this.persistentObject = newPersistentObject;
+				persistentObject = newPersistentObject;
 				return true;
 			} catch (final Exception e) {
 				handleException(e);
@@ -278,7 +277,7 @@ public abstract class AFileManager<T> implements IFileManager<T> {
 	}
 
 	@Override
-	public Lock getFileOperationLock() {
+	public ReentrantLock getFileOperationLock() {
 		return fileOperationLock;
 	}
 

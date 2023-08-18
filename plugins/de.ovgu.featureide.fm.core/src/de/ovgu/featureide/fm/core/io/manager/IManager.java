@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -72,7 +72,7 @@ public interface IManager<T> extends IEventManager {
 	 *
 	 * @return The lock used by the file manager while accessing the file.
 	 */
-	Lock getFileOperationLock();
+	ReentrantLock getFileOperationLock();
 
 	ProblemList externalSave(Runnable externalSaveMethod);
 

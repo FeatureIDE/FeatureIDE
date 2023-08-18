@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -45,7 +44,7 @@ public class VirtualManager<T> implements IManager<T> {
 
 	protected final T variableObject;
 
-	protected final Lock lock = new ReentrantLock();
+	protected final ReentrantLock lock = new ReentrantLock();
 
 	public VirtualManager(T object) {
 		variableObject = object;
@@ -122,7 +121,7 @@ public class VirtualManager<T> implements IManager<T> {
 	}
 
 	@Override
-	public Lock getFileOperationLock() {
+	public ReentrantLock getFileOperationLock() {
 		return lock;
 	}
 
