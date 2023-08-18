@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.propertypage;
+package de.ovgu.featureide.ui.propertypage;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;

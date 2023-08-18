@@ -44,9 +44,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
 import de.ovgu.featureide.munge_android.AndroidProjectConversion;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.wizards.DefaultNewFeatureProjectWizardExtension;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
 public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProjectWizardExtension {

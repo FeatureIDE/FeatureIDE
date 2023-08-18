@@ -69,7 +69,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	/* legend group objects: */
 	Combo languageCombo;
 	Button buttonHideLegend;
-	LinkedList<ILanguage> languages = new LinkedList<ILanguage>();
+	LinkedList<ILanguage> languages = new LinkedList<>();
 
 	/* spaces group objects: */
 	Text textMarginX, textMarginY, textFeatureX, textFeatureY, textConstraint;
@@ -81,9 +81,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	static ColorSelector selectorFeatureBorder;
 	Button buttonHideBorderColor;
 
-	public FMPropertyPage() {
-
-	}
+	public FMPropertyPage() {}
 
 	@Override
 	protected Control createContents(Composite parent) {
@@ -205,9 +203,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 
 		});
 	}

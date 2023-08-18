@@ -7,7 +7,6 @@ Bundle-Activator: de.ovgu.featureide.core.CorePlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.ui,
  org.eclipse.jdt.core,
  de.ovgu.featureide.fm.core,
  org.eclipse.ui.ide
@@ -22,15 +21,13 @@ Export-Package:
  de.ovgu.featureide.core.fstmodel.preprocessor,
  de.ovgu.featureide.core.job,
  de.ovgu.featureide.core.listeners,
- de.ovgu.featureide.core.propertypage,
  de.ovgu.featureide.core.signature,
  de.ovgu.featureide.core.signature.base,
  de.ovgu.featureide.core.signature.comparator,
  de.ovgu.featureide.core.signature.documentation,
  de.ovgu.featureide.core.signature.documentation.base,
  de.ovgu.featureide.core.signature.filter,
- de.ovgu.featureide.core.signature.java,
- de.ovgu.featureide.core.wizardextension
+ de.ovgu.featureide.core.signature.java
 Bundle-ClassPath: lib/tools.jar,
  .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

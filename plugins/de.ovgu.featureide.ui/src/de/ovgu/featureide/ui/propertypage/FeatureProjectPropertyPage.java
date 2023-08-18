@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.propertypage;
+package de.ovgu.featureide.ui.propertypage;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSITION_MECHANISM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSITION_TOOL_SETTINGS;
@@ -49,6 +49,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.core.JavaElement;
 import org.eclipse.swt.SWT;
@@ -69,6 +70,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
@@ -108,6 +110,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private Text sourcePath = null;
 	private Text featurePath = null;
 	private Text configPath = null;
+	private Text featureModelPath = null;
 
 	private IComposerExtensionBase composer = null;
 	private Combo composerCombo;
@@ -159,13 +162,33 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		new Label(labelGroup, SWT.NONE).setText("&Project: ");
 		new Label(labelGroup, SWT.NONE).setText(project.getName());
 		new Label(labelGroup, SWT.NONE).setText("&Compostion tool: ");
-		new Label(labelGroup, SWT.NONE).setText(composer.getName());
-		new Label(labelGroup, SWT.NONE).setText("&Contract Composition: ");
-		new Label(labelGroup, SWT.NONE).setText(featureProject.getContractComposition());
-		new Label(labelGroup, SWT.NONE).setText("&Metaproduct Generation: ");
-		new Label(labelGroup, SWT.NONE).setText(featureProject.getMetaProductGeneration());
+		if (composer != null) {
+			new Label(labelGroup, SWT.NONE).setText(composer != null ? composer.getName() : "- none -");
+			new Label(labelGroup, SWT.NONE).setText("&Contract Composition: ");
+			new Label(labelGroup, SWT.NONE).setText(featureProject.getContractComposition());
+			new Label(labelGroup, SWT.NONE).setText("&Metaproduct Generation: ");
+			new Label(labelGroup, SWT.NONE).setText(featureProject.getMetaProductGeneration());
+			new Label(labelGroup, SWT.NONE).setText("Composition mechanism: ");
+			new Label(labelGroup, SWT.NONE).setText(featureProject.getCompositionMechanism());
+		} else {
+			new Label(labelGroup, SWT.NONE).setText("- none -");
+			new Label(labelGroup, SWT.NONE).setText("&Contract Composition: ");
+			new Label(labelGroup, SWT.NONE).setText("- none -");
+			new Label(labelGroup, SWT.NONE).setText("&Metaproduct Generation: ");
+			new Label(labelGroup, SWT.NONE).setText("- none -");
+			new Label(labelGroup, SWT.NONE).setText("Composition mechanism: ");
+			new Label(labelGroup, SWT.NONE).setText("- none -");
+		}
+
 		new Label(labelGroup, SWT.NONE).setText("Composition mechanism: ");
-		new Label(labelGroup, SWT.NONE).setText(featureProject.getCompositionMechanism());
+		new Label(labelGroup, SWT.NONE).setText("- none -");
+		final Label label = new Label(labelGroup, SWT.NULL);
+		label.setText("Feature model file: ");
+		featureModelPath = new Text(labelGroup, SWT.BORDER | SWT.SINGLE);
+		featureModelPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		featureModelPath.setText(FMCorePlugin.getPersitentModelFilePath(project).map(IPath::toString).orElse(""));
+		featureModelPath.setEnabled(true);
+
 		addCompositionGroup(composite);
 		return composite;
 	}
@@ -210,14 +233,16 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private void addComposerMember(Group group) {
 		composerCombo = createCombo(group, COMPOSER_SELECTION_TEXT);
-
 		extensions = ComposerExtensionManager.getInstance().getComposers().toArray(new IComposerExtension[0]);
 		Arrays.sort(extensions, new ExtensionComparator());
 		for (final IComposerExtensionBase composerExtension : extensions) {
 			composerCombo.add(composerExtension.getName());
 		}
 
-		refreshCombo(composerCombo, true, featureProject.getComposer().getName());
+		final IComposerExtensionClass composer = featureProject.getComposer();
+		if (composer != null) {
+			refreshCombo(composerCombo, true, composer.getName());
+		}
 		composerCombo.addModifyListener(listener);
 	}
 
@@ -257,7 +282,9 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		contractCombo.add(CUMULATIVE_CONTRACT_REFINEMENT);
 		contractCombo.add(PLAIN_CONTRACTING);
 
-		refreshCombo(contractCombo, composer.hasContractComposition(), featureProject.getContractComposition());
+		if (composer != null) {
+			refreshCombo(contractCombo, composer.hasContractComposition(), featureProject.getContractComposition());
+		}
 		contractCombo.addModifyListener(listener);
 	}
 
@@ -272,18 +299,22 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		// TODO reactivate this line if c metaproduct is supported
 		// metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_C);
 
-		refreshCombo(metaCombo, composer.hasMetaProductGeneration(), featureProject.getMetaProductGeneration());
+		if (composer != null) {
+			refreshCombo(metaCombo, composer.hasMetaProductGeneration(), featureProject.getMetaProductGeneration());
+		}
 		metaCombo.addModifyListener(listener);
 	}
 
 	private void addCompositionMechanismMember(Group group) {
 		mechanismCombo = createCombo(group, COMPOSITION_MECHANISM);
 
-		for (final String mechanism : composer.getCompositionMechanisms()) {
-			mechanismCombo.add(mechanism);
+		if (composer != null) {
+			for (final String mechanism : composer.getCompositionMechanisms()) {
+				mechanismCombo.add(mechanism);
+			}
+			refreshCombo(mechanismCombo, composer.getCompositionMechanisms().length > 0, featureProject.getCompositionMechanism());
 		}
 
-		refreshCombo(mechanismCombo, composer.getCompositionMechanisms().length > 0, featureProject.getCompositionMechanism());
 		mechanismCombo.addModifyListener(listener);
 	}
 
@@ -293,13 +324,19 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @param group
 	 */
 	private void addAllPathMember(Group group) {
-		// add feature path
-		featurePath = addPathMember(group, COMPOSER_FEATURE_PATH, featureProject.getSourceFolder(), composer.hasFeatureFolder());
-		// add source path
-		sourcePath = addPathMember(group, COMPOSER_SOURCE_PATH, featureProject.getBuildFolder(), composer.hasSourceFolder());
+		if (composer != null) {
+			// add feature path
+			featurePath = addPathMember(group, COMPOSER_FEATURE_PATH, featureProject.getSourceFolder(), composer.hasFeatureFolder());
+			// add source path
+			sourcePath = addPathMember(group, COMPOSER_SOURCE_PATH, featureProject.getBuildFolder(), composer.hasSourceFolder());
+		} else {
+			// add feature path
+			featurePath = addPathMember(group, COMPOSER_FEATURE_PATH, null, false);
+			// add source path
+			sourcePath = addPathMember(group, COMPOSER_SOURCE_PATH, null, false);
+		}
 		// add configurations path
 		configPath = addPathMember(group, COMPOSER_CONFIG_PATH, featureProject.getConfigFolder(), true);
-
 	}
 
 	/**
@@ -335,6 +372,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (!canFinish) {
 			return false;
 		}
+
+		setFeatureModelFile();
 		setComposer();
 		setPaths();
 		setContractComposition();
@@ -350,6 +389,14 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 			}
 		}
 		return true;
+	}
+
+	private void setFeatureModelFile() {
+		final String text = featureModelPath.getText();
+		if (!Objects.equals(text, FMCorePlugin.getPersitentModelFilePath(project).map(IPath::toString).orElse(null))) {
+			FMCorePlugin.setPersitentModelFilePath(project, text.isBlank() ? null : text);
+			updated = true;
+		}
 	}
 
 	private void setContractComposition() {
@@ -384,7 +431,8 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * Sets the composer of the feature project
 	 */
 	private void setComposer() {
-		if (!featureProject.getComposer().getName().equals(composerCombo.getText())) {
+		final IComposerExtensionClass composer = featureProject.getComposer();
+		if ((composer != null) && !composer.getName().equals(composerCombo.getText())) {
 			for (final IComposerExtensionBase c : extensions) {
 				if (c.getName().equals(composerCombo.getItem(composerCombo.getSelectionIndex()))) {
 					featureProject.setComposerID(c.getId());
@@ -432,16 +480,21 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	@Override
 	protected void performDefaults() {
-		featurePath.setEnabled(composer.hasFeatureFolder());
+		featurePath.setEnabled(composer != null ? composer.hasFeatureFolder() : false);
 		featurePath.setText(getFolderText(featureProject.getSourceFolder()));
-		sourcePath.setEnabled(composer.hasSourceFolder());
+		sourcePath.setEnabled(composer != null ? composer.hasSourceFolder() : false);
 		sourcePath.setText(getFolderText(featureProject.getBuildFolder()));
 		configPath.setText(getFolderText(featureProject.getConfigFolder()));
 
-		refreshCombo(composerCombo, true, featureProject.getComposer().getName());
-		refreshCombo(contractCombo, composer.hasContractComposition(), featureProject.getContractComposition());
-		refreshCombo(metaCombo, composer.hasMetaProductGeneration(), featureProject.getMetaProductGeneration());
-		refreshCombo(mechanismCombo, composer.getCompositionMechanisms().length > 0, featureProject.getCompositionMechanism());
+		final IComposerExtensionClass currentComposer = featureProject.getComposer();
+		if (currentComposer != null) {
+			refreshCombo(composerCombo, true, currentComposer.getName());
+		}
+		if (composer != null) {
+			refreshCombo(contractCombo, composer.hasContractComposition(), featureProject.getContractComposition());
+			refreshCombo(metaCombo, composer.hasMetaProductGeneration(), featureProject.getMetaProductGeneration());
+			refreshCombo(mechanismCombo, composer.getCompositionMechanisms().length > 0, featureProject.getCompositionMechanism());
+		}
 	}
 
 	private String getFolderText(IFolder folder) {

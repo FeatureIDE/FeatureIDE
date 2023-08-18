@@ -113,32 +113,4 @@
            name="FMFeature Modeling">
      </fmComposer>
   </extension>
-  <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="de.ovgu.featureide.core.propertypage.BasePropertyPage"
-            id="de.ovgu.featureide.core.propertypage"
-            name="FeatureIDE">
-         <filter
-               name="projectNature"
-               value="de.ovgu.featureide.core.featureProjectNature">
-         </filter>
-         <enabledWhen>
-				<adapt type="org.eclipse.core.resources.IProject" />
-         </enabledWhen>
-      </page>  
-      <page
-            category="de.ovgu.featureide.core.propertypage"
-            class="de.ovgu.featureide.core.propertypage.FeatureProjectPropertyPage"
-            id="de.ovgu.featureide.core.propertypage2"
-            name="Feature Project">
-         <filter
-               name="projectNature"
-               value="de.ovgu.featureide.core.featureProjectNature">
-         </filter>
-         <enabledWhen>
-				<adapt type="org.eclipse.core.resources.IProject" />
-         </enabledWhen>
-      </page>
-   </extension>
 </plugin>
