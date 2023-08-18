@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.perspective;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LEFT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RIGHT;
 
@@ -56,7 +55,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureIDEperspective";
 
 	@Override
-	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
 		final String editorArea = layout.getEditorArea();
 
@@ -100,7 +98,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(ConfigurationMap.ID);
 		layout.addShowViewShortcut(CollaborationView.ID);
 		layout.addShowViewShortcut(Outline.ID);
-		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
 
