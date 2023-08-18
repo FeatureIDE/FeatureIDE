@@ -1,4 +1,4 @@
-namespace FBtree
+namespace FBTree
 
 features
 	FBtree {abstract true}

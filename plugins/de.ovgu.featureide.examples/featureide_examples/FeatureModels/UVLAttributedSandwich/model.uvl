@@ -2,16 +2,16 @@ namespace Sandwich
 
 features
 	Sandwich {
-		Calories {type "long", recursive true, configurable true},
+		Calories {type 'long', recursive true, configurable true},
 		OrganicFood {recursive true, value false},
 		Price {recursive true, value 0.0},
 		extended__
 	}	
 		mandatory
 			Bread {
-				Calories {type "long", recursive true, configurable true},
-				OrganicFood {type "boolean", recursive true},
-				Price {type "double", recursive true}
+				Calories {type 'long', recursive true, configurable true},
+				OrganicFood {type 'boolean', recursive true},
+				Price {type 'double', recursive true}
 			}	
 				alternative
 					"Full Grain " {
@@ -32,15 +32,15 @@ features
 
 		optional
 			Cheese {
-				Calories {type "long", recursive true, configurable true},
-				OrganicFood {type "boolean", recursive true},
-				Price {type "double", recursive true}
+				Calories {type 'long', recursive true, configurable true},
+				OrganicFood {type 'boolean', recursive true},
+				Price {type 'double', recursive true}
 			}	
 				optional
 					Gouda {
-						Calories {type "long", recursive true, configurable true},
-						OrganicFood {type "boolean", recursive true},
-						Price {type "double", recursive true}
+						Calories {type 'long', recursive true, configurable true},
+						OrganicFood {type 'boolean', recursive true},
+						Price {type 'double', recursive true}
 					}	
 						alternative
 							Sprinkled {
@@ -64,9 +64,9 @@ features
 						Price {recursive true, value 0.59}
 					}
 			Meat {
-				Calories {type "long", recursive true, configurable true},
-				OrganicFood {type "boolean", recursive true},
-				Price {type "double", recursive true}
+				Calories {type 'long', recursive true, configurable true},
+				OrganicFood {type 'boolean', recursive true},
+				Price {type 'double', recursive true}
 			}	
 				or
 					"Salami " {
@@ -85,9 +85,9 @@ features
 						Price {recursive true, value 1.39}
 					}
 			Vegetables {
-				Calories {type "long", recursive true, configurable true},
-				OrganicFood {type "boolean", recursive true},
-				Price {type "double", recursive true}
+				Calories {type 'long', recursive true, configurable true},
+				OrganicFood {type 'boolean', recursive true},
+				Price {type 'double', recursive true}
 			}	
 				optional
 					"Cucumber " {
