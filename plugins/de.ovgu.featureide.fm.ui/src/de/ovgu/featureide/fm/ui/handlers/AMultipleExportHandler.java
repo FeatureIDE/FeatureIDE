@@ -22,8 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -48,7 +47,7 @@ public abstract class AMultipleExportHandler<T> extends ASelectionHandler {
 
 	private Path outputPath;
 	private IPersistentFormat<T> outputFormat;
-	private final List<IFile> files = new ArrayList<>();
+	private final LinkedHashSet<IFile> files = new LinkedHashSet<>();
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
