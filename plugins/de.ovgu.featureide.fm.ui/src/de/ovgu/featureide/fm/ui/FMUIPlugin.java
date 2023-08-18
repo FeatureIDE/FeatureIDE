@@ -20,11 +20,27 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
+import org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
 
@@ -69,6 +85,52 @@ public class FMUIPlugin extends AbstractUIPlugin {
 
 	public static Image getImage(String name) {
 		return getDefault().getImageDescriptor("icons/" + name).createImage();
+	}
+
+	/**
+	 * Opens a Dialog to select the file of the {@link IFeatureModel}
+	 *
+	 * @return a string describing the absolute path of the selected model file
+	 * @see FileDialog#open()
+	 */
+	public static IFile openFileDialog(IProject project) {
+		if ((project != null) && (project.getLocation() != null)) {
+			final FilteredResourcesSelectionDialog dialog = new FilteredResourcesSelectionDialog(getShell(), false, project, IResource.FILE);
+			dialog.setTitle(SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT);
+			dialog.setMessage(SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT);
+			dialog.setInitialPattern("?");
+			if (dialog.open() == FilteredItemsSelectionDialog.OK) {
+				final Object[] results = dialog.getResult();
+				if ((results != null) && (results.length > 0)) {
+					final Object result = results[0];
+					if (FMCorePlugin.isFeatureModelFile(result)) {
+						final IFile file = (IFile) result;
+						FMCorePlugin.setPersitentModelFilePath(project.getProject(), file.getLocation().toOSString());
+						return file;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public static Shell getShell() {
+		return Optional //
+				.ofNullable(PlatformUI.getWorkbench().getActiveWorkbenchWindow()) //
+				.or(() -> Arrays.stream(PlatformUI.getWorkbench().getWorkbenchWindows()).findFirst()) //
+				.map(IWorkbenchWindow::getShell) //
+				.orElse(null);
+	}
+
+	public static Optional<IFile> findModelFile(IProject project) {
+		IFile modelFile = FMCorePlugin.findModelFile(project).orElse(null);
+		if (modelFile == null) {
+			modelFile = openFileDialog(project.getProject());
+			if (modelFile == null) {
+				return Optional.empty();
+			}
+		}
+		return Optional.of(modelFile);
 	}
 
 }

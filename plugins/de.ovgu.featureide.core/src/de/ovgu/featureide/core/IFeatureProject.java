@@ -237,4 +237,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	void checkForProblems();
 
+	boolean hasValidFeatureModel();
+
+	void autoDetectModelFile();
+
 }

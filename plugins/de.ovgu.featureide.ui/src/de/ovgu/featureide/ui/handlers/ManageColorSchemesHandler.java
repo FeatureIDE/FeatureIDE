@@ -25,6 +25,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 /**
@@ -36,8 +37,10 @@ public class ManageColorSchemesHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final ColorSchemeWizard wizard = new ColorSchemeWizard(featureProject.getFeatureModel());
-		new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard).open();
+		if (UIPlugin.ensureProjectHasValidFeatureModel(featureProject)) {
+			final ColorSchemeWizard wizard = new ColorSchemeWizard(featureProject.getFeatureModel());
+			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard).open();
+		}
 	}
 
 }

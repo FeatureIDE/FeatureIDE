@@ -216,6 +216,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		if (maxConfigs <= 0) {
 			return;
 		}
+		if (!UIPlugin.ensureProjectHasValidFeatureModel(featureProject)) {
+			return;
+		}
+
 		configurationNumber = maxConfigs;
 		if (runTests) {
 			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());

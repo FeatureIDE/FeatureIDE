@@ -20,13 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,16 +35,12 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -64,12 +55,10 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -92,9 +81,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, IEventListener, IResourceChangeListener, IConfigurationEditor {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
-
-	private static final QualifiedName MODEL_PATH =
-		new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
 	private final JobToken configJobToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
@@ -191,10 +177,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		super.setInput(input);
 		setPartName(file.getName());
 
-		final File modelFile = setFeatureModelFile(file.getProject());
+		final Path modelPath = setFeatureModelFile(file.getProject());
 
 		if (!isReadFeatureModelError()) {
-			final Path modelPath = modelFile.toPath();
 			featureModelManager = FeatureModelManager.getInstance(modelPath);
 			if (featureModelManager != null) {
 				invalidFeatureModel = featureModelManager.getLastProblems().containsError();
@@ -236,126 +221,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 	}
 
-	private File setFeatureModelFile(IProject project) {
-		// if mpl.velvet exists then it is a multi product line
-		IResource res = project.findMember("mpl.velvet");
-		if (res instanceof IFile) {
-			// final IContainer parentFolder = file.getParent();
-			// mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
-		} else {
-			// try to find UVL model first before resort to XML
-			final String filename = project.getFile("model.uvl").exists() ? "model.uvl" : "model.xml";
-			res = project.findMember(filename);
-		}
-
-		File modelFile = null;
-		if (res instanceof IFile) {
-			modelFile = ((IFile) res).getLocation().toFile();
-		}
-		if (modelFile == null) {
-			// case: there is no model file found at the project
-
-			// get the path saved at the projects persistent properties
-			String path = getPersitentModelFilePath(project);
-			if (path == null) {
-				// case: there was no path saved for this project
-				path = openFileDialog(project);
-				if (path == null) {
-					setReadFeatureModelError(true);
-				} else {
-					modelFile = new File(path);
-					setReadFeatureModelError(!setModelFile(project, path));
-				}
-			} else {
-				// case: use the saved path
-				if (!setModelFile(project, path)) {
-					// case: the file does not exist
-					path = openFileDialog(project);
-					if (path == null) {
-						setReadFeatureModelError(true);
-						return null;
-					}
-				}
-				modelFile = new File(path);
-				setReadFeatureModelError(!setModelFile(project, path));
-			}
-		}
-		if (modelFile == null) {
-			setReadFeatureModelError(true);
-		}
-		return modelFile;
-	}
-
-	/**
-	 * Sets and saved the model file with the given path
-	 *
-	 * @param path The path of the model file
-	 * @param project
-	 * @return <i>false</i> if the file with the given path does not exist
-	 */
-	private boolean setModelFile(IProject project, String path) {
-		if (Files.exists(Paths.get(path))) {
-			setPersitentModelFilePath(project, path);
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Opens a Dialog to select the file of the {@link IFeatureModel}
-	 *
-	 * @return a string describing the absolute path of the selected model file
-	 * @see FileDialog#open()
-	 */
-	private String openFileDialog(IProject project) {
-		if ((project != null) && (project.getLocation() != null)) {
-			final FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
-			dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
-			dialog.setFileName("model.xml");
-			final ArrayList<String> suffixes = new ArrayList<>();
-			final ArrayList<String> names = new ArrayList<>();
-			for (final IPersistentFormat<IFeatureModel> extension : FMFormatManager.getInstance().getExtensions()) {
-				if (extension.supportsRead()) {
-					suffixes.add("*." + extension.getSuffix());
-					names.add(extension.getName() + " *." + extension.getSuffix());
-				}
-			}
-			dialog.setFilterExtensions(suffixes.toArray(new String[0]));
-			dialog.setFilterNames(names.toArray(new String[0]));
-			dialog.setFilterPath(project.getLocation().toOSString());
-			return dialog.open();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Saves the given path at persistent properties of the project
-	 *
-	 * @param path The path of the models file
-	 * @param project
-	 */
-	private void setPersitentModelFilePath(IProject project, String path) {
-		try {
-			project.setPersistentProperty(MODEL_PATH, path);
-		} catch (final CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-
-	/**
-	 * Gets the models path at persistent properties of the project
-	 *
-	 * @param project
-	 * @return The saved path or {@code null} if there is none.
-	 */
-	private String getPersitentModelFilePath(IProject project) {
-		try {
-			return project.getPersistentProperty(MODEL_PATH);
-		} catch (final CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return null;
+	private Path setFeatureModelFile(IProject project) {
+		final IFile modelFile = FMUIPlugin.findModelFile(project).orElse(null);
+		setReadFeatureModelError(modelFile == null);
+		return modelFile == null ? null : modelFile.getLocation().toPath();
 	}
 
 	@Override

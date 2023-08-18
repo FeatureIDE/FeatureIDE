@@ -97,8 +97,12 @@ public class DynamicProfileMenu extends ContributionItem {
 	private boolean initFeatureModel() {
 		try {
 			final IFeatureProject curFeatureProject = getCurrentFeatureProject();
-			featureModel = curFeatureProject == null ? null : curFeatureProject.getFeatureModel();
-			return featureModel != null;
+			final IFeatureModel featureModel = curFeatureProject == null ? null : curFeatureProject.getFeatureModel();
+			if ((featureModel != null) && (featureModel.getSourceFile() != null)) {
+				this.featureModel = featureModel;
+				return true;
+			}
+			return false;
 		} catch (final Exception e) {
 			return false;
 		}

@@ -20,15 +20,28 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.init.FMCoreEclipseLibrary;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
@@ -41,6 +54,9 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
 public class FMCorePlugin extends AbstractCorePlugin {
 
 	private static FMCorePlugin plugin;
+
+	private static final QualifiedName MODEL_PATH = new QualifiedName("de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor#MODEL_PATH",
+			"de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor#MODEL_PATH");
 
 	@Override
 	public String getID() {
@@ -115,6 +131,118 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			LongRunningWrapper.getRunner(ret, jobName).schedule();
 		}
 		return ret;
+	}
+
+	public static Optional<IFile> findModelFile(IProject project) {
+		final Optional<IPath> persitentModelFilePath = getPersitentModelFilePath(project);
+		if ((persitentModelFilePath.isPresent()) && project.getFile(persitentModelFilePath.get()).exists()) {
+			return persitentModelFilePath.map(project::getFile);
+		} else if (isFeatureModel(project, "mpl.velvet")) {
+			return getModelFile(project, "mpl.velvet");
+		} else if (isFeatureModel(project, "model.uvl")) {
+			return getModelFile(project, "model.uvl");
+		} else if (isFeatureModel(project, "model.xml")) {
+			return getModelFile(project, "model.xml");
+		} else {
+			final ArrayList<IFile> potentialModelFiles = findModelFiles(project);
+			return potentialModelFiles.size() == 1 //
+				? getModelFile(project, potentialModelFiles.get(0)) //
+				: Optional.empty();
+		}
+	}
+
+	/**
+	 * @param project
+	 * @return
+	 */
+	private static boolean isFeatureModel(IProject project, String fileName) {
+		return FMCorePlugin.isFeatureModelFile(project.getFile(fileName));
+	}
+
+	private static Optional<IFile> getModelFile(IProject project, String fileName) {
+		return getModelFile(project, project.getFile(fileName));
+	}
+
+	private static Optional<IFile> getModelFile(IProject project, IFile modelFile) {
+		FMCorePlugin.setPersitentModelFilePath(project.getProject(), modelFile.getLocation().toOSString());
+		return Optional.of(modelFile);
+	}
+
+	private static ArrayList<IFile> findModelFiles(IProject project) {
+		final ArrayList<IFile> modelFiles = new ArrayList<>();
+		try {
+			project.accept(new IResourceVisitor() {
+
+				@Override
+				public boolean visit(IResource resource) throws CoreException {
+					if (resource instanceof IFile) {
+						if (resource.isAccessible()) {
+							final IPersistentFormat<IFeatureModel> format =
+								FMFormatManager.getInstance().getFormatByContent(EclipseFileSystem.getPath(resource));
+							if (format != null) {
+								modelFiles.add((IFile) resource);
+							}
+						}
+					}
+					return true;
+				}
+			}, IResource.DEPTH_ONE, true);
+		} catch (final CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return modelFiles;
+	}
+
+	/**
+	 * Saves the given path at persistent properties of the project
+	 *
+	 * @param path The path of the models file
+	 * @param project
+	 */
+	public static void setPersitentModelFilePath(IProject project, String path) {
+		try {
+			project.setPersistentProperty(MODEL_PATH, Optional.ofNullable(path) //
+					.map(Path::of) //
+					.filter(Files::exists) //
+					.map(p -> p.isAbsolute() //
+						? EclipseFileSystem.getResource(p) //
+						: project.getFile(p.toString())) //
+					.map(IResource::getLocation) //
+					.map(IPath::toOSString) //
+					.orElse(null));
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Gets the models path at persistent properties of the project
+	 *
+	 * @param project
+	 * @return The saved path or {@code null} if there is none.
+	 */
+	public static Optional<IPath> getPersitentModelFilePath(IProject project) {
+		try {
+			return Optional.ofNullable(project.getPersistentProperty(MODEL_PATH)) //
+					.map(Path::of) //
+					.map(p -> p.isAbsolute() //
+						? EclipseFileSystem.getResource(p) //
+						: project.getFile(p.toString())) //
+					.map(IResource::getProjectRelativePath);
+		} catch (final Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return Optional.empty();
+	}
+
+	public static boolean isFeatureModelFile(Object modelFile) {
+		if (modelFile instanceof IFile) {
+			final IFile file = (IFile) modelFile;
+			if (file.isAccessible()) {
+				return FMFormatManager.getInstance().getFormatByContent(EclipseFileSystem.getPath(file)) != null;
+			}
+		}
+		return false;
 	}
 
 }

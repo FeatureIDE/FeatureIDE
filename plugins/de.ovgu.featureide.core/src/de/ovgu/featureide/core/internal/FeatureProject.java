@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
@@ -61,6 +62,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -173,7 +175,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * the model representation of the model file
 	 */
-	private final IFeatureModelManager featureModelManager;
+	private IFeatureModelManager featureModelManager;
+
+	private boolean validFeatureModel;
 
 	private FSTModel fstModel;
 
@@ -185,26 +189,26 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * a folder for jar files
 	 */
-	private final IFolder libFolder;
+	private IFolder libFolder;
 
 	/**
 	 * a folder for temporary generated files
 	 */
-	private final IFolder buildFolder;
+	private IFolder buildFolder;
 
 	/**
 	 * a folder containing all configuration files
 	 */
-	private final Path configFolder;
+	private Path configFolder;
 
 	/**
 	 * a folder for source files
 	 */
-	private final IFolder sourceFolder;
+	private IFolder sourceFolder;
 
 	private final IProject project;
 
-	private final ModelMarkerHandler<IFile> modelFile;
+	private ModelMarkerHandler<IFile> modelFile;
 
 	private IComposerExtensionClass composerExtension = null;
 
@@ -337,25 +341,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 
-		if (project.getFile("mpl.velvet").exists()) {
-			modelFile = new ModelMarkerHandler<>(project.getFile("mpl.velvet"));
-		} else if (project.getFile("model.uvl").exists()) {
-			modelFile = new ModelMarkerHandler<>(project.getFile("model.uvl"));
-		} else {
-			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
-		}
-
-		final FeatureModelManager instance = FeatureModelManager.getInstance(EclipseFileSystem.getPath(modelFile.getModelFile()));
-		if (instance != null) {
-			featureModelManager = instance;
-			instance.read();
-		} else {
-			final DefaultFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
-			final FeatureModel errorFeatureModel = factory.create();
-			factory.createFeature(errorFeatureModel, "__Error__");
-			featureModelManager = new VirtualFeatureModelManager(errorFeatureModel);
-			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
-		}
+		autoDetectModelFile();
 
 		// initialize project structure
 		try {
@@ -424,6 +410,40 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 
 		featureModelManager.addListener(new FeatureModelChangeListner());
+	}
+
+	public boolean hasValidFeatureModel() {
+		return validFeatureModel;
+	}
+
+	public void autoDetectModelFile() {
+		final IFile modelFile = FMCorePlugin.findModelFile(project).orElse(null);
+		if (modelFile != null) {
+			final FeatureModelManager instance = FeatureModelManager.getInstance(EclipseFileSystem.getPath(modelFile));
+			if (instance != null) {
+				validFeatureModel = true;
+				this.modelFile = new ModelMarkerHandler<>(modelFile);
+				featureModelManager = instance;
+				instance.read();
+			} else {
+				this.modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
+				validFeatureModel = false;
+				final DefaultFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
+				final FeatureModel errorFeatureModel = factory.create();
+				factory.createFeature(errorFeatureModel, "__Error__");
+				featureModelManager = new VirtualFeatureModelManager(errorFeatureModel);
+				LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
+			}
+		} else {
+//			FMUIPlugin.openFileDialog(project);
+			this.modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
+			validFeatureModel = false;
+			final DefaultFeatureModelFactory factory = DefaultFeatureModelFactory.getInstance();
+			final FeatureModel errorFeatureModel = factory.create();
+			factory.createFeature(errorFeatureModel, "__Error__");
+			featureModelManager = new VirtualFeatureModelManager(errorFeatureModel);
+			LOGGER.logError(new IOException("No feature model file could be found."));
+		}
 	}
 
 	@Override
@@ -1018,6 +1038,40 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if ((event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0) && (composerExtension != null)
 				&& composerExtension.createFolderForFeatures()) {
 				setAllFeatureModuleMarkers();
+			}
+		}
+
+		if (!hasValidFeatureModel() || Optional.ofNullable(event.getDelta().findMember(modelFile.getModelFile().getFullPath()))
+				.map(d -> d.getKind() == IResourceDelta.REMOVED).orElse(false)) {
+			final ArrayList<IFile> modelFiles = new ArrayList<>();
+			try {
+				event.getDelta().accept(new IResourceDeltaVisitor() {
+
+					@Override
+					public boolean visit(IResourceDelta delta) throws CoreException {
+						if (delta.getProjectRelativePath().segmentCount() == 1) {
+							return true;
+						}
+						if (delta.getKind() == IResourceDelta.ADDED) {
+							final IResource resource = delta.getResource();
+							if (resource instanceof IFile) {
+								if (resource.isAccessible()) {
+									final IPersistentFormat<IFeatureModel> format =
+										FMFormatManager.getInstance().getFormatByContent(EclipseFileSystem.getPath(resource));
+									if (format != null) {
+										modelFiles.add((IFile) resource);
+									}
+								}
+							}
+						}
+						return false;
+					}
+				});
+			} catch (final CoreException e) {
+				CorePlugin.getDefault().logError(e);
+			}
+			if (!modelFiles.isEmpty()) {
+				autoDetectModelFile();
 			}
 		}
 

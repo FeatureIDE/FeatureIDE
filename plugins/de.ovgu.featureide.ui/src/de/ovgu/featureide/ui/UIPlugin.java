@@ -24,7 +24,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.EditorTracker;
 
 /**
@@ -75,6 +77,19 @@ public class UIPlugin extends AbstractUIPlugin {
 			return getDefault().getImageDescriptor("icons/" + name).createImage();
 		}
 		return null;
+	}
+
+	public static boolean ensureProjectHasValidFeatureModel(IFeatureProject project) {
+		if (!project.hasValidFeatureModel()) {
+			if (FMUIPlugin.openFileDialog(project.getProject()) != null) {
+				project.autoDetectModelFile();
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 }
