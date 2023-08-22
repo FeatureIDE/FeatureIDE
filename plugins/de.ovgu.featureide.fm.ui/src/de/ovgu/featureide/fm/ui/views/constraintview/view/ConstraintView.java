@@ -28,9 +28,11 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
@@ -78,6 +80,7 @@ public class ConstraintView implements GUIDefaults {
 	// UI elements
 	private TreeViewer treeViewer;
 	private Text searchBox;
+	private Button parenthesisButton;
 
 	public ConstraintViewFilter filter;
 	private ConstraintViewComparator comparator;
@@ -95,7 +98,7 @@ public class ConstraintView implements GUIDefaults {
 	 */
 	private void init(Composite parent) {
 
-		parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new GridLayout(2, false));
 
 		// create the search box
 		final GridData searchBoxData = new GridData();
@@ -103,6 +106,22 @@ public class ConstraintView implements GUIDefaults {
 		searchBoxData.horizontalAlignment = SWT.FILL;
 		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
 		searchBox.setLayoutData(searchBoxData);
+
+		parenthesisButton = new Button(parent, SWT.TOGGLE);
+		parenthesisButton.setText("Enforce Parentheses");
+		parenthesisButton.setLayoutData(new GridData());
+		parenthesisButton.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				treeViewer.refresh();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				treeViewer.refresh();
+			}
+		});
 
 		// create the tree viewer
 		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
@@ -119,6 +138,7 @@ public class ConstraintView implements GUIDefaults {
 		resetSort();
 
 		final GridData treeData = new GridData();
+		treeData.horizontalSpan = 2;
 		treeData.grabExcessHorizontalSpace = true;
 		treeData.horizontalAlignment = SWT.FILL;
 		treeData.grabExcessVerticalSpace = true;
@@ -241,6 +261,10 @@ public class ConstraintView implements GUIDefaults {
 
 	public Text getSearchBox() {
 		return searchBox;
+	}
+
+	public Button getParenthesisButton() {
+		return parenthesisButton;
 	}
 
 	public void dispose() {

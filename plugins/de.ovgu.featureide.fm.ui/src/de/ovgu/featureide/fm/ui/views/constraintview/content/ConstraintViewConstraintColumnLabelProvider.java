@@ -49,6 +49,7 @@ public class ConstraintViewConstraintColumnLabelProvider extends ColumnLabelProv
 			return (String) element;
 		} else {
 			final NodeWriter nodeWriter = new NodeWriter(((IConstraint) element).getNode());
+			nodeWriter.setEnforceBrackets(controller.getView().getParenthesisButton().getSelection());
 			nodeWriter.setSymbols(NodeWriter.logicalSymbols);
 			return nodeWriter.nodeToString();
 		}
