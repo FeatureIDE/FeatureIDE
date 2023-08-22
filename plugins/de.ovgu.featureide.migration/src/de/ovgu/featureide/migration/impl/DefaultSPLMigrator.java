@@ -51,10 +51,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
+import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
 /**
  * @author Marcus Pinnecke (Feature interface)
@@ -128,7 +130,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	private void convertToFeatureProject(MigrationConfigurationData configurationData) {
 		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath,
-				configurationData.buildPath, false, false, configurationData.composer.hasSourceFolder(), configurationData.composer.hasBuildFolder());
+				configurationData.buildPath, false, false, configurationData.composer.hasSourceFolder(), configurationData.composer.hasBuildFolder(), null);
 
 		CorePlugin.getDefault().addProject(newProject);
 	}

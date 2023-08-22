@@ -33,6 +33,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,6 +101,7 @@ import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -379,9 +381,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param shouldCreateBuildFolder true if build folder should be created
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
-			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder, String importModelPath) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
-		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
+		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder,
+				importModelPath);
 
 		if (composer != null) {
 			final ISafeRunnable runnable = new ISafeRunnable() {
@@ -447,13 +450,20 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param addNature true if nature should be added
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
-			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder,
+			String importModelPath) {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
 		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 
-		final FeatureModelManager featureModel = createFeatureModelFile(project, composer);
+		FeatureModelManager featureModel = null;
+		if (importModelPath != null) {
+			featureModel = loadFeatureModelFile(project, composer, importModelPath);
+		}
+		if (featureModel == null) {
+			featureModel = createFeatureModelFile(project, composer);
+		}
 		createConfigFile(project, configPath, featureModel, "default.");
 
 		if ((composer != null) && addCompiler) {
@@ -569,6 +579,20 @@ public class CorePlugin extends AbstractCorePlugin {
 			FMComposerManager.getFMComposerExtension(project);
 			featureModel.createDefaultValues(project.getName());
 			SimpleFileHandler.save(modelPath, featureModel, format);
+		}
+		return FeatureModelManager.getInstance(modelPath);
+	}
+
+	private static FeatureModelManager loadFeatureModelFile(IProject project, IComposerExtensionClass composerClass, String importModelPath) {
+		final Path path = Paths.get(importModelPath);
+		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.getFileHandler(path);
+		if ((fileHandler == null) || fileHandler.getLastProblems().containsError()) {
+			return null;
+		}
+		final Path modelPath = EclipseFileSystem.getPath(project.getFile(path.getFileName().toString()));
+		if (!Files.exists(modelPath)) {
+			FMComposerManager.getFMComposerExtension(project);
+			SimpleFileHandler.save(modelPath, fileHandler.getObject(), fileHandler.getFormat());
 		}
 		return FeatureModelManager.getInstance(modelPath);
 	}

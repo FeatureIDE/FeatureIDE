@@ -67,7 +67,7 @@ public class AndroidProjectConversion {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 
-		CorePlugin.setupProject(project, compositionTool, sourcePath, configPath, buildPath, true, false);
+		CorePlugin.setupProject(project, compositionTool, sourcePath, configPath, buildPath, true, false, null);
 
 		// Hide build folder
 		try {

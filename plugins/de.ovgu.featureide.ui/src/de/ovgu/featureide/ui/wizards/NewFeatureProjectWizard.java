@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.wizards;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_ANDROID_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATUREIDE_PROJECT;
 
+import java.util.Arrays;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -38,6 +40,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -59,18 +62,27 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 
 	protected NewFeatureProjectPage page;
+	protected ImportFeatureModelFilePage selectFilePage;
 	private DefaultNewFeatureProjectWizardExtension wizardExtension = null;
+
+	@Override
+	public void setInitializationData(IConfigurationElement cfig, String propertyName, Object data) {
+		System.out.println(Arrays.toString(cfig.getAttributeNames()));
+		super.setInitializationData(cfig, propertyName, data);
+		page = new NewFeatureProjectPage();
+		selectFilePage = new ImportFeatureModelFilePage();
+	}
 
 	@Override
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
-		page = new NewFeatureProjectPage();
 		final Shell shell = getShell();
 		if (shell != null) {
 			shell.setImage(colorImage);
 		}
-		addPage(page);
 		super.addPages();
+		addPage(page);
+		addPage(selectFilePage);
 	}
 
 	@Override
@@ -90,18 +102,6 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		// determine wizard extension and next page (basic new project page) when composer has been selected
 		if (page == this.page) {
-			// this.wizardExtension = null;
-			// IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.ui.wizard");
-			// for (IConfigurationElement c : conf) {
-			// try {
-			// if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
-			// wizardExtension = (INewFeatureProjectWizardExtension) c.createExecutableExtension("class");
-			// wizardExtension.setWizard(this);
-			// }
-			// } catch (CoreException e) {
-			// UIPlugin.getDefault().logError(e);
-			// }
-			// }
 			return super.getNextPage(page);
 		} else if (page instanceof WizardNewProjectCreationPage) {
 			// determine next page (reference page) after project has been named
@@ -166,10 +166,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 				try {
 					final IProject newProject = getNewProject();
 					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
-							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled());
+							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled(), selectFilePage.editor.getStringValue());
 					// open editor. try to search uvl format first before xml.
-					final String modelFile = newProject.getFile("model.uvl").exists() ? "model.uvl" : "model.xml";
-					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile(modelFile));
+					FMCorePlugin.findModelFile(newProject) //
+							.ifPresent(path -> UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, path));
 				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}

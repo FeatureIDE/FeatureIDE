@@ -75,11 +75,13 @@ public class DefaultNewFeatureProjectWizardExtension {
 	 * @param buildPath path in which class files created during build process are stored
 	 * @param shouldCreateSourceFolder create source folder if wanted
 	 * @param shouldCreateBuildFolder create build folder if wanted
+	 * @param importModelPath
 	 * @throws CoreException exception
 	 */
 	public void enhanceProject(IProject project, String compID, String sourcePath, String configPath, String buildPath, boolean shouldCreateSourceFolder,
-			boolean shouldCreateBuildFolder) throws CoreException {
-		CorePlugin.setupFeatureProject(project, compID, sourcePath, configPath, buildPath, true, true, shouldCreateSourceFolder, shouldCreateBuildFolder);
+			boolean shouldCreateBuildFolder, String importModelPath) throws CoreException {
+		CorePlugin.setupFeatureProject(project, compID, sourcePath, configPath, buildPath, true, true, shouldCreateSourceFolder, shouldCreateBuildFolder,
+				importModelPath);
 		extendedEnhanceProject(project, compID, sourcePath, configPath, buildPath);
 	}
 
