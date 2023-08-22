@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -202,7 +202,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static void setPersitentModelFilePath(IProject project, String path) {
 		try {
 			project.setPersistentProperty(MODEL_PATH, Optional.ofNullable(path) //
-					.map(Path::of) //
+					.map(Paths::get) //
 					.filter(Files::exists) //
 					.map(p -> p.isAbsolute() //
 						? EclipseFileSystem.getResource(p) //
@@ -224,7 +224,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static Optional<IPath> getPersitentModelFilePath(IProject project) {
 		try {
 			return Optional.ofNullable(project.getPersistentProperty(MODEL_PATH)) //
-					.map(Path::of) //
+					.map(Paths::get) //
 					.map(p -> p.isAbsolute() //
 						? EclipseFileSystem.getResource(p) //
 						: project.getFile(p.toString())) //

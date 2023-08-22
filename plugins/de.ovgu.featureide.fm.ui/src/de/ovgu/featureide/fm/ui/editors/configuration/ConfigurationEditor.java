@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -224,7 +225,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private Path setFeatureModelFile(IProject project) {
 		final IFile modelFile = FMUIPlugin.findModelFile(project).orElse(null);
 		setReadFeatureModelError(modelFile == null);
-		return modelFile == null ? null : modelFile.getLocation().toPath();
+		return modelFile == null ? null : Paths.get(modelFile.getLocation().toOSString());
 	}
 
 	@Override
