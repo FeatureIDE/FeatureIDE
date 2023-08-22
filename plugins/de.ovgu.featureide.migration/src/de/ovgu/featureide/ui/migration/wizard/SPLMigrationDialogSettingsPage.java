@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
 /**
- * Second Page of the {@link SPLMigrationWizard}. Enables the user to choose the new projects composer, and the pathes for source, feature and config folders.
+ * Second Page of the {@link SPLMigrationWizard}. Enables the user to choose the new projects composer, and the paths for source, feature and config folders.
  *
  *
  * @author Konstantin Tonscheidt

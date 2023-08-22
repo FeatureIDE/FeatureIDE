@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -60,7 +61,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			if (inputElement instanceof IExtendedFeatureModel) {
 				config = null;
 				featureModel = (IExtendedFeatureModel) inputElement;
-				List<Object> elements = new ArrayList<Object>();
+				List<Object> elements = new ArrayList<>();
 				elements.add(view.getMode().getMessage());
 				elements.add(featureModel.getStructure().getRoot().getFeature());
 				return elements.toArray();
@@ -69,11 +70,17 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		case CONFIGURATION_EDITOR:
 			if (inputElement instanceof Configuration) {
 				config = (Configuration) inputElement;
-				featureModel = (IExtendedFeatureModel) config.getFeatureModel();
-				List<Object> elements = new ArrayList<Object>();
-				elements.add(view.getMode().getMessage());
-				elements.add(featureModel.getStructure().getRoot().getFeature());
-				return elements.toArray();
+				IFeatureModel configFeatureModel = config.getFeatureModel();
+				if (configFeatureModel instanceof IExtendedFeatureModel) {
+					featureModel = (IExtendedFeatureModel) configFeatureModel;
+					List<Object> elements = new ArrayList<>();
+					elements.add(view.getMode().getMessage());
+					elements.add(featureModel.getStructure().getRoot().getFeature());
+					return elements.toArray();
+				} else {
+					featureModel = null;
+					return new Object[] { view.getMode().getMessage() };
+				}
 			}
 			break;
 		default:
