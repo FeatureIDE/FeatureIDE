@@ -554,8 +554,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 			final IFile modelFile = getModelFile();
 			final String modelFileName = modelFile.getName();
-			// XXX: There could be a more elegant solution here
-			if ("model.xml".equals(modelFileName) && (modelFile.getParent() instanceof IProject)) {
+			if (FMCorePlugin.findModelFile(modelFile.getProject()).map(modelFile::equals).orElse(false)) {
 				setPartName(modelFile.getProject().getName() + MODEL);
 			} else {
 				setPartName(modelFileName + " (" + modelFile.getProject().getName() + ")");
