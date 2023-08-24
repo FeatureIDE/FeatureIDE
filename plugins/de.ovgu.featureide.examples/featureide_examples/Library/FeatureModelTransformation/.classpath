@@ -7,7 +7,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/antlr-3.4.jar"/>
-	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm-v3.9.3.jar"/>
+	<classpathentry kind="lib" path="lib/de.ovgu.featureide.lib.fm-v3.10.0.jar"/>
 	<classpathentry kind="lib" path="lib/uvl-parser.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
