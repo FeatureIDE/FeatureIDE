@@ -36,8 +36,8 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
-import de.ovgu.featureide.fm.core.io.manager.EclipseFileDeleteVisitor;
 import de.ovgu.featureide.fm.core.io.manager.EclipseFileChangeVisitor;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileDeleteVisitor;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 

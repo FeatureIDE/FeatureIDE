@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -58,6 +57,8 @@ public class SimpleFileHandler<T> {
 	private T object;
 
 	private Path path;
+
+	private String content;
 
 	/**
 	 * Retrieves the file name of a {@link Path} without its extension.
@@ -126,7 +127,7 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<T> formatManager) {
-		final String content = fileHandler.getContent();
+		final String content = fileHandler.readContent();
 
 		if (content != null) {
 			final String fileName = fileHandler.getPath().getFileName().toString();
@@ -203,7 +204,7 @@ public class SimpleFileHandler<T> {
 
 	public boolean read() {
 		problemList.clear();
-		return parse(getContent());
+		return parse(readContent());
 	}
 
 	public boolean read(InputStream inputStream) {
@@ -211,20 +212,22 @@ public class SimpleFileHandler<T> {
 		return parse(getContent(inputStream));
 	}
 
-	String getContent() {
-		try {
-			return readContent();
-		} catch (final Exception e) {
-			problemList.add(new Problem(e));
-			return null;
-		}
+	public String getRawContent() {
+		return content;
 	}
 
-	String readContent() throws IOException {
-		if (!Files.exists(path)) {
-			throw new FileNotFoundException(path.toString());
+	String readContent() {
+		content = null;
+		if (Files.exists(path)) {
+			try {
+				content = new String(FileSystem.read(path), DEFAULT_CHARSET);
+			} catch (final Exception e) {
+				problemList.add(new Problem(e));
+			}
+		} else {
+			problemList.add(new Problem(new FileNotFoundException(path.toString())));
 		}
-		return new String(FileSystem.read(path), DEFAULT_CHARSET);
+		return content;
 	}
 
 	private String getContent(InputStream inputStream) {

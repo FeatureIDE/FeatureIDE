@@ -130,7 +130,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	private void convertToFeatureProject(MigrationConfigurationData configurationData) {
 		CorePlugin.setupFeatureProject(newProject, configurationData.composer.getId(), configurationData.sourcePath, configurationData.configPath,
-				configurationData.buildPath, false, false, configurationData.composer.hasSourceFolder(), configurationData.composer.hasBuildFolder(), null);
+				configurationData.buildPath, false, false, configurationData.composer.hasSourceFolder(), configurationData.composer.hasBuildFolder());
 
 		CorePlugin.getDefault().addProject(newProject);
 	}

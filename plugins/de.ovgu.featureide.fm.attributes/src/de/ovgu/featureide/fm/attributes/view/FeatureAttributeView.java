@@ -20,12 +20,16 @@
 */
 package de.ovgu.featureide.fm.attributes.view;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -61,8 +65,11 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
@@ -74,6 +81,7 @@ import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.config.ExtendedConfiguration;
+import de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat;
 import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
 import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
 import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
@@ -97,17 +105,20 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationIO;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelIO;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationExportHandler;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTreeEditorPage;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeature;
-import de.ovgu.featureide.fm.ui.handlers.FMExportHandler;
 
 /**
  * A view to help the user of managing attributes of {@link IExtendedFeatureModel}. This includes the creation, edit, filtering and deletion of such attributes.
@@ -285,9 +296,48 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (currentEditor instanceof FeatureModelEditor) {
-					new FMExportHandler().singleAction(manager.getPath());
+					final Path path = manager.getPath();
+
+					final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					final IWorkbenchPage page = window.getActivePage();
+					page.closeEditor((FeatureModelEditor) currentEditor, true);
+
+					FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(path);
+					if (fileHandler != null && !fileHandler.getLastProblems().containsError()) {
+						Path orgPath = path.resolveSibling("org_" + path.getFileName().toString());
+						if (!Files.exists(orgPath)) {
+							fileHandler.write(orgPath);
+						}
+						String content = fileHandler.getRawContent();
+						if (path.getFileName().toString().endsWith(".uvl")) {
+							content = content.replaceAll("(\\A|\\r?\\n)(features\\s*\\r?\\n\\s+.*)(\\r?\\n)", "$1$2 \\{extended__\\}$3");
+						} else {
+							content = content.replace("<featureModel>", "<extendedFeatureModel>");
+							content = content.replace("</featureModel>", "</extendedFeatureModel>");
+						}
+						try {
+							FileSystem.write(path, content);
+						} catch (IOException e1) {
+							FMAttributesPlugin.getDefault().logError(e1);
+						}
+						FMAttributesPlugin.getDefault().openEditor(FeatureModelEditor.ID, (IFile) EclipseFileSystem.getResource(path));
+					}
 				} else if (currentEditor instanceof ConfigurationEditor) {
-					new ConfigurationExportHandler().singleAction(manager.getPath());
+					final Path path = manager.getPath();
+
+					final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					final IWorkbenchPage page = window.getActivePage();
+					page.closeEditor((ConfigurationEditor) currentEditor, true);
+
+					FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(path);
+					if (fileHandler != null && !fileHandler.getLastProblems().containsError()) {
+						Path orgPath = path.resolveSibling("org_" + path.getFileName().toString());
+						if (!Files.exists(orgPath)) {
+							fileHandler.write(orgPath);
+						}
+						FileHandler.save(path, fileHandler.getObject(), new XmlExtendedConfFormat());
+						FMAttributesPlugin.getDefault().openEditor(ConfigurationEditor.ID, (IFile) EclipseFileSystem.getResource(path));
+					}
 				}
 			}
 		});

@@ -22,8 +22,10 @@ package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -80,8 +82,14 @@ public class DefaultNewFeatureProjectWizardExtension {
 	 */
 	public void enhanceProject(IProject project, String compID, String sourcePath, String configPath, String buildPath, boolean shouldCreateSourceFolder,
 			boolean shouldCreateBuildFolder, String importModelPath) throws CoreException {
-		CorePlugin.setupFeatureProject(project, compID, sourcePath, configPath, buildPath, true, true, shouldCreateSourceFolder, shouldCreateBuildFolder,
-				importModelPath);
+		try {
+			CorePlugin.setupFeatureProject(project, compID, sourcePath, configPath, buildPath, true, true, shouldCreateSourceFolder, shouldCreateBuildFolder,
+					importModelPath);
+		} catch (final Throwable e) {
+			MessageDialog.open(MessageDialog.ERROR, null, "Import Failed",
+					"Unable to parse feaure model file: " + importModelPath + "\n\nDue to the following error:\n" + e.getMessage(), SWT.NONE);
+			CorePlugin.setupFeatureProject(project, compID, sourcePath, configPath, buildPath, true, true, shouldCreateSourceFolder, shouldCreateBuildFolder);
+		}
 		extendedEnhanceProject(project, compID, sourcePath, configPath, buildPath);
 	}
 

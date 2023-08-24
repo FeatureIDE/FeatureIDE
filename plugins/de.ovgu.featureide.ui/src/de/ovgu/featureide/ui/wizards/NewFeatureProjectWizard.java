@@ -167,7 +167,6 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 					final IProject newProject = getNewProject();
 					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
 							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled(), selectFilePage.editor.getStringValue());
-					// open editor. try to search uvl format first before xml.
 					FMCorePlugin.findModelFile(newProject) //
 							.ifPresent(path -> UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, path));
 				} catch (final CoreException e) {

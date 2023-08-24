@@ -91,6 +91,7 @@ import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
@@ -99,7 +100,10 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -381,7 +385,17 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param shouldCreateBuildFolder true if build folder should be created
 	 */
 	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
-			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder, String importModelPath) {
+			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+		try {
+			setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, shouldCreateBuildFolder, shouldCreateBuildFolder,
+					shouldCreateSourceFolder, shouldCreateBuildFolder, null);
+		} catch (final Throwable e) {
+			Logger.logError(e);
+		}
+	}
+
+	public static void setupProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath, final String buildPath,
+			boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder, String importModelPath) throws Throwable {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder,
 				importModelPath);
@@ -448,23 +462,34 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param shouldCreateBuildFolder true if build folder should be created
 	 * @param addCompiler true if compiler
 	 * @param addNature true if nature should be added
+	 * @throws Throwable
 	 */
 	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
+			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder) {
+		try {
+			setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, addCompiler, addNature, shouldCreateSourceFolder,
+					shouldCreateBuildFolder, null);
+		} catch (final Throwable e) {
+			Logger.logError(e);
+		}
+	}
+
+	public static void setupFeatureProject(final IProject project, String compositionToolID, final String sourcePath, final String configPath,
 			final String buildPath, boolean addCompiler, boolean addNature, boolean shouldCreateSourceFolder, boolean shouldCreateBuildFolder,
-			String importModelPath) {
+			String importModelPath) throws Throwable {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
 		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 
-		FeatureModelManager featureModel = null;
-		if (importModelPath != null) {
+		IFeatureModel featureModel = null;
+		if ((importModelPath != null) && !importModelPath.isBlank()) {
 			featureModel = loadFeatureModelFile(project, composer, importModelPath);
 		}
 		if (featureModel == null) {
 			featureModel = createFeatureModelFile(project, composer);
 		}
-		createConfigFile(project, configPath, featureModel, "default.");
+		createConfigFile(project, configPath, new FeatureModelFormula(featureModel), "default.");
 
 		if ((composer != null) && addCompiler) {
 			final ISafeRunnable runnable = new ISafeRunnable() {
@@ -563,7 +588,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		FMCorePlugin.createFolder(project, configPath);
 	}
 
-	private static FeatureModelManager createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
+	private static IFeatureModel createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
 		final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 		final Path modelPath = EclipseFileSystem.getPath(project.getFile("model." + format.getSuffix()));
 
@@ -579,28 +604,38 @@ public class CorePlugin extends AbstractCorePlugin {
 			FMComposerManager.getFMComposerExtension(project);
 			featureModel.createDefaultValues(project.getName());
 			SimpleFileHandler.save(modelPath, featureModel, format);
+			return featureModel;
 		}
-		return FeatureModelManager.getInstance(modelPath);
+		return null;
 	}
 
-	private static FeatureModelManager loadFeatureModelFile(IProject project, IComposerExtensionClass composerClass, String importModelPath) {
+	private static IFeatureModel loadFeatureModelFile(IProject project, IComposerExtensionClass composerClass, String importModelPath) throws Throwable {
 		final Path path = Paths.get(importModelPath);
 		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.getFileHandler(path);
 		if ((fileHandler == null) || fileHandler.getLastProblems().containsError()) {
-			return null;
+			final Problem problem = fileHandler.getLastProblems().getErrors().get(0);
+			if (problem.error != null) {
+				throw problem.error;
+			} else {
+				throw new UnsupportedModelException(problem.getMessage(), 0);
+			}
 		}
 		final Path modelPath = EclipseFileSystem.getPath(project.getFile(path.getFileName().toString()));
 		if (!Files.exists(modelPath)) {
 			FMComposerManager.getFMComposerExtension(project);
-			SimpleFileHandler.save(modelPath, fileHandler.getObject(), fileHandler.getFormat());
+			try {
+				FileSystem.write(modelPath, fileHandler.getRawContent());
+			} catch (final IOException e) {
+				Logger.logError(e);
+			}
 		}
-		return FeatureModelManager.getInstance(modelPath);
+		return fileHandler.getObject();
 	}
 
-	private static Configuration createConfigFile(IProject project, String configPath, FeatureModelManager featureModel, final String configName) {
+	private static Configuration createConfigFile(IProject project, String configPath, FeatureModelFormula featureModelFormula, final String configName) {
 		final XMLConfFormat configFormat = new XMLConfFormat();
 		final IFile file = project.getFolder(configPath).getFile(configName + configFormat.getSuffix());
-		final Configuration config = new Configuration(featureModel.getPersistentFormula());
+		final Configuration config = new Configuration(featureModelFormula);
 		SimpleFileHandler.save(EclipseFileSystem.getPath(file), config, configFormat);
 		return config;
 	}

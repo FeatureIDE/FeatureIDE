@@ -400,22 +400,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		}
 
-		// XXX MPL: hack for importing mpl projects
-		if (getFeatureModel() instanceof MultiFeatureModel) {
-			try {
-				modelFile.getModelFile().touch(null);
-			} catch (final CoreException e) {
-				LOGGER.logError(e);
-			}
-		}
-
 		featureModelManager.addListener(new FeatureModelChangeListner());
 	}
 
+	@Override
 	public boolean hasValidFeatureModel() {
 		return validFeatureModel;
 	}
 
+	@Override
 	public void autoDetectModelFile() {
 		final IFile modelFile = FMCorePlugin.findModelFile(project).orElse(null);
 		if (modelFile != null) {

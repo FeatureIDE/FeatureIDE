@@ -36,8 +36,7 @@ public class EclipseFileChangeVisitor implements IResourceDeltaVisitor {
 
 	@Override
 	public boolean visit(IResourceDelta delta) {
-		if (((delta.getKind() == IResourceDelta.ADDED))
-			|| ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
+		if (((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
 			final IResource resource = delta.getResource();
 			if (resource instanceof IFile) {
 				final IFileManager<?> instance = AFileManager.getInstance(EclipseFileSystem.getPath(resource));

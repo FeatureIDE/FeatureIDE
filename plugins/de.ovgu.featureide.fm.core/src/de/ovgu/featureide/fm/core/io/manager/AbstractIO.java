@@ -104,7 +104,7 @@ public abstract class AbstractIO<T> {
 
 	public final FileHandler<T> getFileHandler(Path path) {
 		final FileHandler<T> fileHandler = new FileHandler<>(path, null, null);
-		final String content = fileHandler.getContent();
+		final String content = fileHandler.readContent();
 
 		if (content != null) {
 			final String fileName = path.getFileName().toString();
