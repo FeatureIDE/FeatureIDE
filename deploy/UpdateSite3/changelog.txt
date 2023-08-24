@@ -4,6 +4,24 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+Release 3.10.0 (August 2023)
+* Adds new and extended functionality
+  * New feature project now allows to import an existing feature model
+  * Action "Export All Features Models" is now more intuitive, working for selected files, folders, and projects. (#1404) 
+  * Sampling with YASA can now be canceled properly (#1435)
+  * Feature color dialog was improvement (#1411)
+  * Adds prime implicant analysis (library only)
+* Updates supported UVL version
+  * Uses latest UVL parser
+  * Enables conversion for UVL language levels (#1433, #1446)
+  * Updates UVL examples (#1444)
+* Bug fixes
+  * Fixes minor incompatibility with latest Eclipse version
+  * Fixes multiple problems in the UI (#1324, #1399, #1416, #1438) 
+  * Fixes multiple problems for projects with no distinct feature model file (#1183, #1381, #1382, #1406, #1408, #1409)
+  * Fixes conversion to extended feature model and configurations in feature attributes view
+  * Fixes other minor bugs
+
 Release 3.9.3 (May 2023)
 * Hotfix containing mostly bugfixes over v3.9.2
 * Fixes more incompatibilities with latest Eclipse versions (#1431,#1430,#1429,#1382)
