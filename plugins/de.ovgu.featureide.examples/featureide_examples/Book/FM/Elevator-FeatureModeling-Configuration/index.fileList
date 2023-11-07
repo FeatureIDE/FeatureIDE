@@ -1,8 +1,8 @@
+model.xml
 .project
-.featureide/model.xml/model.xml.xml
+configs/HomePremium.xml
+configs/CustomElevator.xml
+configs/Enterprise.xml
 configs/HomeBasic.xml
 configs/Ultimate.xml
-configs/CustomElevator.xml
-configs/HomePremium.xml
-configs/Enterprise.xml
-model.xml
+.featureide/model.xml/model.xml.xml

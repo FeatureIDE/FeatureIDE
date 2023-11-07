@@ -1,4 +1,4 @@
-.project
 info.xml
-src/Beautiful.java
 .classpath
+.project
+src/Beautiful.java

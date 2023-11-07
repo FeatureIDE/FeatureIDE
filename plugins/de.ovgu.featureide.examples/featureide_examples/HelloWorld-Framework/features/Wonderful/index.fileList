@@ -1,4 +1,4 @@
-.project
 info.xml
-src/Wonderful.java
 .classpath
+.project
+src/Wonderful.java

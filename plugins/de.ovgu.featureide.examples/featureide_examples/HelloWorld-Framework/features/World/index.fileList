@@ -1,4 +1,4 @@
-.project
 info.xml
-src/World.java
 .classpath
+.project
+src/World.java

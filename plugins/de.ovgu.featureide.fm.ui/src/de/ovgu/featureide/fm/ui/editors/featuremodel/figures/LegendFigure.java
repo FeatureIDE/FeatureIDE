@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -42,6 +43,10 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.ColorScheme;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -124,6 +129,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 	private static final String FEATURE_TOOLTIP = "Feature";
+	private static final String CUSTOM_COLOR_TOOLTIP = "Custom Color";
 
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
@@ -143,6 +149,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	// necessary creating a legend with only abstract or concrete features which then are only named feature
 	private static final int FEATURECON = 15;
 	private static final int FEATUREABS = 16;
+	private static final int COLORED = 17;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -186,8 +193,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setLocation(pos);
 		setLayoutManager(layout);
 		setBorder(FMPropertyManager.getLegendBorder());
-		setLegendSize();
-		createRows();
+		final int rows = createRows();
+		setLegendSize(rows);
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());
 		setOpaque(true);
@@ -282,87 +289,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		return false;
 	}
 
-	private void setLegendSize() {
+	private void setLegendSize(int numRows) {
 		width = LEGEND_WIDTH;
-		int height = ROW_HEIGHT * 2;
-		if (mandatory) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getMandatory());
-		}
-		if (optional) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getOptional());
-		}
-		if (or) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getOrGroup());
-		}
-		if (alternative) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getAlternativeGroup());
-		}
-		if (_abstract && !concrete) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getFeature());
-		}
-		if (concrete && !_abstract) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getFeature());
-		}
-		if (_abstract && concrete) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getAbstract());
-			height = height + ROW_HEIGHT;
-			setWidth(language.getConcrete());
-		}
-		if (imported) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getImported());
-		}
-		if (inherited) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getInherited());
-		}
-		if (interfaced) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getInterfaced());
-		}
-		if (hidden) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getHidden());
-		}
-		if (collapsed) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getCollapsed());
-		}
-		if (dead) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getDead());
-		}
-		if (falseoptional) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getFalseOptional());
-		}
-		if (indetHidden) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getIndetHidden());
-		}
-		if (tautologyConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getTautologyConst());
-		}
-		if (redundantConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getRedundantConst());
-		}
-		if (implicitConst) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getRedundantConst());
-		}
-		if (void_model) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getVoidModelConst());
-		}
+		final int height = numRows * ROW_HEIGHT;
 		this.setSize(width, height);
 	}
 
@@ -383,7 +312,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		return false;
 	}
 
-	private void createRows() {
+	private int createRows() {
 		createRowTitle();
 		row = 2;
 		if (mandatory) {
@@ -451,6 +380,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			// Explanation should be created at last
 			createExplanationEntry();
 		}
+
+		final ColorScheme color = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
+		int colorIndex = 1;
+		if (!color.getColors().isEmpty()) {
+			for (final FeatureColor currentColor : new HashSet<>(color.getColors().values())) {
+				createColoredRowFeatureAbstract(row++, currentColor, colorIndex++);
+			}
+		}
+
+		return row;
 	}
 
 	/**
@@ -573,6 +512,23 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private void createRowFeatureAbstract(int row) {
 		createSymbol(row, FEATUREABS, true, FEATURE_TOOLTIP);
 		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
+		add(labelFeature);
+	}
+
+	private void createColoredRowFeatureAbstract(int row, FeatureColor color, int colorIndex) {
+		final int x1 = ((SYMBOL_SIZE / 2) - 2);
+		final int y1 = ((ROW_HEIGHT * row) - (LIFT_2 / 2));
+		final int x2 = SYMBOL_SIZE + (SYMBOL_SIZE / 2);
+		final int y2 = (((ROW_HEIGHT * row) + SYMBOL_SIZE) - LIFT_2);
+		final Point p1 = new Point(x1, y1);
+		final Figure rect = new RectangleFigure();
+		rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
+		rect.setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+		rect.setSize(x2 - x1, y2 - y1);
+		rect.setLocation(p1);
+		add(rect);
+		final Label labelFeature =
+			createLabel(row, "Custom Color " + String.format("%02d", colorIndex), FMPropertyManager.getFeatureForgroundColor(), CUSTOM_COLOR_TOOLTIP);
 		add(labelFeature);
 	}
 
@@ -774,8 +730,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		removeAll();
 		setLocation(graphicalFeatureModel.getLegend().getPos());
 		refreshProperties(graphicalFeatureModel.getFeatureModelManager());
-		setLegendSize();
-		createRows();
+		final int rows = createRows();
+		setLegendSize(rows);
 	}
 
 	private void createExplanationEntry() {

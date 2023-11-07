@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.prop4j.And;
@@ -250,14 +251,14 @@ public final class Nodes {
 			// sort out obvious tautologies
 			// TODO simplify
 			if (cnf) {
-				if (literal.var.equals(NodeCreator.varTrue)) {
+				if (Objects.equals(literal.var, NodeCreator.varTrue)) {
 					if (literal.positive) {
 						irrelevant = true;
 					} else {
 						absoluteValueCount++;
 						children[j] = null;
 					}
-				} else if (literal.var.equals(NodeCreator.varFalse)) {
+				} else if (Objects.equals(literal.var, NodeCreator.varFalse)) {
 					if (literal.positive) {
 						absoluteValueCount++;
 						children[j] = null;
@@ -266,14 +267,14 @@ public final class Nodes {
 					}
 				}
 			} else {
-				if (literal.var.equals(NodeCreator.varTrue)) {
+				if (Objects.equals(literal.var, NodeCreator.varTrue)) {
 					if (!literal.positive) {
 						irrelevant = true;
 					} else {
 						absoluteValueCount++;
 						children[j] = null;
 					}
-				} else if (literal.var.equals(NodeCreator.varFalse)) {
+				} else if (Objects.equals(literal.var, NodeCreator.varFalse)) {
 					if (!literal.positive) {
 						absoluteValueCount++;
 						children[j] = null;

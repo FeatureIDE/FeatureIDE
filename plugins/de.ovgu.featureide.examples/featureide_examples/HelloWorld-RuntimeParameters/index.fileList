@@ -1,9 +1,9 @@
+model.xml
+.classpath
 .project
-readme.txt
+configs/BeautifulWorld.xml
+configs/HelloWorld.xml
 configs/Hello.xml
 configs/WonderfulWorld.xml
-configs/HelloWorld.xml
-configs/BeautifulWorld.xml
+readme.txt
 src/HelloWorld.java
-.classpath
-model.xml

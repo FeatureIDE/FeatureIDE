@@ -1,9 +1,9 @@
+model.xml
 .project
-readme.txt
+configs/BeautifulWorld.xml
+configs/HelloWorld.xml
 configs/Hello.xml
 configs/WonderfulWorld.xml
-configs/HelloWorld.xml
-configs/BeautifulWorld.xml
-src/main.c
+readme.txt
 .cproject
-model.xml
+src/main.c

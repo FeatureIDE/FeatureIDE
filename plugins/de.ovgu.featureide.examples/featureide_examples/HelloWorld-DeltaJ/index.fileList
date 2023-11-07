@@ -1,10 +1,10 @@
+execute_program/Main.java
+rules.deltas
+model.xml
+.classpath
 .project
-modules/DRemBeautiful.deltaj
+configs/hello.xml
 modules/DWonderful.deltaj
 modules/DHello.deltaj
+modules/DRemBeautiful.deltaj
 modules/DWorld.deltaj
-rules.deltas
-execute_program/Main.java
-configs/hello.xml
-.classpath
-model.xml

@@ -1,9 +1,9 @@
+model.xml
+.profiles/default.profile
 .project
-.featureide/model.xml/model.xml.xml
+configs/HomePremium.xml
+configs/CustomElevator.xml
+configs/Enterprise.xml
 configs/HomeBasic.xml
 configs/Ultimate.xml
-configs/CustomElevator.xml
-configs/HomePremium.xml
-configs/Enterprise.xml
-.profiles/default.profile
-model.xml
+.featureide/model.xml/model.xml.xml

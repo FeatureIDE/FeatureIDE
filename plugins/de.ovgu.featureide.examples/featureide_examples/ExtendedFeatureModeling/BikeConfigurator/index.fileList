@@ -1,4 +1,4 @@
-.project
-.featureide/model.xml/model.xml.xml
-configs/configBike.xml
 model.xml
+.project
+configs/configBike.xml
+.featureide/model.xml/model.xml.xml

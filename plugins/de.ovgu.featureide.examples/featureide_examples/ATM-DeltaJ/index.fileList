@@ -1,7 +1,7 @@
-.project
-modules/ATM.deltaj
 rules.deltas
+model.xml
+.classpath
+.project
 configs/EnglishBalance.xml
 configs/GermanCash.xml
-.classpath
-model.xml
+modules/ATM.deltaj
