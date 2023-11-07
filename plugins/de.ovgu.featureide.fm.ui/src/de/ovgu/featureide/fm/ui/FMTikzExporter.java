@@ -52,10 +52,11 @@ public class FMTikzExporter implements ExportType<GraphicalViewerImpl> {
 
 		FileSystem.mkDir(exportDir);
 
-		save(exportDir, "head.tex", new TikzGraphicalFeatureModelFormat.TikZHeadFormat(), null);
-		save(exportDir, "body.tex", new TikzGraphicalFeatureModelFormat.TikZBodyFormat(path.getFileName().toString()), null);
-		save(exportDir, path.getFileName().toString(), new TikzGraphicalFeatureModelFormat.TikZMainFormat(),
-				(IGraphicalFeatureModel) object.getContents().getModel());
+		final IGraphicalFeatureModel model = (IGraphicalFeatureModel) object.getContents().getModel();
+
+		save(exportDir, "head.tex", new TikzGraphicalFeatureModelFormat.TikZHeadFormat(), model);
+		save(exportDir, "body.tex", new TikzGraphicalFeatureModelFormat.TikZBodyFormat(path.getFileName().toString()), model);
+		save(exportDir, path.getFileName().toString(), new TikzGraphicalFeatureModelFormat.TikZMainFormat(), model);
 	}
 
 	private void save(final Path exportDir, String fileName, IPersistentFormat<IGraphicalFeatureModel> format, IGraphicalFeatureModel model) {

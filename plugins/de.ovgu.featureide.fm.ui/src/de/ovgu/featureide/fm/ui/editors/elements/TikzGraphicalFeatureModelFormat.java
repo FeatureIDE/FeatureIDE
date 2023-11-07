@@ -67,36 +67,119 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		@Override
 		public String write(IGraphicalFeatureModel object) {
 			final StringBuilder str = new StringBuilder();
-			printHead(str);
+			printHead(str, object);
 			return str.toString();
 		}
 
-		private static void printHead(StringBuilder str) {
+		private static void printHead(StringBuilder str, IGraphicalFeatureModel object) {
+			final boolean hasVerticalLayout = object.getLayout().hasVerticalLayout();
 
-			str.append("%---required packages & variable definitions------------------------------------" + lnSep + "\\usepackage{forest}" + lnSep
-				+ "\\usepackage{xcolor}" + lnSep + "\\usetikzlibrary{angles}" + lnSep + "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep
-				+ "\\newcommand{\\circleSize}{0.25em}" + lnSep + "\\newcommand{\\angleSize}{0.8em}" + lnSep
-				+ "%-------------------------------------------------------------------------------" + lnSep
-				+ "%---Define the style of the tree------------------------------------------------" + lnSep + "\\forestset{" + lnSep
-				+ "	/tikz/mandatory/.style={" + lnSep + "		circle,fill=drawColor," + lnSep + "		draw=drawColor," + lnSep
-				+ "		inner sep=\\circleSize" + lnSep + "	}," + lnSep + "	/tikz/optional/.style={" + lnSep + "		circle," + lnSep + "		fill=white,"
-				+ lnSep + "		draw=drawColor," + lnSep + "		inner sep=\\circleSize" + lnSep + "	}," + lnSep + "	featureDiagram/.style={" + lnSep
-				+ "		for tree={" + lnSep + String.format("\t\t\t%s = %s,%n", "text depth", "0") + "			parent anchor = south," + lnSep
-				+ "			child anchor = north," + lnSep + "			draw = drawColor," + lnSep + "			edge = {draw=drawColor}," + lnSep + "		}"
-				+ lnSep + "	}," + lnSep + "	/tikz/abstract/.style={" + lnSep + "		fill = blue!85!cyan!5," + lnSep + "		draw = drawColor" + lnSep
-				+ "	}," + lnSep + "	/tikz/concrete/.style={" + lnSep + "		fill = blue!85!cyan!20," + lnSep + "		draw = drawColor" + lnSep + "	},"
-				+ lnSep + "	mandatory/.style={" + lnSep + "		edge label={node [mandatory] {} }" + lnSep + "	}," + lnSep + "	optional/.style={" + lnSep
-				+ "		edge label={node [optional] {} }" + lnSep + "	}," + lnSep + "	or/.style={" + lnSep + "		tikz+={" + lnSep
+			str.append("%---required packages & variable definitions------------------------------------" + lnSep //
+				+ "\\usepackage{forest}" + lnSep //
+
+				+ "\\usepackage{xcolor}" + lnSep //
+				+ "\\usetikzlibrary{angles}" + lnSep //
+				+ "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep //
+
+				+ "\\newcommand{\\circleSize}{0.25em}" + lnSep //
+				+ "\\newcommand{\\angleSize}{0.8em}" + lnSep //
+
+				+ "%-------------------------------------------------------------------------------" + lnSep //
+
+				+ "%---Define the style of the tree------------------------------------------------" + lnSep //
+				+ "\\forestset{" + lnSep //
+
+				+ "	/tikz/mandatory/.style={" + lnSep //
+				+ "		circle,fill=drawColor," + lnSep //
+				+ "		draw=drawColor," + lnSep //
+
+				+ "		inner sep=\\circleSize" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/optional/.style={" + lnSep //
+				+ "		circle," + lnSep //
+				+ "		fill=white," + lnSep //
+				+ "		draw=drawColor," + lnSep //
+				+ "		inner sep=\\circleSize" + lnSep //
+				+ "	}," + lnSep //
+				+ "	featureDiagram/.style={" + lnSep //
+				+ "		for tree={" + lnSep //
+				+ String.format("			text depth = 0," + lnSep //
+					+ "			parent anchor = %s," + lnSep //
+					+ "			child anchor = %s," + lnSep //
+					+ "			draw = drawColor," + lnSep //
+					+ "			edge = {draw=drawColor}," + lnSep //
+					+ "			%s" //
+					+ "			l sep = 2em," + lnSep //
+					+ "			s sep = 1em" //
+					+ "			%s" + lnSep //
+						, hasVerticalLayout ? "east" : "south", //
+						hasVerticalLayout ? "west" : "north", //
+						hasVerticalLayout ? "grow' = east," + lnSep : "", //
+						hasVerticalLayout ? "," + lnSep + " tier/.pgfmath=level()" : "")
+				+ "		}" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/abstract/.style={" + lnSep //
+				+ "		fill = blue!85!cyan!5," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+
+				+ "	}," + lnSep //
+				+ "	/tikz/concrete/.style={" + lnSep //
+				+ "		fill = blue!85!cyan!20," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	mandatory/.style={" + lnSep //
+				+ "		edge label={node [mandatory] {} }" + lnSep //
+				+ "	}," + lnSep //
+				+ "	optional/.style={" + lnSep //
+
+				+ "		edge label={node [optional] {} }" + lnSep //
+				+ "	}," + lnSep //
+				+ "	or/.style={" + lnSep //
+				+ "		tikz+={" + lnSep //
+
 				+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};"
-				+ lnSep + "		}	" + lnSep + "	}," + lnSep + "	/tikz/or/.style={" + lnSep + "	}," + lnSep + "	alternative/.style={" + lnSep
-				+ "		tikz+={" + lnSep
+				+ lnSep //
+				+ "		}	" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/or/.style={" + lnSep //
+				+ "	}," + lnSep //
+				+ "	alternative/.style={" + lnSep //
+
+				+ "		tikz+={" + lnSep //
+
 				+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};"
-				+ lnSep + "		}	" + lnSep + "	}," + lnSep + "	/tikz/alternative/.style={" + lnSep + "	}," + lnSep + "	/tikz/placeholder/.style={" + lnSep
-				+ "	}," + lnSep + "	collapsed/.style={" + lnSep + "		rounded corners," + lnSep + "		no edge," + lnSep + "		for tree={" + lnSep
-				+ "			fill opacity=0," + lnSep + "			draw opacity=0," + lnSep + "			l = 0em," + lnSep + "		}" + lnSep + "	},"
-				+ lnSep + "	/tikz/hiddenNodes/.style={" + lnSep + "		midway," + lnSep + "		rounded corners," + lnSep + "		draw=drawColor," + lnSep
-				+ "		fill=white," + lnSep + "		minimum size = 1.2em," + lnSep + "		minimum width = 0.8em," + lnSep + "		scale=0.9" + lnSep
-				+ "	}," + lnSep + "}" + lnSep + "%-------------------------------------------------------------------------------" + lnSep);
+				+ lnSep //
+				+ "		}	" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/alternative/.style={" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/placeholder/.style={" + lnSep //
+
+				+ "	}," + lnSep //
+				+ "	collapsed/.style={" + lnSep //
+				+ "		rounded corners," + lnSep //
+				+ "		no edge," + lnSep //
+				+ "		for tree={" + lnSep //
+
+				+ "			fill opacity=0," + lnSep //
+				+ "			draw opacity=0," + lnSep //
+				+ "			l = 0em," + lnSep //
+				+ "		}" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/hiddenNodes/.style={" + lnSep //
+				+ "		midway," + lnSep //
+				+ "		rounded corners," + lnSep //
+				+ "		draw=drawColor," + lnSep //
+
+				+ "		fill=white," + lnSep //
+				+ "		minimum size = 1.2em," + lnSep //
+				+ "		minimum width = 0.8em," + lnSep //
+				+ "		scale=0.9" + lnSep //
+
+				+ "	}," + lnSep //
+				+ "}" + lnSep //
+				+ "%-------------------------------------------------------------------------------" + lnSep //
+			);
 		}
 
 		@Override
@@ -428,7 +511,7 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		final StringBuilder str = new StringBuilder();
 		str.append("\\documentclass[border=5pt]{standalone}");
 		str.append(lnSep);
-		TikZHeadFormat.printHead(str);
+		TikZHeadFormat.printHead(str, object);
 		str.append("\\begin{document}" + lnSep + "	%---The Feature Diagram-----------------------------------------------------" + lnSep);
 		new TikZMainFormat().printForest(object, str);
 		str.append(lnSep);
