@@ -325,17 +325,17 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 
 		private void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
 			str.append("[" + node);
-			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isAbstract() == true) {
+			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isAbstract()) {
 				str.append(",abstract");
 				legend[0] = true;
 			}
-			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isConcrete() == true) {
+			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isConcrete()) {
 				str.append(",concrete");
 				legend[1] = true;
 			}
-			if ((object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot() == false)
-				&& (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isAnd() == true)) {
-				if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isMandatory() == true) {
+			if (!object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot()
+				&& object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isAnd()) {
+				if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isMandatory()) {
 					str.append(",mandatory");
 					legend[2] = true;
 				} else {
@@ -343,18 +343,18 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 					legend[3] = true;
 				}
 			}
-			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot() == false) {
-				if ((object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isOr() == true)
-					&& (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().getFirstChild()
-							.equals(object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure()) == true)) {
+			if (!object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot()) {
+				if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isOr()
+					&& object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().getFirstChild()
+							.equals(object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure())) {
 					str.append(",or");
 					legend[4] = true;
 				}
 			}
-			if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot() == false) {
-				if ((object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isAlternative() == true)
-					&& (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().getFirstChild()
-							.equals(object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure()) == true)) {
+			if (!object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().isRoot()) {
+				if (object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().isAlternative()
+					&& object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure().getParent().getFirstChild()
+							.equals(object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure())) {
 					str.append(",alternative");
 					legend[5] = true;
 				}

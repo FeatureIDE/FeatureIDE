@@ -46,6 +46,7 @@ import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -243,7 +244,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
-		viewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
+		viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		viewer.addSelectionChangedListener(this);
 		viewer.addTreeListener(this);
 

@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.Logger;
 public class Problem {
 
 	public static enum Severity {
+
 		INFO(0), WARNING(1), ERROR(2);
 
 		private final int level;

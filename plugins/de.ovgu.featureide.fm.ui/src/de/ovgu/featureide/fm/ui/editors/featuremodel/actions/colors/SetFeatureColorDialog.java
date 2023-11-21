@@ -183,6 +183,7 @@ public class SetFeatureColorDialog extends Dialog {
 		final Text meaningText = new Text(container, SWT.NONE);
 		meaningText.setLayoutData(gridData);
 		meaningText.setText(initialSelectedColor.getMeaning());
+		newColorMeaning = meaningText.getText();
 		meaningText.addModifyListener((ModifyEvent e) -> {
 			newColorMeaning = meaningText.getText();
 		});
@@ -206,6 +207,8 @@ public class SetFeatureColorDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				onColorSelectionChanged(((Combo) event.widget).getSelectionIndex());
+				meaningText.setText(newColor.getMeaning());
+				newColorMeaning = newColor.getMeaning();
 			}
 
 			@Override
@@ -333,7 +336,9 @@ public class SetFeatureColorDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		newColor.setMeaning(newColorMeaning);
+		if (newColor != FeatureColor.NO_COLOR) {
+			newColor.setMeaning(newColorMeaning);
+		}
 		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureModelManager, Functional.mapToStringList(featureListBuffer), newColor);
 		if (enableUndoRedo) {
 			FeatureModelOperationWrapper.run(op);

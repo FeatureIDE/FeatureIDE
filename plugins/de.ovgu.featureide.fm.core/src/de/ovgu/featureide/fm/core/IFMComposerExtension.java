@@ -59,5 +59,6 @@ public interface IFMComposerExtension extends IFeatureNameValidator {
 	 */
 	boolean hasFeatureOrder();
 
+	@Override
 	String getErrorMessage();
 }

@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public class SatSolver {
 
 	public static enum ValueType {
+
 		ALL(0), TRUE(1), FALSE(-1);
 
 		private final int factor;

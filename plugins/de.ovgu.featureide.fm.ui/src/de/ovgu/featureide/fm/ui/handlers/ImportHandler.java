@@ -89,7 +89,7 @@ public class ImportHandler extends AFileHandler {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
 		fileDialog.setFilterNames(names);
 		fileDialog.setFilterExtensions(extensions);
-		fileDialog.setFileName(FileHandler.getFileName(modelFilePath));
+		fileDialog.setFileName(SimpleFileHandler.getFileName(modelFilePath));
 		fileDialog.setOverwrite(false);
 		fileDialog.setFilterIndex(0);
 

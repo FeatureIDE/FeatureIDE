@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.io.csv.ConfigurationListFormat;
 import de.ovgu.featureide.fm.core.io.expression.ExpressionGroupFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
 
@@ -93,7 +94,7 @@ public class ConfigurationGenerator extends ACLIFunction {
 		final ArrayList<List<ClauseList>> expressionGroups;
 		if (expressionFile != null) {
 			expressionGroups = new ArrayList<>();
-			final ProblemList lastProblems = FileHandler.load(expressionFile, expressionGroups, new ExpressionGroupFormat());
+			final ProblemList lastProblems = SimpleFileHandler.load(expressionFile, expressionGroups, new ExpressionGroupFormat());
 			if (lastProblems.containsError()) {
 				throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
 			}
@@ -104,7 +105,7 @@ public class ConfigurationGenerator extends ACLIFunction {
 		final SolutionList initialSample;
 		if (initialSampleFile != null) {
 			initialSample = new SolutionList();
-			final ProblemList lastProblems = FileHandler.load(initialSampleFile, initialSample, new ConfigurationListFormat());
+			final ProblemList lastProblems = SimpleFileHandler.load(initialSampleFile, initialSample, new ConfigurationListFormat());
 			if (lastProblems.containsError()) {
 				throw new IllegalArgumentException(lastProblems.getErrors().get(0).error);
 			}
@@ -154,7 +155,7 @@ public class ConfigurationGenerator extends ACLIFunction {
 			throw new IllegalArgumentException("No algorithm specified!");
 		}
 		final List<LiteralSet> result = LongRunningWrapper.runMethod(generator, new ConsoleMonitor<>());
-		FileHandler.save(outputFile, new SolutionList(cnf.getVariables(), result), new ConfigurationListFormat());
+		SimpleFileHandler.save(outputFile, new SolutionList(cnf.getVariables(), result), new ConfigurationListFormat());
 	}
 
 	private void resetArguments() {

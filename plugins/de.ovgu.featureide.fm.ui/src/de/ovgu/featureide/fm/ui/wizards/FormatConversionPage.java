@@ -128,6 +128,7 @@ public class FormatConversionPage extends AbstractWizardPage {
 		outputPathText.addModifyListener(new DialogChangedListener());
 
 		button.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final DirectoryDialog fileDialog = new DirectoryDialog(new Shell(), SWT.SAVE);

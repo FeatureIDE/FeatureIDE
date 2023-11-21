@@ -174,23 +174,23 @@ abstract public class FeatureDiagramLayoutManager {
 
 		// Check every side of the legend for an intersection
 		final float m = (float) (target.y - source.y) / (float) (target.x - source.x);
-		float y = (m * (float) (min.x - source.x)) + (float) source.y;
+		float y = (m * (min.x - source.x)) + source.y;
 
 		if ((y >= min.y) && (y <= max.y)) {
 			return true;
 		}
 
-		y = (m * (float) (max.x - source.x)) + (float) source.y;
+		y = (m * (max.x - source.x)) + source.y;
 		if ((y >= min.y) && (y <= max.y)) {
 			return true;
 		}
 
-		float x = ((float) (min.y - source.y) / m) + (float) source.x;
+		float x = ((min.y - source.y) / m) + source.x;
 		if ((x >= min.x) && (x <= max.x)) {
 			return true;
 		}
 
-		x = ((float) (max.y - source.y) / m) + (float) source.x;
+		x = ((max.y - source.y) / m) + source.x;
 		if ((x >= min.x) && (x <= max.x)) {
 			return true;
 		}

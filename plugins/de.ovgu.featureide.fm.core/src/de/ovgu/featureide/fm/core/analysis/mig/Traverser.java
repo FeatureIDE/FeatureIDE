@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.analysis.mig.Visitor.VisitResult;
 public class Traverser extends ATraverser {
 
 	private static class CancelException extends Exception {
+
 		private static final long serialVersionUID = 4872529212110156314L;
 	}
 

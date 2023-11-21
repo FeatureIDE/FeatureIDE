@@ -56,9 +56,8 @@ public abstract class AFeatureModelAction extends Action {
 	@Override
 	public boolean isEnabled() {
 		// determine if the action has to be disabled to prevent editing imported features in other files
-		if (!(this instanceof ActionAllowedInExternalSubmodel) && getInvolvedFeatures().stream().anyMatch(f -> isExternalFeature((IFeature) f))) {
-			if (!((this instanceof ActionAllowedForRootFeaturesInExternalSubmodel)
-				&& getInvolvedFeatures().stream().allMatch(f -> isExternalRootFeature((IFeature) f)))) {
+		if (!(this instanceof ActionAllowedInExternalSubmodel) && getInvolvedFeatures().stream().anyMatch(f -> isExternalFeature(f))) {
+			if (!((this instanceof ActionAllowedForRootFeaturesInExternalSubmodel) && getInvolvedFeatures().stream().allMatch(f -> isExternalRootFeature(f)))) {
 				return false;
 			}
 		}
@@ -110,7 +109,7 @@ public abstract class AFeatureModelAction extends Action {
 		for (final Object selectedElement : selection.toArray()) {
 			if (selectedElement instanceof ConstraintEditPart) {
 				if (((ConstraintEditPart) selectedElement).getModel().getObject() instanceof IConstraint) {
-					final IConstraint constraint = (IConstraint) ((ConstraintEditPart) selectedElement).getModel().getObject();
+					final IConstraint constraint = ((ConstraintEditPart) selectedElement).getModel().getObject();
 					if ((constraint instanceof MultiConstraint) && ((MultiConstraint) constraint).isFromExtern()) {
 						return true;
 					}

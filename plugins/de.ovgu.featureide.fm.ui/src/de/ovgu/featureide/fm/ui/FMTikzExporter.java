@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.TikzGraphicalFeatureModelFormat;
 
@@ -48,7 +48,7 @@ public class FMTikzExporter implements ExportType<GraphicalViewerImpl> {
 	@Override
 	public void export(Path path, GraphicalViewerImpl object) throws IOException {
 		// create new folder
-		final Path exportDir = "tex".equals(FileHandler.getFileExtension(path)) ? path.resolveSibling(FileHandler.getFileName(path)) : path;
+		final Path exportDir = "tex".equals(SimpleFileHandler.getFileExtension(path)) ? path.resolveSibling(SimpleFileHandler.getFileName(path)) : path;
 
 		FileSystem.mkDir(exportDir);
 
@@ -60,7 +60,7 @@ public class FMTikzExporter implements ExportType<GraphicalViewerImpl> {
 	}
 
 	private void save(final Path exportDir, String fileName, IPersistentFormat<IGraphicalFeatureModel> format, IGraphicalFeatureModel model) {
-		final ProblemList result = FileHandler.save(exportDir.resolve(fileName), model, format).getErrors();
+		final ProblemList result = SimpleFileHandler.save(exportDir.resolve(fileName), model, format).getErrors();
 		if (!result.isEmpty()) {
 			final Problem problem = result.get(0);
 			throw problem.error != null //

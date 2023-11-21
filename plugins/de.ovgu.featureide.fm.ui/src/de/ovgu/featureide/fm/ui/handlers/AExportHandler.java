@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.NonGTKFileDialog;
 
@@ -65,7 +66,7 @@ public abstract class AExportHandler<T> extends AFileHandler {
 				public void run() {
 					final String filepath = fileDialog.getSelectedFile();
 					if (filepath != null) {
-						finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
+						finish(modelFilePath, filepath, formatExtensions.get(fileDialog.getFilterIndex()));
 					}
 				}
 			};
@@ -89,7 +90,7 @@ public abstract class AExportHandler<T> extends AFileHandler {
 			// Ask for file name
 			final String filepath = fileDialog.open();
 			if (filepath != null) {
-				finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
+				finish(modelFilePath, filepath, formatExtensions.get(fileDialog.getFilterIndex()));
 			}
 		}
 	}
@@ -111,12 +112,12 @@ public abstract class AExportHandler<T> extends AFileHandler {
 	}
 
 	protected String getDefaultFileName(final Path modelFilePath) {
-		return FileHandler.getFileName(modelFilePath);
+		return SimpleFileHandler.getFileName(modelFilePath);
 	}
 
 	protected void save(final IPersistentFormat<T> format, FileHandler<T> fileHandler, final Path path) {
 		if (!fileHandler.getLastProblems().containsError()) {
-			FileHandler.save(path, fileHandler.getObject(), format);
+			SimpleFileHandler.save(path, fileHandler.getObject(), format);
 		}
 	}
 

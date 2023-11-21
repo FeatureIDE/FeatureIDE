@@ -381,10 +381,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createExplanationEntry();
 		}
 
-		final ColorScheme color = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
+		final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
 		int colorIndex = 1;
-		if (!color.getColors().isEmpty()) {
-			for (final FeatureColor currentColor : new HashSet<>(color.getColors().values())) {
+		if (!colorScheme.getColors().isEmpty()) {
+			for (final FeatureColor currentColor : new HashSet<>(colorScheme.getColors().values())) {
 				createColoredRowFeatureAbstract(row++, currentColor, colorIndex);
 				if (currentColor.getMeaning().isBlank()) {
 					colorIndex++;

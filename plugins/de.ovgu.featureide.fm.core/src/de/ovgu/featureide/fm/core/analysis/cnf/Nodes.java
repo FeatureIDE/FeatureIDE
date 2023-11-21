@@ -123,7 +123,7 @@ public final class Nodes {
 		try {
 			final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
 			final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
-			return slicedCnf == null ? null : new CNF((Variables) satInstance, slicedCnf.getClauses());
+			return slicedCnf == null ? null : new CNF(satInstance, slicedCnf.getClauses());
 		} catch (final Exception e) {
 			return null;
 		}

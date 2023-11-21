@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.mig;
 import org.sat4j.core.VecInt;
 
 public class CollectingVisitor implements Visitor<VecInt[]> {
+
 	final VecInt[] literalList = new VecInt[] { new VecInt(), new VecInt() };
 
 	@Override

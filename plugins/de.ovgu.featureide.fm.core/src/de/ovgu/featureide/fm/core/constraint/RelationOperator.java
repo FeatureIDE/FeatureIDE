@@ -26,6 +26,7 @@ package de.ovgu.featureide.fm.core.constraint;
  * @author Sebastian Henneberg
  */
 public enum RelationOperator {
+
 	EQUAL("=="), NOT_EQUAL("!="), GREATER(">"), LESS("<"), GREATER_EQUAL(">="), LESS_EQUAL("<=");
 
 	private String symbol;

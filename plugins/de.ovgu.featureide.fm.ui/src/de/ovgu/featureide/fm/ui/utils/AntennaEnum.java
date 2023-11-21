@@ -29,6 +29,7 @@ import java.util.List;
  * @author Iris-Maria Banciu
  */
 public enum AntennaEnum {
+
 	IF("if"), ENDIF("endif"), IFDEF("ifdef"), IFNDEF("ifndef"), ELIF("elif"), ELIFDEF("elifdef"), ELIFNDEF("elifndef"), ELSE("else"), CONDITION(
 			"condition"), DEFINE("define"), UNDEFINE("undefine");
 

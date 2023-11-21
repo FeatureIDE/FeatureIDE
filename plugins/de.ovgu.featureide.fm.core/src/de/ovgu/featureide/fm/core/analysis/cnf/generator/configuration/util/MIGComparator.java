@@ -93,7 +93,7 @@ public class MIGComparator implements Comparator<LiteralSet> {
 				vOut += (info.strongOut) + info.weakOut;
 			}
 		}
-		return (double) (vIn - (vOut * vOut));
+		return vIn - (vOut * vOut);
 	}
 
 	public int getOut(LiteralSet... set) {

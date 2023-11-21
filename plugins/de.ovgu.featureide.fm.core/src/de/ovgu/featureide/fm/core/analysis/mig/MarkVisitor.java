@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.mig;
 
 public class MarkVisitor implements Visitor<byte[]> {
+
 	final byte[] markerArray;
 
 	public MarkVisitor(int numberOfariables) {
@@ -29,13 +30,13 @@ public class MarkVisitor implements Visitor<byte[]> {
 
 	@Override
 	public VisitResult visitStrong(int curLiteral) {
-		markerArray[Math.abs(curLiteral) - 1] = curLiteral < 0 ? ModalImplicationGraph.VALUE_0 : ModalImplicationGraph.VALUE_1;
+		markerArray[Math.abs(curLiteral) - 1] = curLiteral < 0 ? IEdgeTypes.VALUE_0 : IEdgeTypes.VALUE_1;
 		return VisitResult.Continue;
 	}
 
 	@Override
 	public VisitResult visitWeak(int curLiteral) {
-		markerArray[Math.abs(curLiteral) - 1] |= (curLiteral < 0 ? ModalImplicationGraph.VALUE_0Q : ModalImplicationGraph.VALUE_1Q);
+		markerArray[Math.abs(curLiteral) - 1] |= (curLiteral < 0 ? IEdgeTypes.VALUE_0Q : IEdgeTypes.VALUE_1Q);
 		return VisitResult.Continue;
 	}
 

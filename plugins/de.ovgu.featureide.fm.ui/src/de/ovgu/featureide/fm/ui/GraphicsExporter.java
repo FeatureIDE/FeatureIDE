@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTikzExporter;
 
 /**
@@ -83,7 +83,7 @@ public class GraphicsExporter {
 		}
 		final int index = fileDialog.getFilterIndex();
 		if (index < 0) {
-			final String fileExtension = FileHandler.getFileExtension(filePath);
+			final String fileExtension = SimpleFileHandler.getFileExtension(filePath);
 			final Optional<ExportType<T>> any = exporter.stream().filter(exp -> Objects.equals(fileExtension, exp.getFileExtension())).findAny();
 			if (any.isEmpty()) {
 				return false;
@@ -107,7 +107,7 @@ public class GraphicsExporter {
 					return Status.OK_STATUS;
 				} catch (final IOException e) {
 					FMUIPlugin.getDefault().logInfo(NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___);
-					return new Status(Status.ERROR, e.getClass().getName(), e.getMessage());
+					return new Status(IStatus.ERROR, e.getClass().getName(), e.getMessage());
 				}
 			}
 		};

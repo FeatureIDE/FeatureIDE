@@ -37,8 +37,8 @@ import org.prop4j.Node;
 public interface SatProblem {
 
 	/**
-	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
+	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form
+	 * (CNF)}. Then, each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
 	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
@@ -51,8 +51,8 @@ public interface SatProblem {
 	public int addFormulas(Node... formulas);
 
 	/**
-	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
+	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form
+	 * (CNF)}. Then, each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
 	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
@@ -65,8 +65,8 @@ public interface SatProblem {
 	public int addFormulas(Collection<? extends Node> formulas);
 
 	/**
-	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
+	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isRegularConjunctiveNormalForm() clausal normal form
+	 * (CNF)}. Then, each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added.
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
 	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with the (possibly empty) given formula <i>g</i> in CNF:
