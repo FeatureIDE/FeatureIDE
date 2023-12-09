@@ -74,11 +74,6 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 		replaceFeatureModel(featureModel, slicingModel);
 
-		if (featureModel.getStructure().getRoot().getChildren().size() == 1) {
-			// The new root has only one child and can be removed
-			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
-		}
-
 		return new FeatureModelOperationEvent(ID, EventType.MODEL_DATA_CHANGED, featureModel, oldModel, featureModel);
 	}
 
