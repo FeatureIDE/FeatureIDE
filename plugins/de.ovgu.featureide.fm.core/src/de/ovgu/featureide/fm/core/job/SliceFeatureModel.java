@@ -58,15 +58,16 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private final FeatureModelFormula formula;
 	private final Collection<String> featureNames;
 	private final IFeatureModel featureModel;
+	private final boolean useSlicing;
 
 	private IFeatureModel slicedFeatureModel;
 	private boolean slicingNecesary;
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints) {
-		this(featureModel, featureNames, considerConstraints, true);
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
+		this(featureModel, featureNames, useSlicing, true);
 	}
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints, boolean usePersistentFormula) {
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, boolean usePersistentFormula) {
 		if (usePersistentFormula) {
 			formula = FeatureModelManager.getInstance(featureModel).getPersistentFormula();
 			this.featureModel = formula.getFeatureModel();
@@ -74,21 +75,20 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 			formula = FeatureModelManager.getInstance(featureModel).getVariableFormula();
 			this.featureModel = featureModel;
 		}
+		this.useSlicing = useSlicing;
 		this.featureNames = featureNames;
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
-		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 		monitor.setRemainingWork(100);
-
 		monitor.checkCancel();
-		final IFeatureModel featureTree = sliceTree(factory, monitor.subTask(2));
-		monitor.checkCancel();
-		if (slicingNecesary) {
+		final IFeatureModel featureTree = sliceTree(monitor.subTask(2));
+		if (slicingNecesary && useSlicing) {
+			monitor.checkCancel();
 			final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
 			monitor.checkCancel();
-			merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
+			merge(FMFactoryManager.getInstance().getFactory(featureModel), slicedFeatureModelCNF, featureTree, monitor.subTask(18));
 		}
 
 		return featureTree;
@@ -101,7 +101,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
 
-	private IFeatureModel sliceTree(IFeatureModelFactory factory, IMonitor<?> monitor) {
+	private IFeatureModel sliceTree(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Tree");
 		monitor.setRemainingWork(2);
 		slicingNecesary = false;

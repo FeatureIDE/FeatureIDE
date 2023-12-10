@@ -126,13 +126,8 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			}
 		}
 
-		if (slicing) {
-			operations.add(new DeleteSlicingOperation(viewer, featureModelManager, getNotSelectedFeatureNames()));
-			addDeleteConstraintOperations(constraintsToDelete);
-		} else {
-			addDeleteConstraintOperations(constraintsToDelete);
-			addDeleteFeatureOperations(featuresToDelete);
-		}
+		addDeleteConstraintOperations(constraintsToDelete);
+		operations.add(new DeleteSlicingOperation(viewer, featureModelManager, getNotSelectedFeatureNames(), slicing));
 	}
 
 	/**

@@ -52,11 +52,13 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 	private IFeatureModel oldModel;
 	private final Collection<String> notSelectedFeatureNames;
 	private final Object viewer;
+	private final boolean useSlicing;
 
-	public DeleteSlicingOperation(Object viewer, IFeatureModelManager featureModelManager, Collection<String> notSelectedFeatureNames) {
+	public DeleteSlicingOperation(Object viewer, IFeatureModelManager featureModelManager, Collection<String> notSelectedFeatureNames, boolean useSlicing) {
 		super(featureModelManager, DELETE_CONSTRAINT);
 		this.notSelectedFeatureNames = notSelectedFeatureNames;
 		this.viewer = viewer;
+		this.useSlicing = useSlicing;
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 		oldModel = featureModel.clone();
 
-		final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, true, false);
+		final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, useSlicing, false);
 		final IFeatureModel slicingModel = LongRunningWrapper.runMethod(method);
 
 		replaceFeatureModel(featureModel, slicingModel);
