@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 
 /**
  * Manages colors assigned to features.
@@ -262,8 +263,12 @@ public class FeatureColorManager implements IEventListener {
 				try {
 					if (split.length != 2) {
 						continue;
+					} else if (split[0].contains(XMLFeatureModelTags.FEATURE_COLOR_MEANING)) {
+						final int key = Integer.parseInt(split[0].substring(XMLFeatureModelTags.FEATURE_COLOR_MEANING.length(), split[0].length()));
+						FeatureColor.getColor(key).setMeaning(split[1]);
+					} else {
+						newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
 					}
-					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
 				} catch (final IllegalArgumentException e) {
 					Logger.logError("Color not found", e);
 				}
@@ -300,9 +305,18 @@ public class FeatureColorManager implements IEventListener {
 		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (final Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
-				out.print(entry.getKey());
-				out.print('=');
-				out.println(entry.getValue());
+				if (entry.getValue() != FeatureColor.NO_COLOR) {
+					out.print(entry.getKey());
+					out.print('=');
+					out.println(entry.getValue());
+				}
+			}
+			for (final FeatureColor featureColor : FeatureColor.values()) {
+				if (!featureColor.getMeaning().isBlank() && (featureColor != FeatureColor.NO_COLOR)) {
+					out.print(XMLFeatureModelTags.FEATURE_COLOR_MEANING + featureColor.getValue());
+					out.print("=");
+					out.println(featureColor.getMeaning());
+				}
 			}
 
 			file.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());

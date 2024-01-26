@@ -91,6 +91,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	private void addListeners() {
 		formatCombo.addModifyListener(new ModifyListener() {
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();

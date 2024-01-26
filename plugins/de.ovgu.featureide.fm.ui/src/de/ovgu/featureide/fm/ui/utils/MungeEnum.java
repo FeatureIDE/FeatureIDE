@@ -29,6 +29,7 @@ import java.util.List;
  * @author Iris-Maria Banciu
  */
 public enum MungeEnum {
+
 	IF("if"), IF_NOT("if_not"), ELSE("else"), END("end");
 
 	private final String text;

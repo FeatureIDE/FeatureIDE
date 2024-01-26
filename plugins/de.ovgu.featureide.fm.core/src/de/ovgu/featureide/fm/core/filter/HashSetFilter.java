@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  *
  * @author Sebastian Krieter
  *
- * 
+ *
  */
 public class HashSetFilter<T> extends HashSet<T> implements Predicate<T> {
 

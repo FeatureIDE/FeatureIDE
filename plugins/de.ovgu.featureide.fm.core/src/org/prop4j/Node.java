@@ -373,6 +373,14 @@ public abstract class Node {
 		return nw.nodeToString();
 	}
 
+	public String toString(String[] symbols, boolean enquoteAlways) {
+		final NodeWriter nw = new NodeWriter(this);
+		nw.setSymbols(symbols);
+		nw.setEnquoteWhitespace(true);
+		nw.setEnquoteAlways(enquoteAlways);
+		return nw.nodeToString();
+	}
+
 	public static Node[] clone(Node[] array) {
 		final Node[] newArray = new Node[array.length];
 		for (int i = 0; i < newArray.length; i++) {

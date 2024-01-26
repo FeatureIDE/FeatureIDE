@@ -23,10 +23,8 @@ package org.prop4j;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import java.util.function.UnaryOperator;
 import java.util.Objects;
-
+import java.util.function.UnaryOperator;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 

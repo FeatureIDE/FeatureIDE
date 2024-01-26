@@ -83,6 +83,7 @@ public class SetFeatureColorAction extends Action {
 	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModelManager featureModelManager) {
 		this(featureModelManager);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				final IStructuredSelection selection = (IStructuredSelection) event.getSelection();

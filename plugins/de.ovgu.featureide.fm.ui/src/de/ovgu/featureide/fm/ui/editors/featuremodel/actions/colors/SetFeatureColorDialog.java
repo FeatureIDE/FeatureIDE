@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_TEXT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -48,6 +50,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -82,6 +85,7 @@ public class SetFeatureColorDialog extends Dialog {
 	private final boolean enableUndoRedo;
 
 	private FeatureColor newColor = FeatureColor.NO_COLOR;
+	private String newColorMeaning = "";
 	private ArrayList<IFeature> featureListBuffer = new ArrayList<>();
 	private Table featureTable;
 	private Combo colorDropDownMenu;
@@ -171,6 +175,19 @@ public class SetFeatureColorDialog extends Dialog {
 		colorDropDownMenu.setLayoutData(gridData);
 		colorDropDownMenu.setItems(colorDropDownItems);
 
+		final Label nameLabel = new Label(container, SWT.NONE);
+		nameLabel.setLayoutData(gridData);
+		nameLabel.setBackground(WHITE);
+		nameLabel.setText(CHOOSE_TEXT);
+
+		final Text meaningText = new Text(container, SWT.BORDER);
+		meaningText.setLayoutData(gridData);
+		meaningText.setText(initialSelectedColor.getMeaning());
+		newColorMeaning = meaningText.getText();
+		meaningText.addModifyListener((ModifyEvent e) -> {
+			newColorMeaning = meaningText.getText();
+		});
+
 		final Label featureLabel = new Label(container, SWT.NONE);
 		featureLabel.setLayoutData(gridData);
 		featureLabel.setBackground(WHITE);
@@ -190,6 +207,8 @@ public class SetFeatureColorDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				onColorSelectionChanged(((Combo) event.widget).getSelectionIndex());
+				meaningText.setText(newColor.getMeaning());
+				newColorMeaning = newColor.getMeaning();
 			}
 
 			@Override
@@ -317,6 +336,9 @@ public class SetFeatureColorDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
+		if (newColor != FeatureColor.NO_COLOR) {
+			newColor.setMeaning(newColorMeaning);
+		}
 		final SetFeatureColorOperation op = new SetFeatureColorOperation(featureModelManager, Functional.mapToStringList(featureListBuffer), newColor);
 		if (enableUndoRedo) {
 			FeatureModelOperationWrapper.run(op);

@@ -28,8 +28,8 @@ import java.util.Set;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 
-import de.ovgu.featureide.fm.core.base.impl.RootFeatureSet;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.RootFeatureSet;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.AddImportedFeaturesDialog;

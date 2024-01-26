@@ -263,10 +263,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
-						if (getSite() == null) {
-							return;
-						}
-						if (getSite().getWorkbenchWindow() == null) {
+						if ((getSite() == null) || (getSite().getWorkbenchWindow() == null)) {
 							return;
 						}
 						final IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
@@ -318,10 +315,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
-						if (getSite() == null) {
-							return;
-						}
-						if (getSite().getWorkbenchWindow() == null) {
+						if ((getSite() == null) || (getSite().getWorkbenchWindow() == null)) {
 							return;
 						}
 						final IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
@@ -540,7 +534,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void setInput(IEditorInput input) {
 		// Cast is necessary, don't remove
-		markerHandler = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
+		markerHandler = new ModelMarkerHandler<>(input.getAdapter(IFile.class));
 		super.setInput(input);
 
 		final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());

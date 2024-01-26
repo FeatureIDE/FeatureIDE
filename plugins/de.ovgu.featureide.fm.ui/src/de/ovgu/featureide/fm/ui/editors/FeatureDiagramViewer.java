@@ -211,11 +211,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			if (f.getObject().getStructure().isRoot()) {
 				continue;
 			}
-			if (((f.getLocation().x + f.getSize().width) > borderRight) || (f.getLocation().x < borderLeft)) {
-				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
-				return true;
-			}
-			if (((f.getLocation().y + f.getSize().height) > editorHeight) || (f.getLocation().y < 0)) {
+			if (((f.getLocation().x + f.getSize().width) > borderRight) || (f.getLocation().x < borderLeft) || ((f.getLocation().y + f.getSize().height) > editorHeight) || (f.getLocation().y < 0)) {
 				getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
 				return true;
 			}

@@ -64,7 +64,7 @@ public class SPLCAToolConfigurationGenerator extends de.ovgu.featureide.fm.core.
 		super(cnf, maxSampleSize);
 		featureModel = DefaultFeatureModelFactory.getInstance().create();
 
-		renamedVariables = (Variables) cnf.getVariables().clone();
+		renamedVariables = cnf.getVariables().clone();
 		int index = 1;
 		for (final String originalName : cnf.getVariables().getNames()) {
 			renamedVariables.renameVariable(originalName, "F" + index++);

@@ -122,7 +122,7 @@ public class DIMACSFormat extends AFeatureModelFormat {
 	}
 
 	public void setOmitDummyRoot(boolean omitRoot) {
-		this.omitDummyRoot = omitRoot;
+		omitDummyRoot = omitRoot;
 	}
 
 	@Override

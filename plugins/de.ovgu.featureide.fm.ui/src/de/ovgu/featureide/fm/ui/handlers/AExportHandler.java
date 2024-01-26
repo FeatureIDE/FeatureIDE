@@ -29,11 +29,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
+import de.ovgu.featureide.fm.core.io.FeatureModelFormatChecker;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelDialog;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
-import de.ovgu.featureide.fm.ui.wizards.NonGTKFileDialog;
 
 public abstract class AExportHandler<T> extends AFileHandler {
 
@@ -43,59 +47,44 @@ public abstract class AExportHandler<T> extends AFileHandler {
 	}
 
 	public void singleAction(Path modelFilePath) {
-
 		final List<? extends IPersistentFormat<T>> formatExtensions = getFormats();
 		final String[][] filter = getFilter(formatExtensions);
 
-		// Workaround for #1003
-		final String os = System.getProperty("os.name").toLowerCase();
-		if ((os.contains("nix") || os.contains("nux") || os.contains("aix"))) {
+		final FileHandler<T> fileHandler = read(modelFilePath);
 
-			NonGTKFileDialog.spawnInfo();
+		final T obj = fileHandler.getObject();
 
-			final NonGTKFileDialog fileDialog = new NonGTKFileDialog(getDefaultPath(modelFilePath), getDefaultFileName(modelFilePath));
-			fileDialog.setFilterNamesAndExtensions(filter[0], filter[1]);
-			if (filter[0].length > 0) {
-				fileDialog.setFilterIndex(getDefaultFormat(formatExtensions));
-			}
-
-			final Runnable bs = new Runnable() {
-
-				@Override
-				public void run() {
-					final String filepath = fileDialog.getSelectedFile();
-					if (filepath != null) {
-						finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
-					}
-				}
-			};
-
-			fileDialog.open(bs);
-
+		if (obj instanceof IFeatureModel) {
+			final IFeatureModel featureModel = (IFeatureModel) obj;
+			final ExportFeatureModelDialog dialog = new ExportFeatureModelDialog(new Shell(), modelFilePath.getParent().toString(), filter[0],
+						// format callback
+						(formatIndex) -> {
+							@SuppressWarnings("unchecked")
+							final IPersistentFormat<IFeatureModel> format = (IPersistentFormat<IFeatureModel>) formatExtensions.get(formatIndex);
+							final ProblemList pl = FeatureModelFormatChecker.checkFormat(format, featureModel);
+							return pl;
+						},
+						// export callback
+						(formatIndex, path, name) -> {
+							final IPersistentFormat<T> format = (IPersistentFormat<T>) formatExtensions.get(formatIndex);
+							save(format, fileHandler, path.resolve(name + "." + format.getSuffix()));
+						});
+			dialog.open();
 		} else {
-
 			final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-
 			fileDialog.setFilterNames(filter[0]);
 			fileDialog.setFilterExtensions(filter[1]);
 			if (filter[0].length > 0) {
 				fileDialog.setFilterIndex(getDefaultFormat(formatExtensions));
 			}
-
 			fileDialog.setFileName(getDefaultFileName(modelFilePath));
 			fileDialog.setFilterPath(getDefaultPath(modelFilePath));
-			fileDialog.setOverwrite(true);
-
-			// Ask for file name
+			fileDialog.setOverwrite(true); // Ask for file name
 			final String filepath = fileDialog.open();
 			if (filepath != null) {
-				finish(modelFilePath, filepath, (IPersistentFormat<T>) formatExtensions.get(fileDialog.getFilterIndex()));
+				save(formatExtensions.get(fileDialog.getFilterIndex()), fileHandler, Paths.get(filepath));
 			}
 		}
-	}
-
-	private void finish(Path modelFilePath, final String filepath, IPersistentFormat<T> format) {
-		save(format, read(modelFilePath), Paths.get(filepath));
 	}
 
 	protected abstract List<? extends IPersistentFormat<T>> getFormats();
@@ -111,12 +100,12 @@ public abstract class AExportHandler<T> extends AFileHandler {
 	}
 
 	protected String getDefaultFileName(final Path modelFilePath) {
-		return FileHandler.getFileName(modelFilePath);
+		return SimpleFileHandler.getFileName(modelFilePath);
 	}
 
 	protected void save(final IPersistentFormat<T> format, FileHandler<T> fileHandler, final Path path) {
 		if (!fileHandler.getLastProblems().containsError()) {
-			FileHandler.save(path, fileHandler.getObject(), format);
+			SimpleFileHandler.save(path, fileHandler.getObject(), format);
 		}
 	}
 
