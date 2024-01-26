@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADVANCED_CONFIGURATION;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -34,16 +33,21 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -62,8 +66,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	private static final String PAGE_TEXT = ADVANCED_CONFIGURATION;
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
 
-	private static HashMap<String, Image> combinedImages = new HashMap<String, Image>();
-
 	private static Image getImage(SelectableFeature selFeature, Selection selection) {
 		final IFeature feature = selFeature.getFeature();
 
@@ -73,26 +75,33 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		final ImageData imageData1 = image1.getImageData();
 		final ImageData imageData2 = image2.getImageData();
 
-		final String imageString = image1.toString() + image2.toString();
+		final int distance = 4;
+		final int colorWidth = 24;
+		final int colorHeight = 12;
 
-		final Image combinedImage = combinedImages.get(imageString);
-		if (combinedImage == null) {
-			final int distance = 3;
-			final Image mergeImage = new Image(image1.getDevice(), imageData1.width + distance + imageData2.width, imageData1.height);
+		final ImageData id =
+			new Image(Display.getCurrent(), imageData2.width + distance + imageData1.width + distance + colorWidth + distance, imageData1.height)
+					.getImageData();
+		id.alpha = 0;
+		final Image mergeImage = new Image(Display.getCurrent(), id);
 
-			final GC gc = new GC(mergeImage);
-			gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
-			gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, imageData1.width + distance, 0, imageData2.width, imageData2.height);
-			gc.dispose();
+		final GC gc = new GC(mergeImage);
 
-			if (feature.getStructure().isRoot()) {
-				image1.dispose();
-			}
+		final FeatureColor color = FeatureColorManager.getColor(feature);
 
-			combinedImages.put(imageString, mergeImage);
-			return mergeImage;
+		gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, 0, 0, imageData2.width, imageData2.height);
+		gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, imageData2.width + distance, 0, imageData1.width, imageData1.height);
+		if (color != FeatureColor.NO_COLOR) {
+			gc.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+			gc.fillRoundRectangle(imageData2.width + distance + imageData1.width + distance, (imageData1.height - colorHeight) / 2, colorWidth, colorHeight,
+					colorHeight, colorHeight);
+		} else {
+			gc.setForeground(new Color(191, 191, 191));
+			gc.drawRoundRectangle(imageData2.width + distance + imageData1.width + distance, (imageData1.height - colorHeight) / 2, colorWidth, colorHeight,
+					colorHeight, colorHeight);
 		}
-		return combinedImage;
+
+		return mergeImage;
 	}
 
 	private static Image getConnectionImage(IFeature feature) {
@@ -110,7 +119,9 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			}
 			return IMG_OPTIONAL;
 		}
-		return new Image(null, IMG_MANDATORY.getImageData().width, IMG_MANDATORY.getImageData().height);
+		final ImageData id = new Image(Display.getCurrent(), IMG_MANDATORY.getImageData().width, IMG_MANDATORY.getImageData().height).getImageData();
+		id.alpha = 0;
+		return new Image(Display.getCurrent(), id);
 	}
 
 	private static Image getSelectionImage(SelectableFeature feat, Selection selection) {

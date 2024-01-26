@@ -300,6 +300,9 @@ public class FeatureColorManager implements IEventListener {
 		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (final Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
+				if (entry.getValue() == FeatureColor.NO_COLOR) {
+					continue;
+				}
 				out.print(entry.getKey());
 				out.print('=');
 				out.println(entry.getValue());
