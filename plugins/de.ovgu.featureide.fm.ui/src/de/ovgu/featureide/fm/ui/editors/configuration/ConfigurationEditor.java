@@ -290,6 +290,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			internalPages.add(initPage(new AdvancedConfigurationPage()));
 			textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
 			internalPages.add(textEditorPage);
+			internalPages.add(initPage(new TreePreviewPage()));
 		}
 		allPages.addAll(internalPages);
 
