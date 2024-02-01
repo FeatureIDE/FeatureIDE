@@ -58,6 +58,7 @@ public class FeatureDragAndDropCommand extends Command {
 	private final boolean hasAutoLayout;
 
 	private final boolean hasVerticalLayout;
+	private final boolean isInverted;
 
 	private final FeatureEditPart editPart;
 
@@ -68,6 +69,7 @@ public class FeatureDragAndDropCommand extends Command {
 		this.newLocation = newLocation;
 		hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
 		hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		isInverted = FeatureUIHelper.isInverted(featureModel);
 		this.editPart = editPart;
 		oldParent = FeatureUIHelper.getGraphicalParent(feature);
 		oldIndex = oldParent != null ? FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) : 0;
@@ -140,7 +142,7 @@ public class FeatureDragAndDropCommand extends Command {
 		final Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		final Dimension d = location.getDifference(nextLocation);
 		if (!hasVerticalLayout) {
-			if (d.height > 0) {
+			if ((isInverted && (d.height < 0)) || (!isInverted && (d.height > 0))) {
 				// insert below
 				newParent = next;
 				newIndex = 0;
@@ -173,7 +175,7 @@ public class FeatureDragAndDropCommand extends Command {
 
 			return true;
 		} else {
-			if (d.width > 0) {
+			if ((isInverted && (d.width < 0)) || (!isInverted && (d.width > 0))) {
 				// insert below
 				newParent = next;
 				newIndex = 0;
@@ -214,7 +216,8 @@ public class FeatureDragAndDropCommand extends Command {
 		int distance = Integer.MAX_VALUE;
 		for (final IGraphicalFeature child : featureModel.getVisibleFeatures()) {
 			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
-			if ((hasVerticalLayout && (targetLocation.x < referencePoint.x)) || (!hasVerticalLayout && (targetLocation.y < referencePoint.y))) {
+			if ((hasVerticalLayout && ((isInverted && (targetLocation.x > referencePoint.x)) || (!isInverted && (targetLocation.x < referencePoint.x))))
+				|| (!hasVerticalLayout && ((isInverted && (targetLocation.y > referencePoint.y)) || (!isInverted && (targetLocation.y < referencePoint.y))))) {
 				final int newDistance = (int) targetLocation.getDistance(referencePoint);
 				if ((newDistance > 0) && (newDistance < distance)) {
 					next = child;
