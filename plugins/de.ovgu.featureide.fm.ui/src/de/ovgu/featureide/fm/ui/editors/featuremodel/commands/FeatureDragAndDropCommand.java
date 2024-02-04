@@ -148,7 +148,8 @@ public class FeatureDragAndDropCommand extends Command {
 				newIndex = 0;
 				for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(next)) {
 					final Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
-					if ((d.width / (double) d.height) <= (cd.width / (double) cd.height)) {
+					if ((isInverted && ((d.width / (double) d.height) >= (cd.width / (double) cd.height)))
+						|| (!isInverted && ((d.width / (double) d.height) <= (cd.width / (double) cd.height)))) {
 						break;
 					} else {
 						newIndex++;
@@ -181,7 +182,8 @@ public class FeatureDragAndDropCommand extends Command {
 				newIndex = 0;
 				for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(next)) {
 					final Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
-					if ((d.height / (double) d.width) <= (cd.height / (double) cd.width)) {
+					if ((isInverted && ((d.height / (double) d.width) <= (cd.height / (double) cd.width)))
+						|| (!isInverted && ((d.height / (double) d.width) <= (cd.height / (double) cd.width)))) {
 						break;
 					} else {
 						newIndex++;
