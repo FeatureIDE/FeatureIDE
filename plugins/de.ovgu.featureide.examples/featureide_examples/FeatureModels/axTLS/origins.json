@@ -1,0 +1,15 @@
+{
+    "Name" : "axTLS",
+    "Year" : 2013,
+    "OriginalFormat" : "DIMACS",
+    "Hierarchy" : false,
+    "History":  [],
+    "Publication" : "https://doi.org/10.1109/TSE.2013.34",
+    "Source" : "https://gsd.uwaterloo.ca/industrial-variability-modeling",
+    "Keywords" : [
+        "Automatic",
+        "KConfig",
+        "LVAT"
+    ],
+    "ConversionTool" : ""
+}

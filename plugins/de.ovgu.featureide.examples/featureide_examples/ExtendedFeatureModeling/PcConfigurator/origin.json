@@ -1,0 +1,14 @@
+{
+    "Name" : "PC Richmond",
+    "Year" : 2019,
+    "OriginalFormat" : "FeatureIDE",
+    "Hierarchy" : true,
+    "Attributes" : true,
+    "History":  [],
+    "Publication" : "https://doi.org/10.1145/3377024.3377036",
+    "Source" : "https://github.com/Subaro/SMT-Based-Variability-Analyses-for-FeatureIDE",
+    "Keywords" : [
+        "Manual"
+    ],
+    "ConversionTool" : ""
+}

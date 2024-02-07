@@ -1,0 +1,20 @@
+{
+    "Name" : "Automotive02",
+    "Year" : 2017,
+    "OriginalFormat" : "FeatureIDE",
+    "Hierarchy" : true,
+    "History":  [
+        "2_1",
+        "2_2",
+        "2_3",
+        "2_4"
+    ],
+    "Publication" : "https://doi.org/10.1145/3106237.3106252",
+    "Source" : "https://github.com/AlexanderKnueppel/is-there-a-mismatch",
+    "Keywords" : [
+        "Obfuscated",
+        "Proprietary",
+        "Automatic"
+    ],
+    "ConversionTool" : ""
+}
