@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
@@ -382,7 +383,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
 		final List<FeatureColor> featureColors =
-			colorScheme.getColors().values().stream().filter((featureColor) -> featureColor != FeatureColor.NO_COLOR).toList();
+			colorScheme.getColors().values().stream().filter((featureColor) -> featureColor != FeatureColor.NO_COLOR).collect(Collectors.toList());
 		int colorIndex = 1;
 		if (!featureColors.isEmpty()) {
 			for (final FeatureColor currentColor : featureColors) {
