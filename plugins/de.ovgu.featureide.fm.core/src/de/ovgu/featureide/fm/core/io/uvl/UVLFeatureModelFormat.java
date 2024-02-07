@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.uvl;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,7 +149,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		pl = new ProblemList();
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
-			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
+			rootModel = uvlModelFactory.parse(source.toString(), getParentDirectoryName(path));
 			uvlModelFactory.convertAllMoreComplexLanguageLevels(rootModel, LanguageLevel.BOOLEAN_LEVEL);
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
@@ -162,6 +163,13 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 			}
 		}
 		return pl;
+	}
+
+	private String getParentDirectoryName(Path path) {
+		if (path.getParent() == null) { // If the parent directory is not specified just use ./ as parent
+			path = Paths.get(".").resolve(path);
+		}
+		return path.getParent().toString();
 	}
 
 	private void constructFeatureModel(MultiFeatureModel fm) {
