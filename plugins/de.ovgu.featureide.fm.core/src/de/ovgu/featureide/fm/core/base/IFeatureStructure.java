@@ -115,6 +115,34 @@ public interface IFeatureStructure {
 		return isMultiple();
 	}
 
+	default boolean hasSameStructure(IFeatureStructure other) {
+		if (other == null) {
+			return false;
+		}
+
+		final boolean hasChildren = hasChildren() == other.hasChildren();
+		final boolean hasHiddenParent = hasHiddenParent() == other.hasHiddenParent();
+		final boolean hasInlineRule = hasInlineRule() == other.hasInlineRule();
+		final boolean isAbstract = isAbstract() == other.isAbstract();
+		final boolean isAlternative = isAlternative() == other.isAlternative();
+		final boolean isAnd = isAnd() == other.isAnd();
+		final boolean isANDPossible = isANDPossible() == other.isANDPossible();
+		final boolean isConcrete = isConcrete() == other.isConcrete();
+		final boolean isHidden = isHidden() == other.isHidden();
+		final boolean isMandatory = isMandatory() == other.isMandatory();
+		final boolean isMandatorySet = isMandatorySet() == other.isMandatorySet();
+		final boolean isMultiple = isMultiple() == other.isMultiple();
+		final boolean isOr = isOr() == other.isOr();
+		final boolean isRoot = isRoot() == other.isRoot();
+
+		final boolean parentsNotNull = (getParent() != null) && (other.getParent() != null);
+
+		return hasChildren && hasHiddenParent && hasInlineRule && isAbstract && isAlternative && isAnd && isANDPossible && isConcrete && isHidden && isMandatory
+			&& isMandatorySet && isMultiple && isOr && isRoot
+			// check if both parents are either "or" or "alternative" if they are not null.
+			&& (!parentsNotNull || ((getParent().isAlternative() == other.getParent().isAlternative()) && (getParent().isOr() == other.getParent().isOr())));
+	}
+
 	void removeChild(IFeatureStructure child);
 
 	IFeatureStructure removeLastChild();

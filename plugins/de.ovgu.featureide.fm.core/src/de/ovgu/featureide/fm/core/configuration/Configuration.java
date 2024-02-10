@@ -120,7 +120,7 @@ public class Configuration implements Cloneable {
 			featureModel = featureModelFormula;
 			root = initFeatures(null, featureRoot, renamings);
 			selectableFeatures.clear();
-			readdFeatures(root);
+			readFeatures(root);
 		}
 	}
 
@@ -148,6 +148,9 @@ public class Configuration implements Cloneable {
 		} else if (sFeature.getFeature() == null) {
 			sFeature.setFeature(feature);
 			sFeature.setName(null);
+		} else if (!sFeature.getFeature().getStructure().hasSameStructure(feature.getStructure())) {
+			sFeature = ConfigurationFactoryManager.getInstance().getFactory(this).createSelectableFeature(feature);
+			selectableFeatures.put(curName, sFeature);
 		}
 
 		sFeature.removeChildren();
@@ -161,10 +164,10 @@ public class Configuration implements Cloneable {
 		return sFeature;
 	}
 
-	private void readdFeatures(SelectableFeature root) {
+	private void readFeatures(SelectableFeature root) {
 		selectableFeatures.put(root.getName(), root);
 		for (final TreeElement child : root.getChildren()) {
-			readdFeatures((SelectableFeature) child);
+			readFeatures((SelectableFeature) child);
 		}
 	}
 
