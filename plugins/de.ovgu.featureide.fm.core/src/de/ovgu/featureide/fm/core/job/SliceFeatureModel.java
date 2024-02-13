@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -108,7 +109,13 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		slicedFeatureModel = featureModel.clone();
 
 		IFeatureStructure root = slicedFeatureModel.getStructure().getRoot();
-		slicedFeatureModel.reset();
+		if (slicedFeatureModel instanceof FeatureModel) {
+			final long elementId = ((FeatureModel) slicedFeatureModel).getNextElementId() - 1;
+			slicedFeatureModel.reset();
+			((FeatureModel) slicedFeatureModel).setNextElementId(elementId);
+		} else {
+			slicedFeatureModel.reset();
+		}
 		postOrderProcessing(root);
 		if (isToBeRemoved(root)) {
 			if ((root.getChildrenCount() == 1) && root.getFirstChild().isMandatory()) {
