@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,8 +35,6 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * This class implements a LaTeX converter for the feature diagram (using TikZ). <br> The main class uses one String for the latex code; the subclasses divides
@@ -334,15 +331,6 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 	 */
 	public static class TikZMainFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
-		private static final String[] symbols;
-		static {
-			if (GUIBasics.unicodeStringTest(GUIDefaults.DEFAULT_FONT, Arrays.toString(NodeWriter.logicalSymbols))) {
-				symbols = NodeWriter.logicalSymbols;
-			} else {
-				symbols = NodeWriter.shortSymbols;
-			}
-		}
-
 		private final boolean[] legend = new boolean[7];
 
 		private IFeatureModel featureModel;
@@ -610,7 +598,6 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 			for (final IGraphicalConstraint constraint : graphicalFeatureModel.getConstraints()) {
 				String text = constraint.getObject().getNode().toString(NodeWriter.latexSymbols, true);
 				text = text.replaceAll("\"([\\w\" ]+)\"", " \\\\text\\{$1\\} "); // wrap all words in \text{} // replace with $2
-				// text = text.replaceAll("\"", ""); // remove all "
 				text = text.replaceAll("\\s+", " "); // remove unnecessary whitespace characters
 				str.append("	\\node {\\(" + text + "\\)}; \\\\" + lnSep);
 			}

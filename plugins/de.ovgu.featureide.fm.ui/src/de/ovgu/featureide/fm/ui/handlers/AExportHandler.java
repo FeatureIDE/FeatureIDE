@@ -32,8 +32,8 @@ import org.eclipse.swt.widgets.Shell;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureModelFormatChecker;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelDialog;
@@ -57,18 +57,15 @@ public abstract class AExportHandler<T> extends AFileHandler {
 		if (obj instanceof IFeatureModel) {
 			final IFeatureModel featureModel = (IFeatureModel) obj;
 			final ExportFeatureModelDialog dialog = new ExportFeatureModelDialog(new Shell(), modelFilePath.getParent().toString(), filter[0],
-						// format callback
-						(formatIndex) -> {
-							@SuppressWarnings("unchecked")
-							final IPersistentFormat<IFeatureModel> format = (IPersistentFormat<IFeatureModel>) formatExtensions.get(formatIndex);
-							final ProblemList pl = FeatureModelFormatChecker.checkFormat(format, featureModel);
-							return pl;
-						},
-						// export callback
-						(formatIndex, path, name) -> {
-							final IPersistentFormat<T> format = (IPersistentFormat<T>) formatExtensions.get(formatIndex);
-							save(format, fileHandler, path.resolve(name + "." + format.getSuffix()));
-						});
+					// format callback
+					(formatIndex) -> {
+						return FeatureModelFormatChecker.checkFormat((IFeatureModelFormat) formatExtensions.get(formatIndex), featureModel);
+					},
+					// export callback
+					(formatIndex, path, name) -> {
+						final IPersistentFormat<T> format = (IPersistentFormat<T>) formatExtensions.get(formatIndex);
+						save(format, fileHandler, path.resolve(name + "." + format.getSuffix()));
+					});
 			dialog.open();
 		} else {
 			final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);

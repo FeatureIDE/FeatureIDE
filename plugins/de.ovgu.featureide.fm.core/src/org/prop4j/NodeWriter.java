@@ -312,7 +312,7 @@ public class NodeWriter {
 	 */
 	protected String variableToString(Object variable) {
 		final String s = String.valueOf(variable);
-		return (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) || isEnquoteAlways() ? '"' + s + '"' : s;
+		return isEnquoteAlways() || (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) ? '"' + s + '"' : s;
 	}
 
 	/**
