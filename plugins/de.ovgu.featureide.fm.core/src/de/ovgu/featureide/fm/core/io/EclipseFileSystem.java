@@ -80,7 +80,8 @@ public class EclipseFileSystem implements IFileSystem {
 		} else {
 			try {
 				if (file.exists()) {
-					file.setContents(new ByteArrayInputStream(content), true, true, null);
+					file.deleteMarkers(null, true, IResource.DEPTH_ZERO);
+					file.setContents(new ByteArrayInputStream(content), true, false, null);
 				} else {
 					file.create(new ByteArrayInputStream(content), true, null);
 				}

@@ -103,7 +103,6 @@ public class CreateFeatureAboveAction extends MultipleSelectionAction implements
 		}
 
 		return false;
-		
 	}
 
 	@Override

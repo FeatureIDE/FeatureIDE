@@ -352,7 +352,7 @@ public abstract class Node {
 
 	@Override
 	public String toString() {
-		return new NodeWriter(this).nodeToString();
+		return toString(NodeWriter.shortSymbols);
 	}
 
 	/**
@@ -367,9 +367,14 @@ public abstract class Node {
 	 * @return a string representing this node
 	 */
 	public String toString(String[] symbols) {
+		return toString(symbols, false);
+	}
+
+	public String toString(String[] symbols, boolean enquoteAlways) {
 		final NodeWriter nw = new NodeWriter(this);
 		nw.setSymbols(symbols);
 		nw.setEnquoteWhitespace(true);
+		nw.setEnquoteAlways(enquoteAlways);
 		return nw.nodeToString();
 	}
 

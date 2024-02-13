@@ -1117,6 +1117,7 @@ public class StringTable {
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
 	public static final String CHOOSE_COLOR = "Choose Color:";
 	public static final String CHOOSE_ACTION = "Choose Action:";
+	public static final String CHOOSE_TEXT = "Choose Text:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";

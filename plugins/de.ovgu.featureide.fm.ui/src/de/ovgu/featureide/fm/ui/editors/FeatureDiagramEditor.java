@@ -103,8 +103,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
@@ -532,7 +532,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (fmManager instanceof AFileManager<?>) {
 			final Path gfmPath = AFileManager.constructExtraPath(((AFileManager<?>) fmManager).getPath(), new GraphicalFeatureModelFormat());
 			if ((gfmPath != null) && FileSystem.exists(gfmPath)) {
-				FileHandler.load(gfmPath, graphicalFeatureModel, new GraphicalFeatureModelFormat());
+				SimpleFileHandler.load(gfmPath, graphicalFeatureModel, new GraphicalFeatureModelFormat());
 				graphicalFeatureModel.writeValues();
 				if (deleteAfterwards) {
 					try {
@@ -631,7 +631,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return (T) adapter.cast(getViewer());
+			return adapter.cast(getViewer());
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());

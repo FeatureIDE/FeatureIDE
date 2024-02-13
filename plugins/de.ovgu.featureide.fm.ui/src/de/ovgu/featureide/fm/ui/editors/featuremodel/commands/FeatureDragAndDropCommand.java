@@ -83,17 +83,10 @@ public class FeatureDragAndDropCommand extends Command {
 			}
 			final Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
 			final IGraphicalFeature next = calculateNext(referencePoint);
-			if (next == null) {
-				return false;
-			}
 
 			// calculate new parent (if exists)
-			if (!calculateNewParentAndIndex(next)) {
-				return false;
-			}
-
 			// no new positions possible next to same feature
-			if (next == feature) {
+			if ((next == null) || !calculateNewParentAndIndex(next) || (next == feature)) {
 				return false;
 			}
 

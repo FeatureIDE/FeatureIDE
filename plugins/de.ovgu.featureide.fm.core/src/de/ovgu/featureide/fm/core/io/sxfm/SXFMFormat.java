@@ -649,7 +649,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private org.prop4j.Node buildChooseConstr(List<IFeature> list, int choose) {
 		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
 		list.stream().forEach((x) -> literals.add(new Literal(x)));
-		return new org.prop4j.Choose(choose, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
+		return new org.prop4j.Choose(choose, literals.toArray(new Literal[literals.size()])).toCNF();
 	}
 
 	/**
@@ -662,7 +662,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private org.prop4j.Node buildAtLeastConstr(List<IFeature> list, int min) {
 		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
 		list.stream().forEach((x) -> literals.add(new Literal(x)));
-		return new org.prop4j.AtLeast(min, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
+		return new org.prop4j.AtLeast(min, literals.toArray(new Literal[literals.size()])).toCNF();
 	}
 
 	/**
@@ -675,7 +675,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private org.prop4j.Node buildAtMostConstr(List<IFeature> list, int max) {
 		final LinkedList<org.prop4j.Literal> literals = new LinkedList<>();
 		list.stream().forEach((x) -> literals.add(new Literal(x)));
-		return new org.prop4j.AtMost(max, (Literal[]) literals.toArray(new Literal[literals.size()])).toCNF();
+		return new org.prop4j.AtMost(max, literals.toArray(new Literal[literals.size()])).toCNF();
 	}
 
 	/**

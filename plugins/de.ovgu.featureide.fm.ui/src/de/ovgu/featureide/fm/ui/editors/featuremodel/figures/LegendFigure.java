@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
@@ -381,11 +381,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			createExplanationEntry();
 		}
 
-		final ColorScheme color = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
+		final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
+		final List<FeatureColor> featureColors =
+			colorScheme.getColors().values().stream().filter((featureColor) -> featureColor != FeatureColor.NO_COLOR).collect(Collectors.toList());
 		int colorIndex = 1;
-		if (!color.getColors().isEmpty()) {
-			for (final FeatureColor currentColor : new HashSet<>(color.getColors().values())) {
-				createColoredRowFeatureAbstract(row++, currentColor, colorIndex++);
+		if (!featureColors.isEmpty()) {
+			for (final FeatureColor currentColor : featureColors) {
+				createColoredRowFeatureAbstract(row++, currentColor, colorIndex);
+				if (currentColor.getMeaning().isBlank()) {
+					colorIndex++;
+				}
 			}
 		}
 
@@ -527,8 +532,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		rect.setSize(x2 - x1, y2 - y1);
 		rect.setLocation(p1);
 		add(rect);
-		final Label labelFeature =
-			createLabel(row, "Custom Color " + String.format("%02d", colorIndex), FMPropertyManager.getFeatureForgroundColor(), CUSTOM_COLOR_TOOLTIP);
+		final String meaning = color.getMeaning().isBlank() ? "Custom Color " + String.format("%02d", colorIndex) : color.getMeaning();
+		final Label labelFeature = createLabel(row, meaning, FMPropertyManager.getFeatureForgroundColor(), CUSTOM_COLOR_TOOLTIP);
 		add(labelFeature);
 	}
 

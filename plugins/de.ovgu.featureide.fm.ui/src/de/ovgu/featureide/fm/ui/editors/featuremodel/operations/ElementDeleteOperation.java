@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -118,6 +120,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			final IFeature feature = getFeatureFromObject(element);
 			if (feature != null) {
 				featuresToDelete.add(feature);
+				FeatureColorManager.setColor(feature, FeatureColor.NO_COLOR);
 			} else {
 				final IConstraint constraint = getConstraintFromObject(element);
 				if (constraint != null) {
@@ -133,6 +136,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 			addDeleteConstraintOperations(constraintsToDelete);
 			addDeleteFeatureOperations(featuresToDelete);
 		}
+
 	}
 
 	/**

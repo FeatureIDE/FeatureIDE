@@ -54,7 +54,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -232,7 +232,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private void appendCustomProperties(Figure toolTipContent) {
 		final StringBuilder sb = new StringBuilder();
 		final IPropertyContainer propsertyContainer = feature.getObject().getCustomProperties();
-		final Set<Entry> properties2 = propsertyContainer.getProperties(XmlFeatureModelFormat.TYPE_CUSTOM);
+		final Set<Entry> properties2 = propsertyContainer.getProperties(XMLFeatureModelTags.TYPE_CUSTOM);
 		final List<String> keys = new ArrayList<>(properties2.size());
 		for (final Entry entry : properties2) {
 			keys.add(entry.getKey());
@@ -246,7 +246,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			for (final String key : keys) {
 				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
 				sb.append("\t=\t");
-				sb.append(propsertyContainer.get(key, XmlFeatureModelFormat.TYPE_CUSTOM));
+				sb.append(propsertyContainer.get(key, XMLFeatureModelTags.TYPE_CUSTOM));
 				sb.append("\n");
 			}
 			sb.delete(sb.length() - 1, sb.length());
