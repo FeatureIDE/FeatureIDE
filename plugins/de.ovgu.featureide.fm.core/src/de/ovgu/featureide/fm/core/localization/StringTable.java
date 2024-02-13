@@ -362,6 +362,7 @@ public class StringTable {
 	public static final String ONLY = "only ";
 	public static final String UNABLE_TO_OPEN_FILE = "Unable to open file ";
 	public static final String ADVANCED_CONFIGURATION = "Advanced Configuration";
+	public static final String CONFIGURATION_TREE = "Configuration Tree";
 	public static final String SELECT_THE_CORRESPONDING_FEATUREMODEL_ = "Select the corresponding feature model.";
 	public static final String SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT = "Select the feature model for the current project.";
 	public static final String CONFIGURATION = "Configuration";
