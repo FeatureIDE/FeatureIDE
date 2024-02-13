@@ -21,7 +21,9 @@
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,6 +68,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	private String curSearchString;
 	private long lastTime;
 
+	private volatile Set<Integer> keysPressed;
+
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
 	 *
@@ -86,10 +90,13 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 
 		resetFeatureList();
 		graphicalFeatureModel.getFeatureModelManager().addListener(this);
+
+		keysPressed = new HashSet<>();
 	}
 
 	@Override
 	public boolean keyReleased(KeyEvent e) {
+		keysPressed.remove(e.keyCode);
 		return false;
 	}
 
@@ -98,6 +105,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	 */
 	@Override
 	public boolean keyPressed(KeyEvent e) {
+		keysPressed.add(e.keyCode);
 		if (Character.isISOControl(e.character)) {
 			if (graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
 				return gvKeyHandler.keyPressed(e);
@@ -120,19 +128,21 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 		}
 		curSearchString += Character.toLowerCase(e.character);
 
-		final int foundIndex = search();
-		if (foundIndex >= 0) {
-			final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().getSnapshot();
-			// select the new feature
-			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
-			if (curFeature != null) {
-				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
-				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(graphicalFeatureModel.getGraphicalFeature(curFeature));
-				if (part != null) {
-					viewer.setSelection(new StructuredSelection(part));
-					viewer.reveal(part);
+		if (keysPressed.size() < 2) {
+			final int foundIndex = search();
+			if (foundIndex >= 0) {
+				final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModelManager().getSnapshot();
+				// select the new feature
+				final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
+				if (curFeature != null) {
+					final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
+					final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(graphicalFeatureModel.getGraphicalFeature(curFeature));
+					if (part != null) {
+						viewer.setSelection(new StructuredSelection(part));
+						viewer.reveal(part);
+					}
+					curIndex = foundIndex;
 				}
-				curIndex = foundIndex;
 			}
 		}
 
