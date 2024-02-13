@@ -1,0 +1,15 @@
+{
+    "Name" : "Automotive01",
+    "Year" : 2016,
+    "OriginalFormat" : "FeatureIDE",
+    "Hierarchy" : true,
+    "History":  [],
+    "Publication" : "https://doi.org/10.1145/3093335.2993248",
+    "Source" : "https://github.com/FeatureIDE/FeatureIDE",
+    "Keywords" : [
+        "Obfuscated",
+        "Proprietary",
+        "Automatic"
+    ],
+    "ConversionTool" : ""
+}
