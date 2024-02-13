@@ -247,12 +247,14 @@ public class ConstraintDialog implements GUIDefaults {
 		 *
 		 * @param shell Shell to use
 		 */
-		public HeaderPanel(Shell shell) {
+		public HeaderPanel(Shell shell, boolean fillsVerticalSpace) {
 			headComposite = new Composite(shell, SWT.NONE);
 			panelBackgroundColor = shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
 			headComposite.setBackground(panelBackgroundColor);
 			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.verticalAlignment = SWT.FILL;
+			gridData.grabExcessVerticalSpace = fillsVerticalSpace;
 			headComposite.setLayoutData(gridData);
 
 			final GridLayout headLayout = new GridLayout();
@@ -279,6 +281,10 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel = new Text(headComposite, SWT.WRAP | SWT.V_SCROLL);
 			gridData = new GridData(GridData.FILL_BOTH);
 			gridData.heightHint = 70;
+			gridData.grabExcessVerticalSpace = true;
+			gridData.grabExcessHorizontalSpace = true;
+			gridData.verticalAlignment = SWT.FILL;
+			gridData.minimumHeight = SWT.DEFAULT;
 			detailsLabel.setLayoutData(gridData);
 			detailsLabel.setEditable(false);
 			detailsLabel.setBackground(panelBackgroundColor);
@@ -465,10 +471,6 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Content proposal pop up for the formula of the constraint.
 	 */
 	private ContentProposalAdapter constraintFormulaProposalAdapter;
-	/**
-	 * Content proposal pop up for existing constraint tags of a feature model.
-	 */
-	private ContentProposalAdapter existingTagsAdapter;
 
 	private final Consumer<ValidationMessage> onUpdate = new Consumer<ValidationMessage>() {
 
@@ -1093,7 +1095,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Initializes the upper part of the dialog.
 	 */
 	private void initHead() {
-		headerPanel = new HeaderPanel(shell);
+		headerPanel = new HeaderPanel(shell, false);
 		headerPanel.setHeader(defaultHeaderText);
 		headerPanel.setDetails(defaultDetailsText, HeaderPanel.HeaderDescriptionImage.NONE);
 	}

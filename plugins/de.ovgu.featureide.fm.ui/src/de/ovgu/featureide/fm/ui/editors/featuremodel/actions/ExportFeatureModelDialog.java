@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog.HeaderPanel;
@@ -63,14 +64,15 @@ public class ExportFeatureModelDialog extends Dialog {
 	private final String[] formatList;
 	private final IFormatChecker formatChecker;
 	private final IExporter exporter;
-	private int selectedExporter;
-	private String selectedPath;
-	private String selectedName;
-	private Button okButton;
-	private boolean saveLogFile;
-	private boolean saveFeatureModel;
+
+	private int selectedExporter = 0;
+	private String selectedPath = "";
+	private String selectedName = "";
+	private boolean saveLogFile = true;
+	private boolean saveFeatureModel = true;
 	private ProblemList problems;
 
+	private Button okButton;
 	private HeaderPanel headerPanel;
 
 	public ExportFeatureModelDialog(Shell parentShell, String defaultPath, String[] formatList, IFormatChecker formatChecker, IExporter exporter) {
@@ -79,22 +81,13 @@ public class ExportFeatureModelDialog extends Dialog {
 		this.formatList = formatList;
 		this.formatChecker = formatChecker;
 		this.exporter = exporter;
-
-		selectedExporter = 0;
-		selectedPath = "";
-		selectedName = "";
-		okButton = new Button(parentShell, 0);
-		saveLogFile = true;
-		saveFeatureModel = true;
-		problems = new ProblemList();
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
-		final boolean isEnabled = okButton.isEnabled();
 		okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setEnabled(isEnabled);
+		okButton.setEnabled(validate());
 	}
 
 	/**
@@ -109,7 +102,7 @@ public class ExportFeatureModelDialog extends Dialog {
 		newShell.setMinimumSize(new Point(450, 200));
 
 		// header panel
-		headerPanel = new HeaderPanel(newShell);
+		headerPanel = new HeaderPanel(newShell, true);
 		headerPanel.setHeader(TITLE);
 		headerPanel.setDetails(SELECT_EXPORT_FORMAT, HeaderDescriptionImage.NONE);
 	}
@@ -122,14 +115,14 @@ public class ExportFeatureModelDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		final Composite container = (Composite) super.createDialogArea(parent);
+		((GridData) parent.getLayoutData()).grabExcessVerticalSpace = false;
 
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 3;
-		gridLayout.verticalSpacing = 5;
-		container.setLayout(gridLayout);
+		final GridLayout headLayout = new GridLayout();
+		headLayout.numColumns = 3;
+		headLayout.verticalSpacing = 5;
+		container.setLayout(headLayout);
 
-		problems = formatChecker.checkFormat(0);
-		headerPanel.setDetails(stringifyProblems(problems), problems.size() > 0 ? HeaderDescriptionImage.WARNING : HeaderDescriptionImage.NONE);
+		computeProblems(0);
 
 		// row 1
 		final Label extensionLabel = new Label(container, SWT.NONE);
@@ -138,8 +131,7 @@ public class ExportFeatureModelDialog extends Dialog {
 		extensionDropDownMenu.setItems(formatList);
 
 		extensionDropDownMenu.addListener(SWT.Selection, (event) -> {
-			problems = formatChecker.checkFormat(extensionDropDownMenu.getSelectionIndex());
-			headerPanel.setDetails(stringifyProblems(problems), problems.size() > 0 ? HeaderDescriptionImage.WARNING : HeaderDescriptionImage.NONE);
+			computeProblems(extensionDropDownMenu.getSelectionIndex());
 			selectedExporter = extensionDropDownMenu.getSelectionIndex();
 		});
 		extensionDropDownMenu.select(0);
@@ -157,11 +149,7 @@ public class ExportFeatureModelDialog extends Dialog {
 		final Text path = new Text(container, SWT.BORDER);
 		path.addListener(SWT.Modify, (event) -> {
 			selectedPath = path.getText();
-			if (validate()) {
-				okButton.setEnabled(true);
-			} else {
-				okButton.setEnabled(false);
-			}
+			okButton.setEnabled(validate());
 		});
 		path.setText(defaultPath);
 		final GridData pathData = new GridData();
@@ -185,11 +173,7 @@ public class ExportFeatureModelDialog extends Dialog {
 		final Text name = new Text(container, SWT.BORDER);
 		name.addListener(SWT.Modify, (event) -> {
 			selectedName = name.getText();
-			if (validate()) {
-				okButton.setEnabled(true);
-			} else {
-				okButton.setEnabled(false);
-			}
+			okButton.setEnabled(validate());
 		});
 		name.setText("Untitled");
 		final GridData nameData = new GridData();
@@ -237,20 +221,27 @@ public class ExportFeatureModelDialog extends Dialog {
 		return parent;
 	}
 
-	private String stringifyProblems(ProblemList problems) {
-		final StringBuilder problemsString = new StringBuilder("");
-		problems.forEach((problem) -> problemsString.append("• " + problem.getMessage() + "\n"));
-		return problemsString.toString().substring(0, problemsString.length() - 1);
+	private void computeProblems(int formatIndex) {
+		problems = formatChecker.checkFormat(formatIndex);
+		headerPanel.setDetails(stringifyProblems(), problems.size() > formatIndex ? HeaderDescriptionImage.WARNING : HeaderDescriptionImage.NONE);
+	}
+
+	private String stringifyProblems() {
+		if (problems.isEmpty()) {
+			return "";
+		}
+		final StringBuilder problemsString = new StringBuilder();
+		for (final Problem problem : problems) {
+			problemsString.append("- ");
+			problemsString.append(problem.getMessage());
+			problemsString.append("\n");
+		}
+		problemsString.setLength(problemsString.length() - 1);
+		return problemsString.toString();
 	}
 
 	private boolean validate() {
-		if (selectedPath.isBlank()) {
-			return false;
-		}
-		if (selectedName.isBlank()) {
-			return false;
-		}
-		return true;
+		return !selectedPath.isBlank() && !selectedName.isBlank();
 	}
 
 	@Override
@@ -262,26 +253,17 @@ public class ExportFeatureModelDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		if (saveLogFile) {
-			final Path logPath = Paths.get(selectedPath).resolve(selectedName + "_problems.log");
-			writeProblemsToLogFile(logPath);
+			writeProblemsToLogFile(Paths.get(selectedPath).resolve(selectedName + "_problems.log"));
 		}
 		if (saveFeatureModel) {
-			final Path path = Paths.get(selectedPath);
-			exporter.export(selectedExporter, path, selectedName);
+			exporter.export(selectedExporter, Paths.get(selectedPath), selectedName);
 		}
 		super.okPressed();
 	}
 
 	private void writeProblemsToLogFile(Path path) {
-		final StringBuilder sb = new StringBuilder();
-		problems.forEach((problem) -> {
-			sb.append("- ");
-			sb.append(problem.getMessage());
-			sb.append("\n");
-		});
 		try {
-
-			FileSystem.write(path, sb.toString());
+			FileSystem.write(path, stringifyProblems());
 		} catch (final IOException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
