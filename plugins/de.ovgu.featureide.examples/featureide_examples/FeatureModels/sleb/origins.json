@@ -1,0 +1,14 @@
+{
+    "Name": "sleb",
+    "Year": 2017,
+    "Hierarchy": true,
+    "OriginalFormat": "FeatureIDE",
+    "Versions": [],
+    "Publication": "https://doi.org/10.1145/3106237.3106252",
+    "Source": "https://github.com/AlexanderKnueppel/is-there-a-mismatch",
+    "Keywords": [
+        "CDL",
+        "Automatic"
+    ],
+    "ConversionTool": ""
+}

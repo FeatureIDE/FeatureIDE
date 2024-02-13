@@ -305,9 +305,18 @@ public class FeatureColorManager implements IEventListener {
 		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (final Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
-				out.print(entry.getKey());
-				out.print('=');
-				out.println(entry.getValue());
+				if (entry.getValue() != FeatureColor.NO_COLOR) {
+					out.print(entry.getKey());
+					out.print('=');
+					out.println(entry.getValue());
+				}
+			}
+			for (final FeatureColor featureColor : FeatureColor.values()) {
+				if (!featureColor.getMeaning().isBlank() && (featureColor != FeatureColor.NO_COLOR)) {
+					out.print(XMLFeatureModelTags.FEATURE_COLOR_MEANING + featureColor.getValue());
+					out.print("=");
+					out.println(featureColor.getMeaning());
+				}
 			}
 
 			System.out.println(FeatureColor.values());

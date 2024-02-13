@@ -30,11 +30,10 @@ public enum FeatureColor {
 	NO_COLOR(-1), Red(0), Orange(1), Yellow(2), Dark_Green(3), Light_Green(4), Cyan(5), Light_Gray(6), Blue(7), Magenta(8), Pink(9);
 
 	final int value;
-	private String meaning;
+	String meaning = "";
 
 	FeatureColor(int i) {
 		value = i;
-		meaning = "";
 	}
 
 	public String getColorName() {

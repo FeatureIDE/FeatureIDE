@@ -247,12 +247,14 @@ public class ConstraintDialog implements GUIDefaults {
 		 *
 		 * @param shell Shell to use
 		 */
-		public HeaderPanel(Shell shell) {
+		public HeaderPanel(Shell shell, boolean fillsVerticalSpace) {
 			headComposite = new Composite(shell, SWT.NONE);
 			panelBackgroundColor = shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
 			headComposite.setBackground(panelBackgroundColor);
 			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.verticalAlignment = SWT.FILL;
+			gridData.grabExcessVerticalSpace = fillsVerticalSpace;
 			headComposite.setLayoutData(gridData);
 
 			final GridLayout headLayout = new GridLayout();
@@ -279,6 +281,10 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel = new Text(headComposite, SWT.WRAP | SWT.V_SCROLL);
 			gridData = new GridData(GridData.FILL_BOTH);
 			gridData.heightHint = 70;
+			gridData.grabExcessVerticalSpace = true;
+			gridData.grabExcessHorizontalSpace = true;
+			gridData.verticalAlignment = SWT.FILL;
+			gridData.minimumHeight = SWT.DEFAULT;
 			detailsLabel.setLayoutData(gridData);
 			detailsLabel.setEditable(false);
 			detailsLabel.setBackground(panelBackgroundColor);
@@ -364,8 +370,6 @@ public class ConstraintDialog implements GUIDefaults {
 		static final String VERB_UPDATE = UPDATE;
 
 		static final String VERB_CREATE = CREATE;
-
-		static final String OK_BUTTON_TEXT = "%s Constraint";
 
 		static final String VERB_SAVE = SAVE;
 
@@ -465,10 +469,6 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Content proposal pop up for the formula of the constraint.
 	 */
 	private ContentProposalAdapter constraintFormulaProposalAdapter;
-	/**
-	 * Content proposal pop up for existing constraint tags of a feature model.
-	 */
-	private ContentProposalAdapter existingTagsAdapter;
 
 	private final Consumer<ValidationMessage> onUpdate = new Consumer<ValidationMessage>() {
 
@@ -586,7 +586,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Depending on the current editing mode of this dialog the OK button text will be altered.
 	 */
 	private void autoSetOkButtonText() {
-		okButton.setText(String.format(StringTable.OK_BUTTON_TEXT, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE)));
+		okButton.setText(mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE);
 	}
 
 	/**
@@ -689,14 +689,14 @@ public class ConstraintDialog implements GUIDefaults {
 		cancelButton = new Button(lastComposite, SWT.NONE);
 		cancelButton.setText(CANCEL);
 		final FormData formDataCancel = new FormData();
-		formDataCancel.width = 70;
+		formDataCancel.width = 120;
 		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
 
 		okButton = new Button(lastComposite, SWT.NONE);
 		autoSetOkButtonText();
 		final FormData formDataOk = new FormData();
-		formDataOk.width = 130;
+		formDataOk.width = 120;
 		formDataOk.right = new FormAttachment(cancelButton, -5);
 		formDataOk.bottom = new FormAttachment(100, -5);
 		okButton.setLayoutData(formDataOk);
@@ -1093,7 +1093,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Initializes the upper part of the dialog.
 	 */
 	private void initHead() {
-		headerPanel = new HeaderPanel(shell);
+		headerPanel = new HeaderPanel(shell, false);
 		headerPanel.setHeader(defaultHeaderText);
 		headerPanel.setDetails(defaultDetailsText, HeaderPanel.HeaderDescriptionImage.NONE);
 	}

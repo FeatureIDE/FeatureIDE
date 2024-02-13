@@ -20,13 +20,20 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.HashSet;
 import java.util.List;
+
+import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.color.ColorScheme;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -76,9 +83,10 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 
 			str.append("%---required packages & variable definitions------------------------------------" + lnSep //
 				+ "\\usepackage{forest}" + lnSep //
-
+				+ "\\usepackage{amsmath}" + lnSep //
 				+ "\\usepackage{xcolor}" + lnSep //
 				+ "\\usetikzlibrary{angles}" + lnSep //
+				+ "\\usetikzlibrary{positioning}" + lnSep //
 				+ "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep //
 
 				+ "\\newcommand{\\circleSize}{0.25em}" + lnSep //
@@ -103,7 +111,7 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				+ "	}," + lnSep //
 				+ "	featureDiagram/.style={" + lnSep //
 				+ "		for tree={" + lnSep //
-				+ String.format("			text depth = 0," + lnSep //
+				+ "             minimum height = 0.6cm," + String.format("			text depth = 0," + lnSep //
 					+ "			parent anchor = %s," + lnSep //
 					+ "			child anchor = %s," + lnSep //
 					+ "			draw = drawColor," + lnSep //
@@ -141,12 +149,50 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				+ lnSep //
 				+ "		}	" + lnSep //
 				+ "	}," + lnSep //
+				+ " /tikz/redColor/.style={" + lnSep //
+				+ " 	fill = red!60," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/orangeColor/.style={" + lnSep //
+				+ " 	fill = orange!50," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/yellowColor/.style={" + lnSep //
+				+ " 	fill = yellow!50," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/darkGreenColor/.style={" + lnSep //
+				+ " 	fill = black!30!green," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/lightGreenColor/.style={" + lnSep //
+				+ " 	fill = green!30," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/cyanColor/.style={" + lnSep //
+				+ " 	fill = cyan!30," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/lightGrayColor/.style={" + lnSep //
+				+ " 	fill = black!10," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/blueColor/.style={" + lnSep //
+				+ " 	fill = blue!50," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/magentaColor/.style={" + lnSep //
+				+ " 	fill = magenta," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
+				+ " /tikz/pinkColor/.style={" + lnSep //
+				+ " 	fill = pink!90," + lnSep //
+				+ " 	draw = drawColor" + lnSep //
+				+ " }," + lnSep //
 				+ "	/tikz/or/.style={" + lnSep //
 				+ "	}," + lnSep //
 				+ "	alternative/.style={" + lnSep //
-
 				+ "		tikz+={" + lnSep //
-
 				+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};"
 				+ lnSep //
 				+ "		}	" + lnSep //
@@ -357,7 +403,39 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 							.equals(object.getGraphicalFeature(featureModel.getFeature(node)).getObject().getStructure())) {
 					str.append(",alternative");
 					legend[5] = true;
+
 				}
+			}
+			final FeatureColor fc = FeatureColorManager.getColor(featureModel.getFeature(node));
+			if (fc != FeatureColor.NO_COLOR) {
+				str.append("," + featureColorToTikzStyle(fc));
+			}
+		}
+
+		private static String featureColorToTikzStyle(FeatureColor featureColor) {
+			switch (featureColor) {
+			case Red:
+				return "redColor";
+			case Orange:
+				return "orangeColor";
+			case Yellow:
+				return "yellowColor";
+			case Dark_Green:
+				return "darkGreenColor";
+			case Light_Green:
+				return "lightGreenColor";
+			case Cyan:
+				return "cyanColor";
+			case Light_Gray:
+				return "lightGrayColor";
+			case Blue:
+				return "blueColor";
+			case Magenta:
+				return "magentaColor";
+			case Pink:
+				return "pinkColor";
+			default:
+				throw new IllegalStateException(String.valueOf(featureColor));
 			}
 		}
 
@@ -426,12 +504,13 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 			str.append(treeStringBuilder);
 			str.append("\t" + lnSep);
 			if (!object.isLegendHidden()) {
-				printLegend(str);
+				printLegend(str, object);
 			}
+			printConstraints(str, object);
 			str.append("\\end{forest}");
 		}
 
-		private void printLegend(StringBuilder str) {
+		private void printLegend(StringBuilder str, IGraphicalFeatureModel graphicalFeatureModel) {
 			boolean check = false;
 			final StringBuilder myString = new StringBuilder();
 			if (legend[0] && legend[1]) {
@@ -484,6 +563,21 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
 				legend[6] = false;
 			}
+
+			final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(graphicalFeatureModel.getFeatureModelManager().getSnapshot());
+			int colorIndex = 1;
+
+			if (!colorScheme.getColors().isEmpty()) {
+				for (final FeatureColor currentColor : new HashSet<>(colorScheme.getColors().values())) {
+					String meaning = currentColor.getMeaning();
+					if (meaning.isEmpty()) {
+						meaning = "Custom Color " + String.format("%02d", colorIndex);
+						colorIndex++;
+					}
+					myString.append("		\\node [" + featureColorToTikzStyle(currentColor) + ",label=right:" + meaning + "] {}; \\\\" + lnSep);
+				}
+			}
+
 			if (check) {
 				str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
 					+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
@@ -497,6 +591,17 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				}
 				check = false;
 			}
+		}
+
+		private void printConstraints(StringBuilder str, IGraphicalFeatureModel graphicalFeatureModel) {
+			str.append("\\matrix [below=1mm of current bounding box] {" + lnSep);
+			for (final IGraphicalConstraint constraint : graphicalFeatureModel.getConstraints()) {
+				String text = constraint.getObject().getNode().toString(NodeWriter.latexSymbols, true);
+				text = text.replaceAll("\"([\\w\" ]+)\"", " \\\\text\\{$1\\} "); // wrap all words in \text{} // replace with $2
+				text = text.replaceAll("\\s+", " "); // remove unnecessary whitespace characters
+				str.append("	\\node {\\(" + text + "\\)}; \\\\" + lnSep);
+			}
+			str.append("};" + lnSep);
 		}
 	}
 
