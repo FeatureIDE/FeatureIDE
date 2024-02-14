@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
@@ -295,22 +297,46 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (currentEditor instanceof FeatureModelEditor) {
-					final Path path = manager.getPath();
+				switch (mode) {
+				case NON_EXTENDED_FEATURE_MODEL: {
+					final Path path;
+					if (manager instanceof FeatureModelManager) {
+						path = manager.getPath();
+					} else if (manager instanceof ConfigurationManager) {
+						path = ((FeatureModelManager) ((ConfigurationManager) manager).getFeatureModelManager()).getPath();
+					} else {
+						break;
+					}
 
 					final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					final IWorkbenchPage page = window.getActivePage();
-					page.closeEditor((FeatureModelEditor) currentEditor, true);
+					if (currentEditor instanceof FeatureModelEditor) {
+						page.closeEditor((IEditorPart) currentEditor, true);
+					}
 
 					FileHandler<IFeatureModel> fileHandler = FeatureModelIO.getInstance().getFileHandler(path);
 					if (fileHandler != null && !fileHandler.getLastProblems().containsError()) {
 						Path orgPath = path.resolveSibling("org_" + path.getFileName().toString());
 						if (!Files.exists(orgPath)) {
-							fileHandler.write(orgPath);
+							try {
+								Files.copy(path, orgPath);
+							} catch (IOException e1) {
+								FMAttributesPlugin.getDefault().logError(e1);
+							}
 						}
 						String content = fileHandler.getRawContent();
 						if (path.getFileName().toString().endsWith(".uvl")) {
-							content = content.replaceAll("(\\A|\\r?\\n)(features\\s*\\r?\\n\\s+.*)(\\r?\\n)", "$1$2 \\{extended__\\}$3");
+							Pattern patternWithoutAttributes = Pattern.compile("(\\A|\\r?\\n)(features\\s*\\r?\\n\\s+.*[^{])(\\s*\\r?\\n)");
+							Matcher matcher = patternWithoutAttributes.matcher(content);
+							if (matcher.find()) {
+								content = matcher.replaceFirst("$1$2 \\{extended__\\}$3");
+							} else {
+								Pattern patternWithAttributes = Pattern.compile("(\\A|\\r?\\n)(features\\s*\\r?\\n\\s+.*\\{)(\\s*\\r?\\n)");
+								matcher = patternWithAttributes.matcher(content);
+								if (matcher.find()) {
+									content = matcher.replaceFirst("$1$2\nextended__,$3");
+								}
+							}
 						} else {
 							content = content.replace("<featureModel>", "<extendedFeatureModel>");
 							content = content.replace("</featureModel>", "</extendedFeatureModel>");
@@ -322,22 +348,39 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						}
 						FMAttributesPlugin.getDefault().openEditor(FeatureModelEditor.ID, (IFile) EclipseFileSystem.getResource(path));
 					}
-				} else if (currentEditor instanceof ConfigurationEditor) {
-					final Path path = manager.getPath();
+					break;
+				}
+				case NON_EXTENDED_CONFIGURATION: {
+					final Path path;
+					if (manager instanceof ConfigurationManager) {
+						path = ((ConfigurationManager) manager).getPath();
+					} else {
+						break;
+					}
 
 					final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					final IWorkbenchPage page = window.getActivePage();
-					page.closeEditor((ConfigurationEditor) currentEditor, true);
+					if (currentEditor instanceof ConfigurationEditor) {
+						page.closeEditor((IEditorPart) currentEditor, true);
+					}
 
 					FileHandler<Configuration> fileHandler = ConfigurationIO.getInstance().getFileHandler(path);
 					if (fileHandler != null && !fileHandler.getLastProblems().containsError()) {
 						Path orgPath = path.resolveSibling("org_" + path.getFileName().toString());
 						if (!Files.exists(orgPath)) {
-							fileHandler.write(orgPath);
+							try {
+								Files.copy(path, orgPath);
+							} catch (IOException e1) {
+								FMAttributesPlugin.getDefault().logError(e1);
+							}
 						}
 						FileHandler.save(path, fileHandler.getObject(), new XmlExtendedConfFormat());
 						FMAttributesPlugin.getDefault().openEditor(ConfigurationEditor.ID, (IFile) EclipseFileSystem.getResource(path));
 					}
+					break;
+				}
+				default:
+					break;
 				}
 			}
 		});
@@ -551,20 +594,17 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void setEditorContentByEditor(IEditorPart editor) {
-		if (editor != null && (editor instanceof FeatureModelEditor)) {
-			final FeatureModelEditor fmEditor = (FeatureModelEditor) editor;
-			setEmptyEditorContent();
-			setFMEditorContent(fmEditor);
-		} else if (editor != null && (editor instanceof ConfigurationEditor)) {
-			final ConfigurationEditor confEditor = (ConfigurationEditor) editor;
-			setEmptyEditorContent();
-			setConfEditorContent(confEditor);
+		mode = FeatureAttributeOperationMode.NONE;
+		if (!treeViewer.getControl().isDisposed()) {
+			treeViewer.setInput("");
+		}
+		setEmptyEditorContent();
+		if (editor instanceof FeatureModelEditor) {
+			setFMEditorContent((FeatureModelEditor) editor);
+		} else if (editor instanceof ConfigurationEditor) {
+			setConfEditorContent((ConfigurationEditor) editor);
 		} else {
-			setEmptyEditorContent();
-			// Set mode
-			mode = FeatureAttributeOperationMode.NONE;
 			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput("");
 				repackAllColumns();
 			}
 		}
@@ -653,13 +693,21 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (editor.getSelectedPage() instanceof ConfigurationTreeEditorPage) {
 			final ConfigurationManager configurationManager = editor.getConfigurationManager();
 			manager = configurationManager;
+
 			Configuration currentConfiguration = configurationManager.getVarObject();
 			if (currentConfiguration instanceof ExtendedConfiguration) {
-				// Valid
-				manager.addListener(this);
-				mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
-				if (!treeViewer.getControl().isDisposed()) {
-					treeViewer.setInput(currentConfiguration);
+				if (configurationManager.getFeatureModelManager().getVarObject() instanceof IExtendedFeatureModel) {
+					// Valid
+					manager.addListener(this);
+					mode = FeatureAttributeOperationMode.CONFIGURATION_EDITOR;
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput(currentConfiguration);
+					}
+				} else {
+					mode = FeatureAttributeOperationMode.NON_EXTENDED_FEATURE_MODEL;
+					if (!treeViewer.getControl().isDisposed()) {
+						treeViewer.setInput("");
+					}
 				}
 			} else {
 				// Invalid format
