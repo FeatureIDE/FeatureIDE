@@ -32,7 +32,13 @@ public class DefaultColorScheme extends ColorScheme {
 
 	public static String defaultName = DefaultColorScheme.class.getName();
 
-	public DefaultColorScheme() {
+	private static DefaultColorScheme instance;
+
+	public static DefaultColorScheme getInstance() {
+		return instance != null ? instance : (instance = new DefaultColorScheme());
+	}
+
+	private DefaultColorScheme() {
 		super(defaultName);
 		setCurrent(true);
 	}
@@ -43,9 +49,7 @@ public class DefaultColorScheme extends ColorScheme {
 	}
 
 	@Override
-	public void setColor(IFeature feature, FeatureColor color) {
-		throw new RuntimeException("setColor called on default color scheme");
-	}
+	public void setColor(IFeature feature, FeatureColor color) {}
 
 	@Override
 	public FeatureColor getColor(IFeature feature) {
