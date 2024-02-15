@@ -534,7 +534,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void setInput(IEditorInput input) {
 		// Cast is necessary, don't remove
-		markerHandler = new ModelMarkerHandler<>(input.getAdapter(IFile.class));
+		markerHandler = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
 		super.setInput(input);
 
 		final Path path = EclipseFileSystem.getPath(markerHandler.getModelFile());
