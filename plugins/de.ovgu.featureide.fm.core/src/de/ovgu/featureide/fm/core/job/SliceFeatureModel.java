@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -125,7 +126,6 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		slicedFeatureModel.getStructure().setRoot(root);
 		monitor.step();
 
-		final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
 		for (final IConstraint constaint : featureModel.getConstraints()) {
 			final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
 			boolean containsOnlyRemainingFeatures = !containedFeatures.isEmpty();
@@ -136,14 +136,16 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				}
 			}
 			if (containsOnlyRemainingFeatures) {
-				innerConstraintList.add(constaint);
+				slicedFeatureModel.addConstraint(constaint);
 			} else {
 				slicingNecesary = true;
 			}
 		}
-		for (final IConstraint constraint : innerConstraintList) {
-			slicedFeatureModel.addConstraint(constraint.clone(slicedFeatureModel));
+
+		if (slicedFeatureModel instanceof FeatureModel) {
+			((FeatureModel) slicedFeatureModel).updateNextElementId();
 		}
+
 		monitor.step();
 
 		return slicedFeatureModel;
