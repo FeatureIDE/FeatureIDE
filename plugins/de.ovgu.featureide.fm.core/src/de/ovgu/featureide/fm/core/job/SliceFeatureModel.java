@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.job;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -41,7 +42,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -97,7 +97,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
+		final HashSet<String> removeFeatures = new HashSet<>(FeatureUtils.getFeatureNames(featureModel));
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
@@ -109,13 +109,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		slicedFeatureModel = featureModel.clone();
 
 		IFeatureStructure root = slicedFeatureModel.getStructure().getRoot();
-		if (slicedFeatureModel instanceof FeatureModel) {
-			final long elementId = ((FeatureModel) slicedFeatureModel).getNextElementId() - 1;
-			slicedFeatureModel.reset();
-			((FeatureModel) slicedFeatureModel).setNextElementId(elementId);
-		} else {
-			slicedFeatureModel.reset();
-		}
+		slicedFeatureModel.reset();
 		postOrderProcessing(root);
 		if (isToBeRemoved(root)) {
 			if ((root.getChildrenCount() == 1) && root.getFirstChild().isMandatory()) {
@@ -124,7 +118,6 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				root = child;
 			} else {
 				root.setAbstract(true);
-				root.getFeature().setName(FeatureUtils.getFeatureName(slicedFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME + "_"));
 				root.getFeature().setName(FeatureUtils.getFeatureName(slicedFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
 				slicedFeatureModel.addFeature(root.getFeature());
 			}
@@ -209,14 +202,14 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 						stack.addLast(it.previous());
 					}
 				} else {
-					processFeatureComplex(stack.removeLast());
+					processFeature(stack.removeLast());
 					path.remove(path.size() - 1);
 				}
 			}
 		}
 	}
 
-	private void processFeatureComplex(IFeatureStructure feat) {
+	private void processFeature(IFeatureStructure feat) {
 		final IFeatureStructure parent = feat.getParent();
 
 		if (isToBeRemoved(feat)) {
@@ -264,7 +257,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				case GROUP_OR:
 				case GROUP_ALT:
 					if (featGroup == parentGroup) {
-						simplePullUp(feat, parent);
+						nonBreakingPullUp(feat, parent);
 					} else {
 						breakingPullUp(feat, parent);
 					}
@@ -279,7 +272,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		}
 	}
 
-	private void simplePullUp(final IFeatureStructure feat, final IFeatureStructure parent) {
+	private void nonBreakingPullUp(final IFeatureStructure feat, final IFeatureStructure parent) {
 		int featIndex = parent.getChildren().indexOf(feat);
 		parent.removeChild(feat);
 		for (final IFeatureStructure child : feat.getChildren()) {
