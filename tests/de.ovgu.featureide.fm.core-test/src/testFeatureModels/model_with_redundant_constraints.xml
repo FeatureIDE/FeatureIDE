@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<struct>
+		<and abstract="true" mandatory="true" name="A">
+			<and name="C">
+				<and name="D">
+					<feature mandatory="true" name="E"/>
+				</and>
+			</and>
+			<feature name="B"/>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>D</var>
+				<var>E</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>B</var>
+				<var>B</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>C</var>
+				<var>A</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>A</var>
+				<var>B</var>
+			</imp>
+		</rule>
+	</constraints>
+</featureModel>

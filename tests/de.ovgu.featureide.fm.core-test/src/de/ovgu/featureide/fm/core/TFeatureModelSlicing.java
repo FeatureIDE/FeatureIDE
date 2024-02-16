@@ -54,6 +54,11 @@ import de.ovgu.featureide.fm.core.job.SliceFeatureModel;
 public class TFeatureModelSlicing {
 
 	@Test
+	public final void silcingWorksforModelWithRedundantConstraints() {
+		testModel("model_with_redundant_constraints.xml");
+	}
+
+	@Test
 	public final void silcingWorksforCar() {
 		testModel("car.xml");
 	}
