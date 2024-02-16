@@ -224,7 +224,7 @@ public class CNFSlicer extends AbstractManipulator {
 
 	private void createClauseLists() {
 		for (final LiteralSet clause : orgCNF.getClauses()) {
-			addNewClause(new DeprecatedClause(clause.getLiterals()));
+			addNewClause(DeprecatedClause.createClause(clause.getLiterals()));
 		}
 
 		cleanClauseList.ensureCapacity(cleanClauseList.size() + newCleanClauseList.size());
