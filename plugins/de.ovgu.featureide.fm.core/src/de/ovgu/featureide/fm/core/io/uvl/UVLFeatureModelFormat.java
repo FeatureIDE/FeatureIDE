@@ -148,7 +148,7 @@ public class UVLFeatureModelFormat extends AFeatureModelFormat {
 		pl = new ProblemList();
 		final UVLModelFactory uvlModelFactory = new UVLModelFactory();
 		try {
-			rootModel = uvlModelFactory.parse(source.toString(), path.getParent().toString());
+			rootModel = uvlModelFactory.parse(source.toString(), path.resolve("..").normalize().toString());
 			uvlModelFactory.convertAllMoreComplexLanguageLevels(rootModel, LanguageLevel.BOOLEAN_LEVEL);
 			constructFeatureModel((MultiFeatureModel) fm);
 		} catch (final ParseError e) {
