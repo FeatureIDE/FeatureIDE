@@ -521,20 +521,22 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createColoredRowFeatureAbstract(int row, FeatureColor color, int colorIndex) {
-		final int x1 = ((SYMBOL_SIZE / 2) - 2);
-		final int y1 = ((ROW_HEIGHT * row) - (LIFT_2 / 2));
-		final int x2 = SYMBOL_SIZE + (SYMBOL_SIZE / 2);
-		final int y2 = (((ROW_HEIGHT * row) + SYMBOL_SIZE) - LIFT_2);
-		final Point p1 = new Point(x1, y1);
-		final Figure rect = new RectangleFigure();
-		rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
-		rect.setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
-		rect.setSize(x2 - x1, y2 - y1);
-		rect.setLocation(p1);
-		add(rect);
-		final String meaning = color.getMeaning().isBlank() ? "Custom Color " + String.format("%02d", colorIndex) : color.getMeaning();
-		final Label labelFeature = createLabel(row, meaning, FMPropertyManager.getFeatureForgroundColor(), CUSTOM_COLOR_TOOLTIP);
-		add(labelFeature);
+		if (color != FeatureColor.NO_COLOR) {
+			final int x1 = ((SYMBOL_SIZE / 2) - 2);
+			final int y1 = ((ROW_HEIGHT * row) - (LIFT_2 / 2));
+			final int x2 = SYMBOL_SIZE + (SYMBOL_SIZE / 2);
+			final int y2 = (((ROW_HEIGHT * row) + SYMBOL_SIZE) - LIFT_2);
+			final Point p1 = new Point(x1, y1);
+			final Figure rect = new RectangleFigure();
+			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
+			rect.setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+			rect.setSize(x2 - x1, y2 - y1);
+			rect.setLocation(p1);
+			add(rect);
+			final String meaning = color.getMeaning().isBlank() ? "Custom Color " + String.format("%02d", colorIndex) : color.getMeaning();
+			final Label labelFeature = createLabel(row, meaning, FMPropertyManager.getFeatureForgroundColor(), CUSTOM_COLOR_TOOLTIP);
+			add(labelFeature);
+		}
 	}
 
 	private void createRowHidden(int row) {

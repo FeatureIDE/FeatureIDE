@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
 
+import java.util.Collection;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -31,12 +33,21 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -152,6 +163,44 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		for (final SelectableFeature feature : configuration.getFeatures()) {
 			if ((feature.getAutomatic() == Selection.UNDEFINED) && (feature.getManual() == Selection.UNSELECTED)) {
 				configuration.setManual(feature, Selection.UNDEFINED);
+			}
+		}
+	}
+
+	private static Image getImage(SelectableFeature selFeature) {
+		final IFeature feature = selFeature.getFeature();
+
+		final int distance = 4;
+		final int colorWidth = 24;
+		final int colorHeight = 12;
+
+		final ImageData id = new Image(Display.getCurrent(), distance + colorWidth + distance, colorHeight + 2).getImageData();
+		id.alpha = 0;
+		final Image mergeImage = new Image(Display.getCurrent(), id);
+
+		final GC gc = new GC(mergeImage);
+
+		final FeatureColor color = FeatureColorManager.getColor(feature);
+
+		if (color != FeatureColor.NO_COLOR) {
+			gc.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+			gc.fillRoundRectangle(distance, 1, colorWidth, colorHeight, colorHeight, colorHeight);
+		} else {
+			gc.setForeground(new Color(191, 191, 191));
+			gc.drawRoundRectangle(distance, 1, colorWidth, colorHeight, colorHeight, colorHeight);
+		}
+
+		return mergeImage;
+	}
+
+	@Override
+	protected void refreshItem(Collection<TreeItem> items) {
+		super.refreshItem(items);
+		for (final TreeItem item : items) {
+			final Object data = item.getData();
+			if (data instanceof SelectableFeature) {
+				final SelectableFeature feature = (SelectableFeature) data;
+				item.setImage(getImage(feature));
 			}
 		}
 	}

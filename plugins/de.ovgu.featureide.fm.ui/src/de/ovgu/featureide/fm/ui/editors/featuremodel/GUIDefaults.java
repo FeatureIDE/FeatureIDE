@@ -151,11 +151,11 @@ public interface GUIDefaults {
 	/*
 	 * All images should be declared here, so an image can not be created twice.
 	 */
-	public static final Image IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.ico");
-	public static final Image IMAGE_SELECTED = FMUIPlugin.getImage("selected.ico");
-	public static final Image IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.ico");
-	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.ico");
-	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.ico");
+	public static final Image IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.png");
+	public static final Image IMAGE_SELECTED = FMUIPlugin.getImage("selected.png");
+	public static final Image IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.png");
+	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.png");
+	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.png");
 
 	public static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
 	public static final Image ERROR_IMAGE = FMUIPlugin.getImage("icon_error.gif");
@@ -165,10 +165,10 @@ public interface GUIDefaults {
 	public static final Image OPERATOR_SYMBOL = FMUIPlugin.getImage("operator_symbol.gif");
 	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
 
-	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
-	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
-	public static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
-	public static final Image IMG_XOR = FMUIPlugin.getImage("xor.gif");
+	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.png");
+	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.png");
+	public static final Image IMG_OR = FMUIPlugin.getImage("or.png");
+	public static final Image IMG_XOR = FMUIPlugin.getImage("xor.png");
 
 	public static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	public static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
