@@ -97,7 +97,7 @@ public class FMPrintAction extends PrintAction {
 	}
 
 	private void moveLegend(IGraphicalFeatureModel featureModel, Point minP) {
-		final GraphicalViewer viewer = (GraphicalViewer) getWorkbenchPart().getAdapter(GraphicalViewer.class);
+		final GraphicalViewer viewer = getWorkbenchPart().getAdapter(GraphicalViewer.class);
 		for (final Object obj : viewer.getEditPartRegistry().values()) {
 			FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
 			if (obj instanceof LegendEditPart) {

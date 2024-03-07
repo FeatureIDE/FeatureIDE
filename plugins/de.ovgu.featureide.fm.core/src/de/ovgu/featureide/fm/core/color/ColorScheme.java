@@ -94,6 +94,20 @@ public class ColorScheme {
 	}
 
 	/**
+	 * Removes the color of the given feature.
+	 */
+	public void removeColor(IFeature feature) {
+		removeColor(feature.getName());
+	}
+
+	/**
+	 * Removes the color of the given feature.
+	 */
+	public void removeColor(String feature) {
+		colors.remove(feature);
+	}
+
+	/**
 	 * Returns the color of the given feature.
 	 */
 	public FeatureColor getColor(IFeature feature) {

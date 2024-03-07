@@ -33,18 +33,15 @@ public class ConstraintViewSelectionListener implements ISelectionChangedListene
 	 * Fires when the selection in the ConstraintView changes.
 	 *
 	 * Sets the active explanation and selects features in the FeatureDiagram
+	 *
 	 * @param event SelectionChangedEvent
 	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 
 		// Don't handle the selection when the "Open FeatureDiagram text is shown"
-		if (!controller.isConstraintsListVisible()) {
-			return;
-		}
-
 		// Don't handle the selection when there are features selected in the FeatureDiagramEditor
-		if ((controller.getView().filter.getSelection() != null) && !controller.getView().filter.getSelection().isEmpty()) {
+		if (!controller.isConstraintsListVisible() || ((controller.getView().filter.getSelection() != null) && !controller.getView().filter.getSelection().isEmpty())) {
 			return;
 		}
 

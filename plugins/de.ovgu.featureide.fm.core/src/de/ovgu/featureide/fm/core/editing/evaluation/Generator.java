@@ -108,7 +108,7 @@ public abstract class Generator {
 		if (!valid) {
 			Logger.logInfo("Feature model not valid!");
 		}
-		final Object[] names = (Object[]) FeatureUtils.getFeatureNamesList(fm).toArray(new Object[FeatureUtils.getFeatureNamesList(fm).size()]);
+		final Object[] names = FeatureUtils.getFeatureNamesList(fm).toArray(new Object[FeatureUtils.getFeatureNamesList(fm).size()]);
 		int k = 0;
 		for (int i = 0; i < numberOfConstraints;) {
 			Node node = getRandomLiteral(names, random);

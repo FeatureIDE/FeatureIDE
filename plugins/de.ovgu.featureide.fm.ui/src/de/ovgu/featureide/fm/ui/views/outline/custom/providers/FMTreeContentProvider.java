@@ -125,10 +125,7 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 					FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 
-		if (!(parentElement instanceof IFeature)) {
-			return null;
-		}
-		if (!((IFeature) parentElement).getStructure().hasChildren()) {
+		if (!(parentElement instanceof IFeature) || !((IFeature) parentElement).getStructure().hasChildren()) {
 			return null;
 		}
 

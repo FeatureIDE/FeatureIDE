@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTikzExporter;
 
 /**
@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationTikzExporter;
  */
 public class GraphicsExporter {
 
-	private static final List<ExportType<GraphicalViewerImpl>> exporter = Arrays.asList(//
+	public static final List<ExportType<GraphicalViewerImpl>> exporter = Arrays.asList(//
 			new FMBitmapExporter("png", "Portable Network Graphics"), //
 			new FMBitmapExporter("bmp", "Windows Bitmap"), //
 			new FMBitmapExporter("gif", "GIF"), //
@@ -65,6 +65,10 @@ public class GraphicsExporter {
 
 	public static boolean exportAs(GraphicalViewerImpl diagramEditor) {
 		return GraphicsExporter.exportAs(diagramEditor, exporter);
+	}
+
+	public static boolean exportAs(GraphicalViewerImpl diagramEditor, String filePath, int index) {
+		return GraphicsExporter.exportAs(diagramEditor, exporter, filePath, index);
 	}
 
 	public static boolean exportAs(Configuration configuration) {
@@ -82,8 +86,12 @@ public class GraphicsExporter {
 			return false;
 		}
 		final int index = fileDialog.getFilterIndex();
+		return exportAs(object, exporter, filePath, index);
+	}
+
+	private static <T> boolean exportAs(T object, List<ExportType<T>> exporter, String filePath, int index) {
 		if (index < 0) {
-			final String fileExtension = FileHandler.getFileExtension(filePath);
+			final String fileExtension = SimpleFileHandler.getFileExtension(filePath);
 			final Optional<ExportType<T>> any = exporter.stream().filter(exp -> Objects.equals(fileExtension, exp.getFileExtension())).findAny();
 			if (any.isEmpty()) {
 				return false;
@@ -107,7 +115,7 @@ public class GraphicsExporter {
 					return Status.OK_STATUS;
 				} catch (final IOException e) {
 					FMUIPlugin.getDefault().logInfo(NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___);
-					return new Status(Status.ERROR, e.getClass().getName(), e.getMessage());
+					return new Status(IStatus.ERROR, e.getClass().getName(), e.getMessage());
 				}
 			}
 		};

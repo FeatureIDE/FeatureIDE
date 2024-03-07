@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNFCreator;
@@ -56,20 +56,20 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
-	private static final String MARK1 = "?", MARK2 = "??";
-	private static final String ABSTRACT_NAME = "Abstract_";
 
-	private boolean changed = false;
-	private final boolean considerConstraints;
 	private final FeatureModelFormula formula;
 	private final Collection<String> featureNames;
 	private final IFeatureModel featureModel;
+	private final boolean useSlicing;
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints) {
-		this(featureModel, featureNames, considerConstraints, true);
+	private IFeatureModel slicedFeatureModel;
+	private boolean slicingNecesary;
+
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
+		this(featureModel, featureNames, useSlicing, true);
 	}
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean considerConstraints, boolean usePersistentFormula) {
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, boolean usePersistentFormula) {
 		if (usePersistentFormula) {
 			formula = FeatureModelManager.getInstance(featureModel).getPersistentFormula();
 			this.featureModel = formula.getFeatureModel();
@@ -77,220 +77,78 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 			formula = FeatureModelManager.getInstance(featureModel).getVariableFormula();
 			this.featureModel = featureModel;
 		}
+		this.useSlicing = useSlicing;
 		this.featureNames = featureNames;
-		this.considerConstraints = considerConstraints;
 	}
 
 	@Override
 	public IFeatureModel execute(IMonitor<IFeatureModel> monitor) throws Exception {
-		final IFeatureModelFactory factory = FMFactoryManager.getInstance().getFactory(featureModel);
 		monitor.setRemainingWork(100);
-
 		monitor.checkCancel();
-		final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
-		monitor.checkCancel();
-		final IFeatureModel featureTree = sliceTree(featureNames, featureModel, factory, monitor.subTask(2));
-		monitor.checkCancel();
-		merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
+		final IFeatureModel featureTree = sliceTree(monitor.subTask(2));
+		if (slicingNecesary && useSlicing) {
+			monitor.checkCancel();
+			final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
+			monitor.checkCancel();
+			merge(FMFactoryManager.getInstance().getFactory(featureModel), slicedFeatureModelCNF, featureTree, monitor.subTask(18));
+		}
 
 		return featureTree;
 	}
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		final ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(featureModel));
+		final HashSet<String> removeFeatures = new HashSet<>(FeatureUtils.getFeatureNames(featureModel));
 		removeFeatures.removeAll(featureNames);
 		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
 	}
 
-	private IFeatureModel sliceTree(Collection<String> selectedFeatureNames, IFeatureModel orgFeatureModel, IFeatureModelFactory factory, IMonitor<?> monitor) {
+	private IFeatureModel sliceTree(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Tree");
 		monitor.setRemainingWork(2);
-		final IFeatureModel m = orgFeatureModel.clone();
-		// mark features
-		for (final IFeature feat : m.getFeatures()) {
-			if (!selectedFeatureNames.contains(feat.getName())) {
-				feat.setName(MARK1);
-			}
-		}
+		slicingNecesary = false;
+		slicedFeatureModel = featureModel.clone();
 
-		final IFeature root = m.getStructure().getRoot().getFeature();
-
-		m.getStructure().setRoot(null);
-
-		// set new abstract root
-		// needs to be done before resetting to get a unique ID
-		final IFeature nroot = factory.createFeature(m, FeatureUtils.getFeatureName(orgFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
-
-		final long nextElementId = m.getNextElementId();
-		m.reset();
-
-		// keep the nextElementId so newly created abstract features get a unique ID
-		if (m instanceof FeatureModel) {
-			((FeatureModel) m).setNextElementId(nextElementId);
-		}
-
-		nroot.getStructure().setAbstract(true);
-		nroot.getStructure().setAnd();
-		nroot.getStructure().addChild(root.getStructure());
-		root.getStructure().setParent(nroot.getStructure());
-
-		// merge tree
-		cut(nroot);
-		do {
-			changed = false;
-			merge(nroot.getStructure(), GROUP_NO);
-		} while (changed);
-		monitor.step();
-
-		// needed to correctly set unique names for newly created abstract features
-		int abstractCount = 0;
-		for (final IFeature f : orgFeatureModel.getFeatures()) {
-			if (f.getName().startsWith(ABSTRACT_NAME)) {
-				try {
-					final int abstractNumber = Integer.parseInt(f.getName().substring(ABSTRACT_NAME.length()));
-					if (abstractNumber >= abstractCount) {
-						abstractCount = abstractNumber + 1;
-					}
-				} catch (final NumberFormatException e) {
-					// feature name is not "Abstract_NUMBER". Can be ignored
-				}
-			}
-		}
-
-		final Hashtable<String, IFeature> featureTable = new Hashtable<>();
-		final LinkedList<IFeature> featureStack = new LinkedList<>();
-		featureStack.push(nroot);
-		while (!featureStack.isEmpty()) {
-			final IFeature curFeature = featureStack.pop();
-			for (final IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
-				featureStack.push(feature);
-			}
-			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName(ABSTRACT_NAME + abstractCount++);
-				curFeature.getStructure().setAbstract(true);
-			}
-			featureTable.put(curFeature.getName(), curFeature);
-		}
-		m.setFeatureTable(featureTable);
-		m.getStructure().setRoot(nroot.getStructure());
-
-		if (m instanceof FeatureModel) {
-			((FeatureModel) m).updateNextElementId();
-		}
-
-		if (considerConstraints) {
-			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
-			for (final IConstraint constaint : orgFeatureModel.getConstraints()) {
-				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
-				boolean containsAllfeatures = !containedFeatures.isEmpty();
-				for (final IFeature feature : containedFeatures) {
-					if (!selectedFeatureNames.contains(feature.getName())) {
-						containsAllfeatures = false;
-						break;
-					}
-				}
-				if (containsAllfeatures) {
-					innerConstraintList.add(constaint);
-				}
-			}
-			for (final IConstraint constraint : innerConstraintList) {
-				m.addConstraint(constraint.clone(m));
-			}
-		}
-		monitor.step();
-
-		return m;
-	}
-
-	private boolean cut(final IFeature curFeature) {
-		final IFeatureStructure structure = curFeature.getStructure();
-		final boolean notSelected = curFeature.getName().equals(MARK1);
-
-		final List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
-		if (list.isEmpty()) {
-			return notSelected;
-		} else {
-			final boolean[] remove = new boolean[list.size()];
-			int removeCount = 0;
-
-			int i = 0;
-			for (final IFeature child : list) {
-				remove[i++] = cut(child);
-			}
-
-			// remove children
-			final Iterator<IFeature> it = list.iterator();
-			for (i = 0; i < remove.length; i++) {
-				final IFeature feat = it.next();
-				if (remove[i]) {
-					it.remove();
-					feat.getStructure().getParent().removeChild(feat.getStructure());
-					feat.getStructure().setParent(null);
-					removeCount++;
-					// changed = true;
-				}
-			}
-			if (list.isEmpty()) {
-				structure.setAnd();
-				return notSelected;
+		IFeatureStructure root = slicedFeatureModel.getStructure().getRoot();
+		slicedFeatureModel.reset();
+		postOrderProcessing(root);
+		if (isToBeRemoved(root)) {
+			if ((root.getChildrenCount() == 1) && root.getFirstChild().isMandatory()) {
+				final IFeatureStructure child = root.getFirstChild();
+				root.removeChild(child);
+				root = child;
 			} else {
-				switch (getGroup(structure)) {
-				case GROUP_OR:
-					if (removeCount > 0) {
-						structure.setAnd();
-						for (final IFeature child : list) {
-							child.getStructure().setMandatory(false);
-						}
-					} else if (list.size() == 1) {
-						structure.setAnd();
-						for (final IFeature child : list) {
-							child.getStructure().setMandatory(true);
-						}
-					}
-					break;
-				case GROUP_ALT:
-					if (removeCount > 0) {
-						if (list.size() == 1) {
-							structure.setAnd();
-							for (final IFeature child : list) {
-								child.getStructure().setMandatory(false);
-							}
-						} else {
-							final IFeatureModel featureModel = curFeature.getFeatureModel();
-							final IFeature pseudoAlternative = FMFactoryManager.getInstance().getFactory(featureModel).createFeature(featureModel, MARK2);
-							pseudoAlternative.getStructure().setMandatory(false);
-							pseudoAlternative.getStructure().setAlternative();
-							for (final IFeature child : list) {
-								structure.removeChild(child.getStructure());
-								pseudoAlternative.getStructure().addChild(child.getStructure());
-							}
-							list.clear();
-							structure.setAnd();
-							structure.addChild(pseudoAlternative.getStructure());
-						}
-					} else if (list.size() == 1) {
-						structure.setAnd();
-						for (final IFeature child : list) {
-							child.getStructure().setMandatory(true);
-						}
-					}
+				root.setAbstract(true);
+				root.getFeature().setName(FeatureUtils.getFeatureName(slicedFeatureModel, StringTable.DEFAULT_SLICING_ROOT_NAME));
+				slicedFeatureModel.addFeature(root.getFeature());
+			}
+		}
+		slicedFeatureModel.getStructure().setRoot(root);
+		monitor.step();
+
+		for (final IConstraint constaint : featureModel.getConstraints()) {
+			final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
+			boolean containsOnlyRemainingFeatures = !containedFeatures.isEmpty();
+			for (final IFeature feature : containedFeatures) {
+				if (!featureNames.contains(feature.getName())) {
+					containsOnlyRemainingFeatures = false;
 					break;
 				}
 			}
+			if (containsOnlyRemainingFeatures) {
+				slicedFeatureModel.addConstraint(constaint);
+			} else {
+				slicingNecesary = true;
+			}
 		}
-		return false;
-	}
 
-	private void deleteFeature(IFeatureStructure curFeature) {
-		final IFeatureStructure parent = curFeature.getParent();
-		final List<IFeatureStructure> children = curFeature.getChildren();
-		parent.removeChild(curFeature);
-		changed = true;
-		for (final IFeatureStructure child : children) {
-			parent.addChild(child);
+		if (slicedFeatureModel instanceof FeatureModel) {
+			((FeatureModel) slicedFeatureModel).updateNextElementId();
 		}
-		children.clear();// XXX code smell
+
+		monitor.step();
+
+		return slicedFeatureModel;
 	}
 
 	private int getGroup(IFeatureStructure f) {
@@ -331,67 +189,129 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		}
 	}
 
-	private void merge(IFeatureStructure curFeature, int parentGroup) {
-		if (!curFeature.hasChildren()) {
-			return;
-		}
-		int curFeatureGroup = getGroup(curFeature);
-		final LinkedList<IFeatureStructure> list = new LinkedList<>(curFeature.getChildren());
-		try {
-			for (final IFeatureStructure child : list) {
-				merge(child, curFeatureGroup);
-				curFeatureGroup = getGroup(curFeature);
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-
-		if (curFeature.getFeature().getName().equals(MARK1)) {
-			if (parentGroup == curFeatureGroup) {
-				if ((parentGroup == GROUP_AND) && !curFeature.isMandatory()) {
-					for (final IFeatureStructure feature : curFeature.getChildren()) {
-						feature.setMandatory(false);
+	private void postOrderProcessing(IFeatureStructure node) {
+		if (node != null) {
+			final ArrayList<IFeatureStructure> path = new ArrayList<>();
+			final ArrayDeque<IFeatureStructure> stack = new ArrayDeque<>();
+			stack.addLast(node);
+			while (!stack.isEmpty()) {
+				final IFeatureStructure curNode = stack.getLast();
+				if (path.isEmpty() || (curNode != path.get(path.size() - 1))) {
+					path.add(curNode);
+					final List<IFeatureStructure> children = curNode.getChildren();
+					final ListIterator<IFeatureStructure> it = children.listIterator(children.size());
+					while (it.hasPrevious()) {
+						stack.addLast(it.previous());
 					}
+				} else {
+					processFeature(stack.removeLast());
+					path.remove(path.size() - 1);
 				}
-				deleteFeature(curFeature);
-			} else {
+			}
+		}
+	}
+
+	private void processFeature(IFeatureStructure feat) {
+		final IFeatureStructure parent = feat.getParent();
+
+		if (isToBeRemoved(feat)) {
+			if (parent == null) {
+				return;
+			}
+			final int featGroup = getGroup(feat);
+			final List<IFeatureStructure> children = parent.getChildren();
+			switch (children.size()) {
+			case 0:
+				parent.removeChild(feat);
+				break;
+			case 1:
+				if (feat.isMandatory()) {
+					parent.removeChild(feat);
+					switch (featGroup) {
+					case GROUP_AND:
+						parent.setAnd();
+						break;
+					case GROUP_OR:
+						parent.setOr();
+						break;
+					case GROUP_ALT:
+						parent.setAlternative();
+						break;
+					default:
+						throw new IllegalStateException(String.valueOf(featGroup));
+					}
+					for (final IFeatureStructure child : feat.getChildren()) {
+						parent.addChild(child);
+					}
+				} else {
+					breakingPullUp(feat, parent);
+				}
+				break;
+			default:
+				final int parentGroup = getGroup(parent);
 				switch (parentGroup) {
 				case GROUP_AND:
-					final IFeatureStructure parent = curFeature.getParent();
-					if (parent.getChildrenCount() == 1) {
-						switch (curFeatureGroup) {
-						case GROUP_OR:
-							parent.setOr();
-							break;
-						case GROUP_ALT:
-							parent.setAlternative();
-							break;
+					if ((featGroup == GROUP_AND) && !feat.isMandatory()) {
+						for (final IFeatureStructure child : feat.getChildren()) {
+							child.setMandatory(false);
 						}
-						deleteFeature(curFeature);
 					}
-					break;
 				case GROUP_OR:
-					if (curFeatureGroup == GROUP_AND) {
-						boolean allOptional = true;
-						for (final IFeatureStructure child : list) {
-							if (child.isMandatory()) {
-								allOptional = false;
-								break;
-							}
-						}
-						if (allOptional) {
-							deleteFeature(curFeature);
-						}
-					}
-					break;
 				case GROUP_ALT:
-					if ((curFeatureGroup == GROUP_AND) && (list.size() == 1)) {
-						deleteFeature(curFeature);
+					if (featGroup == parentGroup) {
+						nonBreakingPullUp(feat, parent);
+					} else {
+						breakingPullUp(feat, parent);
 					}
 					break;
+				default:
+					throw new IllegalStateException(String.valueOf(parentGroup));
 				}
+				break;
 			}
+		} else {
+			slicedFeatureModel.addFeature(feat.getFeature());
 		}
+	}
+
+	private void nonBreakingPullUp(final IFeatureStructure feat, final IFeatureStructure parent) {
+		int featIndex = parent.getChildren().indexOf(feat);
+		parent.removeChild(feat);
+		for (final IFeatureStructure child : feat.getChildren()) {
+			parent.addChildAtPosition(featIndex++, child);
+		}
+	}
+
+	private void breakingPullUp(final IFeatureStructure feat, final IFeatureStructure parent) {
+		slicingNecesary = true;
+		int featIndex = parent.getChildren().indexOf(feat);
+		parent.removeChild(feat);
+		toAnd(parent);
+		for (final IFeatureStructure child : feat.getChildren()) {
+			parent.addChildAtPosition(featIndex++, child);
+			child.setMandatory(false);
+		}
+	}
+
+	private void toAnd(final IFeatureStructure parent) {
+		final int parentGroup = getGroup(parent);
+		switch (parentGroup) {
+		case GROUP_AND:
+			break;
+		case GROUP_OR:
+		case GROUP_ALT:
+			for (final IFeatureStructure child : parent.getChildren()) {
+				child.setMandatory(false);
+			}
+			parent.setAnd();
+			break;
+		default:
+			throw new IllegalStateException(String.valueOf(parentGroup));
+		}
+	}
+
+	private boolean isToBeRemoved(final IFeatureStructure feat) {
+		return !featureNames.contains(feat.getFeature().getName());
 	}
 
 }

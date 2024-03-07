@@ -33,6 +33,9 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelOperationEvent;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.color.ColorScheme;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
@@ -53,6 +56,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	private final String replacementName;
 
 	private IFeature oldFeature;
+	private FeatureColor oldColor;
 	private String oldParentName;
 	private int oldIndex;
 	private boolean deleted;
@@ -72,6 +76,9 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		oldFeature = featureModel.getFeature(featureName);
+		final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(oldFeature);
+		oldColor = colorScheme.getColor(oldFeature);
+		colorScheme.removeColor(featureName);
 		final IFeature oldParent = FeatureUtils.getParent(oldFeature);
 		if (oldParent != null) {
 			oldParentName = oldParent.getName();
@@ -115,6 +122,9 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			if (!deleted) {
 				return null;
 			}
+
+			final ColorScheme colorScheme = FeatureColorManager.getCurrentColorScheme(oldFeature);
+			colorScheme.setColor(oldFeature, oldColor);
 
 			final IFeature oldParent = (oldParentName != null) ? featureModel.getFeature(oldParentName) : null;
 

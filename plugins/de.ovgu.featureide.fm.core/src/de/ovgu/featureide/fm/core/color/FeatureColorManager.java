@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 
 /**
  * Manages colors assigned to features.
@@ -83,11 +84,25 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	/**
+	 * Resets the feature color to no color.
+	 */
+	public static void resetColor(IFeature feature) {
+		final ColorScheme currentColorScheme = getCurrentColorScheme(feature);
+		if (!currentColorScheme.isDefault()) {
+			currentColorScheme.setColor(feature, FeatureColor.NO_COLOR);
+			writeColors(getProject(feature), currentColorScheme);
+		}
+	}
+
+	/**
 	 * Sets the feature color to the given color.
 	 */
 	public static void setColor(IFeature feature, FeatureColor color) {
-		getCurrentColorScheme(feature).setColor(feature, color);
-		writeColors(getProject(feature), getCurrentColorScheme(feature));
+		final ColorScheme currentColorScheme = getCurrentColorScheme(feature);
+		if (!currentColorScheme.isDefault()) {
+			currentColorScheme.setColor(feature, color);
+			writeColors(getProject(feature), currentColorScheme);
+		}
 	}
 
 	/**
@@ -163,7 +178,7 @@ public class FeatureColorManager implements IEventListener {
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeature feature) {
 		if (feature == null) {
-			return new DefaultColorScheme();
+			return DefaultColorScheme.getInstance();
 		}
 		return getCurrentColorScheme(feature.getFeatureModel());
 	}
@@ -180,7 +195,7 @@ public class FeatureColorManager implements IEventListener {
 		try {
 			project = getProject(featureModel);
 		} catch (final NullPointerException e) {
-			return new DefaultColorScheme();
+			return DefaultColorScheme.getInstance();
 		}
 
 		if (!colorSchemes.containsKey(project)) {
@@ -197,7 +212,7 @@ public class FeatureColorManager implements IEventListener {
 				return cs;
 			}
 		}
-		return new DefaultColorScheme();
+		return DefaultColorScheme.getInstance();
 	}
 
 	/**
@@ -217,7 +232,7 @@ public class FeatureColorManager implements IEventListener {
 	 */
 	private static void initColorSchemes(IProject project, IFeatureModel featureModel) {
 		final Map<String, ColorScheme> newEntry = new HashMap<>();
-		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
+		newEntry.put(DefaultColorScheme.defaultName, DefaultColorScheme.getInstance());
 		colorSchemes.put(project, newEntry);
 		FeatureModelManager.getInstance(featureModel).addListener(INSTANCE);
 
@@ -262,8 +277,12 @@ public class FeatureColorManager implements IEventListener {
 				try {
 					if (split.length != 2) {
 						continue;
+					} else if (split[0].contains(XMLFeatureModelTags.FEATURE_COLOR_MEANING)) {
+						final int key = Integer.parseInt(split[0].substring(XMLFeatureModelTags.FEATURE_COLOR_MEANING.length(), split[0].length()));
+						FeatureColor.getColor(key).setMeaning(split[1]);
+					} else {
+						newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
 					}
-					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
 				} catch (final IllegalArgumentException e) {
 					Logger.logError("Color not found", e);
 				}
@@ -300,12 +319,18 @@ public class FeatureColorManager implements IEventListener {
 		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (final Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
-				if (entry.getValue() == FeatureColor.NO_COLOR) {
-					continue;
+				if (entry.getValue() != FeatureColor.NO_COLOR) {
+					out.print(entry.getKey());
+					out.print('=');
+					out.println(entry.getValue());
 				}
-				out.print(entry.getKey());
-				out.print('=');
-				out.println(entry.getValue());
+			}
+			for (final FeatureColor featureColor : FeatureColor.values()) {
+				if (!featureColor.getMeaning().isBlank() && (featureColor != FeatureColor.NO_COLOR)) {
+					out.print(XMLFeatureModelTags.FEATURE_COLOR_MEANING + featureColor.getValue());
+					out.print("=");
+					out.println(featureColor.getMeaning());
+				}
 			}
 
 			file.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());

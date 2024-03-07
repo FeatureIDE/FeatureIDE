@@ -279,8 +279,8 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printAttributs(IFeature node, StringBuilder tree) {
-		if ((node.getStructure().isRoot() == false)) {
-			if (node.getStructure().getParent().isAnd() == true) {
+		if (!node.getStructure().isRoot()) {
+			if (node.getStructure().getParent().isAnd()) {
 				if (node.getStructure().isMandatory()) {
 					tree.append("\\mandatory");
 				} else {

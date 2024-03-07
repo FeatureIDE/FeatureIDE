@@ -2402,13 +2402,13 @@ public class VelvetParser extends Parser {
 						alt20 = 1;
 					} else if (((LA20_2 == ATTR_OP_EQUALS) || (LA20_2 == ATTR_OP_GREATER_EQ) || (LA20_2 == ATTR_OP_LESS_EQ) || (LA20_2 == MINUS)
 						|| (LA20_2 == PLUS))) {
-						alt20 = 2;
-					} else {
-						final NoViableAltException nvae = new NoViableAltException("", 20, 2, input);
+							alt20 = 2;
+						} else {
+							final NoViableAltException nvae = new NoViableAltException("", 20, 2, input);
 
-						throw nvae;
+							throw nvae;
 
-					}
+						}
 				}
 					break;
 				case INT: {

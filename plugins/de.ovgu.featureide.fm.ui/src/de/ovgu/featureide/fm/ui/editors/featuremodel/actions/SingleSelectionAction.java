@@ -143,10 +143,7 @@ public abstract class SingleSelectionAction extends AFeatureModelAction implemen
 				return true;
 			}
 			final IFeature selectedFeature = getSelectedFeature();
-			if (!isExternalFeature(selectedFeature)) {
-				return true;
-			}
-			if ((this instanceof ActionAllowedForRootFeaturesInExternalSubmodel) && isExternalRootFeature(selectedFeature)) {
+			if (!isExternalFeature(selectedFeature) || ((this instanceof ActionAllowedForRootFeaturesInExternalSubmodel) && isExternalRootFeature(selectedFeature))) {
 				return true;
 			}
 		}

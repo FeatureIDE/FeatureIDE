@@ -362,6 +362,7 @@ public class StringTable {
 	public static final String ONLY = "only ";
 	public static final String UNABLE_TO_OPEN_FILE = "Unable to open file ";
 	public static final String ADVANCED_CONFIGURATION = "Advanced Configuration";
+	public static final String CONFIGURATION_TREE = "Configuration Tree";
 	public static final String SELECT_THE_CORRESPONDING_FEATUREMODEL_ = "Select the corresponding feature model.";
 	public static final String SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT = "Select the feature model for the current project.";
 	public static final String CONFIGURATION = "Configuration";
@@ -510,7 +511,7 @@ public class StringTable {
 	public static final String ABSTRACT_OPERATION = "Abstract Operation";
 	public static final String COLLAPSE_OPERATION = "Collapse Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
-	public static final String DEFAULT_SLICING_ROOT_NAME = "NewRootFeature";
+	public static final String DEFAULT_SLICING_ROOT_NAME = "AbstractRootFeature";
 	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
@@ -1116,6 +1117,7 @@ public class StringTable {
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
 	public static final String CHOOSE_COLOR = "Choose Color:";
 	public static final String CHOOSE_ACTION = "Choose Action:";
+	public static final String CHOOSE_TEXT = "Choose Text:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
 	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";

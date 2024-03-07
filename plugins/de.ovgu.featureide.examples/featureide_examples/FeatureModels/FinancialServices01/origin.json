@@ -1,0 +1,22 @@
+{
+    "Name": "FinancialServices01",
+    "Year": 2018,
+    "OriginalFormat": "FeatureIDE",
+    "Hierarchy": true,
+    "History": [
+        "2017-05-22",
+        "2017-09-28",
+        "2017-10-20",
+        "2017-11-20",
+        "2017-12-22",
+        "2018-01-23",
+        "2018-02-20",
+        "2018-03-26",
+        "2018-04-23",
+        "2018-05-09"
+    ],
+    "Publication": "https://doi.org/10.1145/3393934.3278123",
+    "Source": "https://gitlab.com/evolutionexplanation/evolutionexplanation",
+    "Keywords": ["ManualCreation"],
+    "ConversionTool": ""
+}

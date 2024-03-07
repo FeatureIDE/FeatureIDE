@@ -35,7 +35,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseLengthComparatorDsc;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SlicedVariables;
-import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.AbstractManipulator;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.heuristic.AFeatureOrderHeuristic;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.heuristic.MinimumClauseHeuristic;
@@ -137,7 +136,7 @@ public class CNFSlicer extends AbstractManipulator {
 				slicedFeatureList.add(object);
 			}
 		}
-		final SlicedVariables mapping = new SlicedVariables((Variables) orgCNF.getVariables(), slicedFeatureList);
+		final SlicedVariables mapping = new SlicedVariables(orgCNF.getVariables(), slicedFeatureList);
 
 		// Initialize lists and sets
 		createClauseLists();
@@ -225,7 +224,7 @@ public class CNFSlicer extends AbstractManipulator {
 
 	private void createClauseLists() {
 		for (final LiteralSet clause : orgCNF.getClauses()) {
-			addNewClause(new DeprecatedClause(clause.getLiterals()));
+			addNewClause(DeprecatedClause.createClause(clause.getLiterals()));
 		}
 
 		cleanClauseList.ensureCapacity(cleanClauseList.size() + newCleanClauseList.size());

@@ -114,7 +114,7 @@ public class DistributiveLawTransformer {
 			}
 			Collections.reverse(Arrays.asList(node.children));
 		}
-		return (Node) node;
+		return node;
 	}
 
 	private List<Node> convert(Node child) {

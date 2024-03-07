@@ -57,7 +57,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			selectionElementChanged(isValidSelection(selection));
+			selectionElementChanged(isValidSelection(selection), hasExternalFeature(selection));
 		}
 	};
 
@@ -81,6 +81,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 		} else {
 			((TreeViewer) viewer2).addSelectionChangedListener(listener);
 		}
+		featureArray = new ArrayList<>();
 	}
 
 	/**
@@ -123,6 +124,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 				}
 			}
 		}
+
 		return features;
 	}
 
@@ -131,35 +133,30 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 	 *
 	 * @param validSelection
 	 */
-	protected void selectionElementChanged(boolean validSelection) {
+	protected void selectionElementChanged(boolean validSelection, boolean containsExternalFeature) {
 		final List<String> selectedFeatures = getSelectedFeatures();
 		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection), FeatureModelManager.CHANGE_NOTHING);
 		if (validSelection) {
 			updateProperties();
-		} else {
+		}
+		if (!(this instanceof ActionAllowedInExternalSubmodel) && containsExternalFeature) {
 			setEnabled(false);
 		}
 	}
 
 	private void addListeners(IFeatureModel featureModel, List<String> newFeatureArray, boolean validSelection) {
-		if (featureArray != null) {
-			for (final String name : featureArray) {
-				final IFeature feature = featureModel.getFeature(name);
-				if (feature != null) {
-					feature.removeListener(this);
-				}
+		for (final String name : featureArray) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (feature != null) {
+				feature.removeListener(this);
 			}
 		}
-		if (validSelection) {
-			featureArray = newFeatureArray;
-			for (final String name : featureArray) {
-				final IFeature feature = featureModel.getFeature(name);
-				if (feature != null) {
-					feature.addListener(this);
-				}
+		featureArray = newFeatureArray;
+		for (final String name : featureArray) {
+			final IFeature feature = featureModel.getFeature(name);
+			if (feature != null) {
+				feature.addListener(this);
 			}
-		} else {
-			featureArray = null;
 		}
 	}
 
@@ -181,12 +178,7 @@ public abstract class MultipleSelectionAction extends AFeatureModelAction implem
 			}
 		}
 
-		// check whether the selection includes no feature from an external submodel
-		if ((this instanceof ActionAllowedInExternalSubmodel) || !hasExternalFeature(selection)) {
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	@Override

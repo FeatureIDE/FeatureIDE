@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.attributes.view;
 
 import org.eclipse.ui.PartInitException;
 
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.base.IExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorListener;
@@ -36,13 +36,13 @@ import de.ovgu.featureide.fm.ui.editors.IFeatureModelEditorListener;
 public class FeatureAttributeViewAdder implements IFeatureModelEditorListener {
 
 	/**
-	 * Opens the FeatureAttributeView whenever an editor with an {@link ExtendedFeatureModel} is opened.
+	 * Opens the FeatureAttributeView whenever an editor with an {@link IExtendedFeatureModel} is opened.
 	 * 
 	 * @param editor - {@link FeatureModelEditor}
 	 */
 	@Override
 	public void editorOpened(FeatureModelEditor editor) {
-		if (!(editor.getOriginalFeatureModel() instanceof ExtendedFeatureModel)) {
+		if (!(editor.getOriginalFeatureModel() instanceof IExtendedFeatureModel)) {
 			return;
 		}
 

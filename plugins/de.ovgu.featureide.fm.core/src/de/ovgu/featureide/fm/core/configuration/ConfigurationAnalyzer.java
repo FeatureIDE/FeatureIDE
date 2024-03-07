@@ -93,7 +93,7 @@ public class ConfigurationAnalyzer {
 
 	/**
 	 * Ignores hidden features. Use this, when propagate is disabled (hidden features are not updated).
-	 * 
+	 *
 	 * @return true, if configuration is valid
 	 */
 	public boolean isValidNoHidden() {

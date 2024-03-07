@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * @author Rosiak Kamil
  */
 public class ConstraintColorPair {
+
 	private IConstraint constraint;
 	private Color color;
 

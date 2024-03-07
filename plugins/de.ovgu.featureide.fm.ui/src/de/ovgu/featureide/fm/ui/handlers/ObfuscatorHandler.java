@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * {@link ObfuscatorHandler} receives a {@link IFeatureModel}, calls the correct {@link IFeatureModelFactory} depending on the feature model format to have it
@@ -49,7 +50,7 @@ public class ObfuscatorHandler extends FMExportHandler {
 
 	@Override
 	protected String getDefaultFileName(Path modelFilePath) {
-		return "obfuscated_" + FileHandler.getFileName(modelFilePath);
+		return "obfuscated_" + SimpleFileHandler.getFileName(modelFilePath);
 	}
 
 	@Override
@@ -57,12 +58,11 @@ public class ObfuscatorHandler extends FMExportHandler {
 		if (!fileHandler.getLastProblems().containsError()) {
 			IFeatureModel ofm = null;
 			try {
-				ofm = FMFactoryManager.getInstance().getFactory(format).createObfuscatedFeatureModel((IFeatureModel) fileHandler.getObject(),
-						getSalt(fileHandler.getPath()));
+				ofm = FMFactoryManager.getInstance().getFactory(format).createObfuscatedFeatureModel(fileHandler.getObject(), getSalt(fileHandler.getPath()));
 			} catch (final NoSuchExtensionException e) {
 				e.printStackTrace();
 			}
-			FileHandler.save(path, ofm, format);
+			SimpleFileHandler.save(path, ofm, format);
 		}
 	}
 
