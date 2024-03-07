@@ -218,6 +218,7 @@ abstract public class Restriction {
 	}
 
 	public static enum Op {
+
 		EQ("="), GEQ(">=");
 
 		private String symbol;

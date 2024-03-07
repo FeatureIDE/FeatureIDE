@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 public interface IJob<T> {
 
 	public enum JobStatus {
+
 		/**
 		 * Job is not yet started.
 		 */

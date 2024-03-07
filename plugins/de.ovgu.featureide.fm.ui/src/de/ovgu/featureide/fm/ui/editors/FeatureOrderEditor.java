@@ -49,8 +49,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -351,11 +351,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	// TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile(IFeatureModel featureModel) {
 		// Cast is necessary, don't remove
-		final IFile inputFile = ((IFile) input.getAdapter(IFile.class));
+		final IFile inputFile = (input.getAdapter(IFile.class));
 		if (inputFile != null) {
 			final IFile orderFile = inputFile.getProject().getFile(".order");
 			if (orderFile.isAccessible()) {
-				FileHandler.save(EclipseFileSystem.getPath(orderFile), featureModel, new FeatureOrderFormat());
+				SimpleFileHandler.save(EclipseFileSystem.getPath(orderFile), featureModel, new FeatureOrderFormat());
 			}
 		}
 	}

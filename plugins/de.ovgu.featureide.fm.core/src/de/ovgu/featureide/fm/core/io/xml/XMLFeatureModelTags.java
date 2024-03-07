@@ -36,6 +36,7 @@ public interface XMLFeatureModelTags {
 	static final String GRAPHICS = "graphics";
 	static final String CALCULATIONS = "calculations";
 	static final String FEATURE_MODEL = "featureModel";
+	static final String FEATURE_COLOR_MEANING = "featureColorMeaning";
 	static final String EXTENDED_FEATURE_MODEL = "extendedFeatureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";

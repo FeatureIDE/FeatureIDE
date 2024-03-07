@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
  * @author Rahel Arens
  */
 public class FocusOnContainedFeaturesInViewAction extends Action {
+
 	private IStructuredSelection selection;
 	private IGraphicalFeatureModel graphicalFeatureModel;
 

@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.ExportType;
 
 /**
@@ -50,7 +50,7 @@ public class ConfigurationTikzExporter implements ExportType<Configuration> {
 
 	@Override
 	public void export(Path path, Configuration object) throws IOException {
-		final Path exportDir = "tex".equals(FileHandler.getFileExtension(path)) ? path.resolveSibling(FileHandler.getFileName(path)) : path;
+		final Path exportDir = "tex".equals(SimpleFileHandler.getFileExtension(path)) ? path.resolveSibling(SimpleFileHandler.getFileName(path)) : path;
 
 		FileSystem.mkDir(exportDir);
 
@@ -60,7 +60,7 @@ public class ConfigurationTikzExporter implements ExportType<Configuration> {
 	}
 
 	private void save(final Path exportDir, String fileName, IPersistentFormat<Configuration> format, Configuration model) {
-		final ProblemList result = FileHandler.save(exportDir.resolve(fileName), model, format).getErrors();
+		final ProblemList result = SimpleFileHandler.save(exportDir.resolve(fileName), model, format).getErrors();
 		if (!result.isEmpty()) {
 			final Problem problem = result.get(0);
 			throw problem.error != null //

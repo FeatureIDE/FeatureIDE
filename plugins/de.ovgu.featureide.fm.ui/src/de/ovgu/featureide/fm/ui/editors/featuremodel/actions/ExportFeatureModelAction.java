@@ -22,8 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
 
-import org.eclipse.jface.action.Action;
+import java.util.List;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -51,6 +57,18 @@ public class ExportFeatureModelAction extends Action {
 
 	@Override
 	public void run() {
-		GraphicsExporter.exportAs(featureModelEditor.getViewer());
+		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+		final String[] formats = GraphicsExporter.exporter.stream().map((exporter) -> exporter.getDescription() + "*." + //
+			exporter.getFileExtension()).toArray(String[]::new);
+
+		final String defaultPath = featureModelEditor.getFeatureModel().getVarObject().getSourceFile().getParent().toString();
+		final ExportFeatureModelDialog dialog = new ExportFeatureModelDialog(shell, defaultPath, formats,
+				// format check callback
+				(formatIndex) -> new ProblemList(List.of(new Problem("This format may only be exported.", 0))),
+				// export callback
+				(formatIndex, path, name) -> GraphicsExporter.exportAs(featureModelEditor.getViewer(),
+						path.resolve(name + "." + GraphicsExporter.exporter.get(formatIndex).getFileExtension()).toString(), formatIndex));
+		dialog.open();
 	}
 }

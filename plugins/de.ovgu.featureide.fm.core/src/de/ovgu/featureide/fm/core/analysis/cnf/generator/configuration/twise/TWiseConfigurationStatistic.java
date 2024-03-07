@@ -212,7 +212,8 @@ public class TWiseConfigurationStatistic {
 		}
 	}
 
-	private void completeCalc2(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations, List<List<PresenceCondition>> groupedPresenceConditions) {
+	private void completeCalc2(TWiseConfigurationUtil util, List<? extends LiteralSet> configurations,
+			List<List<PresenceCondition>> groupedPresenceConditions) {
 		configValues = new double[configurations.size()];
 		configValues2 = new double[configurations.size()];
 

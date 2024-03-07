@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
@@ -117,7 +118,7 @@ public abstract class AMultipleExportHandler<T> extends ASelectionHandler {
 
 	protected void save(final IPersistentFormat<T> format, FileHandler<T> fileHandler, final Path path) {
 		if (!fileHandler.getLastProblems().containsError()) {
-			FileHandler.save(path, fileHandler.getObject(), format);
+			SimpleFileHandler.save(path, fileHandler.getObject(), format);
 		}
 	}
 

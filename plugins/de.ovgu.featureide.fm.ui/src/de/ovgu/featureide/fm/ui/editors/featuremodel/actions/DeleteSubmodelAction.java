@@ -121,7 +121,7 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		this.selection = selection;
 		if (super.isValidSelection(selection)) {
-			if (getInvolvedFeatures().stream().allMatch(f -> isSubmodelRootFeature((IFeature) f))) {
+			if (getInvolvedFeatures().stream().allMatch(f -> isSubmodelRootFeature(f))) {
 				return true;
 			}
 		}

@@ -91,6 +91,9 @@ public class NodeWriter {
 	 */
 	public static final String[] javaSymbols = new String[] { "!", "&&", "||", noSymbol, "==", ", ", noSymbol, noSymbol, noSymbol };
 
+	public static final String[] latexSymbols =
+		new String[] { "\\lnot", "\\land", "\\lor", "\\Rightarrow", "\\Leftrightarrow", ", ", "choose", "atleast", "atmost" };
+
 	/** The propositional node to convert. */
 	private final Node root;
 
@@ -104,6 +107,8 @@ public class NodeWriter {
 	private boolean enforceBrackets = false;
 	/** If true, this writer will enquote variables if they contain whitespace. */
 	private boolean enquoteWhitespace = false;
+	/** If true, this writer will always enquote variables. */
+	private boolean enquoteAlways = false;
 
 	/**
 	 * Constructs a new instance of this class with the given node to transform. By default, the set of short symbols and infix notation are used, brackets are
@@ -181,6 +186,14 @@ public class NodeWriter {
 	 */
 	protected boolean isEnforceBrackets() {
 		return enforceBrackets;
+	}
+
+	public boolean isEnquoteAlways() {
+		return enquoteAlways;
+	}
+
+	public void setEnquoteAlways(boolean enquoteAlways) {
+		this.enquoteAlways = enquoteAlways;
 	}
 
 	/**
@@ -299,7 +312,7 @@ public class NodeWriter {
 	 */
 	protected String variableToString(Object variable) {
 		final String s = String.valueOf(variable);
-		return (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) ? '"' + s + '"' : s;
+		return isEnquoteAlways() || (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) ? '"' + s + '"' : s;
 	}
 
 	/**

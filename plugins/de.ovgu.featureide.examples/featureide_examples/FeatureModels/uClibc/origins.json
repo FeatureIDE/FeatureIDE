@@ -1,0 +1,18 @@
+{
+    "Name" : "uClibc-09.33.2",
+    "Year" : 2020,
+    "OriginalFormat" : "DIMACS",
+    "Hierarchy" : false,
+    "History":  [],
+    "Variants" : [
+        "09.33.2",
+        "ng_1_0_29"
+    ],
+    "Publication" : "https://apps.cs.utexas.edu/apps/tech-reports/192690",
+    "Source" : "https://github.com/jeho-oh/Smarch",
+    "Keywords" : [
+        "Automatic",
+        "KConfig"
+    ],
+    "ConversionTool" : ""
+}

@@ -39,7 +39,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Saves the figures of an GEF editor into a bitmap file.
@@ -148,7 +148,7 @@ public class GEFImageWriter {
 	}
 
 	private static int readFormatFromFileName(Path saveFilePath) {
-		switch (FileHandler.getFileExtension(saveFilePath).toLowerCase()) {
+		switch (SimpleFileHandler.getFileExtension(saveFilePath).toLowerCase()) {
 		case "bmp":
 			return SWT.IMAGE_BMP;
 		case "gif":

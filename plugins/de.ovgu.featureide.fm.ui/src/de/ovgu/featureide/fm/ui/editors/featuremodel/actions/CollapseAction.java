@@ -81,6 +81,8 @@ public class CollapseAction extends MultipleSelectionAction implements ActionAll
 		} else {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		}
+
+		graphicalFeatureArray = new IGraphicalFeature[0];
 	}
 
 	private boolean isEveryFeatureCollapsed() {
@@ -92,7 +94,6 @@ public class CollapseAction extends MultipleSelectionAction implements ActionAll
 		return true;
 	}
 
-	@Override
 	protected void selectionElementChanged(boolean validSelection) {
 		final List<String> selectedFeatures = getSelectedFeatures();
 		featureModelManager.editObject(featureModel -> addListeners(featureModel, selectedFeatures, validSelection), FeatureModelManager.CHANGE_NOTHING);

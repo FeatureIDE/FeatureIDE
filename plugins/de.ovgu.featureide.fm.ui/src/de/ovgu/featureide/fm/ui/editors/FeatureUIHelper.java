@@ -294,4 +294,8 @@ public class FeatureUIHelper {
 		featureModel.getLayout().setTopDownInverted(isTopDownInverted);
 	}
 
+	public static boolean isInverted(IGraphicalFeatureModel featureModel) {
+		return featureModel.getLayout().getLeftRightInverted() || featureModel.getLayout().getTopDownInverted();
+	}
+
 }
