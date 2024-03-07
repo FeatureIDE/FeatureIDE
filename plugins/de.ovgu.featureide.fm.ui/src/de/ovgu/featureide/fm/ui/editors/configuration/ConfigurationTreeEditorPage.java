@@ -152,7 +152,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
 
 	protected static final Color gray = new Color(null, 140, 140, 140);
-	protected static final Color green = new Color(null, 34, 197, 94);
 	protected static final Color blue = new Color(null, 59, 130, 246);
 	protected static final Color red = new Color(null, 239, 68, 68);
 

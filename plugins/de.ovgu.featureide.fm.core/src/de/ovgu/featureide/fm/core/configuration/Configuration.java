@@ -120,7 +120,7 @@ public class Configuration implements Cloneable {
 			featureModel = featureModelFormula;
 			root = initFeatures(null, featureRoot, renamings);
 			selectableFeatures.clear();
-			readFeatures(root);
+			reaadFeatures(root);
 		}
 	}
 
@@ -164,10 +164,10 @@ public class Configuration implements Cloneable {
 		return sFeature;
 	}
 
-	private void readFeatures(SelectableFeature root) {
+	private void reaadFeatures(SelectableFeature root) {
 		selectableFeatures.put(root.getName(), root);
 		for (final TreeElement child : root.getChildren()) {
-			readFeatures((SelectableFeature) child);
+			reaadFeatures((SelectableFeature) child);
 		}
 	}
 
