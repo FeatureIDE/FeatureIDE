@@ -57,7 +57,7 @@ public class ColorSchemeHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		editorPart = HandlerUtil.getActiveEditor(event);
 		// Cast is necessary for backward compatibility, don't remove
-		editor = editorPart.getAdapter(ITextEditor.class);
+		editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 		provider = editor.getDocumentProvider();
 
 		final int line = getCursorPos();

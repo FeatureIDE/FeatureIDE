@@ -146,7 +146,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	@Override
 	public void createPartControl(Composite parent) {
 		// Cast is necessary, don't remove
-		final IProject project = input.getAdapter(IFile.class).getProject();
+		final IProject project = (IProject) input.getAdapter(IFile.class).getProject();
 		hasFeatureOrder = FMComposerManager.getFMComposerExtension(project).hasFeatureOrder();
 		comp = new Composite(parent, SWT.NONE);
 		final GridLayout layout = new GridLayout();
@@ -351,7 +351,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	// TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile(IFeatureModel featureModel) {
 		// Cast is necessary, don't remove
-		final IFile inputFile = (input.getAdapter(IFile.class));
+		final IFile inputFile = (IFile) (input.getAdapter(IFile.class));
 		if (inputFile != null) {
 			final IFile orderFile = inputFile.getProject().getFile(".order");
 			if (orderFile.isAccessible()) {

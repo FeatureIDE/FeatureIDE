@@ -30,7 +30,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -99,7 +98,7 @@ public class FMUIPlugin extends AbstractUIPlugin {
 			dialog.setTitle(SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT);
 			dialog.setMessage(SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT);
 			dialog.setInitialPattern("?");
-			if (dialog.open() == Window.OK) {
+			if (dialog.open() == FilteredResourcesSelectionDialog.OK) {
 				final Object[] results = dialog.getResult();
 				if ((results != null) && (results.length > 0)) {
 					final Object result = results[0];
