@@ -26,6 +26,7 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Returns a label and an image for a given tree element.
@@ -48,7 +49,7 @@ public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 		}
 		if (o instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) o;
-			return feature.getManual() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
+			return feature.getManual() == Selection.SELECTED ? FMPropertyManager.getImageAselected() : FMPropertyManager.getImageAdeselected();
 		}
 		return null;
 	}

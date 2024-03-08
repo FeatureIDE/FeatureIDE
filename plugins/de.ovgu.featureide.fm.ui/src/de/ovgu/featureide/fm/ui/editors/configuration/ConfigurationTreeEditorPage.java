@@ -47,7 +47,6 @@ import java.util.function.Consumer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
 import org.eclipse.swt.events.ArmListener;
@@ -124,6 +123,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.RunnerSequence;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.ExpandAlgorithm;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
 import de.ovgu.featureide.fm.ui.utils.SearchField;
 import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
@@ -163,15 +163,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static Font treeItemItalicFont = new Font(null, ARIAL, minFontHeight, SWT.ITALIC);
 	protected static Font treeItemBoldItalicFont = new Font(null, ARIAL, minFontHeight, SWT.BOLD | SWT.ITALIC);
 
-	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
-	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
-	private static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getDefault().getImageDescriptor("icons/tree02.png").createImage();
-	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
-	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
-	private static final Image IMAGE_RESOLVE = FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif").createImage();
-	private static final Image IMAGE_INCREASE_FONT = FMUIPlugin.getDefault().getImageDescriptor("icons/increase-font-size.png").createImage();
-	private static final Image IMAGE_DECREASE_FONT = FMUIPlugin.getDefault().getImageDescriptor("icons/decrease-font-size.png").createImage();
-	protected static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
 	private static final Image IMAGE_RESET_SELECTION = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
 
 	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
@@ -418,7 +409,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// Automatically Resolve Conflicting Selections field
 		resolveButton = new ToolItem(toolbar, SWT.PUSH);
-		resolveButton.setImage(IMAGE_RESOLVE);
+		resolveButton.setImage(FMPropertyManager.IMAGE_RESOLVE);
 		resolveButton.setToolTipText("Automatically Resolve Conflicting Selections");
 		resolveButton.setEnabled(false);
 		resolveButton.addSelectionListener(new SelectionListener() {
@@ -438,7 +429,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// collapse all features field
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(IMAGE_COLLAPSE);
+		item.setImage(FMPropertyManager.IMAGE_COLLAPSE);
 		item.setToolTipText("Collapse All Features");
 		item.addSelectionListener(new SelectionListener() {
 
@@ -454,7 +445,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// expand all features field
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(IMAGE_EXPAND);
+		item.setImage(FMPropertyManager.IMAGE_EXPAND);
 		item.setToolTipText("Expand All Features");
 		item.addSelectionListener(new SelectionListener() {
 
@@ -469,7 +460,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		// choose expand algorithm field
 		dropDownMenu = new ToolItem(toolbar, SWT.DROP_DOWN);
-		dropDownMenu.setImage(IMAGE_AUTOEXPAND_GROUP);
+		dropDownMenu.setImage(FMPropertyManager.getImageAutoexpandGroup());
 		dropDownMenu.setToolTipText("Choose Expand Algorithm");
 
 		menu = new Menu(toolbar.getShell(), SWT.POP_UP);
@@ -509,7 +500,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		// show next open clause field
 
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(IMAGE_NEXT);
+		item.setImage(FMPropertyManager.getImageNext());
 		item.setToolTipText(SHOW_NEXT_OPEN_CLAUSE);
 		item.addSelectionListener(new SelectionListener() {
 
@@ -531,7 +522,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		// show previous open clause field
 
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(IMAGE_PREVIOUS);
+		item.setImage(FMPropertyManager.getImagePrevious());
 		item.setToolTipText(SHOW_PREVIOUS_OPEN_CLAUSE);
 		item.addSelectionListener(new SelectionListener() {
 
@@ -553,7 +544,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
 		final ToolItem zoomIn = new ToolItem(toolbar, SWT.PUSH);
-		zoomIn.setImage(IMAGE_INCREASE_FONT);
+		zoomIn.setImage(FMPropertyManager.getImageIncreaseFont());
 		zoomIn.setToolTipText("Increase font size");
 		zoomIn.addListener(SWT.Selection, (event) -> {
 			final FontData[] fdStandard = treeItemStandardFont.getFontData();
@@ -577,7 +568,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		final ToolItem zoomOut = new ToolItem(toolbar, SWT.PUSH);
-		zoomOut.setImage(IMAGE_DECREASE_FONT);
+		zoomOut.setImage(FMPropertyManager.getImageDecreaseFont());
 		zoomOut.setToolTipText("Decrease font size");
 		zoomOut.addListener(SWT.Selection, (event) -> {
 			final FontData[] fdStandard = treeItemStandardFont.getFontData();

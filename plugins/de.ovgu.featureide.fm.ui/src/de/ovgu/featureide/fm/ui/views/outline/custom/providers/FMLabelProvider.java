@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
@@ -75,13 +76,13 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 				return null; // TODO: Add here icon for feature model
 			}
 			if (((IFeature) element).getStructure().getParent().isAlternative()) {
-				return IMG_XOR;
+				return FMPropertyManager.getImageXor();
 			} else if (((IFeature) element).getStructure().getParent().isOr()) {
-				return IMG_OR;
+				return FMPropertyManager.getImageOr();
 			} else if (((IFeature) element).getStructure().isMandatory()) {
-				return IMG_MANDATORY;
+				return FMPropertyManager.getImageMandatory();
 			} else {
-				return IMG_OPTIONAL;
+				return FMPropertyManager.getImageOptional();
 			}
 		} else if (element instanceof String) {
 			return null; // TODO: Add here icon for "constraint" node

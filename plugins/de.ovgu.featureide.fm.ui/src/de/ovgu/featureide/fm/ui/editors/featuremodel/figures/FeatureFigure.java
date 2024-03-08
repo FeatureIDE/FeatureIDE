@@ -125,26 +125,27 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	public void updateProperties() {
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		final IFeature feature = this.feature.getObject();
+		final IFeature featureObject = feature.getObject();
 		// First draw custom color
-		final FeatureColor color = FeatureColorManager.getColor(feature);
+		final FeatureColor color = FeatureColorManager.getColor(featureObject);
 		if (color != FeatureColor.NO_COLOR) {
 			setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
-		} else if (!feature.getStructure().isConcrete()) {
+		} else if (!featureObject.getStructure().isConcrete()) {
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 		}
 
-		if (feature.getStructure().hasHiddenParent()) {
-			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
+		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected(), getBackgroundColor()));
+
+		if (featureObject.getStructure().hasHiddenParent()) {
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 		}
 
 		setLabelIcon();
 
-		if (feature instanceof MultiFeature) {
-			final MultiFeature extendedFeature = (MultiFeature) feature;
+		if (featureObject instanceof MultiFeature) {
+			final MultiFeature extendedFeature = (MultiFeature) featureObject;
 
 			if (extendedFeature.isInstance()) {
 				setBorder(FMPropertyManager.getImportedFeatureBorder());

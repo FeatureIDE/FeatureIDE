@@ -26,6 +26,7 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Insets;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -90,7 +91,7 @@ public interface GUIDefaults {
 
 	// connections and decorators
 
-	public static final Color CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
+	public static final Color CONNECTION_FOREGROUND = GUIBasics.createColor(75, 85, 99);
 	public static final Color NEW_CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 1.0, 0.4);
 	public static final Color VOID_CONNECTION_FOREGROUND = GUIBasics.createColor(1.0, 0.4, 0.4);
 
@@ -101,15 +102,16 @@ public interface GUIDefaults {
 	public static final int TARGET_ANCHOR_DIAMETER = 25;
 	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
+	// constraints
+
+	public static final Color CONSTRAINT_BORDER_UNSELECTED_COLOR = CONNECTION_FOREGROUND;
+	public static final Color CONSTRAINT_BORDER_SELECTED_COLOR = CONNECTION_FOREGROUND;
+
 	// cross-tree constraints
 
-	public static final Color CONSTRAINT_FOREGROUND = FEATURE_FOREGROUND;
+	public static final Color CONSTRAINT_FOREGROUND = CONNECTION_FOREGROUND;
 	public static final Insets CONSTRAINT_INSETS = new Insets(2, 8, 2, 8);
 	public static final Color CONSTRAINT_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 1.0);
-	public static final Color CONSTRAINT_BORDER_COLOR = CONSTRAINT_BACKGROUND;
-	public static final Border CONSTRAINT_BORDER = new LineBorder(CONSTRAINT_BORDER_COLOR, 0);
-	public static final Color CONSTRAINT_SELECTED_BORDER_COLOR = GUIBasics.createBorderColor(CONSTRAINT_BACKGROUND);
-	public static final Border CONSTRAINT_SELECTED_BORDER = new LineBorder(CONSTRAINT_SELECTED_BORDER_COLOR, 3);
 	public static final Color IMPLICIT_CONSTRAINT = GUIBasics.createColor(1.0, 0.0, 0.0);
 	public static final Border IMPLICIT_CONSTRAINT_BORDER = new LineBorder(IMPLICIT_CONSTRAINT, 2);
 
@@ -139,7 +141,7 @@ public interface GUIDefaults {
 
 	// legend
 	public static final int LEGEND_WIDTH = 105;
-	public static final Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
+	public static final Color LEGEND_FOREGROUND = CONNECTION_FOREGROUND;
 	public static final Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;
 	public static final Color LEGEND_MOVING_FEEDBACK_VALID = GUIBasics.createColor(0, 120, 0);
@@ -152,10 +154,15 @@ public interface GUIDefaults {
 	 * All images should be declared here, so an image can not be created twice.
 	 */
 	public static final Image IMAGE_UNDEFINED = FMUIPlugin.getImage("undefined.png");
+	public static final Image IMAGE_UNDEFINED_DARK = FMUIPlugin.getImage("undefined_dark.png");
 	public static final Image IMAGE_SELECTED = FMUIPlugin.getImage("selected.png");
+	public static final Image IMAGE_SELECTED_DARK = FMUIPlugin.getImage("selected_dark.png");
 	public static final Image IMAGE_DESELECTED = FMUIPlugin.getImage("deselected.png");
+	public static final Image IMAGE_DESELECTED_DARK = FMUIPlugin.getImage("deselected_dark.png");
 	public static final Image IMAGE_ASELECTED = FMUIPlugin.getImage("aselected.png");
+	public static final Image IMAGE_ASELECTED_DARK = FMUIPlugin.getImage("aselected_dark.png");
 	public static final Image IMAGE_ADESELECTED = FMUIPlugin.getImage("adeselected.png");
+	public static final Image IMAGE_ADESELECTED_DARK = FMUIPlugin.getImage("adeselected_dark.png");
 
 	public static final Image HELP_IMAGE = FMUIPlugin.getImage("help.gif");
 	public static final Image ERROR_IMAGE = FMUIPlugin.getImage("icon_error.gif");
@@ -166,9 +173,13 @@ public interface GUIDefaults {
 	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
 
 	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.png");
+	public static final Image IMG_OPTIONAL_DARK = FMUIPlugin.getImage("optional_dark.png");
 	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.png");
+	public static final Image IMG_MANDATORY_DARK = FMUIPlugin.getImage("mandatory_dark.png");
 	public static final Image IMG_OR = FMUIPlugin.getImage("or.png");
+	public static final Image IMG_OR_DARK = FMUIPlugin.getImage("or_dark.png");
 	public static final Image IMG_XOR = FMUIPlugin.getImage("xor.png");
+	public static final Image IMG_XOR_DARK = FMUIPlugin.getImage("xor_dark.png");
 
 	public static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	public static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
@@ -184,4 +195,18 @@ public interface GUIDefaults {
 	public static final Image FM_WARNING = FMUIPlugin.getImage("fmwarning.png");
 	public static final Image FM_INFO = FMUIPlugin.getImage("fminfo.png");
 
+	public static final Image IMAGE_EXPAND = FMUIPlugin.getImage("expand.gif");
+	public static final Image IMAGE_COLLAPSE = FMUIPlugin.getImage("collapse.gif");
+	public static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getImage("tree02.png");
+	public static final Image IMAGE_AUTOEXPAND_GROUP_DARK = FMUIPlugin.getImage("tree02_dark.png");
+	public static final Image IMAGE_NEXT = FMUIPlugin.getImage("arrow_down.png");
+	public static final Image IMAGE_NEXT_DARK = FMUIPlugin.getImage("arrow_down_dark.png");
+	public static final Image IMAGE_PREVIOUS = FMUIPlugin.getImage("arrow_up.png");
+	public static final Image IMAGE_PREVIOUS_DARK = FMUIPlugin.getImage("arrow_up_dark.png");
+	public static final Image IMAGE_RESOLVE = FMUIPlugin.getImage("synch_toc_nav.gif");
+	public static final Image IMAGE_INCREASE_FONT = FMUIPlugin.getImage("increase-font-size.png");
+	public static final Image IMAGE_INCREASE_FONT_DARK = FMUIPlugin.getImage("increase-font-size_dark.png");
+	public static final Image IMAGE_DECREASE_FONT = FMUIPlugin.getImage("decrease-font-size.png");
+	public static final Image IMAGE_DECREASE_FONT_DARK = FMUIPlugin.getImage("decrease-font-size_dark.png");
+	public static final ImageDescriptor IMAGE_EXPORT_AS = FMUIPlugin.getDefault().getImageDescriptor("icons/export_wiz.gif");
 }

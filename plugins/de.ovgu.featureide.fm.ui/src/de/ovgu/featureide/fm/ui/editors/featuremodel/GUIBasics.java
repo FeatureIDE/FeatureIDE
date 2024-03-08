@@ -25,6 +25,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 
+import de.ovgu.featureide.fm.core.preferences.DarkModePreference;
+
 /**
  * Implements some basic graphical methods.
  *
@@ -38,6 +40,43 @@ public class GUIBasics {
 
 	public static Color createColor(double r, double g, double b) {
 		return new Color(null, (int) (r * 255), (int) (g * 255), (int) (b * 255));
+	}
+
+	public static Color invertColor(Color color) {
+		return invertColor(color, 1);
+	}
+
+	/**
+	 * Inverts a given color.
+	 *
+	 * @param color The color to invert
+	 * @param damping Damping factor must be between 0 and 1
+	 * @return Inverted color
+	 */
+	public static Color invertColor(Color color, float damping) {
+		if (color == null) {
+			return null;
+		}
+
+		if (damping > 1) {
+			damping = 1;
+		} else if (damping < 0) {
+			damping = 0;
+		}
+
+		final int r = (int) ((255 - color.getRed()) * damping);
+		final int g = (int) ((255 - color.getGreen()) * damping);
+		final int b = (int) ((255 - color.getBlue()) * damping);
+
+		return new Color(null, r, g, b);
+	}
+
+	public static Color invertColorOnDarkTheme(Color color) {
+		return DarkModePreference.getInstance().get() ? invertColor(color) : color;
+	}
+
+	public static Color invertColorOnDarkTheme(Color color, float damping) {
+		return DarkModePreference.getInstance().get() ? invertColor(color, damping) : color;
 	}
 
 	public static Color createBorderColor(Color color) {
@@ -65,5 +104,4 @@ public class GUIBasics {
 		}
 		return true;
 	}
-
 }

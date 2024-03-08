@@ -44,10 +44,12 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.core.preferences.CompletionPreference;
 import de.ovgu.featureide.fm.core.preferences.ConstraintViewPreference;
 import de.ovgu.featureide.fm.core.preferences.DIMACSOmitRootPreference;
+import de.ovgu.featureide.fm.core.preferences.DarkModePreference;
 import de.ovgu.featureide.fm.core.preferences.NonGTKFileDialogPreference;
 
 public class FeatureIDEPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
+	private Button darkModeButton;
 	private Button noneButton;
 	private Button openClauseButton;
 	private Button contradictionButton;
@@ -70,6 +72,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 	@Override
 	protected void performDefaults() {
 		super.performDefaults();
+		darkModeButton.setSelection(DarkModePreference.getInstance().getDefault());
 		switch (CompletionPreference.getInstance().getDefault()) {
 		case CompletionPreference.COMPLETION_NONE:
 			noneButton.setSelection(true);
@@ -113,6 +116,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		if (!super.performOk()) {
 			return false;
 		}
+		DarkModePreference.getInstance().set(darkModeButton.getSelection());
 		if (noneButton.getSelection()) {
 			CompletionPreference.getInstance().set(CompletionPreference.COMPLETION_NONE);
 		} else if (openClauseButton.getSelection()) {
@@ -144,6 +148,13 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 	protected Control createContents(Composite parent) {
 		final Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
+
+		final Group appearance = new Group(container, SWT.SHADOW_IN);
+		appearance.setText("Appearance");
+		appearance.setLayout(new RowLayout(SWT.VERTICAL));
+		darkModeButton = new Button(appearance, SWT.CHECK);
+		darkModeButton.setText("Enable dark theme");
+		darkModeButton.setSelection(DarkModePreference.getInstance().get());
 
 		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
 		completionGroup.setText("Configuration Completion");

@@ -88,7 +88,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		graphicalConstraint = constraint;
 		setLayoutManager(new FreeformLayout());
 
-		label.setForegroundColor(CONSTRAINT_FOREGROUND);
+		label.setForegroundColor(GUIBasics.invertColorOnDarkTheme(CONSTRAINT_FOREGROUND));
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(0, 0));
 
@@ -110,7 +110,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		setText(getConstraintText(graphicalConstraint.getObject()));
 		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
 		setToolTip(null);
-		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
 	/**

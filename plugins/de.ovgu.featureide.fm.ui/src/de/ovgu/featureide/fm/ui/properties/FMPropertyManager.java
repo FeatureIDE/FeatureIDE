@@ -28,11 +28,13 @@ import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.preferences.DarkModePreference;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -57,8 +59,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 ******************************************************/
 	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
 	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR = null;
-	private volatile static Color CURRENT_LEGEND_FORGOUND = null;
-	private volatile static Color CURRENT_LEGEND_BACKGROUND = null;
 	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR = null;
 	private volatile static Color CURRENT_FEATURE_FOREGROUND = null;
 	private volatile static Color CURRENT_CONCRETE_BACKGROUND = null;
@@ -72,7 +72,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Color CURRENT_FEATURE_DEAD = null;
 	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND = null;
 	private volatile static Color CURRENT_WARNING_BACKGROUND = null;
-	private volatile static Color CURRENT_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_INHERITED_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_IMPORTED_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_INTERFACED_FEATURE_BORDER = null;
@@ -85,8 +84,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static void reset() {
 		CURRENT_HIDE_LEGEND = null;
-		CURRENT_LEGEND_FORGOUND = null;
-		CURRENT_LEGEND_BACKGROUND = null;
 		CURRENT_DECORATOR_FORGROUND_COLOR = null;
 		CURRENT_FEATURE_FOREGROUND = null;
 		CURRENT_CONCRETE_BACKGROUND = null;
@@ -106,7 +103,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_LAYOUT_MARGIN_Y = null;
 		CURRENT_LAYOUT_MARGIN_X = null;
 		CURRENT_HIDE_BORDER_COLOR = null;
-		CURRENT_FEATURE_BORDER = null;
 	}
 
 	private static LinkedList<FeatureModelEditor> editors = new LinkedList<>();
@@ -162,30 +158,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return CURRENT_HIDE_BORDER_COLOR;
 	}
 
-	public static void setLegendForgroundColor(Color color) {
-		CURRENT_LEGEND_FORGOUND = color;
-		setColor(QN_LEGEND_FORGOUND, color);
-	}
-
-	public static Color getLegendForgroundColor() {
-		if (CURRENT_LEGEND_FORGOUND == null) {
-			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
-		}
-		return CURRENT_LEGEND_FORGOUND;
-	}
-
-	public static void setLegendBackgroundColor(Color color) {
-		CURRENT_LEGEND_BACKGROUND = color;
-		setColor(QN_LEGEND_BACKGROUND, color);
-	}
-
-	public static Color getLegendBackgroundColor() {
-		if (CURRENT_LEGEND_BACKGROUND == null) {
-			CURRENT_LEGEND_BACKGROUND = getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
-		}
-		return CURRENT_LEGEND_BACKGROUND;
-	}
-
 	public static void setLegendBorderColor(Color color) {
 		CURRENT_LEGEND_BORDER_COLOR = color;
 		setColor(QN_LEGEND_BORDER, color);
@@ -193,7 +165,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getLegendBorderColor() {
 		if (CURRENT_LEGEND_BORDER_COLOR == null) {
-			CURRENT_LEGEND_BORDER_COLOR = getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
+			CURRENT_LEGEND_BORDER_COLOR = GUIBasics.invertColorOnDarkTheme(LEGEND_BORDER_COLOR);
 		}
 		return CURRENT_LEGEND_BORDER_COLOR;
 	}
@@ -322,7 +294,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getConnectionForegroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
-			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
+			CURRENT_CONNECTION_FOREGROUND = GUIBasics.invertColorOnDarkTheme(CONNECTION_FOREGROUND);
 		}
 		return CURRENT_CONNECTION_FOREGROUND;
 	}
@@ -339,16 +311,12 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setColor(QN_WARNING, color);
 	}
 
-	public static Color getFeatureBorderColor() {
-		if (CURRENT_FEATURE_BORDER == null) {
-			CURRENT_FEATURE_BORDER = getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
-		}
-		return CURRENT_FEATURE_BORDER;
-	}
+	public static Color getFeatureBorderColor(Color bgColor) {
+		final int red = (int) (0.8 * bgColor.getRed());
+		final int green = (int) (0.8 * bgColor.getGreen());
+		final int blue = (int) (0.8 * bgColor.getBlue());
 
-	public static void setFeatureBorderColor(Color color) {
-		CURRENT_FEATURE_BORDER = color;
-		setColor(QN_FEATURE_BORDER, color);
+		return new Color(red, green, blue);
 	}
 
 	public static Color getFeatureBorderColorSave() {
@@ -438,17 +406,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Color getConstraintBorderColor(boolean selected) {
-		if (selected) {
-			return GUIBasics.createBorderColor(getConstraintBackgroundColor());
-		}
-		return getConstraintBackgroundColor();
+		return GUIBasics.invertColorOnDarkTheme(selected ? CONSTRAINT_BORDER_SELECTED_COLOR : CONSTRAINT_BORDER_UNSELECTED_COLOR);
 	}
 
 	public static Border getConstraintBorder(boolean selected) {
 		if (selected) {
-			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 3);
+			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 1, Graphics.LINE_DOT);
 		}
-		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
+		return null;
 	}
 
 	public static Border getImplicitConstraintBorder() {
@@ -488,11 +453,11 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
 
-	public static Border getFeatureBorder(boolean selected) {
+	public static Border getFeatureBorder(boolean selected, Color bgColor) {
 		if (selected) {
-			return GUIBasics.createLineBorder(getFeatureBorderColor(), 3);
+			return GUIBasics.createLineBorder(getFeatureBorderColor(bgColor), 3);
 		}
-		return GUIBasics.createLineBorder(getFeatureBorderColor(), 1);
+		return GUIBasics.createLineBorder(getFeatureBorderColor(bgColor), 1);
 	}
 
 	public static Border getInheritedFeatureBorder() {
@@ -743,4 +708,59 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return names;
 	}
 
+	public static Image getImageUndefined() {
+		return DarkModePreference.getInstance().get() ? IMAGE_UNDEFINED : IMAGE_UNDEFINED_DARK;
+	}
+
+	public static Image getImageSelected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_SELECTED : IMAGE_SELECTED_DARK;
+	}
+
+	public static Image getImageDeselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_DESELECTED : IMAGE_DESELECTED_DARK;
+	}
+
+	public static Image getImageAselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_ASELECTED : IMAGE_ASELECTED_DARK;
+	}
+
+	public static Image getImageAdeselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_ADESELECTED : IMAGE_ADESELECTED_DARK;
+	}
+
+	public static Image getImageOptional() {
+		return DarkModePreference.getInstance().get() ? IMG_OPTIONAL : IMG_OPTIONAL_DARK;
+	}
+
+	public static Image getImageMandatory() {
+		return DarkModePreference.getInstance().get() ? IMG_MANDATORY : IMG_MANDATORY_DARK;
+	}
+
+	public static Image getImageOr() {
+		return DarkModePreference.getInstance().get() ? IMG_OR : IMG_OR_DARK;
+	}
+
+	public static Image getImageXor() {
+		return DarkModePreference.getInstance().get() ? IMG_XOR : IMG_XOR_DARK;
+	}
+
+	public static Image getImageAutoexpandGroup() {
+		return DarkModePreference.getInstance().get() ? IMAGE_AUTOEXPAND_GROUP : IMAGE_AUTOEXPAND_GROUP_DARK;
+	}
+
+	public static Image getImageNext() {
+		return DarkModePreference.getInstance().get() ? IMAGE_NEXT : IMAGE_NEXT_DARK;
+	}
+
+	public static Image getImagePrevious() {
+		return DarkModePreference.getInstance().get() ? IMAGE_PREVIOUS : IMAGE_PREVIOUS_DARK;
+	}
+
+	public static Image getImageIncreaseFont() {
+		return DarkModePreference.getInstance().get() ? IMAGE_INCREASE_FONT : IMAGE_INCREASE_FONT_DARK;
+	}
+
+	public static Image getImageDecreaseFont() {
+		return DarkModePreference.getInstance().get() ? IMAGE_DECREASE_FONT : IMAGE_DECREASE_FONT_DARK;
+	}
 }
