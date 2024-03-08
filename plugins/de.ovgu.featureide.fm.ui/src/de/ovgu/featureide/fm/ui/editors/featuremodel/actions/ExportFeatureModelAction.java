@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Shell;
@@ -65,7 +65,7 @@ public class ExportFeatureModelAction extends Action {
 		final String defaultPath = featureModelEditor.getFeatureModel().getVarObject().getSourceFile().getParent().toString();
 		final ExportFeatureModelDialog dialog = new ExportFeatureModelDialog(shell, defaultPath, formats,
 				// format check callback
-				(formatIndex) -> new ProblemList(List.of(new Problem("This format may only be exported.", 0))),
+				(formatIndex) -> new ProblemList(Arrays.asList(new Problem("This format may only be exported.", 0))),
 				// export callback
 				(formatIndex, path, name) -> GraphicsExporter.exportAs(featureModelEditor.getViewer(),
 						path.resolve(name + "." + GraphicsExporter.exporter.get(formatIndex).getFileExtension()).toString(), formatIndex));

@@ -606,7 +606,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		tree.addListener(SWT.PaintItem, (event) -> {
 			if (event.item instanceof TreeItem) {
 				final TreeItem featureItem = (TreeItem) event.item;
-				refreshItem(List.of(featureItem));
+				refreshItem(Arrays.asList(featureItem));
 			}
 		});
 
