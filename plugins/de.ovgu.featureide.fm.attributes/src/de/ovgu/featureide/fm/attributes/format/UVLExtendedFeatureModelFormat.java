@@ -83,6 +83,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			// than just its own value.
 			if (attributeValue instanceof Map<?, ?>) {
 				// check if the attributes list contains informations of the attribute in FeatureIDE, which are value, unit, recrusive, and/or configurable
+				@SuppressWarnings("unchecked")
 				Map<String, Attribute<?>> attributeMap = (Map<String, Attribute<?>>) attributeValue;
 				String unit = "";
 				Object value = null;

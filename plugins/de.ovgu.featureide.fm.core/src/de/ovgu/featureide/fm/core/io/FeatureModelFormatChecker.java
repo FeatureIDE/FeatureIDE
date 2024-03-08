@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -221,6 +222,6 @@ public class FeatureModelFormatChecker {
 	}
 
 	private static ProblemList checkColors(IFeatureModel oldModel, IFeatureModel newModel) {
-		return new ProblemList(List.of(new Problem(COLORS_NOT_EXPORTED, 0)));
+		return new ProblemList(Arrays.asList(new Problem(COLORS_NOT_EXPORTED, 0)));
 	}
 }
