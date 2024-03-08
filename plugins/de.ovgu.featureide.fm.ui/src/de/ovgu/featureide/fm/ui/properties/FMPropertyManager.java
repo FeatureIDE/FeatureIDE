@@ -57,8 +57,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 ******************************************************/
 	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
 	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR = null;
-	private volatile static Color CURRENT_LEGEND_FORGOUND = null;
-	private volatile static Color CURRENT_LEGEND_BACKGROUND = null;
 	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR = null;
 	private volatile static Color CURRENT_FEATURE_FOREGROUND = null;
 	private volatile static Color CURRENT_CONCRETE_BACKGROUND = null;
@@ -85,8 +83,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static void reset() {
 		CURRENT_HIDE_LEGEND = null;
-		CURRENT_LEGEND_FORGOUND = null;
-		CURRENT_LEGEND_BACKGROUND = null;
 		CURRENT_DECORATOR_FORGROUND_COLOR = null;
 		CURRENT_FEATURE_FOREGROUND = null;
 		CURRENT_CONCRETE_BACKGROUND = null;
@@ -162,30 +158,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return CURRENT_HIDE_BORDER_COLOR;
 	}
 
-	public static void setLegendForgroundColor(Color color) {
-		CURRENT_LEGEND_FORGOUND = color;
-		setColor(QN_LEGEND_FORGOUND, color);
-	}
-
-	public static Color getLegendForgroundColor() {
-		if (CURRENT_LEGEND_FORGOUND == null) {
-			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
-		}
-		return CURRENT_LEGEND_FORGOUND;
-	}
-
-	public static void setLegendBackgroundColor(Color color) {
-		CURRENT_LEGEND_BACKGROUND = color;
-		setColor(QN_LEGEND_BACKGROUND, color);
-	}
-
-	public static Color getLegendBackgroundColor() {
-		if (CURRENT_LEGEND_BACKGROUND == null) {
-			CURRENT_LEGEND_BACKGROUND = getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
-		}
-		return CURRENT_LEGEND_BACKGROUND;
-	}
-
 	public static void setLegendBorderColor(Color color) {
 		CURRENT_LEGEND_BORDER_COLOR = color;
 		setColor(QN_LEGEND_BORDER, color);
@@ -193,7 +165,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getLegendBorderColor() {
 		if (CURRENT_LEGEND_BORDER_COLOR == null) {
-			CURRENT_LEGEND_BORDER_COLOR = getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
+			CURRENT_LEGEND_BORDER_COLOR = GUIBasics.invertColorOnDarkTheme(LEGEND_BORDER_COLOR);
 		}
 		return CURRENT_LEGEND_BORDER_COLOR;
 	}
@@ -322,7 +294,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getConnectionForegroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
-			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
+			CURRENT_CONNECTION_FOREGROUND = GUIBasics.invertColorOnDarkTheme(CONNECTION_FOREGROUND);
 		}
 		return CURRENT_CONNECTION_FOREGROUND;
 	}
@@ -339,11 +311,12 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setColor(QN_WARNING, color);
 	}
 
-	public static Color getFeatureBorderColor() {
-		if (CURRENT_FEATURE_BORDER == null) {
-			CURRENT_FEATURE_BORDER = getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
-		}
-		return CURRENT_FEATURE_BORDER;
+	public static Color getFeatureBorderColor(Color bgColor) {
+		final int red = (int) (0.8 * bgColor.getRed());
+		final int green = (int) (0.8 * bgColor.getGreen());
+		final int blue = (int) (0.8 * bgColor.getBlue());
+
+		return new Color(red, green, blue);
 	}
 
 	public static void setFeatureBorderColor(Color color) {
@@ -438,17 +411,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Color getConstraintBorderColor(boolean selected) {
-		if (selected) {
-			return GUIBasics.createBorderColor(getConstraintBackgroundColor());
-		}
-		return getConstraintBackgroundColor();
+		return GUIBasics.invertColorOnDarkTheme(selected ? CONSTRAINT_BORDER_SELECTED_COLOR : CONSTRAINT_BORDER_UNSELECTED_COLOR);
 	}
 
 	public static Border getConstraintBorder(boolean selected) {
 		if (selected) {
-			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 3);
+			return GUIBasics.createLineBorder(getConstraintBorderColor(true), 1, Graphics.LINE_DOT);
 		}
-		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
+		return null;
 	}
 
 	public static Border getImplicitConstraintBorder() {
@@ -488,11 +458,11 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
 
-	public static Border getFeatureBorder(boolean selected) {
+	public static Border getFeatureBorder(boolean selected, Color bgColor) {
 		if (selected) {
-			return GUIBasics.createLineBorder(getFeatureBorderColor(), 3);
+			return GUIBasics.createLineBorder(getFeatureBorderColor(bgColor), 3);
 		}
-		return GUIBasics.createLineBorder(getFeatureBorderColor(), 1);
+		return GUIBasics.createLineBorder(getFeatureBorderColor(bgColor), 1);
 	}
 
 	public static Border getInheritedFeatureBorder() {

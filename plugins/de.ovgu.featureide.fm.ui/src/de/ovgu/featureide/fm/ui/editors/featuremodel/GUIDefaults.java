@@ -90,7 +90,7 @@ public interface GUIDefaults {
 
 	// connections and decorators
 
-	public static final Color CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
+	public static final Color CONNECTION_FOREGROUND = GUIBasics.createColor(75, 85, 99);
 	public static final Color NEW_CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 1.0, 0.4);
 	public static final Color VOID_CONNECTION_FOREGROUND = GUIBasics.createColor(1.0, 0.4, 0.4);
 
@@ -101,15 +101,16 @@ public interface GUIDefaults {
 	public static final int TARGET_ANCHOR_DIAMETER = 25;
 	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
+	// constraints
+
+	public static final Color CONSTRAINT_BORDER_UNSELECTED_COLOR = CONNECTION_FOREGROUND;
+	public static final Color CONSTRAINT_BORDER_SELECTED_COLOR = CONNECTION_FOREGROUND;
+
 	// cross-tree constraints
 
-	public static final Color CONSTRAINT_FOREGROUND = FEATURE_FOREGROUND;
+	public static final Color CONSTRAINT_FOREGROUND = CONNECTION_FOREGROUND;
 	public static final Insets CONSTRAINT_INSETS = new Insets(2, 8, 2, 8);
 	public static final Color CONSTRAINT_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 1.0);
-	public static final Color CONSTRAINT_BORDER_COLOR = CONSTRAINT_BACKGROUND;
-	public static final Border CONSTRAINT_BORDER = new LineBorder(CONSTRAINT_BORDER_COLOR, 0);
-	public static final Color CONSTRAINT_SELECTED_BORDER_COLOR = GUIBasics.createBorderColor(CONSTRAINT_BACKGROUND);
-	public static final Border CONSTRAINT_SELECTED_BORDER = new LineBorder(CONSTRAINT_SELECTED_BORDER_COLOR, 3);
 	public static final Color IMPLICIT_CONSTRAINT = GUIBasics.createColor(1.0, 0.0, 0.0);
 	public static final Border IMPLICIT_CONSTRAINT_BORDER = new LineBorder(IMPLICIT_CONSTRAINT, 2);
 
@@ -139,7 +140,7 @@ public interface GUIDefaults {
 
 	// legend
 	public static final int LEGEND_WIDTH = 105;
-	public static final Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
+	public static final Color LEGEND_FOREGROUND = GUIBasics.createColor(31, 41, 55);
 	public static final Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final Color LEGEND_BORDER_COLOR = LEGEND_FOREGROUND;
 	public static final Color LEGEND_MOVING_FEEDBACK_VALID = GUIBasics.createColor(0, 120, 0);
