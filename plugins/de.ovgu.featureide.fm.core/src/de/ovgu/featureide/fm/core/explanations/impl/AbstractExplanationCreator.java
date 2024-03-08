@@ -124,6 +124,7 @@ public abstract class AbstractExplanationCreator<S, E extends Explanation<S>, O>
 			return null;
 		}
 		shortestExplanation.setCounts(cumulatedExplanation); // Remember the reason and explanations that were generated before.
+		shortestExplanation.setAlternativeExplanations(explanations);
 		return shortestExplanation;
 	}
 

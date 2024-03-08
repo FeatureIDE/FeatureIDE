@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
@@ -548,6 +550,28 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator impleme
 		resultList.addAll(incompleteSolutionList);
 		resultList.addAll(completeSolutionList);
 		return resultList;
+	}
+
+	public Set<String> getCoveredInteractions(LiteralSet configuration) {
+		final ICombinationSupplier<ClauseList> it;
+		final List<List<PresenceCondition>> groupedPresenceConditions = presenceConditionManager.getGroupedPresenceConditions();
+		if (groupedPresenceConditions.size() == 1) {
+			it = new SingleIterator(t, util.getCnf().getVariables().size(), groupedPresenceConditions.get(0));
+		} else {
+			it = new MergeIterator3(t, util.getCnf().getVariables().size(), groupedPresenceConditions);
+		}
+
+		final Set<String> coveredInteractions = new HashSet<>();
+		for (ClauseList combinedCondition = it.get(); combinedCondition != null; combinedCondition = it.get()) {
+			if (combinedCondition.size() > 0) {
+				final LiteralSet set = combinedCondition.get(0);
+				if (configuration.containsAll(set)) {
+					set.setOrder(LiteralSet.Order.NATURAL);
+					coveredInteractions.add(set.toString());
+				}
+			}
+		}
+		return coveredInteractions;
 	}
 
 }

@@ -23,7 +23,10 @@ package de.ovgu.featureide.fm.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -292,6 +295,28 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 		}
 
+		return resultList;
+	}
+
+	public List<Map<IFeature, Boolean>> getAtomicSetsMap(IMonitor<List<LiteralSet>> monitor) {
+		final Variables variables = formula.getCNF().getVariables();
+		final List<Map<IFeature, Boolean>> resultList = new ArrayList<>();
+		final Set<IFeature> coveredFeatures = new HashSet<>();
+
+		for (final LiteralSet literalList : analysesCollection.atomicSetAnalysis.getResult(monitor)) {
+			final Map<IFeature, Boolean> setList = new HashMap<>();
+
+			for (final int literal : literalList.getLiterals()) {
+				final IFeature feature = featureModel.getFeature(variables.getName(literal));
+				if ((feature != null) && coveredFeatures.add(feature)) {
+					setList.put(feature, literal > 0);
+				}
+			}
+
+			if (!setList.isEmpty()) {
+				resultList.add(setList);
+			}
+		}
 		return resultList;
 	}
 

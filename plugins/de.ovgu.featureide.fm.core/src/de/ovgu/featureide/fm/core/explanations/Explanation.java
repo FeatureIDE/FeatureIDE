@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -46,6 +47,8 @@ public abstract class Explanation<S> {
 	private final Map<Reason<?>, Integer> reasonCounts = new LinkedHashMap<>();
 	/** How many explanations have been generated and rolled into one for this explanation. */
 	private int explanationCount = 1;
+
+	private List<? extends Explanation<S>> alternativeExplanations;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -81,6 +84,14 @@ public abstract class Explanation<S> {
 	 */
 	public void setExplanationCount(int explanationCount) {
 		this.explanationCount = explanationCount;
+	}
+
+	public List<? extends Explanation<S>> getAlternativeExplanations() {
+		return alternativeExplanations;
+	}
+
+	public void setAlternativeExplanations(List<? extends Explanation<S>> alternativeExplanations) {
+		this.alternativeExplanations = alternativeExplanations;
 	}
 
 	/**
@@ -228,4 +239,5 @@ public abstract class Explanation<S> {
 		writer.setWritingLineBreaks(false);
 		return writer.getString();
 	}
+
 }
