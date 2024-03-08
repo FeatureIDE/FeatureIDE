@@ -241,7 +241,7 @@ public class ExportFeatureModelDialog extends Dialog {
 	}
 
 	private boolean validate() {
-		return !selectedPath.isBlank() && !selectedName.isBlank();
+		return !selectedPath.trim().isEmpty() && !selectedName.trim().isEmpty();
 	}
 
 	@Override

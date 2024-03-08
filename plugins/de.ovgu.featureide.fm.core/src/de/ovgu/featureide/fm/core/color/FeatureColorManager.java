@@ -326,7 +326,7 @@ public class FeatureColorManager implements IEventListener {
 				}
 			}
 			for (final FeatureColor featureColor : FeatureColor.values()) {
-				if (!featureColor.getMeaning().isBlank() && (featureColor != FeatureColor.NO_COLOR)) {
+				if (!featureColor.getMeaning().trim().isEmpty() && (featureColor != FeatureColor.NO_COLOR)) {
 					out.print(XMLFeatureModelTags.FEATURE_COLOR_MEANING + featureColor.getValue());
 					out.print("=");
 					out.println(featureColor.getMeaning());

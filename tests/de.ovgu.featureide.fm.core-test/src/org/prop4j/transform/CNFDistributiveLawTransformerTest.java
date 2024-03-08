@@ -20,6 +20,7 @@
  */
 package org.prop4j.transform;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class CNFDistributiveLawTransformerTest {
 		final IFeatureModel model = Commons.loadBenchmarkFeatureModelFromFile("berkeley_db_model.xml");
 		final FeatureModelFormula featureModelFormula = new FeatureModelFormula(model);
 		final Node propositionalNode = featureModelFormula.getPropositionalNode();
-		assertTrue(propositionalNode.toCNF(true, true, 1).isEmpty());
+		assertFalse(propositionalNode.toCNF(true, true, 1).isPresent());
 		assertTrue(propositionalNode.toCNF(true, true, 1000).isPresent());
 	}
 

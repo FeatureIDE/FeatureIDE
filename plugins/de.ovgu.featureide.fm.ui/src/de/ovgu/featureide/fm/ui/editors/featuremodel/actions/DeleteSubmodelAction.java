@@ -81,7 +81,7 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 	public void run() {
 		final List<IFeature> featuresToDelete = new ArrayList<>();
 
-		final List<Object> selectedObjects = selection.toList();
+		final List<?> selectedObjects = selection.toList();
 
 		for (final Object selectedObject : selectedObjects) {
 			final IFeature selectedFeature = getFeatureFromObject(selectedObject);
@@ -91,7 +91,7 @@ public class DeleteSubmodelAction extends MultipleSelectionAction implements Act
 
 		final Optional<String> dialogReturnLabel = DeleteDialogVerifier.checkForDialog(featuresToDelete);
 
-		if (dialogReturnLabel.filter("Cancel"::equals).isEmpty()) {
+		if (!dialogReturnLabel.filter("Cancel"::equals).isPresent()) {
 			FeatureModelOperationWrapper.run(new DeleteSubmodelOperation(viewer, featureModelManager));
 		}
 

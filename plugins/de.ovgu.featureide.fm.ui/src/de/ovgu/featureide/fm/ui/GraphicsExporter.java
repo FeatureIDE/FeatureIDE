@@ -93,10 +93,10 @@ public class GraphicsExporter {
 		if (index < 0) {
 			final String fileExtension = SimpleFileHandler.getFileExtension(filePath);
 			final Optional<ExportType<T>> any = exporter.stream().filter(exp -> Objects.equals(fileExtension, exp.getFileExtension())).findAny();
-			if (any.isEmpty()) {
-				return false;
-			} else {
+			if (any.isPresent()) {
 				writeToFile(any.get(), object, Paths.get(filePath));
+			} else {
+				return false;
 			}
 		} else {
 			writeToFile(exporter.get(index), object, Paths.get(filePath));

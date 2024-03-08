@@ -483,7 +483,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		setProjectProperties(project, compositionToolID, sourcePath, configPath, buildPath);
 
 		IFeatureModel featureModel = null;
-		if ((importModelPath != null) && !importModelPath.isBlank()) {
+		if ((importModelPath != null) && !importModelPath.trim().isEmpty()) {
 			featureModel = loadFeatureModelFile(project, composer, importModelPath);
 		}
 		if (featureModel == null) {

@@ -87,7 +87,7 @@ public class ImportFeatureModelFilePage extends WizardPage {
 
 	protected boolean validatePage() {
 		final String pathValue = editor.getStringValue();
-		if (pathValue.isBlank()) {
+		if (pathValue.trim().isEmpty()) {
 			setMessage(null);
 			setErrorMessage(null);
 			setPageComplete(true);

@@ -115,9 +115,12 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Shell getShell() {
+		IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (activeWorkbenchWindow == null) {
+			activeWorkbenchWindow = Arrays.stream(PlatformUI.getWorkbench().getWorkbenchWindows()).findFirst().orElse(null);
+		}
 		return Optional //
-				.ofNullable(PlatformUI.getWorkbench().getActiveWorkbenchWindow()) //
-				.or(() -> Arrays.stream(PlatformUI.getWorkbench().getWorkbenchWindows()).findFirst()) //
+				.ofNullable(activeWorkbenchWindow) //
 				.map(IWorkbenchWindow::getShell) //
 				.orElse(null);
 	}

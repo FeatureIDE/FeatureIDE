@@ -394,7 +394,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	private void setFeatureModelFile() {
 		final String text = featureModelPath.getText();
 		if (!Objects.equals(text, FMCorePlugin.getPersitentModelFilePath(project).map(IPath::toString).orElse(null))) {
-			FMCorePlugin.setPersitentModelFilePath(project, text.isBlank() ? null : text);
+			FMCorePlugin.setPersitentModelFilePath(project, text.trim().isEmpty() ? null : text);
 			updated = true;
 		}
 	}
