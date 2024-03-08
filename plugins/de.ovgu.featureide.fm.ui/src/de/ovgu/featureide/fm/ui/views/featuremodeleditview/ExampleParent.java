@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Calculates an example for added or removed products.
@@ -64,7 +65,7 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 			name = added ? ADDED_PRODUCTS : REMOVED_PRODUCTS;
 		}
 		if (c.getResult() == Comparison.ERROR) {
-			image = IMAGE_UNDEFINED;
+			image = FMPropertyManager.getImageUndefined();
 		} else {
 			final String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? MINUS : ZERO;
 			lazy = !ZERO.equals(imageName);

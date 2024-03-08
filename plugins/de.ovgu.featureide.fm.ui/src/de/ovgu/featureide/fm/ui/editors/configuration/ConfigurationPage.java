@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Displays the tree for common configuration selection at the configuration editor
@@ -77,7 +78,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 			@Override
 			public void menuAboutToShow(IMenuManager mgr) {
-				contextMenu.add(new Action("Export As...", IMAGE_EXPORT_AS) {
+				contextMenu.add(new Action("Export As...", FMPropertyManager.IMAGE_EXPORT_AS) {
 
 					@Override
 					public void run() {
@@ -186,7 +187,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 			gc.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			gc.fillRoundRectangle(distance, 1, colorWidth, colorHeight, colorHeight, colorHeight);
 		} else {
-			gc.setForeground(new Color(191, 191, 191));
+			gc.setForeground(FMPropertyManager.getLegendBorderColor());
 			gc.drawRoundRectangle(distance, 1, colorWidth, colorHeight, colorHeight, colorHeight);
 		}
 

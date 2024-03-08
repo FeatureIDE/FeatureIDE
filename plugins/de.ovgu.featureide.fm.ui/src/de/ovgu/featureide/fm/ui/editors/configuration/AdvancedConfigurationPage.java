@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
@@ -96,7 +97,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			gc.fillRoundRectangle(imageData2.width + distance + imageData1.width + distance, (imageData1.height - colorHeight) / 2, colorWidth, colorHeight,
 					colorHeight, colorHeight);
 		} else {
-			gc.setForeground(new Color(191, 191, 191));
+			gc.setForeground(FMPropertyManager.getLegendBorderColor());
 			gc.drawRoundRectangle(imageData2.width + distance + imageData1.width + distance, (imageData1.height - colorHeight) / 2, colorWidth, colorHeight,
 					colorHeight, colorHeight);
 		}
@@ -108,18 +109,19 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		if (!feature.getStructure().isRoot()) {
 			if (feature.getStructure().getParent() != null) {
 				if (feature.getStructure().getParent().isOr()) {
-					return IMG_OR;
+					return FMPropertyManager.getImageOr();
 				}
 				if (feature.getStructure().getParent().isAlternative()) {
-					return IMG_XOR;
+					return FMPropertyManager.getImageXor();
 				}
 			}
 			if (feature.getStructure().isMandatory()) {
-				return IMG_MANDATORY;
+				return FMPropertyManager.getImageMandatory();
 			}
-			return IMG_OPTIONAL;
+			return FMPropertyManager.getImageOptional();
 		}
-		final ImageData id = new Image(Display.getCurrent(), IMG_MANDATORY.getImageData().width, IMG_MANDATORY.getImageData().height).getImageData();
+		final ImageData id = new Image(Display.getCurrent(), FMPropertyManager.getImageMandatory().getImageData().width,
+				FMPropertyManager.getImageMandatory().getImageData().height).getImageData();
 		id.alpha = 0;
 		return new Image(Display.getCurrent(), id);
 	}
@@ -128,24 +130,24 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		if (selection != null) {
 			switch (selection) {
 			case SELECTED:
-				return IMAGE_ASELECTED;
+				return FMPropertyManager.getImageAselected();
 			case UNSELECTED:
-				return IMAGE_ADESELECTED;
+				return FMPropertyManager.getImageAdeselected();
 			case UNDEFINED:
-				return IMAGE_UNDEFINED;
+				return FMPropertyManager.getImageUndefined();
 			}
 		}
 		if (feat.getAutomatic() != Selection.UNDEFINED) {
-			return feat.getAutomatic() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
+			return feat.getAutomatic() == Selection.SELECTED ? FMPropertyManager.getImageAselected() : FMPropertyManager.getImageAdeselected();
 		}
 		switch (feat.getManual()) {
 		case SELECTED:
-			return IMAGE_SELECTED;
+			return FMPropertyManager.getImageSelected();
 		case UNSELECTED:
-			return IMAGE_DESELECTED;
+			return FMPropertyManager.getImageDeselected();
 		case UNDEFINED:
 		default:
-			return IMAGE_UNDEFINED;
+			return FMPropertyManager.getImageUndefined();
 		}
 	}
 

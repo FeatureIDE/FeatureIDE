@@ -131,7 +131,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		}
 
 		selectorLegendBackground =
-			createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
+			createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBorderColor().getRGB(), LEGEND_BACKGROUND__TIP);
 		selectorLegendBorder = createSelectorEntry(group, LEGEND_BORDER_LABEL, FMPropertyManager.getLegendBorderColor().getRGB(), LEGEND_BORDER_TIP);
 	}
 
@@ -173,7 +173,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		buttonHideBorderColor.setLayoutData(gd);
 		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
 
-		selectorFeatureBorder = createSelectorEntry(colorGroup, COLOR_BORDER, FMPropertyManager.getFeatureBorderColor().getRGB(), COLOR_BORDER_TIP);
+		selectorFeatureBorder = createSelectorEntry(colorGroup, COLOR_BORDER, FMPropertyManager.getLegendBorderColor().getRGB(), COLOR_BORDER_TIP);
 		// selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(),
 		// COLOR_HIDDEN_TIP);
 		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForegroundColor().getRGB(), COLOR_CONNECTION_TIP);
@@ -353,7 +353,6 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	private void performLegendGroup() {
 		FMPropertyManager.setHideLegend(buttonHideLegend.getSelection());
 		FMPropertyManager.setLanguage(languageCombo.getText());
-		FMPropertyManager.setLegendBackgroundColor(new Color(null, selectorLegendBackground.getColorValue()));
 		FMPropertyManager.setLegendBorderColor(new Color(null, selectorLegendBorder.getColorValue()));
 	}
 
@@ -380,7 +379,6 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		FMPropertyManager.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
 		FMPropertyManager.setConnectionForegroundColor(new Color(null, selectorConnection.getColorValue()));
 		FMPropertyManager.setWarningColor(new Color(null, selectorWarning.getColorValue()));
-		FMPropertyManager.setFeatureBorderColor(new Color(null, selectorFeatureBorder.getColorValue()));
 		FMPropertyManager.setHideBorderColor(buttonHideBorderColor.getSelection());
 	}
 
@@ -468,7 +466,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			i++;
 		}
 		selectorLegendBorder.setColorValue(FMPropertyManager.getLegendBorderColor().getRGB());
-		selectorLegendBackground.setColorValue(FMPropertyManager.getLegendBackgroundColor().getRGB());
+		selectorLegendBackground.setColorValue(FMPropertyManager.getLegendBorderColor().getRGB());
 	}
 
 	/**
@@ -495,7 +493,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorConnection.setColorValue(FMPropertyManager.getConnectionForegroundColor().getRGB());
 		selectorWarning.setColorValue(FMPropertyManager.getWarningColor().getRGB());
 		selectorFeatureBorder.setEnabled(FMPropertyManager.isBorderColorHidden());
-		selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColor().getRGB());
+		selectorFeatureBorder.setColorValue(FMPropertyManager.getLegendBorderColor().getRGB());
 		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
 	}
 }

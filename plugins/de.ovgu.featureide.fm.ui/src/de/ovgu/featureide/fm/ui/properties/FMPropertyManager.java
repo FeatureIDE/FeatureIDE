@@ -28,11 +28,13 @@ import org.eclipse.draw2d.Border;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.preferences.DarkModePreference;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -70,7 +72,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Color CURRENT_FEATURE_DEAD = null;
 	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND = null;
 	private volatile static Color CURRENT_WARNING_BACKGROUND = null;
-	private volatile static Color CURRENT_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_INHERITED_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_IMPORTED_FEATURE_BORDER = null;
 	private volatile static Color CURRENT_INTERFACED_FEATURE_BORDER = null;
@@ -102,7 +103,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_LAYOUT_MARGIN_Y = null;
 		CURRENT_LAYOUT_MARGIN_X = null;
 		CURRENT_HIDE_BORDER_COLOR = null;
-		CURRENT_FEATURE_BORDER = null;
 	}
 
 	private static LinkedList<FeatureModelEditor> editors = new LinkedList<>();
@@ -317,11 +317,6 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		final int blue = (int) (0.8 * bgColor.getBlue());
 
 		return new Color(red, green, blue);
-	}
-
-	public static void setFeatureBorderColor(Color color) {
-		CURRENT_FEATURE_BORDER = color;
-		setColor(QN_FEATURE_BORDER, color);
 	}
 
 	public static Color getFeatureBorderColorSave() {
@@ -713,4 +708,59 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return names;
 	}
 
+	public static Image getImageUndefined() {
+		return DarkModePreference.getInstance().get() ? IMAGE_UNDEFINED : IMAGE_UNDEFINED_DARK;
+	}
+
+	public static Image getImageSelected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_SELECTED : IMAGE_SELECTED_DARK;
+	}
+
+	public static Image getImageDeselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_DESELECTED : IMAGE_DESELECTED_DARK;
+	}
+
+	public static Image getImageAselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_ASELECTED : IMAGE_ASELECTED_DARK;
+	}
+
+	public static Image getImageAdeselected() {
+		return DarkModePreference.getInstance().get() ? IMAGE_ADESELECTED : IMAGE_ADESELECTED_DARK;
+	}
+
+	public static Image getImageOptional() {
+		return DarkModePreference.getInstance().get() ? IMG_OPTIONAL : IMG_OPTIONAL_DARK;
+	}
+
+	public static Image getImageMandatory() {
+		return DarkModePreference.getInstance().get() ? IMG_MANDATORY : IMG_MANDATORY_DARK;
+	}
+
+	public static Image getImageOr() {
+		return DarkModePreference.getInstance().get() ? IMG_OR : IMG_OR_DARK;
+	}
+
+	public static Image getImageXor() {
+		return DarkModePreference.getInstance().get() ? IMG_XOR : IMG_XOR_DARK;
+	}
+
+	public static Image getImageAutoexpandGroup() {
+		return DarkModePreference.getInstance().get() ? IMAGE_AUTOEXPAND_GROUP : IMAGE_AUTOEXPAND_GROUP_DARK;
+	}
+
+	public static Image getImageNext() {
+		return DarkModePreference.getInstance().get() ? IMAGE_NEXT : IMAGE_NEXT_DARK;
+	}
+
+	public static Image getImagePrevious() {
+		return DarkModePreference.getInstance().get() ? IMAGE_PREVIOUS : IMAGE_PREVIOUS_DARK;
+	}
+
+	public static Image getImageIncreaseFont() {
+		return DarkModePreference.getInstance().get() ? IMAGE_INCREASE_FONT : IMAGE_INCREASE_FONT_DARK;
+	}
+
+	public static Image getImageDecreaseFont() {
+		return DarkModePreference.getInstance().get() ? IMAGE_DECREASE_FONT : IMAGE_DECREASE_FONT_DARK;
+	}
 }

@@ -25,14 +25,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 
+import de.ovgu.featureide.fm.core.preferences.DarkModePreference;
+
 /**
  * Implements some basic graphical methods.
  *
  * @author Thomas Thuem
  */
 public class GUIBasics {
-
-	private static boolean DARK_THEME = false;
 
 	public static Color createColor(int r, int g, int b) {
 		return new Color(null, r, g, b);
@@ -72,11 +72,11 @@ public class GUIBasics {
 	}
 
 	public static Color invertColorOnDarkTheme(Color color) {
-		return DARK_THEME ? invertColor(color) : color;
+		return DarkModePreference.getInstance().get() ? invertColor(color) : color;
 	}
 
 	public static Color invertColorOnDarkTheme(Color color, float damping) {
-		return DARK_THEME ? invertColor(color, damping) : color;
+		return DarkModePreference.getInstance().get() ? invertColor(color, damping) : color;
 	}
 
 	public static Color createBorderColor(Color color) {
@@ -104,5 +104,4 @@ public class GUIBasics {
 		}
 		return true;
 	}
-
 }
