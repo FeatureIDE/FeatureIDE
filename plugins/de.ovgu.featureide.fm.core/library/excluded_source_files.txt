@@ -58,6 +58,7 @@ de/ovgu/featureide/fm/core/job/monitor/ProgressMonitor.java
 de/ovgu/featureide/fm/core/preferences/BooleanPreference.java
 de/ovgu/featureide/fm/core/preferences/CompletionPreference.java
 de/ovgu/featureide/fm/core/preferences/ConstraintViewPreference.java
+de/ovgu/featureide/fm/core/preferences/DarkModePreference.java
 de/ovgu/featureide/fm/core/preferences/DIMACSOmitRootPreference.java
 de/ovgu/featureide/fm/core/preferences/IntegerPreference.java
 de/ovgu/featureide/fm/core/preferences/NonGTKFileDialogPreference.java
