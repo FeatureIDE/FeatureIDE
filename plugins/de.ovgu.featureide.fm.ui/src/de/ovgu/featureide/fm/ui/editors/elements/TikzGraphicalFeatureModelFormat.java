@@ -111,20 +111,62 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				+ "	}," + lnSep //
 				+ "	featureDiagram/.style={" + lnSep //
 				+ "		for tree={" + lnSep //
-				+ "             minimum height = 0.6cm," + String.format("			text depth = 0," + lnSep //
-					+ "			parent anchor = %s," + lnSep //
-					+ "			child anchor = %s," + lnSep //
-					+ "			draw = drawColor," + lnSep //
-					+ "			edge = {draw=drawColor}," + lnSep //
-					+ "			%s" //
-					+ "			l sep = 2em," + lnSep //
-					+ "			s sep = 1em" //
-					+ "			%s" + lnSep //
-						, hasVerticalLayout ? "east" : "south", //
+				+ "			minimum height = 0.6cm," + lnSep //
+				+ "			text depth = 0," + lnSep //
+				+ "			draw = drawColor," + lnSep //
+				+ "			edge = {draw=drawColor}," + lnSep //
+				+ String.format( //
+						"			parent anchor = %s," + lnSep //
+							+ "			child anchor = %s," + lnSep //
+							+ "%s" //
+							+ "			l sep = 2em," + lnSep //
+							+ "			s sep = 1em," + lnSep //
+							+ "%s", //
+						hasVerticalLayout ? "east" : "south", //
 						hasVerticalLayout ? "west" : "north", //
-						hasVerticalLayout ? "grow' = east," + lnSep : "", //
-						hasVerticalLayout ? "," + lnSep + " tier/.pgfmath=level()" : "")
+						hasVerticalLayout ? "			grow' = east," + lnSep : "", //
+						hasVerticalLayout ? "			tier/.pgfmath=level()," + lnSep : "")
 				+ "		}" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/redColor/.style={" + lnSep //
+				+ "		fill = red!60," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/orangeColor/.style={" + lnSep //
+				+ "		fill = orange!50," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/yellowColor/.style={" + lnSep //
+				+ "		fill = yellow!50," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/darkGreenColor/.style={" + lnSep //
+				+ "		fill = black!30!green," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/lightGreenColor/.style={" + lnSep //
+				+ "		fill = green!30," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/cyanColor/.style={" + lnSep //
+				+ "		fill = cyan!30," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/lightGrayColor/.style={" + lnSep //
+				+ "		fill = black!10," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/blueColor/.style={" + lnSep //
+				+ "		fill = blue!50," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/magentaColor/.style={" + lnSep //
+				+ "		fill = magenta," + lnSep //
+				+ "		draw = drawColor" + lnSep //
+				+ "	}," + lnSep //
+				+ "	/tikz/pinkColor/.style={" + lnSep //
+				+ "		fill = pink!90," + lnSep //
+				+ "		draw = drawColor" + lnSep //
 				+ "	}," + lnSep //
 				+ "	/tikz/abstract/.style={" + lnSep //
 				+ "		fill = blue!85!cyan!5," + lnSep //
@@ -149,46 +191,6 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 				+ lnSep //
 				+ "		}	" + lnSep //
 				+ "	}," + lnSep //
-				+ " /tikz/redColor/.style={" + lnSep //
-				+ " 	fill = red!60," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/orangeColor/.style={" + lnSep //
-				+ " 	fill = orange!50," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/yellowColor/.style={" + lnSep //
-				+ " 	fill = yellow!50," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/darkGreenColor/.style={" + lnSep //
-				+ " 	fill = black!30!green," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/lightGreenColor/.style={" + lnSep //
-				+ " 	fill = green!30," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/cyanColor/.style={" + lnSep //
-				+ " 	fill = cyan!30," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/lightGrayColor/.style={" + lnSep //
-				+ " 	fill = black!10," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/blueColor/.style={" + lnSep //
-				+ " 	fill = blue!50," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/magentaColor/.style={" + lnSep //
-				+ " 	fill = magenta," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
-				+ " /tikz/pinkColor/.style={" + lnSep //
-				+ " 	fill = pink!90," + lnSep //
-				+ " 	draw = drawColor" + lnSep //
-				+ " }," + lnSep //
 				+ "	/tikz/or/.style={" + lnSep //
 				+ "	}," + lnSep //
 				+ "	alternative/.style={" + lnSep //
@@ -594,14 +596,14 @@ public class TikzGraphicalFeatureModelFormat extends APersistentFormat<IGraphica
 		}
 
 		private void printConstraints(StringBuilder str, IGraphicalFeatureModel graphicalFeatureModel) {
-			str.append("\\matrix [below=1mm of current bounding box] {" + lnSep);
+			str.append("	\\matrix [below=1mm of current bounding box] {" + lnSep);
 			for (final IGraphicalConstraint constraint : graphicalFeatureModel.getConstraints()) {
 				String text = constraint.getObject().getNode().toString(NodeWriter.latexSymbols, true);
 				text = text.replaceAll("\"([\\w\" ]+)\"", " \\\\text\\{$1\\} "); // wrap all words in \text{} // replace with $2
 				text = text.replaceAll("\\s+", " "); // remove unnecessary whitespace characters
 				str.append("	\\node {\\(" + text + "\\)}; \\\\" + lnSep);
 			}
-			str.append("};" + lnSep);
+			str.append("	};" + lnSep);
 		}
 	}
 

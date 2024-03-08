@@ -1,7 +1,9 @@
 %---required packages & variable definitions------------------------------------
 \usepackage{forest}
+\usepackage{amsmath}
 \usepackage{xcolor}
 \usetikzlibrary{angles}
+\usetikzlibrary{positioning}
 \definecolor{drawColor}{RGB}{128 128 128}
 \newcommand{\circleSize}{0.25em}
 \newcommand{\angleSize}{0.8em}
@@ -21,12 +23,55 @@
 	},
 	featureDiagram/.style={
 		for tree={
+			minimum height = 0.6cm,
 			text depth = 0,
-			parent anchor = south,
-			child anchor = north,
 			draw = drawColor,
 			edge = {draw=drawColor},
+			parent anchor = south,
+			child anchor = north,
+			l sep = 2em,
+			s sep = 1em,
 		}
+	},
+	/tikz/redColor/.style={
+		fill = red!60,
+		draw = drawColor
+	},
+	/tikz/orangeColor/.style={
+		fill = orange!50,
+		draw = drawColor
+	},
+	/tikz/yellowColor/.style={
+		fill = yellow!50,
+		draw = drawColor
+	},
+	/tikz/darkGreenColor/.style={
+		fill = black!30!green,
+		draw = drawColor
+	},
+	/tikz/lightGreenColor/.style={
+		fill = green!30,
+		draw = drawColor
+	},
+	/tikz/cyanColor/.style={
+		fill = cyan!30,
+		draw = drawColor
+	},
+	/tikz/lightGrayColor/.style={
+		fill = black!10,
+		draw = drawColor
+	},
+	/tikz/blueColor/.style={
+		fill = blue!50,
+		draw = drawColor
+	},
+	/tikz/magentaColor/.style={
+		fill = magenta,
+		draw = drawColor
+	},
+	/tikz/pinkColor/.style={
+		fill = pink!90,
+		draw = drawColor
 	},
 	/tikz/abstract/.style={
 		fill = blue!85!cyan!5,

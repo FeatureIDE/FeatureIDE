@@ -194,7 +194,7 @@ public class FeatureColorManager implements IEventListener {
 		// Fix for #398
 		try {
 			project = getProject(featureModel);
-		} catch (final NullPointerException e) {
+		} catch (final Exception e) {
 			return DefaultColorScheme.getInstance();
 		}
 
