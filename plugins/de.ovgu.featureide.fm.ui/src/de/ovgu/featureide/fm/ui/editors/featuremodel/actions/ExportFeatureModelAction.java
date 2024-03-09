@@ -26,6 +26,8 @@ import java.util.Arrays;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -57,7 +59,20 @@ public class ExportFeatureModelAction extends Action {
 
 	@Override
 	public void run() {
-		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		final Shell shell;
+		try {
+			final IWorkbench workbench = PlatformUI.getWorkbench();
+			if (workbench == null) {
+				return;
+			}
+			final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
+			if (activeWorkbenchWindow == null) {
+				return;
+			}
+			shell = activeWorkbenchWindow.getShell();
+		} catch (final Exception e) {
+			return;
+		}
 
 		final String[] formats = GraphicsExporter.exporter.stream().map((exporter) -> exporter.getDescription() + "*." + //
 			exporter.getFileExtension()).toArray(String[]::new);
