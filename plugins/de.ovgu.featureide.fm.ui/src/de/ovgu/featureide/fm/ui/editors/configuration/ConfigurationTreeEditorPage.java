@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -123,6 +124,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.RunnerSequence;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.ExpandAlgorithm;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
 import de.ovgu.featureide.fm.ui.utils.SearchField;
@@ -166,6 +168,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_RESET_SELECTION = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
 
 	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
+
+	protected static HashMap<String, Image> combinedImages = new HashMap<>();
 
 	private static enum UpdateStrategy {
 		BUILD, UPDATE, RESOLVE
@@ -603,13 +607,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		createUITree(compositeBottom);
 
-		tree.addListener(SWT.PaintItem, (event) -> {
-			if (event.item instanceof TreeItem) {
-				final TreeItem featureItem = (TreeItem) event.item;
-				refreshItem(Arrays.asList(featureItem));
-			}
-		});
-
 		tree.addMouseMoveListener(new MouseMoveListener() {
 
 			@Override
@@ -813,7 +810,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (configurationEditor.isAutoSelectFeatures()) {
 					computeTree(UpdateStrategy.UPDATE);
 				} else {
-					refreshItem(Arrays.asList(item));
+					refreshItems(Arrays.asList(item));
 					if (LongRunningWrapper.runMethod(getPropagator().canBeValid())) {
 						invalidFeatures.clear();
 					} else {
@@ -1008,22 +1005,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return false;
 	}
 
-	protected void refreshItem(Collection<TreeItem> items) {
+	protected void refreshItems(Collection<TreeItem> items) {
+		final Color treeItemStandardColor = GUIBasics.invertColorOnDarkTheme(GUIBasics.createColor(75, 85, 99));
 		for (final TreeItem item : items) {
 			if (!item.isDisposed()) {
 				final Object data = item.getData();
 				if (data instanceof SelectableFeature) {
-					boolean checked = false;
-					boolean grayed = false;
-					Color fgColor = null;
-					Font font = treeItemStandardFont;
 					final SelectableFeature feature = (SelectableFeature) data;
+					boolean checked;
+					boolean grayed;
+					Color fgColor;
+					Font font;
 					final Selection automatic = feature.getAutomatic();
-					final Selection recommended = feature.getRecommended();
 					switch (automatic) {
 					case SELECTED:
 						checked = true;
 						grayed = true;
+						fgColor = treeItemStandardColor;
+						font = treeItemStandardFont;
 						break;
 					case UNSELECTED:
 						checked = false;
@@ -1034,48 +1033,43 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						font = treeItemItalicFont;
 						break;
 					case UNDEFINED:
+					default:
 						checked = feature.getManual() == Selection.SELECTED;
+						grayed = false;
+						fgColor = treeItemStandardColor;
+						font = treeItemStandardFont;
 						break;
 					}
 
-					final StringBuilder sb = new StringBuilder();
+					final String name = feature.getName();
 					if (automatic == Selection.UNDEFINED) {
-						switch (recommended) {
-						case SELECTED:
-							// again, this is a workaround for Ubuntu, which does not show the gray font color correctly
-							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
-							break;
-						case UNSELECTED:
-							font = fgColor == gray ? treeItemBoldItalicFont : treeItemBoldFont;
-							break;
-						case UNDEFINED:
-							break;
-						}
+						final Selection recommended = feature.getRecommended();
 						if (recommended == Selection.UNDEFINED) {
-							sb.append(feature.getName());
+							item.setText(name);
 						} else {
+							final StringBuilder sb = new StringBuilder();
 							final int recommendationValue = feature.getRecommendationValue();
 							if (useRecommendation && (recommendationValue >= 0)) {
 								sb.append(recommendationValue);
 								sb.append(" ");
 							}
-							sb.append(feature.getName());
+							sb.append(name);
 							final Set<Integer> openClauseIndexes = feature.getOpenClauseIndexes();
 							if (useGroups && !openClauseIndexes.isEmpty()) {
 								sb.append(" (unsatisfied group ");
 								sb.append(openClauseIndexes.iterator().next());
 								sb.append(")");
 							}
+							item.setText(sb.toString());
 						}
 					} else {
-						sb.append(feature.getName());
+						item.setText(name);
 					}
-					item.setText(sb.toString());
+					item.setForeground(fgColor);
 					item.setChecked(checked);
 					item.setGrayed(grayed);
 					item.setFont(font);
-					item.setBackground(null);
-					item.setForeground(fgColor);
+					item.setImage(getImage(feature, null));
 				}
 			}
 		}
@@ -1106,7 +1100,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				items.add(item);
 			}
 		}
-		currentDisplay.asyncExec(() -> refreshItem(items));
+		currentDisplay.asyncExec(() -> refreshItems(items));
 	}
 
 	private Void resetUpdateFeatures(IMonitor<Void> monitor) {
@@ -1437,7 +1431,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			root.setData(rootFeature);
 			parentElements.add(root);
 			itemMap.put(rootFeature, root);
-			refreshItem(Arrays.asList(root));
+			refreshItems(Arrays.asList(root));
 		}
 	}
 
@@ -1454,8 +1448,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					itemMap.put(currentFeature, childNode);
 				} catch (final Exception e) {}
 			}
-			refreshItem(items);
+			refreshItems(items);
 		}
 	}
+
+	protected abstract Image getImage(SelectableFeature selFeature, Selection selection);
 
 }
