@@ -188,6 +188,7 @@ public class DrawImageForProjectExplorer {
 
 		final ImageData data = image.getImageData();
 		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
+		image.dispose();
 		gc.dispose();
 
 		final Image finalImage = new Image(DEVICE, data);
@@ -220,6 +221,7 @@ public class DrawImageForProjectExplorer {
 		}
 		final ImageData data = finalImage.getImageData();
 		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
+		finalImage.dispose();
 		gc.dispose();
 		final Image image = new Image(DEVICE, data);
 		images.put(hashCode, image);
