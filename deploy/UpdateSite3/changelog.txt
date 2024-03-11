@@ -4,6 +4,36 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+Release 3.11.0 (March 2024)
+* Improves UI of the configuration editor
+  * Adds new tab showing currently selected features in a feature tree (#1452)
+  * Adds functionality to adapt font size to screen size and manual font-size setting (#1417)
+  * Enables automatic updates after feature model change (#1464)
+* Improves UI of the feature-model editor
+  * Improves feature model export dialog (#843)
+  * Adds feature colors to legend (#1451)
+  * Fixes context menu entries (#1300)
+  * Fixes size of create/update button in constraint dialog
+  * Fixes issues with default color manager
+  * Fixes other issues (#1311, #1418)
+* Other GUI improvements
+  * Improves font colors and symbols for dark mode
+  * Adds preference for enabling/disabling dark mode colors
+* Improves LaTeX/TikZ export (#1419)
+  * Adds support for cross-tree constraints, tree layout, and feature colors
+* Improvements for example projects
+  * Adds references to example projects (#1054)
+  * Fixes wrong configuration files in UVL examples projects
+  * Fixes mistake in code example of FeatureIDE tutorial (#1465)
+* Improves feature-model slicing
+  * Improves feature-tree slicing by avoiding creation of new features (#1439)
+  * Fixes issues where slicing changes propositional logic in certain circumstances (#1213)
+  * Fixes potential duplicate ID problem after slicing
+* Adds convenience methods in FM-library
+* Further bug fixes
+  * Fixes handling of non-extended feature models and configurations in attributes view (#1449)
+  * Fixes support for relative file paths in UVL (#1459)
+
 Release 3.10.0 (August 2023)
 * Adds new and extended functionality
   * New feature project now allows to import an existing feature model
