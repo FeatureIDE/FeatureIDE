@@ -78,7 +78,7 @@ public class FeatureSubtreeSelectionTest {
 		new SelectSubtreeAction(viewer, manager).run();
 
 		// Assert that all other features are selected.
-		final List<EditPart> parts = viewer.getSelectedEditParts();
+		final List<? extends EditPart> parts = viewer.getSelectedEditParts();
 		assertTrue(isSelected(parts, editParts, model, "Alternative1"));
 		assertTrue(isSelected(parts, editParts, model, "Alternative2"));
 		assertTrue(isSelected(parts, editParts, model, "Or1"));
@@ -108,7 +108,7 @@ public class FeatureSubtreeSelectionTest {
 		action.run();
 
 		// Assert that the Optional, Mandatory feature and their sub features have been selected.
-		final List<EditPart> parts = viewer.getSelectedEditParts();
+		final List<? extends EditPart> parts = viewer.getSelectedEditParts();
 		assertTrue(isSelected(parts, editParts, model, "Alternative1"));
 		assertTrue(isSelected(parts, editParts, model, "Alternative2"));
 		assertTrue(isSelected(parts, editParts, model, "Or1"));
@@ -129,7 +129,7 @@ public class FeatureSubtreeSelectionTest {
 		optPart.setSelected(1);
 	}
 
-	private boolean isSelected(Collection<EditPart> parts, Map<?, ?> editParts, final IFeatureModel model, String featName) {
+	private boolean isSelected(Collection<? extends EditPart> parts, Map<?, ?> editParts, final IFeatureModel model, String featName) {
 		return parts.contains(editParts.get(graphicalModel.getGraphicalFeature(model.getFeature(featName))));
 	}
 }
