@@ -1,11 +1,11 @@
-model.xml
-.classpath
 .project
-configs/BeautifulWorld.xml
-configs/HelloWorld.xml
 configs/Hello.xml
 configs/WonderfulWorld.xml
-src/World.aj
-src/Wonderful.aj
+configs/HelloWorld.xml
+configs/BeautifulWorld.xml
 src/Beautiful.aj
 src/Hello.java
+src/World.aj
+src/Wonderful.aj
+.classpath
+model.xml

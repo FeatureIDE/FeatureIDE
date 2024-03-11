@@ -1,9 +1,9 @@
-model.xml
-.classpath
-runtime.properties
 .project
-configs/BeautifulWorld.xml
-configs/HelloWorld.xml
 configs/Hello.xml
 configs/WonderfulWorld.xml
+configs/HelloWorld.xml
+configs/BeautifulWorld.xml
 src/HelloWorld.java
+runtime.properties
+.classpath
+model.xml

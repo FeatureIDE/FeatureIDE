@@ -1,9 +1,9 @@
-decomposed.uvl
-submodels/FileSystem.uvl
-submodels/OperatingSystem.uvl
-server.uvl
-.classpath
-README.md
 .project
+server.uvl
+decomposed.uvl
+submodels/OperatingSystem.uvl
+submodels/FileSystem.uvl
 lib/uvl-parser.jar
 src/UVLParserExample.java
+README.md
+.classpath
