@@ -316,7 +316,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		final int green = (int) (0.8 * bgColor.getGreen());
 		final int blue = (int) (0.8 * bgColor.getBlue());
 
-		return new Color(red, green, blue);
+		return new Color(null, red, green, blue);
 	}
 
 	public static Color getFeatureBorderColorSave() {
