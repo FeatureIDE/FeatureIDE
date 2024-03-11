@@ -23,6 +23,7 @@ package de.ovgu.featureide.ahead.wrapper;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -154,9 +155,9 @@ public class AheadWrapper {
 												&& (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || content.contains(TYPE_SAFETY))) {
 												marker.delete();
 											} else {
-												final AheadBuildErrorEvent buildError =
-													new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(),
-															AheadBuildErrorType.JAVAC_ERROR, (Integer) marker.getAttribute(IMarker.LINE_NUMBER));
+												final AheadBuildErrorEvent buildError = new AheadBuildErrorEvent(file,
+														marker.getAttribute(IMarker.MESSAGE).toString(), AheadBuildErrorType.JAVAC_ERROR,
+														(Integer) Optional.ofNullable(marker.getAttribute(IMarker.LINE_NUMBER)).orElse(0));
 												if (!hasMarker(buildError)) {
 													final IResource res = buildError.getResource();
 													if (res.exists()) {
