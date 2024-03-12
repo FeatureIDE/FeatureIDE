@@ -102,7 +102,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			}
 
 			image.dispose();
-			gc.dispose();
 			if (feature.getStructure().isRoot()) {
 				image1.dispose();
 			}

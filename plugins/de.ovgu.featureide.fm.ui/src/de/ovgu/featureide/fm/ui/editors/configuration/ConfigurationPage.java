@@ -182,7 +182,6 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 			final ImageData id = image.getImageData();
 			id.alpha = 0;
 			combinedImage = new Image(Display.getCurrent(), id);
-			image.dispose();
 
 			final GC gc = new GC(combinedImage);
 
@@ -193,8 +192,9 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 				gc.setForeground(FMPropertyManager.getLegendBorderColor());
 				gc.drawRoundRectangle(distance, 1, colorWidth, colorHeight, colorHeight, colorHeight);
 			}
-			gc.dispose();
 			combinedImages.put(imageString, combinedImage);
+
+			image.dispose();
 		}
 
 		return combinedImage;
