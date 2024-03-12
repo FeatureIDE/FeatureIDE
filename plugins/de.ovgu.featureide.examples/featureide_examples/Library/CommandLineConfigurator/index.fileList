@@ -2,8 +2,8 @@
 model.png
 lib/uvl-parser.jar
 lib/antlr-3.4.jar
+lib/de.ovgu.featureide.lib.fm-v3.11.1.jar
 lib/org.sat4j.core.jar
-lib/de.ovgu.featureide.lib.fm-v3.11.0.jar
 src/de/ovgu/featureide/examples/commandlineconfigurator/CommandLineConfigurator.java
 .settings/org.eclipse.jdt.core.prefs
 .classpath
