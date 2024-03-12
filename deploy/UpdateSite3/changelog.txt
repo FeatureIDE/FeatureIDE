@@ -4,7 +4,10 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
-Release 3.11.0 (March 2024)
+### Release 3.11.1 (March 2024)
+* Hotfix containing a GUI fix for the configuration editor on MacOS 
+
+### Release 3.11.0 (March 2024)
 * Improves UI of the configuration editor
   * Adds new tab showing currently selected features in a feature tree (#1452)
   * Adds functionality to adapt font size to screen size and manual font-size setting (#1417)
@@ -34,7 +37,7 @@ Release 3.11.0 (March 2024)
   * Fixes handling of non-extended feature models and configurations in attributes view (#1449)
   * Fixes support for relative file paths in UVL (#1459)
 
-Release 3.10.0 (August 2023)
+### Release 3.10.0 (August 2023)
 * Adds new and extended functionality
   * New feature project now allows to import an existing feature model
   * Action "Export All Features Models" is now more intuitive, working for selected files, folders, and projects. (#1404) 
@@ -52,17 +55,17 @@ Release 3.10.0 (August 2023)
   * Fixes conversion to extended feature model and configurations in feature attributes view
   * Fixes other minor bugs
 
-Release 3.9.3 (May 2023)
+### Release 3.9.3 (May 2023)
 * Hotfix containing mostly bugfixes over v3.9.2
 * Fixes more incompatibilities with latest Eclipse versions (#1431,#1430,#1429,#1382)
 
-Release 3.9.2 (March 2023)
+### Release 3.9.2 (March 2023)
 * Hotfix containing mostly bugfixes over v3.9.1
 * Improves UVL support of feature diagram editor and constraint view (#1415, #1410, #1377)
 * Fixes some problem in the feature diagram editor (#1299, #1313, #1402)
 * Fixes incompatibility with latest Eclipse versions (#1403)
 
-Release 3.9.1 (December 2022)
+### Release 3.9.1 (December 2022)
 * Hotfix containing mostly bugfixes over v3.9.0
 * Fixed example projects and added current library versions (#1375, #1380)
 * Fixed multiple problems with UVL (#1285, #1304, #1378, #1386, #1391)
@@ -73,7 +76,7 @@ Release 3.9.1 (December 2022)
   * Added timeout functionality for CNF conversion
 * Fixed other minor bugs (#1082)
 
-Release 3.9.0 (September 2022)
+### Release 3.9.0 (September 2022)
 * Many enhancements and fixes for UVL
   * Added GUI support for importing sub models (#1250)
   * Added examples showcasing usage of UVL parser API (#1369)
@@ -89,7 +92,7 @@ Release 3.9.0 (September 2022)
 * Removed no longer supported options for FeatureHouse, including Fuji and Key (#936, #1106, #1169)
 * Removed unused files (#1356)
 
-Release 3.8.3 (May 2022)
+### Release 3.8.3 (May 2022)
 * Hotfix containing mostly bugfixes over v3.8.2
 * Fixed bug that prevented features from being deleted in feature model editor (#1350)
 * Fixed bug that prevented deletion of multiple constraints (#1342)
@@ -104,7 +107,7 @@ Release 3.8.3 (May 2022)
 * Added license file and corresponding information to repository root (#1290)
 * Minor API improvements (#1351)
 
-Release 3.8.2 (April 2022)
+### Release 3.8.2 (April 2022)
 * Hotfix containing mostly bugfixes over v3.8.1
 * Added example projects for using attributes and formats with the FeatureIDE Library (#1098)
 * Added support for using UVL files as default feature model (#1338)
@@ -114,7 +117,7 @@ Release 3.8.2 (April 2022)
   * Fixed problem with changing default directories of a feature project (#1296)
   * Improved behavior of framework plug-in when plug-ins are faulty (#1109)
 
-Release 3.8.1 (November 2021)
+### Release 3.8.1 (November 2021)
 * Hotfix containing only bugfixes over v3.8.0
 * Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263)
   * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, v3.7.2, or v3.8.0
@@ -126,7 +129,7 @@ Release 3.8.1 (November 2021)
 * Several improvements for the constraint view (#1277, #1256)
 * Improvement of the configuration map (#1178, #1253)
 
-Release 3.8.0 (August 2021)
+### Release 3.8.0 (August 2021)
 * Many enhancements for UVL
    * New constraints are now handled correctly (#1164)
    * Feature Attribute Support (#1133)
@@ -146,12 +149,12 @@ Release 3.8.0 (August 2021)
 * Removed outdated support for Fuji and corresponding functionality (#936, #1106)
 * Small fixes and enhancements (#844, #934, #981, #1105, #1108, #1110, #1116, #1130)
 
-Release 3.7.3 (November 2021)
+### Release 3.7.3 (November 2021)
 * Hotfix containing only bugfixes over v3.7.2
 * Fixed a breaking bug that resulted in a faulty CNF in some cases (#1263).
   * This bug was introduced in v3.7.0 and might affect analyses and evaluations that were performed with version v3.7.0, v3.7.1, or v3.7.2.
 
-Release 3.7.2 (July 2021)
+### Release 3.7.2 (July 2021)
 * Hotfix containing only bugfixes and code quality improvements over v3.7.1
 * Cleaned up outdated libraries in fm.core plug-in (#1144)
   * Removed findbugs annotations
@@ -162,14 +165,14 @@ Release 3.7.2 (July 2021)
   * Added test cases to ensure correctness after future updates
 * Fixed bug regarding alternatives and or-groups with one child (#1139)
 
-Release 3.7.1 (June 2021)
+### Release 3.7.1 (June 2021)
 * Hotfix containing only stability improvements over v3.7.0
 * Significant speed-ups when opening and working with large feature models (#1093)
 * Minor fixes to the FeatureIDE library (#1111, #1100, thanks for the reports by Paul Maximilian Bittner and Kevin Feichtinger)
 * Fixed problem when opening the Java editor for AHEAD projects (#1048, #1085, thanks for the reports by MrKSP and Sebastian Böhm)
 * Contributions by Tobias Heß and Sebastian Krieter 
 
-Release 3.7.0 (October 2020)
+### Release 3.7.0 (October 2020)
 * Universal Variability Language (UVL) integrated into FeatureIDE (#1050)
 * New operation to derive subset product lines given a partial configuration (#1079)
 * Significantly revised constraints view with improved performance, sorting (#874, #886, #887, #1014, #1037, #1038, #1039, #1060, #1063, #1064, #1068)
@@ -179,7 +182,7 @@ Release 3.7.0 (October 2020)
 * Stability of feature-model editor (#992, #1028, #1083) and sampling with YASA (#967) improved
 * API improved (#917, thanks for the report by Robert Müller)
 
-Release 3.6.4 (September 2020)
+### Release 3.6.4 (September 2020)
 * Hotfix containing only stability improvements over v3.6.3
 * Minor stability improvements for the feature-model editor (#1027, #1028, #1080) 
 * Fixes for the automated product generation (#1018, #1046, #1066)
@@ -190,7 +193,7 @@ Release 3.6.4 (September 2020)
 * Feature-model generator fixed (#1008, thanks for the report by Jabier Martinez)
 * When comparing feature models only examples products are generated (#264)
 
-Release 3.6.3 (May 2020)
+### Release 3.6.3 (May 2020)
 * Hotfix containing only stability improvements over v3.6.2
 * Performance of FeatureIDE with large feature models improved (#970, #1004)
 * Performance problem when storing feature model for projects with may configurations fixed (#1011)
@@ -206,7 +209,7 @@ Release 3.6.3 (May 2020)
 * Removed redundant code (#933)
 * Several improvements for the feature diagram editor (#932, #977, #986)
 
-Release 3.6.2 (January 2020)
+### Release 3.6.2 (January 2020)
 * Hotfix containing only stability improvements over v3.6.1
 * Analysis of feature models only performed if automatic analysis is enabled in the menu (#942, #944)
 * Migrated FeatureIDE library examples to the API of v3.6.x (#918)
@@ -222,7 +225,7 @@ Release 3.6.2 (January 2020)
 * Usage of random seeds for certain analyses (#915)
 * JavaDoc problems fixed and now checked in CI (#952)
 
-Release 3.6.1 (October 2019)
+### Release 3.6.1 (October 2019)
 * Hotfix containing only stability improvements over v3.6.0
 * Configuration editor required minutes after every click (#907)
 * Random configurations differ in each run now (before the same seed has been used, see #915)
@@ -237,7 +240,7 @@ Release 3.6.1 (October 2019)
 * Critical and major bugs _introduced_ with this version
   * T-wise configuration generation with ICPL and Chvatal does not work anymore (#983)
 
-Release 3.6.0 (August 2019) 
+### Release 3.6.0 (August 2019) 
 * Increased required Java version to 1.8
 * New constraint view added listing cross-tree constraints
   * Filter of constraints based on selection in feature diagram
@@ -290,7 +293,7 @@ Release 3.6.0 (August 2019)
   * Performance problem when storing feature model for projects with may configurations (#1011)
   * Computation and highlighting of implicit constraints fails (#920, #946)
 
-Release 3.5.5 (June 2019)
+### Release 3.5.5 (June 2019)
 * Hotfix containing only stability improvements over v3.5.4
 * Added example called FeatureModelAnalysis to illustrate how to analyze a feature model with the FeatureIDE library
 * Numerous fixes for the framework composer (#779)
@@ -303,7 +306,7 @@ Release 3.5.5 (June 2019)
 * Performance when editing extended feature models improved (#837)
 * Fixed incompatibility with Eclipse 2018-12 and newer versions (#852)
 
-Release 3.5.4 (February 2019)
+### Release 3.5.4 (February 2019)
 * Hotfix containing only stability improvements over v3.5.3
 * Usability and stability of the feature attributes view improved (#847, #853, #856)
 * Performance and appearance of the feature diagram improved (#785, #831)
@@ -311,7 +314,7 @@ Release 3.5.4 (February 2019)
 * Fixed compilation problems with JavaDoc (#748)
 * Removed instable editing functionality in the feature model outline (#760)
 
-Release 3.5.3 (November 2018)
+### Release 3.5.3 (November 2018)
 * Hotfix containing only stability improvements over v3.5.2
 * Numerous issues with the FeatureHouse composer (#794)
 * Improvements for execution of JUnit tests (#814, #819)
@@ -321,7 +324,7 @@ Release 3.5.3 (November 2018)
 * Accidential change of siblings order (#803)
 * All kinds of void feature models supported when editing constraints (#823)
 
-Release 3.5.2 (September 2018)
+### Release 3.5.2 (September 2018)
 * Hotfix containing only stability improvements over v3.5.1
 * Improved loading and saving of feature models (#759, #761, #771, #773, #776, #799)
 * Better performance for feature models with large contraints (#780)
@@ -330,14 +333,14 @@ Release 3.5.2 (September 2018)
 * Mac users find a README in the prepackaged Eclipse when having trouble running unsigned code (#801)
 * Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/26?closed=1
 
-Release 3.5.1 (June 2018)
+### Release 3.5.1 (June 2018)
 * Hotfix containing only stability improvements over v3.5.0
 * Better performance for analyses in constraint dialog (#736)
 * Unused and false-optional features renamed to never-selected and always-selected features to avoid confusion (#705)
 * Example projects added for extended feature models (#756)
 * Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/25?closed=1
 
-Release 3.5.0 (April 2018)
+### Release 3.5.0 (April 2018)
 * Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
 * New library without Eclipse dependencies for extended feature models (#714)
 * New tool bar and revised context menu for feature diagrams (#648, #651, #672, #720)
@@ -357,7 +360,7 @@ Release 3.5.0 (April 2018)
   * impossible feature coloring (#708)
   * editing of redundant constraints (#622)
 
-Release 3.4.3 (February 2018)
+### Release 3.4.3 (February 2018)
 * Hotfix containing only stability improvements over v3.4.2
 * Void feature model detected in constraint dialog (#704) and correctly visualized in feature diagram (#681, #687, #484)
 * Project explorer shows traces to all features (#593) and is refreshed if color scheme is deactived (#592)
@@ -367,19 +370,19 @@ Release 3.4.3 (February 2018)
 * Feature interaction when collapsing explanations in feature diagram fixed (#682)
 * Exceptions for feature diagrams (#703) and FeatureHouse projects (#680) fixed
 
-Release 3.4.2 (December 2017)
+### Release 3.4.2 (December 2017)
 * Hotfix containing only stability improvements over v3.4.1
 * Feature models created with v3.3.0 and v3.3.1 are correctly loaded (some or-groups we automatically transformed into mandatory features)
 * Fixed problems: missing markers for invalid configurations, opening multiple configurations in project explorer
 * Usability of feature diagram improved
 
-Release 3.4.1 (October 2017)
+### Release 3.4.1 (October 2017)
 * Hotfix containing only stability improvements over v3.4.0
 * Removed dependency from feature modeling to FeatureIDE
 * Numerous fixes with respect to new configuration format
 * Improvements for feature-model editor, configuration editor, explanations, and product generation
 
-Release 3.4.0 (September 2017)
+### Release 3.4.0 (September 2017)
 * All feature diagram anomalies can be explained now (based on SAT4J's minimal unsatisfiable subset computation) 
 * Visual explanations for feature diagrams improved
 * XML format is used as default for new configurations (storing manual and automatic selection and deselection of concrete and abstract features)
@@ -387,15 +390,15 @@ Release 3.4.0 (September 2017)
 * Outline view for feature models available if only feature modeling is installed
 * Numerous stability and performance improvements
 
-Release 3.3.2 (July 2017)
+### Release 3.3.2 (July 2017)
 * Hotfix containing merely stability improvements over v3.3.1
 * Improvements for FeatureIDE examples, feature-model editor, configuration editor, feature coloring, black-box frameworks, configuration map
 
-Release 3.3.1 (May 2017)
+### Release 3.3.1 (May 2017)
 * Hotfix containing only stability improvements over v3.3.0
 * Improvements for configuration editor, feature-model editor, configuration map, random and t-wise configuration generation
 
-Release 3.3.0 (April 2017)
+### Release 3.3.0 (April 2017)
 * Feature subtrees in feature diagram can be folded manually and automatically
 * Visual explanations for feature-model defects (e.g., dead features)
 * New view Configuration Map added for an overview on all user-defined configurations
@@ -407,7 +410,7 @@ Release 3.3.0 (April 2017)
 * Improved feature-model slicing
 * Improved FeatureIDE library and its build scripts
 
-Release 3.2.0 (December 2016)
+### Release 3.2.0 (December 2016)
 * Refactored main FeatureIDE functionality into Jar without dependencies to Eclipse
 * New visualizations on the selection of features across configurations
 * Improved performance for analysis of dead and false-optional features
@@ -415,11 +418,11 @@ Release 3.2.0 (December 2016)
 * Content assist for annotations improved for preprocessor Antenna
 * Improvements for product generation (to create and build products in batch mode)
 
-Release 3.1.2 (October 2016)
+### Release 3.1.2 (October 2016)
 * (Release used for FeatureIDE tutorial at SPLC in Beijing, China)
 * Hotfix for product generation under Unix operating systems
 
-Release 3.1.1 (September 2016)
+### Release 3.1.1 (September 2016)
 * Several hotfixes regarding:
   * Example wizard and example projects (#393, #399)
   * Feature model editor and constraint dialog (#383, #389, #404, #406, #409, #420, #422)
@@ -430,7 +433,7 @@ Release 3.1.1 (September 2016)
 * Added Automotive examples (large-scale feature models)
 * Further stability improvements
 
-Release 3.1.0 (July 2016)
+### Release 3.1.0 (July 2016)
 * New extension point to exchange classes for features, constraints, and feature models with the factory pattern
 * Explanations for anomalies in feature models
 * Support to compute implicit constraints for subtrees of the feature model
@@ -440,7 +443,7 @@ Release 3.1.0 (July 2016)
 * Improved tool support for multi-product lines
 * Example wizard revised and new examples added
 
-Release 3.0.1 (May 2016)
+### Release 3.0.1 (May 2016)
 * Several Hotfixes:
   * Configuration is updated when opening configuration editor (Fix #345).
   * Feature model layout is saved properly (Fix #346).
@@ -448,7 +451,7 @@ Release 3.0.1 (May 2016)
   * Feature models from outside the workspace can be save properly.
 * Further stability improvements
 
-Release 3.0.0 (April 2016)
+### Release 3.0.0 (April 2016)
 * Three new generators added for black-box frameworks, runtime parameters, and images
 * New interfaces for feature model, features, and constraints to improve extensibility (new extension points are planned for 3.1.0)
 * Improved performance for feature-model analyses and example wizard
@@ -457,7 +460,7 @@ Release 3.0.0 (April 2016)
 * Usability improvements in configuration editor (e.g., search, folding, revised highlighting)
 * Feature-model slicing available
 
-Release 2.7.5 (December 2015)
+### Release 2.7.5 (December 2015)
 * Support for coloring features in project explorer, feature diagram, configuration, outline, collaboration diagram, and for generated files
 * Fixed wrong statistics for preprocessors
 * New functionality in outline for preprocessor Munge
@@ -465,7 +468,7 @@ Release 2.7.5 (December 2015)
 * Improved short cuts of feature model editor
 * Fixed several bugs and null pointers
 
-Release 2.7.4 (June 2015)
+### Release 2.7.4 (June 2015)
 * Improved outline with support for further langauges (Haskell, C#), nested classes, and with new filters
 * Improved collaboration diagram with support for nested classes, new filters, and toolbar buttons
 * Improved statistics view with LOC, support for nested classes, and jump-to-file actions
@@ -473,7 +476,7 @@ Release 2.7.4 (June 2015)
 * Update problem with feature-model legend and constraints fixed (e.g., wrong highlighting of redundant constraints)
 * Feature model outline revised
 
-Release 2.7.3 (March 2015)
+### Release 2.7.3 (March 2015)
 * Performance and appearance of constraint dialog for large feature models improved (automated analyses run asynchronously)
 * Performance of configuration editor for large feature models improved (automated analyses run asynchronously)
 * Improved support for multi product lines
@@ -483,7 +486,7 @@ Release 2.7.3 (March 2015)
 * Deprecated action framework of Eclipse replaced
 * FeatureIDE requires Java 1.7 (was Java 1.6 before)
 
-Release 2.7.2 (October 2014)
+### Release 2.7.2 (October 2014)
 * Support for Android projects with preprocessor Munge
 * Family-based type checks with Fuji can be activated on demand (to overcome performance problems with large projects)
 * Feature-model import from S.P.L.O.T. improved (can deal with several group types)
@@ -491,17 +494,17 @@ Release 2.7.2 (October 2014)
 * Manual layout of and search for features in feature diagram with keyboard
 * Graphical export of feature diagrams to SVG
 
-Release 2.7.1 (July 2014)
+### Release 2.7.1 (July 2014)
 * Example wizard improved by hierarchical structure and keyword search
 * Removed redundant calculations in composers that caused inconsistencies in threads
 * Performance of configuration editor improved
 
-Release 2.7.0 (April 2014)
+### Release 2.7.0 (April 2014)
 * Advanced support for contracts in FeatureHouse projects (e.g., collaboration diagram and outline, error markers, statistics on contracts, improved variability encoding)
 * Performance of feature-model editor and analyses improved
 * New support for prioritizing products in t-wise generation
 
-Release 2.6.7 (October 2013)
+### Release 2.6.7 (October 2013)
 * New view calculating statistics on FeatureIDE projects
 * New outline and content assist for FeatureHouse projects added
 * Colligens supports development with CPP (integrates TypeChef)
@@ -511,11 +514,11 @@ Release 2.6.7 (October 2013)
 * Configuration editor improved
   * Icons and tool tips added giving relevant information on the feature model
 
-Release 2.6.6 (September 2013)
+### Release 2.6.6 (September 2013)
 * Family-based type checks of FeatureHouse projects fith fuji
 * T-wise product generation with splcatool
 
-Release 2.6.5 (May 2013)
+### Release 2.6.5 (May 2013)
 * New AHEAD version integrated
 * AHEAD projects can be composed with Jampack or Mixin (based on the settings
   in the project properties)
@@ -525,13 +528,13 @@ Release 2.6.5 (May 2013)
 * Support for JML-based verification with KeY and JavaPathFinder
 * JML contracts added to the collaboration diagram for FeatureHouse projects
 
-Release 2.6.4 (December 2012)
+### Release 2.6.4 (December 2012)
 * Support for JML in FeatureHouse (contract composition can be configured using
   right click on a FeatureIDE project -> Properties -> FeatureIDE -> Feature
   Project -> Contract composition)
 * Syntax errors for JML in FeatureHouse projects
 
-Release 2.6.3 (September 2012)
+### Release 2.6.3 (September 2012)
 * Support for arbitrary feature names in feature diagram and constraint dialog
   (features containing whitespace must be placed within quotation marks in the
   constraint dialog; works only when no generator is selected for this project)
@@ -549,10 +552,10 @@ Release 2.6.3 (September 2012)
   Antenna and Munge
 * Efficiency of feature diagram drawing improved
        
-Release 2.6.2 (June 2012)
+### Release 2.6.2 (June 2012)
 * Jak editor for AHEAD replaced with default Java editor
 
-Release 2.6.1 (March 2012)
+### Release 2.6.1 (March 2012)
 * New layout algorithms and manual layout at the feature model editor (right
   click at the feature diagram -> Set Layout)
 * Automated analysis at the feature model editor (highlighting of dead and
@@ -571,16 +574,16 @@ Release 2.6.1 (March 2012)
 * A new option to create FeatureIDE projects without generator for feature
   modeling only
 
-Release 2.6.0 (September 2011)
+### Release 2.6.0 (September 2011)
 * Support for redo and undo at the feature model editor
 * Option to generate all products (right click on a FeatureIDE project ->
   Variant Builder)
 * Error propagation for some languages of FeatureHouse
 
-Release 2.5.2 (June 2011)
+### Release 2.5.2 (June 2011)
 * Collaboration diagram supports further languages in FeatureHouse
 
-Release 2.5.1 (March 2011)
+### Release 2.5.1 (March 2011)
 * Warnings at feature folders indicating whether a feature is not implemented 
   (potentially abstract feature) or does not exist
 * DeltaJ integrated as a new generator
@@ -589,7 +592,7 @@ Release 2.5.1 (March 2011)
 * Simple implementation of a collaboration diagram for preprocessors
 * Methods and fields are shown at collaboration diagram for FeatureHouse and FeatureC++
 
-Release 2.5.0 (December 2010)
+### Release 2.5.0 (December 2010)
 * Any Eclipse project can be converted to a FeatureIDE project (right click on
   a project that is not a FeatureIDE project -> Add FeatureIDE nature)
 * FeatureIDE projects can be run using "Run as" of the host language (e.g., as 
@@ -600,11 +603,11 @@ Release 2.5.0 (December 2010)
   (composer integration is easier and does not involve redundant effort)
 * Munge preprocessor integrated as a new generator
 
-Release 2.4.4 (September 2010)
+### Release 2.4.4 (September 2010)
 * Features can be marked as hidden at the feature model (indicating that they
   are not visible at the configuration editor)
 
-Release 2.4.3 (August 2010)
+### Release 2.4.3 (August 2010)
 * Editor to create cross-tree constraints improved
 * New XML format to store feature models with support for abstract features
 * Editor for configurations is now a multi-page editor (including a source page
@@ -613,30 +616,30 @@ Release 2.4.3 (August 2010)
   elimination leads to a valid configuration
 * Collaboration diagram shows method and fields
 
-Release 2.4.2 (May 2010)
+### Release 2.4.2 (May 2010)
 * Clean build is supported for FeatureIDE projects
 
-Release 2.4.1 (March 2010)
+### Release 2.4.1 (March 2010)
 * Configuration editor synchronized with feature model editor (you do not need
   to close and reopen the configuration editor when changing the feature model)
 
-Release 2.4.0 (February 2010)
+### Release 2.4.0 (February 2010)
 * Collaboration diagram added as a new view
 
-Release 2.3.5 (November 2009)
+### Release 2.3.5 (November 2009)
 * Keyboard shortcuts for the feature model editor
 
-Release 2.3.4 (September 2009)
+### Release 2.3.4 (September 2009)
 
-Release 2.3.3 (August 2009)
+### Release 2.3.3 (August 2009)
 * Editor for feature order as part of the feature model editor
 
-Release 2.3.2 (July 2009)
+### Release 2.3.2 (July 2009)
 * Feature order can be specified
 
-Release 2.3.1 (June 2009)
+### Release 2.3.1 (June 2009)
 
-Release 2.3.0 icse (June 2009)
+### Release 2.3.0 icse (June 2009)
 * Welcome screen
 * FeatureIDE perspective
 * Edit view enhanced (shows added and removed products)
