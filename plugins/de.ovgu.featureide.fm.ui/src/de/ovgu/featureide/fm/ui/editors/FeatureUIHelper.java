@@ -29,8 +29,8 @@ import java.util.Map;
 
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.EditPartViewer;
 import org.eclipse.draw2d.zoom.ZoomListener;
+import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.ZoomManager;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -48,7 +48,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * @author Christian Kaestner
  * @author Martha Nyerembe
  * @author Lukas Vogt
- * @author Malte Grave
  */
 public class FeatureUIHelper {
 
@@ -184,8 +183,9 @@ public class FeatureUIHelper {
 		zoomManager.addZoomListener(new ZoomListener() {
 
 			@Override
-			public void zoomChanged(double newZoomFactor) {
-				FeatureUIHelper.zoomFactor = newZoomFactor;
+			public void zoomChanged(double newZoomLevel) {
+				FeatureUIHelper.zoomFactor = newZoomLevel;
+
 			}
 		});
 	}

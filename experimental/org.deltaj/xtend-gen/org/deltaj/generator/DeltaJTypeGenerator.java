@@ -6,6 +6,7 @@ import org.deltaj.deltaj.ClassType;
 import org.deltaj.deltaj.Type;
 import org.deltaj.deltaj.TypeVariable;
 import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.xtext.xbase.lib.XbaseGenerated;
 
 @SuppressWarnings("all")
 public class DeltaJTypeGenerator {
@@ -13,28 +14,29 @@ public class DeltaJTypeGenerator {
     StringConcatenation _builder = new StringConcatenation();
     return _builder;
   }
-  
+
   protected CharSequence _compileType(final TypeVariable type) {
     StringConcatenation _builder = new StringConcatenation();
     String _varName = type.getVarName();
-    _builder.append(_varName, "");
+    _builder.append(_varName);
     return _builder;
   }
-  
+
   protected CharSequence _compileType(final ClassType type) {
     StringConcatenation _builder = new StringConcatenation();
     String _classref = type.getClassref();
-    _builder.append(_classref, "");
+    _builder.append(_classref);
     return _builder;
   }
-  
+
   protected CharSequence _compileType(final BasicType type) {
     StringConcatenation _builder = new StringConcatenation();
     String _basic = type.getBasic();
-    _builder.append(_basic, "");
+    _builder.append(_basic);
     return _builder;
   }
-  
+
+  @XbaseGenerated
   public CharSequence compileType(final Type type) {
     if (type instanceof BasicType) {
       return _compileType((BasicType)type);
