@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * @author Christian Kaestner
  * @author Martha Nyerembe
  * @author Lukas Vogt
+ * @author Malte Grave VaSiCS LIT CPS
  */
 public class FeatureUIHelper {
 
