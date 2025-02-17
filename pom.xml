@@ -83,7 +83,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.11.2</version>
                 <configuration>
                     <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
                     <destDir>${project.name}</destDir>
@@ -194,9 +194,7 @@
 										<artifactId>
 											maven-resources-plugin
 										</artifactId>
-										<versionRange>
-											[2.4.3,)
-										</versionRange>
+										<version>3.3.1</version>
 										<goals>
 											<goal>resources</goal>
 											<goal>testResources</goal>
@@ -214,9 +212,7 @@
 										<artifactId>
 											tycho-compiler-plugin
 										</artifactId>
-										<versionRange>
-											[0.23.1,)
-										</versionRange>
+										<version>${tycho-version}</version>
 										<goals>
 											<goal>compile</goal>
 										</goals>
@@ -233,9 +229,9 @@
 										<artifactId>
 											tycho-packaging-plugin
 										</artifactId>
-										<versionRange>
-											[0.23.1,)
-										</versionRange>
+										<version>
+											${tycho-version}
+										</version>
 										<goals>
 											<goal>build-qualifier</goal>
 											<goal>build-qualifier-aggregator</goal>

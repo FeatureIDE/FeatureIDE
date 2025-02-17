@@ -14,7 +14,7 @@ Bundle-ClassPath: .,
  lib/SPLCAT.jar,
  lib/commons-math-2.2.jar,
  lib/uvl-parser.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.vill.model,
