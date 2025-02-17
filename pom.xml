@@ -80,19 +80,6 @@
 
 	<build>
 		<plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
-                <configuration>
-                    <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
-                    <destDir>${project.name}</destDir>
-                    <debug>true</debug>
-                    <doclint>none</doclint>
-                    <failOnWarnings>false</failOnWarnings>
-                </configuration>
-            </plugin>
-        
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
@@ -194,7 +181,7 @@
 										<artifactId>
 											maven-resources-plugin
 										</artifactId>
-										<version>3.3.1</version>
+										<versionRange>[3.3.1,)</versionRange>
 										<goals>
 											<goal>resources</goal>
 											<goal>testResources</goal>
@@ -212,7 +199,7 @@
 										<artifactId>
 											tycho-compiler-plugin
 										</artifactId>
-										<version>${tycho-version}</version>
+										<versionRange>[3.0.0,]</versionRange>
 										<goals>
 											<goal>compile</goal>
 										</goals>
@@ -229,9 +216,7 @@
 										<artifactId>
 											tycho-packaging-plugin
 										</artifactId>
-										<version>
-											${tycho-version}
-										</version>
+										<versionRange>[3.0.0,]</versionRange>
 										<goals>
 											<goal>build-qualifier</goal>
 											<goal>build-qualifier-aggregator</goal>
@@ -254,6 +239,19 @@
 	<!-- mvn clean verify jacoco:report -->
 	<reporting>
 		<plugins>
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
+                    <destDir>${project.name}</destDir>
+                    <debug>true</debug>
+                    <doclint>none</doclint>
+                    <failOnWarnings>false</failOnWarnings>
+                </configuration>
+            </plugin>
+		
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>

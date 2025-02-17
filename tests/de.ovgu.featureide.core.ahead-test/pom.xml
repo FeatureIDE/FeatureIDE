@@ -8,6 +8,5 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>de.ovgu.featureide.core.ahead-test</artifactId>
-	<version>3.11.1-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 </project>
