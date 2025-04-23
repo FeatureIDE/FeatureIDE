@@ -61,7 +61,7 @@ public class DimacsWriter {
 			throw new IllegalArgumentException();
 		}
 		this.cnf = cnf;
-		this.projectionVariables = projectionVariables.clone();
+		this.projectionVariables = projectionVariables != null ? projectionVariables.clone() : null;
 	}
 
 	/**
