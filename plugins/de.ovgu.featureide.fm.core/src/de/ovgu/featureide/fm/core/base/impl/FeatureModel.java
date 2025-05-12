@@ -404,6 +404,9 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setConstraints(Iterable<IConstraint> constraints) {
+		for (final IConstraint oldConstraint : this.constraints) {
+			elements.remove(oldConstraint.getInternalId());
+		}
 		this.constraints.clear();
 		for (final IConstraint constraint : constraints) {
 			addConstraint(constraint);
