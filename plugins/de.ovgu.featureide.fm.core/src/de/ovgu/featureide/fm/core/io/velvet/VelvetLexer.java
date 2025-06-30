@@ -1,2433 +1,479 @@
-// $ANTLR 3.4 Velvet.g 2016-07-17 21:07:31
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- *
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
+// Generated from Velvet.g4 by ANTLR 4.13.2
+
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import org.antlr.runtime.BaseRecognizer;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.DFA;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.Lexer;
-import org.antlr.runtime.MismatchedSetException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
 
-@SuppressWarnings({ "all", "warnings", "unchecked" })
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
 public class VelvetLexer extends Lexer {
+	static { RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION); }
 
-	public static final int EOF = -1;
-	public static final int ABSTRACT = 4;
-	public static final int ACONSTR = 5;
-	public static final int ATTR = 6;
-	public static final int ATTR_OP_EQUALS = 7;
-	public static final int ATTR_OP_GREATER = 8;
-	public static final int ATTR_OP_GREATER_EQ = 9;
-	public static final int ATTR_OP_LESS = 10;
-	public static final int ATTR_OP_LESS_EQ = 11;
-	public static final int ATTR_OP_NOT_EQUALS = 12;
-	public static final int BASEEXT = 13;
-	public static final int BOOLEAN = 14;
-	public static final int CINTERFACE = 15;
-	public static final int COLON = 16;
-	public static final int COMMA = 17;
-	public static final int CONCEPT = 18;
-	public static final int CONSTR = 19;
-	public static final int CONSTRAINT = 20;
-	public static final int DEF = 21;
-	public static final int DESCRIPTION = 22;
-	public static final int EMPTY = 23;
-	public static final int END_C = 24;
-	public static final int END_R = 25;
-	public static final int EQ = 26;
-	public static final int ESC_SEQ = 27;
-	public static final int EXPONENT = 28;
-	public static final int FEATURE = 29;
-	public static final int FLOAT = 30;
-	public static final int GROUP = 31;
-	public static final int HEX_DIGIT = 32;
-	public static final int ID = 33;
-	public static final int IDPath = 34;
-	public static final int IMPORT = 35;
-	public static final int IMPORTINSTANCE = 36;
-	public static final int IMPORTINTERFACE = 37;
-	public static final int INT = 38;
-	public static final int MANDATORY = 39;
-	public static final int MINUS = 40;
-	public static final int ML_COMMENT = 41;
-	public static final int OCTAL_ESC = 42;
-	public static final int ONEOF = 43;
-	public static final int OPERAND = 44;
-	public static final int OP_AND = 45;
-	public static final int OP_EQUIVALENT = 46;
-	public static final int OP_IMPLIES = 47;
-	public static final int OP_NOT = 48;
-	public static final int OP_OR = 49;
-	public static final int OP_XOR = 50;
-	public static final int PLUS = 51;
-	public static final int SEMI = 52;
-	public static final int SL_COMMENT = 53;
-	public static final int SOMEOF = 54;
-	public static final int START_C = 55;
-	public static final int START_R = 56;
-	public static final int STRING = 57;
-	public static final int UNARYOP = 58;
-	public static final int UNICODE_ESC = 59;
-	public static final int USE = 60;
-	public static final int VAR_BOOL = 61;
-	public static final int VAR_FLOAT = 62;
-	public static final int VAR_INT = 63;
-	public static final int VAR_STRING = 64;
-	public static final int WS = 65;
+	protected static final DFA[] _decisionToDFA;
+	protected static final PredictionContextCache _sharedContextCache =
+		new PredictionContextCache();
+	public static final int
+		IMPORT=1, MANDATORY=2, ABSTRACT=3, SOMEOF=4, ONEOF=5, CONCEPT=6, CINTERFACE=7, 
+		CONSTRAINT=8, FEATURE=9, USE=10, IMPORTINSTANCE=11, IMPORTINTERFACE=12, 
+		DESCRIPTION=13, VAR_INT=14, VAR_FLOAT=15, VAR_STRING=16, VAR_BOOL=17, 
+		SEMI=18, START_C=19, END_C=20, START_R=21, END_R=22, EQ=23, COMMA=24, 
+		COLON=25, PLUS=26, MINUS=27, OP_NOT=28, OP_AND=29, OP_OR=30, OP_XOR=31, 
+		OP_IMPLIES=32, OP_EQUIVALENT=33, ATTR_OP_EQUALS=34, ATTR_OP_NOT_EQUALS=35, 
+		ATTR_OP_GREATER=36, ATTR_OP_LESS=37, ATTR_OP_GREATER_EQ=38, ATTR_OP_LESS_EQ=39, 
+		EMPTY=40, CONSTR=41, ACONSTR=42, BASEEXT=43, DEF=44, GROUP=45, ATTR=46, 
+		UNARYOP=47, OPERAND=48, BOOLEAN=49, ID=50, IDPath=51, INT=52, FLOAT=53, 
+		STRING=54, WS=55, SL_COMMENT=56, ML_COMMENT=57;
+	public static String[] channelNames = {
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
+	};
 
-	// delegates
-	// delegators
-	public Lexer[] getDelegates() {
-		return new Lexer[] {};
+	public static String[] modeNames = {
+		"DEFAULT_MODE"
+	};
+
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"IMPORT", "MANDATORY", "ABSTRACT", "SOMEOF", "ONEOF", "CONCEPT", "CINTERFACE", 
+			"CONSTRAINT", "FEATURE", "USE", "IMPORTINSTANCE", "IMPORTINTERFACE", 
+			"DESCRIPTION", "VAR_INT", "VAR_FLOAT", "VAR_STRING", "VAR_BOOL", "SEMI", 
+			"START_C", "END_C", "START_R", "END_R", "EQ", "COMMA", "COLON", "PLUS", 
+			"MINUS", "OP_NOT", "OP_AND", "OP_OR", "OP_XOR", "OP_IMPLIES", "OP_EQUIVALENT", 
+			"ATTR_OP_EQUALS", "ATTR_OP_NOT_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_LESS", 
+			"ATTR_OP_GREATER_EQ", "ATTR_OP_LESS_EQ", "EMPTY", "CONSTR", "ACONSTR", 
+			"BASEEXT", "DEF", "GROUP", "ATTR", "UNARYOP", "OPERAND", "BOOLEAN", "ID", 
+			"IDPath", "INT", "FLOAT", "STRING", "EXPONENT", "HEX_DIGIT", "ESC_SEQ", 
+			"OCTAL_ESC", "UNICODE_ESC", "WS", "SL_COMMENT", "ML_COMMENT"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
+
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'import'", "'mandatory'", "'abstract'", "'someOf'", "'oneOf'", 
+			"'concept'", "'cinterface'", "'constraint'", "'feature'", "'use'", "'instance'", 
+			"'interface'", "'description'", "'int'", "'float'", "'string'", "'bool'", 
+			"';'", "'{'", "'}'", "'('", "')'", "'='", "','", "':'", "'+'", "'-'", 
+			"'!'", "'&&'", "'||'", "'xor'", "'->'", "'<->'", "'=='", "'!='", "'>'", 
+			"'<'", "'>='", "'<='", "'EMPTY'", "'CONSTR'", "'ACONSTR'", "'BASEEXT'", 
+			"'DEF'", "'GROUP'", "'ATTR'", "'UNARYOP'", "'OPERAND'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, "IMPORT", "MANDATORY", "ABSTRACT", "SOMEOF", "ONEOF", "CONCEPT", 
+			"CINTERFACE", "CONSTRAINT", "FEATURE", "USE", "IMPORTINSTANCE", "IMPORTINTERFACE", 
+			"DESCRIPTION", "VAR_INT", "VAR_FLOAT", "VAR_STRING", "VAR_BOOL", "SEMI", 
+			"START_C", "END_C", "START_R", "END_R", "EQ", "COMMA", "COLON", "PLUS", 
+			"MINUS", "OP_NOT", "OP_AND", "OP_OR", "OP_XOR", "OP_IMPLIES", "OP_EQUIVALENT", 
+			"ATTR_OP_EQUALS", "ATTR_OP_NOT_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_LESS", 
+			"ATTR_OP_GREATER_EQ", "ATTR_OP_LESS_EQ", "EMPTY", "CONSTR", "ACONSTR", 
+			"BASEEXT", "DEF", "GROUP", "ATTR", "UNARYOP", "OPERAND", "BOOLEAN", "ID", 
+			"IDPath", "INT", "FLOAT", "STRING", "WS", "SL_COMMENT", "ML_COMMENT"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
+	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+		tokenNames = new String[_SYMBOLIC_NAMES.length];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = VOCABULARY.getLiteralName(i);
+			if (tokenNames[i] == null) {
+				tokenNames[i] = VOCABULARY.getSymbolicName(i);
+			}
+
+			if (tokenNames[i] == null) {
+				tokenNames[i] = "<INVALID>";
+			}
+		}
 	}
 
-	public VelvetLexer() {}
+	@Override
+	@Deprecated
+	public String[] getTokenNames() {
+		return tokenNames;
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+		return VOCABULARY;
+	}
+
+
+	public class InternalSyntaxException extends RuntimeException{
+		private final RecognitionException e;
+		public InternalSyntaxException(RecognitionException e){
+			this.e = e;	
+		}
+		
+		public RecognitionException getException(){
+			return e;
+		}
+	}
+
 
 	public VelvetLexer(CharStream input) {
-		this(input, new RecognizerSharedState());
-	}
-
-	public VelvetLexer(CharStream input, RecognizerSharedState state) {
-		super(input, state);
+		super(input);
+		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() {
-		return "Velvet.g";
-	}
-
-	// $ANTLR start "ABSTRACT"
-	public final void mABSTRACT() throws RecognitionException {
-		try {
-			final int _type = ABSTRACT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:4:10: ( 'abstract' )
-			// Velvet.g:4:12: 'abstract'
-			{
-				match("abstract");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ABSTRACT"
-
-	// $ANTLR start "ATTR_OP_EQUALS"
-	public final void mATTR_OP_EQUALS() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_EQUALS;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:5:16: ( '==' )
-			// Velvet.g:5:18: '=='
-			{
-				match("==");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_EQUALS"
-
-	// $ANTLR start "ATTR_OP_GREATER"
-	public final void mATTR_OP_GREATER() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_GREATER;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:6:17: ( '>' )
-			// Velvet.g:6:19: '>'
-			{
-				match('>');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_GREATER"
-
-	// $ANTLR start "ATTR_OP_GREATER_EQ"
-	public final void mATTR_OP_GREATER_EQ() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_GREATER_EQ;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:7:20: ( '>=' )
-			// Velvet.g:7:22: '>='
-			{
-				match(">=");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_GREATER_EQ"
-
-	// $ANTLR start "ATTR_OP_LESS"
-	public final void mATTR_OP_LESS() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_LESS;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:8:14: ( '<' )
-			// Velvet.g:8:16: '<'
-			{
-				match('<');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_LESS"
-
-	// $ANTLR start "ATTR_OP_LESS_EQ"
-	public final void mATTR_OP_LESS_EQ() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_LESS_EQ;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:9:17: ( '<=' )
-			// Velvet.g:9:19: '<='
-			{
-				match("<=");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_LESS_EQ"
-
-	// $ANTLR start "ATTR_OP_NOT_EQUALS"
-	public final void mATTR_OP_NOT_EQUALS() throws RecognitionException {
-		try {
-			final int _type = ATTR_OP_NOT_EQUALS;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:10:20: ( '!=' )
-			// Velvet.g:10:22: '!='
-			{
-				match("!=");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ATTR_OP_NOT_EQUALS"
-
-	// $ANTLR start "CINTERFACE"
-	public final void mCINTERFACE() throws RecognitionException {
-		try {
-			final int _type = CINTERFACE;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:11:12: ( 'cinterface' )
-			// Velvet.g:11:14: 'cinterface'
-			{
-				match("cinterface");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "CINTERFACE"
-
-	// $ANTLR start "COLON"
-	public final void mCOLON() throws RecognitionException {
-		try {
-			final int _type = COLON;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:12:7: ( ':' )
-			// Velvet.g:12:9: ':'
-			{
-				match(':');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "COLON"
-
-	// $ANTLR start "COMMA"
-	public final void mCOMMA() throws RecognitionException {
-		try {
-			final int _type = COMMA;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:13:7: ( ',' )
-			// Velvet.g:13:9: ','
-			{
-				match(',');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "COMMA"
-
-	// $ANTLR start "CONCEPT"
-	public final void mCONCEPT() throws RecognitionException {
-		try {
-			final int _type = CONCEPT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:14:9: ( 'concept' )
-			// Velvet.g:14:11: 'concept'
-			{
-				match("concept");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "CONCEPT"
-
-	// $ANTLR start "CONSTRAINT"
-	public final void mCONSTRAINT() throws RecognitionException {
-		try {
-			final int _type = CONSTRAINT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:15:12: ( 'constraint' )
-			// Velvet.g:15:14: 'constraint'
-			{
-				match("constraint");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "CONSTRAINT"
-
-	// $ANTLR start "DESCRIPTION"
-	public final void mDESCRIPTION() throws RecognitionException {
-		try {
-			final int _type = DESCRIPTION;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:16:13: ( 'description' )
-			// Velvet.g:16:15: 'description'
-			{
-				match("description");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "DESCRIPTION"
-
-	// $ANTLR start "END_C"
-	public final void mEND_C() throws RecognitionException {
-		try {
-			final int _type = END_C;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:17:7: ( '}' )
-			// Velvet.g:17:9: '}'
-			{
-				match('}');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "END_C"
-
-	// $ANTLR start "END_R"
-	public final void mEND_R() throws RecognitionException {
-		try {
-			final int _type = END_R;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:18:7: ( ')' )
-			// Velvet.g:18:9: ')'
-			{
-				match(')');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "END_R"
-
-	// $ANTLR start "EQ"
-	public final void mEQ() throws RecognitionException {
-		try {
-			final int _type = EQ;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:19:4: ( '=' )
-			// Velvet.g:19:6: '='
-			{
-				match('=');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "EQ"
-
-	// $ANTLR start "FEATURE"
-	public final void mFEATURE() throws RecognitionException {
-		try {
-			final int _type = FEATURE;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:20:9: ( 'feature' )
-			// Velvet.g:20:11: 'feature'
-			{
-				match("feature");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "FEATURE"
-
-	// $ANTLR start "IMPORT"
-	public final void mIMPORT() throws RecognitionException {
-		try {
-			final int _type = IMPORT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:21:8: ( 'import' )
-			// Velvet.g:21:10: 'import'
-			{
-				match("import");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "IMPORT"
-
-	// $ANTLR start "IMPORTINSTANCE"
-	public final void mIMPORTINSTANCE() throws RecognitionException {
-		try {
-			final int _type = IMPORTINSTANCE;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:22:16: ( 'instance' )
-			// Velvet.g:22:18: 'instance'
-			{
-				match("instance");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "IMPORTINSTANCE"
-
-	// $ANTLR start "IMPORTINTERFACE"
-	public final void mIMPORTINTERFACE() throws RecognitionException {
-		try {
-			final int _type = IMPORTINTERFACE;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:23:17: ( 'interface' )
-			// Velvet.g:23:19: 'interface'
-			{
-				match("interface");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "IMPORTINTERFACE"
-
-	// $ANTLR start "MANDATORY"
-	public final void mMANDATORY() throws RecognitionException {
-		try {
-			final int _type = MANDATORY;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:24:11: ( 'mandatory' )
-			// Velvet.g:24:13: 'mandatory'
-			{
-				match("mandatory");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "MANDATORY"
-
-	// $ANTLR start "MINUS"
-	public final void mMINUS() throws RecognitionException {
-		try {
-			final int _type = MINUS;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:25:7: ( '-' )
-			// Velvet.g:25:9: '-'
-			{
-				match('-');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "MINUS"
-
-	// $ANTLR start "ONEOF"
-	public final void mONEOF() throws RecognitionException {
-		try {
-			final int _type = ONEOF;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:26:7: ( 'oneOf' )
-			// Velvet.g:26:9: 'oneOf'
-			{
-				match("oneOf");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ONEOF"
-
-	// $ANTLR start "OP_AND"
-	public final void mOP_AND() throws RecognitionException {
-		try {
-			final int _type = OP_AND;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:27:8: ( '&&' )
-			// Velvet.g:27:10: '&&'
-			{
-				match("&&");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_AND"
-
-	// $ANTLR start "OP_EQUIVALENT"
-	public final void mOP_EQUIVALENT() throws RecognitionException {
-		try {
-			final int _type = OP_EQUIVALENT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:28:15: ( '<->' )
-			// Velvet.g:28:17: '<->'
-			{
-				match("<->");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_EQUIVALENT"
-
-	// $ANTLR start "OP_IMPLIES"
-	public final void mOP_IMPLIES() throws RecognitionException {
-		try {
-			final int _type = OP_IMPLIES;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:29:12: ( '->' )
-			// Velvet.g:29:14: '->'
-			{
-				match("->");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_IMPLIES"
-
-	// $ANTLR start "OP_NOT"
-	public final void mOP_NOT() throws RecognitionException {
-		try {
-			final int _type = OP_NOT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:30:8: ( '!' )
-			// Velvet.g:30:10: '!'
-			{
-				match('!');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_NOT"
-
-	// $ANTLR start "OP_OR"
-	public final void mOP_OR() throws RecognitionException {
-		try {
-			final int _type = OP_OR;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:31:7: ( '||' )
-			// Velvet.g:31:9: '||'
-			{
-				match("||");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_OR"
-
-	// $ANTLR start "OP_XOR"
-	public final void mOP_XOR() throws RecognitionException {
-		try {
-			final int _type = OP_XOR;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:32:8: ( 'xor' )
-			// Velvet.g:32:10: 'xor'
-			{
-				match("xor");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OP_XOR"
-
-	// $ANTLR start "PLUS"
-	public final void mPLUS() throws RecognitionException {
-		try {
-			final int _type = PLUS;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:33:6: ( '+' )
-			// Velvet.g:33:8: '+'
-			{
-				match('+');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "PLUS"
-
-	// $ANTLR start "SEMI"
-	public final void mSEMI() throws RecognitionException {
-		try {
-			final int _type = SEMI;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:34:6: ( ';' )
-			// Velvet.g:34:8: ';'
-			{
-				match(';');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "SEMI"
-
-	// $ANTLR start "SOMEOF"
-	public final void mSOMEOF() throws RecognitionException {
-		try {
-			final int _type = SOMEOF;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:35:8: ( 'someOf' )
-			// Velvet.g:35:10: 'someOf'
-			{
-				match("someOf");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "SOMEOF"
-
-	// $ANTLR start "START_C"
-	public final void mSTART_C() throws RecognitionException {
-		try {
-			final int _type = START_C;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:36:9: ( '{' )
-			// Velvet.g:36:11: '{'
-			{
-				match('{');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "START_C"
-
-	// $ANTLR start "START_R"
-	public final void mSTART_R() throws RecognitionException {
-		try {
-			final int _type = START_R;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:37:9: ( '(' )
-			// Velvet.g:37:11: '('
-			{
-				match('(');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "START_R"
-
-	// $ANTLR start "USE"
-	public final void mUSE() throws RecognitionException {
-		try {
-			final int _type = USE;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:38:5: ( 'use' )
-			// Velvet.g:38:7: 'use'
-			{
-				match("use");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "USE"
-
-	// $ANTLR start "VAR_BOOL"
-	public final void mVAR_BOOL() throws RecognitionException {
-		try {
-			final int _type = VAR_BOOL;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:39:10: ( 'bool' )
-			// Velvet.g:39:12: 'bool'
-			{
-				match("bool");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "VAR_BOOL"
-
-	// $ANTLR start "VAR_FLOAT"
-	public final void mVAR_FLOAT() throws RecognitionException {
-		try {
-			final int _type = VAR_FLOAT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:40:11: ( 'float' )
-			// Velvet.g:40:13: 'float'
-			{
-				match("float");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "VAR_FLOAT"
-
-	// $ANTLR start "VAR_INT"
-	public final void mVAR_INT() throws RecognitionException {
-		try {
-			final int _type = VAR_INT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:41:9: ( 'int' )
-			// Velvet.g:41:11: 'int'
-			{
-				match("int");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "VAR_INT"
-
-	// $ANTLR start "VAR_STRING"
-	public final void mVAR_STRING() throws RecognitionException {
-		try {
-			final int _type = VAR_STRING;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:42:12: ( 'string' )
-			// Velvet.g:42:14: 'string'
-			{
-				match("string");
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "VAR_STRING"
-
-	// $ANTLR start "BOOLEAN"
-	public final void mBOOLEAN() throws RecognitionException {
-		try {
-			final int _type = BOOLEAN;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:241:9: ( 'true' | 'false' )
-			int alt1 = 2;
-			final int LA1_0 = input.LA(1);
-
-			if ((LA1_0 == 't')) {
-				alt1 = 1;
-			} else if ((LA1_0 == 'f')) {
-				alt1 = 2;
-			} else {
-				final NoViableAltException nvae = new NoViableAltException("", 1, 0, input);
-
-				throw nvae;
-
-			}
-			switch (alt1) {
-			case 1:
-			// Velvet.g:241:11: 'true'
-			{
-				match("true");
-
-			}
-				break;
-			case 2:
-			// Velvet.g:242:4: 'false'
-			{
-				match("false");
-
-			}
-				break;
-
-			}
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "BOOLEAN"
-
-	// $ANTLR start "ID"
-	public final void mID() throws RecognitionException {
-		try {
-			final int _type = ID;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:245:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )* )
-			// Velvet.g:245:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '-' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
-			{
-				if ((input.LA(1) == '-') || ((input.LA(1) >= 'A') && (input.LA(1) <= 'Z')) || (input.LA(1) == '_')
-					|| ((input.LA(1) >= 'a') && (input.LA(1) <= 'z'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				// Velvet.g:245:35: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' )*
-				loop2: do {
-					int alt2 = 2;
-					final int LA2_0 = input.LA(1);
-
-					if (((LA2_0 == '-') || ((LA2_0 >= '0') && (LA2_0 <= '9')) || ((LA2_0 >= 'A') && (LA2_0 <= 'Z')) || (LA2_0 == '_')
-						|| ((LA2_0 >= 'a') && (LA2_0 <= 'z')))) {
-						alt2 = 1;
-					}
-
-					switch (alt2) {
-					case 1:
-					// Velvet.g:
-					{
-						if ((input.LA(1) == '-') || ((input.LA(1) >= '0') && (input.LA(1) <= '9')) || ((input.LA(1) >= 'A') && (input.LA(1) <= 'Z'))
-							|| (input.LA(1) == '_') || ((input.LA(1) >= 'a') && (input.LA(1) <= 'z'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						break loop2;
-					}
-				} while (true);
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ID"
-
-	// $ANTLR start "IDPath"
-	public final void mIDPath() throws RecognitionException {
-		try {
-			final int _type = IDPath;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:248:8: ( ID ( '.' ID )+ )
-			// Velvet.g:248:10: ID ( '.' ID )+
-			{
-				mID();
-
-				// Velvet.g:248:13: ( '.' ID )+
-				int cnt3 = 0;
-				loop3: do {
-					int alt3 = 2;
-					final int LA3_0 = input.LA(1);
-
-					if ((LA3_0 == '.')) {
-						alt3 = 1;
-					}
-
-					switch (alt3) {
-					case 1:
-					// Velvet.g:248:14: '.' ID
-					{
-						match('.');
-
-						mID();
-
-					}
-						break;
-
-					default:
-						if (cnt3 >= 1) {
-							break loop3;
-						}
-						final EarlyExitException eee = new EarlyExitException(3, input);
-						throw eee;
-					}
-					cnt3++;
-				} while (true);
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "IDPath"
-
-	// $ANTLR start "INT"
-	public final void mINT() throws RecognitionException {
-		try {
-			final int _type = INT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:251:5: ( ( '0' .. '9' )+ )
-			// Velvet.g:251:7: ( '0' .. '9' )+
-			{
-				// Velvet.g:251:7: ( '0' .. '9' )+
-				int cnt4 = 0;
-				loop4: do {
-					int alt4 = 2;
-					final int LA4_0 = input.LA(1);
-
-					if ((((LA4_0 >= '0') && (LA4_0 <= '9')))) {
-						alt4 = 1;
-					}
-
-					switch (alt4) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						if (cnt4 >= 1) {
-							break loop4;
-						}
-						final EarlyExitException eee = new EarlyExitException(4, input);
-						throw eee;
-					}
-					cnt4++;
-				} while (true);
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "INT"
-
-	// $ANTLR start "FLOAT"
-	public final void mFLOAT() throws RecognitionException {
-		try {
-			final int _type = FLOAT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:255:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
-			int alt11 = 3;
-			alt11 = dfa11.predict(input);
-			switch (alt11) {
-			case 1:
-			// Velvet.g:255:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
-			{
-				// Velvet.g:255:9: ( '0' .. '9' )+
-				int cnt5 = 0;
-				loop5: do {
-					int alt5 = 2;
-					final int LA5_0 = input.LA(1);
-
-					if ((((LA5_0 >= '0') && (LA5_0 <= '9')))) {
-						alt5 = 1;
-					}
-
-					switch (alt5) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						if (cnt5 >= 1) {
-							break loop5;
-						}
-						final EarlyExitException eee = new EarlyExitException(5, input);
-						throw eee;
-					}
-					cnt5++;
-				} while (true);
-
-				match('.');
-
-				// Velvet.g:255:25: ( '0' .. '9' )*
-				loop6: do {
-					int alt6 = 2;
-					final int LA6_0 = input.LA(1);
-
-					if ((((LA6_0 >= '0') && (LA6_0 <= '9')))) {
-						alt6 = 1;
-					}
-
-					switch (alt6) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						break loop6;
-					}
-				} while (true);
-
-				// Velvet.g:255:37: ( EXPONENT )?
-				int alt7 = 2;
-				final int LA7_0 = input.LA(1);
-
-				if (((LA7_0 == 'E') || (LA7_0 == 'e'))) {
-					alt7 = 1;
-				}
-				switch (alt7) {
-				case 1:
-				// Velvet.g:255:37: EXPONENT
-				{
-					mEXPONENT();
-
-				}
-					break;
-
-				}
-
-			}
-				break;
-			case 2:
-			// Velvet.g:256:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
-			{
-				match('.');
-
-				// Velvet.g:256:13: ( '0' .. '9' )+
-				int cnt8 = 0;
-				loop8: do {
-					int alt8 = 2;
-					final int LA8_0 = input.LA(1);
-
-					if ((((LA8_0 >= '0') && (LA8_0 <= '9')))) {
-						alt8 = 1;
-					}
-
-					switch (alt8) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						if (cnt8 >= 1) {
-							break loop8;
-						}
-						final EarlyExitException eee = new EarlyExitException(8, input);
-						throw eee;
-					}
-					cnt8++;
-				} while (true);
-
-				// Velvet.g:256:25: ( EXPONENT )?
-				int alt9 = 2;
-				final int LA9_0 = input.LA(1);
-
-				if (((LA9_0 == 'E') || (LA9_0 == 'e'))) {
-					alt9 = 1;
-				}
-				switch (alt9) {
-				case 1:
-				// Velvet.g:256:25: EXPONENT
-				{
-					mEXPONENT();
-
-				}
-					break;
-
-				}
-
-			}
-				break;
-			case 3:
-			// Velvet.g:257:9: ( '0' .. '9' )+ EXPONENT
-			{
-				// Velvet.g:257:9: ( '0' .. '9' )+
-				int cnt10 = 0;
-				loop10: do {
-					int alt10 = 2;
-					final int LA10_0 = input.LA(1);
-
-					if ((((LA10_0 >= '0') && (LA10_0 <= '9')))) {
-						alt10 = 1;
-					}
-
-					switch (alt10) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						if (cnt10 >= 1) {
-							break loop10;
-						}
-						final EarlyExitException eee = new EarlyExitException(10, input);
-						throw eee;
-					}
-					cnt10++;
-				} while (true);
-
-				mEXPONENT();
-
-			}
-				break;
-
-			}
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "FLOAT"
-
-	// $ANTLR start "STRING"
-	public final void mSTRING() throws RecognitionException {
-		try {
-			final int _type = STRING;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:261:5: ( '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"' )
-			// Velvet.g:261:8: '\"' ( ESC_SEQ |~ ( '\\\\' | '\"' ) )* '\"'
-			{
-				match('\"');
-
-				// Velvet.g:261:12: ( ESC_SEQ |~ ( '\\\\' | '\"' ) )*
-				loop12: do {
-					int alt12 = 3;
-					final int LA12_0 = input.LA(1);
-
-					if ((LA12_0 == '\\')) {
-						alt12 = 1;
-					} else
-						if ((((LA12_0 >= '\u0000') && (LA12_0 <= '!')) || ((LA12_0 >= '#') && (LA12_0 <= '[')) || ((LA12_0 >= ']') && (LA12_0 <= '\uFFFF')))) {
-							alt12 = 2;
-						}
-
-					switch (alt12) {
-					case 1:
-					// Velvet.g:261:14: ESC_SEQ
-					{
-						mESC_SEQ();
-
-					}
-						break;
-					case 2:
-					// Velvet.g:261:24: ~ ( '\\\\' | '\"' )
-					{
-						if (((input.LA(1) >= '\u0000') && (input.LA(1) <= '!')) || ((input.LA(1) >= '#') && (input.LA(1) <= '['))
-							|| ((input.LA(1) >= ']') && (input.LA(1) <= '\uFFFF'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						break loop12;
-					}
-				} while (true);
-
-				match('\"');
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "STRING"
-
-	// $ANTLR start "EXPONENT"
-	public final void mEXPONENT() throws RecognitionException {
-		try {
-			// Velvet.g:266:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-			// Velvet.g:266:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
-			{
-				if ((input.LA(1) == 'E') || (input.LA(1) == 'e')) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				// Velvet.g:266:22: ( '+' | '-' )?
-				int alt13 = 2;
-				final int LA13_0 = input.LA(1);
-
-				if (((LA13_0 == '+') || (LA13_0 == '-'))) {
-					alt13 = 1;
-				}
-				switch (alt13) {
-				case 1:
-				// Velvet.g:
-				{
-					if ((input.LA(1) == '+') || (input.LA(1) == '-')) {
-						input.consume();
-					} else {
-						final MismatchedSetException mse = new MismatchedSetException(null, input);
-						recover(mse);
-						throw mse;
-					}
-
-				}
-					break;
-
-				}
-
-				// Velvet.g:266:33: ( '0' .. '9' )+
-				int cnt14 = 0;
-				loop14: do {
-					int alt14 = 2;
-					final int LA14_0 = input.LA(1);
-
-					if ((((LA14_0 >= '0') && (LA14_0 <= '9')))) {
-						alt14 = 1;
-					}
-
-					switch (alt14) {
-					case 1:
-					// Velvet.g:
-					{
-						if (((input.LA(1) >= '0') && (input.LA(1) <= '9'))) {
-							input.consume();
-						} else {
-							final MismatchedSetException mse = new MismatchedSetException(null, input);
-							recover(mse);
-							throw mse;
-						}
-
-					}
-						break;
-
-					default:
-						if (cnt14 >= 1) {
-							break loop14;
-						}
-						final EarlyExitException eee = new EarlyExitException(14, input);
-						throw eee;
-					}
-					cnt14++;
-				} while (true);
-
-			}
-
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "EXPONENT"
-
-	// $ANTLR start "HEX_DIGIT"
-	public final void mHEX_DIGIT() throws RecognitionException {
-		try {
-			// Velvet.g:269:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-			// Velvet.g:
-			{
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '9')) || ((input.LA(1) >= 'A') && (input.LA(1) <= 'F'))
-					|| ((input.LA(1) >= 'a') && (input.LA(1) <= 'f'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-			}
-
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "HEX_DIGIT"
-
-	// $ANTLR start "ESC_SEQ"
-	public final void mESC_SEQ() throws RecognitionException {
-		try {
-			// Velvet.g:273:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | UNICODE_ESC | OCTAL_ESC )
-			int alt15 = 3;
-			final int LA15_0 = input.LA(1);
-
-			if ((LA15_0 == '\\')) {
-				switch (input.LA(2)) {
-				case '\"':
-				case '\'':
-				case '\\':
-				case 'b':
-				case 'f':
-				case 'n':
-				case 'r':
-				case 't': {
-					alt15 = 1;
-				}
-					break;
-				case 'u': {
-					alt15 = 2;
-				}
-					break;
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7': {
-					alt15 = 3;
-				}
-					break;
-				default:
-					final NoViableAltException nvae = new NoViableAltException("", 15, 1, input);
-
-					throw nvae;
-
-				}
-
-			} else {
-				final NoViableAltException nvae = new NoViableAltException("", 15, 0, input);
-
-				throw nvae;
-
-			}
-			switch (alt15) {
-			case 1:
-			// Velvet.g:273:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
-			{
-				match('\\');
-
-				if ((input.LA(1) == '\"') || (input.LA(1) == '\'') || (input.LA(1) == '\\') || (input.LA(1) == 'b') || (input.LA(1) == 'f')
-					|| (input.LA(1) == 'n') || (input.LA(1) == 'r') || (input.LA(1) == 't')) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-			}
-				break;
-			case 2:
-			// Velvet.g:274:9: UNICODE_ESC
-			{
-				mUNICODE_ESC();
-
-			}
-				break;
-			case 3:
-			// Velvet.g:275:9: OCTAL_ESC
-			{
-				mOCTAL_ESC();
-
-			}
-				break;
-
-			}
-
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ESC_SEQ"
-
-	// $ANTLR start "OCTAL_ESC"
-	public final void mOCTAL_ESC() throws RecognitionException {
-		try {
-			// Velvet.g:280:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
-			int alt16 = 3;
-			final int LA16_0 = input.LA(1);
-
-			if ((LA16_0 == '\\')) {
-				final int LA16_1 = input.LA(2);
-
-				if ((((LA16_1 >= '0') && (LA16_1 <= '3')))) {
-					final int LA16_2 = input.LA(3);
-
-					if ((((LA16_2 >= '0') && (LA16_2 <= '7')))) {
-						final int LA16_4 = input.LA(4);
-
-						if ((((LA16_4 >= '0') && (LA16_4 <= '7')))) {
-							alt16 = 1;
-						} else {
-							alt16 = 2;
-						}
-					} else {
-						alt16 = 3;
-					}
-				} else if ((((LA16_1 >= '4') && (LA16_1 <= '7')))) {
-					final int LA16_3 = input.LA(3);
-
-					if ((((LA16_3 >= '0') && (LA16_3 <= '7')))) {
-						alt16 = 2;
-					} else {
-						alt16 = 3;
-					}
-				} else {
-					final NoViableAltException nvae = new NoViableAltException("", 16, 1, input);
-
-					throw nvae;
-
-				}
-			} else {
-				final NoViableAltException nvae = new NoViableAltException("", 16, 0, input);
-
-				throw nvae;
-
-			}
-			switch (alt16) {
-			case 1:
-			// Velvet.g:280:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
-			{
-				match('\\');
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '3'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '7'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '7'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-			}
-				break;
-			case 2:
-			// Velvet.g:281:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
-			{
-				match('\\');
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '7'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '7'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-			}
-				break;
-			case 3:
-			// Velvet.g:282:9: '\\\\' ( '0' .. '7' )
-			{
-				match('\\');
-
-				if (((input.LA(1) >= '0') && (input.LA(1) <= '7'))) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-			}
-				break;
-
-			}
-
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "OCTAL_ESC"
-
-	// $ANTLR start "UNICODE_ESC"
-	public final void mUNICODE_ESC() throws RecognitionException {
-		try {
-			// Velvet.g:287:5: ( '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-			// Velvet.g:287:9: '\\\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-			{
-				match('\\');
-
-				match('u');
-
-				mHEX_DIGIT();
-
-				mHEX_DIGIT();
-
-				mHEX_DIGIT();
-
-				mHEX_DIGIT();
-
-			}
-
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "UNICODE_ESC"
-
-	// $ANTLR start "WS"
-	public final void mWS() throws RecognitionException {
-		try {
-			final int _type = WS;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:289:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-			// Velvet.g:289:7: ( ' ' | '\\t' | '\\r' | '\\n' )
-			{
-				if (((input.LA(1) >= '\t') && (input.LA(1) <= '\n')) || (input.LA(1) == '\r') || (input.LA(1) == ' ')) {
-					input.consume();
-				} else {
-					final MismatchedSetException mse = new MismatchedSetException(null, input);
-					recover(mse);
-					throw mse;
-				}
-
-				_channel = HIDDEN;
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "WS"
-
-	// $ANTLR start "SL_COMMENT"
-	public final void mSL_COMMENT() throws RecognitionException {
-		try {
-			final int _type = SL_COMMENT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:296:12: ( ( '//' (~ ( '\\r' | '\\n' ) )* ) )
-			// Velvet.g:296:14: ( '//' (~ ( '\\r' | '\\n' ) )* )
-			{
-				// Velvet.g:296:14: ( '//' (~ ( '\\r' | '\\n' ) )* )
-				// Velvet.g:296:15: '//' (~ ( '\\r' | '\\n' ) )*
-				{
-					match("//");
-
-					// Velvet.g:296:20: (~ ( '\\r' | '\\n' ) )*
-					loop17: do {
-						int alt17 = 2;
-						final int LA17_0 = input.LA(1);
-
-						if ((((LA17_0 >= '\u0000') && (LA17_0 <= '\t')) || ((LA17_0 >= '\u000B') && (LA17_0 <= '\f'))
-							|| ((LA17_0 >= '\u000E') && (LA17_0 <= '\uFFFF')))) {
-							alt17 = 1;
-						}
-
-						switch (alt17) {
-						case 1:
-						// Velvet.g:
-						{
-							if (((input.LA(1) >= '\u0000') && (input.LA(1) <= '\t')) || ((input.LA(1) >= '\u000B') && (input.LA(1) <= '\f'))
-								|| ((input.LA(1) >= '\u000E') && (input.LA(1) <= '\uFFFF'))) {
-								input.consume();
-							} else {
-								final MismatchedSetException mse = new MismatchedSetException(null, input);
-								recover(mse);
-								throw mse;
-							}
-
-						}
-							break;
-
-						default:
-							break loop17;
-						}
-					} while (true);
-
-				}
-
-				skip();
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "SL_COMMENT"
-
-	// $ANTLR start "ML_COMMENT"
-	public final void mML_COMMENT() throws RecognitionException {
-		try {
-			final int _type = ML_COMMENT;
-			final int _channel = DEFAULT_TOKEN_CHANNEL;
-			// Velvet.g:298:12: ( ( '/*' (~ ( '*/' ) )* ) )
-			// Velvet.g:298:14: ( '/*' (~ ( '*/' ) )* )
-			{
-				// Velvet.g:298:14: ( '/*' (~ ( '*/' ) )* )
-				// Velvet.g:298:15: '/*' (~ ( '*/' ) )*
-				{
-					match("/*");
-
-					// Velvet.g:298:20: (~ ( '*/' ) )*
-					loop18: do {
-						int alt18 = 2;
-						final int LA18_0 = input.LA(1);
-
-						if ((((LA18_0 >= '\u0000') && (LA18_0 <= '\uFFFF')))) {
-							alt18 = 1;
-						}
-
-						switch (alt18) {
-						case 1:
-						// Velvet.g:298:20: ~ ( '*/' )
-						{
-							if (((input.LA(1) >= '\u0000') && (input.LA(1) <= '\uFFFF'))) {
-								input.consume();
-							} else {
-								final MismatchedSetException mse = new MismatchedSetException(null, input);
-								recover(mse);
-								throw mse;
-							}
-
-						}
-							break;
-
-						default:
-							break loop18;
-						}
-					} while (true);
-
-				}
-
-				skip();
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		} finally {
-			// do for sure before leaving
-		}
-	}
-	// $ANTLR end "ML_COMMENT"
+	public String getGrammarFileName() { return "Velvet.g4"; }
 
 	@Override
-	public void mTokens() throws RecognitionException {
-		// Velvet.g:1:8: ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE |
-		// COLON | COMMA | CONCEPT | CONSTRAINT | DESCRIPTION | END_C | END_R | EQ | FEATURE | IMPORT | IMPORTINSTANCE | IMPORTINTERFACE | MANDATORY | MINUS |
-		// ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | SEMI | SOMEOF | START_C | START_R | USE | VAR_BOOL | VAR_FLOAT |
-		// VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS | SL_COMMENT | ML_COMMENT )
-		int alt19 = 48;
-		alt19 = dfa19.predict(input);
-		switch (alt19) {
-		case 1:
-		// Velvet.g:1:10: ABSTRACT
-		{
-			mABSTRACT();
+	public String[] getRuleNames() { return ruleNames; }
 
-		}
-			break;
-		case 2:
-		// Velvet.g:1:19: ATTR_OP_EQUALS
-		{
-			mATTR_OP_EQUALS();
+	@Override
+	public String getSerializedATN() { return _serializedATN; }
 
-		}
-			break;
-		case 3:
-		// Velvet.g:1:34: ATTR_OP_GREATER
-		{
-			mATTR_OP_GREATER();
+	@Override
+	public String[] getChannelNames() { return channelNames; }
 
-		}
-			break;
-		case 4:
-		// Velvet.g:1:50: ATTR_OP_GREATER_EQ
-		{
-			mATTR_OP_GREATER_EQ();
+	@Override
+	public String[] getModeNames() { return modeNames; }
 
-		}
-			break;
-		case 5:
-		// Velvet.g:1:69: ATTR_OP_LESS
-		{
-			mATTR_OP_LESS();
+	@Override
+	public ATN getATN() { return _ATN; }
 
-		}
-			break;
-		case 6:
-		// Velvet.g:1:82: ATTR_OP_LESS_EQ
-		{
-			mATTR_OP_LESS_EQ();
-
-		}
-			break;
-		case 7:
-		// Velvet.g:1:98: ATTR_OP_NOT_EQUALS
-		{
-			mATTR_OP_NOT_EQUALS();
-
-		}
-			break;
-		case 8:
-		// Velvet.g:1:117: CINTERFACE
-		{
-			mCINTERFACE();
-
-		}
-			break;
-		case 9:
-		// Velvet.g:1:128: COLON
-		{
-			mCOLON();
-
-		}
-			break;
-		case 10:
-		// Velvet.g:1:134: COMMA
-		{
-			mCOMMA();
-
-		}
-			break;
-		case 11:
-		// Velvet.g:1:140: CONCEPT
-		{
-			mCONCEPT();
-
-		}
-			break;
-		case 12:
-		// Velvet.g:1:148: CONSTRAINT
-		{
-			mCONSTRAINT();
-
-		}
-			break;
-		case 13:
-		// Velvet.g:1:159: DESCRIPTION
-		{
-			mDESCRIPTION();
-
-		}
-			break;
-		case 14:
-		// Velvet.g:1:171: END_C
-		{
-			mEND_C();
-
-		}
-			break;
-		case 15:
-		// Velvet.g:1:177: END_R
-		{
-			mEND_R();
-
-		}
-			break;
-		case 16:
-		// Velvet.g:1:183: EQ
-		{
-			mEQ();
-
-		}
-			break;
-		case 17:
-		// Velvet.g:1:186: FEATURE
-		{
-			mFEATURE();
-
-		}
-			break;
-		case 18:
-		// Velvet.g:1:194: IMPORT
-		{
-			mIMPORT();
-
-		}
-			break;
-		case 19:
-		// Velvet.g:1:201: IMPORTINSTANCE
-		{
-			mIMPORTINSTANCE();
-
-		}
-			break;
-		case 20:
-		// Velvet.g:1:216: IMPORTINTERFACE
-		{
-			mIMPORTINTERFACE();
-
-		}
-			break;
-		case 21:
-		// Velvet.g:1:232: MANDATORY
-		{
-			mMANDATORY();
-
-		}
-			break;
-		case 22:
-		// Velvet.g:1:242: MINUS
-		{
-			mMINUS();
-
-		}
-			break;
-		case 23:
-		// Velvet.g:1:248: ONEOF
-		{
-			mONEOF();
-
-		}
-			break;
-		case 24:
-		// Velvet.g:1:254: OP_AND
-		{
-			mOP_AND();
-
-		}
-			break;
-		case 25:
-		// Velvet.g:1:261: OP_EQUIVALENT
-		{
-			mOP_EQUIVALENT();
-
-		}
-			break;
-		case 26:
-		// Velvet.g:1:275: OP_IMPLIES
-		{
-			mOP_IMPLIES();
-
-		}
-			break;
-		case 27:
-		// Velvet.g:1:286: OP_NOT
-		{
-			mOP_NOT();
-
-		}
-			break;
-		case 28:
-		// Velvet.g:1:293: OP_OR
-		{
-			mOP_OR();
-
-		}
-			break;
-		case 29:
-		// Velvet.g:1:299: OP_XOR
-		{
-			mOP_XOR();
-
-		}
-			break;
-		case 30:
-		// Velvet.g:1:306: PLUS
-		{
-			mPLUS();
-
-		}
-			break;
-		case 31:
-		// Velvet.g:1:311: SEMI
-		{
-			mSEMI();
-
-		}
-			break;
-		case 32:
-		// Velvet.g:1:316: SOMEOF
-		{
-			mSOMEOF();
-
-		}
-			break;
-		case 33:
-		// Velvet.g:1:323: START_C
-		{
-			mSTART_C();
-
-		}
-			break;
-		case 34:
-		// Velvet.g:1:331: START_R
-		{
-			mSTART_R();
-
-		}
-			break;
-		case 35:
-		// Velvet.g:1:339: USE
-		{
-			mUSE();
-
-		}
-			break;
-		case 36:
-		// Velvet.g:1:343: VAR_BOOL
-		{
-			mVAR_BOOL();
-
-		}
-			break;
-		case 37:
-		// Velvet.g:1:352: VAR_FLOAT
-		{
-			mVAR_FLOAT();
-
-		}
-			break;
-		case 38:
-		// Velvet.g:1:362: VAR_INT
-		{
-			mVAR_INT();
-
-		}
-			break;
-		case 39:
-		// Velvet.g:1:370: VAR_STRING
-		{
-			mVAR_STRING();
-
-		}
-			break;
-		case 40:
-		// Velvet.g:1:381: BOOLEAN
-		{
-			mBOOLEAN();
-
-		}
-			break;
-		case 41:
-		// Velvet.g:1:389: ID
-		{
-			mID();
-
-		}
-			break;
-		case 42:
-		// Velvet.g:1:392: IDPath
-		{
-			mIDPath();
-
-		}
-			break;
-		case 43:
-		// Velvet.g:1:399: INT
-		{
-			mINT();
-
-		}
-			break;
-		case 44:
-		// Velvet.g:1:403: FLOAT
-		{
-			mFLOAT();
-
-		}
-			break;
-		case 45:
-		// Velvet.g:1:409: STRING
-		{
-			mSTRING();
-
-		}
-			break;
-		case 46:
-		// Velvet.g:1:416: WS
-		{
-			mWS();
-
-		}
-			break;
-		case 47:
-		// Velvet.g:1:419: SL_COMMENT
-		{
-			mSL_COMMENT();
-
-		}
-			break;
-		case 48:
-		// Velvet.g:1:430: ML_COMMENT
-		{
-			mML_COMMENT();
-
-		}
-			break;
-
-		}
-
-	}
-
-	protected DFA11 dfa11 = new DFA11(this);
-	protected DFA19 dfa19 = new DFA19(this);
-	static final String DFA11_eotS = "\5\uffff";
-	static final String DFA11_eofS = "\5\uffff";
-	static final String DFA11_minS = "\2\56\3\uffff";
-	static final String DFA11_maxS = "\1\71\1\145\3\uffff";
-	static final String DFA11_acceptS = "\2\uffff\1\2\1\1\1\3";
-	static final String DFA11_specialS = "\5\uffff}>";
-	static final String[] DFA11_transitionS = { "\1\2\1\uffff\12\1", "\1\3\1\uffff\12\1\13\uffff\1\4\37\uffff\1\4", "", "", "" };
-
-	static final short[] DFA11_eot = DFA.unpackEncodedString(DFA11_eotS);
-	static final short[] DFA11_eof = DFA.unpackEncodedString(DFA11_eofS);
-	static final char[] DFA11_min = DFA.unpackEncodedStringToUnsignedChars(DFA11_minS);
-	static final char[] DFA11_max = DFA.unpackEncodedStringToUnsignedChars(DFA11_maxS);
-	static final short[] DFA11_accept = DFA.unpackEncodedString(DFA11_acceptS);
-	static final short[] DFA11_special = DFA.unpackEncodedString(DFA11_specialS);
-	static final short[][] DFA11_transition;
-
+	public static final String _serializedATN =
+		"\u0004\u00009\u020a\u0006\uffff\uffff\u0002\u0000\u0007\u0000\u0002\u0001"+
+		"\u0007\u0001\u0002\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004"+
+		"\u0007\u0004\u0002\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007"+
+		"\u0007\u0007\u0002\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b"+
+		"\u0007\u000b\u0002\f\u0007\f\u0002\r\u0007\r\u0002\u000e\u0007\u000e\u0002"+
+		"\u000f\u0007\u000f\u0002\u0010\u0007\u0010\u0002\u0011\u0007\u0011\u0002"+
+		"\u0012\u0007\u0012\u0002\u0013\u0007\u0013\u0002\u0014\u0007\u0014\u0002"+
+		"\u0015\u0007\u0015\u0002\u0016\u0007\u0016\u0002\u0017\u0007\u0017\u0002"+
+		"\u0018\u0007\u0018\u0002\u0019\u0007\u0019\u0002\u001a\u0007\u001a\u0002"+
+		"\u001b\u0007\u001b\u0002\u001c\u0007\u001c\u0002\u001d\u0007\u001d\u0002"+
+		"\u001e\u0007\u001e\u0002\u001f\u0007\u001f\u0002 \u0007 \u0002!\u0007"+
+		"!\u0002\"\u0007\"\u0002#\u0007#\u0002$\u0007$\u0002%\u0007%\u0002&\u0007"+
+		"&\u0002\'\u0007\'\u0002(\u0007(\u0002)\u0007)\u0002*\u0007*\u0002+\u0007"+
+		"+\u0002,\u0007,\u0002-\u0007-\u0002.\u0007.\u0002/\u0007/\u00020\u0007"+
+		"0\u00021\u00071\u00022\u00072\u00023\u00073\u00024\u00074\u00025\u0007"+
+		"5\u00026\u00076\u00027\u00077\u00028\u00078\u00029\u00079\u0002:\u0007"+
+		":\u0002;\u0007;\u0002<\u0007<\u0002=\u0007=\u0001\u0000\u0001\u0000\u0001"+
+		"\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
+		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
+		"\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001"+
+		"\u0003\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001"+
+		"\u0004\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0006\u0001\u0006\u0001\u0006\u0001"+
+		"\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001"+
+		"\u0006\u0001\u0006\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001"+
+		"\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001"+
+		"\u0007\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b"+
+		"\u0001\t\u0001\t\u0001\t\u0001\t\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
+		"\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\u000b\u0001\u000b\u0001\u000b"+
+		"\u0001\u000b\u0001\u000b\u0001\u000b\u0001\u000b\u0001\u000b\u0001\u000b"+
+		"\u0001\u000b\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001"+
+		"\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\r\u0001\r\u0001\r\u0001\r\u0001"+
+		"\u000e\u0001\u000e\u0001\u000e\u0001\u000e\u0001\u000e\u0001\u000e\u0001"+
+		"\u000f\u0001\u000f\u0001\u000f\u0001\u000f\u0001\u000f\u0001\u000f\u0001"+
+		"\u000f\u0001\u0010\u0001\u0010\u0001\u0010\u0001\u0010\u0001\u0010\u0001"+
+		"\u0011\u0001\u0011\u0001\u0012\u0001\u0012\u0001\u0013\u0001\u0013\u0001"+
+		"\u0014\u0001\u0014\u0001\u0015\u0001\u0015\u0001\u0016\u0001\u0016\u0001"+
+		"\u0017\u0001\u0017\u0001\u0018\u0001\u0018\u0001\u0019\u0001\u0019\u0001"+
+		"\u001a\u0001\u001a\u0001\u001b\u0001\u001b\u0001\u001c\u0001\u001c\u0001"+
+		"\u001c\u0001\u001d\u0001\u001d\u0001\u001d\u0001\u001e\u0001\u001e\u0001"+
+		"\u001e\u0001\u001e\u0001\u001f\u0001\u001f\u0001\u001f\u0001 \u0001 \u0001"+
+		" \u0001 \u0001!\u0001!\u0001!\u0001\"\u0001\"\u0001\"\u0001#\u0001#\u0001"+
+		"$\u0001$\u0001%\u0001%\u0001%\u0001&\u0001&\u0001&\u0001\'\u0001\'\u0001"+
+		"\'\u0001\'\u0001\'\u0001\'\u0001(\u0001(\u0001(\u0001(\u0001(\u0001(\u0001"+
+		"(\u0001)\u0001)\u0001)\u0001)\u0001)\u0001)\u0001)\u0001)\u0001*\u0001"+
+		"*\u0001*\u0001*\u0001*\u0001*\u0001*\u0001*\u0001+\u0001+\u0001+\u0001"+
+		"+\u0001,\u0001,\u0001,\u0001,\u0001,\u0001,\u0001-\u0001-\u0001-\u0001"+
+		"-\u0001-\u0001.\u0001.\u0001.\u0001.\u0001.\u0001.\u0001.\u0001.\u0001"+
+		"/\u0001/\u0001/\u0001/\u0001/\u0001/\u0001/\u0001/\u00010\u00010\u0001"+
+		"0\u00010\u00010\u00010\u00010\u00010\u00010\u00030\u0180\b0\u00011\u0001"+
+		"1\u00051\u0184\b1\n1\f1\u0187\t1\u00012\u00012\u00012\u00042\u018c\b2"+
+		"\u000b2\f2\u018d\u00013\u00043\u0191\b3\u000b3\f3\u0192\u00014\u00044"+
+		"\u0196\b4\u000b4\f4\u0197\u00014\u00014\u00054\u019c\b4\n4\f4\u019f\t"+
+		"4\u00014\u00034\u01a2\b4\u00014\u00014\u00044\u01a6\b4\u000b4\f4\u01a7"+
+		"\u00014\u00034\u01ab\b4\u00014\u00044\u01ae\b4\u000b4\f4\u01af\u00014"+
+		"\u00034\u01b3\b4\u00015\u00015\u00015\u00055\u01b8\b5\n5\f5\u01bb\t5\u0001"+
+		"5\u00015\u00016\u00016\u00036\u01c1\b6\u00016\u00046\u01c4\b6\u000b6\f"+
+		"6\u01c5\u00017\u00017\u00018\u00018\u00018\u00018\u00018\u00038\u01cf"+
+		"\b8\u00018\u00018\u00038\u01d3\b8\u00019\u00019\u00019\u00019\u00039\u01d9"+
+		"\b9\u00019\u00019\u00019\u00039\u01de\b9\u00019\u00019\u00039\u01e2\b"+
+		"9\u0001:\u0001:\u0001:\u0001:\u0001:\u0001:\u0001:\u0001;\u0004;\u01ec"+
+		"\b;\u000b;\f;\u01ed\u0001;\u0001;\u0001<\u0001<\u0001<\u0001<\u0005<\u01f6"+
+		"\b<\n<\f<\u01f9\t<\u0001<\u0001<\u0001=\u0001=\u0001=\u0001=\u0005=\u0201"+
+		"\b=\n=\f=\u0204\t=\u0001=\u0001=\u0001=\u0001=\u0001=\u0001\u0202\u0000"+
+		">\u0001\u0001\u0003\u0002\u0005\u0003\u0007\u0004\t\u0005\u000b\u0006"+
+		"\r\u0007\u000f\b\u0011\t\u0013\n\u0015\u000b\u0017\f\u0019\r\u001b\u000e"+
+		"\u001d\u000f\u001f\u0010!\u0011#\u0012%\u0013\'\u0014)\u0015+\u0016-\u0017"+
+		"/\u00181\u00193\u001a5\u001b7\u001c9\u001d;\u001e=\u001f? A!C\"E#G$I%"+
+		"K&M\'O(Q)S*U+W,Y-[.]/_0a1c2e3g4i5k6m\u0000o\u0000q\u0000s\u0000u\u0000"+
+		"w7y8{9\u0001\u0000\n\u0004\u0000--AZ__az\u0005\u0000--09AZ__az\u0002\u0000"+
+		"\"\"\\\\\u0002\u0000EEee\u0002\u0000++--\u0003\u000009AFaf\u0005\u0000"+
+		"bbffnnrrtt\u0002\u0000\'\'\\\\\u0003\u0000\t\n\r\r  \u0002\u0000\n\n\r"+
+		"\r\u021f\u0000\u0001\u0001\u0000\u0000\u0000\u0000\u0003\u0001\u0000\u0000"+
+		"\u0000\u0000\u0005\u0001\u0000\u0000\u0000\u0000\u0007\u0001\u0000\u0000"+
+		"\u0000\u0000\t\u0001\u0000\u0000\u0000\u0000\u000b\u0001\u0000\u0000\u0000"+
+		"\u0000\r\u0001\u0000\u0000\u0000\u0000\u000f\u0001\u0000\u0000\u0000\u0000"+
+		"\u0011\u0001\u0000\u0000\u0000\u0000\u0013\u0001\u0000\u0000\u0000\u0000"+
+		"\u0015\u0001\u0000\u0000\u0000\u0000\u0017\u0001\u0000\u0000\u0000\u0000"+
+		"\u0019\u0001\u0000\u0000\u0000\u0000\u001b\u0001\u0000\u0000\u0000\u0000"+
+		"\u001d\u0001\u0000\u0000\u0000\u0000\u001f\u0001\u0000\u0000\u0000\u0000"+
+		"!\u0001\u0000\u0000\u0000\u0000#\u0001\u0000\u0000\u0000\u0000%\u0001"+
+		"\u0000\u0000\u0000\u0000\'\u0001\u0000\u0000\u0000\u0000)\u0001\u0000"+
+		"\u0000\u0000\u0000+\u0001\u0000\u0000\u0000\u0000-\u0001\u0000\u0000\u0000"+
+		"\u0000/\u0001\u0000\u0000\u0000\u00001\u0001\u0000\u0000\u0000\u00003"+
+		"\u0001\u0000\u0000\u0000\u00005\u0001\u0000\u0000\u0000\u00007\u0001\u0000"+
+		"\u0000\u0000\u00009\u0001\u0000\u0000\u0000\u0000;\u0001\u0000\u0000\u0000"+
+		"\u0000=\u0001\u0000\u0000\u0000\u0000?\u0001\u0000\u0000\u0000\u0000A"+
+		"\u0001\u0000\u0000\u0000\u0000C\u0001\u0000\u0000\u0000\u0000E\u0001\u0000"+
+		"\u0000\u0000\u0000G\u0001\u0000\u0000\u0000\u0000I\u0001\u0000\u0000\u0000"+
+		"\u0000K\u0001\u0000\u0000\u0000\u0000M\u0001\u0000\u0000\u0000\u0000O"+
+		"\u0001\u0000\u0000\u0000\u0000Q\u0001\u0000\u0000\u0000\u0000S\u0001\u0000"+
+		"\u0000\u0000\u0000U\u0001\u0000\u0000\u0000\u0000W\u0001\u0000\u0000\u0000"+
+		"\u0000Y\u0001\u0000\u0000\u0000\u0000[\u0001\u0000\u0000\u0000\u0000]"+
+		"\u0001\u0000\u0000\u0000\u0000_\u0001\u0000\u0000\u0000\u0000a\u0001\u0000"+
+		"\u0000\u0000\u0000c\u0001\u0000\u0000\u0000\u0000e\u0001\u0000\u0000\u0000"+
+		"\u0000g\u0001\u0000\u0000\u0000\u0000i\u0001\u0000\u0000\u0000\u0000k"+
+		"\u0001\u0000\u0000\u0000\u0000w\u0001\u0000\u0000\u0000\u0000y\u0001\u0000"+
+		"\u0000\u0000\u0000{\u0001\u0000\u0000\u0000\u0001}\u0001\u0000\u0000\u0000"+
+		"\u0003\u0084\u0001\u0000\u0000\u0000\u0005\u008e\u0001\u0000\u0000\u0000"+
+		"\u0007\u0097\u0001\u0000\u0000\u0000\t\u009e\u0001\u0000\u0000\u0000\u000b"+
+		"\u00a4\u0001\u0000\u0000\u0000\r\u00ac\u0001\u0000\u0000\u0000\u000f\u00b7"+
+		"\u0001\u0000\u0000\u0000\u0011\u00c2\u0001\u0000\u0000\u0000\u0013\u00ca"+
+		"\u0001\u0000\u0000\u0000\u0015\u00ce\u0001\u0000\u0000\u0000\u0017\u00d7"+
+		"\u0001\u0000\u0000\u0000\u0019\u00e1\u0001\u0000\u0000\u0000\u001b\u00ed"+
+		"\u0001\u0000\u0000\u0000\u001d\u00f1\u0001\u0000\u0000\u0000\u001f\u00f7"+
+		"\u0001\u0000\u0000\u0000!\u00fe\u0001\u0000\u0000\u0000#\u0103\u0001\u0000"+
+		"\u0000\u0000%\u0105\u0001\u0000\u0000\u0000\'\u0107\u0001\u0000\u0000"+
+		"\u0000)\u0109\u0001\u0000\u0000\u0000+\u010b\u0001\u0000\u0000\u0000-"+
+		"\u010d\u0001\u0000\u0000\u0000/\u010f\u0001\u0000\u0000\u00001\u0111\u0001"+
+		"\u0000\u0000\u00003\u0113\u0001\u0000\u0000\u00005\u0115\u0001\u0000\u0000"+
+		"\u00007\u0117\u0001\u0000\u0000\u00009\u0119\u0001\u0000\u0000\u0000;"+
+		"\u011c\u0001\u0000\u0000\u0000=\u011f\u0001\u0000\u0000\u0000?\u0123\u0001"+
+		"\u0000\u0000\u0000A\u0126\u0001\u0000\u0000\u0000C\u012a\u0001\u0000\u0000"+
+		"\u0000E\u012d\u0001\u0000\u0000\u0000G\u0130\u0001\u0000\u0000\u0000I"+
+		"\u0132\u0001\u0000\u0000\u0000K\u0134\u0001\u0000\u0000\u0000M\u0137\u0001"+
+		"\u0000\u0000\u0000O\u013a\u0001\u0000\u0000\u0000Q\u0140\u0001\u0000\u0000"+
+		"\u0000S\u0147\u0001\u0000\u0000\u0000U\u014f\u0001\u0000\u0000\u0000W"+
+		"\u0157\u0001\u0000\u0000\u0000Y\u015b\u0001\u0000\u0000\u0000[\u0161\u0001"+
+		"\u0000\u0000\u0000]\u0166\u0001\u0000\u0000\u0000_\u016e\u0001\u0000\u0000"+
+		"\u0000a\u017f\u0001\u0000\u0000\u0000c\u0181\u0001\u0000\u0000\u0000e"+
+		"\u0188\u0001\u0000\u0000\u0000g\u0190\u0001\u0000\u0000\u0000i\u01b2\u0001"+
+		"\u0000\u0000\u0000k\u01b4\u0001\u0000\u0000\u0000m\u01be\u0001\u0000\u0000"+
+		"\u0000o\u01c7\u0001\u0000\u0000\u0000q\u01d2\u0001\u0000\u0000\u0000s"+
+		"\u01e1\u0001\u0000\u0000\u0000u\u01e3\u0001\u0000\u0000\u0000w\u01eb\u0001"+
+		"\u0000\u0000\u0000y\u01f1\u0001\u0000\u0000\u0000{\u01fc\u0001\u0000\u0000"+
+		"\u0000}~\u0005i\u0000\u0000~\u007f\u0005m\u0000\u0000\u007f\u0080\u0005"+
+		"p\u0000\u0000\u0080\u0081\u0005o\u0000\u0000\u0081\u0082\u0005r\u0000"+
+		"\u0000\u0082\u0083\u0005t\u0000\u0000\u0083\u0002\u0001\u0000\u0000\u0000"+
+		"\u0084\u0085\u0005m\u0000\u0000\u0085\u0086\u0005a\u0000\u0000\u0086\u0087"+
+		"\u0005n\u0000\u0000\u0087\u0088\u0005d\u0000\u0000\u0088\u0089\u0005a"+
+		"\u0000\u0000\u0089\u008a\u0005t\u0000\u0000\u008a\u008b\u0005o\u0000\u0000"+
+		"\u008b\u008c\u0005r\u0000\u0000\u008c\u008d\u0005y\u0000\u0000\u008d\u0004"+
+		"\u0001\u0000\u0000\u0000\u008e\u008f\u0005a\u0000\u0000\u008f\u0090\u0005"+
+		"b\u0000\u0000\u0090\u0091\u0005s\u0000\u0000\u0091\u0092\u0005t\u0000"+
+		"\u0000\u0092\u0093\u0005r\u0000\u0000\u0093\u0094\u0005a\u0000\u0000\u0094"+
+		"\u0095\u0005c\u0000\u0000\u0095\u0096\u0005t\u0000\u0000\u0096\u0006\u0001"+
+		"\u0000\u0000\u0000\u0097\u0098\u0005s\u0000\u0000\u0098\u0099\u0005o\u0000"+
+		"\u0000\u0099\u009a\u0005m\u0000\u0000\u009a\u009b\u0005e\u0000\u0000\u009b"+
+		"\u009c\u0005O\u0000\u0000\u009c\u009d\u0005f\u0000\u0000\u009d\b\u0001"+
+		"\u0000\u0000\u0000\u009e\u009f\u0005o\u0000\u0000\u009f\u00a0\u0005n\u0000"+
+		"\u0000\u00a0\u00a1\u0005e\u0000\u0000\u00a1\u00a2\u0005O\u0000\u0000\u00a2"+
+		"\u00a3\u0005f\u0000\u0000\u00a3\n\u0001\u0000\u0000\u0000\u00a4\u00a5"+
+		"\u0005c\u0000\u0000\u00a5\u00a6\u0005o\u0000\u0000\u00a6\u00a7\u0005n"+
+		"\u0000\u0000\u00a7\u00a8\u0005c\u0000\u0000\u00a8\u00a9\u0005e\u0000\u0000"+
+		"\u00a9\u00aa\u0005p\u0000\u0000\u00aa\u00ab\u0005t\u0000\u0000\u00ab\f"+
+		"\u0001\u0000\u0000\u0000\u00ac\u00ad\u0005c\u0000\u0000\u00ad\u00ae\u0005"+
+		"i\u0000\u0000\u00ae\u00af\u0005n\u0000\u0000\u00af\u00b0\u0005t\u0000"+
+		"\u0000\u00b0\u00b1\u0005e\u0000\u0000\u00b1\u00b2\u0005r\u0000\u0000\u00b2"+
+		"\u00b3\u0005f\u0000\u0000\u00b3\u00b4\u0005a\u0000\u0000\u00b4\u00b5\u0005"+
+		"c\u0000\u0000\u00b5\u00b6\u0005e\u0000\u0000\u00b6\u000e\u0001\u0000\u0000"+
+		"\u0000\u00b7\u00b8\u0005c\u0000\u0000\u00b8\u00b9\u0005o\u0000\u0000\u00b9"+
+		"\u00ba\u0005n\u0000\u0000\u00ba\u00bb\u0005s\u0000\u0000\u00bb\u00bc\u0005"+
+		"t\u0000\u0000\u00bc\u00bd\u0005r\u0000\u0000\u00bd\u00be\u0005a\u0000"+
+		"\u0000\u00be\u00bf\u0005i\u0000\u0000\u00bf\u00c0\u0005n\u0000\u0000\u00c0"+
+		"\u00c1\u0005t\u0000\u0000\u00c1\u0010\u0001\u0000\u0000\u0000\u00c2\u00c3"+
+		"\u0005f\u0000\u0000\u00c3\u00c4\u0005e\u0000\u0000\u00c4\u00c5\u0005a"+
+		"\u0000\u0000\u00c5\u00c6\u0005t\u0000\u0000\u00c6\u00c7\u0005u\u0000\u0000"+
+		"\u00c7\u00c8\u0005r\u0000\u0000\u00c8\u00c9\u0005e\u0000\u0000\u00c9\u0012"+
+		"\u0001\u0000\u0000\u0000\u00ca\u00cb\u0005u\u0000\u0000\u00cb\u00cc\u0005"+
+		"s\u0000\u0000\u00cc\u00cd\u0005e\u0000\u0000\u00cd\u0014\u0001\u0000\u0000"+
+		"\u0000\u00ce\u00cf\u0005i\u0000\u0000\u00cf\u00d0\u0005n\u0000\u0000\u00d0"+
+		"\u00d1\u0005s\u0000\u0000\u00d1\u00d2\u0005t\u0000\u0000\u00d2\u00d3\u0005"+
+		"a\u0000\u0000\u00d3\u00d4\u0005n\u0000\u0000\u00d4\u00d5\u0005c\u0000"+
+		"\u0000\u00d5\u00d6\u0005e\u0000\u0000\u00d6\u0016\u0001\u0000\u0000\u0000"+
+		"\u00d7\u00d8\u0005i\u0000\u0000\u00d8\u00d9\u0005n\u0000\u0000\u00d9\u00da"+
+		"\u0005t\u0000\u0000\u00da\u00db\u0005e\u0000\u0000\u00db\u00dc\u0005r"+
+		"\u0000\u0000\u00dc\u00dd\u0005f\u0000\u0000\u00dd\u00de\u0005a\u0000\u0000"+
+		"\u00de\u00df\u0005c\u0000\u0000\u00df\u00e0\u0005e\u0000\u0000\u00e0\u0018"+
+		"\u0001\u0000\u0000\u0000\u00e1\u00e2\u0005d\u0000\u0000\u00e2\u00e3\u0005"+
+		"e\u0000\u0000\u00e3\u00e4\u0005s\u0000\u0000\u00e4\u00e5\u0005c\u0000"+
+		"\u0000\u00e5\u00e6\u0005r\u0000\u0000\u00e6\u00e7\u0005i\u0000\u0000\u00e7"+
+		"\u00e8\u0005p\u0000\u0000\u00e8\u00e9\u0005t\u0000\u0000\u00e9\u00ea\u0005"+
+		"i\u0000\u0000\u00ea\u00eb\u0005o\u0000\u0000\u00eb\u00ec\u0005n\u0000"+
+		"\u0000\u00ec\u001a\u0001\u0000\u0000\u0000\u00ed\u00ee\u0005i\u0000\u0000"+
+		"\u00ee\u00ef\u0005n\u0000\u0000\u00ef\u00f0\u0005t\u0000\u0000\u00f0\u001c"+
+		"\u0001\u0000\u0000\u0000\u00f1\u00f2\u0005f\u0000\u0000\u00f2\u00f3\u0005"+
+		"l\u0000\u0000\u00f3\u00f4\u0005o\u0000\u0000\u00f4\u00f5\u0005a\u0000"+
+		"\u0000\u00f5\u00f6\u0005t\u0000\u0000\u00f6\u001e\u0001\u0000\u0000\u0000"+
+		"\u00f7\u00f8\u0005s\u0000\u0000\u00f8\u00f9\u0005t\u0000\u0000\u00f9\u00fa"+
+		"\u0005r\u0000\u0000\u00fa\u00fb\u0005i\u0000\u0000\u00fb\u00fc\u0005n"+
+		"\u0000\u0000\u00fc\u00fd\u0005g\u0000\u0000\u00fd \u0001\u0000\u0000\u0000"+
+		"\u00fe\u00ff\u0005b\u0000\u0000\u00ff\u0100\u0005o\u0000\u0000\u0100\u0101"+
+		"\u0005o\u0000\u0000\u0101\u0102\u0005l\u0000\u0000\u0102\"\u0001\u0000"+
+		"\u0000\u0000\u0103\u0104\u0005;\u0000\u0000\u0104$\u0001\u0000\u0000\u0000"+
+		"\u0105\u0106\u0005{\u0000\u0000\u0106&\u0001\u0000\u0000\u0000\u0107\u0108"+
+		"\u0005}\u0000\u0000\u0108(\u0001\u0000\u0000\u0000\u0109\u010a\u0005("+
+		"\u0000\u0000\u010a*\u0001\u0000\u0000\u0000\u010b\u010c\u0005)\u0000\u0000"+
+		"\u010c,\u0001\u0000\u0000\u0000\u010d\u010e\u0005=\u0000\u0000\u010e."+
+		"\u0001\u0000\u0000\u0000\u010f\u0110\u0005,\u0000\u0000\u01100\u0001\u0000"+
+		"\u0000\u0000\u0111\u0112\u0005:\u0000\u0000\u01122\u0001\u0000\u0000\u0000"+
+		"\u0113\u0114\u0005+\u0000\u0000\u01144\u0001\u0000\u0000\u0000\u0115\u0116"+
+		"\u0005-\u0000\u0000\u01166\u0001\u0000\u0000\u0000\u0117\u0118\u0005!"+
+		"\u0000\u0000\u01188\u0001\u0000\u0000\u0000\u0119\u011a\u0005&\u0000\u0000"+
+		"\u011a\u011b\u0005&\u0000\u0000\u011b:\u0001\u0000\u0000\u0000\u011c\u011d"+
+		"\u0005|\u0000\u0000\u011d\u011e\u0005|\u0000\u0000\u011e<\u0001\u0000"+
+		"\u0000\u0000\u011f\u0120\u0005x\u0000\u0000\u0120\u0121\u0005o\u0000\u0000"+
+		"\u0121\u0122\u0005r\u0000\u0000\u0122>\u0001\u0000\u0000\u0000\u0123\u0124"+
+		"\u0005-\u0000\u0000\u0124\u0125\u0005>\u0000\u0000\u0125@\u0001\u0000"+
+		"\u0000\u0000\u0126\u0127\u0005<\u0000\u0000\u0127\u0128\u0005-\u0000\u0000"+
+		"\u0128\u0129\u0005>\u0000\u0000\u0129B\u0001\u0000\u0000\u0000\u012a\u012b"+
+		"\u0005=\u0000\u0000\u012b\u012c\u0005=\u0000\u0000\u012cD\u0001\u0000"+
+		"\u0000\u0000\u012d\u012e\u0005!\u0000\u0000\u012e\u012f\u0005=\u0000\u0000"+
+		"\u012fF\u0001\u0000\u0000\u0000\u0130\u0131\u0005>\u0000\u0000\u0131H"+
+		"\u0001\u0000\u0000\u0000\u0132\u0133\u0005<\u0000\u0000\u0133J\u0001\u0000"+
+		"\u0000\u0000\u0134\u0135\u0005>\u0000\u0000\u0135\u0136\u0005=\u0000\u0000"+
+		"\u0136L\u0001\u0000\u0000\u0000\u0137\u0138\u0005<\u0000\u0000\u0138\u0139"+
+		"\u0005=\u0000\u0000\u0139N\u0001\u0000\u0000\u0000\u013a\u013b\u0005E"+
+		"\u0000\u0000\u013b\u013c\u0005M\u0000\u0000\u013c\u013d\u0005P\u0000\u0000"+
+		"\u013d\u013e\u0005T\u0000\u0000\u013e\u013f\u0005Y\u0000\u0000\u013fP"+
+		"\u0001\u0000\u0000\u0000\u0140\u0141\u0005C\u0000\u0000\u0141\u0142\u0005"+
+		"O\u0000\u0000\u0142\u0143\u0005N\u0000\u0000\u0143\u0144\u0005S\u0000"+
+		"\u0000\u0144\u0145\u0005T\u0000\u0000\u0145\u0146\u0005R\u0000\u0000\u0146"+
+		"R\u0001\u0000\u0000\u0000\u0147\u0148\u0005A\u0000\u0000\u0148\u0149\u0005"+
+		"C\u0000\u0000\u0149\u014a\u0005O\u0000\u0000\u014a\u014b\u0005N\u0000"+
+		"\u0000\u014b\u014c\u0005S\u0000\u0000\u014c\u014d\u0005T\u0000\u0000\u014d"+
+		"\u014e\u0005R\u0000\u0000\u014eT\u0001\u0000\u0000\u0000\u014f\u0150\u0005"+
+		"B\u0000\u0000\u0150\u0151\u0005A\u0000\u0000\u0151\u0152\u0005S\u0000"+
+		"\u0000\u0152\u0153\u0005E\u0000\u0000\u0153\u0154\u0005E\u0000\u0000\u0154"+
+		"\u0155\u0005X\u0000\u0000\u0155\u0156\u0005T\u0000\u0000\u0156V\u0001"+
+		"\u0000\u0000\u0000\u0157\u0158\u0005D\u0000\u0000\u0158\u0159\u0005E\u0000"+
+		"\u0000\u0159\u015a\u0005F\u0000\u0000\u015aX\u0001\u0000\u0000\u0000\u015b"+
+		"\u015c\u0005G\u0000\u0000\u015c\u015d\u0005R\u0000\u0000\u015d\u015e\u0005"+
+		"O\u0000\u0000\u015e\u015f\u0005U\u0000\u0000\u015f\u0160\u0005P\u0000"+
+		"\u0000\u0160Z\u0001\u0000\u0000\u0000\u0161\u0162\u0005A\u0000\u0000\u0162"+
+		"\u0163\u0005T\u0000\u0000\u0163\u0164\u0005T\u0000\u0000\u0164\u0165\u0005"+
+		"R\u0000\u0000\u0165\\\u0001\u0000\u0000\u0000\u0166\u0167\u0005U\u0000"+
+		"\u0000\u0167\u0168\u0005N\u0000\u0000\u0168\u0169\u0005A\u0000\u0000\u0169"+
+		"\u016a\u0005R\u0000\u0000\u016a\u016b\u0005Y\u0000\u0000\u016b\u016c\u0005"+
+		"O\u0000\u0000\u016c\u016d\u0005P\u0000\u0000\u016d^\u0001\u0000\u0000"+
+		"\u0000\u016e\u016f\u0005O\u0000\u0000\u016f\u0170\u0005P\u0000\u0000\u0170"+
+		"\u0171\u0005E\u0000\u0000\u0171\u0172\u0005R\u0000\u0000\u0172\u0173\u0005"+
+		"A\u0000\u0000\u0173\u0174\u0005N\u0000\u0000\u0174\u0175\u0005D\u0000"+
+		"\u0000\u0175`\u0001\u0000\u0000\u0000\u0176\u0177\u0005t\u0000\u0000\u0177"+
+		"\u0178\u0005r\u0000\u0000\u0178\u0179\u0005u\u0000\u0000\u0179\u0180\u0005"+
+		"e\u0000\u0000\u017a\u017b\u0005f\u0000\u0000\u017b\u017c\u0005a\u0000"+
+		"\u0000\u017c\u017d\u0005l\u0000\u0000\u017d\u017e\u0005s\u0000\u0000\u017e"+
+		"\u0180\u0005e\u0000\u0000\u017f\u0176\u0001\u0000\u0000\u0000\u017f\u017a"+
+		"\u0001\u0000\u0000\u0000\u0180b\u0001\u0000\u0000\u0000\u0181\u0185\u0007"+
+		"\u0000\u0000\u0000\u0182\u0184\u0007\u0001\u0000\u0000\u0183\u0182\u0001"+
+		"\u0000\u0000\u0000\u0184\u0187\u0001\u0000\u0000\u0000\u0185\u0183\u0001"+
+		"\u0000\u0000\u0000\u0185\u0186\u0001\u0000\u0000\u0000\u0186d\u0001\u0000"+
+		"\u0000\u0000\u0187\u0185\u0001\u0000\u0000\u0000\u0188\u018b\u0003c1\u0000"+
+		"\u0189\u018a\u0005.\u0000\u0000\u018a\u018c\u0003c1\u0000\u018b\u0189"+
+		"\u0001\u0000\u0000\u0000\u018c\u018d\u0001\u0000\u0000\u0000\u018d\u018b"+
+		"\u0001\u0000\u0000\u0000\u018d\u018e\u0001\u0000\u0000\u0000\u018ef\u0001"+
+		"\u0000\u0000\u0000\u018f\u0191\u000209\u0000\u0190\u018f\u0001\u0000\u0000"+
+		"\u0000\u0191\u0192\u0001\u0000\u0000\u0000\u0192\u0190\u0001\u0000\u0000"+
+		"\u0000\u0192\u0193\u0001\u0000\u0000\u0000\u0193h\u0001\u0000\u0000\u0000"+
+		"\u0194\u0196\u000209\u0000\u0195\u0194\u0001\u0000\u0000\u0000\u0196\u0197"+
+		"\u0001\u0000\u0000\u0000\u0197\u0195\u0001\u0000\u0000\u0000\u0197\u0198"+
+		"\u0001\u0000\u0000\u0000\u0198\u0199\u0001\u0000\u0000\u0000\u0199\u019d"+
+		"\u0005.\u0000\u0000\u019a\u019c\u000209\u0000\u019b\u019a\u0001\u0000"+
+		"\u0000\u0000\u019c\u019f\u0001\u0000\u0000\u0000\u019d\u019b\u0001\u0000"+
+		"\u0000\u0000\u019d\u019e\u0001\u0000\u0000\u0000\u019e\u01a1\u0001\u0000"+
+		"\u0000\u0000\u019f\u019d\u0001\u0000\u0000\u0000\u01a0\u01a2\u0003m6\u0000"+
+		"\u01a1\u01a0\u0001\u0000\u0000\u0000\u01a1\u01a2\u0001\u0000\u0000\u0000"+
+		"\u01a2\u01b3\u0001\u0000\u0000\u0000\u01a3\u01a5\u0005.\u0000\u0000\u01a4"+
+		"\u01a6\u000209\u0000\u01a5\u01a4\u0001\u0000\u0000\u0000\u01a6\u01a7\u0001"+
+		"\u0000\u0000\u0000\u01a7\u01a5\u0001\u0000\u0000\u0000\u01a7\u01a8\u0001"+
+		"\u0000\u0000\u0000\u01a8\u01aa\u0001\u0000\u0000\u0000\u01a9\u01ab\u0003"+
+		"m6\u0000\u01aa\u01a9\u0001\u0000\u0000\u0000\u01aa\u01ab\u0001\u0000\u0000"+
+		"\u0000\u01ab\u01b3\u0001\u0000\u0000\u0000\u01ac\u01ae\u000209\u0000\u01ad"+
+		"\u01ac\u0001\u0000\u0000\u0000\u01ae\u01af\u0001\u0000\u0000\u0000\u01af"+
+		"\u01ad\u0001\u0000\u0000\u0000\u01af\u01b0\u0001\u0000\u0000\u0000\u01b0"+
+		"\u01b1\u0001\u0000\u0000\u0000\u01b1\u01b3\u0003m6\u0000\u01b2\u0195\u0001"+
+		"\u0000\u0000\u0000\u01b2\u01a3\u0001\u0000\u0000\u0000\u01b2\u01ad\u0001"+
+		"\u0000\u0000\u0000\u01b3j\u0001\u0000\u0000\u0000\u01b4\u01b9\u0005\""+
+		"\u0000\u0000\u01b5\u01b8\u0003q8\u0000\u01b6\u01b8\b\u0002\u0000\u0000"+
+		"\u01b7\u01b5\u0001\u0000\u0000\u0000\u01b7\u01b6\u0001\u0000\u0000\u0000"+
+		"\u01b8\u01bb\u0001\u0000\u0000\u0000\u01b9\u01b7\u0001\u0000\u0000\u0000"+
+		"\u01b9\u01ba\u0001\u0000\u0000\u0000\u01ba\u01bc\u0001\u0000\u0000\u0000"+
+		"\u01bb\u01b9\u0001\u0000\u0000\u0000\u01bc\u01bd\u0005\"\u0000\u0000\u01bd"+
+		"l\u0001\u0000\u0000\u0000\u01be\u01c0\u0007\u0003\u0000\u0000\u01bf\u01c1"+
+		"\u0007\u0004\u0000\u0000\u01c0\u01bf\u0001\u0000\u0000\u0000\u01c0\u01c1"+
+		"\u0001\u0000\u0000\u0000\u01c1\u01c3\u0001\u0000\u0000\u0000\u01c2\u01c4"+
+		"\u000209\u0000\u01c3\u01c2\u0001\u0000\u0000\u0000\u01c4\u01c5\u0001\u0000"+
+		"\u0000\u0000\u01c5\u01c3\u0001\u0000\u0000\u0000\u01c5\u01c6\u0001\u0000"+
+		"\u0000\u0000\u01c6n\u0001\u0000\u0000\u0000\u01c7\u01c8\u0007\u0005\u0000"+
+		"\u0000\u01c8p\u0001\u0000\u0000\u0000\u01c9\u01ce\u0005\\\u0000\u0000"+
+		"\u01ca\u01cf\u0007\u0006\u0000\u0000\u01cb\u01cc\u0005\\\u0000\u0000\u01cc"+
+		"\u01cf\u0005\"\u0000\u0000\u01cd\u01cf\u0007\u0007\u0000\u0000\u01ce\u01ca"+
+		"\u0001\u0000\u0000\u0000\u01ce\u01cb\u0001\u0000\u0000\u0000\u01ce\u01cd"+
+		"\u0001\u0000\u0000\u0000\u01cf\u01d3\u0001\u0000\u0000\u0000\u01d0\u01d3"+
+		"\u0003u:\u0000\u01d1\u01d3\u0003s9\u0000\u01d2\u01c9\u0001\u0000\u0000"+
+		"\u0000\u01d2\u01d0\u0001\u0000\u0000\u0000\u01d2\u01d1\u0001\u0000\u0000"+
+		"\u0000\u01d3r\u0001\u0000\u0000\u0000\u01d4\u01d5\u0005\\\u0000\u0000"+
+		"\u01d5\u01d6\u000203\u0000\u01d6\u01d8\u000207\u0000\u01d7\u01d9\u0002"+
+		"07\u0000\u01d8\u01d7\u0001\u0000\u0000\u0000\u01d8\u01d9\u0001\u0000\u0000"+
+		"\u0000\u01d9\u01e2\u0001\u0000\u0000\u0000\u01da\u01db\u0005\\\u0000\u0000"+
+		"\u01db\u01dd\u000207\u0000\u01dc\u01de\u000207\u0000\u01dd\u01dc\u0001"+
+		"\u0000\u0000\u0000\u01dd\u01de\u0001\u0000\u0000\u0000\u01de\u01e2\u0001"+
+		"\u0000\u0000\u0000\u01df\u01e0\u0005\\\u0000\u0000\u01e0\u01e2\u00020"+
+		"7\u0000\u01e1\u01d4\u0001\u0000\u0000\u0000\u01e1\u01da\u0001\u0000\u0000"+
+		"\u0000\u01e1\u01df\u0001\u0000\u0000\u0000\u01e2t\u0001\u0000\u0000\u0000"+
+		"\u01e3\u01e4\u0005\\\u0000\u0000\u01e4\u01e5\u0005u\u0000\u0000\u01e5"+
+		"\u01e6\u0003o7\u0000\u01e6\u01e7\u0003o7\u0000\u01e7\u01e8\u0003o7\u0000"+
+		"\u01e8\u01e9\u0003o7\u0000\u01e9v\u0001\u0000\u0000\u0000\u01ea\u01ec"+
+		"\u0007\b\u0000\u0000\u01eb\u01ea\u0001\u0000\u0000\u0000\u01ec\u01ed\u0001"+
+		"\u0000\u0000\u0000\u01ed\u01eb\u0001\u0000\u0000\u0000\u01ed\u01ee\u0001"+
+		"\u0000\u0000\u0000\u01ee\u01ef\u0001\u0000\u0000\u0000\u01ef\u01f0\u0006"+
+		";\u0000\u0000\u01f0x\u0001\u0000\u0000\u0000\u01f1\u01f2\u0005/\u0000"+
+		"\u0000\u01f2\u01f3\u0005/\u0000\u0000\u01f3\u01f7\u0001\u0000\u0000\u0000"+
+		"\u01f4\u01f6\b\t\u0000\u0000\u01f5\u01f4\u0001\u0000\u0000\u0000\u01f6"+
+		"\u01f9\u0001\u0000\u0000\u0000\u01f7\u01f5\u0001\u0000\u0000\u0000\u01f7"+
+		"\u01f8\u0001\u0000\u0000\u0000\u01f8\u01fa\u0001\u0000\u0000\u0000\u01f9"+
+		"\u01f7\u0001\u0000\u0000\u0000\u01fa\u01fb\u0006<\u0000\u0000\u01fbz\u0001"+
+		"\u0000\u0000\u0000\u01fc\u01fd\u0005/\u0000\u0000\u01fd\u01fe\u0005*\u0000"+
+		"\u0000\u01fe\u0202\u0001\u0000\u0000\u0000\u01ff\u0201\t\u0000\u0000\u0000"+
+		"\u0200\u01ff\u0001\u0000\u0000\u0000\u0201\u0204\u0001\u0000\u0000\u0000"+
+		"\u0202\u0203\u0001\u0000\u0000\u0000\u0202\u0200\u0001\u0000\u0000\u0000"+
+		"\u0203\u0205\u0001\u0000\u0000\u0000\u0204\u0202\u0001\u0000\u0000\u0000"+
+		"\u0205\u0206\u0005*\u0000\u0000\u0206\u0207\u0005/\u0000\u0000\u0207\u0208"+
+		"\u0001\u0000\u0000\u0000\u0208\u0209\u0006=\u0000\u0000\u0209|\u0001\u0000"+
+		"\u0000\u0000\u0018\u0000\u017f\u0185\u018d\u0192\u0197\u019d\u01a1\u01a7"+
+		"\u01aa\u01af\u01b2\u01b7\u01b9\u01c0\u01c5\u01ce\u01d2\u01d8\u01dd\u01e1"+
+		"\u01ed\u01f7\u0202\u0001\u0006\u0000\u0000";
+	public static final ATN _ATN =
+		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
-		final int numStates = DFA11_transitionS.length;
-		DFA11_transition = new short[numStates][];
-		for (int i = 0; i < numStates; i++) {
-			DFA11_transition[i] = DFA.unpackEncodedString(DFA11_transitionS[i]);
+		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
+		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {
+			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
 		}
 	}
-
-	class DFA11 extends DFA {
-
-		public DFA11(BaseRecognizer recognizer) {
-			this.recognizer = recognizer;
-			decisionNumber = 11;
-			eot = DFA11_eot;
-			eof = DFA11_eof;
-			min = DFA11_min;
-			max = DFA11_max;
-			accept = DFA11_accept;
-			special = DFA11_special;
-			transition = DFA11_transition;
-		}
-
-		@Override
-		public String getDescription() {
-			return "254:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
-		}
-	}
-
-	static final String DFA19_eotS = "\1\uffff\1\44\1\47\1\51\1\54\1\56\1\44\2\uffff\1\44\2\uffff\3\44"
-		+ "\1\71\1\44\2\uffff\1\44\2\uffff\1\44\2\uffff\4\44\1\101\4\uffff" + "\2\44\13\uffff\11\44\2\uffff\7\44\3\uffff\11\44\1\141\2\44\1\144"
-		+ "\2\44\1\147\15\44\1\uffff\2\44\1\uffff\2\44\1\uffff\1\171\1\172" + "\6\44\1\u0081\1\172\4\44\1\u0086\2\44\2\uffff\6\44\1\uffff\1\u008f"
-		+ "\3\44\1\uffff\1\u0093\1\u0094\2\44\1\u0097\2\44\1\u009a\1\uffff" + "\3\44\2\uffff\1\u009e\1\44\1\uffff\2\44\1\uffff\1\u00a2\2\44\1\uffff"
-		+ "\3\44\1\uffff\1\u00a8\1\u00a9\1\u00aa\1\u00ab\1\44\4\uffff\1\u00ad" + "\1\uffff";
-	static final String DFA19_eofS = "\u00ae\uffff";
-	static final String DFA19_minS =
-		"\1\11\1\55\2\75\1\55\1\75\1\55\2\uffff\1\55\2\uffff\5\55\2\uffff" + "\1\55\2\uffff\1\55\2\uffff\4\55\1\56\3\uffff\1\52\2\55\13\uffff"
-			+ "\11\55\2\uffff\7\55\3\uffff\35\55\1\uffff\2\55\1\uffff\2\55\1\uffff" + "\21\55\2\uffff\6\55\1\uffff\4\55\1\uffff\10\55\1\uffff\3\55\2\uffff"
-			+ "\2\55\1\uffff\2\55\1\uffff\3\55\1\uffff\3\55\1\uffff\5\55\4\uffff" + "\1\55\1\uffff";
-	static final String DFA19_maxS =
-		"\1\175\1\172\4\75\1\172\2\uffff\1\172\2\uffff\5\172\2\uffff\1\172" + "\2\uffff\1\172\2\uffff\4\172\1\145\3\uffff\1\57\2\172\13\uffff\11"
-			+ "\172\2\uffff\7\172\3\uffff\35\172\1\uffff\2\172\1\uffff\2\172\1" + "\uffff\21\172\2\uffff\6\172\1\uffff\4\172\1\uffff\10\172\1\uffff"
-			+ "\3\172\2\uffff\2\172\1\uffff\2\172\1\uffff\3\172\1\uffff\3\172\1" + "\uffff\5\172\4\uffff\1\172\1\uffff";
-	static final String DFA19_acceptS = "\7\uffff\1\11\1\12\1\uffff\1\16\1\17\5\uffff\1\30\1\34\1\uffff\1"
-		+ "\36\1\37\1\uffff\1\41\1\42\5\uffff\1\54\1\55\1\56\3\uffff\1\51\1" + "\52\1\2\1\20\1\4\1\3\1\6\1\31\1\5\1\7\1\33\11\uffff\1\32\1\26\7"
-		+ "\uffff\1\53\1\57\1\60\35\uffff\1\46\2\uffff\1\35\2\uffff\1\43\21" + "\uffff\1\44\1\50\6\uffff\1\45\4\uffff\1\27\10\uffff\1\22\3\uffff"
-		+ "\1\40\1\47\2\uffff\1\13\2\uffff\1\21\3\uffff\1\1\3\uffff\1\23\5" + "\uffff\1\24\1\25\1\10\1\14\1\uffff\1\15";
-	static final String DFA19_specialS = "\u00ae\uffff}>";
-	static final String[] DFA19_transitionS = {
-		"\2\40\2\uffff\1\40\22\uffff\1\40\1\5\1\37\3\uffff\1\21\1\uffff" + "\1\30\1\13\1\uffff\1\24\1\10\1\17\1\36\1\41\12\35\1\7\1\25\1"
-			+ "\4\1\2\1\3\2\uffff\32\34\4\uffff\1\34\1\uffff\1\1\1\32\1\6\1" + "\11\1\34\1\14\2\34\1\15\3\34\1\16\1\34\1\20\3\34\1\26\1\33\1"
-			+ "\31\2\34\1\23\2\34\1\27\1\22\1\12",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\43\1\42\30\43", "\1\46", "\1\50", "\1\53\17\uffff\1\52", "\1\55",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\10\43\1\57\5\43\1\60\13\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\61\25\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\64\3\43\1\62\6\43\1\63\16\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\14\43\1\65\1\66\14\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\67\31\43",
-		"\1\43\1\45\1\uffff\12\43\4\uffff\1\70\2\uffff\32\43\4\uffff" + "\1\43\1\uffff\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\72\14\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\73\13\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\74\4\43\1\75\6\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\22\43\1\76\7\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\77\13\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\100\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\36\1\uffff\12\35\13\uffff\1\36\37\uffff\1\36", "", "", "",
-		"\1\103\4\uffff\1\102", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\22\43\1\104\7\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "", "", "", "", "", "", "", "", "", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\105\14\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\106\14\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\22\43\1\107\7\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\110\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\111\13\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\13\43\1\112\16\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\17\43\1\113\12\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\22\43\1\114\1\115\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\116\14\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\117\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\120\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\14\43\1\121\15\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\122\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\123\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\124\13\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\24\43\1\125\5\43", "", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\126\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\127\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\130\17\43\1\131\7\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\132\27\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\133\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\134\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\22\43\1\135\7\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\136\13\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\137\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\140\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\3\43\1\142\26\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\16\43\1\143\13\43\4\uffff" + "\1\43\1\uffff\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\145\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\10\43\1\146\21\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\13\43\1\150\16\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\151\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\152\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\153\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\154\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\155\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\156\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\24\43\1\157\5\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\160\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\161\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\162\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\163\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\164\10\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\165\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\5\43\1\166\24\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\16\43\1\167\13\43\4\uffff" + "\1\43\1\uffff\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\170\14\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\173\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\174\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\17\43\1\175\12\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\176\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\10\43\1\177\21\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\u0080\10\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u0082\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\u0083\14\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\5\43\1\u0084\24\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u0085\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\5\43\1\u0087\24\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\6\43\1\u0088\23\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\u0089\27\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\5\43\1\u008a\24\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u008b\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\u008c\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\17\43\1\u008d\12\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\u008e\25\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\u0090\27\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\u0091\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\u0092\13\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u0095\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\1\u0096\31\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\10\43\1\u0098\21\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u0099\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\u009b\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\u009c\27\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\21\43\1\u009d\10\43", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\2\43\1\u009f\27\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\u00a0\14\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\10\43\1\u00a1\21\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\u00a3\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\30\43\1\u00a4\1\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\4\43\1\u00a5\25\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\23\43\1\u00a6\6\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\16\43\1\u00a7\13\43", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\15\43\1\u00ac\14\43", "", "", "", "",
-		"\1\43\1\45\1\uffff\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff" + "\32\43", "" };
-
-	static final short[] DFA19_eot = DFA.unpackEncodedString(DFA19_eotS);
-	static final short[] DFA19_eof = DFA.unpackEncodedString(DFA19_eofS);
-	static final char[] DFA19_min = DFA.unpackEncodedStringToUnsignedChars(DFA19_minS);
-	static final char[] DFA19_max = DFA.unpackEncodedStringToUnsignedChars(DFA19_maxS);
-	static final short[] DFA19_accept = DFA.unpackEncodedString(DFA19_acceptS);
-	static final short[] DFA19_special = DFA.unpackEncodedString(DFA19_specialS);
-	static final short[][] DFA19_transition;
-
-	static {
-		final int numStates = DFA19_transitionS.length;
-		DFA19_transition = new short[numStates][];
-		for (int i = 0; i < numStates; i++) {
-			DFA19_transition[i] = DFA.unpackEncodedString(DFA19_transitionS[i]);
-		}
-	}
-
-	class DFA19 extends DFA {
-
-		public DFA19(BaseRecognizer recognizer) {
-			this.recognizer = recognizer;
-			decisionNumber = 19;
-			eot = DFA19_eot;
-			eof = DFA19_eof;
-			min = DFA19_min;
-			max = DFA19_max;
-			accept = DFA19_accept;
-			special = DFA19_special;
-			transition = DFA19_transition;
-		}
-
-		@Override
-		public String getDescription() {
-			return "1:1: Tokens : ( ABSTRACT | ATTR_OP_EQUALS | ATTR_OP_GREATER | ATTR_OP_GREATER_EQ | ATTR_OP_LESS | ATTR_OP_LESS_EQ | ATTR_OP_NOT_EQUALS | CINTERFACE | COLON | COMMA | CONCEPT | CONSTRAINT | DESCRIPTION | END_C | END_R | EQ | FEATURE | IMPORT | IMPORTINSTANCE | IMPORTINTERFACE | MANDATORY | MINUS | ONEOF | OP_AND | OP_EQUIVALENT | OP_IMPLIES | OP_NOT | OP_OR | OP_XOR | PLUS | SEMI | SOMEOF | START_C | START_R | USE | VAR_BOOL | VAR_FLOAT | VAR_INT | VAR_STRING | BOOLEAN | ID | IDPath | INT | FLOAT | STRING | WS | SL_COMMENT | ML_COMMENT );";
-		}
-	}
-
 }
