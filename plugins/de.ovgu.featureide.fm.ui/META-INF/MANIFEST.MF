@@ -16,7 +16,8 @@ Require-Bundle:
  org.eclipse.gef,
  org.eclipse.core.expressions,
  org.eclipse.core.resources,
- de.ovgu.featureide.fm.core
+ de.ovgu.featureide.fm.core,
+ org.eclipse.draw2d
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: University of Magdeburg
