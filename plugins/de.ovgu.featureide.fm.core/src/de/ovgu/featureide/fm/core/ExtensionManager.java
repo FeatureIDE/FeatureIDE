@@ -47,7 +47,7 @@ public abstract class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExt
 	}
 
 	public synchronized boolean addExtension(T extension) {
-		if (extension != null) {
+		if ((extension != null) && (extension.getId() != null)) {
 			for (final T t : extensions) {
 				if (t.getId().equals(extension.getId())) {
 					return false;
