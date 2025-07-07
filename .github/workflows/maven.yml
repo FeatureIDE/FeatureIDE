@@ -37,7 +37,7 @@ jobs:
       run: mvn -B compile --file pom.xml
   
     - name: Build update site with Maven
-      run: mvn verify -pl deploy -am
+      run: mvn -B -Pnu package
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
