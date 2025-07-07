@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   build:
@@ -35,15 +36,63 @@ jobs:
         
     - name: Build with Maven
       run: mvn -B compile --file pom.xml
-  
-    - name: Build update site with Maven
-      run: mvn -B -Pnu package
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./deploy/NightlyUpdate/target/repository
+  build-update-site:
+    runs-on: ubuntu-latest
+    needs: build
 
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@v5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
+
+      - name: Build update site only
+        run: mvn -B -Pnu package
+
+      - name: Upload update site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: update-site
+          path: deploy/NightlyUpdate/target/repository
+
+
+  deploy-update-site:
+    runs-on: ubuntu-latest
+    needs: build-update-site
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: update-site
+          
+      - name: Add .nojekyll
+        run: touch .nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
