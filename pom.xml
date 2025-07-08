@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
@@ -33,13 +34,10 @@
 		<module>plugins/de.ovgu.featureide.core.images</module>
 		<module>plugins/de.ovgu.featureide.core.mpl</module>
 		<module>plugins/de.ovgu.featureide.core.munge</module>
-		<module>plugins/de.ovgu.featureide.core.munge.android</module>
 		<module>plugins/de.ovgu.featureide.core.runtime</module>
-		<module>plugins/de.ovgu.featureide.examples</module>
 		<module>plugins/de.ovgu.featureide.migration</module>
-		<module>plugins/de.ovgu.featureide.ui.android</module>
 		<module>plugins/de.ovgu.featureide.ui.mpl</module>
-		
+
 		<!--Testmodules-->
 		<module>tests/de.ovgu.featureide.fm.core-test</module>
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
@@ -52,31 +50,53 @@
 		<module>tests/de.ovgu.featureide.fm.attributes-test</module>
 	</modules>
 
-	<!--The profiles are NightlyUpdates (nu) and GuiTests (gui)
+	<!--The
+	profiles are NightlyUpdates (nu) and GuiTests (gui)
 		run 'mvn -Pnu clean package' to build an update-site
 		run 'mvn -Pnu -Pgui clean verify' to build update-site and execute gui-tests
 		NOTE: 	Do not run 'mvn -Pgui clean verify'. 
 				Gui-Test-Module needs an installable FeatureIDE-Version from nu.-->
 	<profiles>
 		<profile>
-            <id>nu</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>deploy</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>gui</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>gui-tests/de.ovgu.featureide.fm.gui-test</module>
-            </modules>
-        </profile>
-    </profiles>
+			<id>nu</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>deploy/br.ufal.ic.colligens.feature</module>
+				<module>deploy/de.ovgu.featureide.featurecpp</module>
+				<module>deploy/de.ovgu.featureide.featurehouse</module>
+				<module>deploy/de.ovgu.featureide</module>
+				<module>deploy/de.ovgu.featureide.ahead</module>
+				<module>deploy/de.ovgu.featureide.antenna</module>
+				<module>deploy/de.ovgu.featureide.aspectj</module>
+				<module>deploy/de.ovgu.featureide.featuremodeling</module>
+				<module>deploy/de.ovgu.featureide.munge</module>
+				<module>deploy/NightlyUpdate</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>gui</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>gui-tests/de.ovgu.featureide.fm.gui-test</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>deprecated-build</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>deploy</module>
+				<module>plugins/de.ovgu.featureide.examples</module>
+				<module>plugins/de.ovgu.featureide.ui.android</module>
+				<module>plugins/de.ovgu.featureide.core.munge.android</module>
+			</modules>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
@@ -239,19 +259,19 @@
 	<!-- mvn clean verify jacoco:report -->
 	<reporting>
 		<plugins>
-            <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
-                <configuration>
-                    <reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
-                    <destDir>${project.name}</destDir>
-                    <debug>true</debug>
-                    <doclint>none</doclint>
-                    <failOnWarnings>false</failOnWarnings>
-                </configuration>
-            </plugin>
-		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.11.2</version>
+				<configuration>
+					<reportOutputDirectory>${project.basedir}/../Javadoc</reportOutputDirectory>
+					<destDir>${project.name}</destDir>
+					<debug>true</debug>
+					<doclint>none</doclint>
+					<failOnWarnings>false</failOnWarnings>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -274,9 +294,4 @@
 			<layout>p2</layout>
 		</repository>
 	</repositories>
-
-	<dependencies>
-		
-	
-	</dependencies>
 </project>
