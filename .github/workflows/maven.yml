@@ -80,10 +80,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
+      - name: Create artifact download directory
+        run: mkdir update-site
+        
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: update-site
+          path: update-site/
           
       - name: Add .nojekyll
         run: touch .nojekyll
@@ -94,7 +98,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: deploy/NightlyUpdate/target/repository
+          path: update-site/
         
       - name: Deploy to GitHub Pages
         id: deployment
