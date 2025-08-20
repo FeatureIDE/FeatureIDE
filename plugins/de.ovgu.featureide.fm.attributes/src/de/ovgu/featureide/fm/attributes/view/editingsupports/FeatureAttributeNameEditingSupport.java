@@ -59,13 +59,13 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 
 	@Override
 	protected Object getValue(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		return attribute.getName();
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		IFeatureAttribute attribute = (IFeatureAttribute) element;
+		IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		IExtendedFeature feature = (IExtendedFeature) attribute.getFeature();
 		String newName = value.toString();
 

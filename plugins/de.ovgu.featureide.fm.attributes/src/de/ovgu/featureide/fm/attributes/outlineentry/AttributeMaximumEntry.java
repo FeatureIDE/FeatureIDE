@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 public class AttributeMaximumEntry implements IOutlineEntry {
 
-	IFeatureAttribute attribute;
+	IFeatureAttribute<?> attribute;
 	Configuration config;
 	Double result;
 	EstimatedMaximumComputation estimatedMax;
@@ -41,7 +41,7 @@ public class AttributeMaximumEntry implements IOutlineEntry {
 	private static final String EST = " (est)";
 	private String labelSuffix;
 
-	public AttributeMaximumEntry(Configuration config, IFeatureAttribute attribute) {
+	public AttributeMaximumEntry(Configuration config, IFeatureAttribute<?> attribute) {
 		this.config = config;
 		this.attribute = attribute;
 		estimatedMax = new EstimatedMaximumComputation(config, attribute);

@@ -51,7 +51,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 		return configurableAttributes;
 	}
 
-	public boolean hasAttributeWithConfiguredValue(IFeatureAttribute att) {
+	public boolean hasAttributeWithConfiguredValue(IFeatureAttribute<?> att) {
 		return configurableAttributes.containsKey(att.getName());
 	}
 
@@ -63,7 +63,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 		configurableAttributes.put(name, value);
 	}
 
-	public Object getAttributeValue(IFeatureAttribute att) {
+	public Object getAttributeValue(IFeatureAttribute<?> att) {
 		if (hasAttributeWithConfiguredValue(att)) {
 			return configurableAttributes.get(att.getName());
 		} else {
@@ -73,7 +73,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 
 	public Object getAttributeDefaultValue(String attName) {
 		IExtendedFeature feat = ((IExtendedFeature) getFeature());
-		for (IFeatureAttribute att : feat.getAttributes()) {
+		for (IFeatureAttribute<?> att : feat.getAttributes()) {
 			if (att.getName().equals(attName)) {
 				return att.getValue();
 			}
@@ -89,7 +89,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 		}
 	}
 
-	public void removeConfigurableAttribute(IFeatureAttribute att) {
+	public void removeConfigurableAttribute(IFeatureAttribute<?> att) {
 		if (hasAttributeWithConfiguredValue(att)) {
 			configurableAttributes.remove(att.getName());
 		}

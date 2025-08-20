@@ -40,16 +40,16 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  */
 public class ExtendedFeature extends Feature implements IExtendedFeature {
 
-	protected List<IFeatureAttribute> attributes;
+	protected List<IFeatureAttribute<?>> attributes;
 
 	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure newFeatureStructure) {
 		super(oldFeature, featureModel, copyId, newFeatureStructure);
 
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 		if (oldFeature instanceof IExtendedFeature) {
 			// Copy attributes from the old feature if available
 			IExtendedFeature feature = (IExtendedFeature) oldFeature;
-			for (IFeatureAttribute attribute : feature.getAttributes()) {
+			for (IFeatureAttribute<?> attribute : feature.getAttributes()) {
 				attributes.add(attribute.cloneAtt(this));
 			}
 		}
@@ -58,11 +58,11 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 	public ExtendedFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
 		super(oldFeature, featureModel, copyId);
 
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 		if (oldFeature instanceof IExtendedFeature) {
 			// Copy attributes from the old feature if available
 			IExtendedFeature feature = (IExtendedFeature) oldFeature;
-			for (IFeatureAttribute attribute : feature.getAttributes()) {
+			for (IFeatureAttribute<?> attribute : feature.getAttributes()) {
 				attributes.add(attribute.cloneAtt(this));
 			}
 		}
@@ -72,21 +72,21 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 		super(featureModel, name);
 
 		// Create empty attributes list
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 	}
 
 	@Override
-	public List<IFeatureAttribute> getAttributes() {
+	public List<IFeatureAttribute<?>> getAttributes() {
 		return attributes;
 	}
 
 	@Override
-	public void addAttribute(IFeatureAttribute attribute) {
+	public void addAttribute(IFeatureAttribute<?> attribute) {
 		attributes.add(attribute);
 	}
 
 	@Override
-	public void removeAttribute(IFeatureAttribute attribute) {
+	public void removeAttribute(IFeatureAttribute<?> attribute) {
 		attributes.remove(attribute);
 	}
 
@@ -96,8 +96,8 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 	}
 
 	@Override
-	public boolean isContainingAttribute(IFeatureAttribute attribute) {
-		for (IFeatureAttribute att : attributes) {
+	public boolean isContainingAttribute(IFeatureAttribute<?> attribute) {
+		for (IFeatureAttribute<?> att : attributes) {
 			if (attribute.getName().equals(att.getName())) {
 				return true;
 			}
@@ -111,13 +111,13 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 		return createExtendedTooltip(attributes, tooltip);
 	}
 
-	public static String createExtendedTooltip(List<IFeatureAttribute> attributes, StringBuilder tooltip) {
+	public static String createExtendedTooltip(List<IFeatureAttribute<?>> attributes, StringBuilder tooltip) {
 		tooltip.append("\n\n");
 
 		StringBuilder attributesString = new StringBuilder();
 		StringBuilder inhreritedString = new StringBuilder();
-		List<IFeatureAttribute> featureAttributes = new ArrayList<>();
-		List<IFeatureAttribute> inheritedAttributes = new ArrayList<>();
+		List<IFeatureAttribute<?>> featureAttributes = new ArrayList<>();
+		List<IFeatureAttribute<?>> inheritedAttributes = new ArrayList<>();
 
 		if (attributes.size() == 0) {
 			tooltip.append("No Attributes.\n");
@@ -125,7 +125,7 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 			attributesString.append("Attributes:\n");
 			inhreritedString.append("Inherited Attributes:\n");
 			for (int i = 0; i < attributes.size(); i++) {
-				IFeatureAttribute attribute = attributes.get(i);
+				IFeatureAttribute<?> attribute = attributes.get(i);
 				if (attributes.get(i).isRecursive() && !attributes.get(i).isHeadOfRecursiveAttribute()) {
 					inheritedAttributes.add(attribute);
 				} else {
@@ -135,7 +135,7 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 			// Append attributes defined for this feature
 			for (int i = 0; i < featureAttributes.size(); i++) {
-				IFeatureAttribute iFeatureAttribute = featureAttributes.get(i);
+				IFeatureAttribute<?> iFeatureAttribute = featureAttributes.get(i);
 				if (iFeatureAttribute.isRecursive()) {
 					attributesString.append("recursive ");
 				}
@@ -156,7 +156,7 @@ public class ExtendedFeature extends Feature implements IExtendedFeature {
 
 			// Append attributes inherited of this feature
 			for (int i = 0; i < inheritedAttributes.size(); i++) {
-				IFeatureAttribute iFeatureAttribute = inheritedAttributes.get(i);
+				IFeatureAttribute<?> iFeatureAttribute = inheritedAttributes.get(i);
 				if (iFeatureAttribute.isRecursive()) {
 					inhreritedString.append("recursive ");
 				}

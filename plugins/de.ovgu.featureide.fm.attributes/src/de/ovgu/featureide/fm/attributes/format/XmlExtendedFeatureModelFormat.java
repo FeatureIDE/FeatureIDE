@@ -104,8 +104,8 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
 		// handle recursive attributes
-		List<IFeatureAttribute> recursiveAttributes = getRecursiveAttributes();
-		for (IFeatureAttribute att : recursiveAttributes) {
+		List<IFeatureAttribute<?>> recursiveAttributes = getRecursiveAttributes();
+		for (IFeatureAttribute<?> att : recursiveAttributes) {
 			recurseAttributesWithLookup(att.getFeature(), att);
 		}
 
@@ -114,10 +114,10 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 
 	protected void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
 		if (feature instanceof IExtendedFeature) {
-			List<IFeatureAttribute> attributesList = ((IExtendedFeature) feature).getAttributes();
+			List<IFeatureAttribute<?>> attributesList = ((IExtendedFeature) feature).getAttributes();
 			if ((attributesList != null) && !attributesList.isEmpty()) {
 				// Write FeatureAttributes into the XML
-				for (final IFeatureAttribute featureAttribute : attributesList) {
+				for (final IFeatureAttribute<?> featureAttribute : attributesList) {
 					final Element attributeNode;
 					if (featureAttribute.isRecursive() && !featureAttribute.isHeadOfRecursiveAttribute()) {
 						createRecursedAttribute(doc, fnode, featureAttribute);
@@ -149,7 +149,7 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 	 * @param fnode parent node
 	 * @param att recursed feature attribute that is supposed to be added
 	 */
-	private void createRecursedAttribute(Document doc, Element fnode, IFeatureAttribute att) {
+	private void createRecursedAttribute(Document doc, Element fnode, IFeatureAttribute<?> att) {
 		final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
 		if (att.getValue() == null) {
 			return;
@@ -242,7 +242,7 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			if (parsedAttribute.isRecursed()) {
 				addLookUpEntry(parent.getName(), name, value);
 			} else {
-				IFeatureAttribute featureAttribute;
+				IFeatureAttribute<?> featureAttribute;
 				try {
 					featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
 					if (featureAttribute != null) {
@@ -268,11 +268,11 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 		// TODO Auto-generated method stub
 	}
 
-	private List<IFeatureAttribute> getRecursiveAttributes() {
-		List<IFeatureAttribute> recursiveAttributes = new ArrayList<>();
+	private List<IFeatureAttribute<?>> getRecursiveAttributes() {
+		List<IFeatureAttribute<?>> recursiveAttributes = new ArrayList<>();
 		for (IFeature feat : object.getFeatures()) {
 			ExtendedFeature ext = (ExtendedFeature) feat;
-			for (IFeatureAttribute att : ext.getAttributes()) {
+			for (IFeatureAttribute<?> att : ext.getAttributes()) {
 				if (att.isRecursive()) {
 					recursiveAttributes.add(att);
 				}
@@ -281,8 +281,8 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 		return recursiveAttributes;
 	}
 
-	private void recurseAttributesWithLookup(IFeature feature, IFeatureAttribute attribute) {
-		IFeatureAttribute newAttribute = null;
+	private void recurseAttributesWithLookup(IFeature feature, IFeatureAttribute<?> attribute) {
+		IFeatureAttribute<?> newAttribute = null;
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttributesWithLookup(feat, attribute);
@@ -304,7 +304,8 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 		return null;
 	}
 
-	private void addValueAccordingToType(IFeatureAttribute attribute, String value) {
+	@SuppressWarnings("unchecked")
+	private void addValueAccordingToType(IFeatureAttribute<?> attribute, String value) {
 		if (value == null) {
 			return;
 		}
@@ -314,28 +315,28 @@ public class XmlExtendedFeatureModelFormat extends XmlFeatureModelFormat impleme
 			if (value != null) {
 				valueBoolean = Boolean.parseBoolean(value);
 			}
-			attribute.setValue(valueBoolean);
+			((IFeatureAttribute<Boolean>) attribute).setValue(valueBoolean);
 			break;
 		case FeatureAttribute.LONG:
 			Long valueLong = null;
 			if (value != null) {
 				valueLong = Long.parseLong(value);
 			}
-			attribute.setValue(valueLong);
+			((IFeatureAttribute<Long>) attribute).setValue(valueLong);
 			break;
 		case FeatureAttribute.DOUBLE:
 			Double valueDouble = null;
 			if (value != null) {
 				valueDouble = Double.parseDouble(value);
 			}
-			attribute.setValue(valueDouble);
+			((IFeatureAttribute<Double>) attribute).setValue(valueDouble);
 			break;
 		case FeatureAttribute.STRING:
 			String valueString = null;
 			if (value != null) {
 				valueString = value;
 			}
-			attribute.setValue(valueString);
+			((IFeatureAttribute<String>) attribute).setValue(valueString);
 			break;
 
 		default:

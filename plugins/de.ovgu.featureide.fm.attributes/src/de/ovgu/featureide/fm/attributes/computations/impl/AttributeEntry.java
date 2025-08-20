@@ -20,11 +20,11 @@ public class AttributeEntry implements IOutlineEntry {
 
 	private Configuration config;
 
-	private IFeatureAttribute attribute;
+	private IFeatureAttribute<?> attribute;
 
 	private final static String imgAttribute = "attribute_obj.ico";
 
-	public AttributeEntry(Configuration config, IFeatureAttribute attribute) {
+	public AttributeEntry(Configuration config, IFeatureAttribute<?> attribute) {
 		this.config = config;
 		this.attribute = attribute;
 	}

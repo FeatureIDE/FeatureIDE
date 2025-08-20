@@ -51,7 +51,7 @@ public class ChangeAttributeNameOperation extends AbstractFeatureModelOperation 
 	 */
 	private final String newName;
 
-	public ChangeAttributeNameOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, String newName) {
+	public ChangeAttributeNameOperation(IFeatureModelManager featureModelManager, IFeatureAttribute<?> attribute, String newName) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_NAME_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
@@ -60,7 +60,7 @@ public class ChangeAttributeNameOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setName(newName);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
@@ -70,7 +70,7 @@ public class ChangeAttributeNameOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, newName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, newName);
 		if (attribute != null) {
 			attribute.setName(attributeName);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());

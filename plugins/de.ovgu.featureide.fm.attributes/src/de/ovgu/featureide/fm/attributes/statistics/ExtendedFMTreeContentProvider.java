@@ -45,10 +45,10 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (fModel instanceof IExtendedFeatureModel) {
-			List<IFeatureAttribute> attributeList = new ArrayList<>();
+			List<IFeatureAttribute<?>> attributeList = new ArrayList<>();
 			for (IFeature feat : fModel.getFeatures()) {
 				if (feat instanceof IExtendedFeature) {
-					for (IFeatureAttribute att : ((IExtendedFeature) feat).getAttributes()) {
+					for (IFeatureAttribute<?> att : ((IExtendedFeature) feat).getAttributes()) {
 						if (!containsAttribute(attributeList, att.getName())) {
 							attributeList.add(att);
 						}
@@ -92,8 +92,8 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 		return false;
 	}
 
-	private boolean containsAttribute(List<IFeatureAttribute> list, String attributeName) {
-		for (IFeatureAttribute att : list) {
+	private boolean containsAttribute(List<IFeatureAttribute<?>> list, String attributeName) {
+		for (IFeatureAttribute<?> att : list) {
 			if (att.getName().equals(attributeName)) {
 				return true;
 			}

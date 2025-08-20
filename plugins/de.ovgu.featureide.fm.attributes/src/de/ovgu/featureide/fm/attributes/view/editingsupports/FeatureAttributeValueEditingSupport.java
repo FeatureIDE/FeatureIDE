@@ -62,7 +62,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
 			String[] items = { "", "false", "true" };
 			ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor((Composite) getViewer().getControl(), SWT.READ_ONLY);
@@ -77,7 +77,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 
 	@Override
 	protected Object getValue(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		if (view.getCurrentEditor() instanceof ConfigurationEditor) {
 			Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getVarObject();
 			for (SelectableFeature feat : config.getFeatures()) {
@@ -102,7 +102,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		final String valueString = value == null || value.toString().equals("") ? null : value.toString();
 		if (view.getMode() == FeatureAttributeOperationMode.CONFIGURATION_EDITOR) {
 			setValueInConfig(attribute, valueString);
@@ -120,7 +120,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	 * @param attribute The configurable attribute
 	 * @param value The new configured attribute value
 	 */
-	private void setValueInConfig(IFeatureAttribute attribute, String value) {
+	private void setValueInConfig(IFeatureAttribute<?> attribute, String value) {
 		if (value == null || attribute.isValidValue(value)) {
 			final ConfigurationManager manager = (ConfigurationManager) view.getManager();
 			switch (attribute.getType()) {
@@ -157,7 +157,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	 * @param attribute The attribute to be edited
 	 * @param value The new attribute value
 	 */
-	private void setValueInFeatureDiagram(IFeatureAttribute attribute, String value) {
+	private void setValueInFeatureDiagram(IFeatureAttribute<?> attribute, String value) {
 		if (value == null || attribute.isValidValue(value)) {
 			final IFeatureModelManager manager = (IFeatureModelManager) view.getManager();
 			switch (attribute.getType()) {

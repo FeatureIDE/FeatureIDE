@@ -65,7 +65,7 @@ public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupp
 	protected boolean canEdit(Object element) {
 		if (enabled && view.getCurrentEditor() instanceof FeatureModelEditor) {
 			if (element instanceof IFeatureAttribute) {
-				IFeatureAttribute att = (IFeatureAttribute) element;
+				IFeatureAttribute<?> att = (IFeatureAttribute<?>) element;
 				if (att.isRecursive() && !att.isHeadOfRecursiveAttribute()) {
 					return false;
 				}

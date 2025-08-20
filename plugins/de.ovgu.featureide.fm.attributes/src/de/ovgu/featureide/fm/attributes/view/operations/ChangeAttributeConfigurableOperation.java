@@ -56,7 +56,7 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 	 */
 	private final boolean oldConfigurable;
 
-	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newConfigurable) {
+	public ChangeAttributeConfigurableOperation(IFeatureModelManager featureModelManager, IFeatureAttribute<?> attribute, boolean newConfigurable) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_CONFIGURABLE_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
@@ -67,7 +67,7 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setConfigurable(newConfigurable);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
@@ -77,7 +77,7 @@ public class ChangeAttributeConfigurableOperation extends AbstractFeatureModelOp
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setConfigurable(oldConfigurable);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());

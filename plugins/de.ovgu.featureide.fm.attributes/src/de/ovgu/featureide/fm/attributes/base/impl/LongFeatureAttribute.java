@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -29,9 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class LongFeatureAttribute extends FeatureAttribute {
-
-	private Long value;
+public class LongFeatureAttribute extends FeatureAttribute<Long> {
 
 	/**
 	 * Creates a new long attribute with the given values.
@@ -45,8 +42,7 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 * 
 	 */
 	public LongFeatureAttribute(IFeature feature, String name, String unit, Long value, boolean recursive, boolean configurable) {
-		super(feature, name, unit, recursive, configurable);
-		this.value = value;
+		super(feature, name, value, unit, recursive, configurable);
 		attributeType = FeatureAttribute.LONG;
 	}
 
@@ -58,34 +54,13 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 */
 	public LongFeatureAttribute(LongFeatureAttribute oldAttribute, IFeature feature) {
 		super(oldAttribute, feature);
-		value = oldAttribute.value;
-	}
-
-	@Override
-	public Long getValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(Object value) {
-		if (value == null) {
-			this.value = null;
-			return;
-		}
-		if (value instanceof Long) {
-			this.value = (Long) value;
-		}
 	}
 
 	/**
 	 * Returns a copy of the attribute
 	 */
 	@Override
-	public IFeatureAttribute cloneAtt(IFeature feature) {
+	public LongFeatureAttribute cloneAtt(IFeature feature) {
 		return new LongFeatureAttribute(this, feature);
 	}
 
@@ -96,17 +71,18 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override
-	public IFeatureAttribute cloneRecursive(IFeature feature) {
-		return new LongFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
+	public LongFeatureAttribute cloneRecursive(IFeature feature) {
+		return new LongFeatureAttribute(feature, getName(), getUnit(), null, isRecursive(), isConfigurable());
 	}
 
 	@Override
 	public boolean isValidValue(String value) {
 		try {
-			Long.parseLong(value.toString());
+			Long.parseLong(value);
 			return true;
 		} catch (final NumberFormatException e) {
 			return false;
 		}
 	}
+
 }

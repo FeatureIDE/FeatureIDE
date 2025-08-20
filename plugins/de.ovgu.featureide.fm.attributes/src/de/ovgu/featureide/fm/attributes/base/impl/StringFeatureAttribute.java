@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -29,9 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class StringFeatureAttribute extends FeatureAttribute {
-
-	private String value;
+public class StringFeatureAttribute extends FeatureAttribute<String> {
 
 	/**
 	 * Creates a new String attribute with the given values.
@@ -45,8 +42,7 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 * 
 	 */
 	public StringFeatureAttribute(IFeature feature, String name, String unit, String value, boolean recursive, boolean configurable) {
-		super(feature, name, unit, recursive, configurable);
-		this.value = value;
+		super(feature, name, value, unit, recursive, configurable);
 		attributeType = FeatureAttribute.STRING;
 	}
 
@@ -58,32 +54,13 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 */
 	public StringFeatureAttribute(StringFeatureAttribute oldAttribute, IFeature feature) {
 		super(oldAttribute, feature);
-		value = oldAttribute.value;
-	}
-
-	@Override
-	public String getValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(Object value) {
-		if (value == null) {
-			this.value = null;
-			return;
-		}
-		this.value = value.toString();
 	}
 
 	/**
 	 * Returns a copy of the attribute
 	 */
 	@Override
-	public IFeatureAttribute cloneAtt(IFeature feature) {
+	public StringFeatureAttribute cloneAtt(IFeature feature) {
 		return new StringFeatureAttribute(this, feature);
 	}
 
@@ -94,7 +71,7 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override
-	public IFeatureAttribute cloneRecursive(IFeature feature) {
+	public StringFeatureAttribute cloneRecursive(IFeature feature) {
 		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
 
@@ -102,4 +79,5 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	public boolean isValidValue(String value) {
 		return true;
 	}
+
 }

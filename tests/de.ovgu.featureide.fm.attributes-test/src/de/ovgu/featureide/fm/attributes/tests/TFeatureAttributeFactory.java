@@ -26,10 +26,13 @@ import org.junit.Test;
 
 import de.ovgu.featureide.fm.attributes.FMAttributesLibrary;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
-import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
+import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
 import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
 
@@ -50,16 +53,16 @@ public class TFeatureAttributeFactory {
 		ExtendedFeature root = (ExtendedFeature) model.getFeature("Root");
 
 		// Create all types of attributes with values
-		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(root, "stringTest", "EMPTY", "Ein Test", false, false);
-		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(root, "booleanTest", "State", true, true, false);
-		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(root, "longTest", "Euro", Long.MAX_VALUE, false, true);
-		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(root, "doubleTest", "Dollar", Double.MAX_VALUE, true, true);
+		StringFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(root, "stringTest", "EMPTY", "Ein Test", false, false);
+		BooleanFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(root, "booleanTest", "State", true, true, false);
+		LongFeatureAttribute longAttribute = attributeFactory.createLongAttribute(root, "longTest", "Euro", Long.MAX_VALUE, false, true);
+		DoubleFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(root, "doubleTest", "Dollar", Double.MAX_VALUE, true, true);
 
 		// Create all types of attributes with null values
-		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(root, "sNull", "", null, true, true);
-		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(root, "bNull", "", null, false, true);
-		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(root, "lNull", "", null, true, false);
-		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(root, "dNull", "", null, false, false);
+		StringFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(root, "sNull", "", null, true, true);
+		BooleanFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(root, "bNull", "", null, false, true);
+		LongFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(root, "lNull", "", null, true, false);
+		DoubleFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(root, "dNull", "", null, false, false);
 
 		assertTrue(stringAttribute.getName().equals("stringTest"));
 		assertTrue(stringAttribute.getUnit().equals("EMPTY"));

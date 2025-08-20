@@ -70,13 +70,13 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 	/**
 	 * Map of removed attributes and the names of their features.
 	 */
-	private final Map<IFeatureAttribute, String> removedAttributes;
+	private final Map<IFeatureAttribute<?>, String> removedAttributes;
 
-	public RemoveFeatureAttributeOperation(IFeatureModelManager featureModelManager, List<IFeatureAttribute> attributes) {
+	public RemoveFeatureAttributeOperation(IFeatureModelManager featureModelManager, List<IFeatureAttribute<?>> attributes) {
 		super(featureModelManager, REMOVE_ATTRIBUTE_OPERATION_NAME);
 
 		this.attributes = new ArrayList<>(attributes.size());
-		for (IFeatureAttribute a : attributes) {
+		for (IFeatureAttribute<?> a : attributes) {
 			this.attributes.add(new FeatureAttributeDescriptor(a.getFeature().getName(), a.getName()));
 		}
 
@@ -87,7 +87,8 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
 		removedAttributes.clear();
 		for (final FeatureAttributeDescriptor attributeDescriptor : attributes) {
-			final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, attributeDescriptor.featureName, attributeDescriptor.attributeName);
+			final IFeatureAttribute<?> attribute =
+				AttributeUtils.getAttribute(featureModel, attributeDescriptor.featureName, attributeDescriptor.attributeName);
 			if (attribute != null) {
 				final IExtendedFeature extendedFeature = (IExtendedFeature) attribute.getFeature();
 				if (attribute.isRecursive()) {
@@ -107,11 +108,11 @@ public class RemoveFeatureAttributeOperation extends AbstractFeatureModelOperati
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		for (final Map.Entry<IFeatureAttribute, String> removedAttribute : removedAttributes.entrySet()) {
+		for (final Map.Entry<IFeatureAttribute<?>, String> removedAttribute : removedAttributes.entrySet()) {
 			final IFeature feature = featureModel.getFeature(removedAttribute.getValue());
 			if (feature instanceof IExtendedFeature) {
 				final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
-				final IFeatureAttribute attribute = removedAttribute.getKey().cloneAtt(extendedFeature);
+				final IFeatureAttribute<?> attribute = removedAttribute.getKey().cloneAtt(extendedFeature);
 				extendedFeature.addAttribute(attribute);
 				if (attribute.isRecursive()) {
 					attribute.addRecursiveAttributes(); // Restores values of descendants

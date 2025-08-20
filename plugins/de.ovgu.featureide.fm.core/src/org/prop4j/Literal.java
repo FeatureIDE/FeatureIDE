@@ -61,7 +61,7 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	protected Literal(Literal oldLiteral) {
-		var = oldLiteral.var;
+		var = (oldLiteral.var instanceof String) ? new String((String) oldLiteral.var) : oldLiteral.var;
 		positive = oldLiteral.positive;
 	}
 
@@ -130,18 +130,21 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(var) * (positive ? 31 : 37);
+		return Objects.hash(positive, var);
 	}
 
 	@Override
-	public boolean equals(Object node) {
-		if (this == node) {
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!(node instanceof Literal)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		final Literal other = (Literal) node;
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Literal other = (Literal) obj;
 		return (positive == other.positive) && Objects.equals(var, other.var);
 	}
 

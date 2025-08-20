@@ -133,12 +133,12 @@ public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 				return false;
 			}
 		} else if (element instanceof IFeatureAttribute) {
-			return ((IFeatureAttribute) element).isConfigurable();
+			return ((IFeatureAttribute<?>) element).isConfigurable();
 		}
 		return false;
 	}
 
-	private boolean isConfigurableAttribute(IFeatureAttribute att) {
+	private boolean isConfigurableAttribute(IFeatureAttribute<?> att) {
 		return att.isConfigurable();
 	}
 

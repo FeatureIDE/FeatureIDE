@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -29,9 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class BooleanFeatureAttribute extends FeatureAttribute {
-
-	private Boolean value;
+public class BooleanFeatureAttribute extends FeatureAttribute<Boolean> {
 
 	/**
 	 * Creates a new boolean attribute with the given values.
@@ -45,8 +42,7 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	 * 
 	 */
 	public BooleanFeatureAttribute(IFeature feature, String name, String unit, Boolean value, boolean recursive, boolean configurable) {
-		super(feature, name, unit, recursive, configurable);
-		this.value = value;
+		super(feature, name, value, unit, recursive, configurable);
 		attributeType = FeatureAttribute.BOOLEAN;
 	}
 
@@ -58,27 +54,10 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	 */
 	public BooleanFeatureAttribute(BooleanFeatureAttribute oldAttribute, IFeature feature) {
 		super(oldAttribute, feature);
-		value = oldAttribute.value;
 	}
 
 	@Override
-	public Boolean getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		if (value == null) {
-			this.value = null;
-			return;
-		}
-		if (value instanceof Boolean) {
-			this.value = (Boolean) value;
-		}
-	}
-
-	@Override
-	public IFeatureAttribute cloneAtt(IFeature feature) {
+	public BooleanFeatureAttribute cloneAtt(IFeature feature) {
 		return new BooleanFeatureAttribute(this, feature);
 	}
 
@@ -89,7 +68,7 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override
-	public IFeatureAttribute cloneRecursive(IFeature feature) {
+	public BooleanFeatureAttribute cloneRecursive(IFeature feature) {
 		return new BooleanFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
 
@@ -97,4 +76,5 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	public boolean isValidValue(String value) {
 		return true;
 	}
+
 }

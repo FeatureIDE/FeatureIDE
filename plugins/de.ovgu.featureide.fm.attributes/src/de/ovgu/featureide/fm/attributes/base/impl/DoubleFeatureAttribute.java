@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -29,9 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class DoubleFeatureAttribute extends FeatureAttribute {
-
-	private Double value;
+public class DoubleFeatureAttribute extends FeatureAttribute<Double> {
 
 	/**
 	 * Creates a new double attribute with the given values.
@@ -45,8 +42,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 * 
 	 */
 	public DoubleFeatureAttribute(IFeature feature, String name, String unit, Double value, boolean recursive, boolean configurable) {
-		super(feature, name, unit, recursive, configurable);
-		this.value = value;
+		super(feature, name, value, unit, recursive, configurable);
 		attributeType = FeatureAttribute.DOUBLE;
 	}
 
@@ -58,34 +54,13 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 */
 	public DoubleFeatureAttribute(DoubleFeatureAttribute oldAttribute, IFeature feature) {
 		super(oldAttribute, feature);
-		value = oldAttribute.value;
-	}
-
-	@Override
-	public Double getValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(Object value) {
-		if (value == null) {
-			this.value = null;
-			return;
-		}
-		if (value instanceof Double) {
-			this.value = (Double) value;
-		}
 	}
 
 	/**
 	 * Returns a copy of the attribute
 	 */
 	@Override
-	public IFeatureAttribute cloneAtt(IFeature feature) {
+	public DoubleFeatureAttribute cloneAtt(IFeature feature) {
 		return new DoubleFeatureAttribute(this, feature);
 	}
 
@@ -96,7 +71,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 * @return clone of the attribute with value set to null
 	 */
 	@Override
-	public IFeatureAttribute cloneRecursive(IFeature feature) {
+	public DoubleFeatureAttribute cloneRecursive(IFeature feature) {
 		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
 
@@ -109,4 +84,5 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 			return false;
 		}
 	}
+
 }

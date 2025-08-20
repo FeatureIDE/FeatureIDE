@@ -24,11 +24,11 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 	private static final String LABEL = "Maximal sum of attribute value (est.): ";
 
 	Configuration config;
-	IFeatureAttribute attribute;
+	IFeatureAttribute<?> attribute;
 	List<IFeature> selectedFeatures;
 	List<IFeature> unselectedFeatures;
 
-	public EstimatedMaximumComputation(Configuration config, IFeatureAttribute attribute) {
+	public EstimatedMaximumComputation(Configuration config, IFeatureAttribute<?> attribute) {
 		this.config = config;
 		this.attribute = attribute;
 	}
@@ -69,7 +69,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 	private double getSubtreeValue(IFeature root) {
 		double value = 0;
 		IExtendedFeature ext = (IExtendedFeature) root;
-		for (IFeatureAttribute att : ext.getAttributes()) {
+		for (IFeatureAttribute<?> att : ext.getAttributes()) {
 			if (att.getName().equals(attribute.getName())) {
 				if (att instanceof LongFeatureAttribute) {
 					if (!(att.getValue() == null)) {

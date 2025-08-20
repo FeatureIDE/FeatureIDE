@@ -38,14 +38,14 @@ public interface IExtendedFeature extends IFeature {
 	/**
 	 * @return all attributes that are contained in this feature.
 	 */
-	public List<IFeatureAttribute> getAttributes();
+	public List<IFeatureAttribute<?>> getAttributes();
 
 	/**
 	 * @param name The name of an attribute
 	 * @return The attribute with the given name, or null if no such attribute exists
 	 */
-	public default IFeatureAttribute getAttribute(String name) {
-		for (IFeatureAttribute attribute : getAttributes()) {
+	public default IFeatureAttribute<?> getAttribute(String name) {
+		for (IFeatureAttribute<?> attribute : getAttributes()) {
 			if (attribute.getName().equals(name)) {
 				return attribute;
 			}
@@ -56,17 +56,17 @@ public interface IExtendedFeature extends IFeature {
 	/**
 	 * @param attribute the attribute that is added to this feature.
 	 */
-	public void addAttribute(IFeatureAttribute attribute);
+	public void addAttribute(IFeatureAttribute<?> attribute);
 
 	/**
 	 * @param attribute the attribute that needs to be removed from this feature.
 	 */
-	public void removeAttribute(IFeatureAttribute attribute);
+	public void removeAttribute(IFeatureAttribute<?> attribute);
 
 	/**
 	 * @param attribute the attribute that needs to be checked for containment in this feature.
 	 * @return true, if the name of the given attribute is contained in the feature. False otherwise.
 	 */
-	public boolean isContainingAttribute(IFeatureAttribute attribute);
+	public boolean isContainingAttribute(IFeatureAttribute<?> attribute);
 
 }

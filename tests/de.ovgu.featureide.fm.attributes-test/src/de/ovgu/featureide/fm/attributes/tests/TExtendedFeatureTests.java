@@ -85,7 +85,7 @@ public class TExtendedFeatureTests {
 		// Get a feature
 		ExtendedFeature breadFeature = (ExtendedFeature) model.getFeature("Bread");
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
+		IFeatureAttribute<?> attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
 		// Add the attribute to the feature
 		assertTrue(breadFeature.getAttributes().size() == 3);
 		breadFeature.addAttribute(attribute);
@@ -103,7 +103,7 @@ public class TExtendedFeatureTests {
 		// Get a feature
 		ExtendedFeature breadFeature = (ExtendedFeature) model.getFeature("Bread");
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
+		IFeatureAttribute<?> attribute = attributeFactory.createStringAttribute(breadFeature, "test", "Test", "Test Value", false, false);
 		// Add the attribute to the feature
 		assertTrue(breadFeature.getAttributes().size() == 3);
 		breadFeature.addAttribute(attribute);
@@ -124,7 +124,7 @@ public class TExtendedFeatureTests {
 		ExtendedFeature testFeature = factory.createFeature(model, "Test");
 
 		// Create an attribute
-		IFeatureAttribute attribute = attributeFactory.createStringAttribute(testFeature, "test", "Test", "Test Value", true, true);
+		IFeatureAttribute<?> attribute = attributeFactory.createStringAttribute(testFeature, "test", "Test", "Test Value", true, true);
 		// Add the attribute to the feature
 		testFeature.addAttribute(attribute);
 
@@ -133,7 +133,7 @@ public class TExtendedFeatureTests {
 		assertTrue(cloneF instanceof ExtendedFeature);
 		ExtendedFeature cloneExF = (ExtendedFeature) cloneF;
 		assertTrue(cloneExF.getAttributes().size() == 1);
-		IFeatureAttribute attributeClone = cloneExF.getAttributes().get(0);
+		IFeatureAttribute<?> attributeClone = cloneExF.getAttributes().get(0);
 		assertTrue(attributeClone.getFeature() == cloneExF);
 		assertTrue(attributeClone.getName().equals("test"));
 		assertTrue(attributeClone instanceof StringFeatureAttribute);
@@ -154,7 +154,7 @@ public class TExtendedFeatureTests {
 		// Get a feature
 		ExtendedFeature breadFeature = (ExtendedFeature) model.getFeature("Bread");
 
-		for (IFeatureAttribute att : breadFeature.getAttributes()) {
+		for (IFeatureAttribute<?> att : breadFeature.getAttributes()) {
 			assertTrue(breadFeature.isContainingAttribute(att));
 		}
 	}

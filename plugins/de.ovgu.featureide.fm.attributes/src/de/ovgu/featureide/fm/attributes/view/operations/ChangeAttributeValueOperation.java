@@ -56,18 +56,19 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 	/**
 	 * The old value of the attribute before the operation.
 	 */
-	private Object oldValue;
+	private D oldValue;
 
-	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute att, D newValue) {
+	public ChangeAttributeValueOperation(IFeatureModelManager fmManager, IFeatureAttribute<?> att, D newValue) {
 		super(fmManager, CHANGE_ATTRIBUTE_VALUE_OPERATION_NAME);
 		featureName = att.getFeature().getName();
 		attributeName = att.getName();
 		this.newValue = newValue;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<D> attribute = (IFeatureAttribute<D>) AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			oldValue = attribute.getValue();
 			attribute.setValue(newValue);
@@ -76,9 +77,10 @@ public class ChangeAttributeValueOperation<D> extends AbstractFeatureModelOperat
 		return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<D> attribute = (IFeatureAttribute<D>) AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setValue(oldValue);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());

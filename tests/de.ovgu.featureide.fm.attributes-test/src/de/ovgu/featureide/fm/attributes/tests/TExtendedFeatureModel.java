@@ -20,7 +20,20 @@
  */
 package de.ovgu.featureide.fm.attributes.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,4 +81,107 @@ public class TExtendedFeatureModel {
 		assertTrue(bFeature instanceof ExtendedFeature);
 		assertTrue(!bFeature.getStructure().isRoot());
 	}
+
+	@Test
+	public void testClone() throws IllegalArgumentException, IllegalAccessException {
+		ExtendedFeatureModel fm1 = Commons.getPCConfiguratorModel();
+		classesUseDifferentMemory(fm1, fm1.clone(true), 0, "fm", new HashSet<>());
+	}
+
+	private static final LinkedHashSet<String> unequalFields = new LinkedHashSet<>(Arrays.asList( //
+			"de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature#eventManager", //
+			"de.ovgu.featureide.fm.core.base.impl.Constraint#eventManager", //
+			"de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel#eventManager", //
+			"de.ovgu.featureide.fm.core.RenamingsManager#eventManager"));
+	private static final LinkedHashSet<String> sameFields = new LinkedHashSet<>(Arrays.asList( //
+			"de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel#factoryID", //
+			"de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel#factory", //
+			"org.prop4j.Literal#var", //
+			"id"));
+	private static final LinkedHashSet<Class<?>> wrapperClasses =
+		new LinkedHashSet<>(Arrays.asList(Double.class, Float.class, Long.class, Integer.class, Short.class, Character.class, Byte.class, Boolean.class));
+
+	private void classesUseDifferentMemory(Object o1, Object o2, int depth, String fieldName, HashSet<Integer> alreadyChecked)
+			throws IllegalArgumentException, IllegalAccessException {
+		if (o1 == null && o2 == null) {
+			return;
+		}
+
+		if (!alreadyChecked.add(System.identityHashCode(o1))) {
+			return;
+		}
+
+		Class<? extends Object> class1 = o1.getClass();
+		Class<? extends Object> class2 = o2.getClass();
+		assertEquals(class1, class2);
+
+		if (!unequalFields.contains(fieldName)) {
+			assertEquals(o1, o2);
+		}
+
+		if (class1.isPrimitive() || wrapperClasses.contains(class1)) {
+			return;
+		}
+
+		if (!sameFields.contains(fieldName)) {
+			assertNotSame(o1, o2);
+		}
+
+		ArrayList<Field> allFields = new ArrayList<>();
+		Class<?> fieldClass = class1;
+		while (fieldClass != null) {
+			Field[] fields = fieldClass.getDeclaredFields();
+			allFields.addAll(Arrays.asList(fields));
+			fieldClass = fieldClass.getSuperclass();
+		}
+
+		for (Field field : allFields) {
+			if ((field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) != 0) {
+				continue;
+			}
+			try {
+				field.setAccessible(true);
+			} catch (Exception e) {
+				continue;
+			}
+			Object i1 = field.get(o1);
+			Object i2 = field.get(o2);
+			if (i1 == null && i2 == null) {
+				continue;
+			}
+
+			String childName = String.format("%s#%s", class1.getName(), field.getName());
+
+			if (Iterable.class.isAssignableFrom(field.getType())) {
+				Iterator<?> iterator1 = ((Iterable<?>) i1).iterator();
+				Iterator<?> iterator2 = ((Iterable<?>) i2).iterator();
+				int i = 0;
+				while (iterator1.hasNext()) {
+					classesUseDifferentMemory(iterator1.next(), iterator2.next(), depth + 1, childName + i, alreadyChecked);
+				}
+				assertFalse(iterator2.hasNext());
+			} else if (Map.class.isAssignableFrom(field.getType())) {
+				Iterator<? extends Map.Entry<?, ?>> iterator1 = ((Map<?, ?>) i1).entrySet().iterator();
+				Iterator<? extends Map.Entry<?, ?>> iterator2 = ((Map<?, ?>) i2).entrySet().iterator();
+				int i = 0;
+				while (iterator1.hasNext()) {
+					Entry<?, ?> next1 = iterator1.next();
+					Entry<?, ?> next2 = iterator2.next();
+					classesUseDifferentMemory(next1.getKey(), next2.getKey(), depth + 1, childName + i + "key", alreadyChecked);
+					classesUseDifferentMemory(next1.getValue(), next2.getValue(), depth + 1, childName + i + "value", alreadyChecked);
+				}
+				assertFalse(iterator2.hasNext());
+			} else if (field.getType().isArray()) {
+				Object[] array1 = (Object[]) i1;
+				Object[] array2 = (Object[]) i2;
+				assertEquals(array1.length, array2.length);
+				for (int i = 0; i < array1.length; i++) {
+					classesUseDifferentMemory(array1[i], array2[i], depth + 1, childName + i, alreadyChecked);
+				}
+			} else {
+				classesUseDifferentMemory(i1, i2, depth + 1, childName, alreadyChecked);
+			}
+		}
+	}
+
 }

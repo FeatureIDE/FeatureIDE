@@ -76,7 +76,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected Object getValue(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		return attribute.isRecursive();
 	}
 
@@ -86,7 +86,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		final IFeature feature = attribute.getFeature();
 		final Boolean newRecursive = (Boolean) value;
 
@@ -100,7 +100,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		FeatureModelOperationWrapper.run(new ChangeAttributeRecursiveOperation((IFeatureModelManager) view.getManager(), attribute, newRecursive));
 	}
 
-	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
+	private boolean isNameUnique(IFeatureAttribute<?> attribute, IFeature feature) {
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
 			final IExtendedFeature feat = (IExtendedFeature) struct.getFeature();
 			if (feat.isContainingAttribute(attribute)) {

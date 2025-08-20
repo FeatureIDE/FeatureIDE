@@ -40,23 +40,23 @@ import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
  */
 public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeature {
 
-	protected List<IFeatureAttribute> attributes;
+	protected List<IFeatureAttribute<?>> attributes;
 
 	public ExtendedMultiFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 
 		// Create empty attributes list
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 	}
 
 	public ExtendedMultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId, IFeatureStructure featureStructure) {
 		super(oldFeature, featureModel, copyId, featureStructure);
 
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 		if (oldFeature instanceof IExtendedFeature) {
 			// Copy attributes from the old feature if available
 			IExtendedFeature feature = (IExtendedFeature) oldFeature;
-			for (IFeatureAttribute attribute : feature.getAttributes()) {
+			for (IFeatureAttribute<?> attribute : feature.getAttributes()) {
 				attributes.add(attribute.cloneAtt(this));
 			}
 		}
@@ -65,33 +65,33 @@ public class ExtendedMultiFeature extends MultiFeature implements IExtendedFeatu
 	public ExtendedMultiFeature(IFeature oldFeature, IFeatureModel featureModel, boolean copyId) {
 		super(oldFeature, featureModel, copyId);
 
-		attributes = Collections.synchronizedList(new LinkedList<IFeatureAttribute>());
+		attributes = Collections.synchronizedList(new LinkedList<>());
 		if (oldFeature instanceof IExtendedFeature) {
 			// Copy attributes from the old feature if available
 			IExtendedFeature feature = (IExtendedFeature) oldFeature;
-			for (IFeatureAttribute attribute : feature.getAttributes()) {
+			for (IFeatureAttribute<?> attribute : feature.getAttributes()) {
 				attributes.add(attribute.cloneAtt(this));
 			}
 		}
 	}
 
 	@Override
-	public List<IFeatureAttribute> getAttributes() {
+	public List<IFeatureAttribute<?>> getAttributes() {
 		return attributes;
 	}
 
 	@Override
-	public void addAttribute(IFeatureAttribute attribute) {
+	public void addAttribute(IFeatureAttribute<?> attribute) {
 		attributes.add(attribute);
 	}
 
 	@Override
-	public void removeAttribute(IFeatureAttribute attribute) {
+	public void removeAttribute(IFeatureAttribute<?> attribute) {
 		attributes.remove(attribute);
 	}
 
 	@Override
-	public boolean isContainingAttribute(IFeatureAttribute attribute) {
+	public boolean isContainingAttribute(IFeatureAttribute<?> attribute) {
 		return attributes.stream().anyMatch(a -> attribute.getName().equals(a.getName()));
 	}
 

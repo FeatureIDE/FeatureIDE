@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.prop4j.Literal;
@@ -202,6 +203,26 @@ public class RenamingsManager implements IEventManager, Cloneable {
 
 	public RenamingsManager clone(IFeatureModel newModel) {
 		return new RenamingsManager(this, newModel);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(renamings);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final RenamingsManager other = (RenamingsManager) obj;
+		return Objects.equals(renamings, other.renamings);
 	}
 
 }

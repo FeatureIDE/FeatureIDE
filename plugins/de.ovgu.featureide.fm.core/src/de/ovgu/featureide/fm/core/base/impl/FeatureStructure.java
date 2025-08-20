@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -484,6 +485,28 @@ public class FeatureStructure implements IFeatureStructure {
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(and, concrete, correspondingFeature, hidden, mandatory, multiple, parent, partOfConstraints);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final FeatureStructure other = (FeatureStructure) obj;
+		return (and == other.and) && (concrete == other.concrete) && Objects.equals(correspondingFeature, other.correspondingFeature)
+			&& (hidden == other.hidden) && (mandatory == other.mandatory) && (multiple == other.multiple) && Objects.equals(parent, other.parent)
+			&& Objects.equals(partOfConstraints, other.partOfConstraints);
 	}
 
 }

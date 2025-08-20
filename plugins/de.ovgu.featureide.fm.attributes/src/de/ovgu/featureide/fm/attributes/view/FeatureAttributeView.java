@@ -520,12 +520,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 						menuManager.add(new AddFeatureAttributeAction(fmManager, featureName, FeatureAttribute.LONG, StringTable.ADD_LONG_ATTRIBUTE));
 						menuManager.add(new AddFeatureAttributeAction(fmManager, featureName, FeatureAttribute.DOUBLE, StringTable.ADD_DOUBLE_ATTRIBUTE));
 					} else {
-						List<IFeatureAttribute> attributes = new ArrayList<>();
+						List<IFeatureAttribute<?>> attributes = new ArrayList<>();
 						for (final Object object : selection.toList()) {
-							if (!(object instanceof IFeatureAttribute)) {
+							if (!(object instanceof IFeatureAttribute<?>)) {
 								return;
 							} else {
-								attributes.add((IFeatureAttribute) object);
+								attributes.add((IFeatureAttribute<?>) object);
 							}
 						}
 						menuManager.add(new RemoveFeatureAttributeAction(fmManager, attributes));
@@ -777,7 +777,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		} else if (event.getEventType() == EventType.FEATURE_ADD) {
 			if (event.getSource() instanceof IExtendedFeatureModel) {
 				IExtendedFeature feature = (IExtendedFeature) event.getNewValue();
-				for (IFeatureAttribute att : ((IExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
+				for (IFeatureAttribute<?> att : ((IExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
 						feature.addAttribute(att.cloneRecursive(feature));
 					}
@@ -789,12 +789,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				GraphicalFeature graphFeat = (GraphicalFeature) event.getSource();
 				if (graphFeat.getObject() instanceof IExtendedFeature) {
 					IExtendedFeature feat = (IExtendedFeature) graphFeat.getObject();
-					for (IFeatureAttribute att : feat.getAttributes()) {
+					for (IFeatureAttribute<?> att : feat.getAttributes()) {
 						if (att.isRecursive() && !((IExtendedFeature) feat.getStructure().getParent().getFeature()).isContainingAttribute(att)) {
 							feat.removeAttribute(att);
 						}
 					}
-					for (IFeatureAttribute att : ((IExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
+					for (IFeatureAttribute<?> att : ((IExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
 						if (att.isRecursive()) {
 							if (!feat.isContainingAttribute(att)) {
 								feat.addAttribute(att.cloneRecursive(feat));

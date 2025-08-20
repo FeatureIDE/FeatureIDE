@@ -49,7 +49,7 @@ public class FeatureAttributeValueColumnLabelProvider extends FeatureAttributeCo
 		if ((element instanceof IFeature) || (element instanceof String)) {
 			return "-";
 		} else if (element instanceof IFeatureAttribute) {
-			final IFeatureAttribute attribute = (IFeatureAttribute) element;
+			final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 			if (view.getCurrentEditor() instanceof ConfigurationEditor) {
 				Configuration config = ((ConfigurationEditor) view.getCurrentEditor()).getConfigurationManager().getVarObject();
 				for (SelectableFeature feat : config.getFeatures()) {

@@ -59,7 +59,7 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected Object getValue(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		return attribute.getUnit();
 	}
 
@@ -69,7 +69,7 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		final String newUnit = value.toString();
 		if (!attribute.getUnit().equals(newUnit)) {
 			FeatureModelOperationWrapper.run(new ChangeAttributeUnitOperation((IFeatureModelManager) view.getManager(), attribute, newUnit));

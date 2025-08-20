@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.Objects;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -38,7 +40,7 @@ public class FeatureProperty implements IFeatureProperty {
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
-		description = oldProperty.description.toString();
+		description = new String(oldProperty.description);
 		implicit = oldProperty.implicit;
 	}
 
@@ -98,5 +100,25 @@ public class FeatureProperty implements IFeatureProperty {
 	@Override
 	public void setImplicit(boolean implicit) {
 		this.implicit = implicit;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(description, implicit);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final FeatureProperty other = (FeatureProperty) obj;
+		return Objects.equals(description, other.description) && (implicit == other.implicit);
 	}
 }

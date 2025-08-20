@@ -47,7 +47,7 @@ public class FeatureAttributeConfigureableColumnLabelProvider extends FeatureAtt
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IFeatureAttribute) {
-			if (((IFeatureAttribute) element).isConfigurable()) {
+			if (((IFeatureAttribute<?>) element).isConfigurable()) {
 				return cachedImages.get(FeatureAttributeView.checkboxEnabled);
 			} else {
 				return cachedImages.get(FeatureAttributeView.checkboxDisabled);

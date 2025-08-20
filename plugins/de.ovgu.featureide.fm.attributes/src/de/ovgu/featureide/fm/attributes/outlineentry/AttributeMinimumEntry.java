@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 public class AttributeMinimumEntry implements IOutlineEntry {
 
-	IFeatureAttribute attribute;
+	IFeatureAttribute<?> attribute;
 	Configuration config;
 	EstimatedMinimumComputation estimatedMinimum;
 	Double result;
@@ -42,7 +42,7 @@ public class AttributeMinimumEntry implements IOutlineEntry {
 	private static final String EST = " (est)";
 	private static final String LABEL = "Minimal sum of value: ";
 
-	public AttributeMinimumEntry(Configuration config, IFeatureAttribute attribute) {
+	public AttributeMinimumEntry(Configuration config, IFeatureAttribute<?> attribute) {
 		this.config = config;
 		this.attribute = attribute;
 		estimatedMinimum = new EstimatedMinimumComputation(config, attribute);

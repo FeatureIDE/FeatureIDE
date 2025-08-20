@@ -56,7 +56,7 @@ public class ChangeAttributeUnitOperation extends AbstractFeatureModelOperation 
 	 */
 	private final String oldUnit;
 
-	public ChangeAttributeUnitOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, String newUnit) {
+	public ChangeAttributeUnitOperation(IFeatureModelManager featureModelManager, IFeatureAttribute<?> attribute, String newUnit) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_UNIT_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
@@ -67,7 +67,7 @@ public class ChangeAttributeUnitOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent operation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setUnit(newUnit);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());
@@ -77,7 +77,7 @@ public class ChangeAttributeUnitOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setUnit(oldUnit);
 			return new FeatureIDEEvent(attribute, EventType.FEATURE_ATTRIBUTE_CHANGED, true, attribute.getFeature());

@@ -58,7 +58,7 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 	@Override
 	public Color getBackground(Object element) {
 		if (element instanceof IFeatureAttribute) {
-			IFeatureAttribute attribute = (IFeatureAttribute) element;
+			IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 			IFeature feature = attribute.getFeature();
 			final FeatureColor featureColor = FeatureColorManager.getColor(feature);
 			return ColorPalette.toSwtColor(featureColor);

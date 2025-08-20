@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.prop4j.NodeWriter;
 
@@ -57,6 +58,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * @author Marcus Pinnecke
  */
+
 public class FeatureModel implements IFeatureModel {
 
 	private static long NEXT_ID = 0;
@@ -140,6 +142,18 @@ public class FeatureModel implements IFeatureModel {
 				if (featureTable.keySet().containsAll(Functional.mapToStringList(constraint.getContainedFeatures()))) {
 					constraints.add(constraint.clone(this, copyId));
 				}
+			}
+		}
+
+		final LinkedHashMap<Long, IFeatureModelElement> temp = new LinkedHashMap<>(elements);
+		elements.clear();
+		for (final Entry<Long, IFeatureModelElement> elementEntry : oldFeatureModel.elements.entrySet()) {
+			final Long key = elementEntry.getKey();
+			final IFeatureModelElement value = elementEntry.getValue();
+			if (value instanceof IFeature) {
+				elements.put(key, temp.get(key));
+			} else if (value instanceof IConstraint) {
+				elements.put(key, value);
 			}
 		}
 	}

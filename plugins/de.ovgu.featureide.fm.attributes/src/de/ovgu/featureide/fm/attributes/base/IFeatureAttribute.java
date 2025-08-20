@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public interface IFeatureAttribute {
+public interface IFeatureAttribute<T> {
 
 	/**
 	 * Retrieves the {@link IFeature} assigned to the feature attribute.
@@ -53,7 +53,7 @@ public interface IFeatureAttribute {
 	/**
 	 * @return The value of the feature attribute.
 	 */
-	public Object getValue();
+	public T getValue();
 
 	/**
 	 * @return The type of the feature attribute.
@@ -94,7 +94,7 @@ public interface IFeatureAttribute {
 	 * 
 	 * @param value New value for the attribute.
 	 */
-	public void setValue(Object value);
+	public void setValue(T value);
 
 	/**
 	 * Sets the feature attribute to recursive.
@@ -133,7 +133,7 @@ public interface IFeatureAttribute {
 	 * @param feature New feature
 	 * @return Clone of attribute with new feature.
 	 */
-	public IFeatureAttribute cloneRecursive(IFeature feature);
+	public IFeatureAttribute<T> cloneRecursive(IFeature feature);
 
 	/**
 	 * Clones the attribute.
@@ -141,7 +141,7 @@ public interface IFeatureAttribute {
 	 * @param feature New feature
 	 * @return Clone of the attribute with the new feature.
 	 */
-	public IFeatureAttribute cloneAtt(IFeature feature);
+	public IFeatureAttribute<T> cloneAtt(IFeature feature);
 
 	/**
 	 * @return true, if attribute is head recursive attribute.

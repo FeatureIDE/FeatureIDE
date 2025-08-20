@@ -41,9 +41,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureModelOper
 public class RemoveFeatureAttributeAction extends Action {
 
 	private final IFeatureModelManager fmManager;
-	private final List<IFeatureAttribute> attributes;
+	private final List<IFeatureAttribute<?>> attributes;
 
-	public RemoveFeatureAttributeAction(IFeatureModelManager fmManager, List<IFeatureAttribute> attributes) {
+	public RemoveFeatureAttributeAction(IFeatureModelManager fmManager, List<IFeatureAttribute<?>> attributes) {
 		super(StringTable.REMOVE_SELECTED_ATTRIBUTE);
 		this.fmManager = fmManager;
 		this.attributes = attributes;

@@ -44,7 +44,7 @@ public class AttributeComputationBundle implements IOutlineEntry {
 	@Override
 	public List<IOutlineEntry> getChildren() {
 		List<IOutlineEntry> children = new ArrayList<>();
-		for (IFeatureAttribute att : getUniqueAttributes()) {
+		for (IFeatureAttribute<?> att : getUniqueAttributes()) {
 			children.add(new AttributeEntry(config, att));
 		}
 		return children;
@@ -64,11 +64,11 @@ public class AttributeComputationBundle implements IOutlineEntry {
 		return config.getFeatureModel() instanceof IExtendedFeatureModel;
 	}
 
-	private List<IFeatureAttribute> getUniqueAttributes() {
-		List<IFeatureAttribute> attributeList = new ArrayList<IFeatureAttribute>();
+	private List<IFeatureAttribute<?>> getUniqueAttributes() {
+		List<IFeatureAttribute<?>> attributeList = new ArrayList<IFeatureAttribute<?>>();
 		for (IFeature feat : config.getFeatureModel().getFeatures()) {
 			if (feat instanceof IExtendedFeature) {
-				for (IFeatureAttribute att : ((IExtendedFeature) feat).getAttributes()) {
+				for (IFeatureAttribute<?> att : ((IExtendedFeature) feat).getAttributes()) {
 					if (!containsAttribute(attributeList, att.getName())) {
 						attributeList.add(att);
 					}
@@ -78,8 +78,8 @@ public class AttributeComputationBundle implements IOutlineEntry {
 		return attributeList;
 	}
 
-	private boolean containsAttribute(List<IFeatureAttribute> list, String attributeName) {
-		for (IFeatureAttribute att : list) {
+	private boolean containsAttribute(List<IFeatureAttribute<?>> list, String attributeName) {
+		for (IFeatureAttribute<?> att : list) {
 			if (att.getName().equals(attributeName)) {
 				return true;
 			}

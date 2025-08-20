@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.Objects;
+
 /**
  * Representation of a feature renaming.
  */
@@ -32,6 +34,26 @@ public class Renaming {
 	public Renaming(String oldName, String newName) {
 		this.oldName = oldName;
 		this.newName = newName;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(newName, oldName);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Renaming other = (Renaming) obj;
+		return Objects.equals(newName, other.newName) && Objects.equals(oldName, other.oldName);
 	}
 
 }

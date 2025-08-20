@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 import de.ovgu.featureide.fm.attributes.base.IExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
@@ -35,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public abstract class FeatureAttribute implements IFeatureAttribute {
+public abstract class FeatureAttribute<T> implements IFeatureAttribute<T> {
 
 	/** Identifier for double attributes */
 	public static final String DOUBLE = "double";
@@ -63,22 +62,22 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	protected String attributeType;
 
-	private Map<IExtendedFeature, Object> savedRecursiveValues = new HashMap<>();
+	protected T value;
 
 	/**
 	 * Creates a new feature attribute with the given values.
 	 * 
 	 * @param feature Assigned feature
 	 * @param name Name of the FeatureAttribute
+	 * @param value Value of the FeatureAttribute
 	 * @param unit Unit of the FeatureAttribute
 	 * @param recursive True, if the current Attribute should be inherited
 	 * @param configureable True, if the current FeatureAttribute needs be seting the configuration.
-	 * 
 	 */
-	protected FeatureAttribute(IFeature feature, String name, String unit, boolean recursive, boolean configureable) {
-		super();
+	protected FeatureAttribute(IFeature feature, String name, T value, String unit, boolean recursive, boolean configureable) {
 		this.feature = feature;
 		this.name = name;
+		this.value = value;
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configureable = configureable;
@@ -90,33 +89,24 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @param oldAttribute The attribute to be copied
 	 * @param feature The feature to contain this attribute
 	 */
-	protected FeatureAttribute(FeatureAttribute oldAttribute, IFeature feature) {
+	@SuppressWarnings("unchecked")
+	protected FeatureAttribute(FeatureAttribute<T> oldAttribute, IFeature feature) {
 		this.feature = feature;
-		name = oldAttribute.name;
-		unit = oldAttribute.unit;
+		name = new String(oldAttribute.name);
+		unit = new String(oldAttribute.unit);
+		value = STRING.equals(oldAttribute.attributeType) 
+				? (T) new String((String)oldAttribute.value)
+				: oldAttribute.value;
 		recursive = oldAttribute.recursive;
 		configureable = oldAttribute.configureable;
-		attributeType = oldAttribute.attributeType;
-
-		savedRecursiveValues = new HashMap<>(oldAttribute.savedRecursiveValues.size());
-		for (Map.Entry<IExtendedFeature, Object> e : oldAttribute.savedRecursiveValues.entrySet()) {
-			savedRecursiveValues.put(e.getKey(), e.getValue());
-		}
+		attributeType = new String(oldAttribute.attributeType);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getName()
-	 */
 	@Override
 	public IFeature getFeature() {
 		return feature;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getName()
-	 */
 	@Override
 	public String getName() {
 		if (name == null) {
@@ -125,10 +115,6 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		return name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getUnit()
-	 */
 	@Override
 	public String getUnit() {
 		if (unit == null) {
@@ -137,58 +123,31 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		return unit;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getValue()
-	 */
-	@Override
-	public abstract Object getValue();
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#isRecursive()
-	 */
 	@Override
 	public boolean isRecursive() {
 		return recursive;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getType()
-	 */
 	@Override
 	public String getType() {
 		return attributeType;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#isConfigureable()
-	 */
 	@Override
 	public boolean isConfigurable() {
 		return configureable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setName(java.lang.String)
-	 */
 	@Override
 	public void setFeature(IFeature feature) {
 		this.feature = feature;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setName(java.lang.String)
-	 */
 	@Override
 	public void setName(String name) {
 		if (recursive) {
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute<?> att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setName(name);
 					}
@@ -198,16 +157,12 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setUnit(java.lang.String)
-	 */
 	@Override
 	public void setUnit(String unit) {
 		// recursive boolean is enough because otherwise it would not be clickable check this again later
 		if (recursive) {
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute<?> att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setUnit(unit);
 					}
@@ -217,34 +172,16 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.unit = unit;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setValue(java.lang.String)
-	 */
-	@Override
-	public void setValue(Object value) {
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setRecursive(boolean)
-	 */
 	@Override
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setConfigureable(boolean)
-	 */
 	@Override
 	public void setConfigurable(boolean configurable) {
 		if (recursive) {
-			Iterable<IFeature> test = getFeature().getFeatureModel().getFeatures();
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
-				for (IFeatureAttribute att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
+				for (IFeatureAttribute<?> att : ((IExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
 						att.setConfigurable(configurable);
 					}
@@ -267,10 +204,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	private void addRecursiveAttributes(IExtendedFeature feature) {
 		for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
 			IExtendedFeature child = (IExtendedFeature) childStructure.getFeature();
-			IFeatureAttribute newAttribute = this.cloneRecursive(child);
-			if (savedRecursiveValues.containsKey(child)) {
-				newAttribute.setValue(savedRecursiveValues.get(child));
-			}
+			IFeatureAttribute<?> newAttribute = this.cloneRecursive(child);
 			if (!child.isContainingAttribute(newAttribute)) {
 				child.addAttribute(newAttribute);
 			}
@@ -291,9 +225,8 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	private void deleteRecursiveAttributes(IExtendedFeature feature) {
 		for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
 			IExtendedFeature child = (IExtendedFeature) childStructure.getFeature();
-			IFeatureAttribute att = child.getAttribute(getName());
+			IFeatureAttribute<?> att = child.getAttribute(getName());
 			if (att != null) {
-				saveRecursiveValue(child, att.getValue());
 				child.removeAttribute(att);
 			}
 			deleteRecursiveAttributes(child);
@@ -308,15 +241,11 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 			return true;
 		} else {
 			// Check parent feature/attribute if not root
-			IFeatureAttribute parentAttribute = ((IExtendedFeature) getFeature().getStructure().getParent().getFeature()).getAttribute(getName());
+			IFeatureAttribute<?> parentAttribute = ((IExtendedFeature) getFeature().getStructure().getParent().getFeature()).getAttribute(getName());
 			return parentAttribute == null || !parentAttribute.isRecursive();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
@@ -325,11 +254,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		builder.append(", Type: ");
 		builder.append(attributeType);
 		builder.append(", Value: ");
-		if (getValue() == null) {
-			builder.append("null");
-		} else {
-			builder.append(getValue().toString());
-		}
+		builder.append(String.valueOf(value));
 		builder.append(", Unit: ");
 		builder.append(unit);
 		builder.append(", Recursive: ");
@@ -340,12 +265,27 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		return builder.toString();
 	}
 
-	public void saveRecursiveValue(IExtendedFeature feature, Object value) {
-		savedRecursiveValues.put(feature, value);
+	public T getValue() {
+		return value;
 	}
 
-	public Map<IExtendedFeature, Object> getSavedRecursiveValues() {
-		return savedRecursiveValues;
+	public void setValue(T value) {
+		this.value = (T) value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(attributeType, configureable, feature, name, recursive, unit, value);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		FeatureAttribute<?> other = (FeatureAttribute<?>) obj;
+		return Objects.equals(attributeType, other.attributeType) && configureable == other.configureable && Objects.equals(feature, other.feature)
+			&& Objects.equals(name, other.name) && recursive == other.recursive && Objects.equals(unit, other.unit) && Objects.equals(value, other.value);
 	}
 
 }

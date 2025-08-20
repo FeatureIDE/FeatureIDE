@@ -1,0 +1,1580 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+<properties/>
+<struct>
+<and abstract="true" mandatory="true" name="PC RICHMOND F">
+<attribute name="Price" recursive="true" type="double" unit="€" value="841.9"/>
+<alt mandatory="true" name="Processor">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Intel Pentium">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="G4560 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="4.0"/>
+</feature>
+<feature name="G4600 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+</alt>
+<alt name="Intel Core i3">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="i3-7100 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="23.0"/>
+</feature>
+<feature name="i3-7300 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="69.0"/>
+</feature>
+<feature name="i3-7320 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="85.0"/>
+</feature>
+<feature name="i3-7350K Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="92.0"/>
+</feature>
+</alt>
+<alt name="Intel Core i5">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="i5-7400 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="72.0"/>
+</feature>
+<feature name="i5-7500 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="78.0"/>
+</feature>
+<feature name="i5-7600 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="114.0"/>
+</feature>
+<feature name="i5-7600K Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="117.0"/>
+</feature>
+</alt>
+<alt name="Intel Core i7 Prozessoren">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="i7-7700 Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="159.0"/>
+</feature>
+<feature name="i7-7700K Kaby Lake">
+<attribute name="Price" recursive="true" type="double" unit="€" value="177.9"/>
+</feature>
+</alt>
+<alt name="i7 Overclocked">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Stufe 1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="206.8"/>
+</feature>
+<feature name="Stufe 2">
+<attribute name="Price" recursive="true" type="double" unit="€" value="235.8"/>
+</feature>
+<feature name="Stufe 3">
+<attribute name="Price" recursive="true" type="double" unit="€" value="292.8"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="Graphic card">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Geforce GTX">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="1030 Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="ASUS GT1030">
+<attribute name="Price" recursive="true" type="double" unit="€" value="30.0"/>
+</feature>
+<feature name="GT1030 MSI Aero">
+<attribute name="Price" recursive="true" type="double" unit="€" value="37.0"/>
+</feature>
+</alt>
+<alt name="1050 Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="GTX1050 MSI Aero">
+<attribute name="Price" recursive="true" type="double" unit="€" value="83.0"/>
+</feature>
+<feature name="GTX1050 ASUS Strix">
+<attribute name="Price" recursive="true" type="double" unit="€" value="94.0"/>
+</feature>
+<feature name="GTX1050-Ti MSI Gaming">
+<attribute name="Price" recursive="true" type="double" unit="€" value="130.0"/>
+</feature>
+<feature name="GTX1050-Ti ASUS Expedition">
+<attribute name="Price" recursive="true" type="double" unit="€" value="137.0"/>
+</feature>
+<feature name="GTX1050-Ti ASUS Strix">
+<attribute name="Price" recursive="true" type="double" unit="€" value="159.0"/>
+</feature>
+</alt>
+<alt name="1060 Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI ARMOR">
+<attribute name="Price" recursive="true" type="double" unit="€" value="262.0"/>
+</feature>
+<feature name="MSI GAMING">
+<attribute name="Price" recursive="true" type="double" unit="€" value="268.0"/>
+</feature>
+<feature name="ASUS Dual">
+<attribute name="Price" recursive="true" type="double" unit="€" value="270.0"/>
+</feature>
+<feature name="ASUS Strix">
+<attribute name="Price" recursive="true" type="double" unit="€" value="267.0"/>
+</feature>
+</alt>
+<alt name="1070 Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Gainward Phoenix">
+<attribute name="Price" recursive="true" type="double" unit="€" value="393.8"/>
+</feature>
+<feature name="MSI Gaming X">
+<attribute name="Price" recursive="true" type="double" unit="€" value="372.0"/>
+</feature>
+<feature name="ASUS Strix 08G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="380.9"/>
+</feature>
+</alt>
+<and name="1070-Ti Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="MSI Gaming 8G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="491.8"/>
+</feature>
+</and>
+<alt name="1080 Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI Armor 8G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="685.8"/>
+</feature>
+<feature name="MSI Gaming X 8G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="524.8"/>
+</feature>
+<feature name="ASUS Strix A8G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="444.8"/>
+</feature>
+<feature name="MSI GAMING X 8G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1511.8"/>
+</feature>
+<feature name="ASUS Strix A8G Gaming">
+<attribute name="Price" recursive="true" type="double" unit="€" value="135.8"/>
+</feature>
+</alt>
+<alt name="1080-Ti Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI GAMING X 11G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="764.8"/>
+</feature>
+<feature name="ASUS ROG Strix 011G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="762.8"/>
+</feature>
+<feature name="MSI Gaming X 11G">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1977.8"/>
+</feature>
+</alt>
+</alt>
+<alt name="Quadro">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="K420 PNY">
+<attribute name="Price" recursive="true" type="double" unit="€" value="58.0"/>
+</feature>
+<feature name="K620 PNY">
+<attribute name="Price" recursive="true" type="double" unit="€" value="99.0"/>
+</feature>
+<feature name="P2000 Pny">
+<attribute name="Price" recursive="true" type="double" unit="€" value="330.0"/>
+</feature>
+<feature name="P4000 Pny">
+<attribute name="Price" recursive="true" type="double" unit="€" value="765.8"/>
+</feature>
+<feature name="P5000 Pny">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1931.8"/>
+</feature>
+<feature name="P6000 Pny">
+<attribute name="Price" recursive="true" type="double" unit="€" value="6242.8"/>
+</feature>
+</alt>
+<alt name="AMD Radeon">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="RX550">
+<attribute name="Price" recursive="true" type="double" unit="€" value="57.0"/>
+</feature>
+<feature name="RX580">
+<attribute name="Price" recursive="true" type="double" unit="€" value="313.0"/>
+</feature>
+</alt>
+<alt name="Low Profile">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="GT710">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="GTX1050">
+<attribute name="Price" recursive="true" type="double" unit="€" value="61.0"/>
+</feature>
+<feature name="GTX1050-Ti">
+<attribute name="Price" recursive="true" type="double" unit="€" value="117.0"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="RAM">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="2133 MHz Crucial">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="1x 8GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="2x 8GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="53.0"/>
+</feature>
+<feature name="1x 16GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="77.8"/>
+</feature>
+<feature name="4x 8GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="205.8"/>
+</feature>
+<feature name="2x 16GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="256.8"/>
+</feature>
+<feature name="4x 16GB DDR4-2133">
+<attribute name="Price" recursive="true" type="double" unit="€" value="636.8"/>
+</feature>
+</alt>
+<alt name="2400 MHz Crucial">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="1x 8GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="16.0"/>
+</feature>
+<feature name="2x 8GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="64.9"/>
+</feature>
+<feature name="1x 16GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="88.8"/>
+</feature>
+<feature name="4x 8GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="297.8"/>
+</feature>
+<feature name="2x 16GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="288.8"/>
+</feature>
+<feature name="4x 16GB DDR4-2400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="686.8"/>
+</feature>
+</alt>
+<alt name="Corsair Vengeance RGB Black">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="2x 8GB DDR4-3000">
+<attribute name="Price" recursive="true" type="double" unit="€" value="146.8"/>
+</feature>
+<feature name="4x 8GB DDR4-3200">
+<attribute name="Price" recursive="true" type="double" unit="€" value="401.8"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="Mainboard">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI B250M PRO-VDH">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="MSI B250M GAMING PRO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="13.0"/>
+</feature>
+<feature name="MSI Z270 PC MATE">
+<attribute name="Price" recursive="true" type="double" unit="€" value="22.0"/>
+</feature>
+<feature name="MSI Z270 Gaming Pro Carbon">
+<attribute name="Price" recursive="true" type="double" unit="€" value="60.8"/>
+</feature>
+</alt>
+<alt name="Asus">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="B250M-A">
+<attribute name="Price" recursive="true" type="double" unit="€" value="5.0"/>
+</feature>
+<feature name="B250M-PLUS">
+<attribute name="Price" recursive="true" type="double" unit="€" value="16.0"/>
+</feature>
+<feature name="H270-PLUS">
+<attribute name="Price" recursive="true" type="double" unit="€" value="26.0"/>
+</feature>
+<feature name="Z270-K">
+<attribute name="Price" recursive="true" type="double" unit="€" value="34.0"/>
+</feature>
+<feature name="Z270M-PLUS">
+<attribute name="Price" recursive="true" type="double" unit="€" value="44.0"/>
+</feature>
+<feature name="Z270F GAMING">
+<attribute name="Price" recursive="true" type="double" unit="€" value="58.9"/>
+</feature>
+<feature name="IX HERO Gaming">
+<attribute name="Price" recursive="true" type="double" unit="€" value="170.8"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="Case">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Office Midtower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="IT-5905">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="EM-01">
+<attribute name="Price" recursive="true" type="double" unit="€" value="30.8"/>
+</feature>
+<feature name="RAIJINTEK Arcadia">
+<attribute name="Price" recursive="true" type="double" unit="€" value="5.8"/>
+</feature>
+<feature name="RAIJINTEK Arcadia soundproof">
+<attribute name="Price" recursive="true" type="double" unit="€" value="49.8"/>
+</feature>
+<feature name="Bitfenix Neos Black">
+<attribute name="Price" recursive="true" type="double" unit="€" value="4.9"/>
+</feature>
+<feature name="Bitfenix Neos White">
+<attribute name="Price" recursive="true" type="double" unit="€" value="14.8"/>
+</feature>
+</alt>
+<alt name="M-ATX Microtower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Aerocool Qs-183">
+<attribute name="Price" recursive="true" type="double" unit="€" value="3.0"/>
+</feature>
+<feature name="MA-01 MICRO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1.0"/>
+</feature>
+<feature name="GM-6013">
+<attribute name="Price" recursive="true" type="double" unit="€" value="14.8"/>
+</feature>
+<feature name="Thermaltake Versa H15">
+<attribute name="Price" recursive="true" type="double" unit="€" value="12.8"/>
+</feature>
+</alt>
+<alt name="Gaming Miditower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="K1- black">
+<attribute name="Price" recursive="true" type="double" unit="€" value="17.8"/>
+</feature>
+<feature name="N21 Crusader">
+<attribute name="Price" recursive="true" type="double" unit="€" value="22.8"/>
+</feature>
+<feature name="N21-02 Arthurus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="22.8"/>
+</feature>
+<feature name="Eterno K-five Demon Hunter">
+<attribute name="Price" recursive="true" type="double" unit="€" value="17.8"/>
+</feature>
+<feature name="Corsair Carbide SPEC-01">
+<attribute name="Price" recursive="true" type="double" unit="€" value="25.8"/>
+</feature>
+<feature name="Corsair Carbide 270R">
+<attribute name="Price" recursive="true" type="double" unit="€" value="40.8"/>
+</feature>
+<feature name="BitFenix Aegis">
+<attribute name="Price" recursive="true" type="double" unit="€" value="85.8"/>
+</feature>
+<feature name="BitFenix Shinobi">
+<attribute name="Price" recursive="true" type="double" unit="€" value="34.8"/>
+</feature>
+<feature name="Kolink Punisher RGB">
+<attribute name="Price" recursive="true" type="double" unit="€" value="42.8"/>
+</feature>
+<feature name="M-908">
+<attribute name="Price" recursive="true" type="double" unit="€" value="80.8"/>
+</feature>
+<feature name="M-909">
+<attribute name="Price" recursive="true" type="double" unit="€" value="83.8"/>
+</feature>
+</alt>
+<alt name="PRO Gaming Miditower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Aerocool Aero-800">
+<attribute name="Price" recursive="true" type="double" unit="€" value="28.8"/>
+</feature>
+<feature name="Aerocool Battlehawk V2">
+<attribute name="Price" recursive="true" type="double" unit="€" value="44.8"/>
+</feature>
+<feature name="Aerocool Mechatron">
+<attribute name="Price" recursive="true" type="double" unit="€" value="66.8"/>
+</feature>
+<feature name="Corsair Carbide Clear 400c">
+<attribute name="Price" recursive="true" type="double" unit="€" value="82.8"/>
+</feature>
+<feature name="Corsair Obsidian 450D">
+<attribute name="Price" recursive="true" type="double" unit="€" value="94.8"/>
+</feature>
+<feature name="Phanteks Enthoo Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="105.8"/>
+</feature>
+<feature name="Cougar Challenger">
+<attribute name="Price" recursive="true" type="double" unit="€" value="61.8"/>
+</feature>
+<feature name="Silent Base 800">
+<attribute name="Price" recursive="true" type="double" unit="€" value="135.8"/>
+</feature>
+<feature name="NZXT Phantom 410 black">
+<attribute name="Price" recursive="true" type="double" unit="€" value="97.8"/>
+</feature>
+<feature name="NZXT Phantom 410 white">
+<attribute name="Price" recursive="true" type="double" unit="€" value="94.8"/>
+</feature>
+<feature name="NZXT Phantom 410 red">
+<attribute name="Price" recursive="true" type="double" unit="€" value="96.8"/>
+</feature>
+<feature name="NZXT H440 white">
+<attribute name="Price" recursive="true" type="double" unit="€" value="121.8"/>
+</feature>
+<feature name="NZXT H440 black">
+<attribute name="Price" recursive="true" type="double" unit="€" value="117.8"/>
+</feature>
+<feature name="Thermaltake Versa N27">
+<attribute name="Price" recursive="true" type="double" unit="€" value="55.8"/>
+</feature>
+<feature name="Thermaltake Core V51">
+<attribute name="Price" recursive="true" type="double" unit="€" value="89.8"/>
+</feature>
+<feature name="Thermaltake Suppressor F51">
+<attribute name="Price" recursive="true" type="double" unit="€" value="115.8"/>
+</feature>
+<feature name="Thermaltake View 31">
+<attribute name="Price" recursive="true" type="double" unit="€" value="135.8"/>
+</feature>
+<feature name="Thermaltake Core X31">
+<attribute name="Price" recursive="true" type="double" unit="€" value="111.8"/>
+</feature>
+<feature name="anidees AI-Crystal">
+<attribute name="Price" recursive="true" type="double" unit="€" value="180.8"/>
+</feature>
+</alt>
+<alt name="PRO Gaming Cube">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="anidees AI-7MBW">
+<attribute name="Price" recursive="true" type="double" unit="€" value="77.8"/>
+</feature>
+<feature name="Thermaltake Core V21">
+<attribute name="Price" recursive="true" type="double" unit="€" value="48.8"/>
+</feature>
+<feature name="Corsair Carbide Air 540 Cube">
+<attribute name="Price" recursive="true" type="double" unit="€" value="141.8"/>
+</feature>
+</alt>
+<alt name="Big Tower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Dark Base Pro 900">
+<attribute name="Price" recursive="true" type="double" unit="€" value="244.8"/>
+</feature>
+<feature name="Corsair Obsidian 750D">
+<attribute name="Price" recursive="true" type="double" unit="€" value="162.8"/>
+</feature>
+<feature name="NZXT Phantom Big-Tower white">
+<attribute name="Price" recursive="true" type="double" unit="€" value="142.8"/>
+</feature>
+<feature name="NZXT Phantom Big-Tower black">
+<attribute name="Price" recursive="true" type="double" unit="€" value="149.8"/>
+</feature>
+<feature name="NZXT H630">
+<attribute name="Price" recursive="true" type="double" unit="€" value="157.8"/>
+</feature>
+<feature name="Cougar Panzer Max">
+<attribute name="Price" recursive="true" type="double" unit="€" value="118.8"/>
+</feature>
+<feature name="Cooler Master Storm Trooper">
+<attribute name="Price" recursive="true" type="double" unit="€" value="190.8"/>
+</feature>
+</alt>
+<and name="Design Tower">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="Corsair Crystal Series 570X">
+<attribute name="Price" recursive="true" type="double" unit="€" value="192.8"/>
+</feature>
+</and>
+</alt>
+<alt mandatory="true" name="Power Adapter">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Corsair VS-Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="VS450">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="VS550">
+<attribute name="Price" recursive="true" type="double" unit="€" value="3.9"/>
+</feature>
+<feature name="VS650">
+<attribute name="Price" recursive="true" type="double" unit="€" value="11.8"/>
+</feature>
+</alt>
+<alt name="Corsair TX-M-Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="TX550M">
+<attribute name="Price" recursive="true" type="double" unit="€" value="36.8"/>
+</feature>
+<feature name="TX650M">
+<attribute name="Price" recursive="true" type="double" unit="€" value="42.8"/>
+</feature>
+<feature name="TX750M">
+<attribute name="Price" recursive="true" type="double" unit="€" value="65.8"/>
+</feature>
+<feature name="TX850M">
+<attribute name="Price" recursive="true" type="double" unit="€" value="78.8"/>
+</feature>
+</alt>
+<alt name="Corsair HX-Series">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="HX750">
+<attribute name="Price" recursive="true" type="double" unit="€" value="115.8"/>
+</feature>
+<feature name="HX850">
+<attribute name="Price" recursive="true" type="double" unit="€" value="112.8"/>
+</feature>
+<feature name="HX1000">
+<attribute name="Price" recursive="true" type="double" unit="€" value="181.8"/>
+</feature>
+<feature name="HX1200">
+<attribute name="Price" recursive="true" type="double" unit="€" value="229.8"/>
+</feature>
+</alt>
+<alt name="Bequiet Pure Power">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="300 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="7.8"/>
+</feature>
+<feature name="400 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="15.8"/>
+</feature>
+<feature name="400 W CM">
+<attribute name="Price" recursive="true" type="double" unit="€" value="25.8"/>
+</feature>
+<feature name="500 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.8"/>
+</feature>
+<feature name="500 W CM">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.8"/>
+</feature>
+<feature name="600 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="43.8"/>
+</feature>
+<feature name="600 W CM">
+<attribute name="Price" recursive="true" type="double" unit="€" value="51.8"/>
+</feature>
+<feature name="700 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="58.8"/>
+</feature>
+<feature name="700 W CM">
+<attribute name="Price" recursive="true" type="double" unit="€" value="65.8"/>
+</feature>
+</alt>
+<alt name="Bequiet Dark Power">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="550 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="119.8"/>
+</feature>
+<feature name="750 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="160.8"/>
+</feature>
+<feature name="850 W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="192.8"/>
+</feature>
+</alt>
+<alt name="Argus">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="700 W Argus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="25.8"/>
+</feature>
+<feature name="650 W Argus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="37.8"/>
+</feature>
+<feature name="750 W Argus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="45.8"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="CPU Cooler">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Tower Cooler">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="RaiJintek Aidos">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<feature name="MSI Core Frozr">
+<attribute name="Price" recursive="true" type="double" unit="€" value="14.0"/>
+</feature>
+</alt>
+<alt name="Top-Blow-Cooler">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Scythe Shuriken">
+<attribute name="Price" recursive="true" type="double" unit="€" value="7.0"/>
+</feature>
+<feature name="Scythe Kozuti">
+<attribute name="Price" recursive="true" type="double" unit="€" value="7.0"/>
+</feature>
+</alt>
+<alt name="Big Tower Cooler">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Be Quiet Shadow Rock Slim">
+<attribute name="Price" recursive="true" type="double" unit="€" value="18.0"/>
+</feature>
+<feature name="Be Quiet Dark Roch Pro 3">
+<attribute name="Price" recursive="true" type="double" unit="€" value="46.8"/>
+</feature>
+<feature name="Scythe Asura">
+<attribute name="Price" recursive="true" type="double" unit="€" value="23.0"/>
+</feature>
+<feature name="MSI Core Frozr XL">
+<attribute name="Price" recursive="true" type="double" unit="€" value="48.8"/>
+</feature>
+<feature name="Scythe Mugen">
+<attribute name="Price" recursive="true" type="double" unit="€" value="23.0"/>
+</feature>
+</alt>
+<alt name="Argus Water Cooling">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Argus Storm 1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="24.0"/>
+</feature>
+<feature name="Argus Storm 2">
+<attribute name="Price" recursive="true" type="double" unit="€" value="35.8"/>
+</feature>
+</alt>
+<alt name="Corsair Water Cooling">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Corsair H60">
+<attribute name="Price" recursive="true" type="double" unit="€" value="34.9"/>
+</feature>
+<feature name="Corsair H80i">
+<attribute name="Price" recursive="true" type="double" unit="€" value="51.8"/>
+</feature>
+<feature name="Corsair H100i">
+<attribute name="Price" recursive="true" type="double" unit="€" value="74.8"/>
+</feature>
+<feature name="Corsair H115i">
+<attribute name="Price" recursive="true" type="double" unit="€" value="94.8"/>
+</feature>
+</alt>
+<alt name="Bequiet Water Cooling">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Silent Loop 120mm">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+</feature>
+<feature name="Silent Loop 240mm">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+</feature>
+<feature name="Silent Loop 280mm">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+</feature>
+<feature name="Silent Loop 360mm">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+</feature>
+</alt>
+<alt name="NZXT Water Cooling">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Kraken X31">
+<attribute name="Price" recursive="true" type="double" unit="€" value="56.8"/>
+</feature>
+<feature name="Kraken X41">
+<attribute name="Price" recursive="true" type="double" unit="€" value="90.8"/>
+</feature>
+</alt>
+</alt>
+<alt name="M.2 SSD">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="M.2 SSD Plug-In Card">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="120 GB Western Digital Green">
+<attribute name="Price" recursive="true" type="double" unit="€" value="40.0"/>
+</feature>
+<feature name="240 GB Kingston SSDnow">
+<attribute name="Price" recursive="true" type="double" unit="€" value="76.0"/>
+</feature>
+<feature name="500 GB Samsung 850 Evo">
+<attribute name="Price" recursive="true" type="double" unit="€" value="152.8"/>
+</feature>
+<feature name="525 GB Crucial MAX300">
+<attribute name="Price" recursive="true" type="double" unit="€" value="102.9"/>
+</feature>
+<feature name="1,05 TB Crucial MAX300">
+<attribute name="Price" recursive="true" type="double" unit="€" value="254.8"/>
+</feature>
+</alt>
+<alt name="M.2 SSD Plug-In Card NVMe">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="256 GB Western Digital">
+<attribute name="Price" recursive="true" type="double" unit="€" value="78.0"/>
+</feature>
+<feature name="1,0 TB Intel 600p">
+<attribute name="Price" recursive="true" type="double" unit="€" value="322.8"/>
+</feature>
+<feature name="250 GB Samsung 960 Evo">
+<attribute name="Price" recursive="true" type="double" unit="€" value="88.0"/>
+</feature>
+<feature name="500 GB Samsung 960 Evo">
+<attribute name="Price" recursive="true" type="double" unit="€" value="216.8"/>
+</feature>
+<feature name="1,0 TB Samsung 960 Evo">
+<attribute name="Price" recursive="true" type="double" unit="€" value="436.8"/>
+</feature>
+<feature name="2,0 TB Samsung 960 Evo">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1291.8"/>
+</feature>
+</alt>
+</alt>
+<alt name="2,5 SSD">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Samsung">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="250 GB 860 EVO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="105.9"/>
+</feature>
+<feature name="500 GB 860 EVO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="191.9"/>
+</feature>
+<feature name="1,0 TB 850 EVO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="343.9"/>
+</feature>
+<feature name="2,0 TB 850 EVO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="819.9"/>
+</feature>
+<feature name="4,0 TB 850 EVO">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1657.9"/>
+</feature>
+</alt>
+<alt name="Kingston">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="120 GB SSDnow">
+<attribute name="Price" recursive="true" type="double" unit="€" value="52.9"/>
+</feature>
+<feature name="240 GB SSDNow">
+<attribute name="Price" recursive="true" type="double" unit="€" value="83.9"/>
+</feature>
+<feature name="480 GB SSDnow UV400">
+<attribute name="Price" recursive="true" type="double" unit="€" value="156.9"/>
+</feature>
+<feature name="960 GB SSDNow">
+<attribute name="Price" recursive="true" type="double" unit="€" value="359.9"/>
+</feature>
+</alt>
+<and name="Crucial">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="1,0 TB Crucial MX300">
+<attribute name="Price" recursive="true" type="double" unit="€" value="314.9"/>
+</feature>
+</and>
+</alt>
+<alt name="3,5 Harddrive">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Western Digital">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="1 TB Blue">
+<attribute name="Price" recursive="true" type="double" unit="€" value="51.9"/>
+</feature>
+<feature name="2 TB Blue">
+<attribute name="Price" recursive="true" type="double" unit="€" value="75.9"/>
+</feature>
+<feature name="3 TB Blue">
+<attribute name="Price" recursive="true" type="double" unit="€" value="106.9"/>
+</feature>
+<feature name="4 TB Blue">
+<attribute name="Price" recursive="true" type="double" unit="€" value="124.9"/>
+</feature>
+<feature name="6 TB Red">
+<attribute name="Price" recursive="true" type="double" unit="€" value="231.9"/>
+</feature>
+<feature name="8 TB Red">
+<attribute name="Price" recursive="true" type="double" unit="€" value="316.9"/>
+</feature>
+</alt>
+<alt name="Seagate BarraCuda">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="1 TB">
+<attribute name="Price" recursive="true" type="double" unit="€" value="56.9"/>
+</feature>
+<feature name="2 TB">
+<attribute name="Price" recursive="true" type="double" unit="€" value="73.9"/>
+</feature>
+<feature name="3 TB">
+<attribute name="Price" recursive="true" type="double" unit="€" value="105.9"/>
+</feature>
+<feature name="4 TB">
+<attribute name="Price" recursive="true" type="double" unit="€" value="120.9"/>
+</feature>
+<feature name="6 TB Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="301.9"/>
+</feature>
+<feature name="8 TB Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="411.9"/>
+</feature>
+<feature name="10 TB Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="531.9"/>
+</feature>
+<feature name="12 TB Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="553.9"/>
+</feature>
+</alt>
+<alt name="SSHD">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="1 TB Seagate FireCuda">
+<attribute name="Price" recursive="true" type="double" unit="€" value="74.9"/>
+</feature>
+<feature name="2 TB Seagate FirecCuda">
+<attribute name="Price" recursive="true" type="double" unit="€" value="102.9"/>
+</feature>
+</alt>
+</alt>
+<alt name="Drive">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="DVD-Drive">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="LG GH24NSD1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="7.9"/>
+</feature>
+<feature name="ASUS DRW-24D5MT">
+<attribute name="Price" recursive="true" type="double" unit="€" value="14.8"/>
+</feature>
+</alt>
+<and name="BluRay-Drive">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="BluRay-RW/DVD-RW Writer">
+<attribute name="Price" recursive="true" type="double" unit="€" value="79.8"/>
+</feature>
+</and>
+<and name="Extern USB-Drive">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="Externer USB DVD-RW Brenner">
+<attribute name="Price" recursive="true" type="double" unit="€" value="35.8"/>
+</feature>
+</and>
+<alt name="Hard Drive Caddies">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="For 2,5 HDD">
+<attribute name="Price" recursive="true" type="double" unit="€" value="38.8"/>
+</feature>
+<feature name="For 3,5 HDD">
+<attribute name="Price" recursive="true" type="double" unit="€" value="43.8"/>
+</feature>
+<feature name="For 2.5 and 3.5 HDD">
+<attribute name="Price" recursive="true" type="double" unit="€" value="73.8"/>
+</feature>
+</alt>
+</alt>
+<feature name="Multicardreader">
+<attribute name="Price" recursive="true" type="double" unit="€" value="9.9"/>
+</feature>
+<alt name="Network">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Asus Network">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="PCE-N15">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.9"/>
+</feature>
+<feature name="PCE-AC55BT">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="PCE-AC88">
+<attribute name="Price" recursive="true" type="double" unit="€" value="109.9"/>
+</feature>
+<feature name="XG-C100C">
+<attribute name="Price" recursive="true" type="double" unit="€" value="119.9"/>
+</feature>
+</alt>
+<feature name="Netis WF2113">
+<attribute name="Price" recursive="true" type="double" unit="€" value="22.9"/>
+</feature>
+<alt name="LAN">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="2x 1 Gbit INtel">
+<attribute name="Price" recursive="true" type="double" unit="€" value="155.9"/>
+</feature>
+<feature name="4x 1 Gbit Intel">
+<attribute name="Price" recursive="true" type="double" unit="€" value="372.9"/>
+</feature>
+</alt>
+</alt>
+<alt mandatory="true" name="Sound Card">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="onBoard Soundchip">
+<attribute name="Price" recursive="true" type="double" unit="€" value="0.0"/>
+</feature>
+<alt name="ASUS Soundcard">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Xonar DSX">
+<attribute name="Price" recursive="true" type="double" unit="€" value="49.9"/>
+</feature>
+<feature name="Strix Soar">
+<attribute name="Price" recursive="true" type="double" unit="€" value="89.9"/>
+</feature>
+<feature name="Strix Raid Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="139.9"/>
+</feature>
+</alt>
+</alt>
+<alt name="Extensions">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="4x USB3.0">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.9"/>
+</feature>
+<feature name="2x USB3.1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="Firewire PCI-Card">
+<attribute name="Price" recursive="true" type="double" unit="€" value="17.9"/>
+</feature>
+</alt>
+<alt name="OS">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="Windows 10 64 Bit">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Home">
+<attribute name="Price" recursive="true" type="double" unit="€" value="119.9"/>
+</feature>
+<feature name="Pro">
+<attribute name="Price" recursive="true" type="double" unit="€" value="179.9"/>
+</feature>
+</alt>
+<feature name="Premium Pre-Installation">
+<attribute name="Price" recursive="true" type="double" unit="€" value="19.9"/>
+</feature>
+</alt>
+<and name="Security Software">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature mandatory="true" name="KASPERSKY Internet Security">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+</and>
+<alt name="Office Software">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Microsoft Office 2016 Home and Student">
+<attribute name="Price" recursive="true" type="double" unit="€" value="151.9"/>
+</feature>
+<feature name="Microsoft Office 2016 Home and Business">
+<attribute name="Price" recursive="true" type="double" unit="€" value="262.9"/>
+</feature>
+</alt>
+<alt name="Monitor">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI Monitors">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI Optix G27C2">
+<attribute name="Price" recursive="true" type="double" unit="€" value="399.9"/>
+</feature>
+<feature name="MSI Optix AG32C">
+<attribute name="Price" recursive="true" type="double" unit="€" value="599.9"/>
+</feature>
+</alt>
+<alt name="ASUS Monitors">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="ASUS VP247HA">
+<attribute name="Price" recursive="true" type="double" unit="€" value="139.9"/>
+</feature>
+<feature name="ASUS VS248HR">
+<attribute name="Price" recursive="true" type="double" unit="€" value="159.9"/>
+</feature>
+<feature name="ASUS VG248QE">
+<attribute name="Price" recursive="true" type="double" unit="€" value="289.9"/>
+</feature>
+<feature name="ASUS VS278H">
+<attribute name="Price" recursive="true" type="double" unit="€" value="239.9"/>
+</feature>
+<feature name="ASUS ROG SWIFT PG278QR">
+<attribute name="Price" recursive="true" type="double" unit="€" value="699.9"/>
+</feature>
+<feature name="ASUS ROG SWIFT PG348Q">
+<attribute name="Price" recursive="true" type="double" unit="€" value="1199.9"/>
+</feature>
+</alt>
+<feature name="LG 34UC88-B">
+<attribute name="Price" recursive="true" type="double" unit="€" value="849.9"/>
+</feature>
+</alt>
+<alt name="Headset">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI Headsets">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="MSI DS501">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="MSI DS502">
+<attribute name="Price" recursive="true" type="double" unit="€" value="79.9"/>
+</feature>
+<feature name="MSI Immerse GH70">
+<attribute name="Price" recursive="true" type="double" unit="€" value="119.9"/>
+</feature>
+</alt>
+<alt name="ASUS Headsets">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Cerberus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="49.9"/>
+</feature>
+<feature name="ROG Strix Wireless Gaming">
+<attribute name="Price" recursive="true" type="double" unit="€" value="139.9"/>
+</feature>
+<feature name="ROG Strix Fusion 500">
+<attribute name="Price" recursive="true" type="double" unit="€" value="179.9"/>
+</feature>
+<feature name="ROG Centurion 7.1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="249.9"/>
+</feature>
+</alt>
+<alt name="Other Headsets">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Zalman ZM-HPS200">
+<attribute name="Price" recursive="true" type="double" unit="€" value="19.9"/>
+</feature>
+<feature name="Logitech H340">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="Logitech H390">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+</alt>
+</alt>
+<alt name="Keyboard">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI Keyboards">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Interceptor DS4100">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="Vigo GK40">
+<attribute name="Price" recursive="true" type="double" unit="€" value="69.9"/>
+</feature>
+<feature name="Vigor GK70">
+<attribute name="Price" recursive="true" type="double" unit="€" value="169.9"/>
+</feature>
+<feature name="NewFeature4">
+<attribute name="Price" recursive="true" type="double" unit="€" value="199.9"/>
+</feature>
+</alt>
+<feature name="ASUS ROG Claymore Core">
+<attribute name="Price" recursive="true" type="double" unit="€" value="179.9"/>
+</feature>
+<alt name="Tt eSports Keyboards">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Commander USB-Set">
+<attribute name="Price" recursive="true" type="double" unit="€" value="44.9"/>
+</feature>
+<feature name="Challenger USB-Set">
+<attribute name="Price" recursive="true" type="double" unit="€" value="69.9"/>
+</feature>
+</alt>
+<alt name="Other Keyboards">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Logitech K120">
+<attribute name="Price" recursive="true" type="double" unit="€" value="13.9"/>
+</feature>
+<feature name="Eterno KM-3123">
+<attribute name="Price" recursive="true" type="double" unit="€" value="17.9"/>
+</feature>
+<feature name="Eterno KM-232W">
+<attribute name="Price" recursive="true" type="double" unit="€" value="24.9"/>
+</feature>
+<feature name="Eterno PG-5545">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+<feature name="Logitech MI120">
+<attribute name="Price" recursive="true" type="double" unit="€" value="24.9"/>
+</feature>
+<feature name="Logitech MK330">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+</alt>
+</alt>
+<alt name="Mouse">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI Mouses">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Interceptor DSB1">
+<attribute name="Price" recursive="true" type="double" unit="€" value="26.9"/>
+</feature>
+<feature name="Clutch GM10">
+<attribute name="Price" recursive="true" type="double" unit="€" value="33.9"/>
+</feature>
+<feature name="Interceptor DS300">
+<attribute name="Price" recursive="true" type="double" unit="€" value="69.9"/>
+</feature>
+<feature name="Clutch GM60">
+<attribute name="Price" recursive="true" type="double" unit="€" value="79.9"/>
+</feature>
+<feature name="Clutch GM70">
+<attribute name="Price" recursive="true" type="double" unit="€" value="119.9"/>
+</feature>
+</alt>
+<alt name="ASUS Mouses">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Cerberus Gaming Maus">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.9"/>
+</feature>
+<feature name="ROG Strix Evolve">
+<attribute name="Price" recursive="true" type="double" unit="€" value="79.9"/>
+</feature>
+<feature name="ROG Gladius II">
+<attribute name="Price" recursive="true" type="double" unit="€" value="94.9"/>
+</feature>
+<feature name="ROG Spatha">
+<attribute name="Price" recursive="true" type="double" unit="€" value="169.9"/>
+</feature>
+</alt>
+<feature name="Logitech B100">
+<attribute name="Price" recursive="true" type="double" unit="€" value="9.9"/>
+</feature>
+</alt>
+<alt name="Mousepad">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<alt name="MSI Mousepads">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Gaming Mousepad XL">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.9"/>
+</feature>
+<feature name="Thunderstorm Aluminium">
+<attribute name="Price" recursive="true" type="double" unit="€" value="37.9"/>
+</feature>
+<feature name="Sistorm Gaming">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+</alt>
+<alt name="ASUS Mousepads">
+<attribute name="Price" recursive="true" type="double" unit="€"/>
+<feature name="Cerberus Mauspad">
+<attribute name="Price" recursive="true" type="double" unit="€" value="19.9"/>
+</feature>
+<feature name="Strix Edge">
+<attribute name="Price" recursive="true" type="double" unit="€" value="29.9"/>
+</feature>
+<feature name="ROG Sheath">
+<attribute name="Price" recursive="true" type="double" unit="€" value="39.9"/>
+</feature>
+</alt>
+</alt>
+</and>
+</struct>
+<constraints>
+<rule>
+<imp>
+<disj>
+<var>1070 Series</var>
+<disj>
+<var>1070-Ti Series</var>
+<disj>
+<var>1080 Series</var>
+<disj>
+<var>1080-Ti Series</var>
+<disj>
+<var>P5000 Pny</var>
+<disj>
+<var>P6000 Pny</var>
+<var>RX580</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+<disj>
+<var>VS550</var>
+<disj>
+<var>VS650</var>
+<disj>
+<var>Corsair TX-M-Series</var>
+<disj>
+<var>Corsair HX-Series</var>
+<disj>
+<var>500 W</var>
+<disj>
+<var>500 W CM</var>
+<disj>
+<var>600 W</var>
+<disj>
+<var>600 W CM</var>
+<disj>
+<var>700 W</var>
+<disj>
+<var>700 W CM</var>
+<disj>
+<var>Bequiet Dark Power</var>
+<var>Argus</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>Stufe 1</var>
+<disj>
+<var>Stufe 2</var>
+<var>Stufe 3</var>
+</disj>
+</disj>
+<disj>
+<var>Be Quiet Dark Roch Pro 3</var>
+<disj>
+<var>Scythe Asura</var>
+<disj>
+<var>MSI Core Frozr XL</var>
+<disj>
+<var>Argus Storm 2</var>
+<disj>
+<var>Corsair H100i</var>
+<disj>
+<var>Corsair H115i</var>
+<disj>
+<var>Bequiet Water Cooling</var>
+<var>NZXT Water Cooling</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>Corsair Vengeance RGB Black</var>
+<disj>
+<var>4x 8GB DDR4-2133</var>
+<disj>
+<var>4x 16GB DDR4-2133</var>
+<disj>
+<var>4x 8GB DDR4-2400</var>
+<var>4x 16GB DDR4-2400</var>
+</disj>
+</disj>
+</disj>
+</disj>
+<disj>
+<var>MSI Z270 PC MATE</var>
+<disj>
+<var>MSI Z270 Gaming Pro Carbon</var>
+<disj>
+<var>Z270F GAMING</var>
+<var>IX HERO Gaming</var>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>Corsair H115i</var>
+<disj>
+<var>Silent Loop 280mm</var>
+<var>Silent Loop 360mm</var>
+</disj>
+</disj>
+<disj>
+<var>Corsair Obsidian 450D</var>
+<disj>
+<var>Phanteks Enthoo Pro</var>
+<disj>
+<var>Silent Base 800</var>
+<disj>
+<var>Thermaltake Suppressor F51</var>
+<disj>
+<var>Thermaltake Core X31</var>
+<disj>
+<var>Corsair Carbide Air 540 Cube</var>
+<disj>
+<var>Dark Base Pro 900</var>
+<disj>
+<var>Corsair Obsidian 750D</var>
+<disj>
+<var>NZXT H630</var>
+<disj>
+<var>Cougar Panzer Max</var>
+<disj>
+<var>Cooler Master Storm Trooper</var>
+<var>Corsair Obsidian 750D</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>MSI Z270 PC MATE</var>
+<disj>
+<var>MSI Z270 Gaming Pro Carbon</var>
+<disj>
+<var>H270-PLUS</var>
+<disj>
+<var>Z270-K</var>
+<disj>
+<var>Z270F GAMING</var>
+<var>IX HERO Gaming</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+<disj>
+<var>Aerocool Aero-800</var>
+<disj>
+<var>Aerocool Battlehawk V2</var>
+<disj>
+<var>Corsair Obsidian 450D</var>
+<disj>
+<var>Phanteks Enthoo Pro</var>
+<disj>
+<var>Silent Base 800</var>
+<disj>
+<var>Thermaltake Core V51</var>
+<disj>
+<var>Thermaltake Suppressor F51</var>
+<disj>
+<var>Thermaltake Core X31</var>
+<disj>
+<var>Corsair Carbide Air 540 Cube</var>
+<disj>
+<var>Dark Base Pro 900</var>
+<disj>
+<var>Corsair Obsidian 750D</var>
+<disj>
+<var>NZXT H630</var>
+<disj>
+<var>Cougar Panzer Max</var>
+<var>Cooler Master Storm Trooper</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>MSI Core Frozr</var>
+<disj>
+<var>Big Tower Cooler</var>
+<disj>
+<var>Argus Water Cooling</var>
+<disj>
+<var>Corsair Water Cooling</var>
+<disj>
+<var>Bequiet Water Cooling</var>
+<var>NZXT Water Cooling</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+<disj>
+<var>Aerocool Aero-800</var>
+<disj>
+<var>Aerocool Battlehawk V2</var>
+<disj>
+<var>Corsair Obsidian 450D</var>
+<disj>
+<var>Phanteks Enthoo Pro</var>
+<disj>
+<var>Silent Base 800</var>
+<disj>
+<var>Thermaltake Core V51</var>
+<disj>
+<var>Thermaltake Suppressor F51</var>
+<disj>
+<var>Thermaltake Core X31</var>
+<disj>
+<var>Corsair Carbide Air 540 Cube</var>
+<disj>
+<var>Dark Base Pro 900</var>
+<disj>
+<var>Corsair Obsidian 750D</var>
+<disj>
+<var>NZXT H630</var>
+<disj>
+<var>Cougar Panzer Max</var>
+<var>Cooler Master Storm Trooper</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>XG-C100C</var>
+<disj>
+<var>LAN</var>
+<disj>
+<var>ASUS Soundcard</var>
+<var>2x USB3.1</var>
+</disj>
+</disj>
+</disj>
+<conj>
+<not>
+<var>MSI B250M PRO-VDH</var>
+</not>
+<conj>
+<not>
+<var>MSI B250M GAMING PRO</var>
+</not>
+<not>
+<var>B250M-A</var>
+</not>
+</conj>
+</conj>
+</imp>
+</rule>
+<rule>
+<imp>
+<var>i7 Overclocked</var>
+<disj>
+<var>MSI B250M PRO-VDH</var>
+<disj>
+<var>MSI B250M GAMING PRO</var>
+<disj>
+<var>B250M-A</var>
+<disj>
+<var>B250M-PLUS</var>
+<disj>
+<var>H270-PLUS</var>
+<var>IX HERO Gaming</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>Corsair Carbide 270R</var>
+<disj>
+<var>BitFenix Aegis</var>
+<disj>
+<var>M-908</var>
+<disj>
+<var>M-909</var>
+<disj>
+<var>Corsair Carbide Clear 400c</var>
+<disj>
+<var>NZXT H440 white</var>
+<disj>
+<var>NZXT H440 black</var>
+<disj>
+<var>Thermaltake Versa N27</var>
+<disj>
+<var>Thermaltake View 31</var>
+<disj>
+<var>anidees AI-Crystal</var>
+<disj>
+<var>Thermaltake Core V21</var>
+<var>Design Tower</var>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+</disj>
+<conj>
+<not>
+<var>DVD-Drive</var>
+</not>
+<conj>
+<not>
+<var>BluRay-Drive</var>
+</not>
+<not>
+<var>Hard Drive Caddies</var>
+</not>
+</conj>
+</conj>
+</imp>
+</rule>
+<rule>
+<imp>
+<var>4x USB3.0</var>
+<conj>
+<not>
+<var>B250M-A</var>
+</not>
+<not>
+<var>Netis WF2113</var>
+</not>
+</conj>
+</imp>
+</rule>
+<rule>
+<imp>
+<var>2x USB3.1</var>
+<conj>
+<not>
+<var>B250M-A</var>
+</not>
+<conj>
+<not>
+<var>MSI B250M GAMING PRO</var>
+</not>
+<conj>
+<not>
+<var>MSI B250M PRO-VDH</var>
+</not>
+<not>
+<var>LAN</var>
+</not>
+</conj>
+</conj>
+</conj>
+</imp>
+</rule>
+<rule>
+<imp>
+<disj>
+<var>Stufe 2</var>
+<var>Stufe 3</var>
+</disj>
+<conj>
+<not>
+<var>Scythe Asura</var>
+</not>
+<conj>
+<not>
+<var>Silent Loop 120mm</var>
+</not>
+<not>
+<var>NZXT Water Cooling</var>
+</not>
+</conj>
+</conj>
+</imp>
+</rule>
+</constraints>
+<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+<comments/>
+<featureOrder userDefined="false"/>
+</extendedFeatureModel>

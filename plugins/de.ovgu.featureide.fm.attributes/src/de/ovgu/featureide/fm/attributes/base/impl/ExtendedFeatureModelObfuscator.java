@@ -82,8 +82,8 @@ public class ExtendedFeatureModelObfuscator extends FeatureModelObfuscator {
 
 		final AbstractFeatureAttributeFactory attributeFactory = new FeatureAttributeFactory();
 
-		for (IFeatureAttribute attribute : orgFeature.getAttributes()) {
-			IFeatureAttribute obfFeatureAttribute = null;
+		for (IFeatureAttribute<?> attribute : orgFeature.getAttributes()) {
+			IFeatureAttribute<?> obfFeatureAttribute = null;
 
 			final String attributeName = attribute.getName();
 			final String obfAttributeName = getObfuscatedFeatureAttributeName(attributeName);

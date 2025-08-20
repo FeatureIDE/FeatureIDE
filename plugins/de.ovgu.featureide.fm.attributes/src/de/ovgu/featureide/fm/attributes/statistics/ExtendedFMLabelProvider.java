@@ -29,7 +29,7 @@ public class ExtendedFMLabelProvider extends OutlineLabelProvider {
 			return "UUups";
 		}
 		if (element instanceof IFeatureAttribute) {
-			return ((IFeatureAttribute) element).getName();
+			return ((IFeatureAttribute<?>) element).getName();
 		}
 		if (element instanceof ComputationHeader) {
 			return ((ComputationHeader) element).getName();

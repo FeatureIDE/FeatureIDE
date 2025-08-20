@@ -165,6 +165,12 @@ public class Commons {
 		return (ExtendedFeatureModel) model;
 	}
 
+	public static ExtendedFeatureModel getPCConfiguratorModel() {
+		IFeatureModel model = Commons.loadTestExtendedFeatureModelFromFile("PCConfiguratorModel.xml");
+		assertTrue(model instanceof ExtendedFeatureModel);
+		return (ExtendedFeatureModel) model;
+	}
+
 	public static boolean compareByAttributeValues(ExtendedFeatureModel model1, ExtendedFeatureModel model2) {
 		return compareModelToValueMap(model2, extractValueMap(model1));
 	}
@@ -174,7 +180,7 @@ public class Commons {
 		for (IFeature feat : model.getFeatures()) {
 			ExtendedFeature ext = (ExtendedFeature) feat;
 			Map<String, Object> featValueMap = new HashMap<>();
-			for (IFeatureAttribute att : ext.getAttributes()) {
+			for (IFeatureAttribute<?> att : ext.getAttributes()) {
 				featValueMap.put(att.getName(), att.getValue());
 			}
 			valueMap.put(ext.getName(), featValueMap);
@@ -190,7 +196,7 @@ public class Commons {
 			if (!valueMap.containsKey(ext.getName())) {
 				return false;
 			}
-			for (IFeatureAttribute att : ext.getAttributes()) {
+			for (IFeatureAttribute<?> att : ext.getAttributes()) {
 				if (valueMap.get(ext.getName()).containsKey(att.getName())) {
 					if (att.getValue() == null) {
 						if (valueMap.get(ext.getName()).get(att.getName()) == null) {

@@ -118,16 +118,16 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(eBaseFeature.getAttributes().size() == 0);
 
 		// Create all types of attributes with values
-		IFeatureAttribute stringAttribute = attributeFactory.createStringAttribute(eRootFeature, "stringTest", "EMPTY", "Ein Test", false, false);
-		IFeatureAttribute booleanAttribute = attributeFactory.createBooleanAttribute(eRootFeature, "booleanTest", "State", true, false, false);
-		IFeatureAttribute longAttribute = attributeFactory.createLongAttribute(eRootFeature, "longTest", "Euro", Long.MAX_VALUE, false, false);
-		IFeatureAttribute doubleAttribute = attributeFactory.createDoubleAttribute(eRootFeature, "doubleTest", "Dollar", Double.MAX_VALUE, false, false);
+		IFeatureAttribute<?> stringAttribute = attributeFactory.createStringAttribute(eRootFeature, "stringTest", "EMPTY", "Ein Test", false, false);
+		IFeatureAttribute<?> booleanAttribute = attributeFactory.createBooleanAttribute(eRootFeature, "booleanTest", "State", true, false, false);
+		IFeatureAttribute<?> longAttribute = attributeFactory.createLongAttribute(eRootFeature, "longTest", "Euro", Long.MAX_VALUE, false, false);
+		IFeatureAttribute<?> doubleAttribute = attributeFactory.createDoubleAttribute(eRootFeature, "doubleTest", "Dollar", Double.MAX_VALUE, false, false);
 
 		// Create all types of attributes with null values
-		IFeatureAttribute stringAttributeNull = attributeFactory.createStringAttribute(eRootFeature, "sNull", "", null, false, false);
-		IFeatureAttribute booleanAttributeNull = attributeFactory.createBooleanAttribute(eRootFeature, "bNull", "", null, false, false);
-		IFeatureAttribute longAttributeNull = attributeFactory.createLongAttribute(eRootFeature, "lNull", "", null, false, false);
-		IFeatureAttribute doubleAttributeNull = attributeFactory.createDoubleAttribute(eRootFeature, "dNull", "", null, false, false);
+		IFeatureAttribute<?> stringAttributeNull = attributeFactory.createStringAttribute(eRootFeature, "sNull", "", null, false, false);
+		IFeatureAttribute<?> booleanAttributeNull = attributeFactory.createBooleanAttribute(eRootFeature, "bNull", "", null, false, false);
+		IFeatureAttribute<?> longAttributeNull = attributeFactory.createLongAttribute(eRootFeature, "lNull", "", null, false, false);
+		IFeatureAttribute<?> doubleAttributeNull = attributeFactory.createDoubleAttribute(eRootFeature, "dNull", "", null, false, false);
 
 		// Add the attributes to the feature
 		eRootFeature.addAttribute(stringAttribute);
@@ -187,10 +187,10 @@ public class TExtendedFeatureModelSaveAndLoading {
 		assertTrue(!doubleAttribute.isConfigurable());
 
 		// Check Attributes with null values
-		IFeatureAttribute sN = eReadRootFeature.getAttributes().get(4);
-		IFeatureAttribute bN = eReadRootFeature.getAttributes().get(5);
-		IFeatureAttribute lN = eReadRootFeature.getAttributes().get(6);
-		IFeatureAttribute dN = eReadRootFeature.getAttributes().get(7);
+		IFeatureAttribute<?> sN = eReadRootFeature.getAttributes().get(4);
+		IFeatureAttribute<?> bN = eReadRootFeature.getAttributes().get(5);
+		IFeatureAttribute<?> lN = eReadRootFeature.getAttributes().get(6);
+		IFeatureAttribute<?> dN = eReadRootFeature.getAttributes().get(7);
 
 		assertTrue(sN.getName().equals("sNull"));
 		assertTrue(sN.getValue() == null);

@@ -320,27 +320,32 @@ public abstract class Node {
 
 	@Override
 	public int hashCode() {
-		int hashCode = children.length * 37;
-		for (int i = 0; i < children.length; i++) {
-			hashCode += children[i].hashCode();
-		}
-		return hashCode;
+		return Arrays.hashCode(children);
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object) {
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!getClass().isInstance(object)) {
+		if (obj == null) {
 			return false;
 		}
-		final Node otherNode = (Node) object;
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Node otherNode = (Node) obj;
+		if ((children == null) && (otherNode.children == null)) {
+			return true;
+		}
+		if ((children == null) || (otherNode.children == null)) {
+			return false;
+		}
 		if (children.length != otherNode.children.length) {
 			return false;
 		}
-		final List<Node> thisChildrenList = Arrays.asList(children);
-		final List<Node> otherChildrenList = Arrays.asList(otherNode.children);
+		final LinkedHashSet<Node> thisChildrenList = new LinkedHashSet<>(Arrays.asList(children));
+		final LinkedHashSet<Node> otherChildrenList = new LinkedHashSet<>(Arrays.asList(otherNode.children));
 		return thisChildrenList.containsAll(otherChildrenList) && otherChildrenList.containsAll(thisChildrenList);
 	}
 

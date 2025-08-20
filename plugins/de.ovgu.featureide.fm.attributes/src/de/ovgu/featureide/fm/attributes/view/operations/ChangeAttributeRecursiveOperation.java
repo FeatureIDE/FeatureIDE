@@ -56,7 +56,7 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 	 */
 	private final boolean oldRecursive;
 
-	public ChangeAttributeRecursiveOperation(IFeatureModelManager featureModelManager, IFeatureAttribute attribute, boolean newRecursive) {
+	public ChangeAttributeRecursiveOperation(IFeatureModelManager featureModelManager, IFeatureAttribute<?> attribute, boolean newRecursive) {
 		super(featureModelManager, CHANGE_ATTRIBUTE_RECURSIVE_OPERATION_NAME);
 		featureName = attribute.getFeature().getName();
 		attributeName = attribute.getName();
@@ -71,7 +71,7 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 		}
 
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setRecursive(newRecursive);
 			if (newRecursive) {
@@ -90,7 +90,7 @@ public class ChangeAttributeRecursiveOperation extends AbstractFeatureModelOpera
 			return FeatureIDEEvent.getDefault(EventType.FEATURE_ATTRIBUTE_CHANGED);
 		}
 
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			attribute.setRecursive(oldRecursive);
 			if (oldRecursive) {

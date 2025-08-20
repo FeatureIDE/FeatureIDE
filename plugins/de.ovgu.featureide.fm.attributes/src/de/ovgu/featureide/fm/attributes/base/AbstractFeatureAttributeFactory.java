@@ -22,6 +22,10 @@ package de.ovgu.featureide.fm.attributes.base;
 
 import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
 import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
+import de.ovgu.featureide.fm.attributes.base.impl.BooleanFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.StringFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -41,7 +45,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @return The instance of the feature attribute. Can return null when information contain invalid values. Like the value of an extended feature attribute
 	 *         of type double is set to "test".
 	 */
-	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature)
+	public abstract IFeatureAttribute<?> createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature)
 			throws FeatureAttributeParseException, UnknownFeatureAttributeTypeException;
 
 	/**
@@ -55,7 +59,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createStringAttribute(IFeature correspondingFeature, String name, String unit, String value, boolean recursive,
+	public abstract StringFeatureAttribute createStringAttribute(IFeature correspondingFeature, String name, String unit, String value, boolean recursive,
 			boolean configurable);
 
 	/**
@@ -69,7 +73,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
+	public abstract BooleanFeatureAttribute createBooleanAttribute(IFeature correspondingFeature, String name, String unit, Boolean value, boolean recursive,
 			boolean configurable);
 
 	/**
@@ -83,7 +87,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive,
+	public abstract LongFeatureAttribute createLongAttribute(IFeature correspondingFeature, String name, String unit, Long value, boolean recursive,
 			boolean configurable);
 
 	/**
@@ -97,7 +101,7 @@ public abstract class AbstractFeatureAttributeFactory {
 	 * @param configurable true when the attribute should be configurable
 	 * @return The instance of the created feature attribute.
 	 */
-	public abstract IFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
+	public abstract DoubleFeatureAttribute createDoubleAttribute(IFeature correspondingFeature, String name, String unit, Double value, boolean recursive,
 			boolean configurable);
 
 }

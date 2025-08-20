@@ -51,7 +51,7 @@ public class FeatureValueProvider implements FormulaValueProvider {
 		for (String key : keySet) {
 			result.put(key, DEFAULT_WEIGHT);
 		}
-		for (IFeatureAttribute att : ext.getAttributes()) {
+		for (IFeatureAttribute<?> att : ext.getAttributes()) {
 			if (keySet.contains(att.getName())) {
 				if (att.getType().equals(FeatureAttribute.BOOLEAN)) {
 					result.put(att.getName(), AttributeUtils.getBooleanValueAsDouble(att, defaultValue));
@@ -71,7 +71,7 @@ public class FeatureValueProvider implements FormulaValueProvider {
 		Map<String, String> result = new HashMap<>();
 		for (IFeature feat : model.getFeatures()) {
 			IExtendedFeature ext = (IExtendedFeature) feat;
-			for (IFeatureAttribute att : ext.getAttributes()) {
+			for (IFeatureAttribute<?> att : ext.getAttributes()) {
 				if (keySet.contains(att.getName())) {
 					result.put(att.getName(), att.getUnit());
 				}

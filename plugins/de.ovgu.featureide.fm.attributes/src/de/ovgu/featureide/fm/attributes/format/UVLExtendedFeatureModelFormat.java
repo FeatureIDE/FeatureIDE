@@ -184,7 +184,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 			attributes.put(EXTENDED_ATTRIBUTE_NAME, new Attribute<>(EXTENDED_ATTRIBUTE_NAME, true));
 		}
 		if (feature instanceof IExtendedFeature) {
-			for (IFeatureAttribute attr : ((IExtendedFeature) feature).getAttributes()) {
+			for (IFeatureAttribute<?> attr : ((IExtendedFeature) feature).getAttributes()) {
 				attributes.put(attr.getName(), new Attribute<>(attr.getName(), printAttribute(attr)));
 			}
 
@@ -199,7 +199,7 @@ public class UVLExtendedFeatureModelFormat extends UVLFeatureModelFormat {
 	 * @return the value of the attribute. This is either simply the value, if the attr has no other information, or a map containing all information of the
 	 *         attribute.
 	 */
-	private Object printAttribute(IFeatureAttribute attr) {
+	private Object printAttribute(IFeatureAttribute<?> attr) {
 		if (!attr.isConfigurable() && !attr.isRecursive() && (attr.getUnit() == null || attr.getUnit().equals("")) && attr.getValue() != null) {
 			return attr.getValue();
 		} else {

@@ -69,11 +69,11 @@ public class AttributeUtils {
 //		return new String[] { "Not an extended Feature Model" };
 //	}
 
-	public static boolean isNumerical(IFeatureAttribute att) {
+	public static boolean isNumerical(IFeatureAttribute<?> att) {
 		return att.getType().equals(FeatureAttribute.LONG) || att.getType().equals(FeatureAttribute.DOUBLE);
 	}
 
-	public static boolean isBoolean(IFeatureAttribute att) {
+	public static boolean isBoolean(IFeatureAttribute<?> att) {
 		return att.getType().equals(FeatureAttribute.BOOLEAN);
 	}
 
@@ -85,7 +85,7 @@ public class AttributeUtils {
 			IExtendedFeatureModel extModel = (IExtendedFeatureModel) featureModel;
 			for (IFeature feat : extModel.getFeatures()) {
 				IExtendedFeature ext = (IExtendedFeature) feat;
-				for (IFeatureAttribute att : ext.getAttributes()) {
+				for (IFeatureAttribute<?> att : ext.getAttributes()) {
 					if (att.getName().equals(attribute)) {
 						return att.getUnit();
 					}
@@ -96,7 +96,7 @@ public class AttributeUtils {
 		return null;
 	}
 
-	public static Double getDoubleValue(IFeatureAttribute att, Double defaultValue) {
+	public static Double getDoubleValue(IFeatureAttribute<?> att, Double defaultValue) {
 		if (!isNumerical(att)) {
 			return null;
 		}
@@ -111,14 +111,14 @@ public class AttributeUtils {
 		}
 	}
 
-	public static Boolean getBooleanValue(IFeatureAttribute att) {
+	public static Boolean getBooleanValue(IFeatureAttribute<?> att) {
 		if (!isBoolean(att) || att.getValue() == null) {
 			return null;
 		}
 		return (boolean) att.getValue();
 	}
 
-	public static Double getBooleanValueAsDouble(IFeatureAttribute att, Double defaultValue) {
+	public static Double getBooleanValueAsDouble(IFeatureAttribute<?> att, Double defaultValue) {
 		Double trueDouble = 1d;
 		Double falseDouble = 0d;
 		Boolean value = getBooleanValue(att);
@@ -136,7 +136,7 @@ public class AttributeUtils {
 	 * @param attributeName The name of the attribute
 	 * @return The attribute, or null if the feature or attribute cannot be found
 	 */
-	public static IFeatureAttribute getAttribute(IFeatureModel featureModel, String featureName, String attributeName) {
+	public static IFeatureAttribute<?> getAttribute(IFeatureModel featureModel, String featureName, String attributeName) {
 		final IFeature feature = featureModel.getFeature(featureName);
 		if (feature instanceof IExtendedFeature) { // Also checks that feature != null
 			final IExtendedFeature extendedFeature = (IExtendedFeature) feature;
@@ -153,13 +153,13 @@ public class AttributeUtils {
 	 * @param attributeName
 	 * @return The found attribute, or null if no attribute is found
 	 */
-	public static IFeatureAttribute getChildAttribute(IExtendedFeature feature, String attributeName) {
-		IFeatureAttribute att = feature.getAttribute(attributeName);
+	public static IFeatureAttribute<?> getChildAttribute(IExtendedFeature feature, String attributeName) {
+		IFeatureAttribute<?> att = feature.getAttribute(attributeName);
 		if (att != null) {
 			return att;
 		}
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			IFeatureAttribute childAtt = getChildAttribute((IExtendedFeature) child.getFeature(), attributeName);
+			IFeatureAttribute<?> childAtt = getChildAttribute((IExtendedFeature) child.getFeature(), attributeName);
 			if (childAtt != null) {
 				return childAtt;
 			}

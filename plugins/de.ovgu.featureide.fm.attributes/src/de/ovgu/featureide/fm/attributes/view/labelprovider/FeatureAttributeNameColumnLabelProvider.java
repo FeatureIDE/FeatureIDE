@@ -45,7 +45,7 @@ public class FeatureAttributeNameColumnLabelProvider extends FeatureAttributeCol
 		if ((element instanceof IFeature) || (element instanceof String)) {
 			return element.toString();
 		} else if (element instanceof IFeatureAttribute) {
-			final IFeatureAttribute attribute = (IFeatureAttribute) element;
+			final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 			return attribute.getName();
 		}
 		return "null";
@@ -56,7 +56,7 @@ public class FeatureAttributeNameColumnLabelProvider extends FeatureAttributeCol
 		if ((element instanceof IFeature) || (element instanceof String)) {
 			return cachedImages.get(FeatureAttributeView.imgFeature);
 		} else if (element instanceof IFeatureAttribute) {
-			if (((IFeatureAttribute) element).isRecursive()) {
+			if (((IFeatureAttribute<?>) element).isRecursive()) {
 				return cachedImages.get(FeatureAttributeView.imgAttributeRecurisve);
 			} else {
 				return cachedImages.get(FeatureAttributeView.imgAttribute);

@@ -63,7 +63,7 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	 */
 	private boolean firstOverwrite = true;
 
-	public ChangeConfigurableAttributeValueOperation(ConfigurationManager configurationManager, IFeatureAttribute att, D newValue) {
+	public ChangeConfigurableAttributeValueOperation(ConfigurationManager configurationManager, IFeatureAttribute<?> att, D newValue) {
 		super(configurationManager, CHANGE_CONFIGURABLE_ATTRIBUTE_VALUE_OPERATION_NAME);
 		featureName = att.getFeature().getName();
 		attributeName = att.getName();
@@ -74,7 +74,7 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	protected FeatureIDEEvent operation(Configuration config) {
 		final ExtendedConfiguration extConfig = (ExtendedConfiguration) config;
 		final ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(featureName);
-		final IFeatureAttribute att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
+		final IFeatureAttribute<?> att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
 		firstOverwrite = !selectableFeat.hasAttributeWithConfiguredValue(att);
 		oldValue = selectableFeat.getAttributeValue(att);
 		if (newValue != null) {
@@ -89,7 +89,7 @@ public class ChangeConfigurableAttributeValueOperation<D> extends AbstractConfig
 	protected FeatureIDEEvent inverseOperation(Configuration config) {
 		final ExtendedConfiguration extConfig = (ExtendedConfiguration) config;
 		final ExtendedSelectableFeature selectableFeat = extConfig.getSelectableFeature(featureName);
-		final IFeatureAttribute att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
+		final IFeatureAttribute<?> att = ((IExtendedFeature) selectableFeat.getFeature()).getAttribute(attributeName);
 		// Case: switch back to default value from model
 		if (firstOverwrite) {
 			selectableFeat.removeConfigurableAttribute(att);

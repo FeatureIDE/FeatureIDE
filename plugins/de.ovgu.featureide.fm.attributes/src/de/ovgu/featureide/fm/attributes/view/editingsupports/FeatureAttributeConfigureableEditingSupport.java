@@ -69,7 +69,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected Object getValue(Object element) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		return attribute.isConfigurable();
 	}
 
@@ -79,7 +79,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 		FeatureModelOperationWrapper.run(new ChangeAttributeConfigurableOperation((IFeatureModelManager) view.getManager(), attribute, (Boolean) value));
 	}
 }

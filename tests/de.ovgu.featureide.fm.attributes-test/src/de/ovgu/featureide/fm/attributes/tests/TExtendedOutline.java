@@ -60,8 +60,8 @@ public class TExtendedOutline {
 
 		// Get attribute to compute
 		ExtendedFeature feature = (ExtendedFeature) model.getStructure().getRoot().getFeature();
-		IFeatureAttribute attributePrice = null;
-		for (IFeatureAttribute att : feature.getAttributes()) {
+		IFeatureAttribute<?> attributePrice = null;
+		for (IFeatureAttribute<?> att : feature.getAttributes()) {
 			if (att.getName().equals("Price")) {
 				attributePrice = att;
 			}
@@ -91,8 +91,8 @@ public class TExtendedOutline {
 
 		// Get attribute to compute
 		ExtendedFeature feature = (ExtendedFeature) model.getStructure().getRoot().getFeature();
-		IFeatureAttribute attributePrice = null;
-		for (IFeatureAttribute att : feature.getAttributes()) {
+		IFeatureAttribute<?> attributePrice = null;
+		for (IFeatureAttribute<?> att : feature.getAttributes()) {
 			if (att.getName().equals("Price")) {
 				attributePrice = att;
 			}
@@ -122,8 +122,8 @@ public class TExtendedOutline {
 
 		// Get attribute to compute
 		ExtendedFeature feature = (ExtendedFeature) model.getStructure().getRoot().getFeature();
-		IFeatureAttribute attributePrice = null;
-		for (IFeatureAttribute att : feature.getAttributes()) {
+		IFeatureAttribute<?> attributePrice = null;
+		for (IFeatureAttribute<?> att : feature.getAttributes()) {
 			if (att.getName().equals("Price")) {
 				attributePrice = att;
 			}

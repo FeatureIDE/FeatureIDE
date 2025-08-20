@@ -45,7 +45,7 @@ public class FeatureAttributeUnitColumnLabelProvider extends FeatureAttributeCol
 		if ((element instanceof IFeature) || (element instanceof String)) {
 			return "-";
 		} else if (element instanceof IFeatureAttribute) {
-			final IFeatureAttribute attribute = (IFeatureAttribute) element;
+			final IFeatureAttribute<?> attribute = (IFeatureAttribute<?>) element;
 			return attribute.getUnit();
 		}
 		return "null";

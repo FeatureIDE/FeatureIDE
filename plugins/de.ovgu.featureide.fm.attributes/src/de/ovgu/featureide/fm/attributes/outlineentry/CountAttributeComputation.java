@@ -40,10 +40,10 @@ import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 public class CountAttributeComputation implements IOutlineEntry {
 
 	Configuration config;
-	IFeatureAttribute attribute;
+	IFeatureAttribute<?> attribute;
 	private static final String LABEL = "Number of occurences: ";
 
-	public CountAttributeComputation(Configuration config, IFeatureAttribute attribute) {
+	public CountAttributeComputation(Configuration config, IFeatureAttribute<?> attribute) {
 		this.config = config;
 		this.attribute = attribute;
 	}

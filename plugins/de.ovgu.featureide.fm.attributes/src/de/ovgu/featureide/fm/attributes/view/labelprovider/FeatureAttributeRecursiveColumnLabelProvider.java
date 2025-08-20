@@ -47,7 +47,7 @@ public class FeatureAttributeRecursiveColumnLabelProvider extends FeatureAttribu
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IFeatureAttribute) {
-			if (((IFeatureAttribute) element).isRecursive()) {
+			if (((IFeatureAttribute<?>) element).isRecursive()) {
 				return cachedImages.get(FeatureAttributeView.checkboxEnabled);
 			} else {
 				return cachedImages.get(FeatureAttributeView.checkboxDisabled);

@@ -71,7 +71,7 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 			if (attributeName == null) {
 				attributeName = getUniqueAttributeName(attributeType, extendedFeature);
 			}
-			IFeatureAttribute attribute;
+			IFeatureAttribute<?> attribute;
 			switch (attributeType) {
 			case FeatureAttribute.BOOLEAN:
 				attribute = new BooleanFeatureAttribute(extendedFeature, attributeName, "", null, false, false);
@@ -114,7 +114,7 @@ public class AddFeatureAttributeOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected FeatureIDEEvent inverseOperation(IFeatureModel featureModel) {
-		final IFeatureAttribute attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
+		final IFeatureAttribute<?> attribute = AttributeUtils.getAttribute(featureModel, featureName, attributeName);
 		if (attribute != null) {
 			final IExtendedFeature extendedFeature = (IExtendedFeature) attribute.getFeature();
 			extendedFeature.removeAttribute(attribute);
