@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Maps a {@link FeatureAttribute} to its name and feature.
@@ -38,8 +39,12 @@ public class FeatureAttributeMap<T> {
 		attrs = new HashMap<>();
 	}
 
+	public Set<String> getKeys() {
+		return attrs.keySet();
+	}
+
 	public FeatureAttributeMap(FeatureAttributeMap<T> oldMap) {
-		this.attrs = new HashMap<>((int) (1.5 * oldMap.attrs.size()));
+		attrs = new HashMap<>((int) (1.5 * oldMap.attrs.size()));
 
 		for (final Entry<String, Map<String, FeatureAttribute<T>>> mapEntry : oldMap.attrs.entrySet()) {
 			final Map<String, FeatureAttribute<T>> value = mapEntry.getValue();
@@ -48,7 +53,7 @@ public class FeatureAttributeMap<T> {
 				final FeatureAttribute<T> v = attributeEntry.getValue();
 				newFeatureMap.put(attributeEntry.getKey(), new FeatureAttribute<>(v.getAttributeName(), v.getFeatureName(), v.getValue()));
 			}
-			this.attrs.put(mapEntry.getKey(), newFeatureMap);
+			attrs.put(mapEntry.getKey(), newFeatureMap);
 		}
 	}
 

@@ -221,15 +221,15 @@ public interface VelvetListener extends ParseTreeListener {
 	 */
 	void exitAttributeConstraint(VelvetParser.AttributeConstraintContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link VelvetParser#attribConstraint}.
+	 * Enter a parse tree produced by {@link VelvetParser#attribNumExpr}.
 	 * @param ctx the parse tree
 	 */
-	void enterAttribConstraint(VelvetParser.AttribConstraintContext ctx);
+	void enterAttribNumExpr(VelvetParser.AttribNumExprContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link VelvetParser#attribConstraint}.
+	 * Exit a parse tree produced by {@link VelvetParser#attribNumExpr}.
 	 * @param ctx the parse tree
 	 */
-	void exitAttribConstraint(VelvetParser.AttribConstraintContext ctx);
+	void exitAttribNumExpr(VelvetParser.AttribNumExprContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VelvetParser#attribOperator}.
 	 * @param ctx the parse tree

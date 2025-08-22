@@ -272,13 +272,13 @@ public class VelvetBaseListener implements VelvetListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAttribConstraint(VelvetParser.AttribConstraintContext ctx) { }
+	@Override public void enterAttribNumExpr(VelvetParser.AttribNumExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAttribConstraint(VelvetParser.AttribConstraintContext ctx) { }
+	@Override public void exitAttribNumExpr(VelvetParser.AttribNumExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

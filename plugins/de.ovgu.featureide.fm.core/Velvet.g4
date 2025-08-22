@@ -153,14 +153,15 @@ attribute
 	: (intAttribute | floatAttribute | stringAttribute | boolAttribute) SEMI
 	;
 	
-attributeConstraint
-	: attribConstraint
-	;
 
-attribConstraint
-	: attribNumInstance (attribOperator attribNumInstance)* 
+attributeConstraint
+	: attribNumExpr
 	  attribRelation 
-	  attribNumInstance (attribOperator attribNumInstance)*
+	  attribNumExpr
+	;
+	
+attribNumExpr
+	: attribNumInstance (attribOperator attribNumInstance)* 	
 	;
 	
 attribOperator

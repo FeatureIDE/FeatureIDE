@@ -140,11 +140,11 @@ public interface VelvetVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAttributeConstraint(VelvetParser.AttributeConstraintContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link VelvetParser#attribConstraint}.
+	 * Visit a parse tree produced by {@link VelvetParser#attribNumExpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAttribConstraint(VelvetParser.AttribConstraintContext ctx);
+	T visitAttribNumExpr(VelvetParser.AttribNumExprContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VelvetParser#attribOperator}.
 	 * @param ctx the parse tree

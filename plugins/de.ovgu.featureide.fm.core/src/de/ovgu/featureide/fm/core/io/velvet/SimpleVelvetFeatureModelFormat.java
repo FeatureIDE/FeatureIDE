@@ -1,6 +1,7 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
  * 				 2025  Malte Grave, VaSiCS, LIT CPS Lab, Johannes Kepler University, Linz
+ * 				 2025  Oleksandr Kudriavchenko, VaSiCS, LIT CPS Lab, Johannes Kepler University, Linz
 
  *
  * This file is part of FeatureIDE.
@@ -22,7 +23,46 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.eclipse.core.resources.IProject;
+import org.prop4j.Equals;
+import org.prop4j.Implies;
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.MultiConstraint;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeature;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModelFactory;
+import de.ovgu.featureide.fm.core.constraint.Equation;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
+import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
+import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Reads / Writes feature models in the Velvet format.
@@ -31,181 +71,430 @@ import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
  * @author Matthias Strauss
  * @author Reimar Schroeter
  * @author Malte Grave
+ * @author Oleksandr Kudriavchenko
  */
-public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
+public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat implements IVelvetFeatureModelFormat {
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IFeatureModelFormat#getName()
-	 */
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName();
+	public final boolean velvetImport = false;
+	MultiFeatureModel extFeatureModel;
+	String extFeatureModelName;
+	protected File featureModelFile;
+	protected ProblemList problemList;
+	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private final StringBuilder sb = new StringBuilder();
+	private static final String[] paths = { "%s.velvet", "%s.xml", "MPL/%s.velvet", "MPL/%s.xml" };
+
+	public SimpleVelvetFeatureModelFormat() {
+		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentFormat#getSuffix()
+	public SimpleVelvetFeatureModelFormat(AFeatureModelFormat oldFormat) {
+		super(oldFormat);
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	<T> void collectAttributes(Map<String, String> attributesMap, FeatureAttributeMap<T> attributes, String type) {
+		for (final String key : attributes.getKeys()) {
+			for (final FeatureAttribute<T> attribute : attributes.getAttributes(key)) {
+
+				attributesMap.put(String.format("%s %s = %s;", type, attribute.getAttributeName(), attribute.getValue()), attribute.getFeatureName());
+			}
+		}
+	}
+
+	@Override
+	public String write(IFeatureModel object) {
+		final int depth = 0;
+		if (object instanceof MultiFeatureModel) {
+			extFeatureModel = (MultiFeatureModel) object;
+		}
+
+		final Map<String, String> attributes = new HashMap<>();
+		final FeatureAttributeMap<Integer> intAttrs = extFeatureModel.getIntegerAttributes();
+		// final FeatureAttributeMap<Integer> floatAttrs = extFeatureModel.getIntegerAttributes();
+		final FeatureAttributeMap<Boolean> boolAttrs = extFeatureModel.getBooleanAttributes();
+		final FeatureAttributeMap<String> strAttrs = extFeatureModel.getStringAttributes();
+		List<Equation> attributeConstraints = null;
+		collectAttributes(attributes, intAttrs, "int");
+		collectAttributes(attributes, boolAttrs, "bool");
+		collectAttributes(attributes, strAttrs, "string");
+
+		final List<IConstraint> constraints = new ArrayList<>(extFeatureModel.getConstraints());
+		final IFeatureStructure root = object.getStructure().getRoot();
+		sb.delete(0, sb.length());
+		sb.append("concept ");
+		sb.append(root.getFeature().getName());
+		sb.append(" {");
+		sb.append(NEWLINE);
+		if (extFeatureModel != null) {
+			attributeConstraints = extFeatureModel.getAttributConstraints();
+
+			// find parent by looking where new numbers come from
+
+			for (final Entry<String, String> attr : attributes.entrySet()) {
+				if (attr.getValue().equals(root.getFeature().getName())) {
+					writeTab(depth + 1);
+					sb.append(attr.getKey());
+					sb.append(NEWLINE);
+				}
+			}
+
+			for (final IFeatureStructure child : root.getChildren()) {
+				// writeNewDefined(child, 1);
+				writeFeature(child, 1, constraints, attributes, attributeConstraints);
+			}
+			for (final IConstraint constraint : constraints) {
+				if (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERN) {
+					writeConstraint(constraint, depth);
+				}
+			}
+		} else {
+			writeFeatureGroup(root, 1, constraints, attributes, attributeConstraints);
+			for (final IConstraint constraint : object.getConstraints()) {
+				writeConstraint(constraint, depth);
+			}
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+
+	private void writeConstraint(IConstraint constraint, int depth) {
+		writeTab(depth + 1);
+		sb.append("constraint ");
+		final Node constraintNode = ((Implies) constraint.getNode()).getChildren()[1];
+
+		final Node[] children = ((Equals) constraintNode).getChildren();
+		final Node name = children[0];
+		final Node value = children[1];
+		sb.append(name.toString(SYMBOLS));
+		sb.append(" = ");
+		sb.append(value.toString(SYMBOLS));
+		sb.append(";");
+		sb.append(NEWLINE);
+	}
+
+	private void writeFeatureGroup(IFeatureStructure root, int depth, List<IConstraint> constraints, Map<String, String> attributes,
+			List<Equation> attributeConstraints) {
+		if (root.isAnd()) {
+			for (final IFeatureStructure feature : root.getChildren()) {
+				writeFeature(feature, depth + 1, constraints, attributes, attributeConstraints);
+			}
+		} else if (root.isOr()) {
+			writeTab(depth + 1);
+			sb.append("someOf {");
+			sb.append(NEWLINE);
+			for (final IFeatureStructure feature : root.getChildren()) {
+				writeFeature(feature, depth + 2, constraints, attributes, attributeConstraints);
+			}
+			writeTab(depth + 1);
+			sb.append("}");
+			sb.append(NEWLINE);
+		} else if (root.isAlternative()) {
+			writeTab(depth + 1);
+			sb.append("oneOf {");
+			sb.append(NEWLINE);
+			for (final IFeatureStructure f : root.getChildren()) {
+				writeFeature(f, depth + 2, constraints, attributes, attributeConstraints);
+			}
+			writeTab(depth + 1);
+			sb.append("}");
+			sb.append(NEWLINE);
+		}
+	}
+
+	private void writeAttributeConstraint(Map<String, String> attributes, Equation attributeConstraint, String featureName, int depth) {
+		writeTab(depth + 1);
+		sb.append("constraint ");
+		sb.append("ID = ");
+		final List<WeightedTerm> sortedTerms = attributeConstraint.getWeightedTerms();
+		sortedTerms.sort(Comparator.comparing(WeightedTerm::isPositive).reversed());
+		boolean first = true;
+		for (final WeightedTerm term : sortedTerms) {
+			if (!term.isPositive()) {
+				sb.append(" - ");
+			} else if (!first) {
+				sb.append(" + ");
+			}
+
+			final String name = term.getReference().getAttributeName();
+			if (!name.equals("attributeName")) {
+				sb.append(name);
+
+			} else {
+				sb.append(term.getWeight());
+			}
+			first = false;
+
+		}
+		sb.append(" ");
+		sb.append(attributeConstraint.getOperator());
+		sb.append(" 0;");
+		sb.append(NEWLINE);
+
+	}
+
+	private void writeFeature(IFeatureStructure feature, int depth, List<IConstraint> constraints, Map<String, String> attributes,
+			List<Equation> attributeConstraints) {
+		final String featureName = feature.getFeature().getName().toString();
+		writeTab(depth);
+		if (feature.isAbstract()) {
+			sb.append("abstract ");
+		}
+		if (feature.isMandatory() && ((feature.getParent() == null) || feature.getParent().isAnd())) {
+			sb.append("mandatory ");
+		}
+		sb.append("feature ");
+		sb.append(featureName);
+
+		final String description = feature.getFeature().getProperty().getDescription();
+
+		final List<IConstraint> childConstraints = new ArrayList<>();
+		final List<Equation> childAttributeConstraints = new ArrayList<>();
+
+		final Iterator<IConstraint> iteratorC = constraints.iterator();
+		while (iteratorC.hasNext()) {
+			final IConstraint constraint = iteratorC.next();
+			final Node constraintNode = constraint.getNode();
+			final Node[] children = ((Implies) constraintNode).getChildren();
+			final Node parentFeature = children[0];
+			if ((parentFeature.toString().equals(featureName))) {
+				childConstraints.add(constraint);
+				iteratorC.remove();
+			}
+		}
+
+		final Iterator<Equation> iteratorAC = attributeConstraints.iterator();
+		while (iteratorAC.hasNext()) {
+			String parentFeature = null;
+			final Equation attributeConstraint = iteratorAC.next();
+
+			for (final WeightedTerm term : attributeConstraint.getWeightedTerms()) {
+				/*
+				 * go through all terms in equation if there is one, that has a parent which is not present in attributes, we see, that it is equations parent
+				 */
+				if (!attributes.containsValue(term.getReference().toString())) {
+					parentFeature = term.getReference().toString();
+					break;
+				}
+			}
+
+			if (featureName.equals(parentFeature)) {
+				childAttributeConstraints.add(attributeConstraint);
+				iteratorAC.remove();
+			}
+
+		}
+
+		final boolean hasDescription = (description != null) && !description.isEmpty();
+		final boolean hasConstraints = (childConstraints != null) && !childConstraints.isEmpty();
+		final boolean hasAttributeConstraints = (childAttributeConstraints != null) && !childAttributeConstraints.isEmpty();
+		final boolean hasAttributes = attributes.containsValue(featureName);
+
+		if ((feature.getChildrenCount() == 0) && !hasDescription && !hasConstraints && !hasAttributes && !hasAttributeConstraints) {
+			sb.append(";");
+		} else {
+			sb.append(" {");
+			sb.append(NEWLINE);
+			if (hasDescription) {
+				writeTab(depth + 1);
+				sb.append("description \"");
+				sb.append(description.replace("\"", "\\\""));
+				sb.append("\";");
+				sb.append(NEWLINE);
+			}
+			if (hasAttributes) {
+				for (final Entry<String, String> attr : attributes.entrySet()) {
+					if (attr.getValue().equals(featureName)) {
+						writeTab(depth + 1);
+						sb.append(attr.getKey());
+						sb.append(NEWLINE);
+					}
+				}
+			}
+			if (hasAttributeConstraints) {
+				for (final Equation attributeConstraint : childAttributeConstraints) {
+
+					writeAttributeConstraint(attributes, attributeConstraint, featureName, depth);
+				}
+			}
+			if (hasConstraints) {
+				for (final IConstraint constraint : childConstraints) {
+
+					writeConstraint(constraint, depth);
+
+				}
+
+			}
+			writeFeatureGroup(feature, depth, constraints, attributes, attributeConstraints);
+			writeTab(depth);
+			sb.append("}");
+		}
+
+		sb.append(NEWLINE);
+	}
+
+	private void writeTab(int times) {
+		for (int i = 0; i < times; i++) {
+			sb.append('\t');
+		}
+	}
+
+	@Override
+	public ProblemList read(IFeatureModel object, CharSequence source) {
+		problemList = new ProblemList();
+		factory = MultiFeatureModelFactory.getInstance();
+		extFeatureModel = (MultiFeatureModel) object;
+		if (extFeatureModel != null) {
+			featureModelFile = extFeatureModel.getSourceFile().toFile();
+		}
+		final ByteArrayInputStream inputstr = new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		try {
+			parseInputStream(inputstr);
+		} catch (final UnsupportedModelException e) {
+			problemList.add(new Problem(e, e.lineNumber));
+		}
+		return problemList;
+	}
+
+	protected synchronized void parseInputStream(final InputStream inputStream) throws UnsupportedModelException {
+		CharStream charStream = null;
+		try {
+			charStream = CharStreams.fromStream(inputStream);
+		} catch (final IOException e) {
+			Logger.logError(e);
+			throw new UnsupportedModelException("Error while reading model!", 0);
+		}
+		init();
+		final VelvetLexer lexer = new VelvetLexer(charStream);
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+		final VelvetParser parser = new VelvetParser(tokens);
+		final VelvetVisitorImpl visitor = new VelvetVisitorImpl(this);
+
+		final ParseTree tree = parser.velvetModel();
+		visitor.visit(tree);
+	}
+
+	/**
+	 * Initializes all variables.
 	 */
+	private void init() {
+		extFeatureModel.reset();
+		extFeatureModelName = null;
+		extFeatureModel.setInterface(false);
+
+	}
+
 	@Override
 	public String getSuffix() {
-		// TODO Auto-generated method stub
-		return null;
+		return "velvet";
+	}
+
+	@Override
+	public SimpleVelvetFeatureModelFormat getInstance() {
+		return new SimpleVelvetFeatureModelFormat(this);
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, MultiFeatureModelFactory.ID);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getName() {
+		return "Simple Velvet";
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IExtension#getId()
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getExtFeatureModelName()
 	 */
 	@Override
-	public String getId() {
+	public String getExtFeatureModelName() {
+		return extFeatureModelName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getExtFeatureModel()
+	 */
+	@Override
+	public MultiFeatureModel getExtFeatureModel() {
+		return extFeatureModel;
+	}
+
+	@Override
+	public void setExtFeatureModelName(String name) {
+		extFeatureModelName = name;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getFeatureModelFile()
+	 */
+	@Override
+	public File getFeatureModelFile() {
+		// TODO Auto-generated method stub
+		return featureModelFile;
+	}
+
+	@Override
+	public boolean isVelvetImport() {
+		return velvetImport;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getLocalSearch()
+	 */
+	@Override
+	public boolean getLocalSearch() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getIsUsedAsAPI()
+	 */
+	@Override
+	public boolean getIsUsedAsAPI() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String[] getPaths() {
+
+		return paths;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.velvet.IVelvetFeatureModelFormat#getProject()
+	 */
+	@Override
+	public IProject getProject() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	/*
-	 * public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName(); protected Path
-	 * featureModelFile; protected ProblemList problemList; private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast",
-	 * "atmost" }; private static final String NEWLINE = System.getProperty("line.separator", "\n"); private final StringBuilder sb = new StringBuilder();
-	 * public SimpleVelvetFeatureModelFormat() { super(); } public SimpleVelvetFeatureModelFormat(AFeatureModelFormat oldFormat) { super(oldFormat); }
-	 * @Override public boolean supportsRead() { return true; }
-	 * @Override public boolean supportsWrite() { return true; }
-	 * @Override public String write(IFeatureModel object) { if (object instanceof MultiFeatureModel) { extFeatureModel = (MultiFeatureModel) object; } final
-	 * IFeatureStructure root = object.getStructure().getRoot(); sb.delete(0, sb.length()); sb.append("concept "); sb.append(root.getFeature().getName());
-	 * sb.append(" {"); sb.append(NEWLINE); if (extFeatureModel != null) { for (final IFeatureStructure child : root.getChildren()) { writeNewDefined(child, 1);
-	 * } for (final IConstraint constraint : object.getConstraints()) { if (((MultiConstraint) constraint).getType() == MultiFeature.TYPE_INTERN) {
-	 * sb.append("\tconstraint "); sb.append(constraint.getNode().toString(SYMBOLS)); sb.append(";"); sb.append(NEWLINE); } } } else { writeFeatureGroup(root,
-	 * 1); for (final IConstraint constraint : object.getConstraints()) { sb.append("\tconstraint "); sb.append(constraint.getNode().toString(SYMBOLS));
-	 * sb.append(";"); sb.append(NEWLINE); } } sb.append("}"); return sb.toString(); } private void writeFeatureGroup(IFeatureStructure root, int depth) { if
-	 * (root.isAnd()) { for (final IFeatureStructure feature : root.getChildren()) { writeFeature(feature, depth + 1); } } else if (root.isOr()) {
-	 * writeTab(depth + 1); sb.append("someOf {"); sb.append(NEWLINE); for (final IFeatureStructure feature : root.getChildren()) { writeFeature(feature, depth
-	 * + 2); } writeTab(depth + 1); sb.append("}"); sb.append(NEWLINE); } else if (root.isAlternative()) { writeTab(depth + 1); sb.append("oneOf {");
-	 * sb.append(NEWLINE); for (final IFeatureStructure f : root.getChildren()) { writeFeature(f, depth + 2); } writeTab(depth + 1); sb.append("}");
-	 * sb.append(NEWLINE); } } private void writeFeature(IFeatureStructure feature, int depth) { writeTab(depth); if (feature.isAbstract()) {
-	 * sb.append("abstract "); } if (feature.isMandatory() && ((feature.getParent() == null) || feature.getParent().isAnd())) { sb.append("mandatory "); }
-	 * sb.append("feature "); sb.append(feature.getFeature().getName()); final String description = feature.getFeature().getProperty().getDescription(); final
-	 * boolean hasDescription = (description != null) && !description.isEmpty(); if ((feature.getChildrenCount() == 0) && !hasDescription) { sb.append(";"); }
-	 * else { sb.append(" {"); sb.append(NEWLINE); if (hasDescription) { writeTab(depth + 1); sb.append("description \""); sb.append(description.replace("\"",
-	 * "\\\"")); sb.append("\";"); sb.append(NEWLINE); } writeFeatureGroup(feature, depth); writeTab(depth); sb.append("}"); } sb.append(NEWLINE); } private
-	 * void writeNewDefined(IFeatureStructure child2, int depth) { writeFeature(child2, 1); for (final IFeatureStructure child : child2.getChildren()) {
-	 * writeNewDefined(child, depth); } } private void writeTab(int times) { for (int i = 0; i < times; i++) { sb.append('\t'); } }
-	 * @Override public ProblemList read(IFeatureModel object, CharSequence source) { problemList = new ProblemList(); factory =
-	 * MultiFeatureModelFactory.getInstance(); extFeatureModel = (MultiFeatureModel) object; if (extFeatureModel != null) { featureModelFile =
-	 * extFeatureModel.getSourceFile(); } final ByteArrayInputStream inputstr = new
-	 * ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8"))); try { parseInputStream(inputstr); } catch (final
-	 * UnsupportedModelException e) { problemList.add(new Problem(e, e.lineNumber)); } return problemList; } private static class ConstraintNode { private final
-	 * Node computedNode; private final Tree rawNode; public ConstraintNode(Node computedNode, Tree rawNode) { this.computedNode = computedNode; this.rawNode =
-	 * rawNode; } } private static final int[] binaryOperators = { VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES,
-	 * VelvetParser.OP_EQUIVALENT }; private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<>(); private final LinkedList<IFeature>
-	 * parentStack = new LinkedList<>(); private final LinkedList<ConstraintNode> constraintNodeList = new LinkedList<>(); private final HashSet<String>
-	 * usedVariables = new HashSet<>(); private final boolean velvetImport = false; private MultiFeatureModel extFeatureModel; private String
-	 * extFeatureModelName; private static WeightedTerm createTerm(final int weight, final boolean rightSide, final boolean minus, final Reference reference) {
-	 * boolean positive = weight >= 0; if (rightSide ^ minus) { positive = !positive; } return new WeightedTerm(Math.abs(weight), positive, reference); }
-	 * private static LinkedList<Tree> getChildren(final Tree root) { final LinkedList<Tree> children = new LinkedList<>(); final int childCount =
-	 * root.getChildCount(); for (int i = 0; i < childCount; i++) { children.add(root.getChild(i)); } return children; } protected synchronized void
-	 * parseInputStream(final InputStream inputStream) throws UnsupportedModelException { CharStream charStream = null; try { charStream =
-	 * CharStreams.fromStream(inputStream); } catch (final IOException e) { Logger.logError(e); throw new
-	 * UnsupportedModelException("Error while reading model!", 0); } final VelvetLexer lexer = new VelvetLexer(charStream); final CommonTokenStream tokens = new
-	 * CommonTokenStream(lexer); final VelvetParser parser = new VelvetParser(tokens); final ParseTree root = parser.velvetModel(); init(); parseModel(root);
-	 * parseAttributeConstraints(); } private MultiFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean
-	 * isAbstract, final boolean isHidden) { final MultiFeature newFeature = (MultiFeature) factory.createFeature(extFeatureModel, featureName);
-	 * newFeature.getStructure().setMandatory(isMandatory); newFeature.getStructure().setAbstract(isAbstract); newFeature.getStructure().setHidden(isHidden);
-	 * final IFeature orgFeature = extFeatureModel.getFeature(featureName); if ((orgFeature != null) && (orgFeature instanceof MultiFeature)) { return
-	 * (MultiFeature) orgFeature; } else { extFeatureModel.addFeature(newFeature); parent.getStructure().addChild(newFeature.getStructure());
-	 * newFeature.setNewDefined(true); return newFeature; } } private String checkNode(Node curNode) { if (curNode instanceof Literal) { final Literal literal =
-	 * (Literal) curNode; final String varString = literal.var.toString(); if (extFeatureModel.getFeature(varString) == null) { return literal.var.toString(); }
-	 * } else { for (final Node child : curNode.getChildren()) { final String childRet = checkNode(child); if (childRet != null) { return childRet; } } } return
-	 * null; }
-	 *//**
-		 * Initializes all variables.
-		 *//*
-			 * private void init() { atrributeConstraintNodes.clear(); parentStack.clear(); constraintNodeList.clear(); usedVariables.clear();
-			 * extFeatureModel.reset(); extFeatureModelName = null; extFeatureModel.setInterface(false); } private void parseAttribute(final Tree root, final
-			 * IFeature parent) throws RecognitionException { final LinkedList<Tree> nodeList = getChildren(root); final Tree valueNode = nodeList.poll();
-			 * switch (valueNode.getType()) { case VelvetParser.FLOAT: break; case VelvetParser.INT: extFeatureModel.addAttribute(parent.getName(), name,
-			 * Integer.parseInt(valueNode.getText())); break; case VelvetParser.BOOLEAN: extFeatureModel.addAttribute(parent.getName(), name,
-			 * Boolean.parseBoolean(valueNode.getText())); break; case VelvetParser.STRING: final String valueNodeText = valueNode.getText();
-			 * extFeatureModel.addAttribute(parent.getName(), name, valueNodeText.substring(1, valueNodeText.length() - 1)); break; default:
-			 * reportSyntaxError(valueNode); } } private void parseAttributeConstraints() throws UnsupportedModelException, RecognitionException { while
-			 * (!atrributeConstraintNodes.isEmpty()) { final LinkedList<Tree> nodeList = getChildren(atrributeConstraintNodes.poll()); final
-			 * LinkedList<WeightedTerm> weightedTerms = new LinkedList<>(); RelationOperator relationOperator = null; boolean minus = false; int degree = 0;
-			 * while (!nodeList.isEmpty()) { final Tree curNode = nodeList.poll(); switch (curNode.getType()) { case VelvetParser.ID: case VelvetParser.IDPath:
-			 * final String attributeName = curNode.getText(); final Collection<FeatureAttribute<Integer>> attributes =
-			 * extFeatureModel.getIntegerAttributes().getAttributes(attributeName); if (attributes == null) { throw new
-			 * UnsupportedModelException(curNode.getLine() + ":" + curNode.getCharPositionInLine() + NO_SUCH_ATTRIBUTE_DEFINED_, curNode.getLine()); } for
-			 * (final FeatureAttribute<Integer> attr : attributes) { weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus, new
-			 * Reference(attr.getFeatureName(), ReferenceType.FEATURE, attributeName))); } break; // case VelvetParser.FLOAT: // break; case VelvetParser.INT:
-			 * final int value = Integer.parseInt(curNode.getText()); if ((relationOperator == null) ^ minus) { degree -= value; } else { degree += value; }
-			 * break; case VelvetParser.PLUS: minus = false; break; case VelvetParser.MINUS: minus = true; break; case VelvetParser.ATTR_OP_EQUALS:
-			 * relationOperator = RelationOperator.EQUAL; break; case VelvetParser.ATTR_OP_NOT_EQUALS: relationOperator = RelationOperator.NOT_EQUAL; break;
-			 * case VelvetParser.ATTR_OP_GREATER: relationOperator = RelationOperator.GREATER; break; case VelvetParser.ATTR_OP_GREATER_EQ: relationOperator =
-			 * RelationOperator.GREATER_EQUAL; break; case VelvetParser.ATTR_OP_LESS: relationOperator = RelationOperator.LESS; break; case
-			 * VelvetParser.ATTR_OP_LESS_EQ: relationOperator = RelationOperator.LESS_EQUAL; break; default: reportSyntaxError(curNode); } } final Equation
-			 * equation = new Equation(weightedTerms, relationOperator, degree); extFeatureModel.addAttributeConstraint(equation); } } private void
-			 * parseConcept(final Tree root) throws RecognitionException { final LinkedList<Tree> nodeList = getChildren(root); while (!nodeList.isEmpty()) {
-			 * final Tree curNode = nodeList.poll(); switch (curNode.getType()) { case VelvetParser.ID: extFeatureModelName = checkTree(curNode).getText();
-			 * final MultiFeature rootFeature = (MultiFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
-			 * rootFeature.getStructure().setAbstract(true); rootFeature.getStructure().setMandatory(true); extFeatureModel.addFeature(rootFeature);
-			 * extFeatureModel.getStructure().setRoot(rootFeature.getStructure()); parentStack.push(rootFeature); break; case VelvetParser.BASEEXT:
-			 * reportWarning(curNode, "Inheritance are not supported."); break; case VelvetParser.IMPORTINSTANCE: reportWarning(curNode,
-			 * "Instances are not supported."); break; case VelvetParser.IMPORTINTERFACE: reportWarning(curNode, "Interfaces are not supported."); break; case
-			 * VelvetParser.DEF: parseDefinitions(curNode); break; default: reportSyntaxError(curNode); } } for (final ConstraintNode constraintNode :
-			 * constraintNodeList) { final String nameError = checkNode(constraintNode.computedNode); if (nameError == null) {
-			 * extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode)); } else {
-			 * reportWarning(constraintNode.rawNode, format("There is no feature with the name %s.", nameError)); } } } private void parseConstraint(final Tree
-			 * root, final IFeature parent) throws RecognitionException { final LinkedList<Tree> nodeList = getChildren(root); while (!nodeList.isEmpty()) {
-			 * final Tree curNode = nodeList.poll(); switch (curNode.getType()) { case VelvetParser.ID: // name = curNode.getText(); break; case
-			 * VelvetParser.CONSTR: Node newNode = parseConstraint_rec(curNode); newNode = new Implies(new Literal(parent.getName()), newNode);
-			 * constraintNodeList.add(new ConstraintNode(newNode, curNode)); break; case VelvetParser.ACONSTR: atrributeConstraintNodes.add(curNode); break;
-			 * default: reportSyntaxError(curNode); } } } private Node parseConstraint_rec(final Tree root) throws RecognitionException { final LinkedList<Tree>
-			 * nodeList = getChildren(root); final LinkedList<Node> nodes = new LinkedList<>(); final LinkedList<Integer> operators = new LinkedList<>(); final
-			 * LinkedList<Integer> unaryOp = new LinkedList<>(); Node n = null; while (!nodeList.isEmpty()) { final Tree curNode = nodeList.poll(); switch
-			 * (curNode.getType()) { case VelvetParser.UNARYOP: unaryOp.push(curNode.getChild(0).getType()); break; case VelvetParser.CONSTR: n =
-			 * parseConstraint_rec(curNode); break; case VelvetParser.OPERAND: n = new Literal(curNode.getChild(0).getText()); break; default:
-			 * operators.add(curNode.getType()); } if (n != null) { while (!unaryOp.isEmpty()) { switch (unaryOp.pop()) { case VelvetParser.OP_NOT: n = new
-			 * Not(n); } } nodes.add(n); n = null; } } if (!operators.isEmpty()) { for (final int operator : binaryOperators) { final ListIterator<Node> nodesIt
-			 * = nodes.listIterator(); for (final ListIterator<Integer> opIt = operators.listIterator(); opIt.hasNext();) { final Node operand1 =
-			 * nodesIt.next(); if (opIt.next() == operator) { opIt.remove(); nodesIt.remove(); final Node operand2 = nodesIt.next(); switch (operator) { case
-			 * VelvetParser.OP_AND: nodesIt.set(new And(operand1, operand2)); break; case VelvetParser.OP_OR: nodesIt.set(new Or(operand1, operand2)); break;
-			 * case VelvetParser.OP_XOR: nodesIt.set(new Choose(1, operand1, operand2)); break; case VelvetParser.OP_IMPLIES: nodesIt.set(new Implies(operand1,
-			 * operand2)); break; case VelvetParser.OP_EQUIVALENT: nodesIt.set(new Equals(operand1, operand2)); break; } nodesIt.previous(); } } } } if
-			 * (nodes.isEmpty()) { return null; } return nodes.getFirst(); } private void parseDefinitions(final Tree root) throws RecognitionException { final
-			 * LinkedList<Tree> nodeList = getChildren(root); final IFeature parentFeature = parentStack.pop(); parentFeature.getStructure().setAnd(); while
-			 * (!nodeList.isEmpty()) { final Tree curNode = nodeList.poll(); switch (curNode.getType()) { // Feature case VelvetParser.FEATURE:
-			 * parseFeature(curNode, parentFeature); break; // Feature-Group case VelvetParser.GROUP: parseFeatureGroup(curNode, parentFeature); break; //
-			 * Constraint case VelvetParser.CONSTRAINT: parseConstraint(curNode, parentFeature); break; // Use case VelvetParser.USE: parseUse(curNode,
-			 * parentFeature); break; // Attribute case VelvetParser.ATTR: parseAttribute(curNode, parentFeature); break; case VelvetParser.DESCRIPTION:
-			 * parseDescription(curNode, parentFeature); break; case VelvetParser.EMPTY: break; default: reportSyntaxError(curNode); } } } private void
-			 * parseDescription(Tree root, IFeature parent) throws RecognitionException { final LinkedList<Tree> nodeList = getChildren(root); final Tree
-			 * valueNode = nodeList.poll(); switch (valueNode.getType()) { case VelvetParser.STRING: final String valueNodeText = valueNode.getText();
-			 * parent.getProperty().setDescription(valueNodeText.substring(1, valueNodeText.length() - 1).replace("\\\"", "\"")); break; default:
-			 * reportSyntaxError(valueNode); } } private void parseFeature(final Tree root, IFeature parent) throws RecognitionException { final
-			 * LinkedList<Tree> childList = getChildren(root); final String featureName; if (extFeatureModel.isInterface()) { featureName =
-			 * checkTree(childList.poll()).getText(); } else { if (velvetImport || parent.getStructure().isRoot()) { featureName =
-			 * checkTree(childList.poll()).getText(); } else { featureName = parent.getName() + "." + checkTree(childList.poll()).getText(); } } boolean
-			 * isMandatory = false, isAbstract = false, moreDefinitions = false; Tree childNode = null; while (!childList.isEmpty() && !moreDefinitions) {
-			 * childNode = childList.poll(); switch (childNode.getType()) { case VelvetParser.MANDATORY: isMandatory = true; break; case VelvetParser.ABSTRACT:
-			 * isAbstract = true; break; case VelvetParser.DEF: moreDefinitions = true; break; default: reportSyntaxError(childNode); } } if ((validator !=
-			 * null) && !validator.isValidFeatureName(featureName)) { problemList.add(new Problem(featureName + " is not a valid feature name", root.getLine(),
-			 * de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR)); } final MultiFeature newFeature = addFeature(parent, featureName, isMandatory,
-			 * isAbstract, false); if (moreDefinitions) { parentStack.push(newFeature); parseDefinitions(childNode); } } private void parseFeatureGroup(final
-			 * Tree root, final IFeature parent) throws RecognitionException { final LinkedList<Tree> nodeList = getChildren(root); while (!nodeList.isEmpty())
-			 * { final Tree curNode = nodeList.poll(); switch (curNode.getType()) { case VelvetParser.SOMEOF: parent.getStructure().setOr(); break; case
-			 * VelvetParser.ONEOF: parent.getStructure().setAlternative(); break; case VelvetParser.FEATURE: parseFeature(curNode, parent); break; default:
-			 * reportSyntaxError(curNode); } } } private void parseModel(final Tree root) throws RecognitionException { final LinkedList<Tree> nodeList =
-			 * getChildren(root); while (!nodeList.isEmpty()) { final Tree curNode = nodeList.poll(); switch (curNode.getType()) { case VelvetParser.CONCEPT:
-			 * parseConcept(curNode); break; case VelvetParser.CINTERFACE: extFeatureModel.setInterface(true); parseConcept(curNode); break; case
-			 * VelvetParser.EOF: if (curNode.getTokenStartIndex() > -1) { break; } default: reportSyntaxError(curNode); } } } private void parseUse(Tree root,
-			 * IFeature parent) throws RecognitionException { reportWarning(root, "USE is not supported."); } private void reportWarning(Tree curNode, String
-			 * message) { Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getFileName()
-			 * : "") + ": \"" + curNode.getText() + "\")"); }
-			 * @Override public String getSuffix() { return "velvet"; }
-			 * @Override public SimpleVelvetFeatureModelFormat getInstance() { return new SimpleVelvetFeatureModelFormat(this); }
-			 * @Override public String getId() { return ID; }
-			 * @Override public boolean initExtension() { if (super.initExtension()) {
-			 * FMFactoryManager.getInstance().getDefaultFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, MultiFeatureModelFactory.ID); return
-			 * true; } return false; }
-			 * @Override public String getName() { return "Simple Velevet"; }
-			 */
-
 }
