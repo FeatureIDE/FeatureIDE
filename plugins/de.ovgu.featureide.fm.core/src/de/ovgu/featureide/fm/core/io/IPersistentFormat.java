@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io;
 import java.nio.file.Path;
 
 import de.ovgu.featureide.fm.core.IExtension;
+import de.ovgu.featureide.fm.core.base.impl.MultiFeatureModel;
 
 /**
  * Interface for reading and writing data from and to arbitrary objects.
@@ -57,6 +58,11 @@ public interface IPersistentFormat<T> extends IExtension {
 	 * @see #supportsRead()
 	 */
 	default ProblemList read(T object, CharSequence source, Path path) {
+		if (object instanceof MultiFeatureModel) {
+			final MultiFeatureModel extFeatureModel = (MultiFeatureModel) object;
+			extFeatureModel.setSourceFile(path);
+			object = (T) extFeatureModel;
+		}
 		return read(object, source);
 	}
 
