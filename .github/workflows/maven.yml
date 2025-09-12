@@ -39,7 +39,7 @@ jobs:
       run: mvn -B compile --file pom.xml
 
   build-update-site:
-    if: ${{ github.event.pull_request.merged }}
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     needs: build
 
