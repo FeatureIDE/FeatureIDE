@@ -1,5 +1,6 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ * 					  2025  Malte Grave, VaSiCS, LIT CPS Lab, Johannes Kepler University, Linz
  *
  * This file is part of FeatureIDE.
  *
@@ -38,26 +39,38 @@ import org.eclipse.swt.widgets.ToolItem;
  * @author Jonas Weigt
  * @author Christian Harnisch
  * @author Marcus Pinnecke
+ * @author Malte Grave
  */
 
 public class ToolBarMenuManager extends MenuManager {
 
-	private Image image;
+	private ImageDescriptor imageDescriptor;
 
 	public ToolBarMenuManager(String text) {
 		super(text);
 	}
 
-	public ToolBarMenuManager(String text, ImageDescriptor image, String id) {
-		super(text, image, id);
-		this.image = image.createImage();
+	public ToolBarMenuManager(String text, ImageDescriptor imageDescriptor, String id) {
+		super(text, imageDescriptor, id);
+		this.imageDescriptor = imageDescriptor;
 	}
 
 	@Override
 	public void fill(final ToolBar toolbar, int index) {
 		final ToolItem toolItem = (index >= 0) ? new ToolItem(toolbar, SWT.DROP_DOWN, index) : new ToolItem(toolbar, SWT.DROP_DOWN);
 		toolItem.setText(getMenuText());
-		toolItem.setImage(image);
+
+		if (imageDescriptor != null) {
+			final Image img = imageDescriptor.createImage();
+			toolItem.setImage(img);
+
+			toolItem.addDisposeListener(e -> {
+				if ((img != null) && !img.isDisposed()) {
+					img.dispose();
+				}
+			});
+		}
+
 		toolItem.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -73,15 +86,4 @@ public class ToolBarMenuManager extends MenuManager {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.MenuManager#dispose()
-	 */
-	@Override
-	public void dispose() {
-		image.dispose();
-		super.dispose();
-	}
-
 }
