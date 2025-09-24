@@ -1,5 +1,6 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
+ *                    2025  Malte Grave, VaSiCS, LIT CPS Lab, Johannes Kepler University, Linz
  *
  * This file is part of FeatureIDE.
  *
@@ -22,7 +23,6 @@ package de.ovgu.featureide.fm.ui;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -31,10 +31,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -90,11 +87,12 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Image getImage(String name) {
-		final URL url = FileLocator.find(Platform.getBundle(PLUGIN_ID), new Path("icons/" + name), null);
-		if (url != null) {
-			return ImageDescriptor.createFromURL(url).createImage();
+		final ImageDescriptor descriptor = getDefault().getImageDescriptor("icons/" + name);
+		if (descriptor != null) {
+			return descriptor.createImage();
 		} else {
-			getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, "Image not found: " + name));
+			final IStatus status = new Status(IStatus.WARNING, PLUGIN_ID, "[FeatureIDE] Image not found: icons/" + name);
+			getDefault().getLog().log(status);
 			return null;
 		}
 	}
