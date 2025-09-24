@@ -1,6 +1,6 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2019  FeatureIDE team, University of Magdeburg, Germany
- *
+ *                    2025  Malte Grave, VaSiCS, LIT CPS Lab, Johannes Kepler University, Linz
  * This file is part of FeatureIDE.
  *
  * FeatureIDE is free software: you can redistribute it and/or modify
@@ -580,7 +580,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				return true;
 			}
 		}, ANALYZE_FEATURE_MODEL);
-		analyzeJob.setJobPriority(Job.LONG);
 		LongRunningWrapper.startJob(analysisToken, analyzeJob);
 
 	}
