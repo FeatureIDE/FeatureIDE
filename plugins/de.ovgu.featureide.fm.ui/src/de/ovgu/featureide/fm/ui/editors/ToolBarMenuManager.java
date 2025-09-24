@@ -80,8 +80,8 @@ public class ToolBarMenuManager extends MenuManager {
 	 */
 	@Override
 	public void dispose() {
-		super.dispose();
 		image.dispose();
+		super.dispose();
 	}
 
 }
