@@ -38,8 +38,6 @@ public class FeatureIDECLI {
 			System.err.println("No operation specified!");
 			return;
 		}
-		System.err.println(Arrays.asList(args));
-
 		final String functionName = args[0];
 
 		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());

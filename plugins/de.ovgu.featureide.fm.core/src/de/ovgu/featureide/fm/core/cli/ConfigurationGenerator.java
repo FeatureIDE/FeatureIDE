@@ -225,11 +225,11 @@ public class ConfigurationGenerator extends ACLIFunction {
 					break;
 				}
 				default: {
-					throw new IllegalArgumentException(arg);
+					throw new IllegalArgumentException("Unknown argument: " + arg);
 				}
 				}
 			} else {
-				throw new IllegalArgumentException(arg);
+				throw new IllegalArgumentException("Unknown value: " + arg);
 			}
 		}
 	}
