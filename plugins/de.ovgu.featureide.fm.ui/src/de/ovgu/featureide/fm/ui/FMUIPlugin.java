@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_FEATURE_MODEL_FOR_THE_CURRENT_PROJECT;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -30,6 +31,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -83,7 +90,13 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Image getImage(String name) {
-		return getDefault().getImageDescriptor("icons/" + name).createImage();
+		final URL url = FileLocator.find(Platform.getBundle(PLUGIN_ID), new Path("icons/" + name), null);
+		if (url != null) {
+			return ImageDescriptor.createFromURL(url).createImage();
+		} else {
+			getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, "Image not found: " + name));
+			return null;
+		}
 	}
 
 	/**
