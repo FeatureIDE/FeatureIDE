@@ -116,7 +116,7 @@ public class TExtendedFeatureModel {
 		assertEquals(class1, class2);
 
 		if (!unequalFields.contains(fieldName)) {
-			assertEquals(o1, o2);
+			assertEquals("values for " + fieldName + " are not equal", o1, o2);
 		}
 
 		if (class1.isPrimitive() || wrapperClasses.contains(class1)) {
@@ -124,7 +124,7 @@ public class TExtendedFeatureModel {
 		}
 
 		if (!sameFields.contains(fieldName)) {
-			assertNotSame(o1, o2);
+			assertNotSame("values for " + fieldName + " are the same", o1, o2);
 		}
 
 		ArrayList<Field> allFields = new ArrayList<>();
@@ -172,11 +172,15 @@ public class TExtendedFeatureModel {
 				}
 				assertFalse(iterator2.hasNext());
 			} else if (field.getType().isArray()) {
-				Object[] array1 = (Object[]) i1;
-				Object[] array2 = (Object[]) i2;
-				assertEquals(array1.length, array2.length);
-				for (int i = 0; i < array1.length; i++) {
-					classesUseDifferentMemory(array1[i], array2[i], depth + 1, childName + i, alreadyChecked);
+				if (i1 instanceof Object[]) {
+					Object[] array1 = (Object[]) i1;
+					Object[] array2 = (Object[]) i2;
+					assertEquals(array1.length, array2.length);
+					for (int i = 0; i < array1.length; i++) {
+						classesUseDifferentMemory(array1[i], array2[i], depth + 1, childName + i, alreadyChecked);
+					}
+				} else {
+					assertEquals(i1, i2);
 				}
 			} else {
 				classesUseDifferentMemory(i1, i2, depth + 1, childName, alreadyChecked);

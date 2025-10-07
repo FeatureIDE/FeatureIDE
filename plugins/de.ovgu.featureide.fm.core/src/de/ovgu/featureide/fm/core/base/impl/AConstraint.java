@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.prop4j.Node;
 
@@ -47,7 +48,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final IPropertyContainer propertyContainer;
 
-	protected final List<IFeature> containedFeatureList = new ArrayList<>();
+	protected final List<String> containedFeatureList = new ArrayList<>();
 
 	protected Node propNode;
 	boolean featureSelected;
@@ -68,7 +69,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public AConstraint(IConstraint oldConstraint, IFeatureModel featureModel, boolean copyId) {
 		super(oldConstraint, featureModel, copyId);
 		setNode(oldConstraint.getNode().clone());
-		description = oldConstraint.getDescription();
+		description = new String(oldConstraint.getDescription());
 		tags = new HashSet<>(oldConstraint.getTags());
 		propertyContainer = new MapPropertyContainer(oldConstraint.getCustomProperties());
 		if (oldConstraint instanceof AConstraint) {
@@ -106,7 +107,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public Collection<IFeature> getContainedFeatures() {
 		synchronized (containedFeatureList) {
-			return new ArrayList<>(containedFeatureList);
+			return new ArrayList<>(containedFeatureList.stream().map(featureModel::getFeature).collect(Collectors.toList()));
 		}
 	}
 
@@ -136,8 +137,9 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		synchronized (containedFeatureList) {
 			containedFeatureList.clear();
 			if (propNode != null) {
-				for (final String featureName : propNode.getContainedFeatures()) {
-					containedFeatureList.add(featureModel.getFeature(featureName));
+				final List<String> containedFeatureNames = propNode.getContainedFeatures();
+				for (final String containedFeatureName : containedFeatureNames) {
+					containedFeatureList.add(new String(containedFeatureName));
 				}
 			}
 		}
