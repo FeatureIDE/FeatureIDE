@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -58,11 +57,11 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 
 	private final FeatureModelFormula formula;
-	private final Collection<String> featureNames;
-	private final IFeatureModel featureModel;
+	private final Collection<String> featuresToKeep, featuresToRemove;
+	private final IFeatureModel slicedFeatureModel;
+	private final IFeatureModelFactory factory;
 	private final boolean useSlicing;
 
-	private IFeatureModel slicedFeatureModel;
 	private boolean slicingNecesary;
 
 	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
@@ -70,15 +69,18 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	}
 
 	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, boolean usePersistentFormula) {
-		if (usePersistentFormula) {
-			formula = FeatureModelManager.getInstance(featureModel).getPersistentFormula();
-			this.featureModel = formula.getFeatureModel();
-		} else {
-			formula = FeatureModelManager.getInstance(featureModel).getVariableFormula();
-			this.featureModel = featureModel;
-		}
+		formula = usePersistentFormula //
+			? FeatureModelManager.getInstance(featureModel).getPersistentFormula() //
+			: FeatureModelManager.getInstance(featureModel).getVariableFormula();
+
+		final IFeatureModel featureModelObject = formula.getFeatureModel();
+		factory = FMFactoryManager.getInstance().getFactory(featureModelObject);
+		slicedFeatureModel = featureModelObject.clone();
+		featuresToKeep = featureNames;
+		featuresToRemove = new HashSet<>(FeatureUtils.getFeatureNames(featureModelObject));
+		featuresToRemove.removeAll(featuresToKeep);
+
 		this.useSlicing = useSlicing;
-		this.featureNames = featureNames;
 	}
 
 	@Override
@@ -90,7 +92,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 			monitor.checkCancel();
 			final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
 			monitor.checkCancel();
-			merge(FMFactoryManager.getInstance().getFactory(featureModel), slicedFeatureModelCNF, featureTree, monitor.subTask(18));
+			merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
 		}
 
 		return featureTree;
@@ -98,19 +100,18 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		final HashSet<String> removeFeatures = new HashSet<>(FeatureUtils.getFeatureNames(featureModel));
-		removeFeatures.removeAll(featureNames);
-		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), removeFeatures), monitor.subTask(1));
+		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), featuresToRemove), monitor.subTask(1));
 	}
 
 	private IFeatureModel sliceTree(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Tree");
 		monitor.setRemainingWork(2);
 		slicingNecesary = false;
-		slicedFeatureModel = featureModel.clone();
 
 		IFeatureStructure root = slicedFeatureModel.getStructure().getRoot();
+		final List<IConstraint> constraints = new ArrayList<>(slicedFeatureModel.getConstraints());
 		slicedFeatureModel.reset();
+
 		postOrderProcessing(root);
 		if (isToBeRemoved(root)) {
 			if ((root.getChildrenCount() == 1) && root.getFirstChild().isMandatory()) {
@@ -126,17 +127,9 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		slicedFeatureModel.getStructure().setRoot(root);
 		monitor.step();
 
-		for (final IConstraint constaint : featureModel.getConstraints()) {
-			final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
-			boolean containsOnlyRemainingFeatures = !containedFeatures.isEmpty();
-			for (final IFeature feature : containedFeatures) {
-				if (!featureNames.contains(feature.getName())) {
-					containsOnlyRemainingFeatures = false;
-					break;
-				}
-			}
-			if (containsOnlyRemainingFeatures) {
-				slicedFeatureModel.addConstraint(constaint);
+		for (final IConstraint constraint : constraints) {
+			if (featuresToKeep.containsAll(constraint.getNode().getContainedFeatures())) {
+				slicedFeatureModel.addConstraint(constraint);
 			} else {
 				slicingNecesary = true;
 			}
@@ -311,7 +304,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	}
 
 	private boolean isToBeRemoved(final IFeatureStructure feat) {
-		return !featureNames.contains(feat.getFeature().getName());
+		return !featuresToKeep.contains(feat.getFeature().getName());
 	}
 
 }
