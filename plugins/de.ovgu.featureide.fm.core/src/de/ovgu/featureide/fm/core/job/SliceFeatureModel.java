@@ -42,12 +42,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Create mpl interfaces.
+ * Slices a feature model while preserving as much of its hierarchy and cross-tree constrains as possible.
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
@@ -56,8 +55,8 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
 
-	private final FeatureModelFormula formula;
 	private final Collection<String> featuresToKeep, featuresToRemove;
+	private final CNF cnfFormula;
 	private final IFeatureModel slicedFeatureModel;
 	private final IFeatureModelFactory factory;
 	private final boolean useSlicing;
@@ -65,17 +64,14 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private boolean slicingNecesary;
 
 	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
-		this(featureModel, featureNames, useSlicing, true);
+		this(new FeatureModelFormula(featureModel), featureNames, useSlicing);
 	}
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, boolean usePersistentFormula) {
-		formula = usePersistentFormula //
-			? FeatureModelManager.getInstance(featureModel).getPersistentFormula() //
-			: FeatureModelManager.getInstance(featureModel).getVariableFormula();
-
+	public SliceFeatureModel(FeatureModelFormula formula, Collection<String> featureNames, boolean useSlicing) {
 		final IFeatureModel featureModelObject = formula.getFeatureModel();
 		factory = FMFactoryManager.getInstance().getFactory(featureModelObject);
 		slicedFeatureModel = featureModelObject.clone();
+		cnfFormula = formula.getCNF();
 		featuresToKeep = featureNames;
 		featuresToRemove = new HashSet<>(FeatureUtils.getFeatureNames(featureModelObject));
 		featuresToRemove.removeAll(featuresToKeep);
@@ -100,7 +96,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		return LongRunningWrapper.runMethod(new CNFSlicer(formula.getCNF(), featuresToRemove), monitor.subTask(1));
+		return LongRunningWrapper.runMethod(new CNFSlicer(cnfFormula, featuresToRemove), monitor.subTask(1));
 	}
 
 	private IFeatureModel sliceTree(IMonitor<?> monitor) {

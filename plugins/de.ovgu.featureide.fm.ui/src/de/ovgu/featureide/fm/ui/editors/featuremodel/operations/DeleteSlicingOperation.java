@@ -71,7 +71,7 @@ public class DeleteSlicingOperation extends AbstractFeatureModelOperation {
 
 		oldModel = featureModel.clone();
 
-		final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, useSlicing, false);
+		final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, notSelectedFeatureNames, useSlicing);
 		final IFeatureModel slicingModel = LongRunningWrapper.runMethod(method);
 
 		replaceFeatureModel(featureModel, slicingModel);

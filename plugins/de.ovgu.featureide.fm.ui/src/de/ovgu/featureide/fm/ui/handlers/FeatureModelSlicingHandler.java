@@ -57,7 +57,7 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 				final Collection<String> selectedFeatures = (Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES);
-				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, selectedFeatures, true);
+				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(manager.getPersistentFormula(), selectedFeatures, true);
 
 				final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method, "Slicing Feature Model");
 				runner.addJobFinishedListener(finishedJob -> save(finishedJob, file, format));

@@ -353,7 +353,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
 		final ArrayList<LongRunningMethod<?>> arguments = new ArrayList<>(1);
-		arguments.add(new SliceFeatureModel(featureProject.getFeatureModel(), featureNames, true));
+		arguments.add(new SliceFeatureModel(featureProject.getFeatureModelManager().getPersistentFormula(), featureNames, true));
 		FMCorePlugin.startJobs(arguments, StringTable.CREATE_INTERFACE, true);
 	}
 
