@@ -87,7 +87,7 @@ public abstract class LazyParent extends Parent {
 		if (lazy) {
 			final TreeJob job = new StatisticTreeJob(this, expand);
 			final IRunner<Boolean> runner = LongRunningWrapper.getRunner(job, CALCULATE + this.getClass().getName());
-			runner.setPriority(Job.SHORT);
+			runner.setJobPriority(Job.SHORT);
 			if (runner instanceof LongRunningJob<?>) {
 				((LongRunningJob<?>) runner).addJobChangeListener(JobDoneListener.getInstance());
 			}

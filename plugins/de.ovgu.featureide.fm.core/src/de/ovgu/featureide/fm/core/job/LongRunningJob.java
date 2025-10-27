@@ -95,4 +95,9 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 		this.timeout = timeout;
 	}
 
+	@Override
+	public void setJobPriority(int priority) {
+		setPriority(priority);
+	}
+
 }

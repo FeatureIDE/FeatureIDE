@@ -847,7 +847,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					}
 				};
 				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(job, REFRESH_COLLABORATION_VIEW);
-				runner.setPriority(Job.SHORT);
+				runner.setJobPriority(Job.SHORT);
 				runner.schedule();
 			}
 		};
@@ -867,7 +867,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				configurations.add(configurationFile);
 			}
 			final IRunner<Void> updateGUIRunner = LongRunningWrapper.getRunner(updateGUIMethod, UPDATE_COLLABORATION_VIEW);
-			updateGUIRunner.setPriority(Job.LONG);
+			updateGUIRunner.setJobPriority(Job.LONG);
 			LongRunningWrapper.startJob(updateGuiToken, updateGUIRunner);
 		}
 	}

@@ -86,7 +86,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	protected AbstractJob(String name, int priority) {
 		super(name);
-		setPriority(priority);
+		setJobPriority(priority);
 	}
 
 	@SuppressWarnings("rawtypes")

@@ -580,7 +580,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				return true;
 			}
 		}, ANALYZE_FEATURE_MODEL);
-		analyzeJob.setPriority(Job.LONG);
+		analyzeJob.setJobPriority(Job.LONG);
 		LongRunningWrapper.startJob(analysisToken, analyzeJob);
 
 	}

@@ -99,7 +99,7 @@ public interface IJob<T> {
 
 	void schedule();
 
-	void setPriority(int priority);
+	void setJobPriority(int priority);
 
 	void setIntermediateFunction(Consumer<T> intermediateFunction);
 
