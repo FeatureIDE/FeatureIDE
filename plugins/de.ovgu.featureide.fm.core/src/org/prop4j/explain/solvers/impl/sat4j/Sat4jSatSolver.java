@@ -120,8 +120,7 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 		}
 		int index = getIndexFromVariable(variable);
 		if (index == 0) {
-			index = getOracle().nextFreeVarId(false);
-			getOracle().newVar(index);
+			index = getOracle().newVar();
 			variableIndexes.put(variable, index);
 			indexVariables.put(index, variable);
 		}

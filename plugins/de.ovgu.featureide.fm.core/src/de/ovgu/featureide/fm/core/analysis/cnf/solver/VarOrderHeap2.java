@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 
-import org.sat4j.minisat.core.Heap;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ISolver;
@@ -48,7 +47,7 @@ public class VarOrderHeap2 extends VarOrderHeap {
 		}
 		phaseStrategy.init(nlength);
 		activity[0] = -1;
-		heap = new Heap(activity);
+		heap = createHeap(activity);
 		heap.setBounds(nlength);
 		nlength--;
 		for (int i = 0; i < nlength; i++) {

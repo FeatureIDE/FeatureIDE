@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.solver;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sat4j.minisat.constraints.cnf.UnitClause;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.specs.IConstr;
 
@@ -74,6 +75,9 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 		}
 		if (constr != null) {
 			try {
+				if (constr instanceof UnitClause) {
+					solver.unset(constr.get(0));
+				}
 				solver.removeConstr(constr);
 			} catch (final Exception e) {
 				throw new RuntimeContradictionException(e);
