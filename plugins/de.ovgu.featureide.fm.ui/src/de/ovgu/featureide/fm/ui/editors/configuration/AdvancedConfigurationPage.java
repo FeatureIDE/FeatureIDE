@@ -31,7 +31,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -43,9 +42,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.color.ColorPalette;
-import de.ovgu.featureide.fm.core.color.FeatureColor;
-import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -72,14 +68,11 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
 
-		final FeatureColor color = FeatureColorManager.getColor(feature);
-		final String imageString = image1.toString() + image2.toString() + (color != null ? color.getColorName() : "");
+		final String imageString = image1.toString() + image2.toString();
 		Image combinedImage = combinedImages.get(imageString);
 
 		if (combinedImage == null) {
 			final int distance = 4;
-			final int colorWidth = 24;
-			final int colorHeight = 12;
 
 			Image tempImage = null;
 			GC gc = null;
@@ -87,31 +80,15 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 				final ImageData imageData1 = image1.getImageData();
 				final ImageData imageData2 = image2.getImageData();
 
-				final int colorPositionX = imageData2.width + distance + imageData1.width + distance;
-				final int colorPositionY = (imageData1.height - colorHeight) / 2;
+				tempImage = new Image(Display.getCurrent(), imageData2.width + distance + imageData1.width, imageData1.height);
+				final ImageData data = tempImage.getImageData();
+				data.alpha = 0;
 
-				tempImage = new Image(Display.getCurrent(), colorPositionX + colorWidth + distance, imageData1.height);
-				final ImageData id = tempImage.getImageData();
-				id.alpha = 0;
-
-				combinedImage = new Image(Display.getCurrent(), id);
+				combinedImage = new Image(Display.getCurrent(), data);
 				gc = new GC(combinedImage);
 
 				gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, 0, 0, imageData2.width, imageData2.height);
 				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, imageData2.width + distance, 0, imageData1.width, imageData1.height);
-
-				if (color != FeatureColor.NO_COLOR) {
-					final Color bgColor = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
-					try {
-						gc.setBackground(bgColor);
-						gc.fillRoundRectangle(colorPositionX, colorPositionY, colorWidth, colorHeight, colorHeight, colorHeight);
-					} finally {
-						bgColor.dispose();
-					}
-				} else {
-					gc.setForeground(FMPropertyManager.getLegendBorderColor());
-					gc.drawRoundRectangle(colorPositionX, colorPositionY, colorWidth, colorHeight, colorHeight, colorHeight);
-				}
 
 				combinedImages.put(imageString, combinedImage);
 			} finally {
