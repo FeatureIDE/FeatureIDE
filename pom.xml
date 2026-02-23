@@ -8,8 +8,8 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho-version>5.0.0</tycho-version>
-		<tycho-extras-version>5.0.0</tycho-extras-version>
+		<tycho-version>5.0.2</tycho-version>
+		<tycho-extras-version>5.0.2</tycho-extras-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
@@ -289,8 +289,8 @@
 
 	<repositories>
 		<repository>
-			<id>2025-12</id>
-			<url>http://download.eclipse.org/releases/2025-12</url>
+			<id>2026-03</id>
+			<url>http://download.eclipse.org/releases/2026-03</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
