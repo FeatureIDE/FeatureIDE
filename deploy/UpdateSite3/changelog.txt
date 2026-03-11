@@ -4,6 +4,19 @@ Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found [here](https://github.com/FeatureIDE/FeatureIDE/milestones).
 This log contains an overview of enhancements and bug fixes for each release:
 
+### Release 3.12.0 (March 2026)
+* Adds functionality to specify custom timeouts for many analyses (#1480)
+* Fixes some compatibility issues
+  * Increases Sat4J version to 2.3.6
+  * Increase compatibility with newer Eclipse versions
+  * #1504, #1477 
+* Fixes problems with output formats
+  * SXFM (#1483)
+  * DIMACS (#1487) 
+* Fixes UI problems in configuration editor (#1510)
+* Fixes problems in feature model cloning (#1482)
+* Other minor bug fixes (#1476, #1478, #1479, #1481, #1486, #1489)
+
 ### Release 3.11.1 (March 2024)
 * Hotfix containing a GUI fix for the configuration editor on MacOS 
 
