@@ -223,37 +223,22 @@ Library.
 
    <plugin
          id="de.ovgu.featureide.core"
-         download-size="0"
-         install-size="0"
-         version="3.12.0.qualifier"
-         unpack="false"/>
+         version="3.12.0.qualifier"/>
 
    <plugin
          id="de.ovgu.featureide.ui"
-         download-size="0"
-         install-size="0"
-         version="3.12.0.qualifier"
-         unpack="false"/>
+         version="3.12.0.qualifier"/>
 
    <plugin
          id="de.ovgu.featureide.core.images"
-         download-size="0"
-         install-size="0"
-         version="3.12.0.qualifier"
-         unpack="false"/>
+         version="3.12.0.qualifier"/>
 
    <plugin
          id="de.ovgu.featureide.core.framework"
-         download-size="0"
-         install-size="0"
-         version="3.12.0.qualifier"
-         unpack="false"/>
+         version="3.12.0.qualifier"/>
 
    <plugin
          id="de.ovgu.featureide.core.runtime"
-         download-size="0"
-         install-size="0"
-         version="3.12.0.qualifier"
-         unpack="false"/>
+         version="3.12.0.qualifier"/>
 
 </feature>
