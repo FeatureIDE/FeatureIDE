@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.eclipse.core.runtime.jobs.Job;
-
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
@@ -170,15 +168,15 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 	@Override
 	public void setJobPriority(int priority) {
 		switch (priority) {
-		case Job.INTERACTIVE:
+		case 10:
 			setPriority(Thread.MAX_PRIORITY);
 			break;
-		case Job.SHORT:
+		case 20:
 			setPriority(Thread.NORM_PRIORITY);
 			break;
-		case Job.LONG:
-		case Job.BUILD:
-		case Job.DECORATE:
+		case 30:
+		case 40:
+		case 50:
 			setPriority(Thread.MIN_PRIORITY);
 			break;
 		default:
