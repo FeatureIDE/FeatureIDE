@@ -242,9 +242,7 @@ public class EmptySatSolver implements ISatSolver {
 	public void reset() {}
 
 	@Override
-	public void setTimeout(int timeout) {
-
-	}
+	public void setTimeout(long timeout) {}
 
 	@Override
 	public int[] getInternalSolution() {

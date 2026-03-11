@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.job.monitor.MonitorThread;
 public class CNFSlicer extends AbstractManipulator {
 
 	protected static final Comparator<LiteralSet> lengthComparator = new ClauseLengthComparatorDsc();
+	protected long solverTimeoutInMS = -1;
 
 	protected final CNF cnfCopy;
 
@@ -91,6 +92,19 @@ public class CNFSlicer extends AbstractManipulator {
 		super(orgCNF);
 		this.dirtyVariables = dirtyVariables;
 		cnfCopy = new CNF(orgCNF, false);
+	}
+
+	public long getSolverTimeout() {
+		return solverTimeoutInMS;
+	}
+
+	/**
+	 * A timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
+	 *
+	 * @param timeoutInMS the timeout in ms.
+	 */
+	public void setSolverTimeout(long solverTimeoutInMS) {
+		this.solverTimeoutInMS = solverTimeoutInMS;
 	}
 
 	int cr = 0, cnr = 0, dr = 0, dnr = 0;
@@ -343,7 +357,7 @@ public class CNFSlicer extends AbstractManipulator {
 		if (nextFeature.getClauseCount() > 0) {
 			addCleanClauses();
 
-			final ISimpleSatSolver solver = new SimpleSatSolver(cnfCopy);
+			final ISimpleSatSolver solver = new SimpleSatSolver(cnfCopy, solverTimeoutInMS);
 			solver.addClauses(cleanClauseList);
 			solver.addClauses(dirtyClauseList.subList(0, dirtyListPosIndex));
 
@@ -371,7 +385,7 @@ public class CNFSlicer extends AbstractManipulator {
 //				if (paths.get(dirtyGraph.getVertex(clause.getLiterals()[0]).getId()).hasStrongPath(clause.getLiterals()[1])) {
 //					deleteClause(clause);
 //				}
-////				dirtyGraph.addClause(clause);
+			////				dirtyGraph.addClause(clause);
 //			} else {
 //				for (final int literals : clause.getLiterals()) {
 //
@@ -397,7 +411,7 @@ public class CNFSlicer extends AbstractManipulator {
 
 			addCleanClauses();
 
-			final ISimpleSatSolver solver = new SimpleSatSolver(cnfCopy);
+			final ISimpleSatSolver solver = new SimpleSatSolver(cnfCopy, solverTimeoutInMS);
 			solver.addClauses(cleanClauseList);
 
 			// SAT Relevant
@@ -426,7 +440,7 @@ public class CNFSlicer extends AbstractManipulator {
 		heuristic = new MinimumClauseHeuristic(map, numberOfDirtyFeatures);
 		first = true;
 		try {
-			newSolver = new SimpleSatSolver(cnfCopy);
+			newSolver = new SimpleSatSolver(cnfCopy, solverTimeoutInMS);
 			// newSolver.addClauses(cleanClauseList);
 		} catch (final RuntimeContradictionException e) {
 			return false;

@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.analysis.cnf.Variables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -60,14 +61,53 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private final IFeatureModel slicedFeatureModel;
 	private final IFeatureModelFactory factory;
 	private final boolean useSlicing;
+	private final long timeoutInMS;
 
 	private boolean slicingNecesary;
 
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
-		this(new FeatureModelFormula(featureModel), featureNames, useSlicing);
+	/**
+	 * Initialize a new slicing operation.
+	 *
+	 * @param featureModel the featureModel to perform slicing on
+	 * @param featureNames the feature names of the features to keep
+	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
+	 * @param solverTimeoutInMS the timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
+	 */
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, long solverTimeoutInMS) {
+		this(featureModel, featureNames, useSlicing);
 	}
 
+	/**
+	 * Initialize a new slicing operation.
+	 *
+	 * @param featureModel the featureModel to perform slicing on
+	 * @param featureNames the feature names of the features to keep
+	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
+	 */
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
+		this(new FeatureModelFormula(featureModel), featureNames, useSlicing, -1);
+	}
+
+	/**
+	 * Initialize a new slicing operation.
+	 *
+	 * @param formula the formula to perform slicing on
+	 * @param featureNames the feature names of the features to keep
+	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
+	 */
 	public SliceFeatureModel(FeatureModelFormula formula, Collection<String> featureNames, boolean useSlicing) {
+		this(formula, featureNames, useSlicing, -1);
+	}
+
+	/**
+	 * Initialize a new slicing operation.
+	 *
+	 * @param formula the formula to perform slicing on
+	 * @param featureNames the feature names of the features to keep
+	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
+	 * @param solverTimeoutInMS the timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
+	 */
+	public SliceFeatureModel(FeatureModelFormula formula, Collection<String> featureNames, boolean useSlicing, long solverTimeoutInMS) {
 		final IFeatureModel featureModelObject = formula.getFeatureModel();
 		factory = FMFactoryManager.getInstance().getFactory(featureModelObject);
 		slicedFeatureModel = featureModelObject.clone();
@@ -77,6 +117,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		featuresToRemove.removeAll(featuresToKeep);
 
 		this.useSlicing = useSlicing;
+		timeoutInMS = solverTimeoutInMS;
 	}
 
 	@Override
@@ -96,7 +137,9 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
-		return LongRunningWrapper.runMethod(new CNFSlicer(cnfFormula, featuresToRemove), monitor.subTask(1));
+		final CNFSlicer slicer = new CNFSlicer(cnfFormula, featuresToRemove);
+		slicer.setSolverTimeout(timeoutInMS);
+		return LongRunningWrapper.runMethod(slicer, monitor.subTask(1));
 	}
 
 	private IFeatureModel sliceTree(IMonitor<?> monitor) {

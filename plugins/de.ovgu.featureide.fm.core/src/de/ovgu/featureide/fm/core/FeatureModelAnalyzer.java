@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CauseAnalysis.Anomalies;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.HasSolutionAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -106,6 +107,18 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	/**
+	 * A timeout for the internal SAT solver in ms. Set to a non-negative number to overwrite individual timeouts of analyses. If this is -1 and an individual
+	 * analysis also specifies -1 for their individual timeout, then the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout} is used.
+	 *
+	 * @param defaultSolverTimeoutInMS the timeout in ms.
+	 *
+	 * @see AnalysesCollection.AnalysisWrapper#getResult(IMonitor, long, long)
+	 */
+	public void setDefaultSolverTimeout(long defaultSolverTimeoutInMS) {
+		analysesCollection.setDefaultSolverTimeout(defaultSolverTimeoutInMS);
+	}
+
+	/**
 	 * Tests if <code>featureModel</code> is valid.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
@@ -119,11 +132,23 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Tests if <code>featureModel</code> is valid.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<Boolean> isValid(IMonitor<Boolean> monitor, int timeout) {
-		final Optional<Boolean> result = analysesCollection.validAnalysis.getResult(monitor, timeout);
+	public Optional<Boolean> isValid(IMonitor<Boolean> monitor, long threadTimoutInMS) {
+		return isValid(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Tests if <code>featureModel</code> is valid.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<Boolean> isValid(IMonitor<Boolean> monitor, long threadTimoutInMS, long solverTimoutInMS) {
+		final Optional<Boolean> result = analysesCollection.validAnalysis.getResult(monitor, threadTimoutInMS, solverTimoutInMS);
 		if (result.isPresent() && !result.get()) {
 			getFeatureModelProperties().setStatus(FeatureModelStatus.VOID);
 		}
@@ -263,25 +288,35 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	/**
+	 * Analyzes the feature model.
+	 *
+	 * @param monitor monitor
+	 * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
+	 */
+	public AnalysesCollection analyzeFeatureModel(IMonitor<Boolean> monitor) {
+		return analyzeFeatureModel(monitor, -1);
+	}
+
+	/**
 	 * Computes a list of all core features.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IFeature>> getCoreFeatures(IMonitor<LiteralSet> monitor, int timeout) {
-		return analysesCollection.coreDeadAnalysis.getResult(monitor, timeout).map(list -> convertToFeatureList(list, true, false));
+	public Optional<List<IFeature>> getCoreFeatures(IMonitor<LiteralSet> monitor, long threadTimoutInMS) {
+		return getCoreFeatures(monitor, threadTimoutInMS, -1);
 	}
 
 	/**
 	 * Computes a list of all dead features.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IFeature>> getDeadFeatures(IMonitor<LiteralSet> monitor, int timeout) {
-		return analysesCollection.coreDeadAnalysis.getResult(monitor, timeout).map(list -> convertToFeatureList(list, false, true));
+	public Optional<List<IFeature>> getDeadFeatures(IMonitor<LiteralSet> monitor, long threadTimoutInMS) {
+		return getDeadFeatures(monitor, threadTimoutInMS, -1);
 	}
 
 	/**
@@ -289,11 +324,172 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * will calculate the features that are present in all variants specified by the feature model.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IFeature>> getCommonFeatures(IMonitor<LiteralSet> monitor, int timeout) {
-		return analysesCollection.coreDeadAnalysis.getResult(monitor, timeout).map(list -> featureModel.getFeatures().stream()
+	public Optional<List<IFeature>> getCommonFeatures(IMonitor<LiteralSet> monitor, long threadTimoutInMS) {
+		return getCommonFeatures(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all atomic sets.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<List<IFeature>>> getAtomicSets(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getAtomicSets(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all indeterminate hidden features.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IFeature>> getIndeterminedHiddenFeatures(IMonitor<LiteralSet> monitor, long threadTimoutInMS) {
+		return getIndeterminedHiddenFeatures(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all false-optional features.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IFeature>> getFalseOptionalFeatures(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getFalseOptionalFeatures(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all void constraints.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getVoidConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getVoidConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all redundant constraints.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getRedundantConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getRedundantConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all contradictory constraints.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getContradictoryConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getContradictoryConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all tautology constraints.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getTautologyConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getTautologyConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all constraints with an anomaly (e.g. redundancy).
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getAnomalyConstraints(IMonitor<List<Anomalies>> monitor, long threadTimoutInMS) {
+		return getAnomalyConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all constraints with an anomaly (e.g. redundancy). Considers only constraints that are set to true in the given index.
+	 *
+	 * @param relevantConstraint an index indicating which constraints to check. Uses the constraint order of the feature model.
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IConstraint>> getAnomalyConstraints(boolean[] relevantConstraint, IMonitor<List<Anomalies>> monitor, long threadTimoutInMS) {
+		return getAnomalyConstraints(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all atomic sets.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<Map<IFeature, Boolean>>> getAtomicSetsMap(IMonitor<List<LiteralSet>> monitor, long threadTimoutInMS) {
+		return getAtomicSetsMap(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Analyzes the feature model.
+	 *
+	 * @param monitor monitor
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
+	 */
+	public AnalysesCollection analyzeFeatureModel(IMonitor<Boolean> monitor, long threadTimoutInMS) {
+		return analyzeFeatureModel(monitor, threadTimoutInMS, -1);
+	}
+
+	/**
+	 * Computes a list of all core features.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IFeature>> getCoreFeatures(IMonitor<LiteralSet> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.coreDeadAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> convertToFeatureList(list, true, false));
+	}
+
+	/**
+	 * Computes a list of all dead features.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IFeature>> getDeadFeatures(IMonitor<LiteralSet> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.coreDeadAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> convertToFeatureList(list, false, true));
+	}
+
+	/**
+	 * Returns the list of features that occur in all variants, where one of the given features is selected. If the given list of features is empty, this method
+	 * will calculate the features that are present in all variants specified by the feature model.
+	 *
+	 * @param monitor a {@link IMonitor monitor} instance (can be null)
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
+	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
+	 */
+	public Optional<List<IFeature>> getCommonFeatures(IMonitor<LiteralSet> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.coreDeadAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS).map(list -> featureModel.getFeatures().stream()
 				.filter(new FeatureSetFilter(convertToFeatureList(list, true, true)).negate()).collect(Collectors.toList()));
 	}
 
@@ -301,11 +497,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all atomic sets.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<List<IFeature>>> getAtomicSets(IMonitor<List<LiteralSet>> monitor, int timeout) {
-		return analysesCollection.atomicSetAnalysis.getResult(monitor, timeout).map(list -> {
+	public Optional<List<List<IFeature>>> getAtomicSets(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.atomicSetAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS).map(list -> {
 			final CNF cnf = formula.getCNF();
 			final ArrayList<List<IFeature>> resultList = new ArrayList<>();
 			for (final LiteralSet literalList : list) {
@@ -327,23 +524,27 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all indeterminate hidden features.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IFeature>> getIndeterminedHiddenFeatures(IMonitor<LiteralSet> monitor, int timeout) {
-		return analysesCollection.determinedAnalysis.getResult(monitor, timeout).map(list -> convertToFeatureList(list, true, false));
+	public Optional<List<IFeature>> getIndeterminedHiddenFeatures(IMonitor<LiteralSet> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.determinedAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> convertToFeatureList(list, true, false));
 	}
 
 	/**
 	 * Computes a list of all false-optional features.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IFeature>> getFalseOptionalFeatures(IMonitor<List<LiteralSet>> monitor, int timeout) {
+	public Optional<List<IFeature>> getFalseOptionalFeatures(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		final List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new OptionalFeatureFilter());
-		return getFalseOptionalFeatures(optionalFeatures, monitor, timeout).map(list -> selectPositiveElements(optionalFeatures, list));
+		return getFalseOptionalFeatures(optionalFeatures, monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> selectPositiveElements(optionalFeatures, list));
 	}
 
 	/**
@@ -351,12 +552,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 *
 	 * @param optionalFeatures a list of optional features
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	private Optional<List<LiteralSet>> getFalseOptionalFeatures(final List<IFeature> optionalFeatures, IMonitor<List<LiteralSet>> monitor, int timeout) {
+	private Optional<List<LiteralSet>> getFalseOptionalFeatures(final List<IFeature> optionalFeatures, IMonitor<List<LiteralSet>> monitor,
+			long threadTimeoutInMS, long solverTimeoutInMS) {
 		analysesCollection.foAnalysis.setOptionalFeatures(optionalFeatures);
-		return analysesCollection.foAnalysis.getResult(monitor, timeout);
+		return analysesCollection.foAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS);
 	}
 
 	private List<IFeature> convertToFeatureList(final LiteralSet result, boolean includePositive, boolean includeNegative) {
@@ -368,38 +571,45 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all void constraints.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getVoidConstraints(IMonitor<List<LiteralSet>> monitor, int timeout) {
+	public Optional<List<IConstraint>> getVoidConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		analysesCollection.constraintVoidAnalysis.setConstraints(constraints);
-		return analysesCollection.constraintVoidAnalysis.getResult(monitor, timeout).map(list -> selectPositiveElements(constraints, list));
+		return analysesCollection.constraintVoidAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> selectPositiveElements(constraints, list));
 	}
 
 	/**
 	 * Computes a list of all redundant constraints.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getRedundantConstraints(IMonitor<List<LiteralSet>> monitor, int timeout) {
+	public Optional<List<IConstraint>> getRedundantConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		analysesCollection.constraintRedundancyAnalysis.setConstraints(constraints);
-		return analysesCollection.constraintRedundancyAnalysis.getResult(monitor, timeout).map(list -> selectPositiveElements(constraints, list));
+		return analysesCollection.constraintRedundancyAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+				.map(list -> selectPositiveElements(constraints, list));
 	}
 
 	/**
 	 * Computes a list of all contradictory constraints.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getContradictoryConstraints(IMonitor<List<LiteralSet>> monitor, int timeout) {
-		final Optional<List<IConstraint>> voidConstraints = getVoidConstraints(monitor != null ? monitor.subTask(1) : null, timeout);
+	public Optional<List<IConstraint>> getContradictoryConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		final Optional<List<IConstraint>> voidConstraints =
+			getVoidConstraints(monitor != null ? monitor.subTask(1) : null, threadTimeoutInMS, solverTimeoutInMS);
 		return voidConstraints.flatMap(constraints -> {
 			analysesCollection.constraintContradictionAnalysis.setConstraints(constraints);
-			return analysesCollection.constraintContradictionAnalysis.getResult(monitor, timeout).map(list -> selectPositiveElements(constraints, list));
+			return analysesCollection.constraintContradictionAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+					.map(list -> selectPositiveElements(constraints, list));
 		});
 	}
 
@@ -407,14 +617,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all tautology constraints.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getTautologyConstraints(IMonitor<List<LiteralSet>> monitor, int timeout) {
-		final Optional<List<IConstraint>> redundantConstraints = getRedundantConstraints(monitor != null ? monitor.subTask(1) : null, timeout);
+	public Optional<List<IConstraint>> getTautologyConstraints(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		final Optional<List<IConstraint>> redundantConstraints =
+			getRedundantConstraints(monitor != null ? monitor.subTask(1) : null, threadTimeoutInMS, solverTimeoutInMS);
 		return redundantConstraints.flatMap(constraints -> {
 			analysesCollection.constraintTautologyAnalysis.setConstraints(constraints);
-			return analysesCollection.constraintTautologyAnalysis.getResult(monitor, timeout).map(list -> selectPositiveElements(constraints, list));
+			return analysesCollection.constraintTautologyAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS)
+					.map(list -> selectPositiveElements(constraints, list));
 		});
 	}
 
@@ -422,10 +635,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all constraints with an anomaly (e.g. redundancy).
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getAnomalyConstraints(IMonitor<List<Anomalies>> monitor, int timeout) {
+	public Optional<List<IConstraint>> getAnomalyConstraints(IMonitor<List<Anomalies>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		int i = 0;
 		final boolean[] relevantConstraint = new boolean[constraints.size()];
 		for (final IConstraint constraint : constraints) {
@@ -435,7 +649,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 			i++;
 		}
-		return getAnomalyConstraints(relevantConstraint, monitor, timeout);
+		return getAnomalyConstraints(relevantConstraint, monitor, threadTimeoutInMS, solverTimeoutInMS);
 	}
 
 	/**
@@ -443,12 +657,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 *
 	 * @param relevantConstraint an index indicating which constraints to check. Uses the constraint order of the feature model.
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<IConstraint>> getAnomalyConstraints(boolean[] relevantConstraint, IMonitor<List<Anomalies>> monitor, int timeout) {
+	public Optional<List<IConstraint>> getAnomalyConstraints(boolean[] relevantConstraint, IMonitor<List<Anomalies>> monitor, long threadTimeoutInMS,
+			long solverTimeoutInMS) {
 		analysesCollection.constraintAnomaliesAnalysis.setRelevantConstraint(relevantConstraint);
-		return analysesCollection.constraintAnomaliesAnalysis.getResult(monitor, timeout).map(list -> {
+		return analysesCollection.constraintAnomaliesAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS).map(list -> {
 			final List<IConstraint> resultList = new ArrayList<>();
 			final Variables variables = formula.getCNF().getVariables();
 			for (int i = 0; i < analysesCollection.constraintAnomaliesAnalysis.getClauseGroupSize().length; i++) {
@@ -481,11 +697,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Computes a list of all atomic sets.
 	 *
 	 * @param monitor a {@link IMonitor monitor} instance (can be null)
-	 * @param timeout a timeout in ms
+	 * @param threadTimoutInMS a timeout for the analysis thread in ms (-1 for no timeout)
+	 * @param solverTimoutInMS a timeout for internal SAT solver in ms (-1 for the default of the analysis)
 	 * @return an {@link Optional} containing the analysis result. Empty if a timeout or an error occurred.
 	 */
-	public Optional<List<Map<IFeature, Boolean>>> getAtomicSetsMap(IMonitor<List<LiteralSet>> monitor, int timeout) {
-		return analysesCollection.atomicSetAnalysis.getResult(monitor, timeout).map(list -> {
+	public Optional<List<Map<IFeature, Boolean>>> getAtomicSetsMap(IMonitor<List<LiteralSet>> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
+		return analysesCollection.atomicSetAnalysis.getResult(monitor, threadTimeoutInMS, solverTimeoutInMS).map(list -> {
 			final List<Map<IFeature, Boolean>> resultList = new ArrayList<>();
 			final Variables variables = formula.getCNF().getVariables();
 			final Set<IFeature> coveredFeatures = new HashSet<>();
@@ -540,6 +757,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * Analyzes the feature model.
 	 *
 	 * @param monitor monitor
+	 * @param threadTimeoutInMS thread timeout in ms
+	 * @param solverTimeoutInMS solver timeout in ms
 	 * @return Hashmap: key entry is Feature/Constraint, value usually indicating the kind of attribute
 	 */
 	/*
@@ -547,7 +766,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * unnecessary or redundant calculations) Hashing might be fast for locating features, but creating a HashSet is costly So LinkedLists are much faster
 	 * because the number of feature in the set is usually small (e.g. dead features)
 	 */
-	public AnalysesCollection analyzeFeatureModel(IMonitor<Boolean> monitor) {
+	public AnalysesCollection analyzeFeatureModel(IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (monitor == null) {
 			monitor = new NullMonitor<>();
 		}
@@ -565,11 +784,11 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 			monitor.setRemainingWork(work);
 
-			updateFeatureModel(monitor);
+			updateFeatureModel(monitor, threadTimeoutInMS, solverTimeoutInMS);
 
-			updateFeatures(monitor);
+			updateFeatures(monitor, threadTimeoutInMS, solverTimeoutInMS);
 
-			updateConstraints(monitor);
+			updateConstraints(monitor, threadTimeoutInMS, solverTimeoutInMS);
 		} finally {
 			monitor.done();
 		}
@@ -578,10 +797,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateConstraints() {
-		updateConstraints(null);
+		updateConstraints(null, -1, -1);
 	}
 
-	protected void updateConstraints(IMonitor<Boolean> monitor) {
+	protected void updateConstraints(IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (analysesCollection.isCalculateConstraints()) {
 			if (monitor == null) {
 				monitor = new NullMonitor<>();
@@ -599,21 +818,25 @@ public class FeatureModelAnalyzer implements IEventListener {
 			monitor.checkCancel();
 			final FeatureModelProperties properties = getFeatureModelProperties();
 			if (properties.hasStatus(FeatureModelStatus.VOID)) {
-				final List<IConstraint> voidConstraints = getVoidConstraints(monitor.subTask(2), -1).orElse(Collections.emptyList());
+				final List<IConstraint> voidConstraints =
+					getVoidConstraints(monitor.subTask(2), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 				for (final IConstraint constraint : voidConstraints) {
 					getConstraintProperties(constraint).setStatus(ConstraintStatus.VOID);
 				}
 				monitor.checkCancel();
-				final List<IConstraint> contradictoryConstraints = getContradictoryConstraints(monitor.subTask(2), -1).orElse(Collections.emptyList());
+				final List<IConstraint> contradictoryConstraints =
+					getContradictoryConstraints(monitor.subTask(2), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 				for (final IConstraint constraint : contradictoryConstraints) {
 					getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
 				}
 				monitor.worked(15);
 			} else {
 				// get constraint anomalies
-				final Collection<IConstraint> redundantConstraints = annotateConstraints(ConstraintStatus.REDUNDANT, monitor);
+				final Collection<IConstraint> redundantConstraints =
+					annotateConstraints(ConstraintStatus.REDUNDANT, monitor, threadTimeoutInMS, solverTimeoutInMS);
 				monitor.checkCancel();
-				final Collection<IConstraint> tautologyConstraints = annotateConstraints(ConstraintStatus.TAUTOLOGY, monitor);
+				final Collection<IConstraint> tautologyConstraints =
+					annotateConstraints(ConstraintStatus.TAUTOLOGY, monitor, threadTimeoutInMS, solverTimeoutInMS);
 
 				if (!redundantConstraints.isEmpty() || !tautologyConstraints.isEmpty()) {
 					properties.setStatus(FeatureModelStatus.ANOMALIES);
@@ -635,6 +858,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @return new {@link Collection}
 	 */
 	public Collection<IConstraint> annotateConstraints(ConstraintStatus status, IMonitor<Boolean> monitor) {
+		return annotateConstraints(status, monitor, -1, -1);
+	}
+
+	/**
+	 * Annotates the constraints in <code>constraints</code> with <code>status</code>, which might either {@link ConstraintStatus#REDUNDANT} or
+	 * {@link ConstraintStatus#TAUTOLOGY} (as redundant constraints or tautologies). This triggers a constraint analysis using the given <code>monitor</code>.
+	 * For any other status, this method returns an empty list.
+	 *
+	 * @param status - {@link ConstraintStatus}
+	 * @param monitor - {@link IMonitor} <code>monitor</code> may also be null, in which case a {@link NullMonitor} is used.
+	 * @param threadTimeoutInMS thread timeout in ms
+	 * @param solverTimeoutInMS solver timeout in ms
+	 * @return new {@link Collection}
+	 */
+	public Collection<IConstraint> annotateConstraints(ConstraintStatus status, IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (monitor == null) {
 			monitor = new NullMonitor<>();
 		}
@@ -642,10 +880,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 		switch (status) {
 		case REDUNDANT:
-			annotatedConstraints = getRedundantConstraints(monitor.subTask(2), -1).orElse(Collections.emptyList());
+			annotatedConstraints = getRedundantConstraints(monitor.subTask(2), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 			break;
 		case TAUTOLOGY:
-			annotatedConstraints = getTautologyConstraints(monitor.subTask(2), -1).orElse(Collections.emptyList());
+			annotatedConstraints = getTautologyConstraints(monitor.subTask(2), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 			break;
 		default:
 			annotatedConstraints = Collections.emptyList();
@@ -656,17 +894,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateFeatures() {
-		updateFeatures(null);
+		updateFeatures(null, -1, -1);
 	}
 
-	protected void updateFeatureModel(IMonitor<Boolean> monitor) {
+	protected void updateFeatureModel(IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (analysesCollection.isCalculateFeatures() || analysesCollection.isCalculateConstraints()) {
 			if (monitor == null) {
 				monitor = new NullMonitor<>();
 			}
 			monitor.checkCancel();
 			final FeatureModelProperties properties = getFeatureModelProperties();
-			if (isValid(monitor.subTask(1))) {
+			if (isValid(monitor.subTask(1), threadTimeoutInMS, solverTimeoutInMS).orElse(Boolean.FALSE)) {
 				properties.setStatus(FeatureModelStatus.VALID);
 			} else {
 				properties.setStatus(FeatureModelStatus.VOID);
@@ -674,17 +912,17 @@ public class FeatureModelAnalyzer implements IEventListener {
 		}
 	}
 
-	protected void updateFeatures(IMonitor<Boolean> monitor) {
+	protected void updateFeatures(IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (analysesCollection.isCalculateFeatures()) {
 			if (monitor == null) {
 				monitor = new NullMonitor<>();
 			}
 			featureModel.getFeatures().forEach(feature -> getFeatureProperties(feature).resetStatus());
 
-			annotateFeatures(FeatureStatus.COMMON, monitor);
-			annotateFeatures(FeatureStatus.MANDATORY, monitor);
-			annotateFeatures(FeatureStatus.OPTIONAL, monitor);
-			annotateFeatures(FeatureStatus.GROUP, monitor);
+			annotateFeatures(FeatureStatus.COMMON, monitor, threadTimeoutInMS, solverTimeoutInMS);
+			annotateFeatures(FeatureStatus.MANDATORY, monitor, threadTimeoutInMS, solverTimeoutInMS);
+			annotateFeatures(FeatureStatus.OPTIONAL, monitor, threadTimeoutInMS, solverTimeoutInMS);
+			annotateFeatures(FeatureStatus.GROUP, monitor, threadTimeoutInMS, solverTimeoutInMS);
 
 			monitor.worked();
 
@@ -698,11 +936,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 				monitor.worked(3);
 			} else {
 				// get feature anomalies
-				final Collection<IFeature> deadFeatures = annotateFeatures(FeatureStatus.DEAD, monitor);
+				final Collection<IFeature> deadFeatures = annotateFeatures(FeatureStatus.DEAD, monitor, threadTimeoutInMS, solverTimeoutInMS);
 				monitor.checkCancel();
-				final Collection<IFeature> falseOptionalFeatures = annotateFeatures(FeatureStatus.FALSE_OPTIONAL, monitor);
+				final Collection<IFeature> falseOptionalFeatures =
+					annotateFeatures(FeatureStatus.FALSE_OPTIONAL, monitor, threadTimeoutInMS, solverTimeoutInMS);
 				monitor.checkCancel();
-				final Collection<IFeature> indeterminedHiddenFeatures = annotateFeatures(FeatureStatus.INDETERMINATE_HIDDEN, monitor);
+				final Collection<IFeature> indeterminedHiddenFeatures =
+					annotateFeatures(FeatureStatus.INDETERMINATE_HIDDEN, monitor, threadTimeoutInMS, solverTimeoutInMS);
 				if (!deadFeatures.isEmpty() || !falseOptionalFeatures.isEmpty() || !indeterminedHiddenFeatures.isEmpty()) {
 					properties.setStatus(FeatureModelStatus.ANOMALIES);
 				}
@@ -720,6 +960,21 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @return new {@link Collection}
 	 */
 	public Collection<IFeature> annotateFeatures(FeatureStatus status, IMonitor<Boolean> monitor) {
+		return annotateFeatures(status, monitor, -1, -1);
+	}
+
+	/**
+	 * Annotates the features of <code>featureModelFormula</code> with the given status, i.e. checks if they are common, mandatory, optional features, belong to
+	 * a group, or are dead, false optional or indeterminate. The latter three analyzes require the <code>monitor</code> object, though a monitor is not
+	 * necessary. Afterwards returns the annotated features.
+	 *
+	 * @param status - {@link FeatureStatus}
+	 * @param monitor - {@link IMonitor}
+	 * @param threadTimeoutInMS thread timeout in ms
+	 * @param solverTimeoutInMS solver timeout in ms
+	 * @return new {@link Collection}
+	 */
+	public Collection<IFeature> annotateFeatures(FeatureStatus status, IMonitor<Boolean> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 		if (monitor == null) {
 			monitor = new NullMonitor<>();
 		}
@@ -747,14 +1002,14 @@ public class FeatureModelAnalyzer implements IEventListener {
 			if (getFeatureModelProperties().hasStatus(FeatureModelStatus.VOID)) {
 				annotatedFeatures = featureModel.getFeatures();
 			} else {
-				annotatedFeatures = getDeadFeatures(monitor.subTask(1), -1).orElse(Collections.emptyList());
+				annotatedFeatures = getDeadFeatures(monitor.subTask(1), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 			}
 			break;
 		case FALSE_OPTIONAL:
-			annotatedFeatures = getFalseOptionalFeatures(monitor.subTask(1), -1).orElse(Collections.emptyList());
+			annotatedFeatures = getFalseOptionalFeatures(monitor.subTask(1), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 			break;
 		case INDETERMINATE_HIDDEN:
-			annotatedFeatures = getIndeterminedHiddenFeatures(monitor.subTask(1), -1).orElse(Collections.emptyList());
+			annotatedFeatures = getIndeterminedHiddenFeatures(monitor.subTask(1), threadTimeoutInMS, solverTimeoutInMS).orElse(Collections.emptyList());
 			break;
 		default:
 			annotatedFeatures = Collections.emptyList();

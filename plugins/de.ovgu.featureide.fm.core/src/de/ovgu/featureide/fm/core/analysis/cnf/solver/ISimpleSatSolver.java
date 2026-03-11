@@ -35,12 +35,14 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
  */
 public interface ISimpleSatSolver extends Cloneable {
 
+	static final int DEFAULT_TIMEOUT = 10_000;
+
 	/**
 	 * Possible outcomes of a satisfiability solver call.<br> One of {@code TRUE}, {@code FALSE}, or {@code TIMEOUT}.
 	 *
 	 * @author Sebastian Krieter
 	 */
-	public static enum SatResult {
+	static enum SatResult {
 		FALSE, TIMEOUT, TRUE
 	}
 
@@ -168,7 +170,12 @@ public interface ISimpleSatSolver extends Cloneable {
 	 */
 	void reset();
 
-	void setTimeout(int timeout);
+	/**
+	 * A timeout for the SAT solver in ms. Set to -1 for the {@link DEFAULT_TIMEOUT default timeout}.
+	 *
+	 * @param timeoutInMS the timeout in ms.
+	 */
+	void setTimeout(long timeoutInMS);
 
 	IInternalVariables getInternalMapping();
 

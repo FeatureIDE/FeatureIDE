@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -47,7 +48,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 
 	private boolean timeoutOccured = false;
 	private boolean throwTimeoutException = true;
-	private int timeout = 1000;
+	private long timeoutInMS = -1;
 
 	private T result = null;
 
@@ -72,7 +73,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		if (solver == null) {
 			return null;
 		}
-		solver.setTimeout(timeout);
+		solver.setTimeout(timeoutInMS);
 		if (assumptions != null) {
 			solver.assignmentPushAll(assumptions.getLiterals());
 		}
@@ -134,12 +135,20 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		this.random = random;
 	}
 
-	public int getTimeout() {
-		return timeout;
+	/**
+	 * The timeout for the internal SAT solver in ms. If set to -1, the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout} is used.
+	 */
+	public long getTimeout() {
+		return timeoutInMS;
 	}
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
+	/**
+	 * A timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
+	 *
+	 * @param timeoutInMS the timeout in ms.
+	 */
+	public void setTimeout(long timeoutInMS) {
+		this.timeoutInMS = timeoutInMS;
 	}
 
 }

@@ -55,8 +55,8 @@ class StoppableExecuter<T> extends Executer<T> {
 
 	}
 
-	private final int cancelingTime;
-	private final int timeout;
+	private final long cancelingTime;
+	private final long timeout;
 	private boolean canceled = false;
 
 	private InnerThread innerThread = null;
@@ -65,13 +65,13 @@ class StoppableExecuter<T> extends Executer<T> {
 	 * Creates a new stoppable executor. If the provided canceling timeout is smaller then 0, the {@link #DEFAULT_CANCELING_TIME default} is used.
 	 *
 	 * @param method the method to run. Must not be {@code null}.
-	 * @param timeout time in ms after which the execution is canceled.
-	 * @param cancelingTime time in ms to wait after canceling the execution before the thread is stopped forcefully.
+	 * @param timeoutInMS time in ms after which the execution is canceled.
+	 * @param cancelingTimeInMS time in ms to wait after canceling the execution before the thread is stopped forcefully.
 	 */
-	public StoppableExecuter(LongRunningMethod<T> method, int timeout, int cancelingTime) {
+	public StoppableExecuter(LongRunningMethod<T> method, long timeoutInMS, long cancelingTimeInMS) {
 		super(method);
-		this.cancelingTime = (cancelingTime < 0) ? DEFAULT_CANCELING_TIME : cancelingTime;
-		this.timeout = (timeout <= 0) ? -1 : timeout;
+		cancelingTime = (cancelingTimeInMS < 0) ? DEFAULT_CANCELING_TIME : cancelingTimeInMS;
+		timeout = (timeoutInMS <= 0) ? -1 : timeoutInMS;
 
 	}
 
@@ -105,7 +105,7 @@ class StoppableExecuter<T> extends Executer<T> {
 		stopInnerThread();
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("removal")
 	private void stopInnerThread() {
 		try {
 			synchronized (this) {

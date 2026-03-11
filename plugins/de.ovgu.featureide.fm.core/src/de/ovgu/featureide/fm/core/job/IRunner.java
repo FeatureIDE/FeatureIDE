@@ -32,14 +32,14 @@ public interface IRunner<T> extends IJob<T> {
 	 *
 	 * @return time in ms
 	 */
-	int getCancelingTime();
+	long getCancelingTime();
 
 	/**
 	 * Time after which the execution is canceled.
 	 *
 	 * @return time in ms
 	 */
-	int getTimeout();
+	long getTimeout();
 
 	/**
 	 * Whether the runner can be stopped by a timeout or manually.
@@ -51,16 +51,16 @@ public interface IRunner<T> extends IJob<T> {
 	/**
 	 * Time to wait after canceling the execution before the executing thread is stopped forcefully.
 	 *
-	 * @param cancelingTime time in ms
+	 * @param cancelingTimeInMS time in ms
 	 */
-	void setCancelingTime(int cancelingTime);
+	void setCancelingTime(long cancelingTimeInMS);
 
 	/**
 	 * Time after which the execution is canceled.
 	 *
-	 * @param timeout time in ms
+	 * @param timeoutInMS time in ms
 	 */
-	void setTimeout(int timeout);
+	void setTimeout(long timeoutInMS);
 
 	/**
 	 * Determines, whether the runner can be stopped by a timeout or manually.

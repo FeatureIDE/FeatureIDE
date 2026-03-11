@@ -55,11 +55,19 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		this(satInstance, satInstance.getInternalVariables());
 	}
 
+	public SimpleSatSolver(CNF satInstance, long timeoutInMS) {
+		this(satInstance, satInstance.getInternalVariables(), timeoutInMS);
+	}
+
 	protected SimpleSatSolver(SimpleSatSolver oldSolver) {
 		this(oldSolver.satInstance, oldSolver.internalMapping);
 	}
 
-	protected SimpleSatSolver(CNF satInstance, IInternalVariables variables) throws RuntimeContradictionException {
+	protected SimpleSatSolver(CNF satInstance, IInternalVariables variables) {
+		this(satInstance, variables, DEFAULT_TIMEOUT);
+	}
+
+	protected SimpleSatSolver(CNF satInstance, IInternalVariables variables, long timeoutInMS) throws RuntimeContradictionException {
 		this.satInstance = satInstance;
 		internalMapping = variables;
 
@@ -67,6 +75,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		boolean contradictionException = false;
 		try {
 			newSolver = newSolver();
+			newSolver.setTimeoutMs(timeoutInMS < 0 ? DEFAULT_TIMEOUT : timeoutInMS);
 		} catch (final RuntimeContradictionException e) {
 			contradictionException = true;
 		}
@@ -247,7 +256,6 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	 * Set several options for the Sat4J solver instance.
 	 */
 	protected void configureSolver(Solver<?> solver) {
-		solver.setTimeoutMs(10_000);
 		solver.setDBSimplificationAllowed(false);
 		solver.setVerbose(false);
 	}
@@ -278,9 +286,9 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	}
 
 	@Override
-	public void setTimeout(int timeout) {
+	public void setTimeout(long timeoutInMS) {
 		if (!contradiction) {
-			solver.setTimeoutMs(timeout);
+			solver.setTimeoutMs(timeoutInMS < 0 ? DEFAULT_TIMEOUT : timeoutInMS);
 		}
 	}
 

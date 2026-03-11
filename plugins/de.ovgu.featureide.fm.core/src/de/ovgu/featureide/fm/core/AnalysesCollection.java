@@ -159,6 +159,7 @@ public class AnalysesCollection {
 	static class AnalysisWrapper<R, A extends AbstractAnalysis<R>> {
 
 		protected FeatureModelFormula formula;
+		protected long defaultSolverTimeoutInMS = -1;
 
 		private Object syncObject = new Object();
 		private IMonitor<R> monitor = new NullMonitor<>();
@@ -177,14 +178,18 @@ public class AnalysesCollection {
 		}
 
 		public Optional<R> getResult(IMonitor<R> monitor) {
-			return getResult(monitor, -1);
+			return getResult(monitor, -1, -1);
 		}
 
-		public Optional<R> getResult(int timeout) {
-			return getResult(null, timeout);
+		public Optional<R> getResult(int threadTimeoutInMS) {
+			return getResult(null, threadTimeoutInMS, -1);
 		}
 
-		public Optional<R> getResult(IMonitor<R> monitor, int timeout) {
+		public Optional<R> getResult(int threadTimeoutInMS, long solverTimeoutInMS) {
+			return getResult(null, threadTimeoutInMS, solverTimeoutInMS);
+		}
+
+		public Optional<R> getResult(IMonitor<R> monitor, long threadTimeoutInMS, long solverTimeoutInMS) {
 			if (!enabled) {
 				return Optional.empty();
 			}
@@ -201,9 +206,10 @@ public class AnalysesCollection {
 				R result = null;
 				if (curAnalysisResult == null) {
 					final AbstractAnalysis<R> analysisInstance = createNewAnalysis();
+					analysisInstance.setTimeout(defaultSolverTimeoutInMS < 0 ? solverTimeoutInMS : defaultSolverTimeoutInMS);
 					try {
-						result = timeout > 0 //
-							? compute(analysisInstance, timeout) //
+						result = threadTimeoutInMS > 0 //
+							? compute(analysisInstance, threadTimeoutInMS) //
 							: compute(analysisInstance);
 						curAnalysisResult = result == null ? null : analysisInstance.getResult();
 					} catch (final MethodCancelException e) {
@@ -228,10 +234,10 @@ public class AnalysesCollection {
 			return LongRunningWrapper.runMethod(analysisInstance, monitor);
 		}
 
-		private R compute(final AbstractAnalysis<R> analysisInstance, int timeout) throws InterruptedException {
+		private R compute(final AbstractAnalysis<R> analysisInstance, long timeoutInMS) throws InterruptedException {
 			final IRunner<R> thread = LongRunningWrapper.getThread(analysisInstance, monitor);
 			thread.setStoppable(true);
-			thread.setTimeout(timeout);
+			thread.setTimeout(timeoutInMS);
 			thread.schedule();
 			thread.join();
 			return thread.getResults();
@@ -259,6 +265,10 @@ public class AnalysesCollection {
 
 		public void setFormula(FeatureModelFormula formula) {
 			this.formula = formula;
+		}
+
+		public void setDefaultSolverTimeout(long defaultSolverTimeoutInMS) {
+			this.defaultSolverTimeoutInMS = defaultSolverTimeoutInMS;
 		}
 
 		public boolean isEnabled() {
@@ -530,6 +540,12 @@ public class AnalysesCollection {
 		constraintTautologyAnalysis.setEnabled(calculateTautologyConstraints);
 		if (calculateTautologyConstraints) {
 			constraintRedundancyAnalysis.setEnabled(true);
+		}
+	}
+
+	public void setDefaultSolverTimeout(long defaultSolverTimeoutInMS) {
+		for (final AnalysisWrapper<?, ?> analysisWrapper : list) {
+			analysisWrapper.setDefaultSolverTimeout(defaultSolverTimeoutInMS);
 		}
 	}
 
