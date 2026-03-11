@@ -1,10 +1,10 @@
-.project
-model.png
+model.xml
+.classpath
 lib/uvl-parser.jar
+lib/de.ovgu.featureide.lib.fm-v3.12.0.jar
 lib/antlr-3.4.jar
-lib/de.ovgu.featureide.lib.fm-v3.11.1.jar
-lib/org.sat4j.core.jar
+lib/org.ow2.sat4j.core-2.3.6.jar
 src/de/ovgu/featureide/examples/commandlineconfigurator/CommandLineConfigurator.java
 .settings/org.eclipse.jdt.core.prefs
-.classpath
-model.xml
+.project
+model.png
