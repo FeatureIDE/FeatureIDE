@@ -33,6 +33,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.ClauseLengthComparatorDsc;
+import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SlicedVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.AbstractManipulator;
@@ -41,6 +42,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.heuristic.Mini
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeTimeoutException;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -156,7 +158,7 @@ public class CNFSlicer extends AbstractManipulator {
 		createClauseLists();
 
 		if (!prepareHeuristics()) {
-			return new CNF(mapping, orgCNF.getClauses());
+			return new CNF(mapping, new ClauseList(List.of(new LiteralSet())));
 		}
 
 //		final CNF cleanCNF = new CNF(mapping, cleanClauseList);
@@ -445,7 +447,16 @@ public class CNFSlicer extends AbstractManipulator {
 		} catch (final RuntimeContradictionException e) {
 			return false;
 		}
-		return newSolver.hasSolution() == SatResult.TRUE;
+		switch (newSolver.hasSolution()) {
+		case FALSE:
+			return false;
+		case TRUE:
+			return true;
+		case TIMEOUT:
+			throw new RuntimeTimeoutException(String.valueOf(solverTimeoutInMS));
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 	protected void release() {
