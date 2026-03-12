@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
@@ -68,30 +69,37 @@ public class TFeatureModelSlicing {
 		testModel("gpl_medium_model.xml");
 	}
 
+	@Test
+	public final void testTimeout() {
+		final IFeatureModel featureModel = Commons.loadBenchmarkFeatureModelFromFile("embtoolkit.xml");
+		assertNull(LongRunningWrapper.runMethod(new SliceFeatureModel(featureModel, List.of(), true, 1)));
+		assertNull(LongRunningWrapper.runMethod(new SliceFeatureModel(new FeatureModelFormula(featureModel), List.of(), true, 1)));
+	}
+
 	private void testModel(String modelFileName) {
 		final IFeatureModel featureModel = Commons.loadTestFeatureModelFromFile(modelFileName);
 		// There is no loop here on purposes,
 		// it makes tracing easier in case of a test failure
-		sliceModel(featureModel, new Random(0).nextLong());
-		sliceModel(featureModel, new Random(1).nextLong());
-		sliceModel(featureModel, new Random(2).nextLong());
-		sliceModel(featureModel, new Random(3).nextLong());
-		sliceModel(featureModel, new Random(4).nextLong());
-		sliceModel(featureModel, new Random(5).nextLong());
-		sliceModel(featureModel, new Random(6).nextLong());
-		sliceModel(featureModel, new Random(7).nextLong());
-		sliceModel(featureModel, new Random(8).nextLong());
-		sliceModel(featureModel, new Random(9).nextLong());
+		sliceModel(featureModel, new Random(0).nextLong(), -1);
+		sliceModel(featureModel, new Random(1).nextLong(), -1);
+		sliceModel(featureModel, new Random(2).nextLong(), -1);
+		sliceModel(featureModel, new Random(3).nextLong(), -1);
+		sliceModel(featureModel, new Random(4).nextLong(), -1);
+		sliceModel(featureModel, new Random(5).nextLong(), -1);
+		sliceModel(featureModel, new Random(6).nextLong(), -1);
+		sliceModel(featureModel, new Random(7).nextLong(), -1);
+		sliceModel(featureModel, new Random(8).nextLong(), -1);
+		sliceModel(featureModel, new Random(9).nextLong(), -1);
 	}
 
-	private void sliceModel(final IFeatureModel featureModel, long randomSeed) {
+	private void sliceModel(final IFeatureModel featureModel, long randomSeed, long timeoutInMS) {
 		final List<String> featureNames = featureModel.getFeatures().stream().map(IFeature::getName).collect(Collectors.toList());
 		Collections.shuffle(featureNames.subList(1, featureNames.size()), new Random(randomSeed));
 		final int removeIndex = featureNames.size() / 2;
 		final List<String> featuresToKeep = featureNames.subList(0, removeIndex);
 		final List<String> featuresToRemove = featureNames.subList(removeIndex, featureNames.size());
 
-		final IFeatureModel slicedModel = LongRunningWrapper.runMethod(new SliceFeatureModel(featureModel, featuresToKeep, true));
+		final IFeatureModel slicedModel = LongRunningWrapper.runMethod(new SliceFeatureModel(featureModel, featuresToKeep, true, timeoutInMS));
 
 		final FeatureModelFormula orgFormula = new FeatureModelFormula(featureModel);
 		final FeatureModelFormula slicedFormula = new FeatureModelFormula(slicedModel);

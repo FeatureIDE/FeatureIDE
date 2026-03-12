@@ -61,7 +61,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private final IFeatureModel slicedFeatureModel;
 	private final IFeatureModelFactory factory;
 	private final boolean useSlicing;
-	private final long timeoutInMS;
+	private final long solverTimeoutInMS;
 
 	private boolean slicingNecesary;
 
@@ -70,11 +70,9 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	 *
 	 * @param featureModel the featureModel to perform slicing on
 	 * @param featureNames the feature names of the features to keep
-	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
-	 * @param solverTimeoutInMS the timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
 	 */
-	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, long solverTimeoutInMS) {
-		this(featureModel, featureNames, useSlicing);
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames) {
+		this(featureModel, featureNames, true);
 	}
 
 	/**
@@ -85,7 +83,19 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
 	 */
 	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing) {
-		this(new FeatureModelFormula(featureModel), featureNames, useSlicing, -1);
+		this(featureModel, featureNames, useSlicing, -1);
+	}
+
+	/**
+	 * Initialize a new slicing operation.
+	 *
+	 * @param featureModel the featureModel to perform slicing on
+	 * @param featureNames the feature names of the features to keep
+	 * @param useSlicing whether to use actual slicing or just try to modify the feature tree
+	 * @param solverTimeoutInMS the timeout for the internal SAT solver in ms. Set to -1 for the {@link ISimpleSatSolver#DEFAULT_TIMEOUT default timeout}.
+	 */
+	public SliceFeatureModel(IFeatureModel featureModel, Collection<String> featureNames, boolean useSlicing, long solverTimeoutInMS) {
+		this(new FeatureModelFormula(featureModel), featureNames, useSlicing, solverTimeoutInMS);
 	}
 
 	/**
@@ -117,7 +127,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		featuresToRemove.removeAll(featuresToKeep);
 
 		this.useSlicing = useSlicing;
-		timeoutInMS = solverTimeoutInMS;
+		this.solverTimeoutInMS = solverTimeoutInMS;
 	}
 
 	@Override
@@ -128,6 +138,9 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		if (slicingNecesary && useSlicing) {
 			monitor.checkCancel();
 			final CNF slicedFeatureModelCNF = sliceFormula(monitor.subTask(80));
+			if (slicedFeatureModelCNF == null) {
+				throw new RuntimeException();
+			}
 			monitor.checkCancel();
 			merge(factory, slicedFeatureModelCNF, featureTree, monitor.subTask(18));
 		}
@@ -138,7 +151,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private CNF sliceFormula(IMonitor<?> monitor) {
 		monitor.setTaskName("Slicing Feature Model Formula");
 		final CNFSlicer slicer = new CNFSlicer(cnfFormula, featuresToRemove);
-		slicer.setSolverTimeout(timeoutInMS);
+		slicer.setSolverTimeout(solverTimeoutInMS);
 		return LongRunningWrapper.runMethod(slicer, monitor.subTask(1));
 	}
 
