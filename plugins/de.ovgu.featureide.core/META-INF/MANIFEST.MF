@@ -30,7 +30,7 @@ Export-Package:
  de.ovgu.featureide.core.signature.java
 Bundle-ClassPath: lib/tools.jar,
  .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: University of Magdeburg
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: de.ovgu.featureide.core
