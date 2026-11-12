@@ -21,3 +21,8 @@
 /tests/de.ovgu.featureide.fm.core-test/.featureide/
 /tests/de.ovgu.featureide.fm.core-test/feature_model_tmp**
 **/target
+
+# Eclipse project and settings files (e.g. created by m2e on import).
+# Note: this only affects untracked files; files already tracked by git stay tracked.
+.project
+.settings/

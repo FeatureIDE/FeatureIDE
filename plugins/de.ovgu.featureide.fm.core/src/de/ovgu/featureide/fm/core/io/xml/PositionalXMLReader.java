@@ -30,7 +30,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,8 +54,7 @@ public class PositionalXMLReader {
 	public static Document readXML(final InputStream is) throws IOException, SAXException, ParserConfigurationException {
 		final Document doc;
 		SAXParser parser;
-		final SAXParserFactory factory = SAXParserFactory.newInstance();
-		parser = factory.newSAXParser();
+		parser = SAXParsers.newSAXParser();
 		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 		doc = docBuilder.newDocument();

@@ -39,21 +39,21 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForCore() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getCoreFeatures(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getCoreFeatures(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getCoreFeatures(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getCoreFeatures(null, 10).isPresent());
 	}
 
 	@Test
 	public final void timeoutOccursForAnomalyConstraints() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getAnomalyConstraints(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getAnomalyConstraints(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getAnomalyConstraints(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getAnomalyConstraints(null, 10).isPresent());
 	}
 
 	@Test
 	public final void timeoutOccursForAntomicSets() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getAtomicSets(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getAtomicSets(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getAtomicSets(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getAtomicSets(null, 10).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(2)).getAtomicSets(null, 10000, 1).isPresent());
@@ -61,7 +61,7 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForFalseOptionalFeatures() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(201)).getFalseOptionalFeatures(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getFalseOptionalFeatures(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getFalseOptionalFeatures(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getFalseOptionalFeatures(null, 10).isPresent());
 	}
@@ -75,7 +75,7 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForContradictoryConstraints() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getContradictoryConstraints(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getContradictoryConstraints(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getContradictoryConstraints(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getContradictoryConstraints(null, 10).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(2)).getContradictoryConstraints(null, 10000, 1).isPresent());
@@ -83,7 +83,7 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForTautologyConstraints() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getTautologyConstraints(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getTautologyConstraints(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getTautologyConstraints(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getTautologyConstraints(null, 10).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(2)).getTautologyConstraints(null, 10000, 1).isPresent());
@@ -91,7 +91,7 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForRedundantConstraints() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getRedundantConstraints(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getRedundantConstraints(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getRedundantConstraints(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getRedundantConstraints(null, 10).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(2)).getRedundantConstraints(null, 10000, 1).isPresent());
@@ -99,7 +99,7 @@ public class FeatureModelAnalyzerTimeoutTest {
 
 	@Test
 	public final void timeoutOccursForVoidConstraints() {
-		assertFalse(FeatureModelManager.getAnalyzer(getFM(1)).getVoidConstraints(null, 1).isPresent());
+		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getVoidConstraints(null, 1).isPresent());
 		assertTrue(FeatureModelManager.getAnalyzer(getFM(1)).getVoidConstraints(null, 10000).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(1000)).getVoidConstraints(null, 10).isPresent());
 		assertFalse(FeatureModelManager.getAnalyzer(getFM(2)).getVoidConstraints(null, 10000, 1).isPresent());

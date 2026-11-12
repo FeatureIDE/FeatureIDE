@@ -37,9 +37,14 @@ import java.util.jar.JarFile;
 public class JavaVersionTest {
 
 	/**
+	 * Class file major version of Java 21, the Java version required by FeatureIDE.
+	 */
+	private static final int MAX_MAJOR_VERSION = 65;
+
+	/**
 	 * Checks the Java Version of all class files in the same jar as the given class.
 	 *
-	 * @throws Exception if the version of a class is higher then Java 7, or the jar cannot be read.
+	 * @throws Exception if the version of a class is higher then Java 21, or the jar cannot be read.
 	 */
 	public static void testJavaVersion(final Class<?> c) throws Exception {
 		final CodeSource source = c.getProtectionDomain().getCodeSource();
@@ -58,8 +63,8 @@ public class JavaVersionTest {
 					}
 					final int minor = data.readUnsignedShort();
 					final int major = data.readUnsignedShort();
-					if (major > 51) {
-						throw new Exception("Class " + name + " is compiled with version higher then Java 7: " + major + "." + minor);
+					if (major > MAX_MAJOR_VERSION) {
+						throw new Exception("Class " + name + " is compiled with version higher then Java 21: " + major + "." + minor);
 					}
 				}
 			}

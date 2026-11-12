@@ -152,11 +152,20 @@ public class TestRunner {
 
 				});
 				final SecurityManager originalManager = System.getSecurityManager();
+				boolean noExitManagerInstalled = false;
 				try {
-					System.setSecurityManager(NO_EXIT_MANAGER);
+					try {
+						System.setSecurityManager(NO_EXIT_MANAGER);
+						noExitManagerInstalled = true;
+					} catch (final UnsupportedOperationException e) {
+						// Since Java 18, a security manager can only be installed with -Djava.security.manager=allow,
+						// and since Java 24 not at all. The tests then run without protection against System.exit().
+					}
 					core.run(clazz);
 				} finally {
-					System.setSecurityManager(originalManager);
+					if (noExitManagerInstalled) {
+						System.setSecurityManager(originalManager);
+					}
 				}
 			} catch (final ClassNotFoundException e) {
 				LOGGER.logError(e);
