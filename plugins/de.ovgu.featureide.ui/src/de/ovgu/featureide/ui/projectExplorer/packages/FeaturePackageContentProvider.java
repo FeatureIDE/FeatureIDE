@@ -51,7 +51,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  * Shows the content of feature folders in the Project Explorer as packages, like the content of a Java source folder.
  * <p>
  * The Java content of the Project Explorer shows feature folders as normal folders, because they are not on the build path. This provider replaces the
- * children of feature folders (and of the folders <code>src</code> and <code>src/main</code> in feature folders with the Maven layout) with the nodes
+ * children of feature folders (and of the folders above the source folders, such as <code>src</code>, <code>src/main</code> or <code>main</code>, in
+ * feature folders with the Maven layout) with the nodes
  * computed by {@link FeaturePackageStructure}, and provides the children of these nodes.
  *
  * @author Philipp Hehnle
@@ -97,7 +98,7 @@ public class FeaturePackageContentProvider implements IPipelinedTreeContentProvi
 			if (parentElement instanceof FeaturePackageRoot) {
 				final FeaturePackageRoot root = (FeaturePackageRoot) parentElement;
 				if (root.getFolder().exists()) {
-					return FeaturePackageStructure.getPackageRootChildren(root, root.getFolder()).toArray();
+					return FeaturePackageStructure.getSourceFolderChildren(root).toArray();
 				}
 			} else if (parentElement instanceof FeaturePackage) {
 				final FeaturePackage featurePackage = (FeaturePackage) parentElement;

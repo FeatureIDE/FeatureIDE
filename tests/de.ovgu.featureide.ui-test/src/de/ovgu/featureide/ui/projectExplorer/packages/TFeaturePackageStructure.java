@@ -128,14 +128,22 @@ public class TFeaturePackageStructure {
 	}
 
 	@Test
-	public void metaInfInResourcesIsNoPackage() throws CoreException {
+	public void resourceFoldersShowNormalFolders() throws CoreException {
 		createFile(feature, "src/main/resources/META-INF/MANIFEST.MF");
-		createFile(feature, "src/main/resources/config/app.properties");
+		final IFile properties = createFile(feature, "src/main/resources/de/ovgu/config/app.properties");
+		final IFile root = createFile(feature, "src/main/resources/log.xml");
 
 		final FeaturePackageRoot resources = new FeaturePackageRoot(feature.getFolder("src/main/resources"), feature);
-		final List<Object> children = FeaturePackageStructure.getPackageRootChildren(resources, resources.getFolder());
-		assertTrue(children.contains(feature.getFolder("src/main/resources/META-INF")));
-		assertEquals(Set.of("META-INF", "config"), labels(children));
+		final List<Object> children = FeaturePackageStructure.getSourceFolderChildren(resources);
+		// no packages (like de.ovgu.config), only the folders and files of the resource folder
+		assertEquals(List.of(), children.stream().filter(child -> !(child instanceof IResource)).toList());
+		assertEquals(Set.of("META-INF", "de", "log.xml"), labels(children));
+
+		// the content of resource folders keeps its usual parent, except for the direct children
+		assertEquals(resources, FeaturePackageStructure.getParent(root, feature));
+		assertEquals(resources, FeaturePackageStructure.getParent(feature.getFolder("src/main/resources/de"), feature));
+		assertNull(FeaturePackageStructure.getParent(properties, feature));
+		assertNull(FeaturePackageStructure.getParent(feature.getFolder("src/main/resources/de/ovgu"), feature));
 	}
 
 	@Test
@@ -158,7 +166,7 @@ public class TFeaturePackageStructure {
 		}
 
 		final FeaturePackageRoot resources = new FeaturePackageRoot(feature.getFolder("src/main/resources"), feature);
-		assertEquals(Set.of("config"), labels(FeaturePackageStructure.getPackageRootChildren(resources, resources.getFolder())));
+		assertEquals(List.of(feature.getFolder("src/main/resources/config")), FeaturePackageStructure.getSourceFolderChildren(resources));
 	}
 
 	@Test
@@ -171,15 +179,121 @@ public class TFeaturePackageStructure {
 	@Test
 	public void otherFoldersInSrcRemainVisible() throws CoreException {
 		createFile(feature, "src/main/java/de/A.java");
-		createFile(feature, "src/test/java/de/ATest.java");
+		createFile(feature, "src/it/java/de/AIT.java");
 
 		final List<Object> children = FeaturePackageStructure.getFeatureFolderChildren(feature);
 		assertEquals(Set.of("src/main/java", "src"), labels(children));
 
 		// in the folder src, the folder main is hidden, because it is shown as src/main/java
-		final Collection<Object> srcChildren = new ArrayList<>(List.of(feature.getFolder("src/main"), feature.getFolder("src/test")));
+		final Collection<Object> srcChildren = new ArrayList<>(List.of(feature.getFolder("src/main"), feature.getFolder("src/it")));
 		FeaturePackageStructure.removeResourcesInSourceFolders(feature, srcChildren);
-		assertEquals(Set.of("test"), labels(srcChildren));
+		assertEquals(Set.of("it"), labels(srcChildren));
+	}
+
+	@Test
+	public void otherFoldersInMainRemainVisible() throws CoreException {
+		// target folder src: the feature folders contain main/java etc.
+		createFile(feature, "main/java/de/A.java");
+		createFile(feature, "main/webapp/index.html");
+
+		assertEquals(Set.of("main/java", "main"), labels(FeaturePackageStructure.getFeatureFolderChildren(feature)));
+
+		final Collection<Object> mainChildren = new ArrayList<>(List.of(feature.getFolder("main/java"), feature.getFolder("main/webapp")));
+		FeaturePackageStructure.removeResourcesInSourceFolders(feature, mainChildren);
+		assertEquals(Set.of("webapp"), labels(mainChildren));
+	}
+
+	@Test
+	public void mavenTestSourceFoldersAreShownAsOneNode() throws CoreException {
+		createFile(feature, "src/main/java/de/A.java");
+		createFile(feature, "src/main/resources/app.properties");
+		createFile(feature, "src/test/java/de/ATest.java");
+		createFile(feature, "src/test/resources/test.properties");
+
+		// src, src/main and src/test are not shown, neither as folders nor as packages
+		assertEquals(Set.of("src/main/java", "src/main/resources", "src/test/java", "src/test/resources"),
+				labels(FeaturePackageStructure.getFeatureFolderChildren(feature)));
+
+		final FeaturePackageRoot testJava = new FeaturePackageRoot(feature.getFolder("src/test/java"), feature);
+		assertEquals(Set.of("de"), labels(FeaturePackageStructure.getPackageRootChildren(testJava, testJava.getFolder())));
+	}
+
+	@Test
+	public void sourceFoldersForTargetFolderSrc() throws CoreException {
+		// target folder src: the feature folders contain main/java, main/resources, test/java and test/resources
+		createFile(feature, "main/java/de/ovgu/a/A.java");
+		createFile(feature, "main/resources/META-INF/MANIFEST.MF");
+		final IFile test = createFile(feature, "test/java/de/ovgu/a/ATest.java");
+		createFile(feature, "test/resources/test.properties");
+		createFile(feature, "pom.xml");
+
+		final List<Object> children = FeaturePackageStructure.getFeatureFolderChildren(feature);
+		// main and test are not shown, neither as folders nor as packages
+		assertEquals(Set.of("main/java", "main/resources", "test/java", "test/resources", "pom.xml"), labels(children));
+
+		final FeaturePackageRoot mainJava = new FeaturePackageRoot(feature.getFolder("main/java"), feature);
+		final List<Object> mainChildren = FeaturePackageStructure.getSourceFolderChildren(mainJava);
+		assertEquals(Set.of("de.ovgu.a"), labels(mainChildren));
+		assertEquals(mainJava, ((FeaturePackage) mainChildren.get(0)).getParent());
+
+		final FeaturePackageRoot mainResources = new FeaturePackageRoot(feature.getFolder("main/resources"), feature);
+		assertEquals(List.of(feature.getFolder("main/resources/META-INF")), FeaturePackageStructure.getSourceFolderChildren(mainResources));
+
+		// resources in the source folders are shown in their packages
+		final FeaturePackageRoot testJava = new FeaturePackageRoot(feature.getFolder("test/java"), feature);
+		final Object parent = FeaturePackageStructure.getParent(test, feature);
+		assertEquals(new FeaturePackage(null, testJava.getFolder(), feature.getFolder("test/java/de/ovgu/a")), parent);
+		assertEquals(testJava, ((FeaturePackage) parent).getParent());
+		assertEquals(feature, FeaturePackageStructure.getParent(feature.getFolder("test/java"), feature));
+		assertEquals(testJava, FeaturePackageStructure.getSourceFolder(test, feature));
+	}
+
+	@Test
+	public void sourceFoldersForTargetFolderSrcMain() throws CoreException {
+		// target folder src/main: the feature folders contain java and resources
+		createFile(feature, "java/de/ovgu/a/A.java");
+		createFile(feature, "java/Main.java");
+		createFile(feature, "resources/app.properties");
+
+		assertEquals(Set.of("java", "resources"), labels(FeaturePackageStructure.getFeatureFolderChildren(feature)));
+
+		final FeaturePackageRoot java = new FeaturePackageRoot(feature.getFolder("java"), feature);
+		assertEquals(Set.of("(default package)", "de.ovgu.a"), labels(FeaturePackageStructure.getPackageRootChildren(java, java.getFolder())));
+		assertEquals("java", java.getLabel());
+	}
+
+	@Test
+	public void javaSourceFolderForNewElements() throws CoreException {
+		// without Maven layout: the feature folder
+		assertEquals(feature, FeaturePackageStructure.getJavaSourceFolder(feature));
+
+		createFile(feature, "test/java/de/ATest.java");
+		createFile(feature, "main/resources/app.properties");
+		// main/java does not exist yet, but is on the level of the existing source folders
+		assertEquals(feature.getFolder("main/java"), FeaturePackageStructure.getJavaSourceFolder(feature));
+
+		createFile(feature, "main/java/de/A.java");
+		assertEquals(feature.getFolder("main/java"), FeaturePackageStructure.getJavaSourceFolder(feature));
+	}
+
+	@Test
+	public void javaSourceFolderForNewElementsOnOtherLevels() throws CoreException {
+		createFile(feature, "src/test/java/de/ATest.java");
+		assertEquals(feature.getFolder("src/main/java"), FeaturePackageStructure.getJavaSourceFolder(feature));
+
+		final IFolder other = project.getFolder("features/Other");
+		createFile(other, "resources/app.properties");
+		assertEquals(other.getFolder("java"), FeaturePackageStructure.getJavaSourceFolder(other));
+	}
+
+	@Test
+	public void javaAndTestSourceFolders() throws CoreException {
+		createFile(feature, "test/java/de/ATest.java");
+		createFile(feature, "test/resources/test.properties");
+
+		assertTrue(FeaturePackageStructure.isJavaSourceFolder(new FeaturePackageRoot(feature.getFolder("test/java"), feature)));
+		assertTrue(!FeaturePackageStructure.isJavaSourceFolder(new FeaturePackageRoot(feature.getFolder("test/resources"), feature)));
+		assertNull(FeaturePackageStructure.getSourceFolder(feature.getFolder("test"), feature));
 	}
 
 	@Test

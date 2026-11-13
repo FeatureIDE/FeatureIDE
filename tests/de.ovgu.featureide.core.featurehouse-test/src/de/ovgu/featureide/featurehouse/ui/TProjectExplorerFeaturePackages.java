@@ -144,6 +144,27 @@ public class TProjectExplorerFeaturePackages {
 	}
 
 	@Test
+	public void mavenSourceFoldersForTargetFolderSrc() throws CoreException {
+		// the target folder of this project is src, so the feature folders contain main/java, test/java etc.
+		final IFolder feature = project.getFolder("features/MavenSrc");
+		createFile(feature, "main/java/de/b/B.java");
+		createFile(feature, "main/resources/app.properties");
+		final IFile test = createFile(feature, "test/java/de/b/BTest.java");
+		createFile(feature, "test/resources/test.properties");
+
+		assertEquals(Set.of("main/java", "main/resources", "test/java", "test/resources"), labels(children(feature)));
+		final FeaturePackageRoot testRoot = new FeaturePackageRoot(feature.getFolder("test/java"), feature);
+		assertEquals(Set.of("de.b"), labels(children(testRoot)));
+		assertEquals(new FeaturePackage(testRoot, testRoot.getFolder(), feature.getFolder("test/java/de/b")), contentProvider().getParent(test));
+
+		// resource folders show normal folders, no packages
+		createFile(feature, "main/resources/de/b/b.properties");
+		final FeaturePackageRoot resourcesRoot = new FeaturePackageRoot(feature.getFolder("main/resources"), feature);
+		assertEquals(Set.of("app.properties", "de"), labels(children(resourcesRoot)));
+		assertEquals(Set.of("b"), labels(children(feature.getFolder("main/resources/de"))));
+	}
+
+	@Test
 	public void newPackageAndClassAreInTheNewMenuOfFeatureContent() throws CoreException {
 		final IFolder feature = project.getFolder("features/Hello");
 		final IFile a = createFile(feature, "de/ovgu/a/A.java");
@@ -176,6 +197,21 @@ public class TProjectExplorerFeaturePackages {
 		assertLocation(maven.getFolder("src/main/java"), "", FeatureJavaLocation.of(maven));
 		assertLocation(maven.getFolder("src/main/java"), "", FeatureJavaLocation.of(maven.getFile("pom.xml")));
 		assertLocation(maven.getFolder("src/main/java"), "de.b", FeatureJavaLocation.of(maven.getFile("src/main/java/de/b/B.java")));
+
+		// main/java and test/java, e.g. for the target folder src
+		final IFolder mavenSrc = project.getFolder("features/MavenSrc");
+		createFile(mavenSrc, "main/java/de/b/B.java");
+		createFile(mavenSrc, "main/resources/app.properties");
+		createFile(mavenSrc, "test/java/de/b/BTest.java");
+		assertLocation(mavenSrc.getFolder("main/java"), "", FeatureJavaLocation.of(mavenSrc));
+		assertLocation(mavenSrc.getFolder("main/java"), "", FeatureJavaLocation.of(mavenSrc.getFile("main/resources/app.properties")));
+		// new classes next to a test are created in the test source folder
+		assertLocation(mavenSrc.getFolder("test/java"), "de.b", FeatureJavaLocation.of(mavenSrc.getFile("test/java/de/b/BTest.java")));
+		assertLocation(mavenSrc.getFolder("test/java"), "",
+				FeatureJavaLocation.of(new FeaturePackageRoot(mavenSrc.getFolder("test/java"), mavenSrc)));
+		// not in resource folders
+		assertLocation(mavenSrc.getFolder("main/java"), "",
+				FeatureJavaLocation.of(new FeaturePackageRoot(mavenSrc.getFolder("main/resources"), mavenSrc)));
 
 		// not in a feature folder
 		assertNull(FeatureJavaLocation.of(project.getFolder("features")));

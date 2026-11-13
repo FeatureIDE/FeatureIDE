@@ -33,13 +33,12 @@ import org.eclipse.jdt.core.JavaCore;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * A place for new Java packages and classes in a feature: a source folder (the feature folder or its <code>src/main/java</code>) and a package in it.
+ * A place for new Java packages and classes in a feature: a source folder (the feature folder or a Java source folder in it, such as
+ * <code>src/main/java</code>, <code>main/java</code>, <code>java</code> or <code>src/test/java</code>) and a package in it.
  *
  * @author Philipp Hehnle
  */
 public final class FeatureJavaLocation {
-
-	private static final String JAVA_SOURCE_FOLDER = "src/main/java";
 
 	private final IFolder featureFolder;
 	private final IContainer root;
@@ -65,14 +64,17 @@ public final class FeatureJavaLocation {
 				: new FeatureJavaLocation(featureFolder, featurePackage.getRoot(), featurePackage.isDefaultPackage() ? "" : featurePackage.getName());
 		} else if (element instanceof FeaturePackageRoot) {
 			final FeaturePackageRoot root = (FeaturePackageRoot) element;
-			return new FeatureJavaLocation(root.getFeatureFolder(), root.getFolder(), "");
+			// new Java elements are not created in resource folders, but in the main Java source folder
+			final IContainer folder =
+				FeaturePackageStructure.isJavaSourceFolder(root) ? root.getFolder() : FeaturePackageStructure.getJavaSourceFolder(root.getFeatureFolder());
+			return new FeatureJavaLocation(root.getFeatureFolder(), folder, "");
 		} else if (element instanceof IResource) {
 			final IResource resource = (IResource) element;
 			final IFolder featureFolder = FeatureFolders.getFeatureFolder(resource);
 			if (featureFolder == null) {
 				return null;
 			}
-			final IContainer root = getJavaSourceFolder(featureFolder);
+			final IContainer root = getJavaSourceFolder(featureFolder, resource);
 			final IContainer container = (resource instanceof IContainer) ? (IContainer) resource : resource.getParent();
 			return new FeatureJavaLocation(featureFolder, root, getPackageName(root, container));
 		}
@@ -80,10 +82,15 @@ public final class FeatureJavaLocation {
 	}
 
 	/**
-	 * @return <code>src/main/java</code> if the feature folder uses the Maven layout, otherwise the feature folder itself.
+	 * @return the Java source folder that contains the resource (e.g. <code>src/test/java</code> for a test class), otherwise the main Java source folder of
+	 *         the feature folder (see {@link FeaturePackageStructure#getJavaSourceFolder(IFolder)}).
 	 */
-	private static IContainer getJavaSourceFolder(IFolder featureFolder) {
-		return FeaturePackageStructure.getSourceFolders(featureFolder).isEmpty() ? featureFolder : featureFolder.getFolder(JAVA_SOURCE_FOLDER);
+	private static IContainer getJavaSourceFolder(IFolder featureFolder, IResource resource) {
+		final FeaturePackageRoot root = FeaturePackageStructure.getSourceFolder(resource, featureFolder);
+		if ((root != null) && FeaturePackageStructure.isJavaSourceFolder(root)) {
+			return root.getFolder();
+		}
+		return FeaturePackageStructure.getJavaSourceFolder(featureFolder);
 	}
 
 	/**

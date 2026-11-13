@@ -153,7 +153,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				if (composer.hasFeatureFolder() && isInFeatureFolder(folder)) {
 					if (folder.getParent().equals(featureProject.getSourceFolder())) {
 						getFeatureFolderColors(folder, elementColors, featureProject);
-						return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
+						return DrawImageForProjectExplorer.getFeatureFolderImage(elementColors.iterator().next());
 					} else if (isInSourceFolder(folder)) {
 						return DrawImageForProjectExplorer.getPackageImage();
 					}
@@ -490,7 +490,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 						// folder inSourceFolder but not SourceFolder itself
 						if (isInSourceFolder(folder) && folder.getParent().equals(featureProject.getSourceFolder())) {
-							return " " + folder.getName();
+							// the icon of feature folders contains the color of the feature, no space is needed for it
+							return folder.getName();
 						}
 					}
 

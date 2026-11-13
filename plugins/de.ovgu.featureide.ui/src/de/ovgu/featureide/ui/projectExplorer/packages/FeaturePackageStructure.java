@@ -41,18 +41,46 @@ import org.eclipse.jdt.core.JavaCore;
  * <p>
  * A feature folder is shown like a Java source folder: every folder that contains files is a package, named by its path relative to the feature folder,
  * e.g. <code>de.ovgu.example</code> for <code>de/ovgu/example</code>. As in the Package Explorer, folders whose names are not valid package names (e.g.
- * <code>de.ovgu</code> or <code>META-INF</code>) are no packages and are shown as normal folders, together with their content. If the feature folder uses the Maven layout, i.e. contains <code>src/main/java</code> or
- * <code>src/main/resources</code>, these folders are shown as {@link FeaturePackageRoot source folders} that contain the packages instead, and the folders
- * <code>src</code> and <code>main</code> are not shown as packages.
+ * <code>de.ovgu</code> or <code>META-INF</code>) are no packages and are shown as normal folders, together with their content.
+ * <p>
+ * If the feature folder uses the Maven layout, its source folders are shown as {@link FeaturePackageRoot source folders} that contain the packages instead.
+ * Depending on the target folder of the project (e.g. <code>src</code> or <code>src/main</code> instead of <code>src/main/java</code>), the feature folders
+ * contain the Maven source folders on different levels, see {@link #SOURCE_FOLDERS}: e.g. <code>src/main/java</code>, <code>main/java</code> or
+ * <code>java</code>, and the same for <code>test</code> and <code>resources</code>. The folders above the source folders (e.g. <code>src</code>,
+ * <code>main</code> or <code>test</code>) are not shown as packages, and not shown at all if they only contain source folders. Only the content of the
+ * Java source folders (e.g. <code>src/main/java</code>) is shown as packages; the content of the resource folders (e.g. <code>main/resources</code>) is
+ * shown as normal folders and files.
  *
  * @author Philipp Hehnle
  */
 public final class FeaturePackageStructure {
 
 	/**
-	 * Source folders inside a feature folder that are shown as {@link FeaturePackageRoot}s, relative to the feature folder.
+	 * Source folders inside a feature folder that are shown as {@link FeaturePackageRoot}s, relative to the feature folder. They cover the Maven layout for
+	 * the different target folders of a project:
+	 * <ul>
+	 * <li>the project folder as target: the feature folders contain <code>src/main/java</code>, <code>src/test/java</code>, ...</li>
+	 * <li><code>src</code> as target: the feature folders contain <code>main/java</code>, <code>test/java</code>, ...</li>
+	 * <li><code>src/main</code> as target: the feature folders contain <code>java</code> and <code>resources</code>.</li>
+	 * </ul>
+	 * The Java source folders come first, the main ones before the test ones and the higher levels before the lower ones; see
+	 * {@link #getJavaSourceFolder(IFolder)}.
 	 */
-	public static final List<IPath> SOURCE_FOLDERS = List.of(new Path("src/main/java"), new Path("src/main/resources"));
+	public static final List<IPath> SOURCE_FOLDERS = List.of( //
+			new Path("src/main/java"), new Path("main/java"), new Path("java"), //
+			new Path("src/test/java"), new Path("test/java"), //
+			new Path("src/main/resources"), new Path("main/resources"), new Path("resources"), //
+			new Path("src/test/resources"), new Path("test/resources"));
+
+	/**
+	 * The name of Java source folders, e.g. <code>src/main/java</code> or <code>test/java</code>.
+	 */
+	private static final String JAVA_FOLDER_NAME = "java";
+
+	/**
+	 * The name of the folder that contains the test source folders, e.g. <code>src/test</code> or <code>test</code>.
+	 */
+	private static final String TEST_FOLDER_NAME = "test";
 
 	/**
 	 * Files with these extensions in the root of a source folder belong to the default package. Other files are shown directly in the source folder.
@@ -73,6 +101,60 @@ public final class FeaturePackageStructure {
 			}
 		}
 		return roots;
+	}
+
+	/**
+	 * @return the source folder of the feature folder that contains the given resource (or is the resource), or <code>null</code> if the resource is not in
+	 *         a source folder.
+	 */
+	public static FeaturePackageRoot getSourceFolder(IResource resource, IFolder featureFolder) {
+		for (final FeaturePackageRoot root : getSourceFolders(featureFolder)) {
+			if (root.getFolder().getFullPath().isPrefixOf(resource.getFullPath())) {
+				return root;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return whether the source folder contains Java sources (e.g. <code>src/main/java</code> or <code>test/java</code>), not resources.
+	 */
+	public static boolean isJavaSourceFolder(FeaturePackageRoot root) {
+		return JAVA_FOLDER_NAME.equals(root.getFolder().getName());
+	}
+
+	/**
+	 * Determines the folder for new Java packages and classes that are not created in a specific source folder.
+	 *
+	 * @return the feature folder, if it does not use the Maven layout. Otherwise the existing main Java source folder (e.g. <code>main/java</code>). If it
+	 *         does not exist yet, the main Java source folder on the level of the existing source folders, e.g. <code>main/java</code> if the feature folder
+	 *         only contains <code>main/resources</code> or <code>test/java</code>.
+	 */
+	public static IContainer getJavaSourceFolder(IFolder featureFolder) {
+		final List<FeaturePackageRoot> roots = getSourceFolders(featureFolder);
+		if (roots.isEmpty()) {
+			return featureFolder;
+		}
+		final FeaturePackageRoot first = roots.get(0);
+		if (isJavaSourceFolder(first) && !isTestSourceFolder(first)) {
+			return first.getFolder();
+		}
+		final int level = first.getFolder().getFullPath().segmentCount() - featureFolder.getFullPath().segmentCount();
+		for (final IPath path : SOURCE_FOLDERS) {
+			if (path.segmentCount() == level) {
+				// the first source folder on each level is the main Java source folder
+				return featureFolder.getFolder(path);
+			}
+		}
+		return featureFolder.getFolder(SOURCE_FOLDERS.get(0));
+	}
+
+	/**
+	 * @return whether the source folder contains tests, e.g. <code>src/test/java</code> or <code>test/resources</code>.
+	 */
+	private static boolean isTestSourceFolder(FeaturePackageRoot root) {
+		final IPath path = root.getFolder().getFullPath().makeRelativeTo(root.getFeatureFolder().getFullPath());
+		return (path.segmentCount() >= 2) && TEST_FOLDER_NAME.equals(path.segment(path.segmentCount() - 2));
 	}
 
 	/**
@@ -104,6 +186,16 @@ public final class FeaturePackageStructure {
 		if (!roots.isEmpty()) {
 			children.removeIf(child -> (child instanceof IResource) && isCoveredBySourceFolders((IResource) child, roots));
 		}
+	}
+
+	/**
+	 * @return the nodes to show in the source folder: packages for Java source folders, the normal folders and files for resource folders.
+	 */
+	public static List<Object> getSourceFolderChildren(FeaturePackageRoot root) throws CoreException {
+		if (isJavaSourceFolder(root)) {
+			return getPackageRootChildren(root, root.getFolder());
+		}
+		return new ArrayList<>(List.of(root.getFolder().members()));
 	}
 
 	/**
@@ -197,6 +289,10 @@ public final class FeaturePackageStructure {
 		}
 		for (final FeaturePackageRoot root : roots) {
 			if (root.getFolder().getFullPath().isPrefixOf(resource.getFullPath()) && !root.getFolder().equals(resource)) {
+				if (!isJavaSourceFolder(root)) {
+					// resource folders show their content as normal folders and files
+					return root.getFolder().equals(resource.getParent()) ? root : null;
+				}
 				return getParentInPackageRoot(resource, root, root.getFolder());
 			}
 		}
