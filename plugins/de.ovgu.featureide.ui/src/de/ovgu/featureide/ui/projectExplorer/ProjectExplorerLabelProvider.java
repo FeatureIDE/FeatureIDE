@@ -50,6 +50,8 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
+import de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage;
+import de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot;
 
 /**
  * Label provider for projectExplorer - sets an image and a text before the files, folders and packages
@@ -73,6 +75,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
+		if (isFeaturePackageNode(element)) {
+			// labeled by the FeaturePackageLabelProvider
+			return null;
+		}
 		final Image superImage = super.getImage(element);
 		final Set<Integer> elementColors = new HashSet<Integer>();
 
@@ -385,6 +391,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 */
 	@Override
 	public StyledString getStyledText(Object element) {
+		if (isFeaturePackageNode(element)) {
+			// labeled by the FeaturePackageLabelProvider
+			return null;
+		}
 		final String content = getText(element);
 		if (content == null) {
 			return super.getStyledText(element);
@@ -555,6 +565,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		return null;
+	}
+
+	private static boolean isFeaturePackageNode(Object element) {
+		return (element instanceof FeaturePackage) || (element instanceof FeaturePackageRoot);
 	}
 
 	private boolean hasUnselectedColors(IComposerExtensionClass composer) {
