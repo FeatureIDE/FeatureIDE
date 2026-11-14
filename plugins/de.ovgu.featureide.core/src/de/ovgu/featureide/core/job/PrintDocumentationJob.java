@@ -30,6 +30,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.function.Predicate;
 
+import javax.tools.DocumentationTool;
+import javax.tools.ToolProvider;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -278,7 +281,15 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			System.arraycopy(args1, 0, javadocargs, defaultArguments + args0.length, args1.length);
 		}
 
-		com.sun.tools.javadoc.Main.execute(javadocargs);
+		// The JDK's own javadoc. Eclipse may run on a Java runtime without the jdk.javadoc module.
+		final DocumentationTool javadoc = ToolProvider.getSystemDocumentationTool();
+		if (javadoc == null) {
+			CorePlugin.getDefault().logError("Cannot build the documentation: Eclipse does not run on a JDK with javadoc (module jdk.javadoc).", null);
+			return;
+		}
+		if (javadoc.run(null, null, null, javadocargs) != 0) {
+			CorePlugin.getDefault().logWarning("javadoc reported errors while building the documentation in " + docOutput);
+		}
 		workMonitor.worked();
 
 		try {

@@ -90,10 +90,10 @@ public class LatexFormatTest {
 		final String main = formatMain.write(configExample).replace(System.lineSeparator(), "\n");
 		final String body = formatBody.write(configExample).replace(System.lineSeparator(), "\n");
 
-		// test the Tikz-Exporter
-		assertEquals(testHead, head);
-		assertEquals(testMain, main);
-		assertEquals(testBody, body);
+		// test the Tikz-Exporter (the reference files have CRLF line endings in Windows checkouts)
+		assertEquals(testHead.replace("\r\n", "\n"), head);
+		assertEquals(testMain.replace("\r\n", "\n"), main);
+		assertEquals(testBody.replace("\r\n", "\n"), body);
 	}
 
 }

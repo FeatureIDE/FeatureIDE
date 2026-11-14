@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -198,7 +197,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 		final ProblemList lastWarnings = new ProblemList();
 		try {
 			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-			SAXParserFactory.newInstance().newSAXParser().parse(new InputSource(new StringReader(source.toString())), new PositionalXMLHandler(doc));
+			SAXParsers.newSAXParser().parse(new InputSource(new StringReader(source.toString())), new PositionalXMLHandler(doc));
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
 		} catch (final SAXParseException e) {

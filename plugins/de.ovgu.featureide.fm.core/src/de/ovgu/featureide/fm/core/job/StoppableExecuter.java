@@ -105,12 +105,13 @@ class StoppableExecuter<T> extends Executer<T> {
 		stopInnerThread();
 	}
 
-	@SuppressWarnings("removal")
 	private void stopInnerThread() {
 		try {
 			synchronized (this) {
 				if (innerThread.isAlive()) {
-					innerThread.stop();
+					// Thread.stop() always throws an UnsupportedOperationException since Java 20,
+					// so the thread can only be asked to stop.
+					innerThread.interrupt();
 				}
 			}
 		} catch (final Exception e) {
@@ -137,6 +138,13 @@ class StoppableExecuter<T> extends Executer<T> {
 			}
 			if (innerThread.exception != null) {
 				throw innerThread.exception;
+			}
+			synchronized (this) {
+				if (canceled) {
+					// The method was still running when the timeout expired or it was canceled. A result it computed during the canceling time is discarded,
+					// so that a timeout always leads to no result.
+					return null;
+				}
 			}
 			return innerThread.result;
 		} catch (final InterruptedException e) {

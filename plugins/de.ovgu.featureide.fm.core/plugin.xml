@@ -47,11 +47,6 @@
             name="UVL">
       </fmFormat>
       <fmFormat
-            class="de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat"
-            id="de.ovgu.featureide.fm.core.format.VelvetFeatureModelFormat"
-            name="Velvet">
-      </fmFormat>
-      <fmFormat
             class="de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat"
             id="de.ovgu.featureide.fm.core.format.XmlFeatureModelFormat"
             name="XML">

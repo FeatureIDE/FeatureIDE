@@ -28,11 +28,15 @@ import java.util.Map;
 
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 
@@ -66,6 +70,16 @@ public class DrawImageForProjectExplorer {
 	private static Image WHITESPACE_IMAGE;
 
 	private final static Map<Integer, Image> COLOR_IMAGES = new HashMap<>();
+
+	/**
+	 * Size of the color marker in the icon of feature folders, at 100% zoom.
+	 */
+	private static final int FEATURE_COLOR_MARKER_SIZE = 7;
+
+	/**
+	 * Cache for the icons of feature folders, by color.
+	 */
+	private final static Map<Integer, Image> FEATURE_FOLDER_IMAGES = new HashMap<>();
 
 	public enum ExplorerObject {
 		JAVA_FILE(1), FOLDER(2), PACKAGE(3), FILE(4);
@@ -226,6 +240,42 @@ public class DrawImageForProjectExplorer {
 		final Image image = new Image(DEVICE, data);
 		images.put(hashCode, image);
 		return image;
+	}
+
+	/**
+	 * Returns the icon of a feature folder: the folder icon with a small marker in the color of the feature in its top right corner. Unlike
+	 * {@link #getFOPModuleImage(List)}, the icon has the size of a normal folder icon. Wider icons overlap the label in trees on Windows, where all icons are
+	 * drawn in a slot of the same size.
+	 *
+	 * @param color the color of the feature, see de.ovgu.featureide.fm.core.color.FeatureColor#getValue(); negative if the feature has no color.
+	 * @return the icon; the normal folder icon if the feature has no color.
+	 */
+	public static Image getFeatureFolderImage(int color) {
+		if ((color < 0) || (color >= NUMBER_OF_COLORS)) {
+			return FOLDER_IMAGE;
+		}
+		return FEATURE_FOLDER_IMAGES.computeIfAbsent(color, colorID -> {
+			final RGB rgb = ColorPalette.getColor(colorID, 0.4f).getRGB();
+			final ImageDescriptor marker = ImageDescriptor.createFromImageDataProvider(zoom -> createColorMarker(rgb, zoom));
+			return new DecorationOverlayIcon(FOLDER_IMAGE, marker, IDecoration.TOP_RIGHT).createImage();
+		});
+	}
+
+	/**
+	 * @return a square in the given color with a black border, scaled to the given zoom (e.g. 150 for 150%).
+	 */
+	private static ImageData createColorMarker(RGB color, int zoom) {
+		final int size = Math.max(3, (FEATURE_COLOR_MARKER_SIZE * zoom) / 100);
+		final ImageData data = new ImageData(size, size, 24, new PaletteData(0xFF0000, 0xFF00, 0xFF));
+		final int border = data.palette.getPixel(new RGB(0, 0, 0));
+		final int fill = data.palette.getPixel(color);
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				final boolean isBorder = (x == 0) || (y == 0) || (x == (size - 1)) || (y == (size - 1));
+				data.setPixel(x, y, isBorder ? border : fill);
+			}
+		}
+		return data;
 	}
 
 	/**

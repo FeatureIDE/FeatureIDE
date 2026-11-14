@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.ide,
+ org.eclipse.ui.navigator,
  org.eclipse.ui.editors,
  org.eclipse.gef,
  org.eclipse.jdt.core,
@@ -22,7 +23,7 @@ Require-Bundle: org.eclipse.core.expressions,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/FeatureIDEAnnotations.jar,
  .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
  de.ovgu.featureide,
@@ -38,6 +39,7 @@ Export-Package:
  de.ovgu.featureide.ui.handlers.base,
  de.ovgu.featureide.ui.perspective,
  de.ovgu.featureide.ui.projectExplorer,
+ de.ovgu.featureide.ui.projectExplorer.packages,
  de.ovgu.featureide.ui.properties,
  de.ovgu.featureide.ui.propertypage,
  de.ovgu.featureide.ui.quickfix,

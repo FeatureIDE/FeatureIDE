@@ -23,6 +23,25 @@
 				name="FeatureIDE Source File"
 				project="false">
 		</wizard>
+		<!-- Java packages and classes in feature folders, see the content "FeatureIDE Feature Packages" of the Project Explorer -->
+		<wizard
+				category="de.ovgu.featureide.ui.category"
+				class="de.ovgu.featureide.ui.projectExplorer.packages.NewFeaturePackageWizard"
+				icon="platform:/plugin/org.eclipse.jdt.ui/icons/full/etool16/newpack_wiz.png"
+				id="de.ovgu.featureide.ui.wizards.NewFeaturePackageWizard"
+				name="Package"
+				project="false">
+			<description>Create a Java package in a feature folder</description>
+		</wizard>
+		<wizard
+				category="de.ovgu.featureide.ui.category"
+				class="de.ovgu.featureide.ui.projectExplorer.packages.NewFeatureClassWizard"
+				icon="platform:/plugin/org.eclipse.jdt.ui/icons/full/etool16/newclass_wiz.png"
+				id="de.ovgu.featureide.ui.wizards.NewFeatureClassWizard"
+				name="Class"
+				project="false">
+			<description>Create a Java class in a package of a feature folder</description>
+		</wizard>
 		<wizard
 				category="de.ovgu.featureide.ui.category"
 				class="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
@@ -1373,6 +1392,13 @@
 	<extension
 			point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
+				class="de.ovgu.featureide.ui.projectExplorer.packages.FeatureFolderPropertyTester"
+				id="de.ovgu.featureide.ui.projectExplorer.featureFolderTester"
+				namespace="de.ovgu.featureide.ui.projectExplorer"
+				properties="isFeatureFolder,isInFeatureFolder"
+				type="org.eclipse.core.resources.IResource">
+		</propertyTester>
+		<propertyTester
 				class="de.ovgu.featureide.ui.properties.ComposerTester"
 				id="de.ovgu.featureide.fm.ui.propertytester.composer"
 				namespace="de.ovgu.featureide.fm.ui.properties"
@@ -1425,6 +1451,9 @@
 				<contentExtension
 						pattern="de.ovgu.featureide.ui.contentID">
 				</contentExtension>
+				<contentExtension
+						pattern="de.ovgu.featureide.ui.featurePackages">
+				</contentExtension>
 			</includes>
 		</viewerContentBinding>
 	</extension>
@@ -1451,6 +1480,138 @@
 				</or>
 			</triggerPoints>
 		</navigatorContent>
+		<!-- Shows the content of feature folders as packages, like the content of a Java source folder. -->
+		<navigatorContent
+				activeByDefault="true"
+				contentProvider="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageContentProvider"
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.featureide.ui.featurePackages"
+				labelProvider="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageLabelProvider"
+				name="FeatureIDE Feature Packages"
+				priority="highest">
+			<triggerPoints>
+				<or>
+					<instanceof
+							value="org.eclipse.core.resources.IFolder">
+					</instanceof>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot">
+					</instanceof>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage">
+					</instanceof>
+				</or>
+			</triggerPoints>
+			<possibleChildren>
+				<or>
+					<!-- Files in feature folders are children of packages; needed to compute their parent, e.g. to reveal them.
+					     Only files in feature folders: for other files, this extension would replace the Java content. -->
+					<and>
+						<instanceof
+								value="org.eclipse.core.resources.IFile">
+						</instanceof>
+						<test
+								forcePluginActivation="true"
+								property="de.ovgu.featureide.ui.projectExplorer.isInFeatureFolder">
+						</test>
+					</and>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot">
+					</instanceof>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage">
+					</instanceof>
+				</or>
+			</possibleChildren>
+			<override
+					policy="InvokeOnlyIfSuppressedExtAlsoVisibleAndActive"
+					suppressedExtensionId="org.eclipse.jdt.java.ui.javaContent">
+			</override>
+			<commonSorter
+					class="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageSorter"
+					id="de.ovgu.featureide.ui.featurePackages.sorter">
+				<parentExpression>
+					<or>
+						<instanceof
+								value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot">
+						</instanceof>
+						<instanceof
+								value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage">
+						</instanceof>
+						<and>
+							<instanceof
+									value="org.eclipse.core.resources.IFolder">
+							</instanceof>
+							<test
+									forcePluginActivation="true"
+									property="de.ovgu.featureide.ui.projectExplorer.isFeatureFolder">
+							</test>
+						</and>
+					</or>
+				</parentExpression>
+			</commonSorter>
+		</navigatorContent>
+		<!-- New > Package and New > Class on feature folders, their source folders, packages and files -->
+		<commonWizard
+				menuGroupId="org.eclipse.jdt.ui.java"
+				type="new"
+				wizardId="de.ovgu.featureide.ui.wizards.NewFeaturePackageWizard">
+			<enablement>
+				<or>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage">
+					</instanceof>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot">
+					</instanceof>
+					<and>
+						<instanceof
+								value="org.eclipse.core.resources.IResource">
+						</instanceof>
+						<or>
+							<test
+									forcePluginActivation="true"
+									property="de.ovgu.featureide.ui.projectExplorer.isFeatureFolder">
+							</test>
+							<test
+									forcePluginActivation="true"
+									property="de.ovgu.featureide.ui.projectExplorer.isInFeatureFolder">
+							</test>
+						</or>
+					</and>
+				</or>
+			</enablement>
+		</commonWizard>
+		<commonWizard
+				menuGroupId="org.eclipse.jdt.ui.java"
+				type="new"
+				wizardId="de.ovgu.featureide.ui.wizards.NewFeatureClassWizard">
+			<enablement>
+				<or>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackage">
+					</instanceof>
+					<instanceof
+							value="de.ovgu.featureide.ui.projectExplorer.packages.FeaturePackageRoot">
+					</instanceof>
+					<and>
+						<instanceof
+								value="org.eclipse.core.resources.IResource">
+						</instanceof>
+						<or>
+							<test
+									forcePluginActivation="true"
+									property="de.ovgu.featureide.ui.projectExplorer.isFeatureFolder">
+							</test>
+							<test
+									forcePluginActivation="true"
+									property="de.ovgu.featureide.ui.projectExplorer.isInFeatureFolder">
+							</test>
+						</or>
+					</and>
+				</or>
+			</enablement>
+		</commonWizard>
 		<commonWizard
 				menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
 				type="new"

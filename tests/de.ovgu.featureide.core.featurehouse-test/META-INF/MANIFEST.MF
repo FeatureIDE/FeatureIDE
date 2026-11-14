@@ -4,8 +4,9 @@ Bundle-Name: FeatureHouse Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse-test;singleton:=true
 Bundle-Version: 3.12.0.qualifier
 Fragment-Host: de.ovgu.featureide.core.featurehouse
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: University of Magdeburg
-Require-Bundle: org.junit
+Require-Bundle: org.junit,
+ org.eclipse.ui.navigator
 Import-Package: com.sun.tools.classfile
 Automatic-Module-Name: de.ovgu.featureide.core.featurehouse-test
